@@ -707,5 +707,6 @@
 	<modules>
 		<module>CIConfiguration</module>
 		<module>ontologies</module>
+		<module>ModuleTemplate</module>
 	</modules>
 </project>

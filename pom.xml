@@ -708,5 +708,6 @@
 		<module>CIConfiguration</module>
 		<module>ontologies</module>
 		<module>ModuleTemplate</module>
+		<module>microJIAC</module>
 	</modules>
 </project>

@@ -53,6 +53,17 @@
 			<organizationUrl>http://www.dai-labor.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>joachim</id>
+			<name>Joachim Fuchs</name>
+			<email>joachim.fuchs@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<build>
@@ -715,5 +726,6 @@
 		<module>ontologies</module>
 		<module>ModuleTemplate</module>
 		<module>microJIAC</module>
+		<module>agentCore</module>
 	</modules>
 </project>

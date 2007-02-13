@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://maven.apache.org/maven-1.x/plugins/faq/faq.xsd" title="Frequently Asked Questions" toplink="false">
+    <part id="general">
+        <title>General</title>
+        <faq id="whats-agentCore">
+            <question>What is agentCore?</question>
+            <answer>
+                <p>It provides basic building blocks for JIAC TNG, eg. agent life-cycle, etc.
+                </p>
+            </answer>
+        </faq>
+    </part>
+    <part id="how-to">
+        <title>How to use agentCore</title>
+        <faq id="how-use">
+            <question>How do I use agentCore?</question>
+            <answer>
+                <p>I just do not know.</p>
+            </answer>
+        </faq>
+    </part>
+</faqs>

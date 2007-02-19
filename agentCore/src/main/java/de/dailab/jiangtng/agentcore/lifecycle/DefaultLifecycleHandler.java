@@ -25,22 +25,17 @@ public class DefaultLifecycleHandler {
      * Indicates wether this <code>Lifecycle</code> may accept only transitions
      * following the state graph
      */
-    private boolean strict = false;
+    protected boolean strict = false;
     
     /**
      * The <code>Lifecycle</code>'s current state
      */
-    private LifecycleStates state = UNDEFINED;
+    protected LifecycleStates state = UNDEFINED;
     
     /**
      * The <code>Lifecycle</code> this handler takes care of
      */
     protected Lifecycle lifecycle = null;
-    
-    /**
-     * The callback for the case of a kill condition on this <code>Lifecycle</code>
-     */
-    protected KillListener killListener = null;
     
     /**
      * The list of registered <code>LifecycleListeners</code>
@@ -70,12 +65,6 @@ public class DefaultLifecycleHandler {
         this.lifecycle = lifecycle;
         this.strict = strict;
         
-        if (lifecycle instanceof KillListener) {
-            
-            this.killListener = (KillListener)lifecycle;
-            
-        }
-        
     }
 
     /**
@@ -88,30 +77,7 @@ public class DefaultLifecycleHandler {
         return state;
         
     }
-    
-    /**
-     * Setter for the killListener property. If the <code>Lifecycle</code> supplied
-     * to the constructor is a <code>KillListener</code>, the property is already
-     * set.
-     *
-     * @param killListener the listener
-     */
-    public void setKillListener(KillListener killListener) {
         
-        this.killListener = killListener;
-        
-    }
-    
-    /**
-     * Getter for the killListener property.
-     * @return the kill listener if set, null otherwise
-     */
-    public KillListener getKillListener() {
-        
-        return this.killListener;
-        
-    }
-    
     /**
      * Returns an anonymous lifecyle listener that allows the top most
      * listener in a hierarchy to receive lifecyle events from its 'grandchildren'
@@ -361,39 +327,7 @@ public class DefaultLifecycleHandler {
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, CLEANED_UP));
         
-    }
-    
-    /**
-     * The <code>Lifecycle</code> may wish to switch to VOID state if an error
-     * occurs. This method propagates the KILLED event to all registered
-     * <code>LifecycleListeners</code> and notifies the <code>KillListener</code>
-     * if set.
-     *
-     * @todo call lifecycle.cleanup()????
-     */
-    public void kill() {
-        
-        state = KILLED;
-        
-        // spawn a separate notification thread and return quickly to allow immediate recovery
-        (new Thread(new Runnable() {
-            
-            public void run() {
-                
-                if (killListener != null) {
-                    
-                    killListener.onKill(lifecycle);
-                    
-                }
-                
-                fireLifecycleEvent(
-                        new LifecycleEvent(lifecycle, KILLED));
-                
-            }
-            
-        })).start();
-        
-    }
+    }        
     
     /**
      * Allows for creating listener hierarchies.

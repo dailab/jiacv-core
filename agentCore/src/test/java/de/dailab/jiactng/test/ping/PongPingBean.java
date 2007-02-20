@@ -15,8 +15,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import de.dailab.jiangtng.agentcore.AAgentBean;
-import de.dailab.jiangtng.agentcore.knowledge.Tuple;
+import de.dailab.jiactng.agentcore.AAgentBean;
+import de.dailab.jiactng.agentcore.knowledge.Tuple;
 
 public class PongPingBean extends AAgentBean implements ActionListener {
 

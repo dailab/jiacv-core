@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 
-import de.dailab.jiangtng.agentcore.AAgentBean;
+import de.dailab.jiactng.agentcore.AAgentBean;
 
 public class MemoryMonitor extends AAgentBean implements ActionListener {
 

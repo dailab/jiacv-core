@@ -7,7 +7,6 @@
 package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
@@ -27,17 +26,17 @@ public class Agent extends AbstractLifecycle implements
     ApplicationContextAware, BeanNameAware, LifecycleListener, Runnable,
     InitializingBean {
 
-  private String                      agentName      = null;
+  private String                agentName = null;
 
-  private IMemory                     memory         = null;
+  private IMemory               memory    = null;
 
-  private ArrayList<AAgentBean>       adaptors       = null;
+  private ArrayList<AAgentBean> adaptors  = null;
 
-  private Thread                      myThread       = null;
+  private Thread                myThread  = null;
 
-  private Boolean                     syncObj        = Boolean.TRUE;
+  private Boolean               syncObj   = Boolean.TRUE;
 
-  private boolean                     active         = false;
+  private boolean               active    = false;
 
   public static void main(String[] args) {
     ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(

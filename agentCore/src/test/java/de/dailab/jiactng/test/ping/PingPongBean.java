@@ -7,6 +7,7 @@
 package de.dailab.jiactng.test.ping;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,12 +29,14 @@ public class PingPongBean extends AAgentBean implements ActionListener {
     System.err.println("### new PingPongBean created ");
   }
 
+  
   private void initGui() {
     JFrame jp = new JFrame();
     JPanel panel = new JPanel(new BorderLayout());
+    jp.setPreferredSize(new Dimension(200, 100));
     jp.add(panel);
 
-    JButton b = new JButton("Pong");
+    JButton b = new JButton("Ping");
     panel.add(b, BorderLayout.NORTH);
     b.addActionListener(this);
 
@@ -41,6 +44,7 @@ public class PingPongBean extends AAgentBean implements ActionListener {
     txt.setEditable(false);
     panel.add(txt, BorderLayout.SOUTH);
 
+    jp.pack();
     jp.setVisible(true);
   }
 
@@ -50,15 +54,17 @@ public class PingPongBean extends AAgentBean implements ActionListener {
 
   @Override
   public void execute() {
-    Tuple read = new Tuple("pong", null);
-    this.memory.out(read);
+    Tuple temp = new Tuple("pingpong.pong", null);
+    Tuple read = this.memory.test(temp);
     if (read != null) {
+      this.memory.in(read);
       txt.setText("read: " + read.getArg2());
+      System.err.println("PingBean read: " + read.getArg2());
     }
   }
 
   public void actionPerformed(ActionEvent e) {
-    this.memory.in(new Tuple("ping", "ping" + (count++)));
+    this.memory.out(new Tuple("pingpong.ping", "ping" + (count++)));
   }
 
 }

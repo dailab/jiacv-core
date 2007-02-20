@@ -7,6 +7,7 @@
 package de.dailab.jiactng.test.ping;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -31,6 +32,7 @@ public class PongPingBean extends AAgentBean implements ActionListener {
   private void initGui() {
     JFrame jp = new JFrame();
     JPanel panel = new JPanel(new BorderLayout());
+    jp.setPreferredSize(new Dimension(200,100));
     jp.add(panel);
 
     JButton b = new JButton("Pong");
@@ -41,6 +43,7 @@ public class PongPingBean extends AAgentBean implements ActionListener {
     txt.setEditable(false);
     panel.add(txt, BorderLayout.SOUTH);
 
+    jp.pack();
     jp.setVisible(true);
   }
 
@@ -50,14 +53,16 @@ public class PongPingBean extends AAgentBean implements ActionListener {
 
   @Override
   public void execute() {
-    Tuple read = new Tuple("ping", null);
-    this.memory.out(read);
+    Tuple temp = new Tuple("pingpong.ping", null);
+    Tuple read = this.memory.test(temp);
     if (read != null) {
+      this.memory.in(read);
       txt.setText("read: " + read.getArg2());
+      System.err.println("PongBean read: "+ read.getArg2());
     }
   }
 
   public void actionPerformed(ActionEvent e) {
-    this.memory.in(new Tuple("pong", "pong" + (count++)));
+    this.memory.out(new Tuple("pingpong.pong", "pong" + (count++)));
   }
 }

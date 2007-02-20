@@ -6,29 +6,28 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 
 public abstract class AAgentBean extends AbstractLifecycle implements
-    ApplicationContextAware, BeanNameAware {
+    BeanNameAware {
 
-  private ApplicationContext appContext = null;
+  protected Agent thisAgent = null;
+  
+  protected IMemory memory   = null;
 
-  protected IMemory          memory     = null;
+  protected String  beanName = null;
 
-  protected String           beanName   = null;
-
-  public void setApplicationContext(ApplicationContext arg0)
-      throws BeansException {
-    this.appContext = arg0;
-    memory = (IMemory) appContext.getBean("memory");
+  public void setThisAgent(Agent agent) {
+    this.thisAgent=agent;
   }
-
+  
+  public void setMemory(IMemory mem) {
+    this.memory = mem;
+  }
+  
   public abstract void execute();
 
   public void setBeanName(String arg0) {
@@ -43,11 +42,8 @@ public abstract class AAgentBean extends AbstractLifecycle implements
 
   public void doStop() {
   }
-  
+
   public void doCleanup() {
   }
 
-
-  
 }
-

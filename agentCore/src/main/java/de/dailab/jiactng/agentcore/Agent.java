@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -22,23 +23,24 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleListener;
 
 public class Agent extends AbstractLifecycle implements
-    ApplicationContextAware, BeanNameAware, LifecycleListener {
+    ApplicationContextAware, BeanNameAware, LifecycleListener, Runnable,
+    InitializingBean {
 
-  private String                agentName  = null;
+  private String                agentName = null;
 
-  private IMemory               memory     = null;
+  private IMemory               memory    = null;
 
-  private String                statePath  = null;
+  private ArrayList<AAgentBean> adaptors  = null;
 
-  private ArrayList<AAgentBean> adaptors   = null;
+  private Thread                myThread  = null;
 
-  private ApplicationContext    appContext = null;
+  private Boolean               syncObj   = Boolean.TRUE;
+
+  private boolean               active    = false;
 
   public static void main(String[] args) {
     ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(
         args[0]);
-
-    // Object memBean = appContext.getBean("memory");
   }
 
   public IMemory getMemory() {
@@ -55,32 +57,43 @@ public class Agent extends AbstractLifecycle implements
 
   public void setAdaptors(ArrayList adaptors) {
     this.adaptors = adaptors;
-    if (appContext != null) initAgent();
   }
 
   private void initAgent() {
-    memory.out(new Tuple("thisAgent.name", agentName));
+    this.memory.out(new Tuple("thisAgent.name", this.agentName));
     for (AAgentBean a : this.adaptors) {
+      a.setMemory(memory);
+      a.setThisAgent(this);
       if (a instanceof Lifecycle) a.addLifecycleListener(this);
-      memory.out(new Tuple(this.agentName + ".beans", a.beanName));
+      memory.out(new Tuple(createBeanPath(a.beanName) + ".name", a.beanName));
     }
     doInit();
-    memory.out(new Tuple("thisAgent.state", LifecycleStates.INITIALIZED
-        .toString()));
     doStart();
-    memory
-        .out(new Tuple("thisAgent.state", LifecycleStates.STARTED.toString()));
+  }
+
+  public void run() {
+    while (active) {
+      try {
+        synchronized (syncObj) {
+          syncObj.wait(1000);
+        }
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      for (AAgentBean a : this.adaptors) {
+        a.execute();
+      }
+
+    }
   }
 
   public void setApplicationContext(ApplicationContext arg0)
       throws BeansException {
-    appContext = arg0;
-    if (adaptors != null) initAgent();
   }
 
   public void setBeanName(String arg0) {
     this.agentName = arg0;
-    this.statePath = agentName + ".states.";
   }
 
   public void onEvent(LifecycleEvent evt) {
@@ -92,36 +105,70 @@ public class Agent extends AbstractLifecycle implements
   public void doCleanup() {
     for (AAgentBean a : this.adaptors) {
       a.doCleanup();
-      memory.out(new Tuple(this.statePath + a.beanName,
-          LifecycleStates.CLEANED_UP.toString()));
+      setBeanState(a.beanName, LifecycleStates.CLEANED_UP);
     }
+    updateState(LifecycleStates.CLEANED_UP);
   }
 
   @Override
   public void doInit() {
     for (AAgentBean a : this.adaptors) {
       a.doInit();
-      memory.out(new Tuple(this.statePath + a.beanName,
-          LifecycleStates.INITIALIZED.toString()));
+      setBeanState(a.beanName, LifecycleStates.INITIALIZED);
     }
+    updateState(LifecycleStates.INITIALIZED);
   }
 
   @Override
   public void doStart() {
     for (AAgentBean a : this.adaptors) {
       a.doStart();
-      memory.out(new Tuple(this.statePath + a.beanName, LifecycleStates.STARTED
-          .toString()));
+      setBeanState(a.beanName, LifecycleStates.STARTED);
     }
+    myThread = new Thread(this);
+    myThread.start();
+    active = true;
+    updateState(LifecycleStates.STARTED);
   }
 
   @Override
   public void doStop() {
+    active = false;
     for (AAgentBean a : this.adaptors) {
       a.doStop();
-      memory.out(new Tuple(this.statePath + a.beanName, LifecycleStates.STOPPED
-          .toString()));
+      setBeanState(a.beanName, LifecycleStates.STOPPED);
     }
+    updateState(LifecycleStates.STOPPED);
+  }
+
+  private void updateState(Lifecycle.LifecycleStates newState) {
+    if (memory.test(new Tuple("thisAgent.state", null)) != null) {
+      memory.in(new Tuple("thisAgent.state", null));
+    }
+    memory.out(new Tuple("thisAgent.state", newState.toString()));
+  }
+
+  public void afterPropertiesSet() throws Exception {
+    initAgent();
+  }
+
+  public void setBeanState(String beanName, LifecycleStates newState) {
+    String beanPath = createBeanPath(beanName) + ".state";
+    Tuple test = this.memory.test(new Tuple(beanPath, null));
+    if (test != null) {
+      this.memory.in(test);
+    }
+    this.memory.out(new Tuple(beanPath, newState.toString()));
+  }
+
+  public LifecycleStates getBeanState(String beanName) {
+    String beanPath = createBeanPath(beanName) + ".state";
+    Tuple test = this.memory.test(new Tuple(beanPath, null));
+    return LifecycleStates.valueOf(test.getArg2());
+  }
+
+  private String createBeanPath(String beanName) {
+    return "thisAgent.beans." + beanName;
   }
 
 }

@@ -32,4 +32,9 @@ public class Tuple {
   public void setArg2(String arg2) {
     this.arg2 = arg2;
   }
+
+  public String toString() {
+    return new StringBuffer("(").append(arg1).append(":").append(arg2).append(
+        ")").toString();
+  }
 }

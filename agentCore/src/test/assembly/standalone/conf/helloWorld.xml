@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for "example" DispatcherServlet.
+  -->
+<beans>
+
+  <bean name="HelloWorldAgent" class="de.dailab.jiactng.agentcore.Agent">
+    <property name="memory"><ref bean="memory"/></property>
+    <property name="adaptors">
+      <list>
+        <ref bean="helloBean"/>
+      </list>
+    </property>
+  </bean>
+
+  <!--bean name="Agent2" class="de.dailab.jiactng.agentcore.Agent">
+    <property name="memory"><ref bean="memory"/></property>
+    <property name="adaptors">
+      <list>
+        <ref bean="pongPing"/>
+      </list>
+    </property>
+  </bean-->
+
+  <bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
+    <!--property name="timeOut" value="-1"/-->
+  </bean>
+
+  <bean name="helloBean" class="de.dailab.jiactng.test.helloworld.HelloBean" singleton="false">
+  </bean>
+
+</beans>

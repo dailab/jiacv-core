@@ -1,23 +1,31 @@
 /*
  * Created on 20.02.2007
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 package de.dailab.jiactng.test.helloworld;
 
 import de.dailab.jiactng.agentcore.AAgentBean;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
+/**
+ * The HelloWorldBean. Simply prints Hello World and quits the agent afterwards.
+ * 
+ * @author Thomas Konnerth
+ */
 public class HelloBean extends AAgentBean {
 
-  @Override
+  /**
+   * Exection of the HelloWorld Example. Pretty simple.
+   * 
+   * @see de.dailab.jiactng.agentcore.AAgentBean#execute()
+   */
   public void execute() {
-    System.err.println("Hello World");
+    // print Hello world
+    System.out.println("Hello World");
+
     try {
+      // stop Agent
       thisAgent.stop();
     } catch (LifecycleException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 

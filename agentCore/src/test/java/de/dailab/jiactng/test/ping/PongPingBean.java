@@ -19,50 +19,76 @@ import javax.swing.JTextField;
 import de.dailab.jiactng.agentcore.AAgentBean;
 import de.dailab.jiactng.agentcore.knowledge.Tuple;
 
+/**
+ * One of the Beans for the local PingPong example. This bean creates a GUI
+ * which allows the user to send 'ping's. The execute-method of the bean tries
+ * to read a 'pong', and shows it in the GUI if successful.
+ * 
+ * @author Thomas Konnerth
+ */
 public class PongPingBean extends AAgentBean implements ActionListener {
 
-  private int        count = 0;
+  /**
+   * Counter for sent pings, used to distinguish the pings.
+   */
+  private int        count         = 0;
 
-  private JTextField txt   = null;
+  /**
+   * Textfield to show result of read pongs.
+   */
+  private JTextField pingTextfield = null;
 
-  public PongPingBean() {
-    System.err.println("### new PongPingBean created ");
-  }
-
+  /**
+   * Initialisation of GUI. Consists of a Button (to send pings) and a Textfield
+   * (to show Pongs)
+   */
   private void initGui() {
-    JFrame jp = new JFrame();
-    JPanel panel = new JPanel(new BorderLayout());
-    jp.setPreferredSize(new Dimension(200,100));
-    jp.add(panel);
+    JFrame pongFrame = new JFrame();
+    JPanel pongPanel = new JPanel(new BorderLayout());
+    pongFrame.setPreferredSize(new Dimension(200, 100));
+    pongFrame.add(pongPanel);
 
-    JButton b = new JButton("Pong");
-    panel.add(b, BorderLayout.NORTH);
-    b.addActionListener(this);
+    JButton pongButton = new JButton("Pong");
+    pongPanel.add(pongButton, BorderLayout.NORTH);
+    pongButton.addActionListener(this);
 
-    txt = new JTextField();
-    txt.setEditable(false);
-    panel.add(txt, BorderLayout.SOUTH);
+    pingTextfield = new JTextField();
+    pingTextfield.setEditable(false);
+    pongPanel.add(pingTextfield, BorderLayout.SOUTH);
 
-    jp.pack();
-    jp.setVisible(true);
+    pongFrame.pack();
+    pongFrame.setVisible(true);
   }
 
+  /**
+   * Initialisation of PongBean. Calls initGui.
+   * 
+   * @see de.dailab.jiactng.agentcore.AAgentBean#doInit()
+   */
   public void doInit() {
     initGui();
   }
 
-  @Override
+  /**
+   * Execution of the PongBean. Tries to read a ping and shows it in the GUI if
+   * successful.
+   * 
+   * @see de.dailab.jiactng.agentcore.AAgentBean#execute()
+   */
   public void execute() {
-    Tuple temp = new Tuple("pingpong.ping", null);
-    Tuple read = this.memory.test(temp);
+    // try to read ping with a template-tuple.
+    Tuple template = new Tuple("pingpongQueue.ping", null);
+    Tuple read = this.memory.test(template);
+
     if (read != null) {
+      // ping was found, so remove if from queue and write to textfield
       this.memory.in(read);
-      txt.setText("read: " + read.getArg2());
-      System.err.println("PongBean read: "+ read.getArg2());
+      pingTextfield.setText("read: " + read.getArg2());
     }
   }
 
   public void actionPerformed(ActionEvent e) {
-    this.memory.out(new Tuple("pingpong.pong", "pong" + (count++)));
+    // write 'pong' into queue
+    this.memory.out(new Tuple("pingpongQueue.pong", "pong_" + (count++)));
   }
 }

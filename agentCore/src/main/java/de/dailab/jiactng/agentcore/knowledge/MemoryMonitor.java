@@ -106,6 +106,11 @@ public class MemoryMonitor extends AAgentBean implements ActionListener,
     button.addActionListener(this);
     buttonpanel.add(button);
 
+    button = new JButton("Stop");
+    button.setActionCommand(STOP);
+    button.addActionListener(this);
+    buttonpanel.add(button);
+
     Tuple agent = memory.test(new Tuple("thisAgent.name", null));
     System.err.println("### got: " + agent);
 
@@ -132,13 +137,14 @@ public class MemoryMonitor extends AAgentBean implements ActionListener,
   }
 
   /**
-   * Stopping of the monitor. Stops the thread and destroys.
+   * Stopping of the monitor. Stops the thread and destroys frame.
    * 
    * @see de.dailab.jiactng.agentcore.AAgentBean#doStop()
    */
   public void doStop() {
     active = false;
     myThread = null;
+    frame.dispose();
   }
 
   /*

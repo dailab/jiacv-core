@@ -29,6 +29,11 @@ import de.dailab.jiactng.agentcore.knowledge.Tuple;
 public class PongPingBean extends AAgentBean implements ActionListener {
 
   /**
+   * Frame for the pongBean
+   */
+  private JFrame     pongFrame     = null;
+
+  /**
    * Counter for sent pings, used to distinguish the pings.
    */
   private int        count         = 0;
@@ -43,7 +48,7 @@ public class PongPingBean extends AAgentBean implements ActionListener {
    * (to show Pongs)
    */
   private void initGui() {
-    JFrame pongFrame = new JFrame();
+    pongFrame = new JFrame();
     JPanel pongPanel = new JPanel(new BorderLayout());
     pongFrame.setPreferredSize(new Dimension(200, 100));
     pongFrame.add(pongPanel);
@@ -67,6 +72,15 @@ public class PongPingBean extends AAgentBean implements ActionListener {
    */
   public void doInit() {
     initGui();
+  }
+
+  /**
+   * Stopping of PongBean. Disposes frame.
+   * 
+   * @see de.dailab.jiactng.agentcore.AAgentBean#doInit()
+   */
+  public void doStop() {
+    pongFrame.dispose();
   }
 
   /**

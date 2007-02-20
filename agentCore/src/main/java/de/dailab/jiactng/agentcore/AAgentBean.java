@@ -4,15 +4,15 @@
  * To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package de.dailab.jiangtng.agentcore;
+package de.dailab.jiactng.agentcore;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import de.dailab.jiangtng.agentcore.knowledge.IMemory;
-import de.dailab.jiangtng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.knowledge.IMemory;
+import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 
 public abstract class AAgentBean extends AbstractLifecycle implements
     ApplicationContextAware, BeanNameAware {

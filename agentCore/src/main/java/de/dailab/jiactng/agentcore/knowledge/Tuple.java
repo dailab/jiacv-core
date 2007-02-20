@@ -4,7 +4,7 @@
  * To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package de.dailab.jiangtng.agentcore.knowledge;
+package de.dailab.jiactng.agentcore.knowledge;
 
 public class Tuple {
 

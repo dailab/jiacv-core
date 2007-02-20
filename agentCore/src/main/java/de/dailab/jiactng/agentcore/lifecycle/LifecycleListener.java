@@ -1,4 +1,4 @@
-package de.dailab.jiangtng.agentcore.lifecycle;
+package de.dailab.jiactng.agentcore.lifecycle;
 
 /**
  * Basic listener for lifecycle events.

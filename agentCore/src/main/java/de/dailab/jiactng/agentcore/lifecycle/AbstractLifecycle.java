@@ -1,6 +1,6 @@
-package de.dailab.jiangtng.agentcore.lifecycle;
+package de.dailab.jiactng.agentcore.lifecycle;
 
-import de.dailab.jiangtng.agentcore.lifecycle.Lifecycle.LifecycleStates;
+import de.dailab.jiactng.agentcore.lifecycle.Lifecycle.LifecycleStates;
 
 /**
  * Abstract base class for <code>Lifecycle</code> implementations.

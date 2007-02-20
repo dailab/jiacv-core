@@ -1,4 +1,4 @@
-package de.dailab.jiangtng.agentcore.lifecycle;
+package de.dailab.jiactng.agentcore.lifecycle;
 
 /**
  * Callback interface that gets notified if a <code>Lifecycle</code> gets reset

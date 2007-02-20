@@ -6,7 +6,7 @@
   -->
 <beans>
 
-  <bean name="Agent" class="de.dailab.jiangtng.agentcore.Agent">
+  <bean name="Agent" class="de.dailab.jiactng.agentcore.Agent">
     <property name="memory"><ref bean="memory"/></property>
     <property name="adaptors">
       <list>
@@ -16,7 +16,7 @@
     </property>
   </bean>
 
-  <bean name="Agent2" class="de.dailab.jiangtng.agentcore.Agent">
+  <bean name="Agent2" class="de.dailab.jiactng.agentcore.Agent">
     <property name="memory"><ref bean="memory"/></property>
     <property name="adaptors">
       <list>
@@ -25,11 +25,11 @@
     </property>
   </bean>
 
-  <bean name="memory" class="de.dailab.jiangtng.agentcore.knowledge.Memory">
+  <bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory">
     <property name="timeOut" value="-1"/>
   </bean>
 
-  <bean name="monitor" class="de.dailab.jiangtng.agentcore.knowledge.MemoryMonitor">
+  <bean name="monitor" class="de.dailab.jiactng.agentcore.knowledge.MemoryMonitor">
   </bean>
 
   <bean name="pingPong" class="de.dailab.jiactng.test.ping.PingPongBean" singleton="false">
@@ -37,15 +37,5 @@
 
   <bean name="pongPing" class="de.dailab.jiactng.test.ping.PongPingBean" singleton="false">
   </bean>
-
-	<!--bean name="MyBean" class="simple.SimpleBean">
-	  <property name="text" value="Hello World"/>
-	  <property name="myMem"><ref bean="Memory"/></property>
-	</bean>
-
-	<bean name="MyOtherBean" class="simple.SimpleBean">
-	  <property name="text" value="Foo World"/>
-	  <property name="myMem"><ref bean="Memory"/></property>
-	</bean-->
 
 </beans>

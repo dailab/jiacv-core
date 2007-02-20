@@ -4,7 +4,7 @@
  * To change the template for this generated file go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-package de.dailab.jiangtng.agentcore;
+package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,12 +15,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import de.dailab.jiangtng.agentcore.knowledge.IMemory;
-import de.dailab.jiangtng.agentcore.knowledge.Tuple;
-import de.dailab.jiangtng.agentcore.lifecycle.Lifecycle;
-import de.dailab.jiangtng.agentcore.lifecycle.LifecycleEvent;
-import de.dailab.jiangtng.agentcore.lifecycle.LifecycleException;
-import de.dailab.jiangtng.agentcore.lifecycle.LifecycleListener;
+import de.dailab.jiactng.agentcore.knowledge.IMemory;
+import de.dailab.jiactng.agentcore.knowledge.Tuple;
+import de.dailab.jiactng.agentcore.lifecycle.Lifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleListener;
 
 public class Agent implements ApplicationContextAware, BeanNameAware,
     LifecycleListener {

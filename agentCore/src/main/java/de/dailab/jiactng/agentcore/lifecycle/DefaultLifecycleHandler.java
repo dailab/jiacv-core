@@ -1,8 +1,8 @@
-package de.dailab.jiangtng.agentcore.lifecycle;
+package de.dailab.jiactng.agentcore.lifecycle;
 
-import de.dailab.jiangtng.agentcore.lifecycle.Lifecycle;
-import de.dailab.jiangtng.agentcore.lifecycle.Lifecycle.LifecycleStates;
-import static de.dailab.jiangtng.agentcore.lifecycle.Lifecycle.LifecycleStates.*;
+import de.dailab.jiactng.agentcore.lifecycle.Lifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.Lifecycle.LifecycleStates;
+import static de.dailab.jiactng.agentcore.lifecycle.Lifecycle.LifecycleStates.*;
 
 import java.util.ArrayList;
 import java.util.List;

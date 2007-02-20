@@ -7,6 +7,7 @@
 package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanNameAware;
@@ -26,17 +27,17 @@ public class Agent extends AbstractLifecycle implements
     ApplicationContextAware, BeanNameAware, LifecycleListener, Runnable,
     InitializingBean {
 
-  private String                agentName = null;
+  private String                      agentName      = null;
 
-  private IMemory               memory    = null;
+  private IMemory                     memory         = null;
 
-  private ArrayList<AAgentBean> adaptors  = null;
+  private ArrayList<AAgentBean>       adaptors       = null;
 
-  private Thread                myThread  = null;
+  private Thread                      myThread       = null;
 
-  private Boolean               syncObj   = Boolean.TRUE;
+  private Boolean                     syncObj        = Boolean.TRUE;
 
-  private boolean               active    = false;
+  private boolean                     active         = false;
 
   public static void main(String[] args) {
     ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(
@@ -152,6 +153,11 @@ public class Agent extends AbstractLifecycle implements
     initAgent();
   }
 
+  public LifecycleStates getAgentState() {
+    return LifecycleStates.valueOf(memory.read(
+        new Tuple("thisAgent.state", null)).getArg2());
+  }
+
   public void setBeanState(String beanName, LifecycleStates newState) {
     String beanPath = createBeanPath(beanName) + ".state";
     Tuple test = this.memory.test(new Tuple(beanPath, null));
@@ -169,6 +175,10 @@ public class Agent extends AbstractLifecycle implements
 
   private String createBeanPath(String beanName) {
     return "thisAgent.beans." + beanName;
+  }
+
+  public String getAgentName() {
+    return this.agentName;
   }
 
 }

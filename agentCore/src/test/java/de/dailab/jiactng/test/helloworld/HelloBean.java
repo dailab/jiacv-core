@@ -20,7 +20,7 @@ public class HelloBean extends AAgentBean {
    */
   public void execute() {
     // print Hello world
-    System.out.println("Hello World");
+    System.out.println("Hello World from "+getBeanName());
 
     try {
       // stop Agent

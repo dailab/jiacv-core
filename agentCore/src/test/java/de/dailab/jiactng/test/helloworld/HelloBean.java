@@ -25,6 +25,7 @@ public class HelloBean extends AAgentBean {
     try {
       // stop Agent
       thisAgent.stop();
+      thisAgent.cleanup();
     } catch (LifecycleException e) {
       e.printStackTrace();
     }

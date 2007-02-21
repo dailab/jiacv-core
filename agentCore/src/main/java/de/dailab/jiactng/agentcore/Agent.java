@@ -20,6 +20,7 @@ import de.dailab.jiactng.agentcore.knowledge.Tuple;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.Lifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleListener;
 
 public class Agent extends AbstractLifecycle implements
@@ -82,9 +83,16 @@ public class Agent extends AbstractLifecycle implements
         e.printStackTrace();
       }
       for (AAgentBean a : this.adaptors) {
-        a.execute();
+        if (LifecycleStates.STARTED.equals(a.getState())) {
+          try {
+            a.execute();
+          } catch (Exception ex) {
+            ex.printStackTrace();
+            a.doStop();
+            setBeanState(a.beanName, LifecycleStates.STOPPED);
+          }
+        }
       }
-
     }
   }
 
@@ -104,39 +112,64 @@ public class Agent extends AbstractLifecycle implements
   @Override
   public void doCleanup() {
     for (AAgentBean a : this.adaptors) {
-      a.doCleanup();
+      try {
+        a.cleanup();
+      } catch (LifecycleException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
       setBeanState(a.beanName, LifecycleStates.CLEANED_UP);
     }
+    myThread = null;
     updateState(LifecycleStates.CLEANED_UP);
   }
 
   @Override
   public void doInit() {
     for (AAgentBean a : this.adaptors) {
-      a.doInit();
+      try {
+        a.init();
+      } catch (LifecycleException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
       setBeanState(a.beanName, LifecycleStates.INITIALIZED);
     }
+    myThread = new Thread(this);
     updateState(LifecycleStates.INITIALIZED);
   }
 
   @Override
   public void doStart() {
     for (AAgentBean a : this.adaptors) {
-      a.doStart();
+      try {
+        a.start();
+      } catch (LifecycleException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
       setBeanState(a.beanName, LifecycleStates.STARTED);
     }
-    myThread = new Thread(this);
+    synchronized (syncObj) {
+      active = true;
+    }
     myThread.start();
-    active = true;
     updateState(LifecycleStates.STARTED);
   }
 
   @Override
   public void doStop() {
-    active = false;
     for (AAgentBean a : this.adaptors) {
-      a.doStop();
+      try {
+        a.stop();
+      } catch (LifecycleException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
       setBeanState(a.beanName, LifecycleStates.STOPPED);
+    }
+    synchronized (syncObj) {
+      active = false;
     }
     updateState(LifecycleStates.STOPPED);
   }

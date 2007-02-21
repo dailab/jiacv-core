@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import de.dailab.jiactng.agentcore.AAgentBean;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
  * A monitor component that opens a window which shows the memory contens in a
@@ -111,10 +112,7 @@ public class MemoryMonitor extends AAgentBean implements ActionListener,
     button.addActionListener(this);
     buttonpanel.add(button);
 
-    Tuple agent = memory.test(new Tuple("thisAgent.name", null));
-    System.err.println("### got: " + agent);
-
-    tree = new KnowledgeTree(agent.getArg2());
+    tree = new KnowledgeTree(thisAgent.getAgentName());
     tree.setPreferredSize(new Dimension(800, 500));
 
     frame.add(buttonpanel, BorderLayout.NORTH);
@@ -189,7 +187,13 @@ public class MemoryMonitor extends AAgentBean implements ActionListener,
     } else if (e.getActionCommand().equals(GETMEMORY)) {
       updateMemoryTree();
     } else if (e.getActionCommand().equals(STOP)) {
-      thisAgent.doStop();
+      try {
+        thisAgent.stop();
+        thisAgent.cleanup();
+      } catch (LifecycleException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
     }
 
   }

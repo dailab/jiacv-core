@@ -8,11 +8,10 @@ package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
 
-import org.springframework.beans.BeansException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
@@ -23,21 +22,24 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleListener;
 
-public class Agent extends AbstractLifecycle implements
-    ApplicationContextAware, BeanNameAware, LifecycleListener, Runnable,
-    InitializingBean {
+public class Agent extends AbstractLifecycle implements BeanNameAware,
+    LifecycleListener, Runnable, InitializingBean {
 
-  private String                agentName = null;
+  
+  private Log agentLog = LogFactory.getLog(Agent.class);
+  
+  
+  private String                       agentName = null;
 
-  private IMemory               memory    = null;
+  private IMemory                      memory    = null;
 
   private ArrayList<AbstractAgentBean> adaptors  = null;
 
-  private Thread                myThread  = null;
+  private Thread                       myThread  = null;
 
-  private Boolean               syncObj   = Boolean.TRUE;
+  private Boolean                      syncObj   = Boolean.TRUE;
 
-  private boolean               active    = false;
+  private boolean                      active    = false;
 
   public static void main(String[] args) {
     ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(
@@ -96,10 +98,6 @@ public class Agent extends AbstractLifecycle implements
     }
   }
 
-  public void setApplicationContext(ApplicationContext arg0)
-      throws BeansException {
-  }
-
   public void setBeanName(String arg0) {
     this.agentName = arg0;
   }
@@ -111,67 +109,76 @@ public class Agent extends AbstractLifecycle implements
 
   @Override
   public void doCleanup() {
+    agentLog.warn("Cleaning Up Agent "+agentName+"...");
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.cleanup();
+        setBeanState(a.beanName, LifecycleStates.CLEANED_UP);
       } catch (LifecycleException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        handleBeanException(a, e, LifecycleStates.CLEANING_UP);
       }
-      setBeanState(a.beanName, LifecycleStates.CLEANED_UP);
     }
     myThread = null;
     updateState(LifecycleStates.CLEANED_UP);
+    agentLog.warn("  done");
   }
 
   @Override
   public void doInit() {
+    agentLog.warn("Initializing Agent "+agentName+"...");
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.init();
+        setBeanState(a.beanName, LifecycleStates.INITIALIZED);
       } catch (LifecycleException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        handleBeanException(a, e, LifecycleStates.INITIALIZING);
       }
-      setBeanState(a.beanName, LifecycleStates.INITIALIZED);
     }
     myThread = new Thread(this);
     updateState(LifecycleStates.INITIALIZED);
+    agentLog.warn("  done");
   }
 
   @Override
   public void doStart() {
+    agentLog.warn("Starting Agent "+agentName+"...");
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.start();
+        setBeanState(a.beanName, LifecycleStates.STARTED);
       } catch (LifecycleException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        handleBeanException(a, e, LifecycleStates.STARTING);
       }
-      setBeanState(a.beanName, LifecycleStates.STARTED);
     }
     synchronized (syncObj) {
       active = true;
     }
     myThread.start();
     updateState(LifecycleStates.STARTED);
+    agentLog.warn("  done");
   }
 
   @Override
   public void doStop() {
+    agentLog.warn("Stopping Agent "+agentName+"...");
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.stop();
+        setBeanState(a.beanName, LifecycleStates.STOPPED);
       } catch (LifecycleException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        handleBeanException(a, e, LifecycleStates.STOPPING);
       }
-      setBeanState(a.beanName, LifecycleStates.STOPPED);
     }
     synchronized (syncObj) {
       active = false;
     }
     updateState(LifecycleStates.STOPPED);
+    agentLog.warn("  done");
+  }
+
+  private void handleBeanException(AbstractAgentBean a, LifecycleException e,
+      LifecycleStates initializing) {
+    e.printStackTrace();
   }
 
   private void updateState(Lifecycle.LifecycleStates newState) {

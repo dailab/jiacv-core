@@ -105,21 +105,21 @@ public abstract class AbstractLifecycle implements Lifecycle {
     /**
      * Put your initialization code here.
      */
-    public abstract void doInit();
+    public abstract void doInit() throws LifecycleException ;
     
     /**
      * Put your start code here.
      */
-    public abstract void doStart();
+    public abstract void doStart() throws LifecycleException ;
     
     /**
      * Put your stop code here.
      */
-    public abstract void doStop();
+    public abstract void doStop() throws LifecycleException ;
     
     /**
      * Put your clean up code here.
      */
-    public abstract void doCleanup();
+    public abstract void doCleanup() throws LifecycleException ;
     
 }

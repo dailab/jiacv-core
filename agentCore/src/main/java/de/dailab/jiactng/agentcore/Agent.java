@@ -31,7 +31,7 @@ public class Agent extends AbstractLifecycle implements
 
   private IMemory               memory    = null;
 
-  private ArrayList<AAgentBean> adaptors  = null;
+  private ArrayList<AbstractAgentBean> adaptors  = null;
 
   private Thread                myThread  = null;
 
@@ -62,7 +62,7 @@ public class Agent extends AbstractLifecycle implements
 
   private void initAgent() {
     this.memory.out(new Tuple("thisAgent.name", this.agentName));
-    for (AAgentBean a : this.adaptors) {
+    for (AbstractAgentBean a : this.adaptors) {
       a.setMemory(memory);
       a.setThisAgent(this);
       if (a instanceof Lifecycle) a.addLifecycleListener(this);
@@ -82,7 +82,7 @@ public class Agent extends AbstractLifecycle implements
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      for (AAgentBean a : this.adaptors) {
+      for (AbstractAgentBean a : this.adaptors) {
         if (LifecycleStates.STARTED.equals(a.getState())) {
           try {
             a.execute();
@@ -111,7 +111,7 @@ public class Agent extends AbstractLifecycle implements
 
   @Override
   public void doCleanup() {
-    for (AAgentBean a : this.adaptors) {
+    for (AbstractAgentBean a : this.adaptors) {
       try {
         a.cleanup();
       } catch (LifecycleException e) {
@@ -126,7 +126,7 @@ public class Agent extends AbstractLifecycle implements
 
   @Override
   public void doInit() {
-    for (AAgentBean a : this.adaptors) {
+    for (AbstractAgentBean a : this.adaptors) {
       try {
         a.init();
       } catch (LifecycleException e) {
@@ -141,7 +141,7 @@ public class Agent extends AbstractLifecycle implements
 
   @Override
   public void doStart() {
-    for (AAgentBean a : this.adaptors) {
+    for (AbstractAgentBean a : this.adaptors) {
       try {
         a.start();
       } catch (LifecycleException e) {
@@ -159,7 +159,7 @@ public class Agent extends AbstractLifecycle implements
 
   @Override
   public void doStop() {
-    for (AAgentBean a : this.adaptors) {
+    for (AbstractAgentBean a : this.adaptors) {
       try {
         a.stop();
       } catch (LifecycleException e) {

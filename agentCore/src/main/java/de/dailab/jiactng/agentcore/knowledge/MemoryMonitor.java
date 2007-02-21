@@ -19,7 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import de.dailab.jiactng.agentcore.AAgentBean;
+import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
@@ -35,7 +35,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  * To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Generation - Code and Comments
  */
-public class MemoryMonitor extends AAgentBean implements ActionListener,
+public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
     Runnable {
 
   /**
@@ -81,7 +81,7 @@ public class MemoryMonitor extends AAgentBean implements ActionListener,
   /**
    * Initializes the GUI. Called by agent-lifecycle.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#doInit()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
    */
   public void doInit() {
     initGui();
@@ -126,7 +126,7 @@ public class MemoryMonitor extends AAgentBean implements ActionListener,
   /**
    * Starting of the monitor. Creates the thread and starts it.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#doStart()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doStart()
    */
   public void doStart() {
     myThread = new Thread(this);
@@ -137,7 +137,7 @@ public class MemoryMonitor extends AAgentBean implements ActionListener,
   /**
    * Stopping of the monitor. Stops the thread and destroys frame.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#doStop()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doStop()
    */
   public void doStop() {
     active = false;

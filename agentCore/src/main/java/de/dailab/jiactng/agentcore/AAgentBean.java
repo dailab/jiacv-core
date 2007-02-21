@@ -18,7 +18,7 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
  * 
  * @author Thomas Konnerth
  */
-public abstract class AAgentBean extends AbstractLifecycle implements
+public abstract class AbstractAgentBean extends AbstractLifecycle implements
     BeanNameAware {
 
   /**

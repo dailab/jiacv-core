@@ -1,21 +1,17 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
-import de.dailab.jiactng.agentcore.lifecycle.Lifecycle;
-import de.dailab.jiactng.agentcore.lifecycle.Lifecycle.LifecycleStates;
-import static de.dailab.jiactng.agentcore.lifecycle.Lifecycle.LifecycleStates.*;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Basic implementation for a default <code>LifecycleHandler</code>. It manages 
- * the propagation of lifecycle events on behalf of the managed <code>Lifecycle/code>.
- * The <code>Lifecycle</code> implementation may call <code>beforeXXX()</code>
+ * the propagation of lifecycle events on behalf of the managed <code>ILifecycle/code>.
+ * The <code>ILifecycle</code> implementation may call <code>beforeXXX()</code>
  * and <code>afterXXX()</code> when entering or leaving the lifecycle method 
  * <code>xxx()</code>.
- * The <i>kill</i> support is implemented in a way that calling <code>kill()</code>
- * sets the internal state to VOID and informs all registered lifecycle listeners 
- * and a <code>KillListener</code>, if it is set.
  *
  * @author Joachim Fuchs
  */
@@ -35,19 +31,19 @@ public class DefaultLifecycleHandler {
     /**
      * The <code>Lifecycle</code> this handler takes care of
      */
-    protected Lifecycle lifecycle = null;
+    protected ILifecycle lifecycle = null;
     
     /**
      * The list of registered <code>LifecycleListeners</code>
      */
-    protected List<LifecycleListener> listeners = new ArrayList<LifecycleListener>();
+    protected List<ILifecycleListener> listeners = new ArrayList<ILifecycleListener>();
     
     /**
      * Creates a new instance of DefaultLifecycleHandler
      *
      * @param lifecycle the <code>Lifecycle</code> this handler takes care of
      */
-    public DefaultLifecycleHandler(Lifecycle lifecycle) {
+    public DefaultLifecycleHandler(ILifecycle lifecycle) {
         
         this(lifecycle, false);
         
@@ -60,7 +56,7 @@ public class DefaultLifecycleHandler {
      * @param strict    determines wether this handler is suppposed to enforce
      *                  the lifecycle graph
      */
-    public DefaultLifecycleHandler(Lifecycle lifecycle, boolean strict) {
+    public DefaultLifecycleHandler(ILifecycle lifecycle, boolean strict) {
         
         this.lifecycle = lifecycle;
         this.strict = strict;
@@ -83,7 +79,7 @@ public class DefaultLifecycleHandler {
      * listener in a hierarchy to receive lifecyle events from its 'grandchildren'
      * @return a freshly created <code>LifecycleListener</code>
      */
-    public LifecycleListener createLifecycleListener() {
+    public ILifecycleListener createLifecycleListener() {
         
         return new AnonymousLifecycleListener(this);
         
@@ -99,7 +95,7 @@ public class DefaultLifecycleHandler {
         
         synchronized (listeners) {
             
-            for (LifecycleListener ll : listeners) {
+            for (ILifecycleListener ll : listeners) {
                 
                 // @todo fire event unblocking
                 ll.onEvent(evt);
@@ -116,7 +112,7 @@ public class DefaultLifecycleHandler {
      *
      * @param listener the <code>LifecycleListener</code> to add
      */
-    public void addLifecycleListener(LifecycleListener listener) {
+    public void addLifecycleListener(ILifecycleListener listener) {
         
         if (listener instanceof AnonymousLifecycleListener) {
             
@@ -143,7 +139,7 @@ public class DefaultLifecycleHandler {
      *
      * @param listener the <code>LifecycleListener</code> to remove
      */
-    public void removeLifecycleListener(LifecycleListener listener) {
+    public void removeLifecycleListener(ILifecycleListener listener) {
         
         if (listeners.contains(listener)) {
             
@@ -212,7 +208,7 @@ public class DefaultLifecycleHandler {
             
         }
         
-        state = Lifecycle.LifecycleStates.STARTING;
+        state = STARTING;
         
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, STARTING));
@@ -332,7 +328,7 @@ public class DefaultLifecycleHandler {
     /**
      * Allows for creating listener hierarchies.
      */
-    protected class AnonymousLifecycleListener implements LifecycleListener {
+    protected class AnonymousLifecycleListener implements ILifecycleListener {
         
         /**
          * The handler that created this listener. Required to make sure we 

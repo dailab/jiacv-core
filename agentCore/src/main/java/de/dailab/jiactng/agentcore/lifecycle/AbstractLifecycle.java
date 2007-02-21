@@ -1,14 +1,14 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
-import de.dailab.jiactng.agentcore.lifecycle.Lifecycle.LifecycleStates;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 
 /**
- * Abstract base class for <code>Lifecycle</code> implementations.
+ * Abstract base class for <code>ILifecycle</code> implementations.
  * <b>Not threadsafe</b>
  *
  * @author Joachim Fuchs
  */
-public abstract class AbstractLifecycle implements Lifecycle {
+public abstract class AbstractLifecycle implements ILifecycle {
     
     protected DefaultLifecycleHandler lifecycle = new DefaultLifecycleHandler(this);
     
@@ -84,13 +84,13 @@ public abstract class AbstractLifecycle implements Lifecycle {
         
     }
     
-    public void addLifecycleListener(LifecycleListener listener) {
+    public void addLifecycleListener(ILifecycleListener listener) {
         
         lifecycle.addLifecycleListener(listener);
         
     }
     
-    public void removeLifecycleListener(LifecycleListener listener) {
+    public void removeLifecycleListener(ILifecycleListener listener) {
         
         lifecycle.removeLifecycleListener(listener);
         

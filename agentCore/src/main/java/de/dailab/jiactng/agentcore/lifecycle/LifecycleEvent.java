@@ -1,12 +1,12 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
-import de.dailab.jiactng.agentcore.lifecycle.Lifecycle.LifecycleStates;
-import static de.dailab.jiactng.agentcore.lifecycle.Lifecycle.LifecycleStates.*;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.*;
 
 import java.util.EventObject;
 
 /**
- * Basic liefcycle event object.
+ * Basic lifecycle event object.
  *
  * @author Joachim Fuchs
  */
@@ -25,7 +25,7 @@ public class LifecycleEvent extends EventObject {
      * @param source the <code>Lifecycle</code> instance that this event 
      *               originates from
      */
-    public LifecycleEvent(Lifecycle source, LifecycleStates state) {
+    public LifecycleEvent(ILifecycle source, LifecycleStates state) {
         
         super(source);
         this.state = state;

@@ -3,10 +3,9 @@ package de.dailab.jiactng.agentcore.lifecycle;
 /**
  * Basic listener for lifecycle events.
  *
- * @deprecated
  * @author Joachim Fuchs
  */
-public interface LifecycleListener {
+public interface ILifecycleListener {
 
     /**
      * Delivers a <code>LifecycleEvent</code><br/>

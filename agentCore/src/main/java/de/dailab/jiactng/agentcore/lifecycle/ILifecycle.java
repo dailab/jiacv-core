@@ -3,10 +3,9 @@ package de.dailab.jiactng.agentcore.lifecycle;
 /**
  * Basic lifecycle interface.
  *
- * @deprecated
  * @author Joachim Fuchs
  */
-public interface Lifecycle {
+public interface ILifecycle {
 
     /**
      * The states a <code>Lifecycle</code> can have.
@@ -89,14 +88,14 @@ public interface Lifecycle {
      *
      * @param listener the <code>LifecycleListener</code> to add
      */
-    public void addLifecycleListener(LifecycleListener listener);
+    public void addLifecycleListener(ILifecycleListener listener);
 
     /**
      * Remove the specified <code>LifecycleListener</code>
      *
      * @param listener the <code>LifecycleListener</code> to remove
      */
-    public void removeLifecycleListener(LifecycleListener listener);
+    public void removeLifecycleListener(ILifecycleListener listener);
 
     /**
      * Returns the current lifecycle state.

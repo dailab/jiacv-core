@@ -3,7 +3,7 @@
  */
 package de.dailab.jiactng.test.helloworld;
 
-import de.dailab.jiactng.agentcore.AAgentBean;
+import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
@@ -11,12 +11,12 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  * 
  * @author Thomas Konnerth
  */
-public class HelloBean extends AAgentBean {
+public class HelloBean extends AbstractAgentBean {
 
   /**
    * Exection of the HelloWorld Example. Pretty simple.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#execute()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#execute()
    */
   public void execute() {
     // print Hello world

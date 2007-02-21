@@ -16,7 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import de.dailab.jiactng.agentcore.AAgentBean;
+import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.knowledge.Tuple;
 
 /**
@@ -26,7 +26,7 @@ import de.dailab.jiactng.agentcore.knowledge.Tuple;
  * 
  * @author Thomas Konnerth
  */
-public class PongPingBean extends AAgentBean implements ActionListener {
+public class PongPingBean extends AbstractAgentBean implements ActionListener {
 
   /**
    * Frame for the pongBean
@@ -68,7 +68,7 @@ public class PongPingBean extends AAgentBean implements ActionListener {
   /**
    * Initialisation of PongBean. Calls initGui.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#doInit()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
    */
   public void doInit() {
     initGui();
@@ -77,7 +77,7 @@ public class PongPingBean extends AAgentBean implements ActionListener {
   /**
    * Stopping of PongBean. Disposes frame.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#doInit()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
    */
   public void doStop() {
     pongFrame.dispose();
@@ -87,7 +87,7 @@ public class PongPingBean extends AAgentBean implements ActionListener {
    * Execution of the PongBean. Tries to read a ping and shows it in the GUI if
    * successful.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#execute()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#execute()
    */
   public void execute() {
     // try to read ping with a template-tuple.

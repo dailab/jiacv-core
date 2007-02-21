@@ -13,7 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import de.dailab.jiactng.agentcore.AAgentBean;
+import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.knowledge.Tuple;
 
 /**
@@ -23,7 +23,7 @@ import de.dailab.jiactng.agentcore.knowledge.Tuple;
  * 
  * @author Thomas Konnerth
  */
-public class PingPongBean extends AAgentBean implements ActionListener {
+public class PingPongBean extends AbstractAgentBean implements ActionListener {
 
   /**
    * Frame for the pingBean
@@ -65,7 +65,7 @@ public class PingPongBean extends AAgentBean implements ActionListener {
   /**
    * Initialisation of PingBean. Calls initGui.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#doInit()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
    */
   public void doInit() {
     initGui();
@@ -75,7 +75,7 @@ public class PingPongBean extends AAgentBean implements ActionListener {
    * Execution of the PingBean. Tries to read a pong and shows it in the GUI if
    * successful.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#execute()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#execute()
    */
   public void execute() {
     // try to read pong with a template-tuple.
@@ -92,7 +92,7 @@ public class PingPongBean extends AAgentBean implements ActionListener {
   /**
    * Stopping of PingBean. Disposes frame.
    * 
-   * @see de.dailab.jiactng.agentcore.AAgentBean#doInit()
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
    */
   public void doStop() {
     pingFrame.dispose();

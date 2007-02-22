@@ -24,7 +24,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
   /**
    * Reference to the agent that holds this bean.
    */
-  protected Agent   thisAgent = null;
+  protected IAgent  thisAgent = null;
 
   /**
    * Reference to the memory of the agent that holds this bean.
@@ -43,7 +43,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * @param agent
    *          the agent-class that controls this bean.
    */
-  public final void setThisAgent(Agent agent) {
+  public final void setThisAgent(IAgent agent) {
     this.thisAgent = agent;
   }
 

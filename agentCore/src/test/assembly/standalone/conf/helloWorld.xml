@@ -6,7 +6,18 @@
   -->
 <beans>
 
-  <bean name="HelloWorldAgent" class="de.dailab.jiactng.agentcore.Agent">
+  <bean name="myPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+    <property name="agents">
+      <list>
+        <ref bean="HelloWorldAgent1"/>
+        <ref bean="HelloWorldAgent2"/>
+        <ref bean="HelloWorldAgent3"/>
+      </list>
+    </property>
+  </bean>
+
+
+  <bean name="HelloWorldAgent1" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
     <property name="memory"><ref bean="memory"/></property>
     <property name="execution"><ref bean="simpleExecCycle"/></property>
     <property name="adaptors">
@@ -15,6 +26,26 @@
       </list>
     </property>
   </bean>
+  
+  <bean name="HelloWorldAgent2" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
+    <property name="memory"><ref bean="memory"/></property>
+    <property name="execution"><ref bean="simpleExecCycle"/></property>
+    <property name="adaptors">
+      <list>
+        <ref bean="helloBean"/>
+      </list>
+    </property>
+  </bean>
+  
+  <bean name="HelloWorldAgent3" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
+    <property name="memory"><ref bean="memory"/></property>
+    <property name="execution"><ref bean="simpleExecCycle"/></property>
+    <property name="adaptors">
+      <list>
+        <ref bean="helloBean"/>
+      </list>
+    </property>
+  </bean>    
 
   <!--bean name="Agent2" class="de.dailab.jiactng.agentcore.Agent">
     <property name="memory"><ref bean="memory"/></property>

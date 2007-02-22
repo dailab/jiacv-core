@@ -24,8 +24,8 @@ public class HelloBean extends AbstractAgentBean {
 
     try {
       // stop Agent
-      thisAgent.stop();
-      thisAgent.cleanup();
+      thisAgent.getAgentNode().stop();
+      thisAgent.getAgentNode().cleanup();
     } catch (LifecycleException e) {
       e.printStackTrace();
     }

@@ -26,7 +26,5 @@ public interface IExecutionCycle extends ILifecycle, Runnable {
    */
   public void doStep();
 
-  public Agent getAgent();
-
-  public void setAgent(Agent agent);
+  public void setAgent(IAgent agent);
 }

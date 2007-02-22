@@ -10,11 +10,14 @@ import java.util.Set;
 
 import org.sercho.masp.space.SimpleObjectSpace;
 
+import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+
 /**
  * @author Thomas Konnerth
  * @see de.dailab.jiangtng.agentcore.knowledge.Tuple
  */
-public class Memory implements IMemory {
+public class Memory extends AbstractLifecycle implements IMemory {
 
   private SimpleObjectSpace<Tuple> space   = new SimpleObjectSpace<Tuple>(
                                                "MySpace");
@@ -86,5 +89,29 @@ public class Memory implements IMemory {
     } else {
       this.timeOut = timeOut;
     }
+  }
+
+  @Override
+  public void doCleanup() throws LifecycleException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void doInit() throws LifecycleException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void doStart() throws LifecycleException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void doStop() throws LifecycleException {
+    // TODO Auto-generated method stub
+    
   }
 }

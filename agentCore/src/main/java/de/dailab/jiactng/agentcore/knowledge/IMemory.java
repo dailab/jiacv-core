@@ -8,7 +8,9 @@ package de.dailab.jiactng.agentcore.knowledge;
 
 import java.util.Set;
 
-public interface IMemory {
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
+
+public interface IMemory extends ILifecycle {
 
   /**
    * Writes a tuple to the Memory.

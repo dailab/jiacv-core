@@ -8,63 +8,77 @@ package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.knowledge.Tuple;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
-import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
-public class Agent extends AbstractLifecycle implements BeanNameAware,
-    ILifecycleListener, Runnable, InitializingBean {
+public class Agent extends AbstractLifecycle implements IAgent {
 
-  private ExecutorService              threadPool = null;
+  private IAgentNode                   agentNode = null;
 
-  private Log                          agentLog   = null;
+  private Log                          agentLog  = null;
 
-  private String                       agentName  = null;
+  private String                       agentName = null;
 
-  private IMemory                      memory     = null;
+  private IMemory                      memory    = null;
 
-  private ArrayList<AbstractAgentBean> adaptors   = null;
+  private ArrayList<AbstractAgentBean> adaptors  = null;
 
-  private Boolean                      syncObj    = Boolean.TRUE;
+  private Boolean                      syncObj   = Boolean.TRUE;
 
-  private boolean                      active     = false;
+  private boolean                      active    = false;
 
-  private IExecutionCycle              execution  = null;
+  private IExecutionCycle              execution = null;
 
   public static void main(String[] args) {
     ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(
         args[0]);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getMemory()
+   */
   public IMemory getMemory() {
     return memory;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setMemory(de.dailab.jiactng.agentcore.knowledge.IMemory)
+   */
   public void setMemory(IMemory memory) {
     this.memory = memory;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getAdaptors()
+   */
   public ArrayList<AbstractAgentBean> getAdaptors() {
     return adaptors;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setAdaptors(java.util.ArrayList)
+   */
   public void setAdaptors(ArrayList adaptors) {
     this.adaptors = adaptors;
   }
 
-  private void initAgent() {
+  protected void initAgent() {
     this.execution.setAgent(this);
     this.memory.out(new Tuple("thisAgent.name", this.agentName));
 
@@ -75,10 +89,15 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
       memory.out(new Tuple(createBeanPath(a.beanName) + ".name", a.beanName));
     }
 
-    doInit();
-    doStart();
+    // doInit();
+    // doStart();
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#run()
+   */
   public void run() {
     while (active) {
       try {
@@ -93,26 +112,34 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
+   */
   public void setBeanName(String arg0) {
     this.agentName = arg0;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#onEvent(de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent)
+   */
   public void onEvent(LifecycleEvent evt) {
     // TODO Auto-generated method stub
 
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#doCleanup()
+   */
   @Override
-  public void doCleanup() {
-    agentLog.warn("Cleaning Up Agent " + agentName + "...");
-
-    try {
-      execution.cleanup();
-      threadPool.shutdown();
-    } catch (LifecycleException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
+  public void doCleanup() throws LifecycleException {
+    this.memory.cleanup();
+    this.execution.cleanup();
 
     for (AbstractAgentBean a : this.adaptors) {
       try {
@@ -123,25 +150,30 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
       }
     }
     updateState(LifecycleStates.CLEANED_UP);
-    agentLog.warn("  done");
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#doInit()
+   */
   @Override
-  public void doInit() {
-    threadPool = Executors.newCachedThreadPool();
-    agentLog = LogFactory.getLog("Agent:" + agentName);
-    agentLog.warn("Initializing Agent " + agentName + "...");
+  public void doInit() throws LifecycleException {
+    this.agentLog = agentNode.getLog(this);
 
-    try {
-      execution.init();
-    } catch (LifecycleException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
+    this.memory.init();
+    this.memory.out(new Tuple("thisAgent.name", this.agentName));
+
+    this.execution.setAgent(this);
+    this.execution.init();
 
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.init();
+        a.setMemory(memory);
+        a.setThisAgent(this);
+        if (a instanceof ILifecycle) a.addLifecycleListener(this);
+        memory.out(new Tuple(createBeanPath(a.beanName) + ".name", a.beanName));
         setBeanState(a.beanName, LifecycleStates.INITIALIZED);
       } catch (LifecycleException e) {
         handleBeanException(a, e, LifecycleStates.INITIALIZING);
@@ -149,19 +181,18 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     }
 
     updateState(LifecycleStates.INITIALIZED);
-    agentLog.warn("  done");
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#doStart()
+   */
   @Override
-  public void doStart() {
-    agentLog.warn("Starting Agent " + agentName + "...");
+  public void doStart() throws LifecycleException {
 
-    try {
-      execution.start();
-    } catch (LifecycleException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
+    this.memory.start();
+    this.execution.start();
 
     for (AbstractAgentBean a : this.adaptors) {
       try {
@@ -175,21 +206,19 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     synchronized (syncObj) {
       active = true;
     }
-    threadPool.execute(this);
     updateState(LifecycleStates.STARTED);
-    agentLog.warn("  done");
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#doStop()
+   */
   @Override
-  public void doStop() {
-    agentLog.warn("Stopping Agent " + agentName + "...");
+  public void doStop() throws LifecycleException {
 
-    try {
-      execution.stop();
-    } catch (LifecycleException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
+    this.memory.stop();
+    this.execution.stop();
 
     for (AbstractAgentBean a : this.adaptors) {
       try {
@@ -203,7 +232,6 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
       active = false;
     }
     updateState(LifecycleStates.STOPPED);
-    agentLog.warn("  done");
   }
 
   private void handleBeanException(AbstractAgentBean a, LifecycleException e,
@@ -218,15 +246,31 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     memory.out(new Tuple("thisAgent.state", newState.toString()));
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#afterPropertiesSet()
+   */
   public void afterPropertiesSet() throws Exception {
-    initAgent();
+    // initAgent();
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getAgentState()
+   */
   public LifecycleStates getAgentState() {
     return LifecycleStates.valueOf(memory.read(
         new Tuple("thisAgent.state", null)).getArg2());
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setBeanState(java.lang.String,
+   *      de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates)
+   */
   public void setBeanState(String beanName, LifecycleStates newState) {
     String beanPath = createBeanPath(beanName) + ".state";
     Tuple test = this.memory.test(new Tuple(beanPath, null));
@@ -236,6 +280,11 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     this.memory.out(new Tuple(beanPath, newState.toString()));
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getBeanState(java.lang.String)
+   */
   public LifecycleStates getBeanState(String beanName) {
     String beanPath = createBeanPath(beanName) + ".state";
     Tuple test = this.memory.test(new Tuple(beanPath, null));
@@ -246,20 +295,80 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     return "thisAgent.beans." + beanName;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getAgentName()
+   */
   public String getAgentName() {
     return this.agentName;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getThreadPool()
+   */
   public ExecutorService getThreadPool() {
-    return threadPool;
+    return agentNode.getThreadPool();
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getExecution()
+   */
   public IExecutionCycle getExecution() {
     return execution;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setExecution(de.dailab.jiactng.agentcore.IExecutionCycle)
+   */
   public void setExecution(IExecutionCycle execution) {
     this.execution = execution;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getAgentNode()
+   */
+  public IAgentNode getAgentNode() {
+    return agentNode;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getName()
+   */
+  public String getName() {
+    return agentName;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setAgentNode(de.dailab.jiactng.agentcore.IAgentNode)
+   */
+  public void setAgentNode(IAgentNode agentNode) {
+    this.agentNode = agentNode;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setName(java.lang.String)
+   */
+  public void setName(String name) {
+    // TODO Auto-generated method stub
+
+  }
+
+  public Log getLog(AbstractAgentBean bean) {
+    return agentNode.getLog(this, bean);
+  }
 }

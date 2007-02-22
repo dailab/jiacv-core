@@ -22,7 +22,7 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements
    * the list is actualized only after each adaptor has been called once in a
    * cycle.
    */
-  private Agent   agent    = null;
+  private IAgent  agent    = null;
 
   /**
    * Synchronization flag for the thread. Used by the doStep method.
@@ -42,7 +42,7 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements
    *          the reference to the agent.
    */
   public SimpleExecutionCycle() {
-    //this.agent = agent;
+    // this.agent = agent;
   }
 
   /**
@@ -137,13 +137,7 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements
     }
   }
 
-  
-  public Agent getAgent() {
-    return agent;
-  }
-
-  
-  public void setAgent(Agent agent) {
+  public void setAgent(IAgent agent) {
     this.agent = agent;
   }
 

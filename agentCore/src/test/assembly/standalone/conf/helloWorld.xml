@@ -8,6 +8,7 @@
 
   <bean name="HelloWorldAgent" class="de.dailab.jiactng.agentcore.Agent">
     <property name="memory"><ref bean="memory"/></property>
+    <property name="execution"><ref bean="simpleExecCycle"/></property>
     <property name="adaptors">
       <list>
         <ref bean="helloBean"/>
@@ -29,6 +30,9 @@
   </bean>
 
   <bean name="helloBean" class="de.dailab.jiactng.test.helloworld.HelloBean" singleton="false">
+  </bean>
+
+  <bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false">
   </bean>
 
 </beans>

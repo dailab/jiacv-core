@@ -7,6 +7,8 @@
 package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,21 +27,21 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 public class Agent extends AbstractLifecycle implements BeanNameAware,
     ILifecycleListener, Runnable, InitializingBean {
 
-  private Log                          agentLog  = null;
+  private ExecutorService              threadPool = null;
 
-  private String                       agentName = null;
+  private Log                          agentLog   = null;
 
-  private IMemory                      memory    = null;
+  private String                       agentName  = null;
 
-  private ArrayList<AbstractAgentBean> adaptors  = null;
+  private IMemory                      memory     = null;
 
-  private Thread                       myThread  = null;
+  private ArrayList<AbstractAgentBean> adaptors   = null;
 
-  private Boolean                      syncObj   = Boolean.TRUE;
+  private Boolean                      syncObj    = Boolean.TRUE;
 
-  private boolean                      active    = false;
+  private boolean                      active     = false;
 
-  private IExecutionCycle              execCycle = null;
+  private IExecutionCycle              execution  = null;
 
   public static void main(String[] args) {
     ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(
@@ -63,14 +65,16 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
   }
 
   private void initAgent() {
-    this.execCycle = new SimpleExecutionCycle(this);
+    this.execution.setAgent(this);
     this.memory.out(new Tuple("thisAgent.name", this.agentName));
+
     for (AbstractAgentBean a : this.adaptors) {
       a.setMemory(memory);
       a.setThisAgent(this);
       if (a instanceof ILifecycle) a.addLifecycleListener(this);
       memory.out(new Tuple(createBeanPath(a.beanName) + ".name", a.beanName));
     }
+
     doInit();
     doStart();
   }
@@ -85,7 +89,7 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      execCycle.doStep();
+      execution.doStep();
     }
   }
 
@@ -103,7 +107,8 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     agentLog.warn("Cleaning Up Agent " + agentName + "...");
 
     try {
-      execCycle.cleanup();
+      execution.cleanup();
+      threadPool.shutdown();
     } catch (LifecycleException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();
@@ -117,18 +122,18 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
         handleBeanException(a, e, LifecycleStates.CLEANING_UP);
       }
     }
-    myThread = null;
     updateState(LifecycleStates.CLEANED_UP);
     agentLog.warn("  done");
   }
 
   @Override
   public void doInit() {
+    threadPool = Executors.newCachedThreadPool();
     agentLog = LogFactory.getLog("Agent:" + agentName);
     agentLog.warn("Initializing Agent " + agentName + "...");
 
     try {
-      execCycle.init();
+      execution.init();
     } catch (LifecycleException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();
@@ -142,7 +147,7 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
         handleBeanException(a, e, LifecycleStates.INITIALIZING);
       }
     }
-    myThread = new Thread(this);
+
     updateState(LifecycleStates.INITIALIZED);
     agentLog.warn("  done");
   }
@@ -152,7 +157,7 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     agentLog.warn("Starting Agent " + agentName + "...");
 
     try {
-      execCycle.start();
+      execution.start();
     } catch (LifecycleException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();
@@ -166,10 +171,11 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
         handleBeanException(a, e, LifecycleStates.STARTING);
       }
     }
+
     synchronized (syncObj) {
       active = true;
     }
-    myThread.start();
+    threadPool.execute(this);
     updateState(LifecycleStates.STARTED);
     agentLog.warn("  done");
   }
@@ -179,7 +185,7 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     agentLog.warn("Stopping Agent " + agentName + "...");
 
     try {
-      execCycle.stop();
+      execution.stop();
     } catch (LifecycleException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();
@@ -242,6 +248,18 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
 
   public String getAgentName() {
     return this.agentName;
+  }
+
+  public ExecutorService getThreadPool() {
+    return threadPool;
+  }
+
+  public IExecutionCycle getExecution() {
+    return execution;
+  }
+
+  public void setExecution(IExecutionCycle execution) {
+    this.execution = execution;
   }
 
 }

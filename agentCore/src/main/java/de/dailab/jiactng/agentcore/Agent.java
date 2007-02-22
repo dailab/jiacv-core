@@ -17,18 +17,16 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.knowledge.Tuple;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
-import de.dailab.jiactng.agentcore.lifecycle.Lifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
-import de.dailab.jiactng.agentcore.lifecycle.LifecycleListener;
 
 public class Agent extends AbstractLifecycle implements BeanNameAware,
-    LifecycleListener, Runnable, InitializingBean {
+    ILifecycleListener, Runnable, InitializingBean {
 
-  
-  private Log agentLog = LogFactory.getLog(Agent.class);
-  
-  
+  private Log                          agentLog  = null;
+
   private String                       agentName = null;
 
   private IMemory                      memory    = null;
@@ -40,6 +38,8 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
   private Boolean                      syncObj   = Boolean.TRUE;
 
   private boolean                      active    = false;
+
+  private IExecutionCycle              execCycle = null;
 
   public static void main(String[] args) {
     ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(
@@ -54,7 +54,7 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     this.memory = memory;
   }
 
-  public ArrayList getAdaptors() {
+  public ArrayList<AbstractAgentBean> getAdaptors() {
     return adaptors;
   }
 
@@ -63,11 +63,12 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
   }
 
   private void initAgent() {
+    this.execCycle = new SimpleExecutionCycle(this);
     this.memory.out(new Tuple("thisAgent.name", this.agentName));
     for (AbstractAgentBean a : this.adaptors) {
       a.setMemory(memory);
       a.setThisAgent(this);
-      if (a instanceof Lifecycle) a.addLifecycleListener(this);
+      if (a instanceof ILifecycle) a.addLifecycleListener(this);
       memory.out(new Tuple(createBeanPath(a.beanName) + ".name", a.beanName));
     }
     doInit();
@@ -84,17 +85,7 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
         // TODO Auto-generated catch block
         e.printStackTrace();
       }
-      for (AbstractAgentBean a : this.adaptors) {
-        if (LifecycleStates.STARTED.equals(a.getState())) {
-          try {
-            a.execute();
-          } catch (Exception ex) {
-            ex.printStackTrace();
-            a.doStop();
-            setBeanState(a.beanName, LifecycleStates.STOPPED);
-          }
-        }
-      }
+      execCycle.doStep();
     }
   }
 
@@ -109,7 +100,15 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
 
   @Override
   public void doCleanup() {
-    agentLog.warn("Cleaning Up Agent "+agentName+"...");
+    agentLog.warn("Cleaning Up Agent " + agentName + "...");
+
+    try {
+      execCycle.cleanup();
+    } catch (LifecycleException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.cleanup();
@@ -125,7 +124,16 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
 
   @Override
   public void doInit() {
-    agentLog.warn("Initializing Agent "+agentName+"...");
+    agentLog = LogFactory.getLog("Agent:" + agentName);
+    agentLog.warn("Initializing Agent " + agentName + "...");
+
+    try {
+      execCycle.init();
+    } catch (LifecycleException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.init();
@@ -141,7 +149,15 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
 
   @Override
   public void doStart() {
-    agentLog.warn("Starting Agent "+agentName+"...");
+    agentLog.warn("Starting Agent " + agentName + "...");
+
+    try {
+      execCycle.start();
+    } catch (LifecycleException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.start();
@@ -160,7 +176,15 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
 
   @Override
   public void doStop() {
-    agentLog.warn("Stopping Agent "+agentName+"...");
+    agentLog.warn("Stopping Agent " + agentName + "...");
+
+    try {
+      execCycle.stop();
+    } catch (LifecycleException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+
     for (AbstractAgentBean a : this.adaptors) {
       try {
         a.stop();
@@ -181,7 +205,7 @@ public class Agent extends AbstractLifecycle implements BeanNameAware,
     e.printStackTrace();
   }
 
-  private void updateState(Lifecycle.LifecycleStates newState) {
+  private void updateState(ILifecycle.LifecycleStates newState) {
     if (memory.test(new Tuple("thisAgent.state", null)) != null) {
       memory.in(new Tuple("thisAgent.state", null));
     }

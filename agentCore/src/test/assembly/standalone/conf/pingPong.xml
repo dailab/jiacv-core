@@ -6,6 +6,14 @@
   -->
 <beans>
 
+  <bean name="myPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+    <property name="agents">
+      <list>
+        <ref bean="LocalPingPongAgent"/>
+      </list>
+    </property>
+  </bean>
+
   <bean name="LocalPingPongAgent" class="de.dailab.jiactng.agentcore.Agent">
     <property name="memory"><ref bean="memory"/></property>
     <property name="execution"><ref bean="simpleExecCycle"/></property>

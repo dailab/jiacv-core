@@ -188,8 +188,8 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
       updateMemoryTree();
     } else if (e.getActionCommand().equals(STOP)) {
       try {
-        thisAgent.stop();
-        thisAgent.cleanup();
+        thisAgent.getAgentNode().stop();
+        thisAgent.getAgentNode().cleanup();
       } catch (LifecycleException e1) {
         // TODO Auto-generated catch block
         e1.printStackTrace();

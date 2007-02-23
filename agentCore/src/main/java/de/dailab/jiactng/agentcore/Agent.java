@@ -169,9 +169,9 @@ public class Agent extends AbstractLifecycle implements IAgent {
 
     for (AbstractAgentBean a : this.adaptors) {
       try {
-        a.init();
         a.setMemory(memory);
         a.setThisAgent(this);
+        a.init();
         if (a instanceof ILifecycle) a.addLifecycleListener(this);
         memory.out(new Tuple(createBeanPath(a.beanName) + ".name", a.beanName));
         setBeanState(a.beanName, LifecycleStates.INITIALIZED);

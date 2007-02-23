@@ -6,8 +6,12 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.apache.commons.logging.Log;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -19,7 +23,7 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
-public class Agent extends AbstractLifecycle implements IAgent {
+public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
   private IAgentNode                   agentNode = null;
 
@@ -159,6 +163,16 @@ public class Agent extends AbstractLifecycle implements IAgent {
    */
   @Override
   public void doInit() throws LifecycleException {
+	//register agent as JMX resource
+	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+	try {
+	    ObjectName name = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name="+this.agentName);  
+	    mbs.registerMBean(this, name);
+	    System.out.println("Agent " + this.agentName + " registered as JMX resource.");
+	}
+	catch (Exception e) {e.printStackTrace();}
+		  
+	//initialize agent elements
     this.agentLog = agentNode.getLog(this);
 
     this.memory.init();
@@ -344,6 +358,7 @@ public class Agent extends AbstractLifecycle implements IAgent {
    * (non-Javadoc)
    * 
    * @see de.dailab.jiactng.agentcore.IAgent#getName()
+   * @see de.dailab.jiactng.agentcore.AgentMBean#getName()
    */
   public String getName() {
     return agentName;
@@ -370,5 +385,63 @@ public class Agent extends AbstractLifecycle implements IAgent {
 
   public Log getLog(AbstractAgentBean bean) {
     return agentNode.getLog(this, bean);
+  }
+  
+  /**
+   * @see de.dailab.jiactng.agentcore.AgentMBean#getAgentNodeUUID()
+   */
+  public String getAgentNodeUUID() {
+    return agentNode.getUUID();
+  }
+
+  /**
+   * @see de.dailab.jiactng.agentcore.AgentMBean#getLifecycleState()
+   */
+  public String getLifecycleState() {
+	  System.out.println("Get LifecycleState ...");
+	  switch(getState()) {
+	  case UNDEFINED:
+		  return "undefined";
+	  case INITIALIZING:
+		  return "initializing";
+	  case INITIALIZED:
+		  return "initialized";
+	  case STARTING:
+		  return "starting";
+	  case STARTED:
+		  return "started";
+	  case STOPPING:
+		  return "stopping";
+	  case STOPPED:
+		  return "stopped";
+	  case CLEANING_UP:
+		  return "cleaning up";
+	  case CLEANED_UP:
+		  return "cleaned up";
+	  default: 
+		  return "";
+	  }
+  }
+	
+  /**
+   * @see de.dailab.jiactng.agentcore.AgentMBean#setLifecycleState(de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates)
+   */
+  public void setLifecycleState(String state) {
+	  System.out.println("Set LifecycleState to " + state);
+	  try {
+		  if (state.equals("initialized")) {
+			  init();
+		  }
+		  else if (state.equals("started")) { 
+			  start();
+		  }
+		  else if (state.equals("stopped")) { 
+			  stop();
+		  }
+		  else if (state.equals("cleaned up")) { 
+			  cleanup();
+		  }
+	  }
+	  catch (LifecycleException e) {e.printStackTrace();}
   }
 }

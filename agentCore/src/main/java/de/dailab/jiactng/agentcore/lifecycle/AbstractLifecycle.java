@@ -1,6 +1,8 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
-import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
+import javax.management.AttributeChangeNotification;
+import javax.management.MBeanNotificationInfo;
+import javax.management.NotificationBroadcasterSupport;
 
 /**
  * Abstract base class for <code>ILifecycle</code> implementations.
@@ -8,7 +10,7 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
  *
  * @author Joachim Fuchs
  */
-public abstract class AbstractLifecycle implements ILifecycle {
+public abstract class AbstractLifecycle extends NotificationBroadcasterSupport implements ILifecycle {
     
     protected DefaultLifecycleHandler lifecycle = new DefaultLifecycleHandler(this);
     
@@ -102,6 +104,18 @@ public abstract class AbstractLifecycle implements ILifecycle {
         
     }
     
+    @Override 
+    public MBeanNotificationInfo[] getNotificationInfo() { 
+        String[] types = new String[] { 
+            AttributeChangeNotification.ATTRIBUTE_CHANGE 
+        }; 
+        String name = AttributeChangeNotification.class.getName(); 
+        String description = "An attribute of this MBean has changed"; 
+        MBeanNotificationInfo info = 
+            new MBeanNotificationInfo(types, name, description); 
+        return new MBeanNotificationInfo[] {info}; 
+    } 
+ 
     /**
      * Put your initialization code here.
      */

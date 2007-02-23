@@ -6,6 +6,10 @@ import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.*
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.AttributeChangeNotification;
+import javax.management.Notification;
+import javax.management.NotificationBroadcasterSupport;
+
 /**
  * Basic implementation for a default <code>LifecycleHandler</code>. It manages 
  * the propagation of lifecycle events on behalf of the managed <code>ILifecycle/code>.
@@ -38,6 +42,11 @@ public class DefaultLifecycleHandler {
      */
     protected List<ILifecycleListener> listeners = new ArrayList<ILifecycleListener>();
     
+    /**
+     * The number of the next notification.
+     */
+    private long sequenceNumber = 1; 
+
     /**
      * Creates a new instance of DefaultLifecycleHandler
      *
@@ -150,6 +159,27 @@ public class DefaultLifecycleHandler {
     }
     
     /**
+     * Uses JMX to send notifications that the attribute "LifecycleState" 
+     * of the managed lifecycle (e.g. agent) has been changed. 
+     * 
+     * @param oldState the old state of the lifecycle
+     * @param newState the new state of the lifecycle
+     */
+    protected void sendStateChangedNotification(String newState) {
+    	Notification n = 
+    		new AttributeChangeNotification(lifecycle, 
+    				sequenceNumber++, 
+				    System.currentTimeMillis(), 
+				    "LifecycleState changed", 
+				    "LifecycleState", 
+				    "java.lang.String", 
+				    "", 
+				    newState); 
+
+    	((NotificationBroadcasterSupport)lifecycle).sendNotification(n);
+    }
+
+    /**
      * Call this method when entering <code>init()</code>.
      * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
      */
@@ -166,6 +196,7 @@ public class DefaultLifecycleHandler {
         
         state = INITIALIZING;
         
+        sendStateChangedNotification("initializing");
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, INITIALIZING));
         
@@ -188,6 +219,7 @@ public class DefaultLifecycleHandler {
         
         state = INITIALIZED;
         
+        sendStateChangedNotification("initialized");
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, INITIALIZED));
         
@@ -210,6 +242,7 @@ public class DefaultLifecycleHandler {
         
         state = STARTING;
         
+        sendStateChangedNotification("starting");
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, STARTING));
         
@@ -232,6 +265,7 @@ public class DefaultLifecycleHandler {
         
         state = STARTED;
         
+        sendStateChangedNotification("started");
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, STARTED));
         
@@ -254,6 +288,7 @@ public class DefaultLifecycleHandler {
         
         state = STOPPING;
         
+        sendStateChangedNotification("stopping");
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, STOPPING));
         
@@ -276,6 +311,7 @@ public class DefaultLifecycleHandler {
         
         state = STOPPED;
         
+        sendStateChangedNotification("stopped");
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, STOPPED));
         
@@ -298,6 +334,7 @@ public class DefaultLifecycleHandler {
         
         state = CLEANING_UP;
         
+        sendStateChangedNotification("cleaning up");
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, CLEANING_UP));
         
@@ -320,6 +357,7 @@ public class DefaultLifecycleHandler {
         
         state = CLEANED_UP;
         
+        sendStateChangedNotification("cleaned up");
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, CLEANED_UP));
         

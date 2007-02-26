@@ -75,6 +75,17 @@
 			<organizationUrl>http://www.dai-labor.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>keiser</id>
+			<name>Jan Keiser</name>
+			<email>jan.keiser@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<build>

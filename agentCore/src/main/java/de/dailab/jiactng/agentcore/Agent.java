@@ -394,33 +394,4 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
     return agentNode.getUUID();
   }
 
-  /**
-   * @see de.dailab.jiactng.agentcore.AgentMBean#getLifecycleState()
-   */
-  public String getLifecycleState() {
-	  System.out.println("Get LifecycleState ...");
-	  return getState().toString();
-  }
-	
-  /**
-   * @see de.dailab.jiactng.agentcore.AgentMBean#setLifecycleState(de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates)
-   */
-  public void setLifecycleState(String state) {
-	  System.out.println("Set LifecycleState to " + state);
-	  try {
-		  if (state.equals("initialized")) {
-			  init();
-		  }
-		  else if (state.equals("started")) { 
-			  start();
-		  }
-		  else if (state.equals("stopped")) { 
-			  stop();
-		  }
-		  else if (state.equals("cleaned up")) { 
-			  cleanup();
-		  }
-	  }
-	  catch (LifecycleException e) {e.printStackTrace();}
-  }
 }

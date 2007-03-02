@@ -1,9 +1,13 @@
 package de.dailab.jiactng.agentcore;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,7 +22,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  * @author Joachim Fuchs
  */
 public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
-    InitializingBean {
+    InitializingBean, SimpleAgentNodeMBean {
 
   private ExecutorService   threadPool = null;
 
@@ -87,6 +91,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
   }
 
   public void doInit() {
+	//register agent node as JMX resource
+	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+	try {
+		ObjectName name = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name="+this.name);  
+		mbs.registerMBean(this, name);
+		System.out.println("Agent " + this.name + " registered as JMX resource.");
+	}
+	catch (Exception e) {e.printStackTrace();}
+			  
     log = LogFactory.getLog(getName());
     threadPool = Executors.newCachedThreadPool();
 

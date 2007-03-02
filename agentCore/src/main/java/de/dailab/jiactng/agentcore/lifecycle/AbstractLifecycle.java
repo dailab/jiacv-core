@@ -137,6 +137,14 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     }
 
     /**
+     * @see de.dailab.jiactng.agentcore.AgentMBean#getLifecycleState()
+     */
+    public String getLifecycleState() {
+  	  System.out.println("Get LifecycleState ...");
+  	  return getState().toString();
+    }
+  	
+    /**
      * Uses JMX to send notifications that the attribute "LifecycleState" 
      * of the managed lifecycle (e.g. agent) has been changed. 
      * 

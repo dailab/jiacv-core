@@ -26,14 +26,42 @@ public interface AgentMBean {
 	 */
 	public String getLifecycleState();
 	
-	/**
-	 * Setter for attribute "LifecycleState" of the managed agent.
-	 */
-	public void setLifecycleState(String state);
-
 	//public long getInitTime();
 	
 	//public long getStartTime();
 
 	//public String getOwner();
+
+	/**
+	 * Initializes the managed agent.
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * 
+     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#init()}
+	 */
+	public void init() throws Exception;
+
+	/**
+	 * Starts the managed agent.
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+	 *
+     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#start()}
+	 */
+	public void start() throws Exception;
+
+	/**
+	 * Stops the managed agent.
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * 
+     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#stop()}
+	 */
+	public void stop() throws Exception;
+
+	/**
+	 * Cleanes up the managed agent.
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * 
+     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#cleanup()}
+	 */
+	public void cleanup() throws Exception;
+
 }

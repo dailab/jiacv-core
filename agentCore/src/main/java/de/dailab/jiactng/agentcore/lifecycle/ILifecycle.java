@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.INITIALIZING;
+
 /**
  * Basic lifecycle interface.
  *
@@ -104,4 +106,11 @@ public interface ILifecycle {
      */
     public LifecycleStates getState();
 
+    /**
+     * Called when the lifecycle state has been changed.
+     * 
+     * @param oldState the old lifecycle state
+     * @param newState the new lifecycle state
+     */
+    public void stateChanged(LifecycleStates oldState, LifecycleStates newState);
 }

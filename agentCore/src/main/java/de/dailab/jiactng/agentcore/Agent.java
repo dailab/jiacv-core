@@ -399,28 +399,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
    */
   public String getLifecycleState() {
 	  System.out.println("Get LifecycleState ...");
-	  switch(getState()) {
-	  case UNDEFINED:
-		  return "undefined";
-	  case INITIALIZING:
-		  return "initializing";
-	  case INITIALIZED:
-		  return "initialized";
-	  case STARTING:
-		  return "starting";
-	  case STARTED:
-		  return "started";
-	  case STOPPING:
-		  return "stopping";
-	  case STOPPED:
-		  return "stopped";
-	  case CLEANING_UP:
-		  return "cleaning up";
-	  case CLEANED_UP:
-		  return "cleaned up";
-	  default: 
-		  return "";
-	  }
+	  return getState().toString();
   }
 	
   /**

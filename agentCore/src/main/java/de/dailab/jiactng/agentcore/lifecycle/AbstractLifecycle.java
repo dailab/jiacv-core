@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.lifecycle;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.MBeanNotificationInfo;
+import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 
 /**
@@ -13,9 +14,14 @@ import javax.management.NotificationBroadcasterSupport;
 public abstract class AbstractLifecycle extends NotificationBroadcasterSupport implements ILifecycle {
 
     /**
-     * The lifecycle handler that is used internally
+     * The lifecycle handler that is used internally.
      */
     protected DefaultLifecycleHandler lifecycle = new DefaultLifecycleHandler(this);
+
+    /**
+     * The number of the next JMX compliant notification.
+     */
+    protected long sequenceNumber = 1; 
 
     /**
      * You may override this method to change the lifecycle event propagation behavior.
@@ -128,6 +134,27 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 
         return lifecycle.getState();
 
+    }
+
+    /**
+     * Uses JMX to send notifications that the attribute "LifecycleState" 
+     * of the managed lifecycle (e.g. agent) has been changed. 
+     * 
+     * @param oldState the old state of the lifecycle
+     * @param newState the new state of the lifecycle
+     */
+    public void stateChanged(LifecycleStates oldState, LifecycleStates newState) {
+    	Notification n = 
+    		new AttributeChangeNotification(this, 
+    				sequenceNumber++, 
+				    System.currentTimeMillis(), 
+				    "LifecycleState changed", 
+				    "LifecycleState", 
+				    "java.lang.String", 
+				    oldState.toString(), 
+				    newState.toString()); 
+
+    	sendNotification(n);
     }
 
     @Override

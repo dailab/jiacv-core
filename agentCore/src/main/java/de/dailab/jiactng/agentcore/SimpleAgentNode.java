@@ -1,6 +1,8 @@
 package de.dailab.jiactng.agentcore;
 
 import java.lang.management.ManagementFactory;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,6 +81,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 
   public String getName() {
     return this.name;
+  }
+  
+  public String getHost() throws UnknownHostException {
+	return InetAddress.getLocalHost().toString();
+  }
+
+  public String getOwner() {
+	return System.getProperty("user.name");
   }
 
   public void setBeanName(String name) {

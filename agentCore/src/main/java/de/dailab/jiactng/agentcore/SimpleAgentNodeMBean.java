@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore;
 
+import java.net.UnknownHostException;
+
 /**
  * @author Jan Keiser
  *
@@ -16,7 +18,7 @@ public interface SimpleAgentNodeMBean {
 	 */
 	public String getUUID();
 
-	//public String getHost();
+	public String getHost() throws UnknownHostException;
 
 	//public Agent[] getAgents();
 
@@ -29,7 +31,7 @@ public interface SimpleAgentNodeMBean {
 	
 	//public long getStartTime();
 
-	//public String getOwner();
+	public String getOwner();
 	
 	//public String getJiacVersion();
 	

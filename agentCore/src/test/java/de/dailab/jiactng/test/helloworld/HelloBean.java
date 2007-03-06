@@ -21,14 +21,17 @@ public class HelloBean extends AbstractAgentBean {
   public void execute() {
     // print Hello world
     System.out.println("Hello World from "+getBeanName());
-
-    try {
-      // stop Agent
-      thisAgent.getAgentNode().stop();
-      thisAgent.getAgentNode().cleanup();
-    } catch (LifecycleException e) {
-      e.printStackTrace();
-    }
+while(true) {
+  ;
+}
+    
+//    try {
+//      // stop Agent
+//      thisAgent.getAgentNode().stop();
+//      thisAgent.getAgentNode().cleanup();
+//    } catch (LifecycleException e) {
+//      e.printStackTrace();
+//    }
 
   }
 

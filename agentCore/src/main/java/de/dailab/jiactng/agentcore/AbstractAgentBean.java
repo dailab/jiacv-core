@@ -6,8 +6,6 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import org.springframework.beans.factory.BeanNameAware;
-
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 
@@ -19,7 +17,7 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
  * @author Thomas Konnerth
  */
 public abstract class AbstractAgentBean extends AbstractLifecycle implements
-    BeanNameAware {
+    IAgentBean {
 
   /**
    * Reference to the agent that holds this bean.
@@ -37,33 +35,28 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    */
   protected String  beanName  = null;
 
-  /**
-   * Setter for the agent-reference to the agent that holds this bean.
+  /*
+   * (non-Javadoc)
    * 
-   * @param agent
-   *          the agent-class that controls this bean.
+   * @see de.dailab.jiactng.agentcore.IAgentBean#setThisAgent(de.dailab.jiactng.agentcore.IAgent)
    */
   public final void setThisAgent(IAgent agent) {
     this.thisAgent = agent;
   }
 
-  /**
-   * Setter for the memory of the agent that holds this bean.
+  /*
+   * (non-Javadoc)
    * 
-   * @param mem
-   *          the IMemory instance of the agent.
+   * @see de.dailab.jiactng.agentcore.IAgentBean#setMemory(de.dailab.jiactng.agentcore.knowledge.IMemory)
    */
   public final void setMemory(IMemory mem) {
     this.memory = mem;
   }
 
-  /**
-   * Setter for the beanName. This method is called by Spring during
-   * initialisation.
+  /*
+   * (non-Javadoc)
    * 
-   * @param name
-   *          the unqualified name of the bean.
-   * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+   * @see de.dailab.jiactng.agentcore.IAgentBean#setBeanName(java.lang.String)
    */
   public final void setBeanName(String name) {
     this.beanName = name;
@@ -76,8 +69,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * @return the qualified name of the bean.
    */
   public final String getBeanName() {
-    return new StringBuffer(thisAgent.getAgentName()).append(".").append(
-        beanName).toString();
+    return beanName;
+    // return new StringBuffer(thisAgent.getAgentName()).append(".").append(
+    // beanName).toString();
   }
 
   /*
@@ -112,10 +106,10 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
   public void doCleanup() {
   }
 
-  /**
-   * The stub for the execute method, that should be implemented by all beans.
-   * Note: this stub is likely to change, when the Sensor/Effector structure is
-   * implemented.
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgentBean#execute()
    */
   public abstract void execute();
 

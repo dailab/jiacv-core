@@ -7,6 +7,7 @@
 package de.dailab.jiactng.agentcore;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
  * A simple ExecutionCycle implementation. This class implements a round robin
@@ -45,17 +46,14 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements
     // this.agent = agent;
   }
 
-  /**
+  /*
    * This method triggers the execution of the next adaptor in the list. The
    * syncFlag is used to notify the Thread.
    * 
    * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStep()
+   * 
+   * public void doStep() { synchronized (syncFlag) { syncFlag.notify(); } }
    */
-  public void doStep() {
-    synchronized (syncFlag) {
-      syncFlag.notify();
-    }
-  }
 
   /**
    * Run-method for the execution cycle. The method iterates over the list of
@@ -68,22 +66,25 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements
    * @see de.dailab.jiactng.agentcore.IExecutionCycle#run()
    */
   public void run() {
-    while (active) {
-      for (AbstractAgentBean a : agent.getAdaptors()) {
+    if (active) {
+      for (IAgentBean a : agent.getAdaptors()) {
         if (LifecycleStates.STARTED.equals(a.getState())) {
           try {
-            synchronized (syncFlag) {
-              syncFlag.wait();
-            }
             a.execute();
           } catch (Exception ex) {
             ex.printStackTrace();
-            a.doStop();
+            try {
+              a.stop();
+            } catch (LifecycleException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
             // Agent.setBeanState(a.beanName, LifecycleStates.STOPPED);
           }
+          //throw new RuntimeException(((DummyBean)a).getTest());
         }
       }
-    }
+    } 
   }
 
   /**
@@ -121,7 +122,7 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements
   public void doStart() {
     synchronized (syncFlag) {
       active = true;
-      agent.getThreadPool().execute(this);
+      // agent.getThreadPool().execute(this);
     }
   }
 

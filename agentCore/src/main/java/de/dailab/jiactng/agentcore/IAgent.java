@@ -51,7 +51,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * 
    * @param adaptors
    */
-  public void setAdaptors(ArrayList adaptors);
+  public void setAdaptors(ArrayList<IAgentBean> adaptors);
 
   /**
    * Setter for the name of this agent. Used by Spring during initialisation.
@@ -81,7 +81,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * 
    * @return the lifelist of the adaptors.
    */
-  public ArrayList<AbstractAgentBean> getAdaptors();
+  public ArrayList<IAgentBean> getAdaptors();
 
   /**
    * Getter for the global threadpool responsivle for this agent. All threads
@@ -109,6 +109,6 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    *         the beanname.
    * @see org.apache.commons.logging.Log;
    */
-  public Log getLog(AbstractAgentBean bean);
+  public Log getLog(IAgentBean bean);
 
 }

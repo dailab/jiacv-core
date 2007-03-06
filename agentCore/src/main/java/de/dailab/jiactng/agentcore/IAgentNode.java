@@ -106,7 +106,7 @@ public interface IAgentNode extends ILifecycle, BeanNameAware {
    *         the beanname.
    * @see org.apache.commons.logging.Log;
    */
-  public Log getLog(IAgent agent, AbstractAgentBean bean);
+  public Log getLog(IAgent agent, IAgentBean bean);
 
   /**
    * Getter for the global threadpool for this agentnode. All threads should be

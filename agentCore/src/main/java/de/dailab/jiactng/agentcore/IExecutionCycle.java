@@ -24,7 +24,7 @@ public interface IExecutionCycle extends ILifecycle, Runnable {
   /**
    * This method triggers the execution of the next adaptor in the list.
    */
-  public void doStep();
+//  public void doStep();
 
   public void setAgent(IAgent agent);
 }

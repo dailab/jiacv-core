@@ -12,7 +12,7 @@ package de.dailab.jiactng.agentcore.knowledge;
  * 
  * @author Thomas Konnerth
  */
-public class Tuple {
+public class Tuple implements IFact {
 
   /**
    * First argument of the tuple.

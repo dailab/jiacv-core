@@ -5,13 +5,17 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
 /**
  * Abstract base class for <code>ILifecycle</code> implementations.
  * <b>Not threadsafe</b>
  *
  * @author Joachim Fuchs
  */
-public abstract class AbstractLifecycle extends NotificationBroadcasterSupport implements ILifecycle {
+public abstract class AbstractLifecycle extends NotificationBroadcasterSupport implements ILifecycle, ApplicationContextAware {
 
     /**
      * The lifecycle handler that is used internally.
@@ -22,6 +26,11 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * The number of the next JMX compliant notification.
      */
     protected long sequenceNumber = 1; 
+
+    /**
+     * Reference to the spring application context
+     */
+    protected ApplicationContext applicationContext = null;
 
     /**
      * You may override this method to change the lifecycle event propagation behavior.
@@ -177,6 +186,13 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
         return new MBeanNotificationInfo[] {info};
     }
 
+    /**
+     * @see org
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+  	  this.applicationContext = applicationContext;
+    }
+    
     /**
      * Put your initialization code here.
      */

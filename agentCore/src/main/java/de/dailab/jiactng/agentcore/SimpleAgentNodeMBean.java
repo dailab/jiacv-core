@@ -1,10 +1,13 @@
 package de.dailab.jiactng.agentcore;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 /**
+ * JMX compliant management interface of agent nodes to get information
+ * about them and to change their lifecycle states.
+ * 
  * @author Jan Keiser
- *
  */
 public interface SimpleAgentNodeMBean {
 
@@ -18,9 +21,21 @@ public interface SimpleAgentNodeMBean {
 	 */
 	public String getUUID();
 
+	/**
+	 * Getter for attribute "Host" of the managed agent node.
+	 */
 	public String getHost() throws UnknownHostException;
 
-	//public Agent[] getAgents();
+	/**
+	 * Getter for attribute "Agents" of the managed agent node.
+	 */
+	public ArrayList<String> getAgents();
+
+	/**
+	 * Deploys a new agent on this agent node.
+	 * @param name of the XML file which contains the spring configuration of the agent
+	 */
+	public void addAgent(String configFile);
 
 	/**
 	 * Getter for attribute "LifecycleState" of the managed agent node.
@@ -69,8 +84,6 @@ public interface SimpleAgentNodeMBean {
 	 */
 	public void cleanup() throws Exception;
 
-	//public void deployAgent(DeploymentDescriptor descriptor);
-	
 	//public void undeployAgent(Agent agent);
 	
 }

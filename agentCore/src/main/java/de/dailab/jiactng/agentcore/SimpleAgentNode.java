@@ -15,6 +15,7 @@ import javax.management.ObjectName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
@@ -144,12 +145,44 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
     return this.name;
   }
 
+  /**
+   * Returns the name of localhost.
+   * @return name of localhost
+   * 
+   * @see InetAddress#toString()
+   */
   public String getHost() throws UnknownHostException {
     return InetAddress.getLocalHost().toString();
   }
 
+  /**
+   * Returns the user's account name.
+   * @return user's account name
+   * 
+   * @see System#getProperties()
+   */
   public String getOwner() {
     return System.getProperty("user.name");
+  }
+
+  /**
+   * Returns the names of agents which reside on this agent node.
+   * @return list of agent names
+   */
+  public ArrayList<String> getAgents() {
+	  ArrayList<String> result = new ArrayList<String>();
+	  for (IAgent a : this.agents) {
+			  result.add(a.getAgentName());
+	  }
+	  return result;
+  }
+
+  /**
+   * Deploys a new agent on this agent node.
+   * @param name of the XML file which contains the spring configuration of the agent
+   */
+  public void addAgent(String configFile) {
+	  new ClassPathXmlApplicationContext(new String[]{configFile+".xml"}, applicationContext);
   }
 
   /*

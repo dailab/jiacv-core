@@ -8,6 +8,7 @@ package de.dailab.jiactng.agentcore;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -18,6 +19,8 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.commons.logging.Log;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
@@ -35,7 +38,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.IAgent
  */
-public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
+public class Agent extends AbstractLifecycle implements IAgent, InitializingBean, AgentMBean {
 
   /**
    * Reference to the agentnode that holds this agent.
@@ -82,7 +85,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
    * executionThread.
    */
   private Future                executionFuture = null;
-
+  
   /**
    * Main method for starting JIAC-TNG. Loads a spring-configuration file
    * denoted by the first argument and uses a ClassPathXmlApplicationContext to
@@ -361,15 +364,30 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
     memory.out(new Tuple("thisAgent.state", newState.toString()));
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Initialisation-method. This method is called by Spring after startup
+   * (through the InitializingBean-Interface) and is used to start the agent
+   * after all beans haven been instantiated by Spring. Currently only calls the
+   * init() and start()-methods from ILifefycle for this if the agent is deployed
+   * in a running agent node.
    * 
-   * @see de.dailab.jiactng.agentcore.IAgent#afterPropertiesSet()
+   * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */
   public void afterPropertiesSet() throws Exception {
-    // was used for starting the agent before agentnode existed. Could probably
-    // be used again if single agents should be started.
-    // initAgent();
+	  if (applicationContext != null) {
+		  ApplicationContext parent = applicationContext.getParent();
+		  if (parent != null) {
+			  Map agentNodes = parent.getBeansOfType(SimpleAgentNode.class);
+			  if (agentNodes.size() != 1) {
+				  System.out.println("ERROR: More than one agent node in parent context!");
+				  return;
+			  }
+			  agentNode = (IAgentNode)agentNodes.values().toArray()[0];
+			  agentNode.addAgent(this);
+			  init();
+			  start();			  
+		  }
+	  }
   }
 
   /*

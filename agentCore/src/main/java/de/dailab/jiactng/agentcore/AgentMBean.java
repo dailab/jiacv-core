@@ -1,8 +1,10 @@
 package de.dailab.jiactng.agentcore;
 
 /**
+ * JMX compliant management interface of agents to get information
+ * about them and to change their lifecycle states.
+ * 
  * @author Jan Keiser
- *
  */
 public interface AgentMBean {
 

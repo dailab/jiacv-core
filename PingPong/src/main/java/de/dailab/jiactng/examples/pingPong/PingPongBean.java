@@ -80,7 +80,7 @@ public class PingPongBean extends AbstractAgentBean implements ActionListener {
   public void execute() {
     // try to read pong with a template-tuple.
     Tuple template = new Tuple("pingpongQueue.pong", null);
-    Tuple read = this.memory.test(template);
+    Tuple read = (Tuple)this.memory.test(template);
 
     if (read != null) {
       // pong was found, so remove if from queue and write to textfield

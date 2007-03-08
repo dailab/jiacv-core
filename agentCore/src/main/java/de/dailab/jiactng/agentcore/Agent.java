@@ -382,7 +382,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
 	  if (applicationContext != null) {
 		  ApplicationContext parent = applicationContext.getParent();
 		  if (parent != null) {
-			  Map agentNodes = parent.getBeansOfType(SimpleAgentNode.class);
+			  Map agentNodes = parent.getBeansOfType(IAgentNode.class);
 			  if (agentNodes.size() != 1) {
 				  System.out.println("ERROR: More than one agent node in parent context!");
 				  return;

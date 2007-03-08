@@ -216,6 +216,10 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
       }
     }
 
+    // remove agent from the agent list of the agent node
+    agentNode.removeAgent(this);
+    
+    // deregister agent as JMX resource
     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
     try {
       ObjectName name = new ObjectName(
@@ -229,6 +233,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
       e.printStackTrace();
     }
 
+    // update state information in agent's memory
     updateState(LifecycleStates.CLEANED_UP);
   }
 

@@ -300,6 +300,17 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doCleanup()
    */
   public void doCleanup() {
+    // call cleanup for all agents
+    for (IAgent a : this.agents) {
+      try {
+        a.cleanup();
+      } catch (LifecycleException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+    threadPool.shutdown();
+
     // unregister agent node as JMX resource
     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
     try {
@@ -313,16 +324,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
       e.printStackTrace();
     }
 
-    // call cleanup for all agents
-    for (IAgent a : this.agents) {
-      try {
-        a.cleanup();
-      } catch (LifecycleException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-    }
-    threadPool.shutdown();
+
     log.warn("AgentNode " + getName() + " has been closed.");
   }
 

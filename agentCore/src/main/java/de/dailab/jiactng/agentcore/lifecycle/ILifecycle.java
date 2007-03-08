@@ -1,7 +1,5 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
-import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.INITIALIZING;
-
 /**
  * Basic lifecycle interface.
  *

@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Basic implementation for a default <code>LifecycleHandler</code>. It manages 
+ * Basic implementation for a default <code>LifecycleHandler</code>. It manages
  * the propagation of lifecycle events on behalf of the managed <code>ILifecycle/code>.
  * The <code>ILifecycle</code> implementation may call <code>beforeXXX()</code>
- * and <code>afterXXX()</code> when entering or leaving the lifecycle method 
+ * and <code>afterXXX()</code> when entering or leaving the lifecycle method
  * <code>xxx()</code>.
  *
  * @author Joachim Fuchs
@@ -22,7 +22,7 @@ public class DefaultLifecycleHandler {
      * following the state graph
      */
     protected boolean strict = false;
-    
+       
     /**
      * The <code>Lifecycle</code>'s current state
      */
@@ -62,18 +62,18 @@ public class DefaultLifecycleHandler {
         this.strict = strict;
         
     }
-
+    
     /**
      * Returns the current state of the managed <code>Lifecycle</code>
      *
      * @return the liefcycle's state
      */
     public LifecycleStates getState() {
-     
+        
         return state;
         
     }
-        
+    
     /**
      * Returns an anonymous lifecyle listener that allows the top most
      * listener in a hierarchy to receive lifecyle events from its 'grandchildren'
@@ -114,14 +114,11 @@ public class DefaultLifecycleHandler {
      */
     public void addLifecycleListener(ILifecycleListener listener) {
         
-        if (listener instanceof AnonymousLifecycleListener) {
+        if (listener instanceof AnonymousLifecycleListener &&
+                ((AnonymousLifecycleListener)listener).getCreator() == this) {
             
-            if (((AnonymousLifecycleListener)listener).getCreator() == this) {
-                
-                throw new IllegalArgumentException(
-                        "You cannot add a listener to the handler that created it");
-                
-            }
+            throw new IllegalArgumentException(
+                    "You cannot add a listener to the handler that created it");
             
         }
         
@@ -151,16 +148,17 @@ public class DefaultLifecycleHandler {
     
     /**
      * Call this method when entering <code>init()</code>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      */
     public void beforeInit() throws LifecycleException {
         
-        if (strict) {
+        if (isStrict()) {
             
-            /*
-             * check if transition is allowed
-             *
-             */
+            if (!(state.equals(UNDEFINED) || state.equals(CLEANED_UP))) {
+                
+                throw new IllegalStateException();
+                
+            }
             
         }
         
@@ -175,18 +173,9 @@ public class DefaultLifecycleHandler {
     
     /**
      * Call this method when leaving <CODE>init()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      */
     public void afterInit() throws LifecycleException {
-        
-        if (strict) {
-            
-            /*
-             * check if transition is allowed
-             *
-             */
-            
-        }
         
         LifecycleStates oldState = state;
         state = INITIALIZED;
@@ -199,18 +188,22 @@ public class DefaultLifecycleHandler {
     
     /**
      * Call this method when entering <CODE>start()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      */
     public void beforeStart() throws LifecycleException {
         
-        if (strict) {
+        /*
+         * In strict mode the start transition is allowed only from READY state
+         */
+        if (isStrict()) {
             
-            /*
-             * check if transition is allowed
-             *
-             */
+            if (!(state.equals(INITIALIZED) || state.equals(STOPPED))) {
+                
+                throw new IllegalStateException();
+                
+            }
             
-        }
+        } 
         
         LifecycleStates oldState = state;
         state = STARTING;
@@ -223,18 +216,9 @@ public class DefaultLifecycleHandler {
     
     /**
      * Call this method when leaving <CODE>start()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      */
     public void afterStart() throws LifecycleException {
-        
-        if (strict) {
-            
-            /*
-             * check if transition is allowed
-             *
-             */
-            
-        }
         
         LifecycleStates oldState = state;
         state = STARTED;
@@ -247,18 +231,19 @@ public class DefaultLifecycleHandler {
     
     /**
      * Call this method when entering <CODE>stop()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      */
     public void beforeStop() throws LifecycleException {
         
-        if (strict) {
+        if (isStrict()) {
             
-            /*
-             * check if transition is allowed
-             *
-             */
+            if (!state.equals(STARTED)) {
+                
+                throw new IllegalStateException();
+                
+            }
             
-        }
+        } 
         
         LifecycleStates oldState = state;
         state = STOPPING;
@@ -271,18 +256,9 @@ public class DefaultLifecycleHandler {
     
     /**
      * Call this method when leaving <CODE>stop()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      */
     public void afterStop() throws LifecycleException {
-        
-        if (strict) {
-            
-            /*
-             * check if transition is allowed
-             *
-             */
-            
-        }
         
         LifecycleStates oldState = state;
         state = STOPPED;
@@ -295,16 +271,17 @@ public class DefaultLifecycleHandler {
     
     /**
      * Call this method when entering <CODE>cleanup()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      */
     public void beforeCleanup() throws LifecycleException {
         
-        if (strict) {
+        if (isStrict()) {
             
-            /*
-             * check if transition is allowed
-             *
-             */
+            if (!(state.equals(STOPPED) || state.equals(INITIALIZED))) {
+                
+                throw new IllegalStateException();
+                
+            }
             
         }
         
@@ -319,11 +296,11 @@ public class DefaultLifecycleHandler {
     
     /**
      * Call this method when leaving <CODE>cleanup()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException 
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      */
     public void afterCleanup() throws LifecycleException {
         
-        if (strict) {
+        if (isStrict()) {
             
             /*
              * check if transition is allowed
@@ -339,24 +316,30 @@ public class DefaultLifecycleHandler {
         fireLifecycleEvent(
                 new LifecycleEvent(lifecycle, CLEANED_UP));
         
-    }        
+    }
     
+    protected void setState(LifecycleStates targetState) {
+        
+        throw new UnsupportedOperationException("Not yet implemented");
+        
+    }
+        
     /**
      * Allows for creating listener hierarchies.
      */
     protected class AnonymousLifecycleListener implements ILifecycleListener {
         
         /**
-         * The handler that created this listener. Required to make sure we 
+         * The handler that created this listener. Required to make sure we
          * do not build a cyclic hierarchy.
          */
         DefaultLifecycleHandler creator = null;
         
         /**
          * Creates an <code>AnonymousLifecycleListener</code>.
-         * 
-         * 
-         * @param creator 
+         *
+         *
+         * @param creator
          */
         AnonymousLifecycleListener(DefaultLifecycleHandler creator) {
             
@@ -388,4 +371,11 @@ public class DefaultLifecycleHandler {
         }
         
     }
+        
+    public boolean isStrict() {
+        
+        return strict;
+        
+    }
+    
 }

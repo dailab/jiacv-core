@@ -19,6 +19,25 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 public abstract class AbstractAgentBean extends AbstractLifecycle implements
     IAgentBean {
 
+    /**
+     * Creates an agent bean that uses lifecycle support in loose mode
+     */
+    public AbstractAgentBean() {
+     
+        super();
+        
+    }
+    
+    /**
+     * Creates an agent bean that may use lifecycle support in strict mode.
+     * This means, that the lifecycle graph is enforced.
+     */
+    public AbstractAgentBean(boolean strict) {
+     
+        super(strict);
+        
+    }
+    
   /**
    * Reference to the agent that holds this bean.
    */

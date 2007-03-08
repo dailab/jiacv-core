@@ -20,8 +20,20 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     /**
      * The lifecycle handler that is used internally.
      */
-    protected DefaultLifecycleHandler lifecycle = new DefaultLifecycleHandler(this);
+    protected DefaultLifecycleHandler lifecycle = null;
 
+    public AbstractLifecycle() {
+     
+        lifecycle = new DefaultLifecycleHandler(this);
+        
+    }
+    
+    public AbstractLifecycle(boolean strict) {
+     
+        lifecycle = new DefaultLifecycleHandler(this, strict);
+        
+    }
+    
     /**
      * The number of the next JMX compliant notification.
      */

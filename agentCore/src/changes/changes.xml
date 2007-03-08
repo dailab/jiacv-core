@@ -14,6 +14,9 @@
 				this changes.xml. A report will be generated automatically and integrated
 				in the site.
 			</action>
+			<action dev="joachim" type="add">
+        Strict mode support added to <code>de.dailab.jiactng.agentcore.lifecycle.DefaultLifecycleHandler</code>.
+			</action>
 		</release>
 	</body>
 </document>

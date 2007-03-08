@@ -60,25 +60,28 @@ public interface ILifecycle {
      * Initialize your object, prepare to grab all resources you need for work.
      * To avoid any lenghty processing at object creation time put all your
      * initialization code here.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException 
      */
     public void init() throws LifecycleException;
 
     /**
      * Start your object, get ready for business. Acquire any resources.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * 
+     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException 
      */
     public void start() throws LifecycleException;
 
     /**
      * Stop your object. Release resources.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * 
+     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException 
      */
     public void stop() throws LifecycleException;
 
     /**
      * Prepare for the object's removal.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * 
+     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException 
      */
     public void cleanup() throws LifecycleException;
 

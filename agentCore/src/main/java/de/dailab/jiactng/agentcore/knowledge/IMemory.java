@@ -8,6 +8,8 @@ package de.dailab.jiactng.agentcore.knowledge;
 
 import java.util.Set;
 
+import org.sercho.masp.space.TupleSpace;
+
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 public interface IMemory extends ILifecycle {
@@ -20,7 +22,7 @@ public interface IMemory extends ILifecycle {
    * @param tp
    *          the tuple to store.
    */
-  public abstract void out(Tuple tp);
+  public abstract void out(IFact tp);
 
   /**
    * Tries to read a matching tuple from the memory. This is a blocking
@@ -33,7 +35,7 @@ public interface IMemory extends ILifecycle {
    * @return a Tuple that matches tp, or null if no such tuple could be found
    *         after the timeout expired.
    */
-  public abstract Tuple in(Tuple tp);
+  public abstract IFact in(IFact tp);
 
   /**
    * Tries to read a matching tuple from the memory. This is a blocking
@@ -46,7 +48,7 @@ public interface IMemory extends ILifecycle {
    * @return a Tuple that matches tp, or null if no such tuple could be found
    *         after the timeout expired.
    */
-  public abstract Tuple read(Tuple tp);
+  public abstract IFact read(IFact tp);
 
   /**
    * Tries to read a matching tuple from the memory. This is a non-blocking
@@ -58,9 +60,9 @@ public interface IMemory extends ILifecycle {
    *          The template-tuple for the matcher.
    * @return a Tuple that matches tp, or null if no such tuple could be found.
    */
-  public abstract Tuple test(Tuple tp);
+  public abstract IFact test(IFact tp);
 
-  public abstract Set<Tuple> readAll(Tuple tp);
+  public abstract Set<IFact> readAll(IFact tp);
 
   /**
    * Getter for the timeout property. This timeout is used by all read- and
@@ -81,4 +83,11 @@ public interface IMemory extends ILifecycle {
    */
   public abstract void setTimeOut(int timeOut);
 
+  /**
+   * Return the internal TupleSpace implementation
+   * @return the actual TupleSpace
+   */
+  public abstract TupleSpace<IFact> getTupleSpace();
+  
+  public abstract void setTupleSpace(TupleSpace<IFact> space);
 }

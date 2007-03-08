@@ -11,13 +11,17 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import org.sercho.masp.util.swing.SwingObjectVisualizerPanel;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
@@ -78,13 +82,15 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
    */
   private final static String STOP      = "STOP";
 
+  private SwingObjectVisualizerPanel spacePanel;
+  
   /**
    * Initializes the GUI. Called by agent-lifecycle.
    * 
    * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
    */
   public void doInit() {
-    initGui();
+//    initGui();
   }
 
   /**
@@ -129,9 +135,34 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
    * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doStart()
    */
   public void doStart() {
-    myThread = new Thread(this);
-    myThread.start();
-    active = true;
+//    myThread = new Thread(this);
+//    myThread.start();
+//    active = true;
+	  spacePanel=new SwingObjectVisualizerPanel();
+	  spacePanel.showObject(memory.getTupleSpace().readAllOfType(IFact.class), "Knowledge");
+
+	  JPanel panel=new JPanel();
+	  panel.setLayout(new BorderLayout());
+	  panel.add(new JScrollPane(spacePanel), BorderLayout.CENTER);
+
+	  JPanel buttonpanel = new JPanel();
+	  
+	  JButton button = new JButton("Refresh");
+	  button.setActionCommand(GETMEMORY);
+	  button.addActionListener(this);
+	  buttonpanel.add(button);
+	  
+	  button = new JButton("Stop AgentNode");
+	  button.setActionCommand(STOP);
+	  button.addActionListener(this);
+	  buttonpanel.add(button);
+
+	  panel.add(buttonpanel, BorderLayout.SOUTH);
+
+	  frame=new JFrame("JIAC Knowledge Monitor");
+	  frame.getContentPane().add(panel);
+	  frame.setSize(640,480);
+	  frame.setVisible(true);
   }
 
   /**
@@ -140,9 +171,12 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
    * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doStop()
    */
   public void doStop() {
-    active = false;
-    myThread = null;
-    frame.dispose();
+//    active = false;
+//    myThread = null;
+//    frame.dispose();
+	  frame.setVisible(false);
+	  frame.dispose();
+	  spacePanel=null;
   }
 
   /*
@@ -185,7 +219,8 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
     if (e.getActionCommand().equals(CLEAR)) {
       tree.clear();
     } else if (e.getActionCommand().equals(GETMEMORY)) {
-      updateMemoryTree();
+      //updateMemoryTree();
+  	  spacePanel.showObject(memory.getTupleSpace().readAllOfType(IFact.class), "Knowledge");
     } else if (e.getActionCommand().equals(STOP)) {
       try {
         thisAgent.getAgentNode().stop();
@@ -209,8 +244,9 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
     tree.clear();
 
     // get current memory state and iterate
-    Set<Tuple> mem = memory.readAll(new Tuple(null, null));
-    for (Tuple next : mem) {
+    Iterator<IFact> it = memory.readAll(new Tuple(null, null)).iterator();
+    while (it.hasNext()) {
+      Tuple next = (Tuple)it.next();
       String path = next.getArg1();
       String value = next.getArg2();
       DefaultMutableTreeNode root = tree.getRootNode();

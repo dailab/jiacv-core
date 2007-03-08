@@ -1,12 +1,12 @@
-/*
- * Created on 27.02.2007
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
- */
 package de.dailab.jiactng.agentcore.knowledge;
 
+import java.io.Serializable;
 
-public interface IFact {
+/**
+ * The interface is though to be the super interface
+ * of all knowledge add to and removed from the
+ * memory.
+ */
+public interface IFact extends Serializable{
 
 }

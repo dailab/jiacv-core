@@ -9,6 +9,7 @@ package de.dailab.jiactng.agentcore.knowledge;
 import java.util.Set;
 
 import org.sercho.masp.space.SimpleObjectSpace;
+import org.sercho.masp.space.TupleSpace;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
@@ -19,7 +20,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  */
 public class Memory extends AbstractLifecycle implements IMemory {
 
-  private SimpleObjectSpace<Tuple> space   = new SimpleObjectSpace<Tuple>(
+  private TupleSpace<IFact> space   = new SimpleObjectSpace<IFact>(
                                                "MySpace");
 
   private int                      timeOut = 10000;
@@ -27,45 +28,45 @@ public class Memory extends AbstractLifecycle implements IMemory {
   /*
    * (non-Javadoc)
    * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#out(de.dailab.jiangtng.agentcore.knowledge.Tuple)
+   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#out(de.dailab.jiangtng.agentcore.knowledge.IFact)
    */
-  public void out(Tuple tp) {
+  public void out(IFact tp) {
     space.write(tp);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#in(de.dailab.jiangtng.agentcore.knowledge.Tuple)
+   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#in(de.dailab.jiangtng.agentcore.knowledge.IFact)
    */
-  public Tuple in(Tuple tp) {
+  public IFact in(IFact tp) {
     return space.remove(tp, timeOut);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#read(de.dailab.jiangtng.agentcore.knowledge.Tuple)
+   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#read(de.dailab.jiangtng.agentcore.knowledge.IFact)
    */
-  public Tuple read(Tuple tp) {
+  public IFact read(IFact tp) {
     return space.read(tp, timeOut);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#test(de.dailab.jiangtng.agentcore.knowledge.Tuple)
+   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#test(de.dailab.jiangtng.agentcore.knowledge.IFact)
    */
-  public Tuple test(Tuple tp) {
+  public IFact test(IFact tp) {
     return space.read(tp);
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#readAll(de.dailab.jiangtng.agentcore.knowledge.Tuple)
+   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#readAll(de.dailab.jiangtng.agentcore.knowledge.IFact)
    */
-  public Set<Tuple> readAll(Tuple tp) {
+  public Set<IFact> readAll(IFact tp) {
     return space.readAll(tp);
   }
 
@@ -114,4 +115,12 @@ public class Memory extends AbstractLifecycle implements IMemory {
     // TODO Auto-generated method stub
     
   }
+
+	public TupleSpace<IFact> getTupleSpace() {
+		return space;
+	}
+	
+	public void setTupleSpace(TupleSpace<IFact> space) {
+		this.space = space;
+	}
 }

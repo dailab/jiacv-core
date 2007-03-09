@@ -21,9 +21,6 @@ public class HelloBean extends AbstractAgentBean {
   public void execute() {
     // print Hello world
     System.out.println("Hello World from "+getBeanName());
-while(true) {
-  ;
-}
     
 //    try {
 //      // stop Agent

@@ -8,7 +8,6 @@ package de.dailab.jiactng.agentcore;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -20,7 +19,6 @@ import javax.management.ObjectName;
 
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
@@ -190,7 +188,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   }
 
   /**
-   * Undeploys this agent from its agent node.
+   * Stops and undeploys this agent from its agent node (incl. deregistration 
+   * as JMX resource).
    */
   public void remove() throws LifecycleException {
 	  // clean up agent
@@ -371,9 +370,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   /**
    * Initialisation-method. This method is called by Spring after startup
    * (through the InitializingBean-Interface) and is used to start the agent
-   * after all beans haven been instantiated by Spring. Currently only calls the
-   * init() and start()-methods from ILifefycle for this if the agent is deployed
-   * in a running agent node.
+   * after all beans haven been instantiated by Spring. Currently only 
+   * registers the agent as JMX resource.
    * 
    * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */
@@ -389,25 +387,6 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
 	  } catch (Exception e) {
 	      e.printStackTrace();
 	  }
-
-	  // set agent node of this agent
-	  if (applicationContext != null) {
-		  ApplicationContext parent = applicationContext.getParent();
-		  if (parent != null) {
-			  Map agentNodes = parent.getBeansOfType(IAgentNode.class);
-			  if (agentNodes.size() == 1) {
-				  agentNode = (IAgentNode)agentNodes.values().toArray()[0];
-				  agentNode.addAgent(this);
-				  
-				  // start agent
-				  init();
-				  start();			  
-			  } else {
-				  System.out.println("WARNING: Agent node of new agent unknown!");
-			  }
-		  }
-	  }
-	  
   }
 
   /*

@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
@@ -84,6 +86,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
   public void addAgent(IAgent agent) {
     // TODO: statechanges?
     this.agents.add(agent);
+    agent.addLifecycleListener(this.lifecycle.createLifecycleListener());
   }
 
   /*
@@ -178,11 +181,24 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
   }
 
   /**
-   * Deploys a new agent on this agent node.
-   * @param name of the XML file which contains the spring configuration of the agent
+   * Deploys and starts new agents on this agent node.
+   * @param name of the XML file which contains the spring configuration of the agents
    */
-  public void addAgent(String configFile) {
-	  new ClassPathXmlApplicationContext(new String[]{configFile+".xml"}, applicationContext);
+  public void addAgents(String configFile) {
+	  ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(new String[]{configFile+".xml"});
+	  Collection newAgents = appContext.getBeansOfType(IAgent.class).values();
+	  for (Object a : newAgents) {
+		  IAgent agent = (IAgent) a;
+	      agent.setAgentNode(this);
+		  addAgent(agent);
+		  try {
+			  agent.init();
+			  agent.start();			  
+		  } catch (LifecycleException e) {
+			  // TODO:
+			  e.printStackTrace();
+		  }
+	  }
   }
 
   /*
@@ -195,10 +211,41 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
   }
 
   /**
+   * Handles the change of lifecycle states of agents on this agent node.
+   * @param evt the lifecycle event
+   */
+  public void onEvent(LifecycleEvent evt) {
+	Object source = evt.getSource();
+	if (agents.contains(source)) {
+		IAgent agent = (IAgent)source;
+		switch (evt.getState()) {
+		case STARTED:
+	        Future f1 = threadPool.submit(agent);
+	        agentFutures.put(agent.getAgentName(), f1);
+			break;
+		case STOPPED:
+	        Future f2 = agentFutures.get(agent.getAgentName());
+	        if (f2 == null) {
+	          (new LifecycleException("Agentfuture not found")).printStackTrace();
+	        } else {
+	          // if soft-cancel fails, do a force-cancel.
+	          if (!f2.cancel(false) && !f2.isDone()) {
+	            log.warn("Agent " + agent.getAgentName()
+	                + " did not respond then stopping. Thread is forcecanceled.");
+	            f2.cancel(true);
+	          }
+	        }
+			break;
+		}
+	}
+  }
+
+  /**
    * Initialisation-method. This method is called by Spring after startup
    * (through the InitializingBean-Interface) and is used to start the agentnode
-   * after all beans haven been instantiated by Spring. Currently only calls the
-   * init() and start()-methods from ILifefycle for this.
+   * after all beans haven been instantiated by Spring. Currently only registers 
+   * the agent node as JMX resource and calls the init() and start()-methods 
+   * from ILifefycle for this.
    * 
    * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */
@@ -214,13 +261,21 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	  e.printStackTrace();
 	}
 
+    // set references for all agents
+	addLifecycleListener(this);
+    for (IAgent a : this.agents) {
+      a.setAgentNode(this);
+      a.addLifecycleListener(this.lifecycle.createLifecycleListener());
+    }
+    
 	// start agent node
     init();
     start();
   }
 
   /**
-   * Shuts down the managed agent node.
+   * Shuts down the managed agent node and all its agents (incl. deregistration 
+   * as JMX resource).
    * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException
    */
   public void shutdown() throws LifecycleException {
@@ -274,8 +329,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 
     // call init and set references for all agents
     for (IAgent a : this.agents) {
-      a.setAgentNode(this);
-      a.addLifecycleListener(this.lifecycle.createLifecycleListener());
       log.warn("Initializing agent: " + a.getAgentName());
       try {
         a.init();
@@ -296,8 +349,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
     for (IAgent a : this.agents) {
       try {
         a.start();
-        Future f = threadPool.submit(a);
-        agentFutures.put(a.getAgentName(), f);
       } catch (Exception ex) {
         // TODO
         ex.printStackTrace();
@@ -318,18 +369,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
     for (IAgent a : this.agents) {
       try {
         a.stop();
-        Future f = agentFutures.get(a.getAgentName());
-        if (f == null) {
-          throw new LifecycleException("Agentfuture not found");
-        } else {
-          // if soft-cancel fails, do a force-cancel.
-          if (!f.cancel(false) && !f.isDone()) {
-            log.warn("Agent " + a.getAgentName()
-                + " did not respond then stopping. Thread is forcecanceled.");
-            f.cancel(true);
-          }
-        }
-
       } catch (LifecycleException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();

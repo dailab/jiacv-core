@@ -32,10 +32,10 @@ public interface SimpleAgentNodeMBean {
 	public ArrayList<String> getAgents();
 
 	/**
-	 * Deploys a new agent on this agent node.
-	 * @param name of the XML file which contains the spring configuration of the agent
+	 * Deploys new agents on this agent node.
+	 * @param name of the XML file which contains the spring configuration of the agents
 	 */
-	public void addAgent(String configFile);
+	public void addAgents(String configFile);
 
 	/**
 	 * Getter for attribute "LifecycleState" of the managed agent node.

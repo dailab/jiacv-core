@@ -97,8 +97,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    * @see org.springframework.context.support.ClassPathXmlApplicationContext
    */
   public static void main(String[] args) {
-    ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(
-        args[0]);
+    new ClassPathXmlApplicationContext(args[0]);
   }
 
   /**
@@ -190,6 +189,34 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
 
   }
 
+  /**
+   * Undeploys this agent from its agent node.
+   */
+  public void remove() throws LifecycleException {
+	  // clean up agent
+	  stop();
+	  cleanup();
+	  
+	  // deregister agent as JMX resource
+	  MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+	  try {
+	      ObjectName name = new ObjectName(
+	          "de.dailab.jiactng.agentcore:type=Agent,name=" + this.agentName);
+	      if (mbs.isRegistered(name)) {
+	        mbs.unregisterMBean(name);
+	      }
+	      System.out.println("Agent " + this.agentName
+	          + " deregistered as JMX resource.");
+	  } catch (Exception e) {
+	      e.printStackTrace();
+	  }	  
+	  
+	  // remove agent from the agent list of the agent node
+	  if (agentNode != null) {
+		  agentNode.removeAgent(this);
+	  }
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -214,23 +241,6 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
       }
     }
 
-    // remove agent from the agent list of the agent node
-    agentNode.removeAgent(this);
-    
-    // deregister agent as JMX resource
-    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-    try {
-      ObjectName name = new ObjectName(
-          "de.dailab.jiactng.agentcore:type=Agent,name=" + this.agentName);
-      if (mbs.isRegistered(name)) {
-        mbs.unregisterMBean(name);
-      }
-      System.out.println("Agent " + this.agentName
-          + " unregistered as JMX resource.");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     // update state information in agent's memory
     updateState(LifecycleStates.CLEANED_UP);
 
@@ -245,18 +255,6 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    */
   @Override
   public void doInit() throws LifecycleException {
-    // register agent as JMX resource
-    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-    try {
-      ObjectName name = new ObjectName(
-          "de.dailab.jiactng.agentcore:type=Agent,name=" + this.agentName);
-      mbs.registerMBean(this, name);
-      System.out.println("Agent " + this.agentName
-          + " registered as JMX resource.");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     // initialize agent elements
     this.agentLog = agentNode.getLog(this);
 
@@ -380,20 +378,36 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */
   public void afterPropertiesSet() throws Exception {
+	  // register agent as JMX resource
+	  MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+	  try {
+		  ObjectName name = new ObjectName(
+	          "de.dailab.jiactng.agentcore:type=Agent,name=" + this.agentName);
+	      mbs.registerMBean(this, name);
+	      System.out.println("Agent " + this.agentName
+	          + " registered as JMX resource.");
+	  } catch (Exception e) {
+	      e.printStackTrace();
+	  }
+
+	  // set agent node of this agent
 	  if (applicationContext != null) {
 		  ApplicationContext parent = applicationContext.getParent();
 		  if (parent != null) {
 			  Map agentNodes = parent.getBeansOfType(IAgentNode.class);
-			  if (agentNodes.size() != 1) {
-				  System.out.println("ERROR: More than one agent node in parent context!");
-				  return;
+			  if (agentNodes.size() == 1) {
+				  agentNode = (IAgentNode)agentNodes.values().toArray()[0];
+				  agentNode.addAgent(this);
+				  
+				  // start agent
+				  init();
+				  start();			  
+			  } else {
+				  System.out.println("WARNING: Agent node of new agent unknown!");
 			  }
-			  agentNode = (IAgentNode)agentNodes.values().toArray()[0];
-			  agentNode.addAgent(this);
-			  init();
-			  start();			  
 		  }
 	  }
+	  
   }
 
   /*

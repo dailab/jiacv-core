@@ -35,6 +35,12 @@ public interface AgentMBean {
 	//public String getOwner();
 
 	/**
+	 * Undeploys this agent from its agent node.
+     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+	 */
+	public void remove() throws Exception;
+
+	/**
 	 * Initializes the managed agent.
      * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
      * 

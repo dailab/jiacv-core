@@ -203,27 +203,71 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
    * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */
   public void afterPropertiesSet() throws Exception {
+	// register agent node as JMX resource
+	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+	try {
+	  ObjectName name = new ObjectName(
+	      "de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=" + this.name);
+	  mbs.registerMBean(this, name);
+	  System.out.println("Agent node " + this.name + " registered as JMX resource.");
+	} catch (Exception e) {
+	  e.printStackTrace();
+	}
+
+	// start agent node
     init();
     start();
   }
 
+  /**
+   * Shuts down the managed agent node.
+   * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException
+   */
+  public void shutdown() throws LifecycleException {
+	// clean up agent node
+	stop();
+	cleanup();
+	
+    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+
+    // deregister all agents as JMX resource
+    for (IAgent a : this.agents) {
+  	  try {
+	      ObjectName name = new ObjectName(
+	          "de.dailab.jiactng.agentcore:type=Agent,name=" + a.getAgentName());
+	      if (mbs.isRegistered(name)) {
+	        mbs.unregisterMBean(name);
+	      }
+	      System.out.println("Agent " + a.getAgentName()
+	          + " deregistered as JMX resource.");
+	  } catch (Exception e) {
+	      e.printStackTrace();
+	  }	  
+    }
+    
+    this.agents = null;
+    
+    // unregister agent node as JMX resource
+    try {
+      ObjectName name = new ObjectName(
+          "de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=" + this.name);
+      if (mbs.isRegistered(name)) {
+        mbs.unregisterMBean(name);
+      }
+      System.out.println("Agent node " + this.name + " deregistered as JMX resource.");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    log.warn("AgentNode " + getName() + " has been closed.");	
+  }
+  
   /*
    * (non-Javadoc)
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
    */
   public void doInit() {
-    // register agent node as JMX resource
-    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-    try {
-      ObjectName name = new ObjectName(
-          "de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=" + this.name);
-      mbs.registerMBean(this, name);
-      System.out.println("Agent " + this.name + " registered as JMX resource.");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
     log = LogFactory.getLog(getName());
     threadPool = Executors.newCachedThreadPool();
     agentFutures = new HashMap<String, Future>();
@@ -240,7 +284,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
         e.printStackTrace();
       }
     }
-
   }
 
   /*
@@ -310,22 +353,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
       }
     }
     threadPool.shutdown();
-
-    // unregister agent node as JMX resource
-    MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-    try {
-      ObjectName name = new ObjectName(
-          "de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=" + this.name);
-      if (mbs.isRegistered(name)) {
-        mbs.unregisterMBean(name);
-      }
-      System.out.println("Agent " + this.name + " registered as JMX resource.");
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-
-    log.warn("AgentNode " + getName() + " has been closed.");
   }
 
   /*

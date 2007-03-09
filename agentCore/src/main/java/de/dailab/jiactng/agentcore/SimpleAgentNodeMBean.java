@@ -84,6 +84,12 @@ public interface SimpleAgentNodeMBean {
 	 */
 	public void cleanup() throws Exception;
 
+	/**
+	 * Shuts down the managed agent node.
+     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException
+	 */
+	public void shutdown() throws Exception;
+
 	//public void undeployAgent(Agent agent);
 	
 }

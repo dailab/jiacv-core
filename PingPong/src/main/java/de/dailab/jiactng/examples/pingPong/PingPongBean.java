@@ -80,11 +80,11 @@ public class PingPongBean extends AbstractAgentBean implements ActionListener {
   public void execute() {
     // try to read pong with a template-tuple.
     Tuple template = new Tuple("pingpongQueue.pong", null);
-    Tuple read = (Tuple)this.memory.test(template);
+    Tuple read = (Tuple)this.memory.read(template);
 
     if (read != null) {
       // pong was found, so remove if from queue and write to textfield
-      this.memory.in(read);
+      this.memory.remove(read);
       pongTextfield.setText("read: " + read.getArg2());
     }
   }
@@ -105,7 +105,7 @@ public class PingPongBean extends AbstractAgentBean implements ActionListener {
    */
   public void actionPerformed(ActionEvent e) {
     // write 'ping' into queue
-    this.memory.out(new Tuple("pingpongQueue.ping", "ping_" + (count++)));
+    this.memory.write(new Tuple("pingpongQueue.ping", "ping_" + (count++)));
   }
 
 }

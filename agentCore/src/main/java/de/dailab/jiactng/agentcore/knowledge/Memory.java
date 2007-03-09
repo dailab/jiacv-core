@@ -6,8 +6,11 @@
  */
 package de.dailab.jiactng.agentcore.knowledge;
 
+import java.util.Iterator;
 import java.util.Set;
 
+import org.sercho.masp.space.ObjectMatcher;
+import org.sercho.masp.space.ObjectUpdater;
 import org.sercho.masp.space.SimpleObjectSpace;
 import org.sercho.masp.space.TupleSpace;
 
@@ -16,111 +19,169 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
  * @author Thomas Konnerth
- * @see de.dailab.jiangtng.agentcore.knowledge.Tuple
+ * @author axle
+ * 
+ * @see de.dailab.jiactng.agentcore.knowledge.IMemory
+ * @see de.dailab.jiactng.agentcore.knowledge.Tuple
  */
 public class Memory extends AbstractLifecycle implements IMemory {
 
-  private TupleSpace<IFact> space   = new SimpleObjectSpace<IFact>(
-                                               "MySpace");
+	private TupleSpace<IFact> space;
 
-  private int                      timeOut = 10000;
+	private int timeOut = 10000;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#out(de.dailab.jiangtng.agentcore.knowledge.IFact)
-   */
-  public void out(IFact tp) {
-    space.write(tp);
-  }
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void doCleanup() throws LifecycleException {
+		space = null;
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#in(de.dailab.jiangtng.agentcore.knowledge.IFact)
-   */
-  public IFact in(IFact tp) {
-    return space.remove(tp, timeOut);
-  }
+    /**
+     * During initialization the TupleSpace is created.
+     * 
+     * @see org.sercho.masp.space.TupleSpace
+     */
+	@Override
+	public void doInit() throws LifecycleException {
+		space = new SimpleObjectSpace<IFact>("FactBase");
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#read(de.dailab.jiangtng.agentcore.knowledge.IFact)
-   */
-  public IFact read(IFact tp) {
-    return space.read(tp, timeOut);
-  }
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void doStart() throws LifecycleException {
+		// TODO Auto-generated method stub
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#test(de.dailab.jiangtng.agentcore.knowledge.IFact)
-   */
-  public IFact test(IFact tp) {
-    return space.read(tp);
-  }
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void doStop() throws LifecycleException {
+		// TODO Auto-generated method stub
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#readAll(de.dailab.jiangtng.agentcore.knowledge.IFact)
-   */
-  public Set<IFact> readAll(IFact tp) {
-    return space.readAll(tp);
-  }
+    /**
+     * {@inheritDoc}
+     */
+	public int getTimeOut() {
+		return timeOut;
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#getTimeOut()
-   */
-  public int getTimeOut() {
-    return timeOut;
-  }
+    /**
+     * {@inheritDoc}
+     */
+	public void setTimeOut(int timeOut) {
+		this.timeOut = timeOut;
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiangtng.agentcore.knowledge.IMemory#setTimeOut(int)
-   */
-  public void setTimeOut(int timeOut) {
-    if (timeOut < 0) {
-      this.timeOut = Integer.MAX_VALUE;
-    } else {
-      this.timeOut = timeOut;
-    }
-  }
-
-  @Override
-  public void doCleanup() throws LifecycleException {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void doInit() throws LifecycleException {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void doStart() throws LifecycleException {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void doStop() throws LifecycleException {
-    // TODO Auto-generated method stub
-    
-  }
-
+    /**
+     * {@inheritDoc}
+     */
 	public TupleSpace<IFact> getTupleSpace() {
 		return space;
 	}
-	
+
+    /**
+     * {@inheritDoc}
+     */
 	public void setTupleSpace(TupleSpace<IFact> space) {
 		this.space = space;
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public String getID() {
+		return space.getID();
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public ObjectMatcher getMatcher() {
+		return space.getMatcher();
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public ObjectUpdater getUpdater() {
+		return space.getUpdater();
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public IFact read(IFact template) {
+		return space.read(template);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public IFact read(IFact template, long timeOut) {
+		return space.read(template, timeOut);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public Set<IFact> readAll(IFact template) {
+		return space.readAll(template);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@SuppressWarnings("unchecked")
+	public Set<IFact> readAllOfType(Class classname) {
+		return space.readAllOfType(classname);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public IFact remove(IFact template) {
+		return space.remove(template);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public IFact remove(IFact template, long timeOut) {
+		return space.remove(template, timeOut);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public Set<IFact> removeAll(IFact template) {
+		return space.removeAll(template);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public boolean update(IFact template, IFact substPattern) {
+		return space.update(template, substPattern);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public void write(IFact fact) {
+		space.write(fact);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public Iterator<IFact> iterator() {
+		return space.iterator();
+	}
+
 }

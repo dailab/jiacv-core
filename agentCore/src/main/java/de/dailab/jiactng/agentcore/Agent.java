@@ -203,8 +203,6 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
         executionFuture = null;
       }
     }
-    this.memory.cleanup();
-    this.execution.cleanup();
 
     // call cleanup for all adaptors
     for (IAgentBean a : this.adaptors) {
@@ -235,7 +233,10 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
 
     // update state information in agent's memory
     updateState(LifecycleStates.CLEANED_UP);
-  }
+
+    this.execution.cleanup();
+    this.memory.cleanup();
+}
 
   /*
    * (non-Javadoc)
@@ -260,7 +261,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
     this.agentLog = agentNode.getLog(this);
 
     this.memory.init();
-    this.memory.out(new Tuple("thisAgent.name", this.agentName));
+    this.memory.write(new Tuple("thisAgent.name", this.agentName));
 
     this.execution.setAgent(this);
     this.execution.init();
@@ -272,7 +273,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
         a.setThisAgent(this);
         a.init();
         if (a instanceof ILifecycle) a.addLifecycleListener(this);
-        memory.out(new Tuple(createBeanPath(a.getBeanName()) + ".name", a
+        memory.write(new Tuple(createBeanPath(a.getBeanName()) + ".name", a
             .getBeanName()));
         setBeanState(a.getBeanName(), LifecycleStates.INITIALIZED);
       } catch (LifecycleException e) {
@@ -363,10 +364,10 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    *          the new state
    */
   private void updateState(ILifecycle.LifecycleStates newState) {
-    if (memory.test(new Tuple("thisAgent.state", null)) != null) {
-      memory.in(new Tuple("thisAgent.state", null));
+    if (memory.read(new Tuple("thisAgent.state", null)) != null) {
+      memory.remove(new Tuple("thisAgent.state", null));
     }
-    memory.out(new Tuple("thisAgent.state", newState.toString()));
+    memory.write(new Tuple("thisAgent.state", newState.toString()));
   }
 
   /**
@@ -405,29 +406,24 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
     		((Tuple)memory.read(new Tuple("thisAgent.state", null))).getArg2());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.IAgent#setBeanState(java.lang.String,
-   *      de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates)
+  /**
+   * {@inheritDoc}
    */
   public void setBeanState(String beanName, LifecycleStates newState) {
     String beanPath = createBeanPath(beanName) + ".state";
-    Tuple test = (Tuple)this.memory.test(new Tuple(beanPath, null));
+    Tuple test = (Tuple)this.memory.read(new Tuple(beanPath, null));
     if (test != null) {
-      this.memory.in(test);
+      this.memory.remove(test);
     }
-    this.memory.out(new Tuple(beanPath, newState.toString()));
+    this.memory.write(new Tuple(beanPath, newState.toString()));
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.IAgent#getBeanState(java.lang.String)
+  /**
+   * {@inheritDoc}
    */
   public LifecycleStates getBeanState(String beanName) {
     String beanPath = createBeanPath(beanName) + ".state";
-    Tuple test = (Tuple)this.memory.test(new Tuple(beanPath, null));
+    Tuple test = (Tuple)this.memory.read(new Tuple(beanPath, null));
     return LifecycleStates.valueOf(test.getArg2());
   }
 

@@ -749,5 +749,6 @@
 		<module>ModuleTemplate</module>
 		<module>microJIAC</module>
 		<module>agentCore</module>
+		<module>examples</module>
 	</modules>
 </project>

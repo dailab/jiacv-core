@@ -137,15 +137,15 @@ public class IAgentTest extends TestCase {
   }
 
   public void testGetState() {
-    try {
+//    try {
       assertEquals("Wrong state: ", ILifecycle.LifecycleStates.STARTED, agent
           .getState());
-      agent.cleanup();
-      assertEquals("Wrong state: ", ILifecycle.LifecycleStates.CLEANED_UP,
-          agent.getState());
-    } catch (LifecycleException e) {
-      fail("Statechange failed.");
-    }
+//      agent.cleanup();
+//      assertEquals("Wrong state: ", ILifecycle.LifecycleStates.CLEANED_UP,
+//          agent.getState());
+//    } catch (LifecycleException e) {
+//      fail("Statechange failed.");
+//    }
   }
 
   // public void testGetMemory() {

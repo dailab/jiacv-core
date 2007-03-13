@@ -34,8 +34,9 @@ public class IAgentTest extends TestCase {
   protected void tearDown() throws Exception {
     // agent.stop();
     // agent.cleanup();
-    node.stop();
-    node.cleanup();
+    ((SimpleAgentNodeMBean)node).shutdown();
+    //node.stop();
+    //node.cleanup();
   }
 
   public void testGetAgentName() {

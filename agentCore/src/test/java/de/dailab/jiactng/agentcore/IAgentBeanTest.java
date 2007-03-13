@@ -31,8 +31,9 @@ public class IAgentBeanTest extends TestCase {
 
   protected void tearDown() throws Exception {
     super.tearDown();
-    node.stop();
-    node.cleanup();
+    ((SimpleAgentNodeMBean)node).shutdown();
+    //node.stop();
+    //node.cleanup();
   }
 
   public void testSetBeanNameString() {

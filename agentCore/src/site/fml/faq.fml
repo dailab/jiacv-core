@@ -19,4 +19,57 @@
             </answer>
         </faq>
     </part>
+    <part id="lifecycle">
+        <title>Lifecycle</title>
+        <faq id="lifecycle">
+            <question>What are the available phases in the lifecycle model?</question>
+            <answer>
+                <p>
+                  Basically, there are 3 distinct states a component may have:
+                  VOID, READY and STARTED. Being VOID means being either UNDEFINED
+                  or CLEANED_UP, whereas READY means INITIALIZED or STOPPED.
+                  STARTED means the active state of the <code>ILifecycle</code> instance.
+                  Check out the lifecycle graph from some project documentation
+                  to learn more about the lifecycle model.
+                </p>
+            </answer>
+            <question>How does the Lifecycle API apply to my code?</question>
+            <answer><p>
+              The <code>de.dailab.jiactng.agentcore.lifecycle</code> package contains
+              the <code>ILifecycle</code> interface as well as all necessary code.
+              You may subclass <code>AbstractLifecycle</code> or implement
+              <code>ILifecycle</code> to introduce lifecycle management into your
+              code. In the latter case check out how <code>AbstractLifecycle</code>
+              employs the <code>DefaultLifecycleHandler</code> class.</p>
+            </answer>
+            <question>What is the difference between loose and strict lifecycle?</question>
+            <answer><p>
+              Loose means that there are no restrictions on transitions between
+              lifecycle states. The strict mode requires you to adhere to the lifecycle graph.
+              <code>DefaultLifecycleHandler</code> offers a constructor that accepts
+              a boolean parameter, indicating wether or not you want the lifecycle
+              handler to operate in strict mode. The default is loose handling.</p>
+            </answer>
+            <question>Can I switch arbitrarily between those lifecycle states?</question>
+            <answer><p>
+              In loose mode you can. In strict mode you can switch only between
+              adjacent lifecycle states.</p>
+            </answer>
+            <question>How do the lifecycle events come into play?</question>
+            <answer><p>
+              You can register a <code>ILifecycleListener</code> with any <code>
+              Lifecycle</code> to receive state change events. This is different from
+              the JMX state change notifications.</p>
+            </answer>
+            <question>Can I create a hierarchy of lifecycle listeners?</question>
+            <answer><p>
+              Yes. Suppose, there is a lifecycle listener that manages a number
+              of lifecycle objects that make use of the <code>DefaultLifecycleHandler</code>.
+              One of them, which is not a lifecycle listener itself, is managing a bunch of
+              lifecycles as well. To have the top-level object receiving lifecycle events from
+              below, you call <code>createLifecycleListener()</code> on their parent object's lifecycle handler
+              and add it to them. Now all lifecycle events are propagated directly to the top-level object.</p>
+            </answer>
+        </faq>
+    </part>
 </faqs>

@@ -300,15 +300,6 @@ public class DefaultLifecycleHandler {
      */
     public void afterCleanup() throws LifecycleException {
         
-        if (isStrict()) {
-            
-            /*
-             * check if transition is allowed
-             *
-             */
-            
-        }
-        
         LifecycleStates oldState = state;
         state = CLEANED_UP;
         

@@ -32,8 +32,10 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	private SimpleAgentNode node = null;
 
 	/**
-	 * Sets up the test environment. It enables the JMX interface, starts the application and
-	 * registers as notification listener for changes of the agent's lifecycle state.
+	 * Sets up the test environment. It enables the JMX interface, registers as listener
+	 * for agent's (de)registration, starts the application (platform "myPlatform" with 
+	 * one agent "TestAgent") defined in "agentTests.xml" and registers as listener for
+	 * changes of the agent's lifecycle state.
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -59,8 +61,9 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	}
 
 	/**
-	 * Tears down the test environment. It deregisters as notification listener, shuts down 
-	 * the agent node and closes the application context.
+	 * Tears down the test environment. It deregisters as listener for changes of the 
+	 * agent's lifecycle state, shuts down the agent node, deregisters as listener for
+	 * agent's (de)registration and closes the application context.
 	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
@@ -81,7 +84,9 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	
 	
 	/**
-	 * Implementation of the interface NotificationListener. It notes the last two notifications.
+	 * Implementation of the interface NotificationListener. It notes the last two 
+	 * notifications about change of agent's lifecycle state and the last notification 
+	 * about (de)registration of the agent.
 	 */
 	public void handleNotification(Notification notification, Object handback) {
 		if (notification instanceof AttributeChangeNotification) {
@@ -94,8 +99,12 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 
 
 	/**
-	 * Tests if the agent can be correctly removed by using the JMX interface (remove).
+	 * Tests if the agent can be correctly removed by using the JMX interface. This includes
+	 * the previous registration as JMX resource, the change to state CLEANED_UP, the 
+	 * deregistration as JMX resource and the removal from the agent node.
 	 * @see #doAction(String)
+	 * @see #checkRegistrationNotification(String)
+	 * @see #checkStateNotifications(String,String)
 	 */
 	public void testRemove() {
 		checkRegistrationNotification("JMX.mbean.registered");
@@ -107,7 +116,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	}
 	
 	/**
-	 * Tests if you get the correct name of the agent by using the JMX interface.
+	 * Tests if you get the name "TestAgent" of the agent by using the JMX interface.
 	 */
 	public void testGetName() {
 		String name = "";
@@ -126,9 +135,10 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 */
 	
 	/**
-	 * Tests if the agent can change its lifecycle state by using the JMX interface (stop, cleanup, init, start).
+	 * Tests if the agent can change its lifecycle state by using the JMX interface 
+	 * (stop, cleanup, init, start) and notifications are sent to the listener.
 	 * @see #doAction(String)
-	 * @see #checkNotifications(String,String)
+	 * @see #checkStateNotifications(String,String)
 	 * @see #checkState(String)
 	 */
 	public void testSetLifecycleState() {
@@ -150,7 +160,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	}
 
 	/**
-	 * Tests if you get the lifecycle state STARTED of the agent by using the JMX interface.
+	 * Tests if you get the lifecycle state "STARTED" of the agent by using the JMX interface.
 	 * @see #checkState(String)
 	 */
 	public void testGetLifecycleState() {

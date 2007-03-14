@@ -5,9 +5,12 @@ import java.lang.management.ManagementFactory;
 import javax.management.AttributeChangeNotification;
 import javax.management.AttributeChangeNotificationFilter;
 import javax.management.MBeanServer;
+import javax.management.MBeanServerNotification;
 import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
+
+import javax.management.relation.MBeanServerNotificationFilter;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -25,6 +28,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	private ClassPathXmlApplicationContext context = null;
 	private String currentLifecycleState = "";
 	private String previousLifecycleState = "";
+	private String registrationNotification = "";
 	private SimpleAgentNode node = null;
 
 	/**
@@ -34,14 +38,24 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	protected void setUp() throws Exception {
 		super.setUp();
 		System.setProperty("jmx.invoke.getters", "");
+		agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=TestAgent");
+		mbs = ManagementFactory.getPlatformMBeanServer();
+
+		// add listener for (de)registration of the agent
+		MBeanServerNotificationFilter msnf = new MBeanServerNotificationFilter();
+		msnf.disableAllObjectNames();
+		msnf.enableObjectName(agent);
+		mbs.addNotificationListener(new ObjectName("JMImplementation:type=MBeanServerDelegate"), this, msnf, null);
+
+		// start application
 		context = new ClassPathXmlApplicationContext(
 			"de/dailab/jiactng/agentcore/agentTests.xml");
 		node = (SimpleAgentNode) context.getBean("myPlatform");
-		agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=TestAgent");
-		mbs = ManagementFactory.getPlatformMBeanServer();
-		AttributeChangeNotificationFilter filter = new AttributeChangeNotificationFilter();
-		filter.enableAttribute("LifecycleState");
-		mbs.addNotificationListener(agent, this, filter, null);
+
+		// add listener for change of agent's lifecycle state
+		AttributeChangeNotificationFilter acnf = new AttributeChangeNotificationFilter();
+		acnf.enableAttribute("LifecycleState");
+		mbs.addNotificationListener(agent, this, acnf, null);
 	}
 
 	/**
@@ -54,12 +68,14 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 			mbs.removeNotificationListener(agent, this);
 		}
 		node.shutdown();
+		mbs.removeNotificationListener(new ObjectName("JMImplementation:type=MBeanServerDelegate"), this);
 		mbs = null;
 		agent = null;
 		context.close();
 		context = null;
 		currentLifecycleState = "";
 		previousLifecycleState = "";
+		registrationNotification = "";
 		node = null;
 	}
 	
@@ -68,8 +84,12 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 * Implementation of the interface NotificationListener. It notes the last two notifications.
 	 */
 	public void handleNotification(Notification notification, Object handback) {
-		previousLifecycleState = currentLifecycleState;
-		currentLifecycleState = (String) ((AttributeChangeNotification) notification).getNewValue();
+		if (notification instanceof AttributeChangeNotification) {
+			previousLifecycleState = currentLifecycleState;
+			currentLifecycleState = (String) ((AttributeChangeNotification) notification).getNewValue();
+		} else if (notification instanceof MBeanServerNotification) {
+			registrationNotification = notification.getType();
+		}
 	}
 
 
@@ -78,10 +98,12 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 * @see #doAction(String)
 	 */
 	public void testRemove() {
+		checkRegistrationNotification("JMX.mbean.registered");
 		doAction("remove");
 		assertEquals("AgentMBean.remove doesn't deregister management of agent", false, mbs.isRegistered(agent));
 		assertEquals("AgentMBean.remove doesn't remove agent from agent node", true, node.findAgents().isEmpty());
-		checkNotifications("CLEANING_UP", "CLEANED_UP");
+		checkStateNotifications("CLEANING_UP", "CLEANED_UP");
+		checkRegistrationNotification("JMX.mbean.unregistered");
 	}
 	
 	/**
@@ -111,19 +133,19 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	public void testSetLifecycleState() {
 		doAction("stop");
-		checkNotifications("STOPPING", "STOPPED");
+		checkStateNotifications("STOPPING", "STOPPED");
 		checkState("STOPPED");
 	    
 		doAction("cleanup");
-		checkNotifications("CLEANING_UP", "CLEANED_UP");
+		checkStateNotifications("CLEANING_UP", "CLEANED_UP");
 		checkState("CLEANED_UP");
 	    
 		doAction("init");
-		checkNotifications("INITIALIZING", "INITIALIZED");
+		checkStateNotifications("INITIALIZING", "INITIALIZED");
 		checkState("INITIALIZED");
 	    
 		doAction("start");
-		checkNotifications("STARTING", "STARTED");
+		checkStateNotifications("STARTING", "STARTED");
 		checkState("STARTED");
 	}
 
@@ -172,9 +194,17 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 * @param previousState the intended state of the agent after the previous notification
 	 * @param currentState the intended state of the agent after the current notification
 	 */
-	protected void checkNotifications(String previousState, String currentState) {
-		assertEquals("Missing notification about starting agent", previousState, previousLifecycleState);
-		assertEquals("Missing notification about started agent", currentState, currentLifecycleState);
+	protected void checkStateNotifications(String previousState, String currentState) {
+		assertEquals("Missing notification about state " + previousState, previousState, previousLifecycleState);
+		assertEquals("Missing notification about state " + currentState, currentState, currentLifecycleState);
+	}
+
+	/**
+	 * Checks the last registration notification of the agent.
+	 * @param intendedType the intended type of the registration notification
+	 */
+	protected void checkRegistrationNotification(String intendedType) {
+		assertEquals("Missing notification " + intendedType, intendedType, registrationNotification);
 	}
 
 }

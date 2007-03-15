@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore;
 
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.AttributeChangeNotificationFilter;
@@ -23,23 +24,26 @@ import junit.framework.TestCase;
  */
 public class AgentMBeanTest extends TestCase implements NotificationListener {
 
+	private ObjectName node = null;
 	private ObjectName agent = null;
 	private MBeanServer mbs = null;
 	private ClassPathXmlApplicationContext context = null;
 	private String currentLifecycleState = "";
 	private String previousLifecycleState = "";
 	private String registrationNotification = "";
-	private SimpleAgentNode node = null;
+	private ArrayList agentListNotification = null;
+	private SimpleAgentNode nodeRef = null;
 
 	/**
 	 * Sets up the test environment. It enables the JMX interface, registers as listener
 	 * for agent's (de)registration, starts the application (platform "myPlatform" with 
 	 * one agent "TestAgent") defined in "agentTests.xml" and registers as listener for
-	 * changes of the agent's lifecycle state.
+	 * changes of the agent's lifecycle state and agent node's agent list.
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		System.setProperty("jmx.invoke.getters", "");
+		node = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=myPlatform");
 		agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=TestAgent");
 		mbs = ManagementFactory.getPlatformMBeanServer();
 
@@ -52,46 +56,61 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		// start application
 		context = new ClassPathXmlApplicationContext(
 			"de/dailab/jiactng/agentcore/agentTests.xml");
-		node = (SimpleAgentNode) context.getBean("myPlatform");
+		nodeRef = (SimpleAgentNode) context.getBean("myPlatform");
+		ArrayList<String> agentList = new ArrayList<String>();
+		agentList.add("TestAgent");
+		agentListNotification = agentList;
 
 		// add listener for change of agent's lifecycle state
 		AttributeChangeNotificationFilter acnf = new AttributeChangeNotificationFilter();
 		acnf.enableAttribute("LifecycleState");
 		mbs.addNotificationListener(agent, this, acnf, null);
+
+		// add listener for change of agent node's agent list
+		AttributeChangeNotificationFilter acnf2 = new AttributeChangeNotificationFilter();
+		acnf2.enableAttribute("Agents");
+		mbs.addNotificationListener(node, this, acnf2, null);
 	}
 
 	/**
 	 * Tears down the test environment. It deregisters as listener for changes of the 
-	 * agent's lifecycle state, shuts down the agent node, deregisters as listener for
-	 * agent's (de)registration and closes the application context.
+	 * agent's lifecycle state and agent node's agent list, shuts down the agent node, 
+	 * deregisters as listener for agent's (de)registration and closes the application 
+	 * context.
 	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		if (mbs.isRegistered(agent)) {
 			mbs.removeNotificationListener(agent, this);
 		}
-		node.shutdown();
+		mbs.removeNotificationListener(node, this);
+		nodeRef.shutdown();
 		mbs.removeNotificationListener(new ObjectName("JMImplementation:type=MBeanServerDelegate"), this);
 		mbs = null;
 		agent = null;
 		context.close();
 		context = null;
-		currentLifecycleState = "";
-		previousLifecycleState = "";
-		registrationNotification = "";
-		node = null;
+		currentLifecycleState = null;
+		previousLifecycleState = null;
+		registrationNotification = null;
+		agentListNotification = null;
+		nodeRef = null;
 	}
 	
 	
 	/**
 	 * Implementation of the interface NotificationListener. It notes the last two 
 	 * notifications about change of agent's lifecycle state and the last notification 
-	 * about (de)registration of the agent.
+	 * about (de)registration of the agent and about change of agent node's agent list.
 	 */
 	public void handleNotification(Notification notification, Object handback) {
 		if (notification instanceof AttributeChangeNotification) {
-			previousLifecycleState = currentLifecycleState;
-			currentLifecycleState = (String) ((AttributeChangeNotification) notification).getNewValue();
+			if (((AttributeChangeNotification)notification).getAttributeName().equals("LifecycleState")) {
+				previousLifecycleState = currentLifecycleState;
+				currentLifecycleState = (String) ((AttributeChangeNotification) notification).getNewValue();
+			} else if (((AttributeChangeNotification)notification).getAttributeName().equals("Agents")) {
+				agentListNotification = (ArrayList) ((AttributeChangeNotification) notification).getNewValue();
+			}
 		} else if (notification instanceof MBeanServerNotification) {
 			registrationNotification = notification.getType();
 		}
@@ -101,18 +120,22 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	/**
 	 * Tests if the agent can be correctly removed by using the JMX interface. This includes
 	 * the previous registration as JMX resource, the change to state CLEANED_UP, the 
-	 * deregistration as JMX resource and the removal from the agent node.
+	 * deregistration as JMX resource and the removal from the agent node (incl. notification).
 	 * @see #doAction(String)
 	 * @see #checkRegistrationNotification(String)
 	 * @see #checkStateNotifications(String,String)
+	 * @see #checkAgentListNotification(ArrayList)
 	 */
 	public void testRemove() {
 		checkRegistrationNotification("JMX.mbean.registered");
 		doAction("remove");
 		assertEquals("AgentMBean.remove doesn't deregister management of agent", false, mbs.isRegistered(agent));
-		assertEquals("AgentMBean.remove doesn't remove agent from agent node", true, node.findAgents().isEmpty());
+		assertEquals("AgentMBean.remove doesn't remove agent from agent node", true, nodeRef.findAgents().isEmpty());
 		checkStateNotifications("CLEANING_UP", "CLEANED_UP");
 		checkRegistrationNotification("JMX.mbean.unregistered");
+		
+		// check notification
+		checkAgentListNotification(new ArrayList());
 	}
 	
 	/**
@@ -186,7 +209,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	protected void checkState(String intendedState) {
 		// check actual state
-		String state = ((IAgent) node.findAgents().toArray()[0]).getState().toString();
+		String state = nodeRef.findAgents().get(0).getState().toString();
 		assertEquals("Wrong lifecycle state of agent", intendedState, state);		
 
 		// check JMX interface
@@ -205,8 +228,8 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 * @param currentState the intended state of the agent after the current notification
 	 */
 	protected void checkStateNotifications(String previousState, String currentState) {
-		assertEquals("Missing notification about state " + previousState, previousState, previousLifecycleState);
-		assertEquals("Missing notification about state " + currentState, currentState, currentLifecycleState);
+		assertEquals("Missing notification about agent's state " + previousState, previousState, previousLifecycleState);
+		assertEquals("Missing notification about agent's state " + currentState, currentState, currentLifecycleState);
 	}
 
 	/**
@@ -214,7 +237,15 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 * @param intendedType the intended type of the registration notification
 	 */
 	protected void checkRegistrationNotification(String intendedType) {
-		assertEquals("Missing notification " + intendedType, intendedType, registrationNotification);
+		assertEquals("Missing notification about agent " + intendedType, intendedType, registrationNotification);
+	}
+
+	/**
+	 * Checks the last notification about changed agent list of the agent node.
+	 * @param intendedList the intended agent list of the notification
+	 */
+	protected void checkAgentListNotification(ArrayList intendedList) {
+		assertEquals("Missing notification about changed agent list", intendedList, agentListNotification);
 	}
 
 }

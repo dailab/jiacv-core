@@ -28,6 +28,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	private String currentLifecycleState = "";
 	private String previousLifecycleState = "";
 	private String registrationNotification = "";
+	private ArrayList agentListNotification = null;
 	private SimpleAgentNode nodeRef = null;
 
 	/**
@@ -54,10 +55,14 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		context = new ClassPathXmlApplicationContext(
 			"de/dailab/jiactng/agentcore/agentTests.xml");
 		nodeRef = (SimpleAgentNode) context.getBean("myPlatform");
+		ArrayList<String> agentList = new ArrayList<String>();
+		agentList.add("TestAgent");
+		agentListNotification = agentList;
 
-		// add listener for change of agent node's lifecycle state
+		// add listener for change of agent node's lifecycle state and agent list
 		AttributeChangeNotificationFilter acnf = new AttributeChangeNotificationFilter();
 		acnf.enableAttribute("LifecycleState");
+		acnf.enableAttribute("Agents");
 		mbs.addNotificationListener(node, this, acnf, null);
 	}
 
@@ -79,9 +84,10 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		newAgent = null;
 		context.close();
 		context = null;
-		currentLifecycleState = "";
-		previousLifecycleState = "";
-		registrationNotification = "";
+		currentLifecycleState = null;
+		previousLifecycleState = null;
+		registrationNotification = null;
+		agentListNotification = null;
 		nodeRef = null;
 	}
 
@@ -93,8 +99,12 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	 */
 	public void handleNotification(Notification notification, Object handback) {
 		if (notification instanceof AttributeChangeNotification) {
-			previousLifecycleState = currentLifecycleState;
-			currentLifecycleState = (String) ((AttributeChangeNotification) notification).getNewValue();
+			if (((AttributeChangeNotification)notification).getAttributeName().equals("LifecycleState")) {
+				previousLifecycleState = currentLifecycleState;
+				currentLifecycleState = (String) ((AttributeChangeNotification) notification).getNewValue();
+			} else if (((AttributeChangeNotification)notification).getAttributeName().equals("Agents")) {
+				agentListNotification = (ArrayList) ((AttributeChangeNotification) notification).getNewValue();
+			}
 		} else if (notification instanceof MBeanServerNotification) {
 			registrationNotification = notification.getType();
 		}
@@ -176,7 +186,9 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	/**
 	 * Tests if you can add new agents to the agent node by using the JMX interface. This
 	 * includes the registration as JMX resource, the change to state STARTED and the
-	 * update of agent node's list of agents.
+	 * update of agent node's list of agents (inclusive notification).
+	 * 
+	 * @see #checkAgentListNotification(ArrayList)
 	 */
 	public void testAddAgents() {
 		try {
@@ -188,6 +200,12 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		assertEquals("SimpleAgentNodeMBean.addAgents doesn't register management of new agent", true, mbs.isRegistered(newAgent));
 		assertEquals("SimpleAgentNodeMBean.addAgents doesn't add new agent to agent node", 2, nodeRef.findAgents().size());
 		assertEquals("SimpleAgentNodeMBean.addAgents doesn't start new agent", "STARTED", nodeRef.findAgents().get(1).getState().toString());
+		
+		// check notification
+		ArrayList<String> agentList = new ArrayList<String>();
+		agentList.add("TestAgent");
+		agentList.add("NewAgent");
+		checkAgentListNotification(agentList);
 	}
 
 	/**
@@ -303,6 +321,14 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	 */
 	protected void checkRegistrationNotification(String intendedType) {
 		assertEquals("Missing notification about agent node " + intendedType, intendedType, registrationNotification);
+	}
+
+	/**
+	 * Checks the last notification about changed agent list of the agent node.
+	 * @param intendedList the intended agent list of the notification
+	 */
+	protected void checkAgentListNotification(ArrayList intendedList) {
+		assertEquals("Missing notification about changed agent list", intendedList, agentListNotification);
 	}
 
 }

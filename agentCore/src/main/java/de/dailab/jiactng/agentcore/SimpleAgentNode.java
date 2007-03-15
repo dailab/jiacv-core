@@ -10,7 +10,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.management.AttributeChangeNotification;
 import javax.management.MBeanServer;
+import javax.management.Notification;
 import javax.management.ObjectName;
 
 import org.apache.commons.logging.Log;
@@ -85,8 +87,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
    */
   public void addAgent(IAgent agent) {
     // TODO: statechanges?
+	ArrayList<String> oldAgentList = getAgents();
     this.agents.add(agent);
     agent.addLifecycleListener(this.lifecycle.createLifecycleListener());
+    agentListChanged(oldAgentList, getAgents());
   }
 
   /*
@@ -96,7 +100,30 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
    */
   public void removeAgent(IAgent agent) {
     // TODO: statechanges?
+	ArrayList<String> oldAgentList = getAgents();
     this.agents.remove(agent);
+    agentListChanged(oldAgentList, getAgents());
+  }
+
+  /**
+   * Uses JMX to send notifications that the attribute "Agents" of the managed 
+   * agent node has been changed (e.g. added or removed agent). 
+   * 
+   * @param oldAgentList the old list of agent names
+   * @param newAgentList the new list of agent names
+   */
+  private void agentListChanged(ArrayList<String> oldAgentList, ArrayList<String> newAgentList) {
+  	Notification n = 
+  		new AttributeChangeNotification(this, 
+				sequenceNumber++, 
+				System.currentTimeMillis(), 
+				"Agents changed", 
+				"Agents", 
+				"java.util.ArrayList<java.lang.String>", 
+				oldAgentList, 
+				newAgentList); 
+
+  	sendNotification(n);
   }
 
   /*

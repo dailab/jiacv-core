@@ -11,7 +11,6 @@
     <property name="execution"><ref bean="simpleExecCycle"/></property>
     <property name="adaptors">
       <list>
-        <ref bean="dummyBean"/>
       </list>
     </property>
   </bean>

@@ -72,4 +72,27 @@
             </answer>
         </faq>
     </part>
+    <part id="management">
+        <title>Monitoring and Control</title>
+        <faq id="how-manage">
+            <question>How do I manage a running application?</question>
+            <answer><p>
+                Applications implemented with JIAC TNG use JMX (Java Management Extensions,
+                http://java.sun.com/j2se/1.5.0/docs/guide/jmx/) to provide management functionality 
+                of agents and agent nodes for remote monitoring and control on condition that the
+                application was started with system property <code>com.sun.management.jmxremote</code>
+                (see example "HelloWorld"). While a special tool does not yet exist, humans may start
+                the tool "jconsole" of JDK1.5+ (Java Development Kit, version 1.5 or higher) on the 
+                host where the application runs, connect to the JVM (Java Virtual Machine) of the
+                application, change to the tab "MBeans" and open the tree under domain
+                <code>de.dailab.jiactng.agentcore</code>. For each element you can read its attributes,
+                invoke operations on it and subscribe for notifications. Instead of managing the 
+                application manually with tools you may also implement your own Java program which
+                manages your application automatically by using the JMX API. If your program runs in
+                the same JVM as the application you don't need to integrate a connector but you need
+                to set the system property <code>jmx.invoke.getters</code> (see test cases
+                "AgentMBeanTest" and "SimpleAgentNodeMBeanTest").</p>
+            </answer>
+        </faq>
+    </part>
 </faqs>

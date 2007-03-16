@@ -4,10 +4,22 @@
   <properties>
     <title>agentCore Documentation</title>
     <author email="axel.hessler@dai-labor.de">axle</author>
+    <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
   </properties>
   <body>
     <section name="agentCore Documentation"> 
       <p>This section provides an overview about agentCore.</p>
+      <p>The next figure gives an overview about the hierarchy of
+         classes and interfaces related to all lifecycle-aware 
+         elements (agent nodes, agents and agent beans) of JIAC TNG.
+         It contains all methods specified by the interfaces, all
+         attributes of the classes and all methods implemented by the 
+         classes additional to their implemented interfaces. The type
+         of attributes and the type of method results are given after
+         the colon. Input parameters are ignored in this view. The
+         character before the name of attributes and methods describes
+         their visibility (-private, #protected, +public).</p>
+      <img src="StaticStructure.png"/>
     </section>
   </body>
 </document>

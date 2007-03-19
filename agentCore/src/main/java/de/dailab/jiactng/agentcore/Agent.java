@@ -85,6 +85,12 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   private Future                executionFuture = null;
   
   /**
+   * Timeout after which the execution of a bean will be stopped and the agent as well.
+   * TODO do something more intelligent, possibly recover the bean without stopping the agent.
+   */
+  private long beanExecutionTimeout = 5000;
+  
+  /**
    * Main method for starting JIAC-TNG. Loads a spring-configuration file
    * denoted by the first argument and uses a ClassPathXmlApplicationContext to
    * instantiate its contents
@@ -145,7 +151,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
           executionFuture = agentNode.getThreadPool().submit(execution);
           FutureTask t = ((FutureTask) executionFuture);
           try {
-            t.get(500, TimeUnit.MILLISECONDS);
+            t.get(beanExecutionTimeout, TimeUnit.MILLISECONDS);
           } catch (TimeoutException to) {
             System.err.print("this: " + agentName);
             to.printStackTrace();
@@ -509,4 +515,20 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
     return agentNode.getUUID();
   }
 
+  /**
+   * Returns the timeout after which the execution of a bean will be stopped.
+   * @return the timeout in milliseconds
+   */
+  public long getBeanExecutionTimeout() {
+	  return beanExecutionTimeout;
+  }
+	
+  /**
+   * Sets the timeout after which the execution of a bean will be stopped.
+   * @param beanExecutionTimeout the timeout in milliseconds
+   */
+  public void setExecutionTimeout(long beanExecutionTimeout) {
+	  this.beanExecutionTimeout = beanExecutionTimeout;
+  }
+	
 }

@@ -720,7 +720,7 @@
 				<sendOnError>true</sendOnError>
 				<sendOnWarning>true</sendOnWarning>
 				<configuration>
-					<address>jiactng-dev@lists.dai-labor.de</address>
+					<address>jiactng-dev@dai-labor.de</address>
 				</configuration>
 			</notifier>
 		</notifiers>

@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -14,6 +15,9 @@ import javax.management.AttributeChangeNotification;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.ObjectName;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,6 +66,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
    * Storage for the agentFutures. Used to stop/cancel agentthreads.
    */
   private HashMap<String, Future> agentFutures = null;
+  
+  /**
+   * The list of JMX connector servers for remote management.
+   */
+  private ArrayList<JMXConnectorServer> connectorServer = new ArrayList<JMXConnectorServer>();
+
+  /**
+   * Comma separated list of provided JMX connector protocols.
+   */
+  private String jmxConnectors = "";
 
   /**
    * Constructur. Creates the uuid for the agentnode.
@@ -69,6 +83,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
   public SimpleAgentNode() {
     uuid = new String("p:"
         + Long.toHexString(System.currentTimeMillis() + this.hashCode()));
+  }
+
+  /**
+   * Setter for comma separated list of JMX connector protocols.
+   */
+  public void setJmxConnectors(String jmxConnectors) {
+	this.jmxConnectors = jmxConnectors;
   }
 
   /*
@@ -270,15 +291,47 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
   /**
    * Initialisation-method. This method is called by Spring after startup
    * (through the InitializingBean-Interface) and is used to start the agentnode
-   * after all beans haven been instantiated by Spring. Currently only registers 
-   * the agent node as JMX resource and calls the init() and start()-methods 
-   * from ILifefycle for this.
+   * after all beans haven been instantiated by Spring. Currently only creates 
+   * the JMX connector servers, registers the agent node as JMX resource and 
+   * calls the init() and start()-methods from ILifefycle for this.
    * 
    * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */
   public void afterPropertiesSet() throws Exception {
-	// register agent node as JMX resource
 	MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+
+	// Enable remote management
+	StringTokenizer st = new StringTokenizer(jmxConnectors, ",");
+    if (st.countTokens() > 0) {
+      System.setProperty("com.sun.management.jmxremote", "");    	
+    }
+	// Create and register all specified JMX connector servers
+    while (st.hasMoreTokens()) {
+      // get parameters of connector server
+      String protocol = st.nextToken().trim().toLowerCase();
+	  int port = 0;
+	  String path = null;
+	  if (protocol.equals("soap")) {
+		port = 8080;
+		path = "/jmxconnector";
+	  }
+	  
+	  // create connector server
+      JMXServiceURL jurl = new JMXServiceURL(protocol, null, port, path);
+      System.out.println("Creating Connector: " + jurl);
+      JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, null, mbs);
+      cs.start();
+      connectorServer.add(cs);
+      
+      // register connector server
+      JMXServiceURL address = cs.getAddress();
+      System.out.println("Registering URL for agent node: " + address);
+      //TODO register the connector server
+      System.out.println("Registered URL: " + address);        
+      System.out.println("Service URL successfully registered");
+    }
+    
+	// register agent node as JMX resource
 	try {
 	  ObjectName name = new ObjectName(
 	      "de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=" + this.name);
@@ -302,7 +355,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 
   /**
    * Shuts down the managed agent node and all its agents (incl. deregistration 
-   * as JMX resource).
+   * as JMX resource) before stopping all JMX connector servers.
    * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException
    */
   public void shutdown() throws LifecycleException {
@@ -341,6 +394,17 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
       e.printStackTrace();
     }
 
+    // Stop all connector servers
+    for (JMXConnectorServer cs : this.connectorServer) {
+      System.out.println("Stop the connector server: " + cs.getAddress().toString());
+      try {
+    	cs.stop();
+      } catch (Exception e) {
+    	e.printStackTrace();
+      }
+    }
+    this.connectorServer = null;
+    
     log.warn("AgentNode " + getName() + " has been closed.");	
   }
   

@@ -91,7 +91,11 @@
                 manages your application automatically by using the JMX API. If your program runs in
                 the same JVM as the application you don't need to integrate a connector but you need
                 to set the system property <code>jmx.invoke.getters</code> (see test cases
-                "AgentMBeanTest" and "SimpleAgentNodeMBeanTest").</p>
+                "AgentMBeanTest" and "SimpleAgentNodeMBeanTest"). Otherwise you have to set the property
+                <code>jmxConnectors</code> of the agent node with the protocols of the JMX connectors 
+                to be used (see example "HelloWorld") and to integrate a connector client into your 
+                program. Connector servers not yet registered by using any kind of discovery mechanisms, 
+                so existing servers can not be looked up automatically at the moment.</p>
             </answer>
         </faq>
     </part>

@@ -7,6 +7,8 @@
 <beans>
 
   <bean name="myPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+    <!--property name="jmxConnectors" value="rmi,soap,jms"/-->
+    <property name="jmxConnectors" value="rmi"/>
     <property name="agents">
       <list>
         <ref bean="HelloWorldAgent1"/>

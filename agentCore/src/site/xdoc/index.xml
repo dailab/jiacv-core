@@ -19,7 +19,10 @@
          the colon. Input parameters are ignored in this view. The
          character before the name of attributes and methods describes
          their visibility (-private, #protected, +public).</p>
-      <img src="StaticStructure.png"/>
+         
+         <a href="images/StaticStructure.png">
+	      <img src="images/StaticStructure.png"/>
+	     </a>
     </section>
   </body>
 </document>

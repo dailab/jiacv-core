@@ -28,8 +28,6 @@ public class Memory extends AbstractLifecycle implements IMemory {
 
 	private TupleSpace<IFact> space;
 
-	private int timeOut = 10000;
-
     /**
      * {@inheritDoc}
      */
@@ -51,36 +49,6 @@ public class Memory extends AbstractLifecycle implements IMemory {
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void doStart() throws LifecycleException {
-		// TODO Auto-generated method stub
-	}
-
-    /**
-     * {@inheritDoc}
-     */
-	@Override
-	public void doStop() throws LifecycleException {
-		// TODO Auto-generated method stub
-	}
-
-    /**
-     * {@inheritDoc}
-     */
-	public int getTimeOut() {
-		return timeOut;
-	}
-
-    /**
-     * {@inheritDoc}
-     */
-	public void setTimeOut(int timeOut) {
-		this.timeOut = timeOut;
-	}
-
-    /**
-     * {@inheritDoc}
-     */
 	public TupleSpace<IFact> getTupleSpace() {
 		return space;
 	}
@@ -90,6 +58,23 @@ public class Memory extends AbstractLifecycle implements IMemory {
      */
 	public void setTupleSpace(TupleSpace<IFact> space) {
 		this.space = space;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void doStart() throws LifecycleException {
+		// nothing to do yet
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void doStop() throws LifecycleException {
+		// nothing to do yet
+		// persistency may go here
 	}
 
     /**
@@ -116,63 +101,62 @@ public class Memory extends AbstractLifecycle implements IMemory {
     /**
      * {@inheritDoc}
      */
-	public IFact read(IFact template) {
+	public <E extends IFact> E read(E template) {
 		return space.read(template);
 	}
 
     /**
      * {@inheritDoc}
      */
-	public IFact read(IFact template, long timeOut) {
-		return space.read(template, timeOut);
+	public <E extends IFact> E read(E template, long timeout) {
+		return space.read(template, timeout);
 	}
 
     /**
      * {@inheritDoc}
      */
-	public Set<IFact> readAll(IFact template) {
+	public <E extends IFact> Set<E> readAll(E template) {
 		return space.readAll(template);
 	}
 
     /**
      * {@inheritDoc}
      */
-	@SuppressWarnings("unchecked")
-	public Set<IFact> readAllOfType(Class classname) {
-		return space.readAllOfType(classname);
+	public <E extends IFact> Set<E> readAllOfType(Class<E> c) {
+		return space.readAllOfType(c);
 	}
 
     /**
      * {@inheritDoc}
      */
-	public IFact remove(IFact template) {
+	public <E extends IFact> E remove(E template) {
 		return space.remove(template);
 	}
 
     /**
      * {@inheritDoc}
      */
-	public IFact remove(IFact template, long timeOut) {
-		return space.remove(template, timeOut);
+	public <E extends IFact> E remove(E template, long timeout) {
+		return space.remove(template, timeout);
 	}
 
     /**
      * {@inheritDoc}
      */
-	public Set<IFact> removeAll(IFact template) {
+	public <E extends IFact> Set<E> removeAll(E template) {
 		return space.removeAll(template);
 	}
 
     /**
      * {@inheritDoc}
      */
-	public boolean update(IFact template, IFact substPattern) {
-		return space.update(template, substPattern);
+	public <E extends IFact> boolean update(E template, E pattern) {
+		return space.update(template, pattern);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	public void write(IFact fact) {
 		space.write(fact);
 	}
@@ -183,5 +167,4 @@ public class Memory extends AbstractLifecycle implements IMemory {
 	public Iterator<IFact> iterator() {
 		return space.iterator();
 	}
-
 }

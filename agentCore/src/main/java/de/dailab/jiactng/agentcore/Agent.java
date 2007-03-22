@@ -367,9 +367,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    *          the new state
    */
   private void updateState(ILifecycle.LifecycleStates newState) {
-    if (memory.read(new Tuple("thisAgent.state", null)) != null) {
-      memory.remove(new Tuple("thisAgent.state", null));
-    }
+    memory.remove(new Tuple("thisAgent.state", null));
     memory.write(new Tuple("thisAgent.state", newState.toString()));
   }
 
@@ -402,7 +400,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    */
   public LifecycleStates getAgentState() {
     return LifecycleStates.valueOf(
-    		((Tuple)memory.read(new Tuple("thisAgent.state", null))).getArg2());
+    		memory.read(new Tuple("thisAgent.state", null)).getArg2());
   }
 
   /**
@@ -410,10 +408,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    */
   public void setBeanState(String beanName, LifecycleStates newState) {
     String beanPath = createBeanPath(beanName) + ".state";
-    Tuple test = (Tuple)this.memory.read(new Tuple(beanPath, null));
-    if (test != null) {
-      this.memory.remove(test);
-    }
+    this.memory.remove(new Tuple(beanPath, null));
     this.memory.write(new Tuple(beanPath, newState.toString()));
   }
 
@@ -422,8 +417,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    */
   public LifecycleStates getBeanState(String beanName) {
     String beanPath = createBeanPath(beanName) + ".state";
-    Tuple test = (Tuple)this.memory.read(new Tuple(beanPath, null));
-    return LifecycleStates.valueOf(test.getArg2());
+    return LifecycleStates.valueOf(this.memory.read(new Tuple(beanPath, null)).getArg2());
   }
 
   private String createBeanPath(String beanName) {

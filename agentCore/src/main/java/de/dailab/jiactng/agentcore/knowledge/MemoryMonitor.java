@@ -244,9 +244,9 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
     tree.clear();
 
     // get current memory state and iterate
-    Iterator<IFact> it = memory.readAll(new Tuple(null, null)).iterator();
+    Iterator<Tuple> it = memory.readAll(new Tuple(null, null)).iterator();
     while (it.hasNext()) {
-      Tuple next = (Tuple)it.next();
+      Tuple next = it.next();
       String path = next.getArg1();
       String value = next.getArg2();
       DefaultMutableTreeNode root = tree.getRootNode();

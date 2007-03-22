@@ -44,14 +44,17 @@ public class MemoryTest extends TestCase {
 	 */
 	public void testReadWrite() {
 		memory.write(new Fact(1, "test", true));
-		IFact fact = memory.read(new Fact(null, null, null));
+		Fact fact = memory.read(new Fact(null, null, null));
 		assertNotNull(fact);
-		assertTrue(fact instanceof Fact);
-		assertEquals(((Fact)fact).integer.intValue(), 1);
-		assertEquals(((Fact)fact).string, "test");
-		assertEquals(((Fact)fact).bool.booleanValue(), true);
+		assertEquals(fact.integer.intValue(), 1);
+		assertEquals(fact.string, "test");
+		assertEquals(fact.bool.booleanValue(), true);
 
-		Set<IFact> facts = memory.readAllOfType(IFact.class);
+		Set<IFact> ifacts = memory.readAllOfType(IFact.class);
+		assertNotNull(ifacts);
+		assertEquals(ifacts.size(), 1);
+
+		Set<Fact> facts = memory.readAllOfType(Fact.class);
 		assertNotNull(facts);
 		assertEquals(facts.size(), 1);
 		memory.removeAll(new Fact(null, null, null));
@@ -62,7 +65,7 @@ public class MemoryTest extends TestCase {
 	 */
 	public void testRemove() {
 		memory.write(new Fact(2, "test", true));
-		IFact fact = memory.remove(new Fact(null, null, null));
+		Fact fact = memory.remove(new Fact(null, null, null));
 		assertNotNull(fact);
 
 		Set<IFact> facts = memory.readAllOfType(IFact.class);
@@ -75,7 +78,7 @@ public class MemoryTest extends TestCase {
 	 */
 	public void testBlockingReadEmpty() {
 		long starttime = System.currentTimeMillis();
-		IFact fact = memory.read(new Fact(null, null, null), 1000);
+		Fact fact = memory.read(new Fact(null, null, null), 1000);
 		long stoptime = System.currentTimeMillis();
 		assertNull("time="+(stoptime-starttime), fact);
 		System.out.println("time="+(stoptime-starttime));
@@ -96,7 +99,7 @@ public class MemoryTest extends TestCase {
 				memory.write(new Fact(3, "test", true));
 			}
 		}.start();
-		IFact fact = memory.read(new Fact(null, null, null), 1000);
+		Fact fact = memory.read(new Fact(null, null, null), 1000);
 		long stoptime = System.currentTimeMillis();
 		assertNotNull("time="+(stoptime-starttime), fact);
 		System.out.println("time="+(stoptime-starttime));
@@ -108,7 +111,7 @@ public class MemoryTest extends TestCase {
 	 */
 	public void testBlockingRemoveEmpty() {
 		long starttime = System.currentTimeMillis();
-		IFact fact = memory.remove(new Fact(null, null, null), 1000);
+		Fact fact = memory.remove(new Fact(null, null, null), 1000);
 		long stoptime = System.currentTimeMillis();
 		assertNull("time="+(stoptime-starttime), fact);
 		System.out.println("time="+(stoptime-starttime));
@@ -129,21 +132,13 @@ public class MemoryTest extends TestCase {
 				memory.write(new Fact(3, "test", true));
 			}
 		}.start();
-		IFact fact = memory.remove(new Fact(null, null, null), 1000);
+		Fact fact = memory.remove(new Fact(null, null, null), 1000);
 		long stoptime = System.currentTimeMillis();
 		assertNotNull("time="+(stoptime-starttime), fact);
 		System.out.println("time="+(stoptime-starttime));
 		memory.removeAll(new Fact(null, null, null));
 	}
 
-	/**
-	 * Tests whether the timeout can be set and gotten.
-	 */
-	public void testTimeoutGetterSetter() {
-		memory.setTimeOut(1000);
-		assertEquals(memory.getTimeOut(), 1000);
-	}
-	
 	/**
 	 * Tests whether an id has been set.
 	 */
@@ -181,7 +176,7 @@ public class MemoryTest extends TestCase {
 		memory.write(new Fact(6, "test", true));
 		boolean result = memory.update(new Fact(null, null, null), new Fact(5, "update", false));
 		assertEquals(result, true);
-		Fact fact = (Fact)memory.remove(new Fact(null, null, null));
+		Fact fact = memory.remove(new Fact(null, null, null));
 		assertEquals(fact.integer.intValue(), 5);
 		assertEquals(fact.string, "update");
 		assertEquals(fact.bool.booleanValue(), false);
@@ -194,7 +189,7 @@ public class MemoryTest extends TestCase {
 		memory.write(new Fact(6, "test", true));
 		boolean result = memory.update(new Fact(null, null, null), new Fact(5, null, false));
 		assertEquals(result, true);
-		Fact fact = (Fact)memory.remove(new Fact(null, null, null));
+		Fact fact = memory.remove(new Fact(null, null, null));
 		assertEquals(fact.integer.intValue(), 5);
 		assertEquals(fact.string, "test");
 		assertEquals(fact.bool.booleanValue(), false);
@@ -207,7 +202,7 @@ public class MemoryTest extends TestCase {
 		memory.write(new Fact(1, "test1", true));
 		memory.write(new Fact(2, "test2", true));
 		memory.write(new Fact(3, "test3", true));
-		Set<IFact> facts = memory.readAll(new Fact(null, null, null));
+		Set<Fact> facts = memory.readAll(new Fact(null, null, null));
 		assertNotNull(facts);
 		assertEquals(facts.size(), 3);
 		memory.removeAll(new Fact(null, null, null));
@@ -220,7 +215,7 @@ public class MemoryTest extends TestCase {
 		memory.write(new Fact(1, "test1", true));
 		memory.write(new Fact(2, "test2", true));
 		memory.write(new Fact(3, "test3", true));
-		Set<IFact> facts = memory.removeAll(new Fact(null, null, null));
+		Set<Fact> facts = memory.removeAll(new Fact(null, null, null));
 		assertNotNull(facts);
 		assertEquals(facts.size(), 3);
 		facts = memory.removeAll(new Fact(null, null, null));
@@ -235,9 +230,15 @@ public class MemoryTest extends TestCase {
 		memory.write(new Fact(1, "test1", true));
 		memory.write(new Fact(2, "test2", true));
 		memory.write(new Fact(3, "test3", true));
-		Set<IFact> facts = memory.readAllOfType(IFact.class);
+		
+		Set<IFact> ifacts = memory.readAllOfType(IFact.class);
+		assertNotNull(ifacts);
+		assertEquals(ifacts.size(), 3);
+		
+		Set<Fact> facts = memory.readAllOfType(Fact.class);
 		assertNotNull(facts);
 		assertEquals(facts.size(), 3);
+		
 		memory.removeAll(new Fact(null, null, null));
 	}
 	
@@ -250,10 +251,10 @@ public class MemoryTest extends TestCase {
 		memory.write(new Fact(3, "test3", true));
 		boolean result = memory.update(new Fact(null, null, null), new Fact(null, "updated", null));
 		assertEquals(result, true);
-		Set<IFact> facts = memory.removeAll(new Fact(null, null, null));
+		Set<Fact> facts = memory.removeAll(new Fact(null, null, null));
 		assertEquals(facts.size(), 3);
-		for (IFact fact:facts) {
-			assertEquals(((Fact)fact).string, "updated");
+		for (Fact fact:facts) {
+			assertEquals(fact.string, "updated");
 		}
 	}
 	
@@ -295,6 +296,4 @@ public class MemoryTest extends TestCase {
 		memory.cleanup();
 		memory = null;
 	}
-	
-	
 }

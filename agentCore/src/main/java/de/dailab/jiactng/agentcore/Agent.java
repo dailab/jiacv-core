@@ -143,6 +143,15 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   /*
    * (non-Javadoc)
    * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getServiceLibrary()
+   */
+  public IServiceLibrary getServiceLibrary() {
+    return serviceLibrary;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.dailab.jiactng.agentcore.IAgent#setServiceLibrary(de.dailab.jiactng.agentcore.IServiceLibrary)
    */
   public void setServiceLibrary(IServiceLibrary serviceLib) {

@@ -209,6 +209,35 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	}
 
 	/**
+	 * Tests if you can deploy services to the agent node by using the JMX interface. This
+	 * includes the registration of the new provider agent as JMX resource, the change of
+	 * its state to INITIALIZED and the update of agent node's list of agents (inclusive notification).
+	 * 
+	 * @see #checkAgentListNotification(ArrayList)
+	 */
+	public void testDeployServices() {
+		String agentname = null;
+		ObjectName provider = null;
+		try {
+			agentname = (String) mbs.invoke(node, "deployServices", new Object[] {"<service name=\"bla\"></service>"}, new String[] {"java.lang.String"});
+			provider = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=" + agentname);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Error while deploying services to the agent node");
+		}
+		assertEquals("SimpleAgentNodeMBean.deployServices doesn't register management of new provider agent", true, mbs.isRegistered(provider));
+		assertEquals("SimpleAgentNodeMBean.deployServices doesn't add new provider agent to agent node", 2, nodeRef.findAgents().size());
+		assertEquals("SimpleAgentNodeMBean.deployServices doesn't initialize new provider agent", "INITIALIZED", nodeRef.findAgents().get(1).getState().toString());
+		assertEquals("SimpleAgentNodeMBean.deployServices doesn't set service of new provider agent", "<service name=\"bla\"></service>", nodeRef.findAgents().get(1).getServiceLibrary().getServices());
+		
+		// check notification
+		ArrayList<String> agentList = new ArrayList<String>();
+		agentList.add("TestAgent");
+		agentList.add(agentname);
+		checkAgentListNotification(agentList);
+	}
+
+	/**
 	 * Tests if the agent node can be correctly killed by using the JMX interface. This 
 	 * includes the previous registration as JMX resource, the change to state CLEANED_UP 
 	 * and the deregistration as JMX resource.

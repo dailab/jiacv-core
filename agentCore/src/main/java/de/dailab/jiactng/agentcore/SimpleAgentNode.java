@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
+import java.io.StringReader;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -22,7 +23,10 @@ import javax.management.remote.JMXServiceURL;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.xml.sax.InputSource;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
@@ -247,6 +251,40 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 			  e.printStackTrace();
 		  }
 	  }
+  }
+  
+  /**
+   * Deploys services on this agent node by creating a new agent.
+   * @param code the DFL-code of the services
+   * @return name of the new agent which provides the services
+   */
+  public String deployServices(String code) {
+	  // generate XML-based agent configuration
+	  String agentname = Long.toHexString(System.currentTimeMillis() + code.hashCode());
+	  String config = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\"><beans><bean name=\""
+		  +agentname+
+		  "\" class=\"de.dailab.jiactng.agentcore.Agent\"><property name=\"memory\"><ref bean=\"memory\"/></property><property name=\"serviceLibrary\"><ref bean=\"serviceLibrary\"/></property><property name=\"interpreter\"><ref bean=\"interpreter\"/></property><property name=\"execution\"><ref bean=\"simpleExecCycle\"/></property><property name=\"adaptors\"><list></list></property></bean><bean name=\"serviceLibrary\" class=\"de.dailab.jiactng.agentcore.SimpleServiceLibrary\" singleton=\"false\"><property name=\"services\" value=\"<![CDATA["
+		  +code+
+		  "]]>\"/></bean><bean name=\"interpreter\" class=\"de.dailab.jiactng.jadl.interpreter.ExecutionContext\" singleton=\"false\"></bean><bean name=\"memory\" class=\"de.dailab.jiactng.agentcore.knowledge.Memory\" singleton=\"false\"></bean><bean name=\"simpleExecCycle\" class=\"de.dailab.jiactng.agentcore.SimpleExecutionCycle\" singleton=\"false\"></bean></beans>";
+	  
+	  // create application context
+	  GenericApplicationContext ctx = new GenericApplicationContext();
+	  XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
+	  xmlReader.loadBeanDefinitions(new InputSource(new StringReader(config)));
+	  ctx.refresh();
+	  
+	  // initialize agent
+	  IAgent agent = (IAgent) ctx.getBeansOfType(IAgent.class).values().toArray()[0];
+      agent.setAgentNode(this);
+	  addAgent(agent);
+	  try {
+		  agent.init();
+	  } catch (LifecycleException e) {
+		  // TODO:
+		  e.printStackTrace();
+	  }
+
+	  return agentname;
   }
 
   /*

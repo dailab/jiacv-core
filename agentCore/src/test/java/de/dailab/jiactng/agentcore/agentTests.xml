@@ -17,6 +17,8 @@
 
   <bean name="TestAgent" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
     <property name="memory"><ref bean="memory"/></property>
+    <property name="serviceLibrary"><ref bean="serviceLibrary"/></property>
+    <property name="interpreter"><ref bean="interpreter"/></property>
     <property name="execution"><ref bean="simpleExecCycle"/></property>
     <property name="adaptors">
       <list>
@@ -33,6 +35,12 @@
       </list>
     </property>
   </bean-->
+
+  <bean name="serviceLibrary" class="de.dailab.jiactng.agentcore.SimpleServiceLibrary" singleton="false">
+  </bean>
+
+  <bean name="interpreter" class="de.dailab.jiactng.jadl.interpreter.ExecutionContext" singleton="false">
+  </bean>
 
   <bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
     <!--property name="timeOut" value="-1"/-->

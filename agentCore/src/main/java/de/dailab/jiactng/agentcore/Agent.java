@@ -59,6 +59,16 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   private IMemory               memory          = null;
 
   /**
+   * Comment for <code>interpreter</code>
+   */
+  private IInterpreter          interpreter     = null;
+
+  /**
+   * Comment for <code>serviceLibrary</code>
+   */
+  private IServiceLibrary       serviceLibrary  = null;
+
+  /**
    * The list of adaptors of this agent.
    */
   private ArrayList<IAgentBean> adaptors        = null;
@@ -119,6 +129,24 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    */
   public void setMemory(IMemory memory) {
     this.memory = memory;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setInterpreter(de.dailab.jiactng.agentcore.IInterpreter)
+   */
+  public void setInterpreter(IInterpreter interpreter) {
+    this.interpreter = interpreter;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setServiceLibrary(de.dailab.jiactng.agentcore.IServiceLibrary)
+   */
+  public void setServiceLibrary(IServiceLibrary serviceLib) {
+    this.serviceLibrary = serviceLib;
   }
 
   /*
@@ -250,6 +278,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
     updateState(LifecycleStates.CLEANED_UP);
 
     this.execution.cleanup();
+    this.interpreter.cleanup();
+    this.serviceLibrary.cleanup();
     this.memory.cleanup();
 }
 
@@ -265,6 +295,12 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
 
     this.memory.init();
     this.memory.write(new Tuple("thisAgent.name", this.agentName));
+
+    this.serviceLibrary.init();
+
+    this.interpreter.setServiceLibrary(this.serviceLibrary);
+    this.interpreter.setMemory(this.memory);
+    this.interpreter.init();
 
     this.execution.setAgent(this);
     this.execution.init();
@@ -296,6 +332,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   public void doStart() throws LifecycleException {
 
     this.memory.start();
+    this.serviceLibrary.start();
+    this.interpreter.start();
     this.execution.start();
 
     // call start for all adaptors
@@ -323,6 +361,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   public void doStop() throws LifecycleException {
 
     this.memory.stop();
+    this.serviceLibrary.stop();
+    this.interpreter.stop();
     this.execution.stop();
 
     // call stop for all adaptors

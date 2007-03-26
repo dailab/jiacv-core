@@ -70,6 +70,12 @@
         <version>2.0-m2</version>
       </dependency>
     
+      <dependency>
+        <groupId>jsr262-ri</groupId>
+        <artifactId>jmxws</artifactId>
+        <version>20060512</version>
+      </dependency>
+    
    </dependencies>
     
     <build>

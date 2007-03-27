@@ -9,10 +9,16 @@ package de.dailab.jiactng.agentcore.knowledge;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.security.auth.DestroyFailedException;
+
 import org.sercho.masp.space.ObjectMatcher;
 import org.sercho.masp.space.ObjectUpdater;
 import org.sercho.masp.space.SimpleObjectSpace;
 import org.sercho.masp.space.TupleSpace;
+import org.sercho.masp.space.event.EventedSpaceWrapper;
+import org.sercho.masp.space.event.EventedTupleSpace;
+import org.sercho.masp.space.event.SpaceObserver;
+import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
@@ -26,15 +32,8 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  */
 public class Memory extends AbstractLifecycle implements IMemory {
 
-	private TupleSpace<IFact> space;
-
-    /**
-     * {@inheritDoc}
-     */
-	@Override
-	public void doCleanup() throws LifecycleException {
-		space = null;
-	}
+	private SpaceDestroyer<IFact> destroyer;
+	private EventedTupleSpace<IFact> space;
 
     /**
      * During initialization the TupleSpace is created.
@@ -43,20 +42,35 @@ public class Memory extends AbstractLifecycle implements IMemory {
      */
 	@Override
 	public void doInit() throws LifecycleException {
-		space = new SimpleObjectSpace<IFact>("FactBase");
+		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("FactBase"));
+		space = destroyer.space;
 	}
 
     /**
      * {@inheritDoc}
      */
-	public TupleSpace<IFact> getTupleSpace() {
+	@Override
+	public void doCleanup() throws LifecycleException {
+		try {
+			destroyer.destroy();
+		} catch (DestroyFailedException e) {
+			e.printStackTrace();
+		}
+		space = null;
+		destroyer = null;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public EventedTupleSpace<IFact> getTupleSpace() {
 		return space;
 	}
 
     /**
      * {@inheritDoc}
      */
-	public void setTupleSpace(TupleSpace<IFact> space) {
+	public void setTupleSpace(EventedTupleSpace<IFact> space) {
 		this.space = space;
 	}
 
@@ -166,5 +180,26 @@ public class Memory extends AbstractLifecycle implements IMemory {
      */
 	public Iterator<IFact> iterator() {
 		return space.iterator();
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public void attach(SpaceObserver<? super IFact> observer) {
+		space.attach(observer);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public void attach(SpaceObserver<? super IFact> observer, IFact template) {
+		space.attach(observer, template);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public void detach(SpaceObserver<? super IFact> observer) {
+		space.detach(observer);
 	}
 }

@@ -6,7 +6,7 @@
  */
 package de.dailab.jiactng.agentcore.knowledge;
 
-import org.sercho.masp.space.TupleSpace;
+import org.sercho.masp.space.event.EventedTupleSpace;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
@@ -18,19 +18,21 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
  * 
  * @author Thomas Konnerth
  * @author axle
+ * 
  * @see org.sercho.masp.space.TupleSpace
+ * @see org.sercho.masp.space.event.EventedTupleSpace
  */
-public interface IMemory extends ILifecycle, TupleSpace<IFact> {
+public interface IMemory extends ILifecycle, EventedTupleSpace<IFact> {
 
 	/**
 	 * Return the internal TupleSpace implementation
 	 * @return the actual TupleSpace
 	 */
-	public abstract TupleSpace<IFact> getTupleSpace();
+	public abstract EventedTupleSpace<IFact> getTupleSpace();
 
 	/**
 	 * Set the internal TupleSpace implementation
 	 * @param space
 	 */
-	public abstract void setTupleSpace(TupleSpace<IFact> space);
+	public abstract void setTupleSpace(EventedTupleSpace<IFact> space);
 }

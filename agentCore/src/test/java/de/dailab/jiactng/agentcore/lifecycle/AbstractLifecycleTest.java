@@ -222,7 +222,8 @@ public class AbstractLifecycleTest extends TestCase implements ILifecycleListene
         ApplicationContext applicationContext = null;
         MockLifecycle instance = new MockLifecycle();
         
-        instance.setApplicationContext(applicationContext);
+        // TODO check what this shalls! Das Ding ist keine Bean!
+        //instance.setApplicationContext(applicationContext);
         
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

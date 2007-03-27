@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
+import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 /**
@@ -20,5 +21,12 @@ public interface IServiceLibrary extends ILifecycle {
 	 * @param code the DFL code of the services
 	 */
 	public void setServices(String code);
+
+	/**
+	 * Setter for memory of the agent that holds this bean.
+	 * 
+	 * @param memory the IMemory instance.
+	 */
+	public void setMemory(IMemory memory);
 
 }

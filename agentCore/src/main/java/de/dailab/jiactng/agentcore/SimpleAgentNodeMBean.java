@@ -38,13 +38,6 @@ public interface SimpleAgentNodeMBean {
 	public void addAgents(String configFile);
 
 	/**
-	 * Deploys services on this agent node.
-	 * @param code the DFL-code of the services
-	 * @return name of the new agent which provides the services
-	 */
-	public String deployServices(String code);
-
-	/**
 	 * Getter for attribute "LifecycleState" of the managed agent node.
 	 */
 	public String getLifecycleState();

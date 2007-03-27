@@ -46,29 +46,6 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
   public void setExecution(IExecutionCycle execution);
 
   /**
-   * Setter for the agent's interpreter-component. Used for dependency
-   * injection by Spring.
-   * 
-   * @param interpreter
-   */
-  public void setInterpreter(IInterpreter interpreter);
-
-  /**
-   * Getter for the agent's service-library-component.
-   * 
-   * @return service library
-   */
-  public IServiceLibrary getServiceLibrary();
-
-  /**
-   * Setter for the agent's service-library-component. Used for dependency
-   * injection by Spring.
-   * 
-   * @param serviceLib
-   */
-  public void setServiceLibrary(IServiceLibrary serviceLib);
-
-  /**
    * Setter for the agent's adaptor-components. Used for dependency injection by
    * Spring.
    * 

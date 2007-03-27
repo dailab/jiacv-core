@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
+import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
@@ -16,6 +17,9 @@ public class SimpleServiceLibrary extends AbstractLifecycle implements
 	 */
 	private String  services    = null;
 
+	/* Memory where service requests and results are stored */
+	private IMemory memory = null;
+	
 	@Override
 	public void doCleanup() throws LifecycleException {
 		// TODO Auto-generated method stub
@@ -56,6 +60,15 @@ public class SimpleServiceLibrary extends AbstractLifecycle implements
 	 */
 	public void setServices(String code) {
 	    this.services = code;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.IServiceLibrary#setMemory(de.dailab.jiactng.agentcore.knowledge.IMemory)
+	 */
+	public void setMemory(IMemory memory) {
+		this.memory = memory;
 	}
 
 }

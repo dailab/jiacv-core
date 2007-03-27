@@ -753,6 +753,7 @@
 		<module>ModuleTemplate</module>
 		<module>microJIAC</module>
 		<module>agentCore</module>
+		<module>agentInterpreter</module>
 		<module>examples</module>
 	</modules>
 </project>

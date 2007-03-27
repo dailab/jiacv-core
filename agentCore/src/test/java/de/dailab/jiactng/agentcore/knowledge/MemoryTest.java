@@ -3,14 +3,13 @@ package de.dailab.jiactng.agentcore.knowledge;
 import java.util.Iterator;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.sercho.masp.space.SimpleObjectSpace;
-import org.sercho.masp.space.TupleSpace;
-import org.springframework.context.Lifecycle;
+import org.sercho.masp.space.event.EventedSpaceWrapper;
+import org.sercho.masp.space.event.EventedTupleSpace;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
-import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
-
-import junit.framework.TestCase;
 
 public class MemoryTest extends TestCase {
 
@@ -81,7 +80,7 @@ public class MemoryTest extends TestCase {
 		Fact fact = memory.read(new Fact(null, null, null), 1000);
 		long stoptime = System.currentTimeMillis();
 		assertNull("time="+(stoptime-starttime), fact);
-		System.out.println("time="+(stoptime-starttime));
+		//System.out.println("time="+(stoptime-starttime));
 	}
 	
 	/**
@@ -102,7 +101,7 @@ public class MemoryTest extends TestCase {
 		Fact fact = memory.read(new Fact(null, null, null), 1000);
 		long stoptime = System.currentTimeMillis();
 		assertNotNull("time="+(stoptime-starttime), fact);
-		System.out.println("time="+(stoptime-starttime));
+		//System.out.println("time="+(stoptime-starttime));
 		memory.removeAll(new Fact(null, null, null));
 	}
 	
@@ -114,7 +113,7 @@ public class MemoryTest extends TestCase {
 		Fact fact = memory.remove(new Fact(null, null, null), 1000);
 		long stoptime = System.currentTimeMillis();
 		assertNull("time="+(stoptime-starttime), fact);
-		System.out.println("time="+(stoptime-starttime));
+		//System.out.println("time="+(stoptime-starttime));
 	}
 	
 	/**
@@ -135,7 +134,7 @@ public class MemoryTest extends TestCase {
 		Fact fact = memory.remove(new Fact(null, null, null), 1000);
 		long stoptime = System.currentTimeMillis();
 		assertNotNull("time="+(stoptime-starttime), fact);
-		System.out.println("time="+(stoptime-starttime));
+		//System.out.println("time="+(stoptime-starttime));
 		memory.removeAll(new Fact(null, null, null));
 	}
 
@@ -281,9 +280,9 @@ public class MemoryTest extends TestCase {
 	 * Tests whether a tuple space can be exchanged.
 	 */
 	public void testSpaceExchange() {
-		TupleSpace<IFact> space = memory.getTupleSpace();
+		EventedTupleSpace<IFact> space = memory.getTupleSpace();
 		String name = "TestFactBase";
-		memory.setTupleSpace(new SimpleObjectSpace<IFact>(name));
+		memory.setTupleSpace(new EventedSpaceWrapper<IFact>(new SimpleObjectSpace<IFact>(name)));
 		assertNotNull(memory.getTupleSpace());
 		assertEquals(memory.getID(), name);
 		memory.setTupleSpace(space);
@@ -292,8 +291,6 @@ public class MemoryTest extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
-		memory.stop();
-		memory.cleanup();
 		memory = null;
 	}
 }

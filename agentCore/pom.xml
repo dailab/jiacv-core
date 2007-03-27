@@ -48,7 +48,7 @@
 		<dependency>
 			<groupId>org.sercho.masp.utilities</groupId>
 			<artifactId>Swing</artifactId>
-			<version>1.0-alpha</version>
+			<version>1.0-beta-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -95,11 +95,5 @@
 			</testResource>
 		</testResources>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-			</plugin>
-		</plugins>
 	</build>
 </project>

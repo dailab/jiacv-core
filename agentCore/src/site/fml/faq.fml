@@ -21,7 +21,7 @@
     </part>
     <part id="lifecycle">
         <title>Lifecycle</title>
-        <faq id="lifecycle">
+        <faq id="lifecycle1">
             <question>What are the available phases in the lifecycle model?</question>
             <answer>
                 <p>
@@ -33,6 +33,8 @@
                   to learn more about the lifecycle model.
                 </p>
             </answer>
+          </faq>
+          <faq id="lifecycle2">
             <question>How does the Lifecycle API apply to my code?</question>
             <answer><p>
               The <code>de.dailab.jiactng.agentcore.lifecycle</code> package contains
@@ -42,6 +44,8 @@
               code. In the latter case check out how <code>AbstractLifecycle</code>
               employs the <code>DefaultLifecycleHandler</code> class.</p>
             </answer>
+          </faq>
+          <faq id="lifecycle3">
             <question>What is the difference between loose and strict lifecycle?</question>
             <answer><p>
               Loose means that there are no restrictions on transitions between
@@ -50,17 +54,23 @@
               a boolean parameter, indicating wether or not you want the lifecycle
               handler to operate in strict mode. The default is loose handling.</p>
             </answer>
+          </faq>
+          <faq id="lifecycle4">
             <question>Can I switch arbitrarily between those lifecycle states?</question>
             <answer><p>
               In loose mode you can. In strict mode you can switch only between
               adjacent lifecycle states.</p>
             </answer>
+          </faq>
+          <faq id="lifecycle5">
             <question>How do the lifecycle events come into play?</question>
             <answer><p>
               You can register a <code>ILifecycleListener</code> with any <code>
               Lifecycle</code> to receive state change events. This is different from
               the JMX state change notifications.</p>
             </answer>
+          </faq>
+          <faq id="lifecycle6">
             <question>Can I create a hierarchy of lifecycle listeners?</question>
             <answer><p>
               Yes. Suppose, there is a lifecycle listener that manages a number

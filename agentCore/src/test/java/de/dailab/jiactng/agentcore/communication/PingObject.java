@@ -3,6 +3,8 @@ package de.dailab.jiactng.agentcore.communication;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
+ * DUMMY!!!!
+ *
  * @author Joachim Fuchs
  */
 public class PingObject implements IFact {

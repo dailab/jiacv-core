@@ -74,7 +74,13 @@
 			<artifactId>jmxws</artifactId>
 			<version>20060512</version>
 		</dependency>
-		
+
+		<dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>activemq</artifactId>
+            <version>4.1.0-incubator</version>
+        </dependency>
+
 	</dependencies>
 
 	<build>

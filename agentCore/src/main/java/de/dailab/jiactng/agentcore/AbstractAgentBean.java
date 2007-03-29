@@ -8,6 +8,7 @@ package de.dailab.jiactng.agentcore;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
  * Abstract superclass of all agentbeans. This includes core-components as well
@@ -98,7 +99,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
    */
-  public void doInit() {
+  public void doInit() throws LifecycleException {
   }
 
   /*
@@ -106,7 +107,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
    */
-  public void doStart() {
+  public void doStart() throws LifecycleException {
   }
 
   /*
@@ -114,7 +115,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStop()
    */
-  public void doStop() {
+  public void doStop() throws LifecycleException {
   }
 
   /*
@@ -122,7 +123,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doCleanup()
    */
-  public void doCleanup() {
+  public void doCleanup() throws LifecycleException {
   }
 
   /*

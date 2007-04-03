@@ -99,7 +99,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
    */
-  public void doInit() throws LifecycleException {
+  public void doInit() throws Exception {
   }
 
   /*
@@ -107,7 +107,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
    */
-  public void doStart() throws LifecycleException {
+  public void doStart() throws Exception {
   }
 
   /*
@@ -115,7 +115,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStop()
    */
-  public void doStop() throws LifecycleException {
+  public void doStop() throws Exception {
   }
 
   /*
@@ -123,7 +123,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
    * 
    * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doCleanup()
    */
-  public void doCleanup() throws LifecycleException {
+  public void doCleanup() throws Exception {
   }
 
   /*

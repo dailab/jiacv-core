@@ -80,7 +80,7 @@ public class ActiveMQBroker extends AbstractLifecycle {
         
     }
     
-    public void doInit() throws LifecycleException {
+    public void doInit() throws Exception {
         
         if (this.log == null) {
             
@@ -99,16 +99,7 @@ public class ActiveMQBroker extends AbstractLifecycle {
         broker.setUseJmx(brokerUseJmx);
         broker.setPersistent(brokerUsePersistence);
         
-        try {
-            
-            connector = broker.addConnector(brokerUrl);
-            
-        } catch (Exception e) {
-            
-            throw new LifecycleException(
-                    "Failed to add broker connector with url " + brokerUrl, e);
-            
-        }
+        connector = broker.addConnector(brokerUrl);
         
         if (log.isDebugEnabled()) {
             
@@ -118,7 +109,7 @@ public class ActiveMQBroker extends AbstractLifecycle {
         
     }
     
-    public void doStart() throws LifecycleException {
+    public void doStart() throws Exception {
         
         if (log.isDebugEnabled()) {
             
@@ -129,19 +120,12 @@ public class ActiveMQBroker extends AbstractLifecycle {
         // start broker
         if (broker != null) {
             
-            try {
+            connector.start();
+            broker.start();
+            
+            if (log.isDebugEnabled()) {
                 
-                broker.start();
-                
-                if (log.isDebugEnabled()) {
-                    
-                    log.debug("broker started");
-                    
-                }
-                
-            } catch (Exception e) {
-                
-                throw new LifecycleException("Failed to start Broker", e);
+                log.debug("broker started");
                 
             }
             
@@ -153,7 +137,7 @@ public class ActiveMQBroker extends AbstractLifecycle {
         
     }
     
-    public void doStop() throws LifecycleException {
+    public void doStop() throws Exception {
         
         if (log.isDebugEnabled()) {
             
@@ -164,20 +148,12 @@ public class ActiveMQBroker extends AbstractLifecycle {
         // stop broker
         if (broker != null) {
             
-            try {
+            connector.stop();
+            broker.stop();
+            
+            if (log.isDebugEnabled()) {
                 
-                connector.stop();
-                broker.stop();
-                
-                if (log.isDebugEnabled()) {
-                    
-                    log.debug("broker stopped");
-                    
-                }
-                
-            } catch (Exception e) {
-                
-                throw new LifecycleException("Failed to stop Broker", e);
+                log.debug("broker stopped");
                 
             }
             
@@ -185,7 +161,7 @@ public class ActiveMQBroker extends AbstractLifecycle {
         
     }
     
-    public void doCleanup() throws LifecycleException {
+    public void doCleanup() throws Exception {
         
         if (log.isDebugEnabled()) {
             
@@ -194,18 +170,9 @@ public class ActiveMQBroker extends AbstractLifecycle {
         }
         
         if (broker != null && connector != null) {
-            
-            try {
-                                
-                broker.removeConnector(connector);
-                
-            } catch (Exception e) {
-                
-                throw new LifecycleException(
-                        "Failed to remove TransportConnector", e);
-                
-            }
-            
+
+            broker.removeConnector(connector);
+                            
         }
         
         broker = null;
@@ -218,6 +185,9 @@ public class ActiveMQBroker extends AbstractLifecycle {
         
     }
     
+    /**
+     * dummy for tests only
+     */
     public void springStart() throws Exception {
         
         init();
@@ -225,6 +195,9 @@ public class ActiveMQBroker extends AbstractLifecycle {
         
     }
     
+    /**
+     * dummy for tests only
+     */
     public void springStop() throws Exception {
         
         stop();

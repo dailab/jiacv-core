@@ -1,0 +1,62 @@
+package de.dailab.jiactng.agentcore.comm;
+
+import javax.jms.Destination;
+
+import de.dailab.jiactng.agentcore.knowledge.IFact;
+
+/**
+ * Eine InterAgent-Message in Jiac.
+ * 
+ * @author janko
+ * 
+ */
+public interface IJiacMessage extends IFact {
+
+	/**
+	 * Liefert die Nutzdaten
+	 * 
+	 * @return
+	 */
+	public Object getPayload();
+
+	/**
+	 * Liefert den Endpunkt der Nachricht. Dieser wird in der JMS-Nachricht als
+	 * Property gesetzt, damit danach im Consumer selektiert werden kann
+	 * Der Endpoint ist der Empfänger der Nachricht.
+	 * @return
+	 */
+	public IEndPoint getEndPoint();
+
+	/**
+	 * Der Typ der Nachricht, Befehl/Ergebnis/Fehlerhinweis
+	 * 
+	 * @return
+	 */
+	public String getOperation();
+	
+	/**
+	 * Der Sender ist die JMS-Queue oder Topic
+	 * @return
+	 */
+	public Destination getSender();
+	
+	/**
+	 * Der Sender ist die JMS-Queue oder Topic
+	 * @return
+	 */
+	public void setSender(Destination destination);
+	
+	/**
+	 * Der Absender der Nachricht
+	 * @return
+	 */
+	public IEndPoint getStartPoint();
+	
+	/**
+	 * Ermittelt die jiacAdressierung aus vorhandenen daten. Unterscheidet zwischen 
+	 * To-Agent und To-Platform Adresse.
+	 * Dieser Wert wird dann als Property an der JMS-Message gesetzt, so dass danach selektiert werden kann.  
+	 * @return
+	 */
+	public String getJiacDestination();
+}

@@ -76,10 +76,16 @@
 		</dependency>
 
 		<dependency>
-            <groupId>org.apache</groupId>
-            <artifactId>activemq</artifactId>
-            <version>4.1.0-incubator</version>
-        </dependency>
+			<groupId>org.apache</groupId>
+			<artifactId>activemq</artifactId>
+			<version>4.1.0-incubator</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>forms</artifactId>
+			<version>1.0.7</version>
+		</dependency>
 
 	</dependencies>
 

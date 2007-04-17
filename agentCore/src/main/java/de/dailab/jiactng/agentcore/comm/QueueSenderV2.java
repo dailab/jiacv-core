@@ -11,18 +11,16 @@ import javax.jms.QueueConnectionFactory;
 import javax.jms.Session;
 
 import org.apache.activemq.pool.ConnectionPool;
-import org.apache.log4j.Logger;
 
 /**
- * Ein JMS Sender für Jiac Tng.. Soll aber Springkonform sein, d.h. öffentliche Properties, die als gesetzt agnegesehne
+ * Ein JMS Sender für Jiac Tng.. Soll aber Springkonform sein, d.h. öffentliche Properties, die als gesetzt angesehen
  * werden können. Es können aber nur primitive Typen gesetzt werden, so dass zusätzlich eine Init-Methode aufgerufen
- * werden muss, die den rest initialisiert. Tendenziell mehr globale variablen, weniger flexible Methoden (weniger
+ * werden muss, die den Rest initialisiert. Tendenziell mehr globale variablen, weniger flexible Methoden (weniger
  * Params)
  * 
  * @author janko
  */
 public class QueueSenderV2 implements IJiacSender {
-	static Logger log4j = Logger.getLogger("de.dailab.jiactng.agentcore.comm.SenderV2");
 	ConnectionPool _connectionPool;
 	ConnectionFactory _connectionFactory;
 	Destination _destination;
@@ -132,7 +130,6 @@ public class QueueSenderV2 implements IJiacSender {
 	 * @param timeToLive in ms
 	 */
 	public void sendMessage(IJiacMessage message, Destination destination, Destination replyToDestination, long timeToLive) {
-		log4j.info(">>>sending... to " + destination.toString() + " / '" + message.getEndPoint().toString() + "'");
 		dbgLog("sending... to " + destination.toString() + " / '" + message.getEndPoint().toString() + "'");
 		MessageProducer producer = null;
 		try {
@@ -149,14 +146,12 @@ public class QueueSenderV2 implements IJiacSender {
 			dbgLog(" verpackt in dieser ObjectMsg:\n" + objectMessage.toString());
 			producer.send(objectMessage);
 		} catch (JMSException e) {
-			log4j.info("Exception occurred: " + e);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		} finally {
 			Util.closeAll(null, null, producer, null);
 		}
 		dbgLog("Sending done");
-		log4j.info(">>>sending...done");
 	}
 
 	private void dbgLog(String text) {

@@ -4,24 +4,19 @@ import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
 
-import org.apache.log4j.Logger;
-
 import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.QueueSenderV2;
 
 /**
- * Ein Protokoll für die Kommunikation. Die processMessage-Methode wird von
- * einem MessageListener aufgerufen. Die Message wird hier behandelt und mit dem
- * im Konstruktor übergebenen Sender wird eine Antwort gesendet. Der Empfänger der
- * Antwort wird aus der Message gelesen.
+ * Ein Protokoll für die Kommunikation. Die processMessage-Methode wird von einem MessageListener aufgerufen. Die
+ * Message wird hier behandelt und mit dem im Konstruktor übergebenen Sender wird eine Antwort gesendet. Der Empfänger
+ * der Antwort wird aus der Message gelesen.
  * 
  * @author janko
- * 
  */
 public class BasicJiacProtocol implements IProtocolHandler {
-	static Logger log4j = Logger.getLogger("de.dailab.jiactng.protocol.BasicJiacProtocol");
+	// static Logger log4j = Logger.getLogger("de.dailab.jiactng.protocol.BasicJiacProtocol");
 
 	// Diese Befehle versteht das Protokoll
 	public static final String CMD_PING = "PING";
@@ -49,7 +44,6 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	IJiacSender _sender;
 
 	/**
-	 * 
 	 * @param sender der Sender MIT dem eine Antwort verschickt wird
 	 */
 	public BasicJiacProtocol(IJiacSender sender) {
@@ -57,7 +51,7 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	}
 
 	public void setSender(IJiacSender sender) {
-		_sender =  sender;
+		_sender = sender;
 	}
 
 	/**
@@ -83,8 +77,7 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	}
 
 	/**
-	 * Diese Methode leitet entsprechend des MessageTyps an andere Methoden weiter
-	 * und schickt die Antwort
+	 * Diese Methode leitet entsprechend des MessageTyps an andere Methoden weiter und schickt die Antwort
 	 * 
 	 * @param msg
 	 * @param destination
@@ -120,7 +113,7 @@ public class BasicJiacProtocol implements IProtocolHandler {
 		String operation = msg.getOperation();
 		if (ACK_GET_AGENTS.equals(operation)) {
 			System.out.println("Alles Roger.. hab die Agenten gekriegt, von " + msg.getStartPoint());
-//			_platform.addRemoteAgents((List<AgentStub>) msg.getPayload());
+			// _platform.addRemoteAgents((List<AgentStub>) msg.getPayload());
 		} else if (ACK_GET_SERVICES.equals(operation)) {
 			System.out.println("Alles Roger.. hab die Services gekriegt, von " + msg.getStartPoint());
 		} else if (ACK_PING.equals(operation)) {
@@ -161,17 +154,17 @@ public class BasicJiacProtocol implements IProtocolHandler {
 		String operation = receivedMsg.getOperation();
 		IJiacMessage replyMsg = null;
 		if (CMD_GET_AGENTS.equals(operation)) {
-//			List<AgentStub> agents = _platform.getAgents();
-//			System.out.println("+++++ schicke ab an " + receivedMsg.getStartPoint());
-//			PlatformHelper.debugPrintAgents(agents);
+			// List<AgentStub> agents = _platform.getAgents();
+			// System.out.println("+++++ schicke ab an " + receivedMsg.getStartPoint());
+			// PlatformHelper.debugPrintAgents(agents);
 			replyMsg = new JiacMessage(ACK_GET_AGENTS, "agents", receivedMsg.getStartPoint(), receivedMsg.getEndPoint(),
-					receivedMsg.getSender());
+																							receivedMsg.getSender());
 		} else if (CMD_GET_SERVICES.equals(operation)) {
 			String[] services = { "A()", "B()", "C()" };
 		} else if (CMD_PING.equals(operation)) {
 			String content = "Pong";
 			replyMsg = new JiacMessage(ACK_PING, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(), receivedMsg
-					.getSender());
+																							.getSender());
 		} else if (CMD_NOP.equals(operation)) {
 			String content = "psst";
 		}
@@ -184,12 +177,11 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	 * @param msg die AntwortNachricht
 	 * @param destination die ZielDestination
 	 * @param senderAddress die ReplyTo-Destination der JMSMessage
-	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn
-	 *         Versenden nicht möglich war.
+	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht möglich war.
 	 */
 	private int doReply(IJiacMessage msg, Destination destination, Destination senderAddress) {
 		if (msg != null && destination != null && _sender != null) {
-			_sender.send(msg, destination); //, senderAddress, DEFAULT_TTL);
+			_sender.send(msg, destination); // , senderAddress, DEFAULT_TTL);
 			return PROCESSING_SUCCESS;
 		}
 		return PROCESSING_FAILED;

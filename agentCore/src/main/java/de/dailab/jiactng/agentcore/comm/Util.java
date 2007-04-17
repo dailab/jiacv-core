@@ -24,7 +24,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.log4j.Logger;
 
 /**
  * UtilityKlasse, die statische Methoden kapselt.
@@ -32,7 +31,6 @@ import org.apache.log4j.Logger;
  * @author janko
  */
 public class Util {
-	static Logger log4j = Logger.getLogger("de.dailab.jiactng.agentcore.comm.Util");
 
 	public static final char SEPARATOR = '#';
 
@@ -86,7 +84,6 @@ public class Util {
 			ctx = new InitialContext(props);
 			// printContextEnvProps(ctx);
 		} catch (Exception e) {
-			log4j.error(e.getMessage());
 		}
 		return ctx;
 	}
@@ -104,7 +101,6 @@ public class Util {
 				System.out.println(element.toString() + ": " + ht.get(element).toString());
 			}
 		} catch (Exception e) {
-			log4j.error(e.getMessage());
 		}
 	}
 
@@ -217,28 +213,28 @@ public class Util {
 			try {
 				producer.close();
 			} catch (JMSException e) {
-				log4j.warn(e.getMessage());
+				System.err.println(e.getMessage());
 			}
 		}
 		if (publisher != null) {
 			try {
 				publisher.close();
 			} catch (JMSException e) {
-				log4j.warn(e.getMessage());
+				System.err.println(e.getMessage());
 			}
 		}
 		if (session != null) {
 			try {
 				session.close();
 			} catch (JMSException e) {
-				log4j.warn(e.getMessage());
+				System.err.println(e.getMessage());
 			}
 		}
 		if (con != null) {
 			try {
 				con.close();
 			} catch (JMSException e) {
-				log4j.warn(e.getMessage());
+				System.err.println(e.getMessage());
 			}
 		}
 		publisher = null;

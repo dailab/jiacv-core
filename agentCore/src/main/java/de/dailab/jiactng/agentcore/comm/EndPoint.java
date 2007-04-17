@@ -13,6 +13,11 @@ public class EndPoint implements IEndPoint {
 
 	public static final char SEPARATOR = '.';
 
+	/**
+	 * 
+	 * @param uid universal id, should be unique 
+	 * @param id
+	 */
 	public EndPoint(String uid, String id) {
 		setLocalId(id);
 		setUniversalId(uid);

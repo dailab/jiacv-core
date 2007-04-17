@@ -7,7 +7,6 @@ import javax.jms.ObjectMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.QueueSenderV2;
 
 /**
  * Idee: Ein eigenens Protocol für die Agenten. Zusätzlich zu einem Protocol für

@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.V1;
+package de.dailab.jiactng.agentcore.comm.V2;
 
 import javax.swing.JFrame;
 
@@ -6,12 +6,7 @@ import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.comm.CommBean;
 import de.dailab.jiactng.agentcore.comm.gui.AgentPanel;
 
-/**
- * Erzeugt n Fenster mit nem Panel zum Zugriff auf die Communikationsbean
- * @author janko
- */
-public class TestCommBean1 extends AbstractAgentBean {
-
+public class TestPlatformCommunication extends AbstractAgentBean {
 	JFrame _frame;
 	CommBean _commBean;
 	AgentPanel _agentPanel;
@@ -19,7 +14,7 @@ public class TestCommBean1 extends AbstractAgentBean {
 	int _counter = 0;
 	int _timer = 10;
 	
-	public TestCommBean1() {
+	public TestPlatformCommunication() {
 		_frame = createFrame();
 	}
 

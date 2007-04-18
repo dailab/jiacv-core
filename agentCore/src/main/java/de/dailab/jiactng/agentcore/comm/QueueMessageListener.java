@@ -1,5 +1,8 @@
 package de.dailab.jiactng.agentcore.comm;
 
+import java.io.Serializable;
+import java.lang.reflect.Array;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -46,8 +49,30 @@ public class QueueMessageListener implements MessageListener {
 
 	private void debugMsg(ObjectMessage msg, String addressProperty) throws JMSException {
 		JiacMessage jMsg = (JiacMessage) msg.getObject();
-		System.out.println("Von:" + jMsg.getStartPoint() + " An:" + jMsg.getEndPoint() + " Content:"
-				+ jMsg.getPayload().toString());
+		String payLoadString = convertPayLoadToString(jMsg.getPayload());
+		System.out.println("Output:"+payLoadString);
+//		System.out.println("Von:" + jMsg.getStartPoint() + " An:" + jMsg.getEndPoint() + " Content:"		
+//				+ jMsg.getPayload().toString());
 		System.out.println("AddressProperty: " + addressProperty);
+	}
+	
+	private String convertPayLoadToString(Object payload) {
+		StringBuffer sb = new StringBuffer();
+		System.out.println(payload.getClass().getName());
+		System.out.println(payload.getClass());
+		if (payload.getClass().getName().equals("[C")) {
+			char[] content = (char[]) payload;
+			sb.append(content);
+		}
+		if (payload.getClass().equals(Character.TYPE)) {
+			System.out.println("isn char");
+		}
+		if (payload.getClass().isArray()) {
+			System.out.println("isn Array");			
+			System.out.println(Array.getLength(payload)+" einträge");
+			System.out.println("Type ist:"+Array.get(payload, 0).getClass().getName());
+			System.out.println("Type ist:"+payload.getClass().getComponentType());
+		}		
+		return sb.toString();
 	}
 }

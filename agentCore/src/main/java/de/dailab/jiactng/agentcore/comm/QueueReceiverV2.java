@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.comm;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,6 +113,7 @@ public class QueueReceiverV2 {
 					if (content instanceof IJiacMessage) {
 						IJiacMessage jiacMsg = (IJiacMessage) content;
 						Object payload = jiacMsg.getPayload();
+						String outString = convertPayLoadToString(payload);
 						dbgLog(" received Payload:" + payload);
 					}
 					msg.acknowledge();
@@ -120,6 +122,15 @@ public class QueueReceiverV2 {
 				}
 			}
 		}
+	}
+
+	private String convertPayLoadToString(Object payload) {
+		StringBuffer sb = new StringBuffer();
+		if (payload.getClass().equals(Array.class)) {
+			char[] content = (char[]) payload;
+			sb.append(content);
+		}
+		return sb.toString();
 	}
 
 	private void dbgLog(String text) {

@@ -77,6 +77,20 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
   public IAgentNode getAgentNode();
 
   /**
+   * Getter for the owner of this agent.
+   * 
+   * @return the owner of this agent.
+   */
+  public String getOwner();
+
+  /**
+   * Setter for the owner of this agent.
+   * 
+   * @param owner the owner of this agent.
+   */
+  public void setOwner(String owner);
+
+  /**
    * Getter for the list of adaptors of this agent.
    * 
    * @return the lifelist of the adaptors.

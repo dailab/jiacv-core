@@ -32,7 +32,10 @@ public interface AgentMBean {
 	
 	//public long getStartTime();
 
-	//public String getOwner();
+	/**
+	 * Getter for attribute "Owner" of the managed agent.
+	 */
+	public String getOwner();
 
 	/**
 	 * Undeploys this agent from its agent node.

@@ -54,6 +54,11 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   private String                agentName       = null;
 
   /**
+   * The owner of this agent.
+   */
+  private String                owner       = null;
+
+  /**
    * Comment for <code>memory</code>
    */
   protected IMemory               memory          = null;
@@ -496,6 +501,25 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   public void setName(String name) {
     // TODO Auto-generated method stub
 
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getOwner()
+   * @see de.dailab.jiactng.agentcore.AgentMBean#getOwner()
+   */
+  public String getOwner() {
+    return owner;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setOwner(java.lang.String)
+   */
+  public void setOwner(String owner) {
+    this.owner = owner;
   }
 
   public Log getLog(IAgentBean bean) {

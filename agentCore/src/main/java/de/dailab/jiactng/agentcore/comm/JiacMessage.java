@@ -14,29 +14,29 @@ public class JiacMessage implements IJiacMessage {
 
 	public static final String PLATFORM_ENDPOINT_EXTENSION = "TNG";
 	
-	Object _payload;
+	IJiacContent _payload;
 	IEndPoint _endpoint;
 	IEndPoint _startpoint;
 	String _operation;
 	Destination _replyToDestination;
 
-	public JiacMessage(String operation, Object payload, IEndPoint recipient) {
+	public JiacMessage(String operation, IJiacContent payload, IEndPoint recipient) {
 		setOperation(operation);
 		setPayload(payload);
 		setEndPoint(recipient);
 	}
 
-	public JiacMessage(String operation, Object payload, IEndPoint recipient, IEndPoint startpoint, Destination sender) {
+	public JiacMessage(String operation, IJiacContent payload, IEndPoint recipient, IEndPoint startpoint, Destination sender) {
 		this(operation, payload, recipient);
 		setSender(sender);
 		setStartPoint(startpoint);
 	}
 
-	public Object getPayload() {
+	public IJiacContent getPayload() {
 		return _payload;
 	}
 
-	private void setPayload(Object payload) {
+	private void setPayload(IJiacContent payload) {
 		_payload = payload;
 	}
 

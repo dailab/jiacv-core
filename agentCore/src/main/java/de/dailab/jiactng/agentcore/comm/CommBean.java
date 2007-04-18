@@ -84,7 +84,8 @@ public class CommBean extends AbstractAgentBean {
 	 */
 	public void messageReceivedFromTopic(Message message) {
 		informTopicListener(message);
-	}	
+	}
+
 	/**
 	 * sendet auf die defaultQueue
 	 * 
@@ -110,7 +111,7 @@ public class CommBean extends AbstractAgentBean {
 	 * @param operation
 	 * @param payload
 	 */
-	public void send(String operation, Object payload) {
+	public void send(String operation, IJiacContent payload) {
 		IJiacMessage msg = JiacMessageFactory.createJiacMessage(operation, payload, _address, null);
 		send(msg);
 	}
@@ -122,7 +123,7 @@ public class CommBean extends AbstractAgentBean {
 	 * @param payload
 	 * @param receiverAddress
 	 */
-	public void send(String operation, Object payload, IEndPoint receiverAddress) {
+	public void send(String operation, IJiacContent payload, IEndPoint receiverAddress) {
 		IJiacMessage msg = JiacMessageFactory.createJiacMessage(operation, payload, _address, receiverAddress, null);
 		send(msg);
 	}
@@ -131,12 +132,12 @@ public class CommBean extends AbstractAgentBean {
 		_topicCommunicator.publish(message);
 	}
 
-	public void publish(String operation, Object payload) {
+	public void publish(String operation, IJiacContent payload) {
 		IJiacMessage msg = JiacMessageFactory.createJiacMessage(operation, payload, _address, null);
 		publish(msg);
 	}
 
-	public void publish(String operation, Object payload, IEndPoint destAddress) {
+	public void publish(String operation, IJiacContent payload, IEndPoint destAddress) {
 		IJiacMessage msg = JiacMessageFactory.createJiacMessage(operation, payload, _address, destAddress, null);
 		publish(msg);
 	}
@@ -154,8 +155,9 @@ public class CommBean extends AbstractAgentBean {
 		_timerCounter++;
 		if (_timerCounter == _timer) {
 			_timerCounter = 0;
-			JiacMessage msg = new JiacMessage(BasicJiacProtocol.CMD_PING, "Im alive" + _address.toString(), null,
-																							getAddress(), null);
+			ObjectContent content = new ObjectContent();
+			content.setObject("Im alive" + _address.toString());
+			JiacMessage msg = new JiacMessage(BasicJiacProtocol.CMD_PING, content, null, getAddress(), null);
 			publish(msg);
 			System.out.println(this.getBeanName());
 			System.out.println(thisAgent.getAgentName());
@@ -201,7 +203,7 @@ public class CommBean extends AbstractAgentBean {
 			listener.messageReceivedFromTopic(message);
 		}
 	}
-	
+
 	/**
 	 * Fügt einen CommListner der Commbean zu.
 	 * 

@@ -7,6 +7,7 @@ import javax.jms.ObjectMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.ObjectContent;
 
 /**
  * Ein Protokoll für die Kommunikation. Die processMessage-Methode wird von einem MessageListener aufgerufen. Die
@@ -157,12 +158,15 @@ public class BasicJiacProtocol implements IProtocolHandler {
 			// List<AgentStub> agents = _platform.getAgents();
 			// System.out.println("+++++ schicke ab an " + receivedMsg.getStartPoint());
 			// PlatformHelper.debugPrintAgents(agents);
-			replyMsg = new JiacMessage(ACK_GET_AGENTS, "agents", receivedMsg.getStartPoint(), receivedMsg.getEndPoint(),
+			ObjectContent content = new ObjectContent();
+			content.setObject("agents");
+			replyMsg = new JiacMessage(ACK_GET_AGENTS, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(),
 																							receivedMsg.getSender());
 		} else if (CMD_GET_SERVICES.equals(operation)) {
 			String[] services = { "A()", "B()", "C()" };
 		} else if (CMD_PING.equals(operation)) {
-			String content = "Pong";
+			ObjectContent content = new ObjectContent();
+			content.setObject("Pong");
 			replyMsg = new JiacMessage(ACK_PING, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(), receivedMsg
 																							.getSender());
 		} else if (CMD_NOP.equals(operation)) {

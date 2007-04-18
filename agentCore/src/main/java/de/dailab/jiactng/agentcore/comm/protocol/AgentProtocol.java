@@ -7,6 +7,7 @@ import javax.jms.ObjectMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.ObjectContent;
 
 /**
  * Idee: Ein eigenens Protocol für die Agenten. Zusätzlich zu einem Protocol für
@@ -113,8 +114,9 @@ public class AgentProtocol implements IProtocolHandler {
 		if (ACK_AGT_GET_SERVICES.equals(operation)) {
 			System.out.println("Alles Roger.. hab die Services gekriegt, von" + receivedMsg.getStartPoint());
 		} else if (ACK_AGT_PING.equals(operation)) {
-			String content = receivedMsg.getPayload() + "PongPong";
 			System.out.println("Alles Roger.. hab ein Ping-Ack gekriegt, von " + receivedMsg.getStartPoint());
+			ObjectContent content = new ObjectContent();
+			content.setObject(receivedMsg.getPayload() + "PongPong");
 			replyMsg = new JiacMessage(CMD_AGT_NOP, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(),
 					receivedMsg.getSender());
 		} else if (ACK_AGT_PONG.equals(operation)) {
@@ -164,7 +166,8 @@ public class AgentProtocol implements IProtocolHandler {
 		if (CMD_AGT_GET_SERVICES.equals(operation)) {
 			String[] services = { "A()", "B()", "C()" };
 		} else if (CMD_AGT_PING.equals(operation)) {
-			String content = "Pong";
+			ObjectContent content = new ObjectContent();
+			content.setObject(receivedMsg.getPayload() + "Pong");
 			// es wird die platformadresse als absender gesetzt
 			replyMsg = new JiacMessage(ACK_AGT_PING, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(), null);
 			// receivedMsg.getSender()); // hier falscher Sender/replyToAdress(?)

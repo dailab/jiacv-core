@@ -82,9 +82,10 @@ public class TopicSender implements IJiacSender {
 	 * Sendet in angegeben Topic und setzt die instanzvariable auf dieses Topic
 	 */
 	public void send(IJiacMessage message, Destination destination) {
-		_topic = (Topic)destination;
+		_topic = (Topic) destination;
 		sendToTopic(message, null);
-	}	
+	}
+
 	/**
 	 * Verschickt eine Nachricht an ein Topic (im ggs zu einer Queue) _destination muss vorher gesetzt worden sein
 	 * 

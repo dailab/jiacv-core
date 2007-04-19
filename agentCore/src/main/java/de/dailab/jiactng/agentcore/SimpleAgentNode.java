@@ -6,7 +6,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.StringTokenizer;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -58,8 +59,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** The list of JMX connector servers for remote management. */
 	private ArrayList<JMXConnectorServer> _connectorServer = new ArrayList<JMXConnectorServer>();
 
-	/** Comma separated list of provided JMX connector protocols. */
-	private String _jmxConnectors = "";
+	/** Configuration of a set of JMX connector server. */
+	private Set<Map> _jmxConnectors = null;
 
 	JmsBrokerAMQ _embeddedBroker = null;
 
@@ -73,9 +74,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
-	 * Setter for comma separated list of JMX connector protocols.
+	 * Configuration of a set of JMX connector server.
 	 */
-	public void setJmxConnectors(String jmxConnectors) {
+	public void setJmxConnectors(Set<Map> jmxConnectors) {
 		this._jmxConnectors = jmxConnectors;
 	}
 
@@ -280,35 +281,56 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public void afterPropertiesSet() throws Exception {
 		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
-		// Enable remote management
-		StringTokenizer st = new StringTokenizer(_jmxConnectors, ",");
-		if (st.countTokens() > 0) {
-			System.setProperty("com.sun.management.jmxremote", "");
-		}
-		// Create and register all specified JMX connector servers
-		while (st.hasMoreTokens()) {
-			// get parameters of connector server
-			String protocol = st.nextToken().trim().toLowerCase();
-			int port = 0;
-			String path = null;
-			if (protocol.equals("soap")) {
-				port = 8080;
-				path = "/jmxconnector";
+		if (_jmxConnectors != null) {
+			// Enable remote management
+			if (!_jmxConnectors.isEmpty()) {
+				System.setProperty("com.sun.management.jmxremote", "");
 			}
+			// Create and register all specified JMX connector servers
+			for (Map conf : _jmxConnectors) {
+				// get parameters of connector server
+				String protocol = (String) conf.get("protocol");
+				if (protocol == null) {
+					System.out.println("WARNING: No protocol specified for a JMX connector server");
+					continue;
+				}
+				String portStr = (String) conf.get("port");
+				int port = 0;
+				if (portStr != null) {
+					try {
+						port = Integer.parseInt(portStr);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				String path = (String) conf.get("path");
 
-			// create connector server
-			JMXServiceURL jurl = new JMXServiceURL(protocol, null, port, path);
-			System.out.println("Creating Connector: " + jurl);
-			JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, null, mbs);
-			cs.start();
-			_connectorServer.add(cs);
+				if (protocol.equals("rmi")) {
+					// check use of RMI registry
+					String registryPort = (String) conf.get("registryPort");
+					String registryHost = (String) conf.get("registryHost");
+					if ((registryPort != null) || (registryHost != null)) {
+						path = "/jndi/rmi://"
+							+ ((registryHost == null)? "localhost" : registryHost)
+							+ ((registryPort == null)? "" : ":"+registryPort)
+							+ "/" + _name;
+					}
+				}
 
-			// register connector server
-			JMXServiceURL address = cs.getAddress();
-			System.out.println("Registering URL for agent node: " + address);
-			// TODO register the connector server
-			System.out.println("Registered URL: " + address);
-			System.out.println("Service URL successfully registered");
+				// create connector server
+				JMXServiceURL jurl = new JMXServiceURL(protocol, null, port, path);
+				System.out.println("Creating Connector: " + jurl);
+				JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, null, mbs);
+				cs.start();
+				_connectorServer.add(cs);
+
+				// register connector server
+				JMXServiceURL address = cs.getAddress();
+				System.out.println("Registering URL for agent node: " + address);
+				// TODO register the connector server
+				System.out.println("Registered URL: " + address);
+				System.out.println("Service URL successfully registered");
+			}
 		}
 
 		// register agent node as JMX resource

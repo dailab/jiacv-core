@@ -30,7 +30,7 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 	/**
 	 * Synchronization flag for the thread. Used by the doStep method.
 	 */
-	private Boolean syncFlag = Boolean.TRUE;
+	private Boolean syncFlag = new Boolean(true);
 
 	/**
 	 * Activity flag. Used by statechanges

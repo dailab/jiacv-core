@@ -71,7 +71,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   /**
    * Synchronization object for the Thread
    */
-  private Boolean               syncObj         = Boolean.TRUE;
+  private Boolean               syncObj         = new Boolean(true);
 
   /**
    * activity Flag (could be replaced by statecheck

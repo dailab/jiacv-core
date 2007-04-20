@@ -4,6 +4,9 @@ import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.JiacMessage;
@@ -20,7 +23,8 @@ import de.dailab.jiactng.agentcore.comm.ObjectContent;
  * @author janko
  */
 public class AgentProtocol implements IProtocolHandler {
-
+	Log log = LogFactory.getLog(getClass());
+	
 	public static final int PROCESSING_FAILED = -1;
 	public static final int PROCESSING_SUCCESS = 0;
 
@@ -40,31 +44,42 @@ public class AgentProtocol implements IProtocolHandler {
 
 	// Dies sind die negativen Antworten auf die Kommandos
 
-	IJiacSender _sender;
+	IJiacSender _topicSender;
+	IJiacSender _queueSender;
+	
 
 	/**
 	 * 
 	 * @param sender der Sender MIT dem eine Antwort verschickt wird
 	 */
-	public AgentProtocol(IJiacSender sender) {
-		setSender(sender);
+	public AgentProtocol(IJiacSender topicSender, IJiacSender queueSender) {
+		setSender(topicSender, queueSender);
 	}
 
-	public void setSender(IJiacSender sender) {
-		_sender = sender;
+	public void setSender(IJiacSender topicSender, IJiacSender queueSender) {
+		setTopicSender(topicSender);
+		setQueueSender(queueSender);
 	}
+	
+	public void setTopicSender(IJiacSender sender) {
+		_topicSender = sender;
+	}		
+	
+	public void setQueueSender(IJiacSender sender) {
+		_queueSender = sender;
+	}	
 
 	public int processMessage(Message msg) {
-		System.out.println("Ist das geil... ein Agent hat ne nachricht gekriegt...");
+		log.debug("Ist das geil... ein Agent hat ne nachricht gekriegt...");
 		IJiacMessage jiacMsg = null;
 		Destination destination = null;
 		if (msg != null && msg instanceof ObjectMessage) {
 			ObjectMessage oMsg = (ObjectMessage) msg;
 			try {
 				jiacMsg = (IJiacMessage) oMsg.getObject();
-				System.out.println("und zwar folgende Nachricht:" + jiacMsg.toString());
+				log.debug("und zwar folgende Nachricht:" + jiacMsg.toString());
 				destination = msg.getJMSReplyTo();
-				System.out.println("processing Agent message, answer will go to:" + destination);
+				log.debug("processing Agent message, answer will go to:" + destination);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -95,13 +110,22 @@ public class AgentProtocol implements IProtocolHandler {
 					replyMessage = doCommand(msg);
 				}
 				// return doReply(replyMessage, destination, msg.getSender());
-				Destination sender = replyMessage == null ? null : replyMessage.getSender();
-				return doReply(replyMessage, destination, sender);
+				Destination senderDest = replyMessage == null ? null : replyMessage.getSender();
+				return doReply(replyMessage, destination, senderDest, getDefaultSender());
 			}
 		}
 		return PROCESSING_FAILED;
 	}
 
+	/*
+	 * temporäre hilfsmethode. wenn später ordentlich auf commands reagiert wird, sollt edort festgelegt werden, mit
+	 * welchen sender gesendet wird.
+	 */
+	private IJiacSender getDefaultSender() {
+		return _queueSender;
+	}
+
+	
 	/**
 	 * Reaktion auf AcknowledgeMessages
 	 * 
@@ -112,7 +136,7 @@ public class AgentProtocol implements IProtocolHandler {
 		String operation = receivedMsg.getOperation();
 		IJiacMessage replyMsg = null;
 		if (ACK_AGT_GET_SERVICES.equals(operation)) {
-			System.out.println("Alles Roger.. hab die Services gekriegt, von" + receivedMsg.getStartPoint());
+			log.debug("Alles Roger.. hab die Services gekriegt, von" + receivedMsg.getStartPoint());
 		} else if (ACK_AGT_PING.equals(operation)) {
 			System.out.println("Alles Roger.. hab ein Ping-Ack gekriegt, von " + receivedMsg.getStartPoint());
 			ObjectContent content = new ObjectContent();
@@ -120,9 +144,9 @@ public class AgentProtocol implements IProtocolHandler {
 			replyMsg = new JiacMessage(CMD_AGT_NOP, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(),
 					receivedMsg.getSender());
 		} else if (ACK_AGT_PONG.equals(operation)) {
-			System.out.println("Alles Roger.. hab ein Pong-Ack gekriegt, von " + receivedMsg.getStartPoint());
+			log.debug("Alles Roger.. hab ein Pong-Ack gekriegt, von " + receivedMsg.getStartPoint());
 		} else if (ACK_AGT_NOP.equals(operation)) {
-			System.out.println("Ich werd' verrückt.. hab ein NOP-Ack gekriegt, von " + receivedMsg.getStartPoint());
+			log.debug("Ich werd' verrückt.. hab ein NOP-Ack gekriegt, von " + receivedMsg.getStartPoint());
 		}
 		return replyMsg;
 	}
@@ -186,10 +210,10 @@ public class AgentProtocol implements IProtocolHandler {
 	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn
 	 *         Versenden nicht möglich war.
 	 */
-	private int doReply(IJiacMessage msg, Destination destination, Destination senderAddress) {
-		System.out.println("Agent schickt antwort...");
-		if (msg != null && destination != null && _sender != null) {
-			_sender.send(msg, destination);//, senderAddress, DEFAULT_TTL);
+	private int doReply(IJiacMessage msg, Destination destination, Destination senderAddress, IJiacSender sender) {
+		log.debug("Agent schickt antwort...");
+		if (msg != null && destination != null && sender != null) {
+			sender.send(msg, destination);//, senderAddress, DEFAULT_TTL);
 			return PROCESSING_SUCCESS;
 		}
 		return PROCESSING_FAILED;

@@ -4,6 +4,9 @@ import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.JiacMessage;
@@ -18,6 +21,7 @@ import de.dailab.jiactng.agentcore.comm.ObjectContent;
  */
 public class BasicJiacProtocol implements IProtocolHandler {
 	// static Logger log4j = Logger.getLogger("de.dailab.jiactng.protocol.BasicJiacProtocol");
+	Log log = LogFactory.getLog(getClass());
 
 	// Diese Befehle versteht das Protokoll
 	public static final String CMD_PING = "PING";
@@ -42,17 +46,27 @@ public class BasicJiacProtocol implements IProtocolHandler {
 
 	public static final long DEFAULT_TTL = 10000L;
 
-	IJiacSender _sender;
+	IJiacSender _topicSender;
+	IJiacSender _queueSender;
 
 	/**
 	 * @param sender der Sender MIT dem eine Antwort verschickt wird
 	 */
-	public BasicJiacProtocol(IJiacSender sender) {
-		setSender(sender);
+	public BasicJiacProtocol(IJiacSender topicSender, IJiacSender queueSender) {
+		setSender(topicSender, queueSender);
 	}
 
-	public void setSender(IJiacSender sender) {
-		_sender = sender;
+	public void setSender(IJiacSender topicSender, IJiacSender queueSender) {
+		setTopicSender(topicSender);
+		setQueueSender(queueSender);
+	}
+
+	public void setTopicSender(IJiacSender sender) {
+		_topicSender = sender;
+	}
+
+	public void setQueueSender(IJiacSender sender) {
+		_queueSender = sender;
 	}
 
 	/**
@@ -69,7 +83,7 @@ public class BasicJiacProtocol implements IProtocolHandler {
 			try {
 				jiacMsg = (IJiacMessage) oMsg.getObject();
 				destination = msg.getJMSReplyTo();
-				System.out.println("processing message, answer will go to:" + destination);
+				log.debug("processing message, answer will go to:" + destination);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -98,10 +112,18 @@ public class BasicJiacProtocol implements IProtocolHandler {
 					// kein special Prefix, dann ist es ein Kommando
 					replyMessage = doCommand(msg);
 				}
-				return doReply(replyMessage, destination, msg.getSender());
+				return doReply(replyMessage, destination, msg.getSender(), getDefaultSender());
 			}
 		}
 		return PROCESSING_FAILED;
+	}
+
+	/*
+	 * temporäre hilfsmethode. wenn später ordentlich auf commands reagiert wird, sollt edort festgelegt werden, mit
+	 * welchen sender gesendet wird.
+	 */
+	private IJiacSender getDefaultSender() {
+		return _queueSender;
 	}
 
 	/**
@@ -113,14 +135,14 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	private IJiacMessage doAcknowledge(IJiacMessage msg) {
 		String operation = msg.getOperation();
 		if (ACK_GET_AGENTS.equals(operation)) {
-			System.out.println("Alles Roger.. hab die Agenten gekriegt, von " + msg.getStartPoint());
+			log.debug("Alles Roger.. hab die Agenten gekriegt, von " + msg.getStartPoint());
 			// _platform.addRemoteAgents((List<AgentStub>) msg.getPayload());
 		} else if (ACK_GET_SERVICES.equals(operation)) {
-			System.out.println("Alles Roger.. hab die Services gekriegt, von " + msg.getStartPoint());
+			log.debug("Alles Roger.. hab die Services gekriegt, von " + msg.getStartPoint());
 		} else if (ACK_PING.equals(operation)) {
-			System.out.println("Alles Roger.. hab ein Ping-Ack gekriegt, von " + msg.getStartPoint());
+			log.debug("Alles Roger.. hab ein Ping-Ack gekriegt, von " + msg.getStartPoint());
 		} else if (ACK_NOP.equals(operation)) {
-			System.out.println("Ich werd' verrückt.. hab ein NOP-Ack gekriegt, von " + msg.getStartPoint());
+			log.debug("Ich werd' verrückt.. hab ein NOP-Ack gekriegt, von " + msg.getStartPoint());
 		}
 		return null;
 	}
@@ -183,9 +205,9 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	 * @param senderAddress die ReplyTo-Destination der JMSMessage
 	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht möglich war.
 	 */
-	private int doReply(IJiacMessage msg, Destination destination, Destination senderAddress) {
-		if (msg != null && destination != null && _sender != null) {
-			_sender.send(msg, destination); // , senderAddress, DEFAULT_TTL);
+	private int doReply(IJiacMessage msg, Destination destination, Destination senderAddress, IJiacSender sender) {
+		if (msg != null && destination != null && sender != null) {
+			sender.send(msg, destination); // , senderAddress, DEFAULT_TTL);
 			return PROCESSING_SUCCESS;
 		}
 		return PROCESSING_FAILED;

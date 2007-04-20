@@ -2,8 +2,6 @@ package de.dailab.jiactng.agentcore.comm;
 
 import java.io.Serializable;
 
-import de.dailab.jiactng.agentcore.knowledge.IFact;
-
 public class ObjectContent implements IJiacContent {
 	Serializable _object;
 

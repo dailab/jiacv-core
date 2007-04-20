@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.comm;
 
 import java.net.BindException;
+import java.net.URI;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
@@ -47,8 +48,10 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 		broker.setPersistent(values.isPersistent());
 		try {
 			connector = broker.addConnector(values.getUrl());
+			connector.setDiscoveryUri(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
+			broker.addNetworkConnector(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
 		} catch (BindException be) {
-			// address is in use already 
+			// address is in use already
 		}
 
 		if (log.isDebugEnabled()) {
@@ -118,6 +121,10 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 		} catch (LifecycleException le) {
 			le.printStackTrace();
 		}
+	}
+
+	protected String getDiscoveryUri(String discoveryMethod, String discoveryAddress) {
+		return discoveryMethod + "://" + discoveryAddress;
 	}
 
 	// ------------------------ Setter/Getter

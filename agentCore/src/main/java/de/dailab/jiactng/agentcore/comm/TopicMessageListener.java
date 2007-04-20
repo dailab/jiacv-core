@@ -30,7 +30,7 @@ public class TopicMessageListener implements MessageListener {
 	 * momentan wird jede ObjektNachricht bestätigt.
 	 */
 	public void onMessage(Message msg) {
-		log.debug(" JiacMessageListener msg received");
+		log.debug(" TopicMessageListener msg received");
 		if (msg != null) {
 			try {
 				ObjectMessage oMsg = (ObjectMessage) msg;
@@ -47,19 +47,24 @@ public class TopicMessageListener implements MessageListener {
 		}
 	}
 	
+	/**
+	 * filtert selbst gesandte Messages raus, arbeitet nur wenn nicht von einem selbst geschickt wurde
+	 * @param msg
+	 */
 	private void handleMessage(Message msg) {
 		IJiacMessage jiacMessage = Util.extractJiacMessage(msg);
 		if (!jiacMessage.getStartPoint().equals(_commBean.getAddress())) {
 			_commBean.messageReceivedFromTopic(msg);
 			_protocol.processMessage(msg);
 			
+		} else {
+			log.debug("Eigene Msg:"+jiacMessage.toString());
 		}
 	}
 
 	private void debugMsg(ObjectMessage msg, String addressProperty) throws JMSException {
 		JiacMessage jMsg = (JiacMessage) msg.getObject();
 		log.debug("Von:" + jMsg.getStartPoint() + " An:" + jMsg.getEndPoint() + " Content:"
-				+ jMsg.getPayload().toString());
-		log.debug("AddressProperty: " + addressProperty);
+				+ jMsg.getPayload().toString() + "  AddressProperty: " + addressProperty);
 	}
 }

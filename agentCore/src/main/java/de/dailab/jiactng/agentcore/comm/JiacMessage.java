@@ -26,6 +26,14 @@ public class JiacMessage implements IJiacMessage {
 		setEndPoint(recipient);
 	}
 
+	/**
+	 * 
+	 * @param operation die Operation
+	 * @param payload die Daten der nachricht
+	 * @param recipient der empfänger - bei nachrichten in topic nicht definiert
+	 * @param startpoint die jaicinterne senderadresse, ein endpoint
+	 * @param sender die Queue die gesendet hat - bei nachrichten in topic nicht definiert
+	 */
 	public JiacMessage(String operation, IJiacContent payload, IEndPoint recipient, IEndPoint startpoint, Destination sender) {
 		this(operation, payload, recipient);
 		setSender(sender);

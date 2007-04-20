@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore.comm;
 
-import javax.jms.Destination;
 
 /**
  * Erzeugt eindeutige Adressen - Endpoints
@@ -9,11 +8,10 @@ import javax.jms.Destination;
  */
 public class EndPointFactory {
 
-	private static long _counterLocal = 0L;
-	private static long _counterGlobal = 0L;	
+	private static long _counterLocal = 0L;	
 	
-	public static IEndPoint createEndPoint() {
-		IEndPoint endpoint = new EndPoint(""+_counterGlobal, ""+(_counterLocal++));
+	public static IEndPoint createEndPoint(String platformId) {
+		IEndPoint endpoint = new EndPoint(""+platformId, ""+(_counterLocal++));
 		System.out.println("Endpoint created:"+endpoint.toString());
 		return endpoint;
 	}

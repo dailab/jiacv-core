@@ -38,6 +38,7 @@ public class QueueReceiverV2 {
 
 	public QueueReceiverV2(ConnectionFactory connectionFactory, String queueName) {
 		_connectionFactory = (QueueConnectionFactory) connectionFactory;
+
 		_queueName = queueName;
 		doInit();
 	}
@@ -103,9 +104,7 @@ public class QueueReceiverV2 {
 	}
 
 	/**
-	 * Handlet eingehende Messages. Achtung es gibt bisher nur ein kommando - d.h. es wird immer davon ausgegangen, dass
-	 * eine empfangene Nachricht die Id einer neu erkannten platform beinhaltet. Rudimentäre implementation, nur um
-	 * testhalber Jiacnachrichten anzuzeigen.
+	 * Handlet eingehende Messages. 
 	 */
 	public void onMessage(Message msg) {
 		dbgLog("MSG received");

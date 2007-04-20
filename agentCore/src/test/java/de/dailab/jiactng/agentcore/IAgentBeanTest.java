@@ -26,7 +26,7 @@ public class IAgentBeanTest extends TestCase {
         "de/dailab/jiactng/agentcore/agentTests.xml");
     node = (IAgentNode) newContext.getBean("myPlatform");
     agent = node.findAgents().get(0);
-    bean = agent.getAdaptors().get(0);
+    bean = agent.getAgentBeans().get(0);
   }
 
   protected void tearDown() throws Exception {

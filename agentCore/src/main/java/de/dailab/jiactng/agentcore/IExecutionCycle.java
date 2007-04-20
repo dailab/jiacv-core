@@ -12,8 +12,8 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
  * Interface for Agent ExecutionCycles. This interface is used to decouple
  * different ExecutionCycle implementations from the agent. The basic
  * Functionality of an ExecutionCycle is to manage the thread that is used to
- * execute the different adaptors of the agent, and decide in which order these
- * adaptors should get executiontime. The actual strategy of the ExecutionCycle
+ * execute the different agentbeans of the agent, and decide in which order these
+ * agentbeans should get executiontime. The actual strategy of the ExecutionCycle
  * is hidden from the agent, and the interface presents only an extension of
  * runnable as well as a doStep method that triggers the next component.
  * 
@@ -22,7 +22,7 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 public interface IExecutionCycle extends ILifecycle, Runnable {
 
   /**
-   * This method triggers the execution of the next adaptor in the list.
+   * This method triggers the execution of the next agentbean in the list.
    */
 //  public void doStep();
 

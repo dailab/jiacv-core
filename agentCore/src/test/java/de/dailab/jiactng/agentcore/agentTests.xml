@@ -18,7 +18,7 @@
   <bean name="TestAgent" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
     <property name="memory"><ref bean="memory"/></property>
     <property name="execution"><ref bean="simpleExecCycle"/></property>
-    <property name="adaptors">
+    <property name="agentBeans">
       <list>
         <ref bean="dummyBean"/>
       </list>
@@ -27,7 +27,7 @@
   
   <!--bean name="Agent2" class="de.dailab.jiactng.agentcore.Agent">
     <property name="memory"><ref bean="memory"/></property>
-    <property name="adaptors">
+    <property name="agentBeans">
       <list>
         <ref bean="pongPing"/>
       </list>

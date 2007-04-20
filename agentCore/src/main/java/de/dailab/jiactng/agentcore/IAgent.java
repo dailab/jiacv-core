@@ -46,12 +46,12 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
   public void setExecution(IExecutionCycle execution);
 
   /**
-   * Setter for the agent's adaptor-components. Used for dependency injection by
+   * Setter for the agent's agentbeans. Used for dependency injection by
    * Spring.
    * 
-   * @param adaptors
+   * @param agentbeans
    */
-  public void setAdaptors(ArrayList<IAgentBean> adaptors);
+  public void setAgentBeans(ArrayList<IAgentBean> agentbeans);
 
   /**
    * Setter for the name of this agent. Used by Spring during initialisation.
@@ -91,11 +91,11 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
   public void setOwner(String owner);
 
   /**
-   * Getter for the list of adaptors of this agent.
+   * Getter for the list of agentbeans of this agent.
    * 
-   * @return the lifelist of the adaptors.
+   * @return the lifelist of the agentbeans.
    */
-  public ArrayList<IAgentBean> getAdaptors();
+  public ArrayList<IAgentBean> getAgentBeans();
 
   /**
    * Getter for the global threadpool responsivle for this agent. All threads

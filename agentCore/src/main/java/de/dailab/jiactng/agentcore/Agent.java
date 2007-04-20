@@ -31,7 +31,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 /**
  * Agentclass implementing the IAgent interface and therby realizing the basic
  * JIAC-TNG agent. The Agent currently holds a Memory-Component, an
- * ExecutionCycle component and a list of adaptors.
+ * ExecutionCycle component and a list of agentbeans.
  * 
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.IAgent
@@ -64,9 +64,9 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   protected IMemory               memory          = null;
 
   /**
-   * The list of adaptors of this agent.
+   * The list of agentbeans of this agent.
    */
-  private ArrayList<IAgentBean> adaptors        = null;
+  private ArrayList<IAgentBean> agentBeans        = null;
 
   /**
    * Synchronization object for the Thread
@@ -129,19 +129,19 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   /*
    * (non-Javadoc)
    * 
-   * @see de.dailab.jiactng.agentcore.IAgent#getAdaptors()
+   * @see de.dailab.jiactng.agentcore.IAgent#getAgentBeans()
    */
-  public ArrayList<IAgentBean> getAdaptors() {
-    return adaptors;
+  public ArrayList<IAgentBean> getAgentBeans() {
+    return agentBeans;
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.dailab.jiactng.agentcore.IAgent#setAdaptors(java.util.ArrayList)
+   * @see de.dailab.jiactng.agentcore.IAgent#setAgentBeans(java.util.ArrayList)
    */
-  public void setAdaptors(ArrayList<IAgentBean> adaptors) {
-    this.adaptors = adaptors;
+  public void setAgentBeans(ArrayList<IAgentBean> agentbeans) {
+    this.agentBeans = agentbeans;
   }
 
   /*
@@ -241,8 +241,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
       }
     }
 
-    // call cleanup for all adaptors
-    for (IAgentBean a : this.adaptors) {
+    // call cleanup for all agentbeans
+    for (IAgentBean a : this.agentBeans) {
       try {
         a.cleanup();
         setBeanState(a.getBeanName(), LifecycleStates.CLEANED_UP);
@@ -274,8 +274,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
     this.execution.setAgent(this);
     this.execution.init();
 
-    // call init for all adaptors
-    for (IAgentBean a : this.adaptors) {
+    // call init for all agentbeans
+    for (IAgentBean a : this.agentBeans) {
       try {
         a.setMemory(memory);
         a.setThisAgent(this);
@@ -303,8 +303,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
     this.memory.start();
     this.execution.start();
 
-    // call start for all adaptors
-    for (IAgentBean a : this.adaptors) {
+    // call start for all agentbeans
+    for (IAgentBean a : this.agentBeans) {
       try {
         a.start();
         setBeanState(a.getBeanName(), LifecycleStates.STARTED);
@@ -330,8 +330,8 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
     this.memory.stop();
     this.execution.stop();
 
-    // call stop for all adaptors
-    for (IAgentBean a : this.adaptors) {
+    // call stop for all agentbeans
+    for (IAgentBean a : this.agentBeans) {
       try {
         a.stop();
         setBeanState(a.getBeanName(), LifecycleStates.STOPPED);

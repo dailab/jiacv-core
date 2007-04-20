@@ -28,7 +28,7 @@ public class IAgentTest extends TestCase {
         "de/dailab/jiactng/agentcore/agentTests.xml");
     node = (IAgentNode) newContext.getBean("myPlatform");
     agent = node.findAgents().get(0);
-    bean = agent.getAdaptors().get(0);
+    bean = agent.getAgentBeans().get(0);
   }
 
   protected void tearDown() throws Exception {
@@ -47,9 +47,9 @@ public class IAgentTest extends TestCase {
     assertNotNull("Agent.getAgentNode is wrong", agent.getAgentNode());
   }
 
-  public void testGetAdaptors() {
-    assertNotNull("Agent.getAdaptors is null", agent.getAdaptors());
-    assertEquals("Agent.getAdaptors().size() is not 1", 1, agent.getAdaptors()
+  public void testGetAgentBeans() {
+    assertNotNull("Agent.getAgentBeans is null", agent.getAgentBeans());
+    assertEquals("Agent.getAgentBeans().size() is not 1", 1, agent.getAgentBeans()
         .size());
   }
 
@@ -155,7 +155,7 @@ public class IAgentTest extends TestCase {
   public void testRun() {
     // try {
     // //((DummyBean) bean).setMode(DummyBean.Modes.Hello);
-    // ((DummyBean) agent.getAdaptors().get(0)).setMode(DummyBean.Modes.Hello);
+    // ((DummyBean) agent.getAgentBeans().get(0)).setMode(DummyBean.Modes.Hello);
     // // agent.run();
     // // fail("failed: " + agent.getState());
     // // fail("failed: " + ((DummyBean) bean).getTest());

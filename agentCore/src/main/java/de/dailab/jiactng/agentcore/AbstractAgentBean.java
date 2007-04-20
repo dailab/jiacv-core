@@ -8,11 +8,10 @@ package de.dailab.jiactng.agentcore;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
-import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
  * Abstract superclass of all agentbeans. This includes core-components as well
- * as adaptors. The class handles basic references (such as to memory and the
+ * as agentbeans. The class handles basic references (such as to memory and the
  * agent) and defines the methods that are necessary for (lifecycle-)management.
  * 
  * @author Thomas Konnerth

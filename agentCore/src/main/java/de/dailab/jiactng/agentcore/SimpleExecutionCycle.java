@@ -10,7 +10,7 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
- * A simple ExecutionCycle implementation. This class implements a round robin cycle for the adaptors.
+ * A simple ExecutionCycle implementation. This class implements a round robin cycle for the agentbeans.
  * 
  * @author Thomas Konnerth
  */
@@ -22,8 +22,8 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 	private int BE_NICE_TIMER = 20;
 
 	/**
-	 * Reference to the agent. Used to retrieve the list of adaptors. Note that the list is actualized only after each
-	 * adaptor has been called once in a cycle.
+	 * Reference to the agent. Used to retrieve the list of agentbeans. Note that the list is actualized only after each
+	 * agentbean has been called once in a cycle.
 	 */
 	private IAgent agent = null;
 
@@ -48,7 +48,7 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 	}
 
 	/*
-	 * This method triggers the execution of the next adaptor in the list. The syncFlag is used to notify the Thread.
+	 * This method triggers the execution of the next agentbean in the list. The syncFlag is used to notify the Thread.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStep() public void doStep() { synchronized (syncFlag) {
 	 *      syncFlag.notify(); } }
@@ -56,15 +56,15 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 
 	/**
 	 * Run-method for the execution cycle. The method iterates over the list of adators and calls the execute method of
-	 * each adaptor. The call is only performed when the syncFlag-object is notified via the doStep-method. Note that the
-	 * list of adators is updated every cycle, i.e. whenever all adaptors have been executed a new list is retrieved from
+	 * each agentbean. The call is only performed when the syncFlag-object is notified via the doStep-method. Note that the
+	 * list of adators is updated every cycle, i.e. whenever all agentbeans have been executed a new list is retrieved from
 	 * the agent-reference. The run method stays active only as long as the active-flag is set to true.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#run()
 	 */
 	public void run() {
 		if (active) {
-			for (IAgentBean a : agent.getAdaptors()) {
+			for (IAgentBean a : agent.getAgentBeans()) {
 				if (LifecycleStates.STARTED.equals(a.getState())) {
 					try {
 						Thread.sleep(BE_NICE_TIMER);

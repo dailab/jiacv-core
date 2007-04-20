@@ -48,6 +48,7 @@ public class QueueSenderV2 implements IJiacSender {
 			_connection = _connectionFactory.createConnection();
 			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			_destination = createQueue(_destinationName);
+			_defaultReplyDestination = _destination;
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

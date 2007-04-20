@@ -17,12 +17,16 @@ import javax.jms.QueueSession;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Ein Receiver, der mehrere consumer zulassen soll. Design-Problem: Nur eine Session.. Sind überhaupt mehrere nötig?
  * 
  * @author janko
  */
 public class QueueReceiverV2 {
+	Log log = LogFactory.getLog(getClass());
 	QueueConnectionFactory _connectionFactory;
 	QueueConnection _connection;
 	QueueSession _session;
@@ -40,13 +44,13 @@ public class QueueReceiverV2 {
 
 	public void doInit() {
 		try {
-			System.out.println("QueueReceiver.init");
+			log.debug("QueueReceiver.init");
 			_connection = _connectionFactory.createQueueConnection();
 			_session = _connection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
 			_queue = _session.createQueue(_queueName);
 			_connection.start();
 		} catch (Exception e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 	}
 
@@ -60,7 +64,7 @@ public class QueueReceiverV2 {
 	public void receive(String selector, QueueMessageListener listener) {
 		try {
 			MessageConsumer consumer = createConsumer(selector, _queue);
-			System.out.println("Ich kriege Msgs, wenn " + selector);
+			log.debug("Ich kriege Msgs, wenn " + selector);
 			consumer.setMessageListener(listener);
 			_consumerList.add(consumer);
 		} catch (Exception n) {
@@ -80,7 +84,7 @@ public class QueueReceiverV2 {
 		try {
 			TemporaryQueue tempoQueue = _session.createTemporaryQueue();
 			MessageConsumer consumer = createConsumer(selector, tempoQueue);
-			System.out.println("Ich kriege Msgs, wenn " + selector + " auf Queue:" + tempoQueue.getQueueName());
+			log.debug("Ich kriege Msgs, wenn " + selector + " auf Queue:" + tempoQueue.getQueueName());
 			consumer.setMessageListener(listener);
 			_consumerList.add(consumer);
 			return tempoQueue;
@@ -134,7 +138,7 @@ public class QueueReceiverV2 {
 	}
 
 	private void dbgLog(String text) {
-		System.out.println("[QueueReceiver:" + getQueueName() + "]<<< " + text);
+		log.debug("[QueueReceiver:" + getQueueName() + "]<<< " + text);
 	}
 
 	public QueueConnection getConnection() {

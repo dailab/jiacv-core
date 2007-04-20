@@ -15,6 +15,8 @@ import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
 
 import org.apache.activemq.pool.ConnectionPool;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Klasse, die in eine Topic schreibt - properties müssen gesetzt, dann doInit() aufgerufen werden.
@@ -22,6 +24,7 @@ import org.apache.activemq.pool.ConnectionPool;
  * @author janko
  */
 public class TopicSender implements IJiacSender {
+	Log log = LogFactory.getLog(getClass());
 	ConnectionPool _connectionPool;
 	ConnectionFactory _connectionFactory;
 	Topic _topic;
@@ -45,12 +48,12 @@ public class TopicSender implements IJiacSender {
 
 	public void doInit() {
 		try {
-			System.out.println("TopicSender.init");
+			log.debug("TopicSender.init");
 			_connection = _connectionFactory.createConnection();
 			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			_topic = createTopic(_topicName);
 		} catch (Exception e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 	}
 
@@ -107,7 +110,7 @@ public class TopicSender implements IJiacSender {
 			Util.setProperties(msg, props);
 			publisher.publish(msg);
 		} catch (JMSException e) {
-			System.out.println(">>>> Exception occurred: " + e);
+			log.error(">>>> Exception occurred: " + e);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		} finally {
@@ -116,7 +119,7 @@ public class TopicSender implements IJiacSender {
 	}
 
 	private void dbgLog(String text) {
-		System.out.println("[TopicSender:" + getDebugId() + "]>>> " + text);
+		log.debug("[TopicSender:" + getDebugId() + "]>>> " + text);
 	}
 
 	public Connection getConnection() {

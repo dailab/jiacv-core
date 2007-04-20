@@ -5,6 +5,9 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.dailab.jiactng.agentcore.comm.protocol.IProtocolHandler;
 
 /**
@@ -13,6 +16,7 @@ import de.dailab.jiactng.agentcore.comm.protocol.IProtocolHandler;
  * @author janko
  */
 public class TopicMessageListener implements MessageListener {
+	Log log = LogFactory.getLog(getClass());
 	IProtocolHandler _protocol;
 	CommBean _commBean; 
 	
@@ -26,7 +30,7 @@ public class TopicMessageListener implements MessageListener {
 	 * momentan wird jede ObjektNachricht bestätigt.
 	 */
 	public void onMessage(Message msg) {
-		System.out.println(" JiacMessageListener msg received");
+		log.debug(" JiacMessageListener msg received");
 		if (msg != null) {
 			try {
 				ObjectMessage oMsg = (ObjectMessage) msg;
@@ -54,8 +58,8 @@ public class TopicMessageListener implements MessageListener {
 
 	private void debugMsg(ObjectMessage msg, String addressProperty) throws JMSException {
 		JiacMessage jMsg = (JiacMessage) msg.getObject();
-		System.out.println("Von:" + jMsg.getStartPoint() + " An:" + jMsg.getEndPoint() + " Content:"
+		log.debug("Von:" + jMsg.getStartPoint() + " An:" + jMsg.getEndPoint() + " Content:"
 				+ jMsg.getPayload().toString());
-		System.out.println("AddressProperty: " + addressProperty);
+		log.debug("AddressProperty: " + addressProperty);
 	}
 }

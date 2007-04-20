@@ -12,12 +12,16 @@ import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicSession;
 import javax.jms.TopicSubscriber;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Liest von der Topic
  * 
  * @author janko
  */
 public class TopicReceiver implements MessageListener {
+	Log log = LogFactory.getLog(getClass());
 	// für topic Subscription
 	TopicConnection _topicConnection = null;
 	TopicConnectionFactory _topicConnectionFactory;
@@ -42,7 +46,7 @@ public class TopicReceiver implements MessageListener {
 	 */
 	public void doInit() {
 		try {
-			System.out.println("TopicReceiver.init");
+			log.debug("TopicReceiver.init");
 			_topicConnection = _topicConnectionFactory.createTopicConnection();
 			_topicSession = _topicConnection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
 			_topic = _topicSession.createTopic(_topicName);
@@ -71,8 +75,7 @@ public class TopicReceiver implements MessageListener {
 	}
 
 	private TopicSubscriber createSubscriber(String selector, Topic topic, TopicSession topicSession) throws JMSException {
-		if (selector != null) {
-			// wofür war das nochmal ?? warum 'false'
+		if (selector != null) {			
 			return topicSession.createSubscriber(topic, selector, true);
 		} else {
 			return topicSession.createSubscriber(topic, _defaultSelector, true);
@@ -93,7 +96,7 @@ public class TopicReceiver implements MessageListener {
 					if (content instanceof IJiacMessage) {
 						IJiacMessage jiacMsg = (IJiacMessage) content;
 						Object payload = jiacMsg.getPayload();
-						System.out.println("<<<Topic... received Payload:" + payload);
+						log.debug("<<<Topic... received Payload:" + payload);
 						handleMessage(jiacMsg);
 					}
 					msg.acknowledge();
@@ -108,15 +111,15 @@ public class TopicReceiver implements MessageListener {
 	private void handleMessage(IJiacMessage jiacMsg) {
 		IEndPoint senderAddress = jiacMsg.getStartPoint();
 		if (senderAddress.equals(_commBean.getAddress())) {
-			System.out.println("Kam ja von mir.. Ignoriert");
+			log.debug("Kam ja von mir.. Ignoriert");
 		} else {
-			System.out.println("Saustark, ne neue Message");
+			log.debug("Saustark, ne neue Message");
 		}
 	}
 	
 
 	private void dbgLog(String text) {
-		System.out.println("[TopicReceiver:"+getDebugId()+"]<<< "+text);
+		log.debug("[TopicReceiver:"+getDebugId()+"]<<< "+text);
 	}	
 	
 	public String getTopicName() {

@@ -38,18 +38,22 @@ public class CommBean extends AbstractAgentBean {
 	List<CommMessageListener> _commListener = new ArrayList<CommMessageListener>();
 
 	public CommBean() {
-		_address = (EndPoint) EndPointFactory.createEndPoint();
+		super();
 	}
 
 	/**
 	 * Erzeugt zwei Communicatoren mit dem defaultTopic und der DefaultQueue
 	 */
-	public void springInit() {
+	@Override
+	public void doInit() throws Exception {
+		super.doInit();		
+		String platformname = thisAgent.getAgentNode().getName();
+		_address = (EndPoint) EndPointFactory.createEndPoint(platformname);
 		_communicator = new QueueCommunicatorV2();
-		// auf eine Queu mit dem Namen der eigenen Addresse hören
+		// auf eine Queue mit dem Namen der eigenen Addresse hören
 		QueueReceiverV2 queueReceiver = new QueueReceiverV2(_connectionFactory, getAddress().toString());
 		_communicator.setReceiver(queueReceiver);
-		// gesendet wird dafaultmässig auf die defaultQueue.. (?)
+		// gesendet wird defaultmässig auf die defaultQueue.. (?)
 		QueueSenderV2 queueSender = new QueueSenderV2(_connectionFactory, _defaultQueueName);
 		_communicator.setSender(queueSender);
 		IProtocolHandler protocol = (IProtocolHandler) new BasicJiacProtocol(queueSender);
@@ -58,7 +62,7 @@ public class CommBean extends AbstractAgentBean {
 		_communicator.getReceiver().receive(null, msgListener);
 
 		_topicCommunicator = new TopicCommunicator();
-		// Ein topic wird verwedendet, zum lesen und schreiben - das defaultTopic
+		// Ein topic wird verwendet, zum lesen und schreiben - das defaultTopic
 		TopicReceiver topicReceiver = new TopicReceiver(this, _connectionFactory, _defaultTopicName);
 		TopicSender topicSender = new TopicSender(_connectionFactory, _defaultTopicName);
 		IProtocolHandler topicProtocol = (IProtocolHandler) new BasicJiacProtocol(topicSender);
@@ -66,6 +70,10 @@ public class CommBean extends AbstractAgentBean {
 		_topicCommunicator.setReceiver(topicReceiver);
 		_topicCommunicator.setSender(topicSender);
 		_topicCommunicator.getReceiver().receive(null, topicMsgListener);
+//		System.out.println("Communicator = " + _communicator.toString());
+//		System.out.println("Address = " + _address.toString());
+//		_topicCommunicator.subscribe(null, null);
+		
 	}
 
 	/**
@@ -105,16 +113,6 @@ public class CommBean extends AbstractAgentBean {
 		_communicator.send(message, destinationName);
 	}
 
-	/**
-	 * Sendet in die defaultQueue
-	 * 
-	 * @param operation
-	 * @param payload
-	 */
-	public void send(String operation, IJiacContent payload) {
-		IJiacMessage msg = JiacMessageFactory.createJiacMessage(operation, payload, _address, null);
-		send(msg);
-	}
 
 	/**
 	 * Sendet in die defaultqueue
@@ -132,10 +130,6 @@ public class CommBean extends AbstractAgentBean {
 		_topicCommunicator.publish(message);
 	}
 
-	public void publish(String operation, IJiacContent payload) {
-		IJiacMessage msg = JiacMessageFactory.createJiacMessage(operation, payload, _address, null);
-		publish(msg);
-	}
 
 	public void publish(String operation, IJiacContent payload, IEndPoint destAddress) {
 		IJiacMessage msg = JiacMessageFactory.createJiacMessage(operation, payload, _address, destAddress, null);
@@ -156,20 +150,12 @@ public class CommBean extends AbstractAgentBean {
 		if (_timerCounter == _timer) {
 			_timerCounter = 0;
 			ObjectContent content = new ObjectContent();
-			content.setObject("Im alive" + _address.toString());
+			content.setObject("Im alive [" + _address.toString()+"]");
 			JiacMessage msg = new JiacMessage(BasicJiacProtocol.CMD_PING, content, null, getAddress(), null);
 			publish(msg);
 			System.out.println(this.getBeanName());
 			System.out.println(thisAgent.getAgentName());
 		}
-	}
-
-	@Override
-	public void doInit() throws Exception {
-		super.doInit();
-		System.out.println("Communicator = " + _communicator.toString());
-		System.out.println("Address = " + _address.toString());
-		_topicCommunicator.subscribe(null, null);
 	}
 
 	public List getLocalAgents() {

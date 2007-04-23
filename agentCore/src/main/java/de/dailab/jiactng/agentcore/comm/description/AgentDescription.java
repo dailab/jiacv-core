@@ -14,6 +14,14 @@ public class AgentDescription implements IFact {
 	String _name;
 	IEndPoint _endpoint;
 
+	// damit spring auch instanziieren kann
+	public AgentDescription() {}
+	
+	public AgentDescription(String name, IEndPoint endpoint) {
+		setName(name);
+		setEndpoint(endpoint);
+	}
+	
 	public String getName() {
 		return _name;
 	}

@@ -19,7 +19,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  */
 public class JmsBrokerAMQ extends AbstractLifecycle {
 	/** The logger we use, if it is not set by DI, we create our own */
-	protected Log log = null;
+	protected Log log = LogFactory.getLog(getClass());
 
 	public BrokerValues values = null;
 
@@ -35,13 +35,9 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 
 	// ---------------------- Lifecycle
 	public void doInit() throws Exception {
-		if (this.log == null) {
-			this.log = LogFactory.getLog(getClass());
-		}
 		if (log.isDebugEnabled()) {
 			log.debug("initializing embedded broker");
 		}
-
 		broker = new BrokerService();
 		broker.setBrokerName(values.getName());
 		broker.setUseJmx(values.isJmx());
@@ -50,27 +46,22 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 			connector = broker.addConnector(values.getUrl());
 			connector.setDiscoveryUri(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
 			broker.addNetworkConnector(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
+			connector.getDiscoveryAgent().setBrokerName(values.getName());
 		} catch (BindException be) {
 			// address is in use already
 		}
-
 		if (log.isDebugEnabled()) {
 			log.debug("embedded broker initialized. url = " + values.getUrl());
 		}
 	}
 
 	public void doStart() throws Exception {
-		if (log.isDebugEnabled()) {
-			log.debug("starting broker");
-		}
+		log.debug("starting broker");
 		// start broker
 		if (broker != null) {
 			connector.start();
 			broker.start();
-
-			if (log.isDebugEnabled()) {
-				log.debug("broker started");
-			}
+			log.debug("broker started");
 		} else {
 			log.warn("no broker found to start");
 		}
@@ -91,9 +82,7 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 	}
 
 	public void doCleanup() throws Exception {
-		if (log.isDebugEnabled()) {
-			log.debug("cleaning up broker");
-		}
+		log.debug("cleaning up broker");
 		// if it is stopped, it doesnt have to be removed
 		// if (broker != null && connector != null) {
 		// broker.removeConnector(connector);

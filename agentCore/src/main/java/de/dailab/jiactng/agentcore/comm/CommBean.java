@@ -28,7 +28,7 @@ public class CommBean extends AbstractAgentBean {
 	Log log = LogFactory.getLog(getClass());
 
 	// über den Communicator läuft die JMS communication
-	QueueCommunicatorV2 _communicator;
+	QueueCommunicator _communicator;
 	// eigene Adresse
 	EndPoint _address;
 
@@ -64,12 +64,12 @@ public class CommBean extends AbstractAgentBean {
 		TopicReceiver topicReceiver = new TopicReceiver(this, _connectionFactory, _defaultTopicName);
 		TopicSender topicSender = new TopicSender(_connectionFactory, _defaultTopicName);
 				
-		_communicator = new QueueCommunicatorV2();		
+		_communicator = new QueueCommunicator();		
 		// auf eine Queue mit dem Namen der eigenen Addresse hören
-		QueueReceiverV2 queueReceiver = new QueueReceiverV2(_connectionFactory, getAddress().toString());
+		QueueReceiver queueReceiver = new QueueReceiver(_connectionFactory, getAddress().toString());
 		_communicator.setReceiver(queueReceiver);
 		// gesendet wird defaultmässig auf die defaultQueue.. (?)
-		QueueSenderV2 queueSender = new QueueSenderV2(_connectionFactory, getAddress().toString());
+		QueueSender queueSender = new QueueSender(_connectionFactory, getAddress().toString());
 		_communicator.setSender(queueSender);
 		IProtocolHandler queueProtocol = createProtocol(topicSender, queueSender);
 		_communicator.setProtocol(queueProtocol);
@@ -91,7 +91,7 @@ public class CommBean extends AbstractAgentBean {
 	 * @return entsprechend des Protokolltyps, wird dieses zurückgeliefert, sonst ein neues standardprotokoll
 	 *         zurückgegeben.
 	 */
-	private IProtocolHandler createProtocol(TopicSender topicSender, QueueSenderV2 queueSender) {
+	private IProtocolHandler createProtocol(TopicSender topicSender, QueueSender queueSender) {
 		IProtocolHandler protocol;
 		if (IProtocolHandler.AGENT_PROTOCOL.equals(getProtocolType())) {
 			protocol = (IProtocolHandler) new AgentProtocol(topicSender, queueSender);
@@ -249,11 +249,11 @@ public class CommBean extends AbstractAgentBean {
 		_commListener.remove(listener);
 	}
 
-	public QueueCommunicatorV2 getCommunicator() {
+	public QueueCommunicator getCommunicator() {
 		return _communicator;
 	}
 
-	public void setCommunicator(QueueCommunicatorV2 communicator) {
+	public void setCommunicator(QueueCommunicator communicator) {
 		_communicator = communicator;
 	}
 

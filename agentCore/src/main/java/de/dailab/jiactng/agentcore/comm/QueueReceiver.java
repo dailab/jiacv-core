@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author janko
  */
-public class QueueReceiverV2 {
+public class QueueReceiver {
 	Log log = LogFactory.getLog(getClass());
 	QueueConnectionFactory _connectionFactory;
 	QueueConnection _connection;
@@ -36,7 +36,7 @@ public class QueueReceiverV2 {
 	List<MessageConsumer> _consumerList = new ArrayList<MessageConsumer>();
 	String _debugId;
 
-	public QueueReceiverV2(ConnectionFactory connectionFactory, String queueName) {
+	public QueueReceiver(ConnectionFactory connectionFactory, String queueName) {
 		_connectionFactory = (QueueConnectionFactory) connectionFactory;
 
 		_queueName = queueName;

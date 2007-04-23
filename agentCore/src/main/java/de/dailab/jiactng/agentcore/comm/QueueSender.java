@@ -20,7 +20,7 @@ import org.apache.activemq.pool.ConnectionPool;
  * 
  * @author janko
  */
-public class QueueSenderV2 implements IJiacSender {
+public class QueueSender implements IJiacSender {
 	ConnectionPool _connectionPool;
 	ConnectionFactory _connectionFactory;
 	Destination _destination;
@@ -36,7 +36,7 @@ public class QueueSenderV2 implements IJiacSender {
 
 	int _defaultTimeout = 1000;
 
-	public QueueSenderV2(ConnectionFactory connectionFactory, String queueName) {
+	public QueueSender(ConnectionFactory connectionFactory, String queueName) {
 		_connectionFactory = (QueueConnectionFactory)connectionFactory;
 		_destinationName = queueName;
 		doInit();

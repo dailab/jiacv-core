@@ -11,11 +11,11 @@ import de.dailab.jiactng.agentcore.comm.protocol.IProtocolHandler;
  * 
  * @author janko
  */
-public class QueueCommunicatorV2 {
+public class QueueCommunicator {
 	static int counter = 0;
 	IProtocolHandler _protocol;
-	QueueReceiverV2 _receiver;
-	QueueSenderV2 _sender;
+	QueueReceiver _receiver;
+	QueueSender _sender;
 
 	/**
 	 * Sendet eine Nachricht
@@ -70,19 +70,19 @@ public class QueueCommunicatorV2 {
 		return _receiver.receiveFromTemporaryQueue(selector, listener);
 	}
 
-	public QueueReceiverV2 getReceiver() {
+	public QueueReceiver getReceiver() {
 		return _receiver;
 	}
 
-	public QueueSenderV2 getSender() {
+	public QueueSender getSender() {
 		return _sender;
 	}
 
-	public void setReceiver(QueueReceiverV2 receiver) {
+	public void setReceiver(QueueReceiver receiver) {
 		_receiver = receiver;
 	}
 
-	public void setSender(QueueSenderV2 sender) {
+	public void setSender(QueueSender sender) {
 		_sender = sender;
 	}
 		

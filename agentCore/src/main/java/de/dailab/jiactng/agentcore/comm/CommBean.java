@@ -169,9 +169,27 @@ public class CommBean extends AbstractAgentBean {
 	public void execute() {
 		if (IProtocolHandler.PLATFORM_PROTOCOL.equals(_protocolType)) {
 			publishPlatformAliveMessage();
+		} else if (IProtocolHandler.AGENT_PROTOCOL.equals(_protocolType)) {
+//			publishAgentPingMessage();
 		}
 	}
 
+	/**
+	 * Schreibt in die Topic eine 'PlatformPing'-Nachricht.. nach anzahl/timer Aufrufen, d.h. wenn timer==10, muss 10mal aufgerufen
+	 * werden, damit einmal gesendet wird.
+	 */
+	private void publishAgentPingMessage() {
+		_timerCounter++;
+		if (_timerCounter == _timer) {
+			_timerCounter = 0;
+			ObjectContent content = new ObjectContent();
+			content.setObject("ReplyTo:"+_address.toString());
+			IJiacMessage msg = new JiacMessage(NodeProtocol.CMD_PING, content, null, getAddress(), null);
+			publish(msg);
+			log.debug(this.getBeanName() + ", " + thisAgent.getAgentName());
+		}
+	}
+	
 	/**
 	 * Schreibt in die Topic eine 'PlatformPing'-Nachricht.. nach anzahl/timer Aufrufen, d.h. wenn timer==10, muss 10mal aufgerufen
 	 * werden, damit einmal gesendet wird.
@@ -187,7 +205,7 @@ public class CommBean extends AbstractAgentBean {
 			log.debug(this.getBeanName() + ", " + thisAgent.getAgentName());
 		}
 	}
-
+	
 	public List getLocalAgents() {
 		IAgentNode agentNode = thisAgent.getAgentNode();
 		if (agentNode instanceof SimpleAgentNode) {

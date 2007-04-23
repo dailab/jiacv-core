@@ -2,6 +2,11 @@ package de.dailab.jiactng.agentcore.comm;
 
 import java.io.Serializable;
 
+/**
+ * Der Content ist ein serialisierbares Object.
+ * @author janko
+ *
+ */
 public class ObjectContent implements IJiacContent {
 	Serializable _object;
 

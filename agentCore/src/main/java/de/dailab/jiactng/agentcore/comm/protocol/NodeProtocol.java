@@ -1,5 +1,10 @@
 package de.dailab.jiactng.agentcore.comm.protocol;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
@@ -7,58 +12,35 @@ import javax.jms.ObjectMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.dailab.jiactng.agentcore.IAgent;
+import de.dailab.jiactng.agentcore.comm.CommBean;
 import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.ObjectContent;
 
-public class NodeProtocol implements IProtocolHandler {
+/**
+ * Das NodeProtocol reagiert auf nachrichten zwischen den Tng-Knoten
+ * @author janko
+ *
+ */
+public class NodeProtocol implements INodeProtocol {
+	public static final char PLATFORM_VS_AGENT_SEPARATOR = '@';
+	
 	Log log = LogFactory.getLog(getClass());
-
-	// Diese Befehle versteht das Protokoll
-	public static final String CMD_PING = "PING";
-	public static final String CMD_GET_AGENTS = "GET_AGENTS";
-	public static final String CMD_GET_SERVICES = "GET_SERVICES";
-	public static final String CMD_NOP = "NOP";
-
-	// Dies sind die positiven Antworten auf die Kommandos
-	public static final String ACK_PING = "ACK_PING";
-	public static final String ACK_GET_AGENTS = "ACK_AGENTS";
-	public static final String ACK_GET_SERVICES = "ACK_SERVICES";
-	public static final String ACK_NOP = "ACK_NOP";
-
-	// Dies sind die negativen Antworten auf die Kommandos
-	public static final String ERR_PING = "ERR_PING";
-	public static final String ERR_GET_AGENTS = "ERR_AGENTS";
-	public static final String ERR_GET_SERVICES = "ERR_SERVICES";
-	public static final String ERR_NOP = "ERR_NOP";
-
-	public static final int PROCESSING_FAILED = -1;
-	public static final int PROCESSING_SUCCESS = 0;
-
-	public static final long DEFAULT_TTL = 10000L;
 
 	IJiacSender _topicSender;
 	IJiacSender _queueSender;
 
+	IAgent _agent;
+	CommBean _commBean;
+
 	/**
-	 * @param sender der Sender MIT dem eine Antwort verschickt wird
+	 * @param topicSender der Sender MIT dem eine Antwort in die topic verschickt wird
+	 * @param queueSender der Sender MIT dem eine Antwort auf ne queue verschickt wird
 	 */
 	public NodeProtocol(IJiacSender topicSender, IJiacSender queueSender) {
 		setSender(topicSender, queueSender);
-	}
-
-	public void setSender(IJiacSender topicSender, IJiacSender queueSender) {
-		setTopicSender(topicSender);
-		setQueueSender(queueSender);
-	}
-
-	public void setTopicSender(IJiacSender sender) {
-		_topicSender = sender;
-	}
-
-	public void setQueueSender(IJiacSender sender) {
-		_queueSender = sender;
 	}
 
 	public int processMessage(Message msg) {
@@ -99,8 +81,8 @@ public class NodeProtocol implements IProtocolHandler {
 					// kein special Prefix, dann ist es ein Kommando
 					sendInfo = doCommand(msg);
 				}
-				Destination senderDest = (replyMessage == null) ? null : replyMessage.getSender();
-				return doReply(sendInfo._msg, sendInfo._destinationString, senderDest, getDefaultSender());
+				// Destination senderDest = (replyMessage == null) ? null : replyMessage.getSender();
+				// return doReply(sendInfo._msg, sendInfo._destinationString, senderDest, getDefaultSender());
 			}
 		}
 		return PROCESSING_FAILED;
@@ -126,6 +108,12 @@ public class NodeProtocol implements IProtocolHandler {
 		SendInfo sendInfo = new SendInfo();
 		if (ACK_GET_SERVICES.equals(operation)) {
 			log.debug("Alles Roger.. hab die Services gekriegt, von" + receivedMsg.getStartPoint());
+		} else if (ACK_GET_AGENTS.equals(operation)) {
+			// welch meisterlicher aufruf/cast/whatever :D
+			ObjectContent oc = (ObjectContent)receivedMsg.getPayload(); 
+			List<String> agentNames = (List<String>)(oc).getObject();
+			log.warn("Alles Roger.. hab die Agenten gekriegt, von" + receivedMsg.getStartPoint());
+			printStringList(agentNames);
 		} else if (ACK_PING.equals(operation)) {
 			System.out.println("Alles Roger.. hab ein Ping-Ack gekriegt, von " + receivedMsg.getStartPoint());
 			// ObjectContent content = new ObjectContent();
@@ -167,27 +155,94 @@ public class NodeProtocol implements IProtocolHandler {
 		String operation = receivedMsg.getOperation();
 		IJiacMessage replyMsg = null;
 		SendInfo sendInfo = new SendInfo();
-		// if (CMD_GET_AGENTS.equals(operation)) {
-		// List<AgentStub> agents = _platform.getAgents();
-		// System.out.println("+++++ schicke ab an "+receivedMsg.getStartPoint());
-		// PlatformHelper.debugPrintAgents(agents);
-		// replyMsg = new JiacMessage(ACK_GET_AGENTS, agents,
-		// receivedMsg.getStartPoint(), receivedMsg.getEndPoint(),
-		// receivedMsg.getSender());
-		if (CMD_GET_SERVICES.equals(operation)) {
+		if (CMD_GET_AGENTS.equals(operation)) {
+			acknowledgeGetAgents(receivedMsg, _queueSender);
+		} else if (CMD_GET_SERVICES.equals(operation)) {
 			String[] services = { "A()", "B()", "C()" };
 		} else if (CMD_PING.equals(operation)) {
-			ObjectContent content = new ObjectContent();
-			content.setObject(receivedMsg.getPayload() + "Pong");
-			String pay = receivedMsg.getPayload().toString();
-			String destinationName = pay.substring(pay.indexOf(':') + 1);
-			replyMsg = new JiacMessage(ACK_PING, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(), null);
-			sendInfo.setDestinationString(destinationName);
-			sendInfo.setMsg(replyMsg);
+			// auf PING reagieren..
+//			acknowledgePing(receivedMsg, sendInfo);
+			requestAgentNames(receivedMsg, _queueSender);
 		} else if (CMD_NOP.equals(operation)) {
 			String content = "psst";
 		}
 		return sendInfo;
+	}
+
+	private String getRequestor(IJiacMessage receivedMsg) {
+		String pay = receivedMsg.getPayload().toString();
+		return pay.substring(pay.indexOf(':') + 1);
+	}
+	
+	/**
+	 * Liefert ergebnis des GetAgents-Kommandos
+	 * @param receivedMsg
+	 * @param sender
+	 */
+	public void acknowledgeGetAgents(IJiacMessage receivedMsg, IJiacSender sender) {
+		IJiacMessage requestMsg;
+		SendInfo sendInfo = new SendInfo();
+		List<String> agentNames = getAgentNames();
+		printStringList(agentNames);
+		String destinationName = getRequestor(receivedMsg);
+		
+		requestMsg = new JiacMessage(ACK_GET_AGENTS, new ObjectContent((Serializable)agentNames), receivedMsg.getStartPoint(), _commBean.getAddress(), null);
+		sendInfo.setDestinationString(receivedMsg.getStartPoint().toString());
+		sendInfo.setMsg(requestMsg);
+		log.info("requesting agentnames from " + sendInfo.getDestinationString());
+		doReply(sendInfo._msg, sendInfo._destinationString, null, sender);
+	}
+
+	private void printStringList(List<String> strings) {
+		for (Iterator iter = strings.iterator(); iter.hasNext();) {
+			String element = (String) iter.next();
+			System.out.print(">>>>agent:"+element+" ");
+		}
+	}
+	
+	/**
+	 * Fragt die platform nach ihren Agenten
+	 * 
+	 * @param receivedMsg in der receivedMsg sind empfängeradresse drin
+	 * @param sender der sender mit dem verschikt werden soll
+	 */
+	public void requestAgentNames(IJiacMessage receivedMsg, IJiacSender sender) {
+		IJiacMessage requestMsg;
+		SendInfo sendInfo = new SendInfo();
+		String destinationName = getRequestor(receivedMsg);
+		
+		requestMsg = new JiacMessage(CMD_GET_AGENTS, new ObjectContent("agents"), receivedMsg.getStartPoint(), _commBean.getAddress(), null);
+		sendInfo.setDestinationString(destinationName);
+		sendInfo.setMsg(requestMsg);
+		log.warn("requesting agentnames from " + sendInfo.getDestinationString());
+		doReply(sendInfo._msg, sendInfo._destinationString, null, sender);
+	}
+
+	/*
+	 * Reaktion auf Ping - nur um das mal beispielhaft zu haben
+	 */
+	private void acknowledgePing(IJiacMessage receivedMsg, SendInfo sendInfo) {
+		IJiacMessage replyMsg;
+		ObjectContent content = new ObjectContent(receivedMsg.getPayload() + "Pong");
+		String destinationName = getRequestor(receivedMsg);
+		
+		replyMsg = new JiacMessage(ACK_PING, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(), null);
+		sendInfo.setDestinationString(destinationName);
+		sendInfo.setMsg(replyMsg);
+		doReply(sendInfo._msg, sendInfo._destinationString, null, getDefaultSender());
+	}
+
+	/* 
+	 */
+	private List<String> getAgentNames() {
+		List<IAgent> agents = _agent.getAgentNode().findAgents();
+		String platformName = _agent.getAgentNode().getName();
+		List<String> agentNames = new ArrayList<String>();
+		for (Iterator iter = agents.iterator(); iter.hasNext();) {
+			IAgent agent = (IAgent) iter.next();
+			agentNames.add(agent.getAgentName()+PLATFORM_VS_AGENT_SEPARATOR+platformName);
+		}
+		return agentNames;
 	}
 
 	/**
@@ -224,32 +279,32 @@ public class NodeProtocol implements IProtocolHandler {
 		return PROCESSING_FAILED;
 	}
 
-	class SendInfo {
-		IJiacMessage _msg;
-		String _destinationString;
+	public IAgent getAgent() {
+		return _agent;
+	}
 
-		public SendInfo() {}
+	public void setAgent(IAgent agent) {
+		_agent = agent;
+	}
 
-		public SendInfo(IJiacMessage msg, String destinationString) {
-			setDestinationString(destinationString);
-			setMsg(msg);
-		}
+	public void setSender(IJiacSender topicSender, IJiacSender queueSender) {
+		setTopicSender(topicSender);
+		setQueueSender(queueSender);
+	}
 
-		public String getDestinationString() {
-			return _destinationString;
-		}
+	public void setTopicSender(IJiacSender sender) {
+		_topicSender = sender;
+	}
 
-		public void setDestinationString(String destinationString) {
-			_destinationString = destinationString;
-		}
+	public void setQueueSender(IJiacSender sender) {
+		_queueSender = sender;
+	}
 
-		public IJiacMessage getMsg() {
-			return _msg;
-		}
+	public CommBean getCommBean() {
+		return _commBean;
+	}
 
-		public void setMsg(IJiacMessage msg) {
-			_msg = msg;
-		}
-
+	public void setCommBean(CommBean commBean) {
+		_commBean = commBean;
 	}
 }

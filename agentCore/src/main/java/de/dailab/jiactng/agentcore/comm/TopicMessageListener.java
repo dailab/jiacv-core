@@ -30,12 +30,12 @@ public class TopicMessageListener implements MessageListener {
 	 * momentan wird jede ObjektNachricht bestätigt.
 	 */
 	public void onMessage(Message msg) {
-		log.debug(" TopicMessageListener msg received");
+//		log.debug(" TopicMessageListener msg received");
 		if (msg != null) {
 			try {
 				ObjectMessage oMsg = (ObjectMessage) msg;
 				String msgRecipient = oMsg.getStringProperty(Constants.ADDRESS_PROPERTY);
-				debugMsg(oMsg, msgRecipient);
+//				debugMsg(oMsg, msgRecipient);
 				// System.out
 				// .println("An '" + msgReceipient + "' gerichtete Nachricht erhalten:\n
 				// " + oMsg.getObject().toString());
@@ -58,7 +58,7 @@ public class TopicMessageListener implements MessageListener {
 			_protocol.processMessage(msg);
 			
 		} else {
-			log.debug("Eigene Msg:"+jiacMessage.toString());
+//			log.debug("Eigene Msg:"+jiacMessage.toString());
 		}
 	}
 

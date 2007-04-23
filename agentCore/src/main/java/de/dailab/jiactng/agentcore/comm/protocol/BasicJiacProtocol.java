@@ -13,7 +13,8 @@ import de.dailab.jiactng.agentcore.comm.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.ObjectContent;
 
 /**
- * Ein Protokoll für die Kommunikation. Die processMessage-Methode wird von einem MessageListener aufgerufen. Die
+ * Ein 'Basic'-Protokoll für die Kommunikation. Es wird standardmässig verwendet. 
+ * Die processMessage-Methode wird von einem MessageListener aufgerufen. Die
  * Message wird hier behandelt und mit dem im Konstruktor übergebenen Sender wird eine Antwort gesendet. Der Empfänger
  * der Antwort wird aus der Message gelesen.
  * 
@@ -180,15 +181,13 @@ public class BasicJiacProtocol implements IProtocolHandler {
 			// List<AgentStub> agents = _platform.getAgents();
 			// System.out.println("+++++ schicke ab an " + receivedMsg.getStartPoint());
 			// PlatformHelper.debugPrintAgents(agents);
-			ObjectContent content = new ObjectContent();
-			content.setObject("agents");
+			ObjectContent content = new ObjectContent("agents");
 			replyMsg = new JiacMessage(ACK_GET_AGENTS, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(),
 																							receivedMsg.getSender());
 		} else if (CMD_GET_SERVICES.equals(operation)) {
 			String[] services = { "A()", "B()", "C()" };
 		} else if (CMD_PING.equals(operation)) {
-			ObjectContent content = new ObjectContent();
-			content.setObject("Pong");
+			ObjectContent content = new ObjectContent("Pong");
 			replyMsg = new JiacMessage(ACK_PING, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(), receivedMsg
 																							.getSender());
 		} else if (CMD_NOP.equals(operation)) {

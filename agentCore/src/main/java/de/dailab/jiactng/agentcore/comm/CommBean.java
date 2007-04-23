@@ -34,7 +34,7 @@ public class CommBean extends AbstractAgentBean {
 
 	TopicCommunicator _topicCommunicator;
 
-	int _timer = 30;
+	int _timer = 100;
 	int _timerCounter = 0;
 
 	ConnectionFactory _connectionFactory;
@@ -69,7 +69,7 @@ public class CommBean extends AbstractAgentBean {
 		QueueReceiverV2 queueReceiver = new QueueReceiverV2(_connectionFactory, getAddress().toString());
 		_communicator.setReceiver(queueReceiver);
 		// gesendet wird defaultmässig auf die defaultQueue.. (?)
-		QueueSenderV2 queueSender = new QueueSenderV2(_connectionFactory, _defaultQueueName);
+		QueueSenderV2 queueSender = new QueueSenderV2(_connectionFactory, getAddress().toString());
 		_communicator.setSender(queueSender);
 		IProtocolHandler queueProtocol = createProtocol(topicSender, queueSender);
 		_communicator.setProtocol(queueProtocol);
@@ -81,29 +81,29 @@ public class CommBean extends AbstractAgentBean {
 		_topicCommunicator.setReceiver(topicReceiver);
 		_topicCommunicator.setSender(topicSender);
 		_topicCommunicator.getReceiver().receive(null, topicMsgListener);
-		// System.out.println("Communicator = " + _communicator.toString());
-		// System.out.println("Address = " + _address.toString());
-		// _topicCommunicator.subscribe(null, null);
-
 	}
 
 	/**
-	 * Erzeugt ein Protokoll für den TopicListener.
+	 * Erzeugt ein Protokoll für den Queue-/Topic-Listener.
 	 * 
-	 * @param topicSender der Sender, der antworten des Protokolls verschickt.
-	 * @return Wenn die Property TopicProtokoll gesetzt ist, wird diese zurückgeliefert, sonst ein neues standardprotokoll
+	 * @param topicSender der Sender, der antworten des Protokolls in n Topic verschickt.
+	 * @param queueSender der Sender, der antworten des Protokolls in ne Queue verschickt.
+	 * @return entsprechend des Protokolltyps, wird dieses zurückgeliefert, sonst ein neues standardprotokoll
 	 *         zurückgegeben.
 	 */
 	private IProtocolHandler createProtocol(TopicSender topicSender, QueueSenderV2 queueSender) {
-		IProtocolHandler topicProtocol;
+		IProtocolHandler protocol;
 		if (IProtocolHandler.AGENT_PROTOCOL.equals(getProtocolType())) {
-			topicProtocol = (IProtocolHandler) new AgentProtocol(topicSender, queueSender);
+			protocol = (IProtocolHandler) new AgentProtocol(topicSender, queueSender);
+			((AgentProtocol)protocol).setAgent(thisAgent);
 		} else if (IProtocolHandler.PLATFORM_PROTOCOL.equals(getProtocolType())) {
-			topicProtocol = (IProtocolHandler) new NodeProtocol(topicSender, queueSender);
+			protocol = (IProtocolHandler) new NodeProtocol(topicSender, queueSender);
+			((NodeProtocol)protocol).setAgent(thisAgent);
+			((NodeProtocol)protocol).setCommBean(this);
 		} else {
-			topicProtocol = (IProtocolHandler) new BasicJiacProtocol(topicSender, queueSender);
+			protocol = (IProtocolHandler) new BasicJiacProtocol(topicSender, queueSender);
 		}
-		return topicProtocol;
+		return protocol;
 	}
 
 
@@ -182,8 +182,7 @@ public class CommBean extends AbstractAgentBean {
 		_timerCounter++;
 		if (_timerCounter == _timer) {
 			_timerCounter = 0;
-			ObjectContent content = new ObjectContent();
-			content.setObject("ReplyTo:"+_address.toString());
+			ObjectContent content = new ObjectContent("ReplyTo:"+_address.toString());
 			IJiacMessage msg = new JiacMessage(NodeProtocol.CMD_PING, content, null, getAddress(), null);
 			publish(msg);
 			log.debug(this.getBeanName() + ", " + thisAgent.getAgentName());
@@ -198,11 +197,10 @@ public class CommBean extends AbstractAgentBean {
 		_timerCounter++;
 		if (_timerCounter == _timer) {
 			_timerCounter = 0;
-			ObjectContent content = new ObjectContent();
-			content.setObject("ReplyTo:"+_address.toString());
+			ObjectContent content = new ObjectContent("ReplyTo:"+_address.toString());
 			IJiacMessage msg = new JiacMessage(NodeProtocol.CMD_PING, content, null, getAddress(), null);
 			publish(msg);
-			log.debug(this.getBeanName() + ", " + thisAgent.getAgentName());
+//			log.debug(this.getBeanName() + ", " + thisAgent.getAgentName());
 		}
 	}
 	

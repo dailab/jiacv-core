@@ -3,17 +3,15 @@ package de.dailab.jiactng.agentcore.comm;
 import javax.jms.Destination;
 
 /**
- * Ein Objekt, dass Nachrichten, die innerhalb Jiacs verschickt werden, kapselt.
- * Der Recipient bestimmt, wer diese Message bekommen soll. EIne Message ist
- * typisiert, durch das operation-attribut
+ * Ein Objekt, dass Nachrichten, die innerhalb Jiacs verschickt werden, kapselt. Der Recipient bestimmt, wer diese
+ * Message bekommen soll. EIne Message ist typisiert, durch das operation-attribut
  * 
  * @author janko
- * 
  */
 public class JiacMessage implements IJiacMessage {
 
 	public static final String PLATFORM_ENDPOINT_EXTENSION = "TNG";
-	
+
 	IJiacContent _payload;
 	IEndPoint _endpoint;
 	IEndPoint _startpoint;
@@ -27,14 +25,15 @@ public class JiacMessage implements IJiacMessage {
 	}
 
 	/**
-	 * 
 	 * @param operation die Operation
 	 * @param payload die Daten der nachricht
 	 * @param recipient der empfänger - bei nachrichten in topic nicht definiert
 	 * @param startpoint die jaicinterne senderadresse, ein endpoint
-	 * @param sender die Queue die gesendet hat - bei nachrichten in topic nicht definiert
+	 * @param sender die Queue die gesendet hat, (an die ggf. antwort geschickt werden kann) - bei nachrichten in topic
+	 *          nicht definiert
 	 */
-	public JiacMessage(String operation, IJiacContent payload, IEndPoint recipient, IEndPoint startpoint, Destination sender) {
+	public JiacMessage(String operation, IJiacContent payload, IEndPoint recipient, IEndPoint startpoint,
+																					Destination sender) {
 		this(operation, payload, recipient);
 		setSender(sender);
 		setStartPoint(startpoint);
@@ -66,7 +65,7 @@ public class JiacMessage implements IJiacMessage {
 
 	public String toString() {
 		return "[OP:" + getOperation() + ", Payload:" + getPayload().toString() + ", Endpoint:" + getEndPoint()
-				+ ", Startpoint:" + getStartPoint() + ", replyToDest:" + getSender() + "]";
+																						+ ", Startpoint:" + getStartPoint() + ", replyToDest:" + getSender() + "]";
 	}
 
 	public String getOperation() {
@@ -86,8 +85,8 @@ public class JiacMessage implements IJiacMessage {
 	}
 
 	/**
-	 * Wenn es an eine Platform geht, wird der endpoint als String zurückgegeben.
-	 * Wenn es an einen Agenten geht, wird die extension abgeschnitten.
+	 * Wenn es an eine Platform geht, wird der endpoint als String zurückgegeben. Wenn es an einen Agenten geht, wird die
+	 * extension abgeschnitten.
 	 */
 	public String getJiacDestination() {
 		IEndPoint endpoint = getEndPoint();

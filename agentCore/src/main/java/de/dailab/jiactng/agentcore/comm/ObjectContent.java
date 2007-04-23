@@ -5,6 +5,10 @@ import java.io.Serializable;
 public class ObjectContent implements IJiacContent {
 	Serializable _object;
 
+	public ObjectContent(Serializable object) {
+		setObject(object);
+	}
+	
 	public Serializable getObject() {
 		return _object;
 	}

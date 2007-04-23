@@ -1,7 +1,8 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.description;
 
 import java.io.Serializable;
 import java.util.Date;
+
 
 /**
  * Eine Implementation für die Servicebeschreibung
@@ -36,8 +37,8 @@ public class ServiceDescription implements IServiceDescription, Serializable {
 	 * @param qoSRating
 	 */
 	public ServiceDescription(Date expireDate, String id, String name, String[] keywords, ServiceParameter[] inputParams,
-			ServiceParameter[] outputParams, String preCondition, String postCondition, String providerAddress,
-			String qoSRating) {
+																					ServiceParameter[] outputParams, String preCondition, String postCondition,
+																					String providerAddress, String qoSRating) {
 		super();
 		_expireDate = expireDate;
 		_id = id;
@@ -93,8 +94,9 @@ public class ServiceDescription implements IServiceDescription, Serializable {
 
 	public int hashCode() {
 		long hashCode = _expireDate.hashCode() + _id.hashCode() + _name.hashCode() + _preCondition.hashCode()
-				+ _postCondition.hashCode() + _providerAddress.hashCode() + _qoSRating.hashCode() + _keywords.hashCode()
-				+ _inputParams.hashCode() + _outputParams.hashCode();
+																						+ _postCondition.hashCode() + _providerAddress.hashCode()
+																						+ _qoSRating.hashCode() + _keywords.hashCode() + _inputParams.hashCode()
+																						+ _outputParams.hashCode();
 		return (int) (hashCode / 10);
 	}
 
@@ -135,8 +137,9 @@ public class ServiceDescription implements IServiceDescription, Serializable {
 			}
 
 			if (_expireDateEquals && _idEquals && _nameEquals && _preEquals && _postEquals && _providerEquals && _qosEquals
-					&& equalsKeywords(desc._keywords) && equalsServiceParameter(_inputParams, desc._inputParams)
-					&& equalsServiceParameter(_outputParams, desc._outputParams)) {
+																							&& equalsKeywords(desc._keywords)
+																							&& equalsServiceParameter(_inputParams, desc._inputParams)
+																							&& equalsServiceParameter(_outputParams, desc._outputParams)) {
 				return true;
 			}
 		}
@@ -145,7 +148,7 @@ public class ServiceDescription implements IServiceDescription, Serializable {
 
 	private boolean equalsKeywords(String[] keywords) {
 		if (keywords != null && _keywords != null && keywords.length == _keywords.length) {
-			// achtung es wird auf die reihenfolge geachtet.. das ist evtl. nicht gewünscht			
+			// achtung es wird auf die reihenfolge geachtet.. das ist evtl. nicht gewünscht
 			for (int i = 0; i < keywords.length; i++) {
 				if (!keywords[i].equals(_keywords[i])) {
 					// sobald ein element ungleich ist.. wird false geliefert

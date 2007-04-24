@@ -139,7 +139,7 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
 //    myThread.start();
 //    active = true;
 	  spacePanel=new SwingObjectVisualizerPanel();
-	  spacePanel.showObject(memory.getTupleSpace().readAllOfType(IFact.class), "Knowledge");
+	  spacePanel.showObject(memory.readAllOfType(IFact.class), "Knowledge");
 
 	  JPanel panel=new JPanel();
 	  panel.setLayout(new BorderLayout());
@@ -220,7 +220,7 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
       tree.clear();
     } else if (e.getActionCommand().equals(GETMEMORY)) {
       //updateMemoryTree();
-  	  spacePanel.showObject(memory.getTupleSpace().readAllOfType(IFact.class), "Knowledge");
+  	  spacePanel.showObject(memory.readAllOfType(IFact.class), "Knowledge");
     } else if (e.getActionCommand().equals(STOP)) {
       try {
         thisAgent.getAgentNode().stop();

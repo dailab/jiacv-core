@@ -24,14 +24,6 @@ public class MemoryTest extends TestCase {
 	}
 
 	/**
-	 * Tests whether the TupleSpace has been
-	 * initiated.
-	 */
-	public void testInitiated() {
-		assertNotNull(memory.getTupleSpace());
-	}
-
-	/**
 	 * Tests the status of the memory after it's been started.
 	 */
 	public void testStatus() {
@@ -274,18 +266,6 @@ public class MemoryTest extends TestCase {
 		}
 		assertEquals(count, 3);
 		memory.removeAll(new Fact(null, null, null));
-	}
-	
-	/**
-	 * Tests whether a tuple space can be exchanged.
-	 */
-	public void testSpaceExchange() {
-		EventedTupleSpace<IFact> space = memory.getTupleSpace();
-		String name = "TestFactBase";
-		memory.setTupleSpace(new EventedSpaceWrapper<IFact>(new SimpleObjectSpace<IFact>(name)));
-		assertNotNull(memory.getTupleSpace());
-		assertEquals(memory.getID(), name);
-		memory.setTupleSpace(space);
 	}
 	
 	@Override

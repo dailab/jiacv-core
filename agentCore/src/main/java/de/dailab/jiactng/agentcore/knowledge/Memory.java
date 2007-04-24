@@ -50,34 +50,6 @@ public class Memory extends AbstractLifecycle implements IMemory {
      * {@inheritDoc}
      */
 	@Override
-	public void doCleanup() throws LifecycleException {
-		try {
-			destroyer.destroy();
-		} catch (DestroyFailedException e) {
-			e.printStackTrace();
-		}
-		space = null;
-		destroyer = null;
-	}
-
-    /**
-     * {@inheritDoc}
-     */
-	public EventedTupleSpace<IFact> getTupleSpace() {
-		return space;
-	}
-
-    /**
-     * {@inheritDoc}
-     */
-	public void setTupleSpace(EventedTupleSpace<IFact> space) {
-		this.space = space;
-	}
-
-    /**
-     * {@inheritDoc}
-     */
-	@Override
 	public void doStart() throws LifecycleException {
 		// nothing to do yet
 	}
@@ -89,6 +61,20 @@ public class Memory extends AbstractLifecycle implements IMemory {
 	public void doStop() throws LifecycleException {
 		// nothing to do yet
 		// persistency may go here
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void doCleanup() throws LifecycleException {
+		try {
+			destroyer.destroy();
+		} catch (DestroyFailedException e) {
+			e.printStackTrace();
+		}
+		space = null;
+		destroyer = null;
 	}
 
     /**

@@ -19,7 +19,6 @@ import javax.management.ObjectName;
 
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.knowledge.Tuple;
@@ -95,20 +94,6 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    */
   private long beanExecutionTimeout = 5000;
   
-  /**
-   * Main method for starting JIAC-TNG. Loads a spring-configuration file
-   * denoted by the first argument and uses a ClassPathXmlApplicationContext to
-   * instantiate its contents
-   * 
-   * @param args
-   *          the first argument is interpreted as a classpathrelative name of a
-   *          spring configurations file. Other arguments are ignored.
-   * @see org.springframework.context.support.ClassPathXmlApplicationContext
-   */
-  public static void main(String[] args) {
-    new ClassPathXmlApplicationContext(args[0]);
-  }
-
   /**
    * Getter for the memory-component
    * 

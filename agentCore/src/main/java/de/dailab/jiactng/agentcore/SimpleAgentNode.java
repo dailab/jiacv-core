@@ -29,9 +29,10 @@ import de.dailab.jiactng.agentcore.comm.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**
- * Simple platform implementation
+ * Simple agent node implementation
  * 
  * @author Joachim Fuchs
  * @author Thomas Konnerth
@@ -66,7 +67,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** Constructur. Creates the uuid for the agentnode. */
 	public SimpleAgentNode() {
-		_uuid = new String("p:" + Long.toHexString(System.currentTimeMillis() + this.hashCode()));
+//		_uuid = new String("p:" + Long.toHexString(System.currentTimeMillis() + this.hashCode()));
+		_uuid = IdFactory.createAgentNodeId(this.hashCode());
 	}
 
 	public void setEmbeddedBroker(JmsBrokerAMQ embeddedBroker) {
@@ -500,5 +502,20 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public ExecutorService getThreadPool() {
 		return _threadPool;
 	}
+
+	/**
+	 * Main method for starting JIAC-TNG. Loads a spring-configuration file
+	 * denoted by the first argument and uses a ClassPathXmlApplicationContext to
+	 * instantiate its contents
+	 * 
+	 * @param args
+	 *          the first argument is interpreted as a classpathrelative name of a
+	 *          spring configurations file. Other arguments are ignored.
+	 * @see org.springframework.context.support.ClassPathXmlApplicationContext
+	 */
+	public static void main(String[] args) {
+		new ClassPathXmlApplicationContext(args[0]);
+	}
+
 
 }

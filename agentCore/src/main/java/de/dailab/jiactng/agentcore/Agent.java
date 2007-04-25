@@ -258,6 +258,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
 
     this.execution.setAgent(this);
     this.execution.init();
+    ((AbstractAgentBean)this.execution).setMemory(memory);
 
     // call init for all agentbeans
     for (IAgentBean a : this.agentBeans) {

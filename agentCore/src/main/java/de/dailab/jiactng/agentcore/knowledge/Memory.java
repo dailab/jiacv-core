@@ -14,7 +14,6 @@ import javax.security.auth.DestroyFailedException;
 import org.sercho.masp.space.ObjectMatcher;
 import org.sercho.masp.space.ObjectUpdater;
 import org.sercho.masp.space.SimpleObjectSpace;
-import org.sercho.masp.space.TupleSpace;
 import org.sercho.masp.space.event.EventedSpaceWrapper;
 import org.sercho.masp.space.event.EventedTupleSpace;
 import org.sercho.masp.space.event.SpaceObserver;
@@ -28,7 +27,6 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  * @author axle
  * 
  * @see de.dailab.jiactng.agentcore.knowledge.IMemory
- * @see de.dailab.jiactng.agentcore.knowledge.Tuple
  */
 public class Memory extends AbstractLifecycle implements IMemory {
 

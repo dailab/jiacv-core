@@ -21,11 +21,13 @@ import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.InitializingBean;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
-import de.dailab.jiactng.agentcore.knowledge.Tuple;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.ontology.AgentBeanDescription;
+import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
+import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**
  * Agentclass implementing the IAgent interface and therby realizing the basic
@@ -37,6 +39,13 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  */
 public class Agent extends AbstractLifecycle implements IAgent, InitializingBean, AgentMBean {
 
+	/**
+	 * The AID (agent identifier). This property is generated and assigned
+	 * automatically during agent creation. It is not intended to make sense
+	 * for human readers.
+	 */
+	private final String agentId;
+	
   /**
    * Reference to the agentnode that holds this agent.
    */
@@ -102,6 +111,13 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    * public IMemory getMemory() { return memory; }
    */
 
+  /**
+   * Public default constructor, creating the agent identifier.
+   */
+  public Agent() {
+	  agentId = IdFactory.createAgentId(this.hashCode());
+  }
+  
   /*
    * (non-Javadoc)
    * 
@@ -254,24 +270,25 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
     this.agentLog = agentNode.getLog(this);
 
     this.memory.init();
-    this.memory.write(new Tuple("thisAgent.name", this.agentName));
+    this.memory.write(new ThisAgentDescription(this.agentId, this.agentName, LifecycleStates.INITIALIZING.name(), null));
 
     this.execution.setAgent(this);
     this.execution.init();
     ((AbstractAgentBean)this.execution).setMemory(memory);
 
     // call init for all agentbeans
-    for (IAgentBean a : this.agentBeans) {
+    for (IAgentBean ab : this.agentBeans) {
       try {
-        a.setMemory(memory);
-        a.setThisAgent(this);
-        a.init();
-        if (a instanceof ILifecycle) a.addLifecycleListener(this);
-        memory.write(new Tuple(createBeanPath(a.getBeanName()) + ".name", a
-            .getBeanName()));
-        setBeanState(a.getBeanName(), LifecycleStates.INITIALIZED);
+        ab.setMemory(memory);
+        ab.setThisAgent(this);
+        ab.init();
+        if (ab instanceof ILifecycle) {
+        	ab.addLifecycleListener(this);
+        }
+        memory.write(new AgentBeanDescription(ab.getBeanName(), LifecycleStates.INITIALIZED.name()));
+        setBeanState(ab.getBeanName(), LifecycleStates.INITIALIZED);
       } catch (LifecycleException e) {
-        handleBeanException(a, e, LifecycleStates.INITIALIZING);
+        handleBeanException(ab, e, LifecycleStates.INITIALIZING);
       }
     }
 
@@ -358,8 +375,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    *          the new state
    */
   private void updateState(ILifecycle.LifecycleStates newState) {
-    memory.remove(new Tuple("thisAgent.state", null));
-    memory.write(new Tuple("thisAgent.state", newState.toString()));
+	  memory.update(new ThisAgentDescription(null, null, null, null), new ThisAgentDescription(null, null, newState.name(), null));
   }
 
   /**
@@ -390,29 +406,25 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    * @see de.dailab.jiactng.agentcore.IAgent#getAgentState()
    */
   public LifecycleStates getAgentState() {
-    return LifecycleStates.valueOf(
-    		memory.read(new Tuple("thisAgent.state", null)).getArg2());
+	  return LifecycleStates.valueOf(memory.read(new ThisAgentDescription(null, null, null, null)).getState());
+//    return LifecycleStates.valueOf(
+//    		memory.read(new Tuple("thisAgent.state", null)).getArg2());
   }
 
   /**
    * {@inheritDoc}
    */
   public void setBeanState(String beanName, LifecycleStates newState) {
-    String beanPath = createBeanPath(beanName) + ".state";
-    this.memory.remove(new Tuple(beanPath, null));
-    this.memory.write(new Tuple(beanPath, newState.toString()));
+    this.memory.update(new AgentBeanDescription(beanName, null), new AgentBeanDescription(null, newState.name()));
   }
 
   /**
    * {@inheritDoc}
    */
   public LifecycleStates getBeanState(String beanName) {
-    String beanPath = createBeanPath(beanName) + ".state";
-    return LifecycleStates.valueOf(this.memory.read(new Tuple(beanPath, null)).getArg2());
-  }
-
-  private String createBeanPath(String beanName) {
-    return "thisAgent.beans." + beanName;
+//    String beanPath = createBeanPath(beanName) + ".state";
+    return LifecycleStates.valueOf(this.memory.read(new AgentBeanDescription(beanName, null)).getState());
+//    return LifecycleStates.valueOf(this.memory.read(new Tuple(beanPath, null)).getArg2());
   }
 
   /*
@@ -534,5 +546,14 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
   public void setExecutionTimeout(long beanExecutionTimeout) {
 	  this.beanExecutionTimeout = beanExecutionTimeout;
   }
+
+  	/**
+  	 * Returns the agent identifier.
+  	 * 
+  	 * @return the agent identifier of this agent
+  	 */
+	public String getAgentId() {
+		return agentId;
+	}
 	
 }

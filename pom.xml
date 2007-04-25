@@ -90,6 +90,39 @@
 			<organizationUrl>http://www.dai-labor.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>janko</id>
+			<name>Janko Dimitroff</name>
+			<email>janko.dimitroff@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>schenk</id>
+			<name>Claus Schenk</name>
+			<email>claus.schenk@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>endert</id>
+			<name>Holger Endert</name>
+			<email>holger.endert@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<build>
@@ -774,6 +807,7 @@
 		<module>microJIAC</module>
 		<module>agentCore</module>
 		<module>agentInterpreter</module>
+		<module>basicServices</module>
 		<module>examples</module>
 	</modules>
 </project>

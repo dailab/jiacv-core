@@ -6,15 +6,17 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
- * A simple ExecutionCycle implementation. This class implements a round robin cycle for the agentbeans.
+ * A simple ExecutionCycle implementation. This class implements a round robin
+ * cycle for the agentbeans.
  * 
  * @author Thomas Konnerth
  */
-public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutionCycle {
+public class SimpleExecutionCycle extends AbstractAgentBean implements
+		IExecutionCycle {
 
 	/**
 	 * time to sleep to be nice to other threads/processes, in milliseconds
@@ -22,8 +24,9 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 	private int BE_NICE_TIMER = 20;
 
 	/**
-	 * Reference to the agent. Used to retrieve the list of agentbeans. Note that the list is actualized only after each
-	 * agentbean has been called once in a cycle.
+	 * Reference to the agent. Used to retrieve the list of agentbeans. Note
+	 * that the list is actualized only after each agentbean has been called
+	 * once in a cycle.
 	 */
 	private IAgent agent = null;
 
@@ -38,27 +41,32 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 	private boolean active = false;
 
 	/**
-	 * Constructor for the class. For creation the reference to the agent is needed, as the list of adators is taken from
-	 * that reference.
+	 * Constructor for the class. For creation the reference to the agent is
+	 * needed, as the list of adators is taken from that reference.
 	 * 
-	 * @param agent the reference to the agent.
+	 * @param agent
+	 *            the reference to the agent.
 	 */
 	public SimpleExecutionCycle() {
-	// this.agent = agent;
+		// this.agent = agent;
 	}
 
 	/*
-	 * This method triggers the execution of the next agentbean in the list. The syncFlag is used to notify the Thread.
+	 * This method triggers the execution of the next agentbean in the list. The
+	 * syncFlag is used to notify the Thread.
 	 * 
-	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStep() public void doStep() { synchronized (syncFlag) {
-	 *      syncFlag.notify(); } }
+	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStep() public void
+	 *      doStep() { synchronized (syncFlag) { syncFlag.notify(); } }
 	 */
 
 	/**
-	 * Run-method for the execution cycle. The method iterates over the list of adators and calls the execute method of
-	 * each agentbean. The call is only performed when the syncFlag-object is notified via the doStep-method. Note that the
-	 * list of adators is updated every cycle, i.e. whenever all agentbeans have been executed a new list is retrieved from
-	 * the agent-reference. The run method stays active only as long as the active-flag is set to true.
+	 * Run-method for the execution cycle. The method iterates over the list of
+	 * adators and calls the execute method of each agentbean. The call is only
+	 * performed when the syncFlag-object is notified via the doStep-method.
+	 * Note that the list of adators is updated every cycle, i.e. whenever all
+	 * agentbeans have been executed a new list is retrieved from the
+	 * agent-reference. The run method stays active only as long as the
+	 * active-flag is set to true.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#run()
 	 */
@@ -68,6 +76,7 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 				if (LifecycleStates.STARTED.equals(a.getState())) {
 					try {
 						Thread.sleep(BE_NICE_TIMER);
+						
 						a.execute();
 					} catch (Exception ex) {
 						ex.printStackTrace();
@@ -77,16 +86,24 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						// Agent.setBeanState(a.beanName, LifecycleStates.STOPPED);
+						// Agent.setBeanState(a.beanName,
+						// LifecycleStates.STOPPED);
 					}
 					// throw new RuntimeException(((DummyBean)a).getTest());
 				}
 			}
+			// perform one doAction
+			DoAction act = memory.remove(new DoAction(null, null, null));
+			if (act != null) {
+				act.getThisAction().getProviderBean().doAction(act);
+			}
+
 		}
 	}
 
 	/**
-	 * Cleanup-method for the lifecycle. The active-flag is set to false an the thread is set to null.
+	 * Cleanup-method for the lifecycle. The active-flag is set to false an the
+	 * thread is set to null.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doCleanup()
 	 */
@@ -110,7 +127,8 @@ public class SimpleExecutionCycle extends AbstractLifecycle implements IExecutio
 	}
 
 	/**
-	 * Start-method for the lifecycle. The active-flag is set to true and the thread is started.
+	 * Start-method for the lifecycle. The active-flag is set to true and the
+	 * thread is started.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStart()
 	 */

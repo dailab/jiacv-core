@@ -6,14 +6,15 @@
  */
 package de.dailab.jiactng.agentcore.environment;
 
+import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
-public interface ISensor {
+public interface ISensor extends IAgentBean {
 
-  public IEnvironment getEnvironment();
+	public IAdaptor getEnvironment();
 
-  public IFact readSensor();
+	public IFact readSensor();
 
-  public boolean isActive();
+	public boolean isActive();
 
 }

@@ -17,119 +17,120 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
  * @author Thomas Konnerth
  */
 public abstract class AbstractAgentBean extends AbstractLifecycle implements
-    IAgentBean {
+		IAgentBean {
 
-    /**
-     * Creates an agent bean that uses lifecycle support in loose mode
-     */
-    public AbstractAgentBean() {
-     
-        super();
-        
-    }
-    
-    /**
-     * Creates an agent bean that may use lifecycle support in strict mode.
-     * This means, that the lifecycle graph is enforced.
-     */
-    public AbstractAgentBean(boolean strict) {
-     
-        super(strict);
-        
-    }
-    
-  /**
-   * Reference to the agent that holds this bean.
-   */
-  protected IAgent  thisAgent = null;
+	/**
+	 * Creates an agent bean that uses lifecycle support in loose mode
+	 */
+	public AbstractAgentBean() {
 
-  /**
-   * Reference to the memory of the agent that holds this bean.
-   */
-  protected IMemory memory    = null;
+		super();
 
-  /**
-   * The name this bean. Note that this is the unqualified name which is
-   * assigned by Spring.
-   */
-  protected String  beanName  = null;
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.IAgentBean#setThisAgent(de.dailab.jiactng.agentcore.IAgent)
-   */
-  public final void setThisAgent(IAgent agent) {
-    this.thisAgent = agent;
-  }
+	/**
+	 * Creates an agent bean that may use lifecycle support in strict mode. This
+	 * means, that the lifecycle graph is enforced.
+	 */
+	public AbstractAgentBean(boolean strict) {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.IAgentBean#setMemory(de.dailab.jiactng.agentcore.knowledge.IMemory)
-   */
-  public final void setMemory(IMemory mem) {
-    this.memory = mem;
-  }
+		super(strict);
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.IAgentBean#setBeanName(java.lang.String)
-   */
-  public final void setBeanName(String name) {
-    this.beanName = name;
-  }
+	}
 
-  /**
-   * Getter for the beanName. This method returns the qualified name of the
-   * bean. The qualfied name consists of the agentname and the beanname.
-   * 
-   * @return the qualified name of the bean.
-   */
-  public final String getBeanName() {
-    return beanName;
-    // return new StringBuffer(thisAgent.getAgentName()).append(".").append(
-    // beanName).toString();
-  }
+	/**
+	 * Reference to the agent that holds this bean.
+	 */
+	protected IAgent thisAgent = null;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
-   */
-  public void doInit() throws Exception {
-  }
+	/**
+	 * Reference to the memory of the agent that holds this bean.
+	 */
+	protected IMemory memory = null;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
-   */
-  public void doStart() throws Exception {
-  }
+	/**
+	 * The name this bean. Note that this is the unqualified name which is
+	 * assigned by Spring.
+	 */
+	protected String beanName = null;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStop()
-   */
-  public void doStop() throws Exception {
-  }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.IAgentBean#setThisAgent(de.dailab.jiactng.agentcore.IAgent)
+	 */
+	public final void setThisAgent(IAgent agent) {
+		this.thisAgent = agent;
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doCleanup()
-   */
-  public void doCleanup() throws Exception {
-  }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.IAgentBean#setMemory(de.dailab.jiactng.agentcore.knowledge.IMemory)
+	 */
+	public final void setMemory(IMemory mem) {
+		this.memory = mem;
+	}
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.IAgentBean#execute()
-   */
-  public abstract void execute();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.IAgentBean#setBeanName(java.lang.String)
+	 */
+	public final void setBeanName(String name) {
+		this.beanName = name;
+	}
+
+	/**
+	 * Getter for the beanName. This method returns the qualified name of the
+	 * bean. The qualfied name consists of the agentname and the beanname.
+	 * 
+	 * @return the qualified name of the bean.
+	 */
+	public final String getBeanName() {
+		return beanName;
+		// return new StringBuffer(thisAgent.getAgentName()).append(".").append(
+		// beanName).toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
+	 */
+	public void doInit() throws Exception {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
+	 */
+	public void doStart() throws Exception {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStop()
+	 */
+	public void doStop() throws Exception {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doCleanup()
+	 */
+	public void doCleanup() throws Exception {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.dailab.jiactng.agentcore.IAgentBean#execute()
+	 */
+	public void execute() {
+	};
 
 }

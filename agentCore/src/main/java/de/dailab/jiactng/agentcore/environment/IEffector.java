@@ -8,14 +8,14 @@ package de.dailab.jiactng.agentcore.environment;
 
 import java.util.ArrayList;
 
-import de.dailab.jiactng.agentcore.action.IAction;
+import de.dailab.jiactng.agentcore.IAgentBean;
+import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.DoAction;
 
-public interface IEffector {
+public interface IEffector extends IAgentBean {
 
-  public IEnvironment getEnvironment();
+	public ArrayList<Action> getActions();
 
-  public ArrayList<IAction> getActions();
-
-  public void executeAction(IAction action);
+	public void doAction(DoAction doAction);
 
 }

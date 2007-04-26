@@ -13,11 +13,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.IAgent;
+import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.comm.CommBean;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
+import de.dailab.jiactng.agentcore.comm.Util;
+import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
+import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 /**
  * Das NodeProtocol reagiert auf nachrichten zwischen den Tng-Knoten
@@ -113,7 +117,7 @@ public class NodeProtocol implements INodeProtocol {
 			ObjectContent oc = (ObjectContent)receivedMsg.getPayload(); 
 			List<String> agentNames = (List<String>)(oc).getObject();
 			log.warn("Alles Roger.. hab die Agenten gekriegt, von" + receivedMsg.getStartPoint());
-			printStringList(agentNames);
+//			printStringList(agentNames);
 		} else if (ACK_PING.equals(operation)) {
 			System.out.println("Alles Roger.. hab ein Ping-Ack gekriegt, von " + receivedMsg.getStartPoint());
 			// ObjectContent content = new ObjectContent();
@@ -162,7 +166,7 @@ public class NodeProtocol implements INodeProtocol {
 		} else if (CMD_PING.equals(operation)) {
 			// auf PING reagieren..
 //			acknowledgePing(receivedMsg, sendInfo);
-			requestAgentNames(receivedMsg, _queueSender);
+			requestAgentDescriptions(receivedMsg, _queueSender);
 		} else if (CMD_NOP.equals(operation)) {
 			String content = "psst";
 		}
@@ -182,11 +186,9 @@ public class NodeProtocol implements INodeProtocol {
 	public void acknowledgeGetAgents(IJiacMessage receivedMsg, IJiacSender sender) {
 		IJiacMessage requestMsg;
 		SendInfo sendInfo = new SendInfo();
-		List<String> agentNames = getAgentNames();
-		printStringList(agentNames);
-		String destinationName = getRequestor(receivedMsg);
+		List<AgentDescription> agentDescs = getAgentDescriptions();
 		
-		requestMsg = new JiacMessage(ACK_GET_AGENTS, new ObjectContent((Serializable)agentNames), receivedMsg.getStartPoint(), _commBean.getAddress(), null);
+		requestMsg = new JiacMessage(ACK_GET_AGENTS, new ObjectContent((Serializable)agentDescs), receivedMsg.getStartPoint(), _commBean.getAddress(), null);
 		sendInfo.setDestinationString(receivedMsg.getStartPoint().toString());
 		sendInfo.setMsg(requestMsg);
 		log.info("requesting agentnames from " + sendInfo.getDestinationString());
@@ -206,7 +208,7 @@ public class NodeProtocol implements INodeProtocol {
 	 * @param receivedMsg in der receivedMsg sind empfängeradresse drin
 	 * @param sender der sender mit dem verschikt werden soll
 	 */
-	public void requestAgentNames(IJiacMessage receivedMsg, IJiacSender sender) {
+	public void requestAgentDescriptions(IJiacMessage receivedMsg, IJiacSender sender) {
 		IJiacMessage requestMsg;
 		SendInfo sendInfo = new SendInfo();
 		String destinationName = getRequestor(receivedMsg);
@@ -235,17 +237,34 @@ public class NodeProtocol implements INodeProtocol {
 	/* 
 	 * holt die AgentenNamen des aktuellen AgentNodes und liefert sie als liste
 	 */
-	private List<String> getAgentNames() {
+	private List<AgentDescription> getAgentDescriptions() {
 		List<IAgent> agents = _agent.getAgentNode().findAgents();
 		String platformName = _agent.getAgentNode().getName();
-		List<String> agentNames = new ArrayList<String>();
+		List<AgentDescription> agentDescs = new ArrayList<AgentDescription>();
 		for (Iterator iter = agents.iterator(); iter.hasNext();) {
 			IAgent agent = (IAgent) iter.next();
-			agentNames.add(agent.getAgentName()+PLATFORM_VS_AGENT_SEPARATOR+platformName);
+			AgentDescription agentDescription = new AgentDescription(agent.getAgentName(), agent.getAgentName()+PLATFORM_VS_AGENT_SEPARATOR+platformName, Util.getLcsName(agent.getState()), getCommEndPointFromAgent(agent));
+			agentDescs.add(agentDescription);
 		}
-		return agentNames;
+		return agentDescs;
 	}
-
+	
+	/**
+	 * holt aus nem Agenten den CommBean-Address-Endpoint.
+	 * Problem: was, wenn mehrere CommBeans innerhalb eines Agenten ?
+	 * @param agent
+	 * @return Endpoint der commbean eines agenten.
+	 */
+	private IEndPoint getCommEndPointFromAgent(IAgent agent) {
+		for (Iterator iter = agent.getAgentBeans().iterator(); iter.hasNext();) {
+			IAgentBean element = (IAgentBean) iter.next();
+			if (element instanceof CommBean) {
+				return ((CommBean)element).getAddress();
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Verschickt die Antwort
 	 * 

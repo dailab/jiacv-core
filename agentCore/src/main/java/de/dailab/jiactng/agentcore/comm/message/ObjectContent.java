@@ -1,6 +1,7 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.message;
 
 import java.io.Serializable;
+
 
 /**
  * Der Content ist ein serialisierbares Object.

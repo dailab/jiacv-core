@@ -1,6 +1,7 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.message;
 
 import javax.jms.Destination;
+
 
 /**
  * FactoryKlasse zum Erzeugen von JiacMessages. Soll nur Abeit sparen, ist nicht zwingend nötig.

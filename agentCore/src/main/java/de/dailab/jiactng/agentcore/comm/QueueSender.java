@@ -12,6 +12,8 @@ import javax.jms.Session;
 
 import org.apache.activemq.pool.ConnectionPool;
 
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+
 /**
  * Ein JMS Sender für Jiac Tng.. Soll aber Springkonform sein, d.h. öffentliche Properties, die als gesetzt angesehen
  * werden können. Es können aber nur primitive Typen gesetzt werden, so dass zusätzlich eine Init-Methode aufgerufen

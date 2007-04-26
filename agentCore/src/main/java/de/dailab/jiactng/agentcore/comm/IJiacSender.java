@@ -2,6 +2,8 @@ package de.dailab.jiactng.agentcore.comm;
 
 import javax.jms.Destination;
 
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+
 /**
  * Ein allgemeiner Jms Sender für Jiac
  * @author janko

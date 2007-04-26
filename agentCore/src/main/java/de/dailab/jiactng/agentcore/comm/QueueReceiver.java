@@ -20,6 +20,8 @@ import javax.jms.TemporaryQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+
 /**
  * Ein Receiver, der mehrere consumer zulassen soll. Design-Problem: Nur eine Session.. Sind überhaupt mehrere nötig?
  * 

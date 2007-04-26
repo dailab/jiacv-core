@@ -14,10 +14,10 @@ import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.comm.CommBean;
-import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
-import de.dailab.jiactng.agentcore.comm.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.ObjectContent;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 
 /**
  * Das NodeProtocol reagiert auf nachrichten zwischen den Tng-Knoten
@@ -233,6 +233,7 @@ public class NodeProtocol implements INodeProtocol {
 	}
 
 	/* 
+	 * holt die AgentenNamen des aktuellen AgentNodes und liefert sie als liste
 	 */
 	private List<String> getAgentNames() {
 		List<IAgent> agents = _agent.getAgentNode().findAgents();

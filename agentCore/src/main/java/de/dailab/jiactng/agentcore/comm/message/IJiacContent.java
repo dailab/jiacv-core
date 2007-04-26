@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.message;
 
 import java.awt.Image;
 import java.io.Serializable;

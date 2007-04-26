@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.broker;
 
 import java.net.BindException;
 import java.net.URI;

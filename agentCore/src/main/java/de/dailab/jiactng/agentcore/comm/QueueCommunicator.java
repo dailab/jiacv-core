@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.comm;
 import javax.jms.Destination;
 import javax.jms.MessageListener;
 
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.protocol.IProtocolHandler;
 
 /**

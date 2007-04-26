@@ -1,6 +1,7 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.message;
 
 import javax.jms.Destination;
+
 
 /**
  * Ein Objekt, dass Nachrichten, die innerhalb Jiacs verschickt werden, kapselt. Der Recipient bestimmt, wer diese

@@ -18,6 +18,8 @@ import org.apache.activemq.pool.ConnectionPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+
 /**
  * Klasse, die in eine Topic schreibt - properties müssen gesetzt, dann doInit() aufgerufen werden.
  * 

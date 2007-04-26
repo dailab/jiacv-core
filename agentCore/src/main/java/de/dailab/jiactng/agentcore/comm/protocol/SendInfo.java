@@ -1,6 +1,6 @@
 package de.dailab.jiactng.agentcore.comm.protocol;
 
-import de.dailab.jiactng.agentcore.comm.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
  * Hilfsklasse zum response-message zusammenbasteln im Protocol.

@@ -1,4 +1,5 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.message;
+
 
 /**
  * Klasse, die ein zu verschickendes File kapselt.

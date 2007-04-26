@@ -13,10 +13,10 @@ import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
-import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
-import de.dailab.jiactng.agentcore.comm.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.ObjectContent;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 
 /**
  * Idee: Ein eigenens Protocol für die Agenten. Zusätzlich zu einem Protocol für die TNG-Platform. Hier werden also die

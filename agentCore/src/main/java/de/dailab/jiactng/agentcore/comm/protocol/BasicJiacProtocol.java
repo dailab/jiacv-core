@@ -7,10 +7,10 @@ import javax.jms.ObjectMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.dailab.jiactng.agentcore.comm.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
-import de.dailab.jiactng.agentcore.comm.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.ObjectContent;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 
 /**
  * Ein 'Basic'-Protokoll für die Kommunikation. Es wird standardmässig verwendet. 

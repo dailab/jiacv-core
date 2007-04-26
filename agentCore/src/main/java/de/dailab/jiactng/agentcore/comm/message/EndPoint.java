@@ -1,4 +1,5 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.message;
+
 
 /**
  * Ein Endpunkt einer Kommunikation - stellt also eine Adresse auf dem JIAC-JMS-Bus dar. Ein Endpoint kann das Ende UND

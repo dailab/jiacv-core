@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm;
+package de.dailab.jiactng.agentcore.comm.broker;
 
 /**
  * Kapselt Werte, die einen ActiveMQ-Broker steuern. Mit diesen Werten kann dann

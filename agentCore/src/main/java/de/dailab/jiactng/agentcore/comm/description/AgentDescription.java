@@ -1,6 +1,6 @@
 package de.dailab.jiactng.agentcore.comm.description;
 
-import de.dailab.jiactng.agentcore.comm.IEndPoint;
+import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**

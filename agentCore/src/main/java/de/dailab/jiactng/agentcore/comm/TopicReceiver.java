@@ -15,6 +15,9 @@ import javax.jms.TopicSubscriber;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+
 /**
  * Liest von der Topic
  * 

@@ -424,13 +424,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		agentFutures = new HashMap<String, Future>();
 
 		// call init on all beans of the agentnodes
-		for (ILifecycle anb: agentNodeBeans) {
-			log.info("Initializing agentnode bean: " + anb.getClass());
-			try {
-				anb.init();
-			} catch (LifecycleException lce) {
-				//TODO
-				lce.printStackTrace();
+		//TODO testing
+		if (agentNodeBeans != null) {
+			for (ILifecycle anb: agentNodeBeans) {
+				log.info("Initializing agentnode bean: " + anb.getClass());
+				try {
+					anb.init();
+				} catch (LifecycleException lce) {
+					//TODO
+					lce.printStackTrace();
+				}
 			}
 		}
 		
@@ -453,12 +456,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void doStart() {
 		// call start on all beans of the agentnode
-		for (ILifecycle anb: agentNodeBeans) {
-			try {
-				anb.start();
-			} catch (LifecycleException lce) {
-				//TODO
-				lce.printStackTrace();
+		//TODO testing
+		if (agentNodeBeans != null) {
+			for (ILifecycle anb: agentNodeBeans) {
+				try {
+					anb.start();
+				} catch (LifecycleException lce) {
+					//TODO
+					lce.printStackTrace();
+				}
 			}
 		}
 		
@@ -492,12 +498,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// call stop on all beans of the agentnode
-		for (ILifecycle anb: agentNodeBeans) {
-			try {
-				anb.stop();
-			} catch (LifecycleException lce) {
-				//TODO
-				lce.printStackTrace();
+		//TODO testing
+		if (agentNodeBeans != null) {
+			for (ILifecycle anb: agentNodeBeans) {
+				try {
+					anb.stop();
+				} catch (LifecycleException lce) {
+					//TODO
+					lce.printStackTrace();
+				}
 			}
 		}
 	}
@@ -517,17 +526,20 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				e.printStackTrace();
 			}
 		}
-		_threadPool.shutdown();
 
 		// call cleanup on all beans of the agentnode
-		for (ILifecycle anb: agentNodeBeans) {
-			try {
-				anb.cleanup();
-			} catch (LifecycleException lce) {
-				//TODO
-				lce.printStackTrace();
+		//TODO testing
+		if (agentNodeBeans != null) {
+			for (ILifecycle anb: agentNodeBeans) {
+				try {
+					anb.cleanup();
+				} catch (LifecycleException lce) {
+					//TODO
+					lce.printStackTrace();
+				}
 			}
 		}
+		_threadPool.shutdown();
 	}
 
 	/*

@@ -35,14 +35,16 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 
 	// ---------------------- Lifecycle
 	public void doInit() throws Exception {
-		if (log.isDebugEnabled()) {
-			log.debug("initializing embedded broker");
-		}
+		log.debug("initializing embedded broker");
+		
+		values.setUrlFromPortAndProtocol();
+		
 		broker = new BrokerService();
 		broker.setBrokerName(values.getName());
 		broker.setUseJmx(values.isJmx());
 		broker.setPersistent(values.isPersistent());
 		try {
+		
 			connector = broker.addConnector(values.getUrl());
 			connector.setDiscoveryUri(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
 			broker.addNetworkConnector(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
@@ -50,9 +52,7 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 		} catch (BindException be) {
 			// address is in use already
 		}
-		if (log.isDebugEnabled()) {
-			log.debug("embedded broker initialized. url = " + values.getUrl());
-		}
+		log.debug("embedded broker initialized. url = " + values.getUrl());
 	}
 
 	public void doStart() throws Exception {
@@ -68,28 +68,18 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 	}
 
 	public void doStop() throws Exception {
-		if (log.isDebugEnabled()) {
-			log.debug("stopping broker");
-		}
+		log.debug("stopping broker");
 		// stop broker
 		if (broker != null) {
 			connector.stop();
 			broker.stop();
-			if (log.isDebugEnabled()) {
-				log.debug("broker stopped");
-			}
+			log.debug("broker stopped");
 		}
 	}
 
 	public void doCleanup() throws Exception {
 		log.debug("cleaning up broker");
-		// if it is stopped, it doesnt have to be removed
-		// if (broker != null && connector != null) {
-		// broker.removeConnector(connector);
-		// } broker = null;
-		if (log.isDebugEnabled()) {
-			log.debug("broker cleaned up");
-		}
+		log.debug("broker cleaned up");
 	}
 
 	/**

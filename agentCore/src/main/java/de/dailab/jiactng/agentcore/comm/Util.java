@@ -25,6 +25,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 /**
  * UtilityKlasse, die statische Methoden kapselt.
@@ -47,6 +48,19 @@ public class Util {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * gets the local IP or returns 'localhost' on error.
+	 * @return IP in textual presentation or 'localhost' on error.
+	 */
+	public static String getLocalIp() {
+		InetAddress addr = getLocalHost();
+		if (addr != null)
+			return addr.getHostAddress();
+		else {
+			return "localhost";
+		}
 	}
 
 	public static int getLocalHostIpAsInt() {
@@ -334,34 +348,34 @@ public class Util {
 	}
 
 	/**
-	 * Erzeugt aus der eigenen IPAdresse einen kürzeren eindeutigen String, der einigemassen human readable ist.
-	 * Es wird einfach in ein neues Zahlensystem mit 62 zeichen gewandelt.
+	 * Erzeugt aus der eigenen IPAdresse einen kürzeren eindeutigen String, der einigemassen human readable ist. Es wird
+	 * einfach in ein neues Zahlensystem mit 62 zeichen gewandelt.
+	 * 
 	 * @param ipAddress
 	 * @return
 	 */
-	public static String convertToBase62(byte[] ipAddress) {		
-		char[] alphabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
-											  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-											  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
-											  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-											  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
-		int DIVIDER = 62; 
+	public static String convertToBase62(byte[] ipAddress) {
+		char[] alphabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+																						'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+																						'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
+																						'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+		int DIVIDER = 62;
 		int p24 = 2 << 23;
 		int p16 = 2 << 15;
 		int p8 = 2 << 7;
 		ipAddress = getLocalHost().getAddress();
 		long ip = ipAddress[0] * p24;
-		ip += ipAddress[1]*p16;
+		ip += ipAddress[1] * p16;
 		ip += ipAddress[2] * p8;
 		ip += ipAddress[3];
 		long ipCopy = ip;
 		int counter = 0;
 		StringBuffer sb = new StringBuffer();
-		while (ipCopy>0) {
-			int remainder = (int)(ipCopy % DIVIDER);
+		while (ipCopy > 0) {
+			int remainder = (int) (ipCopy % DIVIDER);
 			char letter = alphabet[remainder];
 			ipCopy /= DIVIDER;
-			counter ++;
+			counter++;
 			sb.append(letter);
 		}
 		return sb.toString();
@@ -402,4 +416,34 @@ public class Util {
 			}
 		}
 	}
+	
+	/**
+	 * Wandelt LifeCycleState in ein Lesbaren String um.
+	 * @param state
+	 * @return human readable String
+	 */
+	public static String getLcsName(ILifecycle.LifecycleStates state) {
+		if (state == ILifecycle.LifecycleStates.CLEANED_UP) {
+			return "CLEANED_UP";
+		} else if (state == ILifecycle.LifecycleStates.CLEANING_UP) {
+			return "CLEANING_UP";
+		} else if (state == ILifecycle.LifecycleStates.INITIALIZED) {
+			return "INITIALIZED";
+		} else if (state == ILifecycle.LifecycleStates.INITIALIZING) {
+			return "INITIALIZING";
+		} else if (state == ILifecycle.LifecycleStates.STARTED) {
+			return "STARTED";
+		} else if (state == ILifecycle.LifecycleStates.STARTING) {
+			return "STARTING";
+		} else if (state == ILifecycle.LifecycleStates.STOPPED) {
+			return "STOPPED";
+		} else if (state == ILifecycle.LifecycleStates.STOPPING) {
+			return "STOPPING";
+		} else if (state == ILifecycle.LifecycleStates.UNDEFINED) {
+			return "UNDEFINED";
+		} else {
+			return "xUNDEFINEDx";
+		}
+	}
+	
 }

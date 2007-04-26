@@ -33,9 +33,7 @@ public class QueueMessageListener implements MessageListener {
 	 * bestätigt.
 	 */
 	public void onMessage(Message msg) {
-		if (log.isDebugEnabled()) {
-			log.debug("JiacMessageListener msg received");
-		}
+		log.debug("JiacMessageListener msg received");
 		if (msg != null) {
 			try {
 				ObjectMessage oMsg = (ObjectMessage) msg;
@@ -56,10 +54,10 @@ public class QueueMessageListener implements MessageListener {
 	private void debugMsg(ObjectMessage msg, String addressProperty) throws JMSException {
 		JiacMessage jMsg = (JiacMessage) msg.getObject();
 		String payLoadString = convertPayLoadToString(jMsg.getPayload());
-		System.out.println("Output:" + payLoadString);
+		log.info("Output:" + payLoadString);
 		// System.out.println("Von:" + jMsg.getStartPoint() + " An:" + jMsg.getEndPoint() + " Content:"
 		// + jMsg.getPayload().toString());
-		System.out.println("AddressProperty: " + addressProperty);
+		log.info("AddressProperty: " + addressProperty);
 	}
 
 	private String convertPayLoadToString(Object payload) {

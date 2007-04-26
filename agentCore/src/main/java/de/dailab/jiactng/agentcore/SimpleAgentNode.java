@@ -27,6 +27,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.util.IdFactory;
@@ -51,6 +52,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** The name of the agentnode. */
 	protected String _name = null;
 
+	/** The agentnodes one beans. */
+	private ArrayList<ILifecycle> agentNodeBeans;
+	
 	/** The list of agents. */
 	private ArrayList<IAgent> _agents = null;
 
@@ -419,6 +423,17 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		_threadPool = Executors.newCachedThreadPool();
 		agentFutures = new HashMap<String, Future>();
 
+		// call init on all beans of the agentnodes
+		for (ILifecycle anb: agentNodeBeans) {
+			log.info("Initializing agentnode bean: " + anb.getClass());
+			try {
+				anb.init();
+			} catch (LifecycleException lce) {
+				//TODO
+				lce.printStackTrace();
+			}
+		}
+		
 		// call init and set references for all agents
 		for (IAgent a : _agents) {
 			log.warn("Initializing agent: " + a.getAgentName());
@@ -437,6 +452,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
 	 */
 	public void doStart() {
+		// call start on all beans of the agentnode
+		for (ILifecycle anb: agentNodeBeans) {
+			try {
+				anb.start();
+			} catch (LifecycleException lce) {
+				//TODO
+				lce.printStackTrace();
+			}
+		}
+		
 		// call start() and instantiate Threads for all agents
 		for (IAgent a : _agents) {
 			try {
@@ -465,6 +490,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				e.printStackTrace();
 			}
 		}
+
+		// call stop on all beans of the agentnode
+		for (ILifecycle anb: agentNodeBeans) {
+			try {
+				anb.stop();
+			} catch (LifecycleException lce) {
+				//TODO
+				lce.printStackTrace();
+			}
+		}
 	}
 
 	/*
@@ -483,6 +518,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 		_threadPool.shutdown();
+
+		// call cleanup on all beans of the agentnode
+		for (ILifecycle anb: agentNodeBeans) {
+			try {
+				anb.cleanup();
+			} catch (LifecycleException lce) {
+				//TODO
+				lce.printStackTrace();
+			}
+		}
 	}
 
 	/*
@@ -515,6 +560,20 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public static void main(String[] args) {
 		new ClassPathXmlApplicationContext(args[0]);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public ArrayList<ILifecycle> getAgentNodeBeans() {
+		return this.agentNodeBeans;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public void setAgentNodeBeans(ArrayList<ILifecycle> agentnodebeans) {
+		this.agentNodeBeans = agentnodebeans;
 	}
 
 

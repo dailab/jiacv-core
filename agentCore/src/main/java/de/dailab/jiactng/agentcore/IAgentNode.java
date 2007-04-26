@@ -117,5 +117,20 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    * @see java.util.concurrent.ExecutorService
    */
   public ExecutorService getThreadPool();
-
+  
+  /**
+   * Setter for agentnode's beans. This is thought as generic port
+   * for extending the functionality of an agentnode with infrastructure
+   * services. Beans of the agentnode also underly the agentnode lifecycle.
+   * 
+   * @param agentnodebeans the beans to set 
+   */
+  public void setAgentNodeBeans(ArrayList<ILifecycle> agentnodebeans);
+  
+  /**
+   * Getter for beans of the agentnode.
+   * 
+   * @return the beans of the agent node
+   */
+  public ArrayList<ILifecycle> getAgentNodeBeans();
 }

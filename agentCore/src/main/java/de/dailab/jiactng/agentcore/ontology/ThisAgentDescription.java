@@ -1,6 +1,6 @@
 package de.dailab.jiactng.agentcore.ontology;
 
-import de.dailab.jiactng.agentcore.comm.IEndPoint;
+import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
 
 public class ThisAgentDescription extends AgentDescription {
 

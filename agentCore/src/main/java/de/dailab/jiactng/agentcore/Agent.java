@@ -407,8 +407,6 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    */
   public LifecycleStates getAgentState() {
 	  return LifecycleStates.valueOf(memory.read(new ThisAgentDescription(null, null, null, null)).getState());
-//    return LifecycleStates.valueOf(
-//    		memory.read(new Tuple("thisAgent.state", null)).getArg2());
   }
 
   /**
@@ -422,9 +420,7 @@ public class Agent extends AbstractLifecycle implements IAgent, InitializingBean
    * {@inheritDoc}
    */
   public LifecycleStates getBeanState(String beanName) {
-//    String beanPath = createBeanPath(beanName) + ".state";
     return LifecycleStates.valueOf(this.memory.read(new AgentBeanDescription(beanName, null)).getState());
-//    return LifecycleStates.valueOf(this.memory.read(new Tuple(beanPath, null)).getArg2());
   }
 
   /*

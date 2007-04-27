@@ -3,12 +3,16 @@ package de.dailab.jiactng.agentcore.comm.description;
 import java.io.Serializable;
 import java.util.Date;
 
+import de.dailab.jiactng.agentcore.knowledge.IFact;
+
 /**
  * Ein Interface zur Beschreibung von Services
  * 
  * @author janko
  */
-public interface IServiceDescription extends Serializable {
+public interface IServiceDescription extends IFact {
+	
+
 
 	public String getName();
 
@@ -30,4 +34,8 @@ public interface IServiceDescription extends Serializable {
 	public String getPrecondition();
 
 	public String getPostCondition();
+
+	// needed for generic webservice interface
+	public String getWsdlDescription();
+
 }

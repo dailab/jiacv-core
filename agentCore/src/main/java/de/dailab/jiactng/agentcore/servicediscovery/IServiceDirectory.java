@@ -6,6 +6,7 @@ package de.dailab.jiactng.agentcore.servicediscovery;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.comm.description.IServiceDescription;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
  * Interface for service discovery of the jiac tng.
@@ -14,7 +15,7 @@ import de.dailab.jiactng.agentcore.comm.description.IServiceDescription;
  *
  */
 
-public interface IServiceDirectory {
+public interface IServiceDirectory extends IFact {
 	
 	/**
 	 * Registers the service description in the service directory of jiac tng.

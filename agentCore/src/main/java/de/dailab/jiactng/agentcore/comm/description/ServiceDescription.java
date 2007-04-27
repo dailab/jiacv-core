@@ -5,12 +5,14 @@ import java.util.Date;
 
 
 /**
- * Eine Implementation für die Servicebeschreibung
+ * Eine Implementation fï¿½r die Servicebeschreibung
  * 
  * @author janko
  */
 public class ServiceDescription implements IServiceDescription, Serializable {
 
+	private String wsdlDescription;
+	
 	Date _expireDate;
 	String _id;
 	String _name;
@@ -148,7 +150,7 @@ public class ServiceDescription implements IServiceDescription, Serializable {
 
 	private boolean equalsKeywords(String[] keywords) {
 		if (keywords != null && _keywords != null && keywords.length == _keywords.length) {
-			// achtung es wird auf die reihenfolge geachtet.. das ist evtl. nicht gewünscht
+			// achtung es wird auf die reihenfolge geachtet.. das ist evtl. nicht gewï¿½nscht
 			for (int i = 0; i < keywords.length; i++) {
 				if (!keywords[i].equals(_keywords[i])) {
 					// sobald ein element ungleich ist.. wird false geliefert
@@ -174,5 +176,15 @@ public class ServiceDescription implements IServiceDescription, Serializable {
 		}
 		return false;
 	}
+
+	public String getWsdlDescription() {
+		return wsdlDescription;
+	}
+
+	public void setWsdlDescription(String wsdlDescription) {
+		this.wsdlDescription = wsdlDescription;
+	}
+
+	
 
 }

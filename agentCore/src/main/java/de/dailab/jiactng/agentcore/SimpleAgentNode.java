@@ -68,7 +68,19 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	private Set<Map> _jmxConnectors = null;
 
 	JmsBrokerAMQ _embeddedBroker = null;
+	
+	/** Shutdown thread to be started when JVM was killed */
+	private Thread shutdownhook = new Thread() {
+		public void run() {
+			try {
+				shutdown();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+	};
 
+	
 	/** Constructur. Creates the uuid for the agentnode. */
 	public SimpleAgentNode() {
 //		_uuid = new String("p:" + Long.toHexString(System.currentTimeMillis() + this.hashCode()));
@@ -287,6 +299,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public void afterPropertiesSet() throws Exception {
 		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
+		// create shutdown hook for graceful termination
+		Runtime.getRuntime().addShutdownHook(shutdownhook);
+		
+		// create all connector server for remote management
 		if (_jmxConnectors != null) {
 			// Enable remote management
 			if (!_jmxConnectors.isEmpty()) {
@@ -367,6 +383,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException
 	 */
 	public void shutdown() throws LifecycleException {
+		// remove shutdown hook
+		if (!shutdownhook.isAlive()) {
+			Runtime.getRuntime().removeShutdownHook(shutdownhook);
+		}
+
 		// clean up agent node
 		stop();
 		cleanup();
@@ -409,7 +430,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 		this._connectorServer = null;
-
+		
 		log.warn("AgentNode " + getName() + " has been closed.");
 	}
 

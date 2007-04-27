@@ -1,8 +1,5 @@
 package de.dailab.jiactng.agentcore.comm.message;
 
-import java.awt.Image;
-import java.io.Serializable;
-
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
@@ -11,6 +8,5 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author janko
  */
 public interface IJiacContent extends IFact {
-
 
 }

@@ -1,13 +1,13 @@
 package de.dailab.jiactng.agentcore.comm.description;
 
-import java.io.Serializable;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
  * Eine Klasse, die einen Parameter darstellt
  * 
  * @author janko
  */
-public class ServiceParameter implements Serializable {
+public class ServiceParameter implements IFact {
 
 	String _type;
 	String _name;

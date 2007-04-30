@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore.comm.description;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
@@ -12,8 +11,6 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  */
 public interface IServiceDescription extends IFact {
 	
-
-
 	public String getName();
 
 	public String getId();

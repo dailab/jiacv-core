@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore.comm.description;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**

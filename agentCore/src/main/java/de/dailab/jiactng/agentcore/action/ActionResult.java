@@ -4,10 +4,16 @@ public class ActionResult extends Session {
 
 	private Action thisAction;
 
+	private DoAction resultOf;
+
 	private Object[] results;
 
-	public ActionResult(Action thisAction, Object source, Object[] results) {
+	private boolean success;
+	
+	public ActionResult(Action thisAction, DoAction resultOf, boolean success, Object[] results,
+			Object source) {
 		super(source);
+		this.resultOf = resultOf;
 		this.thisAction = thisAction;
 		this.results = results;
 	}
@@ -18,6 +24,14 @@ public class ActionResult extends Session {
 
 	public Action getThisAction() {
 		return thisAction;
+	}
+
+	public DoAction getResultOf() {
+		return resultOf;
+	}
+
+	public boolean isSuccess() {
+		return success;
 	}
 
 }

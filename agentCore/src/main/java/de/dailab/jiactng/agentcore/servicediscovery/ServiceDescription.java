@@ -1,10 +1,10 @@
-package de.dailab.jiactng.agentcore.comm.description;
+package de.dailab.jiactng.agentcore.servicediscovery;
 
 import java.util.Date;
 
 /**
  * Eine Implementation für die Servicebeschreibung
- * 
+ * Wenn wsdl-Beschreibung null ist, wird davon ausgegangen, dass es kein WebService ist.
  * @author janko
  */
 public class ServiceDescription implements IServiceDescription {
@@ -34,7 +34,7 @@ public class ServiceDescription implements IServiceDescription {
 	 * @param postCondition
 	 * @param providerAddress
 	 * @param qoSRating
-	 * @param wsdl
+	 * @param wsdl wsdl beschreibung
 	 */
 	public ServiceDescription(Date expireDate, String id, String name, String[] keywords, ServiceParameter[] inputParams,
 																					ServiceParameter[] outputParams, String preCondition, String postCondition,
@@ -97,6 +97,10 @@ public class ServiceDescription implements IServiceDescription {
 		return _wsdl;
 	}
 
+	public boolean isWebService() {
+		return _wsdl != null;
+	}
+	
 	public int hashCode() {
 		long hashCode = 0;
 		int cnt = 1; // einfach mal mit 1 initialisieren, um div0 zu verhindern

@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.description;
+package de.dailab.jiactng.agentcore.servicediscovery;
 
 import java.util.Date;
 
@@ -34,5 +34,7 @@ public interface IServiceDescription extends IFact {
 
 	// needed for generic webservice interface
 	public String getWsdlDescription();
+	
+	public boolean isWebService();
 
 }

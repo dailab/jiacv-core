@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.description;
+package de.dailab.jiactng.agentcore.servicediscovery;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 

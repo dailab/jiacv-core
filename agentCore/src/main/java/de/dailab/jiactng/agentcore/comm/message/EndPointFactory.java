@@ -14,7 +14,7 @@ public class EndPointFactory {
 	
 	private static final char HOST_PLATFORM_SEPARATOR = '@';
 	public static IEndPoint createEndPoint(String platformId) {
-		IEndPoint endpoint = new EndPoint(platformId+HOST_PLATFORM_SEPARATOR+Util.convertToBase62(null), ""+(_counterLocal++));
+		IEndPoint endpoint = new EndPoint(platformId+HOST_PLATFORM_SEPARATOR+Util.convertToBase62(), ""+(_counterLocal++));
 		System.out.println("Endpoint created:"+endpoint.toString());
 		return endpoint;
 	}

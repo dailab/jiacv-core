@@ -1,6 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
-import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
+//import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
@@ -9,6 +9,8 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
+import de.dailab.jiactng.agentcore.servicediscovery.IServiceDirectory;
+
 import java.util.List;
 
 /**
@@ -136,9 +138,14 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    */
   public ArrayList<ILifecycle> getAgentNodeBeans();
   
+//  /**
+//   * Setter for protocol enablers
+//   */
+//  public void setProtocolEnablers(List<AbstractProtocolEnabler> enablers);
+  
   /**
-   * Setter for protocol enablers
+   * Liefert das platformweite ServiceDirectory 
    */
-  public void setProtocolEnablers(List<AbstractProtocolEnabler> enablers);
+  public IServiceDirectory getServiceDirectory();
   
 }

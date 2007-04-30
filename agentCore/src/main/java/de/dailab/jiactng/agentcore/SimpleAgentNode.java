@@ -1,6 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
-import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
+//import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,6 +32,7 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.servicediscovery.IServiceDirectory;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**
@@ -56,7 +57,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** The agentnodes one beans. */
 	private ArrayList<ILifecycle> agentNodeBeans;
-	
+
 	/** The list of agents. */
 	private ArrayList<IAgent> _agents = null;
 
@@ -69,28 +70,35 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Configuration of a set of JMX connector server. */
 	private Set<Map> _jmxConnectors = null;
 
+	/** Der eingebettete JMSBroker zur Inter-AgentNode-Kommunikation */
 	JmsBrokerAMQ _embeddedBroker = null;
-	
-        /**
-         * The protocol enablers on this node
-         */
-        private List<AbstractProtocolEnabler> protocolEnablers = null;
-        
+
+	/** Das ServiceDirectory des AgentNodes */
+	private IServiceDirectory _serviceDirectory = null;
+
+	// /**
+	// * The protocol enablers on this node
+	// */
+	// private List<AbstractProtocolEnabler> protocolEnablers = null;
+
+		
+
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
 		public void run() {
 			try {
 				shutdown();
-			} catch(Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	};
 
+	/** -------------Jetzt geht's lo'hos ----------------------------------------- */
 	
 	/** Constructur. Creates the uuid for the agentnode. */
 	public SimpleAgentNode() {
-//		_uuid = new String("p:" + Long.toHexString(System.currentTimeMillis() + this.hashCode()));
+		// _uuid = new String("p:" + Long.toHexString(System.currentTimeMillis() + this.hashCode()));
 		_uuid = IdFactory.createAgentNodeId(this.hashCode());
 	}
 
@@ -308,7 +316,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// create shutdown hook for graceful termination
 		Runtime.getRuntime().addShutdownHook(shutdownhook);
-		
+
 		// create all connector server for remote management
 		if (_jmxConnectors != null) {
 			// Enable remote management
@@ -339,10 +347,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					String registryPort = (String) conf.get("registryPort");
 					String registryHost = (String) conf.get("registryHost");
 					if ((registryPort != null) || (registryHost != null)) {
-						path = "/jndi/rmi://"
-							+ ((registryHost == null)? "localhost" : registryHost)
-							+ ((registryPort == null)? "" : ":"+registryPort)
-							+ "/" + _name;
+						path = "/jndi/rmi://" + ((registryHost == null) ? "localhost" : registryHost)
+																										+ ((registryPort == null) ? "" : ":" + registryPort) + "/" + _name;
 					}
 				}
 
@@ -437,7 +443,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 		this._connectorServer = null;
-		
+
 		log.warn("AgentNode " + getName() + " has been closed.");
 	}
 
@@ -452,19 +458,19 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		agentFutures = new HashMap<String, Future>();
 
 		// call init on all beans of the agentnodes
-		//TODO testing
+		// TODO testing
 		if (agentNodeBeans != null) {
-			for (ILifecycle anb: agentNodeBeans) {
+			for (ILifecycle anb : agentNodeBeans) {
 				log.info("Initializing agentnode bean: " + anb.getClass());
 				try {
 					anb.init();
 				} catch (LifecycleException lce) {
-					//TODO
+					// TODO
 					lce.printStackTrace();
 				}
 			}
 		}
-		
+
 		// call init and set references for all agents
 		for (IAgent a : _agents) {
 			log.warn("Initializing agent: " + a.getAgentName());
@@ -484,18 +490,18 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void doStart() {
 		// call start on all beans of the agentnode
-		//TODO testing
+		// TODO testing
 		if (agentNodeBeans != null) {
-			for (ILifecycle anb: agentNodeBeans) {
+			for (ILifecycle anb : agentNodeBeans) {
 				try {
 					anb.start();
 				} catch (LifecycleException lce) {
-					//TODO
+					// TODO
 					lce.printStackTrace();
 				}
 			}
 		}
-		
+
 		// call start() and instantiate Threads for all agents
 		for (IAgent a : _agents) {
 			try {
@@ -526,13 +532,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// call stop on all beans of the agentnode
-		//TODO testing
+		// TODO testing
 		if (agentNodeBeans != null) {
-			for (ILifecycle anb: agentNodeBeans) {
+			for (ILifecycle anb : agentNodeBeans) {
 				try {
 					anb.stop();
 				} catch (LifecycleException lce) {
-					//TODO
+					// TODO
 					lce.printStackTrace();
 				}
 			}
@@ -556,13 +562,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// call cleanup on all beans of the agentnode
-		//TODO testing
+		// TODO testing
 		if (agentNodeBeans != null) {
-			for (ILifecycle anb: agentNodeBeans) {
+			for (ILifecycle anb : agentNodeBeans) {
 				try {
 					anb.cleanup();
 				} catch (LifecycleException lce) {
-					//TODO
+					// TODO
 					lce.printStackTrace();
 				}
 			}
@@ -589,40 +595,44 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
-	 * Main method for starting JIAC-TNG. Loads a spring-configuration file
-	 * denoted by the first argument and uses a ClassPathXmlApplicationContext to
-	 * instantiate its contents
+	 * Main method for starting JIAC-TNG. Loads a spring-configuration file denoted by the first argument and uses a
+	 * ClassPathXmlApplicationContext to instantiate its contents
 	 * 
-	 * @param args
-	 *          the first argument is interpreted as a classpathrelative name of a
-	 *          spring configurations file. Other arguments are ignored.
+	 * @param args the first argument is interpreted as a classpathrelative name of a spring configurations file. Other
+	 *          arguments are ignored.
 	 * @see org.springframework.context.support.ClassPathXmlApplicationContext
 	 */
 	public static void main(String[] args) {
 		new ClassPathXmlApplicationContext(args[0]);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	public ArrayList<ILifecycle> getAgentNodeBeans() {
 		return this.agentNodeBeans;
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setAgentNodeBeans(ArrayList<ILifecycle> agentnodebeans) {
 		this.agentNodeBeans = agentnodebeans;
 	}
 
+	public IServiceDirectory getServiceDirectory() {
+		return _serviceDirectory;
+	}
 
-        /**
-         * Setter for the protocol enablers
-         */
-    public void setProtocolEnablers(List<AbstractProtocolEnabler> enablers) {        
-        this.protocolEnablers = enablers;
-    }
+	public void setServiceDirectory(IServiceDirectory serviceDirectory) {
+		_serviceDirectory = serviceDirectory;
+	}
 
+	// /**
+	// * Setter for the protocol enablers
+	// */
+	// public void setProtocolEnablers(List<AbstractProtocolEnabler> enablers) {
+	// this.protocolEnablers = enablers;
+	// }
 
 }

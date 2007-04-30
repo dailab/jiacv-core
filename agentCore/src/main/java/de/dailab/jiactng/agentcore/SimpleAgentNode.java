@@ -1,11 +1,13 @@
 package de.dailab.jiactng.agentcore;
 
+import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -69,6 +71,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	JmsBrokerAMQ _embeddedBroker = null;
 	
+        /**
+         * The protocol enablers on this node
+         */
+        private List<AbstractProtocolEnabler> protocolEnablers = null;
+        
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
 		public void run() {
@@ -608,6 +615,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public void setAgentNodeBeans(ArrayList<ILifecycle> agentnodebeans) {
 		this.agentNodeBeans = agentnodebeans;
 	}
+
+
+        /**
+         * Setter for the protocol enablers
+         */
+    public void setProtocolEnablers(List<AbstractProtocolEnabler> enablers) {        
+        this.protocolEnablers = enablers;
+    }
 
 
 }

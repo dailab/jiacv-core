@@ -52,6 +52,7 @@ public class Util {
 
 	/**
 	 * gets the local IP or returns 'localhost' on error.
+	 * 
 	 * @return IP in textual presentation or 'localhost' on error.
 	 */
 	public static String getLocalIp() {
@@ -354,20 +355,27 @@ public class Util {
 	 * @param ipAddress
 	 * @return
 	 */
-	public static String convertToBase62(byte[] ipAddress) {
+	public static String convertToBase62() {
 		char[] alphabet = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
 																						'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
 																						'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
 																						'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
 		int DIVIDER = 62;
-		int p24 = 2 << 23;
-		int p16 = 2 << 15;
-		int p8 = 2 << 7;
-		ipAddress = getLocalHost().getAddress();
-		long ip = ipAddress[0] * p24;
-		ip += ipAddress[1] * p16;
-		ip += ipAddress[2] * p8;
-		ip += ipAddress[3];
+		int p24 = 1 << 24;
+		int p16 = 1 << 16;
+		int p8 = 1 << 8;
+		byte[] ipAddress = getLocalHost().getAddress();
+		ipAddress[0]=(byte)245;
+		int[] ipAddrAsInt = new int[4];
+		ipAddrAsInt[0] = (0x00ff & ipAddress[0]);
+		ipAddrAsInt[1] = (0x00ff & ipAddress[1]);
+		ipAddrAsInt[2] = (0x00ff & ipAddress[2]);
+		ipAddrAsInt[3] = (0x00ff & ipAddress[3]);
+		
+		long ip = (long)(ipAddrAsInt[0]) * p24;
+		ip += (long)(ipAddrAsInt[1]) * p16;
+		ip += (long)(ipAddrAsInt[2]) * p8;
+		ip += (long)(ipAddrAsInt[3]);
 		long ipCopy = ip;
 		int counter = 0;
 		StringBuffer sb = new StringBuffer();
@@ -416,9 +424,10 @@ public class Util {
 			}
 		}
 	}
-	
+
 	/**
-	 * Wandelt LifeCycleState in ein Lesbaren String um.
+	 * Wandelt LifeCycleState in ein Lesbaren String um. Nur Testhalber, wenns einfacher geht.. ändern!
+	 * 
 	 * @param state
 	 * @return human readable String
 	 */
@@ -445,5 +454,5 @@ public class Util {
 			return "xUNDEFINEDx";
 		}
 	}
-	
+
 }

@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
+import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
+import java.util.List;
 
 /**
  * Interface for agentnodes. This interfaces defines functionalities, that are
@@ -133,4 +135,10 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    * @return the beans of the agent node
    */
   public ArrayList<ILifecycle> getAgentNodeBeans();
+  
+  /**
+   * Setter for protocol enablers
+   */
+  public void setProtocolEnablers(List<AbstractProtocolEnabler> enablers);
+  
 }

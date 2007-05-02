@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import de.dailab.jiactng.agentcore.AbstractAgentBean;
+
 /**
  * ServiceDirectoryBean soll Beschreibungen aller Services die auf einem AgentNode existieren, verfügbar halten. Dazu
  * wird die CommBean benutzt. Es soll der memory benutzt werden.. - weil der nicht funktioniert ist mockmässig eine
@@ -14,7 +16,7 @@ import java.util.Set;
  * 
  * @author janko
  */
-public class ServiceDirectory implements IServiceDirectory {
+public class ServiceDirectory extends AbstractAgentBean implements IServiceDirectory {
 
 	HashMap2 _hashMap;
 
@@ -28,7 +30,7 @@ public class ServiceDirectory implements IServiceDirectory {
 	 * @param serviceDescription
 	 */
 	public boolean registerService(IServiceDescription serviceDescription) {
-		// memory.write(serviceDescription);
+		memory.write(serviceDescription);
 		return (_hashMap.put(serviceDescription.getName(), serviceDescription) != null);
 	}
 
@@ -38,7 +40,7 @@ public class ServiceDirectory implements IServiceDirectory {
 	 * @param serviceDescription
 	 */
 	public boolean deRegisterService(IServiceDescription serviceDescription) {
-		// memory.remove(serviceDescription);
+		memory.remove(serviceDescription);
 		return (_hashMap.remove(serviceDescription) != null);
 	}
 
@@ -49,8 +51,8 @@ public class ServiceDirectory implements IServiceDirectory {
 	 * @return
 	 */
 	public Set<ServiceDescription> findServiceByName(String name) {
-		// Set<ServiceDescription> serviceDescriptionList = memory.readAll(new ServiceDescription(null, null, name, null,
-		// null, null, null, null, null, null, null));
+		 Set<ServiceDescription> serviceDescriptionList = memory.readAll(new ServiceDescription(null, null, name, null,
+		 null, null, null, null, null, null, null));
 		// achtung hier wird das Object in der testimplementierung zurückgeliefert.
 		Set<ServiceDescription> hashMap_Set = (Set<ServiceDescription>) _hashMap.findByKey(name);
 		return hashMap_Set;
@@ -85,7 +87,7 @@ public class ServiceDirectory implements IServiceDirectory {
 
 	/*********************************************************************************************************************
 	 * Temporäre Hilfsklasse zum speichern von Sets in nem Hash HashMap2 - eine HashMap mit Sets als Werten
-	 * 
+	 * Es werden Services mit Namen als schlüssel gespeichert.
 	 * @author janko
 	 */
 	class HashMap2 {
@@ -126,7 +128,7 @@ public class ServiceDirectory implements IServiceDirectory {
 		 * Findet alle Objekte die zum gegebenen Key gespeichert wurden
 		 * 
 		 * @param key
-		 * @return ein Set von Objekten
+		 * @return ein Set von Objekten; achtung es ist das gespeicherte Set-Objekt, keine Kopie
 		 */
 		public Set findByKey(Object key) {
 			return (Set) _hash.get(key);

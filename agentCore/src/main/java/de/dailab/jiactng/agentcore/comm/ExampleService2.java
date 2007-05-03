@@ -14,16 +14,15 @@ import de.dailab.jiactng.agentcore.servicediscovery.ServiceDescription;
 import de.dailab.jiactng.agentcore.servicediscovery.ServiceParameter;
 
 /**
- * AgentBean, die das Service-Interface und damit auch das Effector-Interface implementiert, d.h. Actions hostet. Der
- * Service soll Actions Anbieten, die dann als Service (also z.b. auch als WebService) exposable sind.
+ * Einfach noch n Service zum testen. es sind die gleichen methoden wie in exampleservice nur die operationenNamen sind anders
  * 
  * @author janko
  */
-public class ExampleService extends AbstractAgentBean implements IService {
+public class ExampleService2 extends AbstractAgentBean implements IService {
 
-	public static final String SERVICE_GETTIME = "getTime";
-	public static final String SERVICE_GETSYSINFO = "getSysInfo";
-	public static final String SERVICE_TIME_DIFFERENCE = "getTimeDifference";
+	public static final String SERVICE_GETTIME = "getTime2";
+	public static final String SERVICE_GETSYSINFO = "getSysInfo2";
+	public static final String SERVICE_TIME_DIFFERENCE = "getTimeDifference2";
 
 	public static final char SEPARATOR = ':';
 
@@ -83,7 +82,7 @@ public class ExampleService extends AbstractAgentBean implements IService {
 		ServiceParameter spIn[] = {};
 		ServiceParameter spOut[] = {};
 		ServiceDescription sd = new ServiceDescription(new Date(), createServiceId(SERVICE_GETTIME), SERVICE_GETTIME,
-																						keywords, spIn, spOut, "", "", createServiceId(SERVICE_GETTIME), "", null);
+																						keywords, spIn, spOut, "", "", createServiceId(SERVICE_GETTIME), "", "");
 		list.add(sd);
 		
 		keywords = new String[2];
@@ -92,7 +91,7 @@ public class ExampleService extends AbstractAgentBean implements IService {
 		spIn = new ServiceParameter[0];
 		spOut = new ServiceParameter[0];
 		sd = new ServiceDescription(new Date(), createServiceId(SERVICE_GETSYSINFO), SERVICE_GETSYSINFO, keywords, spIn,
-																						spOut, "", "", createServiceId(SERVICE_GETSYSINFO), "", null);
+																						spOut, "", "", createServiceId(SERVICE_GETSYSINFO), "", "");
 		list.add(sd);
 		
 		keywords = new String[1];
@@ -102,7 +101,8 @@ public class ExampleService extends AbstractAgentBean implements IService {
 		spOut = new ServiceParameter[1];
 		spOut[0] = new ServiceParameter("java.util.Date", "timeDiff");
 		sd = new ServiceDescription(new Date(), createServiceId(SERVICE_TIME_DIFFERENCE), SERVICE_TIME_DIFFERENCE, keywords, spIn,
-																						spOut, "", "", createServiceId(SERVICE_TIME_DIFFERENCE), "", null);
+																						spOut, "", "", createServiceId(SERVICE_TIME_DIFFERENCE), "", "");
+
 		list.add(sd);
 		return list;
 	}

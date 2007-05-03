@@ -9,17 +9,17 @@ import java.util.Date;
  */
 public class ServiceDescription implements IServiceDescription {
 
-	Date _expireDate;
-	String _id;
-	String _name;
-	String[] _keywords;
-	ServiceParameter[] _inputParams;
-	ServiceParameter[] _outputParams;
-	String _preCondition;
-	String _postCondition;
-	String _providerAddress;
-	String _qoSRating;
-	String _wsdl;
+	private Date _expireDate;
+	private String _id;
+	private String _name;
+	private String[] _keywords;
+	private ServiceParameter[] _inputParams;
+	private ServiceParameter[] _outputParams;
+	private String _preCondition;
+	private String _postCondition;
+	private String _providerAddress;
+	private String _qoSRating;
+	private String _wsdl;
 
 	/**
 	 * Full Constructor...
@@ -98,7 +98,7 @@ public class ServiceDescription implements IServiceDescription {
 	}
 
 	public boolean isWebService() {
-		return _wsdl != null;
+		return _wsdl != null && _wsdl.length()>0;
 	}
 	
 	public int hashCode() {
@@ -252,4 +252,53 @@ public class ServiceDescription implements IServiceDescription {
 		return false;
 	}
 
+	public void setExpireDate(Date expireDate) {
+		_expireDate = expireDate;
+	}
+
+	public void setId(String id) {
+		_id = id;
+	}
+
+	public void setInputParams(ServiceParameter[] inputParams) {
+		_inputParams = inputParams;
+	}
+
+	public void setKeywords(String[] keywords) {
+		_keywords = keywords;
+	}
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	public void setOutputParams(ServiceParameter[] outputParams) {
+		_outputParams = outputParams;
+	}
+
+	public void setPostCondition(String postCondition) {
+		_postCondition = postCondition;
+	}
+
+	public void setPreCondition(String preCondition) {
+		_preCondition = preCondition;
+	}
+
+	public void setProviderAddress(String providerAddress) {
+		_providerAddress = providerAddress;
+	}
+
+	public void setQoSRating(String qoSRating) {
+		_qoSRating = qoSRating;
+	}
+
+	public void setWsdl(String wsdl) {
+		_wsdl = wsdl;
+	}
+
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append('[').append(_name).append(',').append("WS:").append(isWebService()).append(']');
+		return sb.toString();
+	}
 }

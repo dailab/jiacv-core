@@ -44,4 +44,12 @@ public interface IServiceDirectory extends IFact {
 	 */
 	public List<IServiceDescription> getAllWebServices();
 	
+
+	/**
+	 * Returns all services registered in the jiac tng service directory.
+	 * @return a List of IServiceDescriptions
+	 */
+	public List<IServiceDescription> getAllServices();
+
+	
 }

@@ -30,4 +30,12 @@ public interface IJiacSender {
 	 */
 	public void send(IJiacMessage message, Destination destination);
 	
+	
+	/**
+	 * liefert die eigene destination, die an die geantwortet werden soll/kann.
+	 * Evtl. unsinnig bei TopicSendern
+	 * @return
+	 */
+	public Destination getReplyToDestination();
+	
 }

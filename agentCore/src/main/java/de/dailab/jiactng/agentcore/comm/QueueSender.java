@@ -63,6 +63,10 @@ public class QueueSender implements IJiacSender {
 		return queue;
 	}
 	
+	public Destination getReplyToDestination() {
+		return _destination;
+	}
+	
 	/**
 	 * Verschickt per JMS eine JIAC-Nachricht.
 	 * 

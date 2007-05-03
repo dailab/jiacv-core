@@ -71,6 +71,10 @@ public class TopicSender implements IJiacSender {
 		return topic;
 	}
 
+	public Destination getReplyToDestination() {
+		return _topic;
+	}
+	
 	public void send(IJiacMessage message) {
 		sendToTopic(message, null);
 	}

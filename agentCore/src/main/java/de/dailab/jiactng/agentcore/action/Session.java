@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
- * This class is used as a superclass for everything that is connected to the
- * execution of an action. The idea is, that all phases of action execution (an
- * consequently all objects associated with those phases) have a commen
- * superclass and thus can have the same session-id.
+ * This class is used as a superclass for everything that is connected to the execution of an action. The idea is, that
+ * all phases of action execution (an consequently all objects associated with those phases) have a commen superclass
+ * and thus can have the same session-id.
  * 
  * @author moekon
  */
@@ -18,19 +17,17 @@ public class Session implements IFact {
 	private String id;
 
 	/**
-	 * The history of the session. This list contains all sources of the session
-	 * (i.E. of actions, results, etc.) in order of appearance.
+	 * The history of the session. This list contains all sources of the session (i.E. of actions, results, etc.) in order
+	 * of appearance.
 	 */
 	private ArrayList<Object> history;
 
 	/**
-	 * Constructor for a new session. Can be calles with either any kind of
-	 * object as source (usually the class, that initiated the session), or with
-	 * a class that is a subclass of Session, thus creating the next step in the
-	 * Session with the same id.
+	 * Constructor for a new session. Can be calles with either any kind of object as source (usually the class, that
+	 * initiated the session), or with a class that is a subclass of Session, thus creating the next step in the Session
+	 * with the same id.
 	 * 
-	 * @param source
-	 *            the source that created the new session.
+	 * @param source the source that created the new session.
 	 */
 	public Session(Object source) {
 		if (source instanceof Session) {

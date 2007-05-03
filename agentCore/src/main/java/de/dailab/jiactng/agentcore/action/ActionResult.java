@@ -9,9 +9,8 @@ public class ActionResult extends Session {
 	private Object[] results;
 
 	private boolean success;
-	
-	public ActionResult(Action thisAction, DoAction resultOf, boolean success, Object[] results,
-			Object source) {
+
+	public ActionResult(Action thisAction, DoAction resultOf, boolean success, Object[] results, Object source) {
 		super(source);
 		this.resultOf = resultOf;
 		this.thisAction = thisAction;

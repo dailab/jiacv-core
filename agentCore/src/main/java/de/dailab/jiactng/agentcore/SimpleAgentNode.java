@@ -7,7 +7,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -33,6 +32,7 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.servicediscovery.IServiceDirectory;
+import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**
@@ -74,14 +74,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	JmsBrokerAMQ _embeddedBroker = null;
 
 	/** Das ServiceDirectory des AgentNodes */
-	private IServiceDirectory _serviceDirectory = null;
+	private ServiceDirectory _serviceDirectory = new ServiceDirectory();
 
 	// /**
 	// * The protocol enablers on this node
 	// */
 	// private List<AbstractProtocolEnabler> protocolEnablers = null;
-
-		
 
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
@@ -95,7 +93,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	};
 
 	/** -------------Jetzt geht's lo'hos ----------------------------------------- */
-	
+
 	/** Constructur. Creates the uuid for the agentnode. */
 	public SimpleAgentNode() {
 		// _uuid = new String("p:" + Long.toHexString(System.currentTimeMillis() + this.hashCode()));
@@ -481,6 +479,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				e.printStackTrace();
 			}
 		}
+		// das servicedirectory separat initialisieren - is auch ne AgentBean
+		try { 
+			_serviceDirectory.init();
+		} catch (LifecycleException e) {
+			// TODO:
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -510,6 +515,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				// TODO
 				ex.printStackTrace();
 			}
+		}
+		
+		// das servicedirectory separat starten - is auch ne AgentBean
+		try { 
+			_serviceDirectory.start();
+		} catch (LifecycleException e) {
+			// TODO:
+			e.printStackTrace();
 		}
 
 		log.warn("AgentNode " + getName() + " started with " + _agents.size() + " agents");
@@ -542,6 +555,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					lce.printStackTrace();
 				}
 			}
+		}
+		// das servicedirectory separat stoppen - is auch ne AgentBean
+		try { 
+			_serviceDirectory.stop();
+		} catch (LifecycleException e) {
+			// TODO:
+			e.printStackTrace();
 		}
 	}
 
@@ -620,11 +640,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		this.agentNodeBeans = agentnodebeans;
 	}
 
-	public IServiceDirectory getServiceDirectory() {
+	public ServiceDirectory getServiceDirectory() {
 		return _serviceDirectory;
 	}
 
-	public void setServiceDirectory(IServiceDirectory serviceDirectory) {
+	public void setServiceDirectory(ServiceDirectory serviceDirectory) {
 		_serviceDirectory = serviceDirectory;
 	}
 

@@ -16,18 +16,19 @@ public interface INodeProtocol extends IProtocolHandler {
 
 	// Dies sind die positiven Antworten auf die Kommandos
 	public static final String ACK_PING = "ACK_PING";
-	public static final String ACK_GET_AGENTS = "ACK_AGENTS";
-	public static final String ACK_GET_SERVICES = "ACK_SERVICES";
+	public static final String ACK_GET_AGENTS = "ACK_GET_AGENTS";
+	public static final String ACK_GET_SERVICES = "ACK_GET_SERVICES";
 	public static final String ACK_NOP = "ACK_NOP";
 
 	// Dies sind die negativen Antworten auf die Kommandos
 	public static final String ERR_PING = "ERR_PING";
-	public static final String ERR_GET_AGENTS = "ERR_AGENTS";
-	public static final String ERR_GET_SERVICES = "ERR_SERVICES";
+	public static final String ERR_GET_AGENTS = "ERR_GET_AGENTS";
+	public static final String ERR_GET_SERVICES = "ERR_GET_SERVICES";
 	public static final String ERR_NOP = "ERR_NOP";
 
 	public static final int PROCESSING_FAILED = -1;
 	public static final int PROCESSING_SUCCESS = 0;
 
 	public static final long DEFAULT_TTL = 10000L;
+	
 }

@@ -19,4 +19,5 @@ public interface IAgentProtocol extends IProtocolHandler {
 	public static final String ACK_AGT_GET_SERVICES = "ACK_AGT_SERVICES";
 	public static final String ACK_AGT_GET_BEANNAMES = "ACK_GET_BEANNAMES";
 	public static final String ACK_AGT_NOP = "ACK_AGT_NOP";
+	
 }

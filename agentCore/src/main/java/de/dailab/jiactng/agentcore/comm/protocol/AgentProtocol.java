@@ -28,6 +28,10 @@ import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 public class AgentProtocol implements IAgentProtocol {
 	Log log = LogFactory.getLog(getClass());
 
+	static final String[] OPERATIONS = { CMD_AGT_PING, CMD_AGT_PONG, CMD_AGT_GET_SERVICES, CMD_AGT_GET_BEANNAMES,
+																					CMD_AGT_NOP, ACK_AGT_PING, ACK_AGT_PONG, ACK_AGT_GET_SERVICES,
+																					ACK_AGT_GET_BEANNAMES, ACK_AGT_NOP };
+
 	IJiacSender _topicSender;
 	IJiacSender _queueSender;
 	/** Der agent erbringt die leistungen, getServices, execService, .. etc. */
@@ -121,7 +125,7 @@ public class AgentProtocol implements IAgentProtocol {
 			List<String> beanNames = extractBeanNames(receivedMsg);
 			for (Iterator iter = beanNames.iterator(); iter.hasNext();) {
 				String element = (String) iter.next();
-				System.out.print(element+ ", ");
+				System.out.print(element + ", ");
 			}
 		} else if (ACK_AGT_PING.equals(operation)) {
 			System.out.println("Alles Roger.. hab ein Ping-Ack gekriegt, von " + receivedMsg.getStartPoint());
@@ -186,17 +190,18 @@ public class AgentProtocol implements IAgentProtocol {
 
 	/**
 	 * Zieht aus ner JiacMessage die Liste mit den Beannamen raus.
+	 * 
 	 * @param message
 	 * @return
 	 */
 	private List<String> extractBeanNames(IJiacMessage message) {
 		// indem fall muss es ein ObjectContent sein..
-		ObjectContent content = (ObjectContent)message.getPayload();
+		ObjectContent content = (ObjectContent) message.getPayload();
 		// in dem fall muss es ne Liste sein
-		List<String> list = (List<String>)content.getObject();
+		List<String> list = (List<String>) content.getObject();
 		return list;
 	}
-	
+
 	/**
 	 * Verschickt die Antwort
 	 * 
@@ -221,4 +226,9 @@ public class AgentProtocol implements IAgentProtocol {
 	public void setAgent(IAgent agent) {
 		_agent = agent;
 	}
+
+	public static String[] getOperations() {
+		return OPERATIONS;
+	}
+
 }

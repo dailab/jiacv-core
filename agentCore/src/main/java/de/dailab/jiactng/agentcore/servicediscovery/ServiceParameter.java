@@ -22,7 +22,7 @@ public class ServiceParameter implements IFact {
 	}
 
 	public void setName(String name) {
-		this._name = name;
+		_name = name;
 	}
 
 	public String getType() {
@@ -30,7 +30,7 @@ public class ServiceParameter implements IFact {
 	}
 
 	public void setType(String type) {
-		this._type = type;
+		_type = type;
 	}
 
 	public String toString() {

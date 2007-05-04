@@ -10,10 +10,19 @@ public class TopicCommunicator {
 	TopicReceiver _receiver;
 	TopicSender _sender;
 
+	/**
+	 * Verschickt nachricht auf topic, es wird die defaulttopic des topicsenders benutzt
+	 * @param message
+	 */
 	public void publish(IJiacMessage message) {
 		_sender.sendToTopic(message, null);
 	}
 
+	/**
+	 * Verschickt nachricht auf topic, es wird die defaulttopic des topicsenders benutzt
+	 * @param message die zu verschikende nachricht
+	 * @param topicName bisher unbenutzt
+	 */
 	public void publish(IJiacMessage message, String topicName) {
 		_sender.sendToTopic(message, null);
 	}

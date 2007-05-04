@@ -31,7 +31,6 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
-import de.dailab.jiactng.agentcore.servicediscovery.IServiceDirectory;
 import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
@@ -74,7 +73,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	JmsBrokerAMQ _embeddedBroker = null;
 
 	/** Das ServiceDirectory des AgentNodes */
-	private ServiceDirectory _serviceDirectory = new ServiceDirectory();
+	private ServiceDirectory _serviceDirectory = null;
 
 	// /**
 	// * The protocol enablers on this node
@@ -299,6 +298,26 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					break;
 			}
 		}
+		if (source == _serviceDirectory) {
+			switch (evt.getState()) {
+				case STARTED:
+					Future f1 = _threadPool.submit(_serviceDirectory);
+					agentFutures.put(_serviceDirectory.getFutureName(getName()), f1);
+					break;
+				case STOPPED:
+					Future f2 = agentFutures.get(_serviceDirectory.getFutureName(getName()));
+					if (f2 == null) {
+						(new LifecycleException("ServiceDirectory future not found")).printStackTrace();
+					} else {
+						// if soft-cancel fails, do a force-cancel.
+						if (!f2.cancel(false) && !f2.isDone()) {
+							log.warn("ServiceDirectory " + _serviceDirectory.getFutureName(getName()) + " did not respond to stopping. Thread is forcecanceled.");
+							f2.cancel(true);
+						}
+					}
+					break;
+			}
+		}
 	}
 
 	/**
@@ -382,6 +401,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			a.addLifecycleListener(this.lifecycle.createLifecycleListener());
 		}
 
+		// listener am servicedrirectory setzen 
+		_serviceDirectory.addLifecycleListener(this.lifecycle.createLifecycleListener());
+		
 		// start agent node
 		init();
 		start();
@@ -480,8 +502,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 		// das servicedirectory separat initialisieren - is auch ne AgentBean
-		try { 
-			_serviceDirectory.init();
+		try {
+			if (_serviceDirectory != null) {
+				_serviceDirectory.setAgentNodeName(getName());
+				_serviceDirectory.init();
+			}
 		} catch (LifecycleException e) {
 			// TODO:
 			e.printStackTrace();
@@ -516,10 +541,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				ex.printStackTrace();
 			}
 		}
-		
+
 		// das servicedirectory separat starten - is auch ne AgentBean
-		try { 
-			_serviceDirectory.start();
+		try {
+			if (_serviceDirectory != null) {
+				_serviceDirectory.start();
+			}
 		} catch (LifecycleException e) {
 			// TODO:
 			e.printStackTrace();
@@ -557,8 +584,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 		// das servicedirectory separat stoppen - is auch ne AgentBean
-		try { 
-			_serviceDirectory.stop();
+		try {
+			if (_serviceDirectory != null) {
+				_serviceDirectory.stop();
+			}
 		} catch (LifecycleException e) {
 			// TODO:
 			e.printStackTrace();

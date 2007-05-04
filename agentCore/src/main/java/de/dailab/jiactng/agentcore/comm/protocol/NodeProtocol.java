@@ -118,7 +118,6 @@ public class NodeProtocol implements INodeProtocol {
 		if (ACK_GET_SERVICES.equals(operation)) {
 			log.debug("Alles Roger.. hab die Services gekriegt, von" + receivedMsg.getStartPoint());
 		} else if (ACK_GET_AGENTS.equals(operation)) {
-			// welch meisterlicher aufruf/cast/whatever :D
 			ObjectContent oc = (ObjectContent) receivedMsg.getPayload();
 			List<String> agentNames = (List<String>) (oc).getObject();
 			log.warn("Alles Roger.. hab die Agenten gekriegt, von" + receivedMsg.getStartPoint());

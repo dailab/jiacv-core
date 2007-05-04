@@ -42,7 +42,7 @@ public class CommBean extends AbstractAgentBean {
 
 	TopicCommunicator _topicCommunicator;
 
-	int _timer = 100;
+	int _timer = 200;
 	int _timerCounter = 0;
 
 	ConnectionFactory _connectionFactory;
@@ -54,6 +54,9 @@ public class CommBean extends AbstractAgentBean {
 	// defaultmässig wird das BasicProkoll erzeugt
 	String _protocolType = IProtocolHandler.BASIC_PROTOCOL;
 
+	/* aus dem Namen wird die Adresse gebildet */
+	String _agentNodeName;
+
 	public CommBean() {
 		super();
 	}
@@ -64,15 +67,17 @@ public class CommBean extends AbstractAgentBean {
 	@Override
 	public void doInit() throws Exception {
 		super.doInit();
-		String platformname = thisAgent.getAgentNode().getName();
-		_address = (EndPoint) EndPointFactory.createEndPoint(platformname);
+		if (thisAgent != null && thisAgent.getAgentNode() != null) {
+			setAgentNodeName(thisAgent.getAgentNode().getName());
+		}
+		_address = (EndPoint) EndPointFactory.createEndPoint(getAgentNodeName());
 
 		_topicCommunicator = new TopicCommunicator();
 		// Ein topic wird verwendet, zum lesen und schreiben - das defaultTopic
 		TopicReceiver topicReceiver = new TopicReceiver(this, _connectionFactory, _defaultTopicName);
 		TopicSender topicSender = new TopicSender(_connectionFactory, _defaultTopicName);
-				
-		_communicator = new QueueCommunicator();		
+
+		_communicator = new QueueCommunicator();
 		// auf eine Queue mit dem Namen der eigenen Addresse hören
 		QueueReceiver queueReceiver = new QueueReceiver(_connectionFactory, getAddress().toString());
 		_communicator.setReceiver(queueReceiver);
@@ -103,17 +108,16 @@ public class CommBean extends AbstractAgentBean {
 		IProtocolHandler protocol;
 		if (IProtocolHandler.AGENT_PROTOCOL.equals(getProtocolType())) {
 			protocol = (IProtocolHandler) new AgentProtocol(topicSender, queueSender);
-			((AgentProtocol)protocol).setAgent(thisAgent);
+			((AgentProtocol) protocol).setAgent(thisAgent);
 		} else if (IProtocolHandler.PLATFORM_PROTOCOL.equals(getProtocolType())) {
 			protocol = (IProtocolHandler) new NodeProtocol(topicSender, queueSender);
-			((NodeProtocol)protocol).setAgent(thisAgent);
-			((NodeProtocol)protocol).setCommBean(this);
+			((NodeProtocol) protocol).setAgent(thisAgent);
+			((NodeProtocol) protocol).setCommBean(this);
 		} else {
 			protocol = (IProtocolHandler) new BasicJiacProtocol(topicSender, queueSender);
 		}
 		return protocol;
 	}
-
 
 	/**
 	 * Wird vom Protocol aufgerufen.. Informiert alle Listener
@@ -178,44 +182,46 @@ public class CommBean extends AbstractAgentBean {
 		if (IProtocolHandler.PLATFORM_PROTOCOL.equals(_protocolType)) {
 			publishPlatformAliveMessage();
 		} else if (IProtocolHandler.AGENT_PROTOCOL.equals(_protocolType)) {
-//			publishAgentPingMessage();
+			// publishAgentPingMessage();
 		}
 	}
 
 	/**
-	 * Schreibt in die Topic eine 'PlatformPing'-Nachricht.. nach anzahl/timer Aufrufen, d.h. wenn timer==10, muss 10mal aufgerufen
-	 * werden, damit einmal gesendet wird.
+	 * Schreibt in die Topic eine 'PlatformPing'-Nachricht.. nach anzahl/timer Aufrufen, d.h. wenn timer==10, muss 10mal
+	 * aufgerufen werden, damit einmal gesendet wird.
 	 */
 	private void publishAgentPingMessage() {
 		_timerCounter++;
 		if (_timerCounter == _timer) {
 			_timerCounter = 0;
-			ObjectContent content = new ObjectContent("ReplyTo:"+_address.toString());
+			ObjectContent content = new ObjectContent("ReplyTo:" + _address.toString());
 			IJiacMessage msg = new JiacMessage(NodeProtocol.CMD_PING, content, null, getAddress(), null);
 			publish(msg);
 			log.debug(this.getBeanName() + ", " + thisAgent.getAgentName());
 		}
 	}
-	
+
 	/**
-	 * Schreibt in die Topic eine 'PlatformPing'-Nachricht.. nach anzahl/timer Aufrufen, d.h. wenn timer==10, muss 10mal aufgerufen
-	 * werden, damit einmal gesendet wird.
+	 * Schreibt in die Topic eine 'PlatformPing'-Nachricht.. nach anzahl/timer Aufrufen, d.h. wenn timer==10, muss 10mal
+	 * aufgerufen werden, damit einmal gesendet wird.
 	 */
 	private void publishPlatformAliveMessage() {
 		_timerCounter++;
 		if (_timerCounter == _timer) {
 			_timerCounter = 0;
-			ObjectContent content = new ObjectContent("ReplyTo:"+_address.toString());
+			ObjectContent content = new ObjectContent("ReplyTo:" + _address.toString());
 			IJiacMessage msg = new JiacMessage(NodeProtocol.CMD_PING, content, null, getAddress(), null);
 			publish(msg);
-//			log.debug(this.getBeanName() + ", " + thisAgent.getAgentName());
+			// log.debug(this.getBeanName() + ", " + thisAgent.getAgentName());
 		}
 	}
-	
+
 	public List getLocalAgents() {
-		IAgentNode agentNode = thisAgent.getAgentNode();
-		if (agentNode instanceof SimpleAgentNode) {
-			return ((SimpleAgentNode) agentNode).findAgents();
+		if (thisAgent != null) {
+			IAgentNode agentNode = thisAgent.getAgentNode();
+			if (agentNode instanceof SimpleAgentNode) {
+				return ((SimpleAgentNode) agentNode).findAgents();
+			}
 		}
 		return null;
 	}
@@ -311,6 +317,14 @@ public class CommBean extends AbstractAgentBean {
 
 	public void setProtocolType(String protocolType) {
 		_protocolType = protocolType;
+	}
+
+	public String getAgentNodeName() {
+		return _agentNodeName;
+	}
+
+	public void setAgentNodeName(String agentNodeName) {
+		_agentNodeName = agentNodeName;
 	}
 
 }

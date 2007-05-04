@@ -79,29 +79,38 @@ public class ExampleService extends AbstractAgentBean implements IService {
 	 */
 	public List<IServiceDescription> getServiceDescriptions() {
 		List<IServiceDescription> list = new ArrayList<IServiceDescription>();
+		// aktuelles Datum/Zeit
+		GregorianCalendar gc = new GregorianCalendar();
+		// 3 minuten weiterstellen
+		gc.roll(GregorianCalendar.MINUTE, 2);		
+		
 		String keywords[] = { "Time" };
 		ServiceParameter spIn[] = {};
 		ServiceParameter spOut[] = {};
-		ServiceDescription sd = new ServiceDescription(new Date(), createServiceId(SERVICE_GETTIME), SERVICE_GETTIME,
+		ServiceDescription sd = new ServiceDescription(gc.getTime(), createServiceId(SERVICE_GETTIME), SERVICE_GETTIME,
 																						keywords, spIn, spOut, "", "", createServiceId(SERVICE_GETTIME), "", null);
 		list.add(sd);
 		
+		// noch eine minute weiterstellen
+		gc.roll(GregorianCalendar.MINUTE, 1);	
 		keywords = new String[2];
 		keywords[0] = "System";
 		keywords[1] = "Info";
 		spIn = new ServiceParameter[0];
 		spOut = new ServiceParameter[0];
-		sd = new ServiceDescription(new Date(), createServiceId(SERVICE_GETSYSINFO), SERVICE_GETSYSINFO, keywords, spIn,
+		sd = new ServiceDescription(gc.getTime(), createServiceId(SERVICE_GETSYSINFO), SERVICE_GETSYSINFO, keywords, spIn,
 																						spOut, "", "", createServiceId(SERVICE_GETSYSINFO), "", null);
 		list.add(sd);
 		
+		// noch eine Stunde weiterstellen
+		gc.roll(GregorianCalendar.HOUR, 1);	
 		keywords = new String[1];
 		keywords[0] = "Time";
 		spIn = new ServiceParameter[1];
 		spIn[0] = new ServiceParameter("java.util.Date", "srcDate");
 		spOut = new ServiceParameter[1];
 		spOut[0] = new ServiceParameter("java.util.Date", "timeDiff");
-		sd = new ServiceDescription(new Date(), createServiceId(SERVICE_TIME_DIFFERENCE), SERVICE_TIME_DIFFERENCE, keywords, spIn,
+		sd = new ServiceDescription(gc.getTime(), createServiceId(SERVICE_TIME_DIFFERENCE), SERVICE_TIME_DIFFERENCE, keywords, spIn,
 																						spOut, "", "", createServiceId(SERVICE_TIME_DIFFERENCE), "", null);
 		list.add(sd);
 		return list;

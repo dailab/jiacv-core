@@ -58,16 +58,16 @@ public class AgentProtocol implements IAgentProtocol {
 	}
 
 	public int processMessage(Message msg) {
-		log.debug("Ist das geil... ein Agent hat ne nachricht gekriegt...");
+//		log.debug("Ist das geil... ein Agent hat ne nachricht gekriegt...");
 		IJiacMessage jiacMsg = null;
 		Destination destination = null;
 		if (msg != null && msg instanceof ObjectMessage) {
 			ObjectMessage oMsg = (ObjectMessage) msg;
 			try {
 				jiacMsg = (IJiacMessage) oMsg.getObject();
-				log.debug("und zwar folgende Nachricht:" + jiacMsg.toString());
+//				log.debug("und zwar folgende Nachricht:" + jiacMsg.toString());
 				destination = msg.getJMSReplyTo();
-				log.debug("processing Agent message, answer will go to:" + destination);
+//				log.debug("processing Agent message, answer will go to:" + destination);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

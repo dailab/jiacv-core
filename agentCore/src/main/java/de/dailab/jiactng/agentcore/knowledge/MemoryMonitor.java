@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.JButton;
@@ -60,7 +59,7 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
   /**
    * Synchronization object for the thread
    */
-  private Boolean             syncObj   = Boolean.TRUE;
+  private Boolean             syncObj   = new Boolean(true);
 
   /**
    * Activity flag for the thread.
@@ -174,8 +173,8 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
 //    active = false;
 //    myThread = null;
 //    frame.dispose();
-	  frame.setVisible(false);
-	  frame.dispose();
+//	  frame.setVisible(false);
+//	  frame.dispose();
 	  spacePanel=null;
   }
 

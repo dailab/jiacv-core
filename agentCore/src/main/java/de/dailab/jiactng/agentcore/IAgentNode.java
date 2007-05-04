@@ -9,9 +9,7 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
-import de.dailab.jiactng.agentcore.servicediscovery.IServiceDirectory;
-
-import java.util.List;
+import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 
 /**
  * Interface for agentnodes. This interfaces defines functionalities, that are
@@ -146,6 +144,8 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
   /**
    * Liefert das platformweite ServiceDirectory 
    */
-  public IServiceDirectory getServiceDirectory();
+  public ServiceDirectory getServiceDirectory();
+  
+  public void setServiceDirectory(ServiceDirectory serviceDirectory);
   
 }

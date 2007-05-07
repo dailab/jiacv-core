@@ -402,7 +402,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// listener am servicedrirectory setzen 
-		_serviceDirectory.addLifecycleListener(this.lifecycle.createLifecycleListener());
+		if (_serviceDirectory != null) {
+			_serviceDirectory.addLifecycleListener(this.lifecycle.createLifecycleListener());
+		}
 		
 		// start agent node
 		init();

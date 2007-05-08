@@ -38,7 +38,7 @@ public class CommBean extends AbstractAgentBean {
 	// über den Communicator läuft die JMS communication
 	QueueCommunicator _communicator;
 	// eigene Adresse
-	EndPoint _address;
+	IEndPoint _address;
 
 	TopicCommunicator _topicCommunicator;
 

@@ -111,7 +111,7 @@ public class NodeProtocol implements INodeProtocol {
 	 * @param receivedMsg die empfangene JiacMessage
 	 * @return
 	 */
-	private SendInfo doAcknowledge(IJiacMessage receivedMsg) {
+	protected SendInfo doAcknowledge(IJiacMessage receivedMsg) {
 		String operation = receivedMsg.getOperation();
 		IJiacMessage replyMsg = null;
 		SendInfo sendInfo = new SendInfo();
@@ -143,7 +143,7 @@ public class NodeProtocol implements INodeProtocol {
 	 * @param msg
 	 * @return
 	 */
-	private SendInfo doError(IJiacMessage msg) {
+	protected SendInfo doError(IJiacMessage msg) {
 		String operation = msg.getOperation();
 		// if (ERR_GET_AGENTS.equals(operation)) {
 		// } else if (ERR_GET_SERVICES.equals(operation)) {
@@ -160,7 +160,7 @@ public class NodeProtocol implements INodeProtocol {
 	 * @return eigentlich soll die zu verschickende Antwort zurückgegeben werden, momentan wird direkt aus dieser methode
 	 *         versendet.. (das ist mist)
 	 */
-	private SendInfo doCommand(IJiacMessage receivedMsg) {
+	protected SendInfo doCommand(IJiacMessage receivedMsg) {
 		String operation = receivedMsg.getOperation();
 		IJiacMessage replyMsg = null;
 		SendInfo sendInfo = new SendInfo();
@@ -305,13 +305,13 @@ public class NodeProtocol implements INodeProtocol {
 	 * 
 	 * @param msg die AntwortNachricht
 	 * @param destination die ZielDestination
-	 * @param senderAddress die ReplyTo-Destination der JMSMessage
+	 * @param senderAdress die ReplyTo-Destination der JMSMessage
 	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht möglich war.
 	 */
-	private int doReply(IJiacMessage msg, Destination destination, Destination senderAddress, IJiacSender sender) {
+	private int doReply(IJiacMessage msg, Destination destination, Destination senderAdress, IJiacSender sender) {
 		log.debug("Knoten schickt antwort...");
-		if (msg != null && destination != null && sender != null) {
-			sender.send(msg, destination);// , senderAddress, DEFAULT_TTL);
+		if (msg != null && destination != null && senderAdress != null && sender != null) {
+			sender.send(msg, destination);// , senderAdress, DEFAULT_TTL);
 			return PROCESSING_SUCCESS;
 		}
 		return PROCESSING_FAILED;
@@ -322,13 +322,13 @@ public class NodeProtocol implements INodeProtocol {
 	 * 
 	 * @param msg die AntwortNachricht
 	 * @param destination die ZielDestination
-	 * @param senderAddress die ReplyTo-Destination der JMSMessage
+	 * @param senderAdress die ReplyTo-Destination der JMSMessage
 	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht möglich war.
 	 */
-	private int doReply(IJiacMessage msg, String destinationName, Destination senderAddress, IJiacSender sender) {
+	private int doReply(IJiacMessage msg, String destinationName, Destination senderAdress, IJiacSender sender) {
 		log.debug("Knoten schickt antwort...");
-		if (msg != null && destinationName != null && sender != null) {
-			sender.send(msg, destinationName);// , senderAddress, DEFAULT_TTL);
+		if (msg != null && destinationName != null && senderAdress != null && sender != null) {
+			sender.send(msg, destinationName);// , senderAdress, DEFAULT_TTL);
 			return PROCESSING_SUCCESS;
 		}
 		return PROCESSING_FAILED;

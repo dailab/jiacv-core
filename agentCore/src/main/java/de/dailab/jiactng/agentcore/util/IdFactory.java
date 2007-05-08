@@ -50,4 +50,17 @@ public final class IdFactory {
 			.append(Long.toHexString(System.currentTimeMillis() + hashcode))
 			.toString();
 	}
+	
+	/**
+	 * Creates a id for a session.
+	 * 
+	 * @param hashcode the hashcode of the action or service object.
+	 * @return the session id
+	 */
+	public static String createSessionId(int hashcode) {
+		return new StringBuffer("s:")
+			.append(Long.toHexString(System.currentTimeMillis() + hashcode))
+			.toString();
+	}
+
 }

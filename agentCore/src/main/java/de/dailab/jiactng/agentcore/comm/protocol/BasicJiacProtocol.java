@@ -15,8 +15,8 @@ import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 /**
  * Ein 'Basic'-Protokoll für die Kommunikation. Es wird standardmässig verwendet. 
  * Die processMessage-Methode wird von einem MessageListener aufgerufen. Die
- * Message wird hier behandelt und mit dem im Konstruktor übergebenen Sender wird eine Antwort gesendet. Der Empfänger
- * der Antwort wird aus der Message gelesen.
+ * Message wird hier behandelt und mit dem im Konstruktor übergebenen Sender wird
+ * eine Antwort gesendet. Der Empfänger der Antwort wird aus der Message gelesen.
  * 
  * @author janko
  */
@@ -41,6 +41,9 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	public static final String ERR_GET_AGENTS = "ERR_AGENTS";
 	public static final String ERR_GET_SERVICES = "ERR_SERVICES";
 	public static final String ERR_NOP = "ERR_NOP";
+	
+	// Replys for testing purposes
+	public static final String ACK_TEST_SUCESS = "ACK_TEST_SUCESS";
 
 	public static final int PROCESSING_FAILED = -1;
 	public static final int PROCESSING_SUCCESS = 0;
@@ -130,42 +133,107 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	/**
 	 * Reaktion auf AcknowledgeMessages
 	 * 
-	 * @param msg
-	 * @return bisher null.. auf 'ack' braucht nicht reagiert zu werden..
+	 * @param receivedMsg
+	 * @return nur TestNachrichten. Auf Ack braucht bisher sonst nicht reagiert zu werden...
 	 */
-	private IJiacMessage doAcknowledge(IJiacMessage msg) {
-		String operation = msg.getOperation();
+	protected IJiacMessage doAcknowledge(IJiacMessage receivedMsg) {
+		IJiacMessage replyMsg = null;
+		String operation = receivedMsg.getOperation();
 		if (ACK_GET_AGENTS.equals(operation)) {
-			log.debug("Alles Roger.. hab die Agenten gekriegt, von " + msg.getStartPoint());
+			log.debug("Alles Roger.. hab die Agenten gekriegt, von " + receivedMsg.getStartPoint());
 			// _platform.addRemoteAgents((List<AgentStub>) msg.getPayload());
+			
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + "Gotcha Agent!"), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
+			
 		} else if (ACK_GET_SERVICES.equals(operation)) {
-			log.debug("Alles Roger.. hab die Services gekriegt, von " + msg.getStartPoint());
+			log.debug("Alles Roger.. hab die Services gekriegt, von " + receivedMsg.getStartPoint());
+
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + "Gotcha Service!"), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
+			
 		} else if (ACK_PING.equals(operation)) {
-			log.debug("Alles Roger.. hab ein Ping-Ack gekriegt, von " + msg.getStartPoint());
+			log.debug("Alles Roger.. hab ein Ping-Ack gekriegt, von " + receivedMsg.getStartPoint());
+
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + "Gotcha Ping!"), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
+			
 		} else if (ACK_NOP.equals(operation)) {
-			log.debug("Ich werd' verrückt.. hab ein NOP-Ack gekriegt, von " + msg.getStartPoint());
+			log.debug("Ich werd' verrückt.. hab ein NOP-Ack gekriegt, von " + receivedMsg.getStartPoint());
+
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + "Nothing to do *yawns*"), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
 		}
-		return null;
+		return replyMsg;
 	}
 
 	/**
 	 * Reaktion auf Fehler-messages
 	 * 
-	 * @param msg
-	 * @return
+	 * @param receivedMsg
+	 * @return bisher nur Testnachrichten
 	 */
-	private IJiacMessage doError(IJiacMessage msg) {
-		String operation = msg.getOperation();
+	protected IJiacMessage doError(IJiacMessage receivedMsg) {
+		String operation = receivedMsg.getOperation();
+		IJiacMessage replyMsg = null;
 		if (ERR_GET_AGENTS.equals(operation)) {
 
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + ERR_GET_AGENTS), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
 		} else if (ERR_GET_SERVICES.equals(operation)) {
 
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + ERR_GET_SERVICES), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
 		} else if (ERR_NOP.equals(operation)) {
 
-		} else if (ERR_NOP.equals(operation)) {
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + ERR_NOP), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
+		} else if (ERR_PING.equals(operation)) {
 
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + ERR_PING), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
 		}
-		return null;
+		return replyMsg;
 	}
 
 	/**
@@ -174,7 +242,7 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	 * @param receivedMsg
 	 * @return
 	 */
-	private IJiacMessage doCommand(IJiacMessage receivedMsg) {
+	protected IJiacMessage doCommand(IJiacMessage receivedMsg) {
 		String operation = receivedMsg.getOperation();
 		IJiacMessage replyMsg = null;
 		if (CMD_GET_AGENTS.equals(operation)) {
@@ -182,16 +250,39 @@ public class BasicJiacProtocol implements IProtocolHandler {
 			// System.out.println("+++++ schicke ab an " + receivedMsg.getStartPoint());
 			// PlatformHelper.debugPrintAgents(agents);
 			ObjectContent content = new ObjectContent("agents");
-			replyMsg = new JiacMessage(ACK_GET_AGENTS, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(),
-																							receivedMsg.getSender());
+			replyMsg = new JiacMessage(ACK_GET_AGENTS, 
+					content, 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					receivedMsg.getSender());
 		} else if (CMD_GET_SERVICES.equals(operation)) {
 			String[] services = { "A()", "B()", "C()" };
+
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(receivedMsg.getPayload() + CMD_GET_SERVICES), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
+			
 		} else if (CMD_PING.equals(operation)) {
 			ObjectContent content = new ObjectContent("Pong");
-			replyMsg = new JiacMessage(ACK_PING, content, receivedMsg.getStartPoint(), receivedMsg.getEndPoint(), receivedMsg
-																							.getSender());
+			replyMsg = new JiacMessage(ACK_PING, 
+					content, 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					receivedMsg.getSender());
 		} else if (CMD_NOP.equals(operation)) {
 			String content = "psst";
+
+			// BEGIN TESTING CODE
+			replyMsg = new JiacMessage(ACK_TEST_SUCESS, 
+					new ObjectContent(content), 
+					receivedMsg.getStartPoint(), 
+					receivedMsg.getEndPoint(),
+					null);
+			//END TESTING CODE
 		}
 		return replyMsg;
 	}
@@ -201,12 +292,12 @@ public class BasicJiacProtocol implements IProtocolHandler {
 	 * 
 	 * @param msg die AntwortNachricht
 	 * @param destination die ZielDestination
-	 * @param senderAddress die ReplyTo-Destination der JMSMessage
+	 * @param senderAdress die ReplyTo-Destination der JMSMessage
 	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht möglich war.
 	 */
-	private int doReply(IJiacMessage msg, Destination destination, Destination senderAddress, IJiacSender sender) {
-		if (msg != null && destination != null && sender != null) {
-			sender.send(msg, destination); // , senderAddress, DEFAULT_TTL);
+	private int doReply(IJiacMessage msg, Destination destination, Destination senderAdress, IJiacSender sender) {
+		if (msg != null && destination != null && senderAdress != null && sender != null) {
+			sender.send(msg, destination); // , senderAdress, DEFAULT_TTL);
 			return PROCESSING_SUCCESS;
 		}
 		return PROCESSING_FAILED;

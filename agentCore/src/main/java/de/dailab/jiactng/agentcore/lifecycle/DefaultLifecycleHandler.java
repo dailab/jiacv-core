@@ -1,10 +1,19 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
-import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
-import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.*;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.CLEANED_UP;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.CLEANING_UP;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.INITIALIZED;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.INITIALIZING;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STARTED;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STARTING;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STOPPED;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STOPPING;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.UNDEFINED;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 
 /**
  * Basic implementation for a default <code>LifecycleHandler</code>. It manages

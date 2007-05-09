@@ -96,13 +96,12 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 		List<IServiceDescription> serviceList = getAllServices();
 		for (Iterator iter = serviceList.iterator(); iter.hasNext();) {
 			IServiceDescription serviceDesc = (IServiceDescription) iter.next();
-			log.debug("service found");
 			// nur services publishen, deren verfallsdatum in zukunft liegt.
 			Date actualDate = new Date();
 			if (serviceDesc.getExpireDate().after(actualDate)) {
 				long timeDiff = serviceDesc.getExpireDate().getTime()-actualDate.getTime();
 				log.debug("service:"+serviceDesc.getName()+" has "+timeDiff+" ms to live.");
-				_commBean.publish(createJiacMEssage(serviceDesc));
+				_commBean.publish(createJiacMessage(serviceDesc));
 			}
 		}
 	}
@@ -113,7 +112,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 * @param serviceDesc die zu verschiekende Servicebeschreibung
 	 * @return die Nachricht die per JMS verschickt wird.
 	 */
-	private JiacMessage createJiacMEssage(IServiceDescription serviceDesc) {
+	private JiacMessage createJiacMessage(IServiceDescription serviceDesc) {
 		IJiacContent content = new ObjectContent(serviceDesc);
 		JiacMessage msg = new JiacMessage(IServiceProtocol.PUB_SERVICE, content, null, _commBean.getAddress(), _commBean
 																						.getCommunicator().getSender().getDefaultReplyDestination());

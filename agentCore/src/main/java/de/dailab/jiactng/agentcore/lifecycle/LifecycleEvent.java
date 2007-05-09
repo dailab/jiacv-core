@@ -1,9 +1,10 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
-import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
-import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.*;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.UNDEFINED;
 
 import java.util.EventObject;
+
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 
 /**
  * Basic lifecycle event object.

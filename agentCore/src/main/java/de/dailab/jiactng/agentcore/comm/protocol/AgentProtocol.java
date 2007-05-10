@@ -13,10 +13,15 @@ import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
+import de.dailab.jiactng.agentcore.action.ActionResult;
+import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.DoRemoteAction;
+import de.dailab.jiactng.agentcore.action.RemoteActionResult;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
+import de.dailab.jiactng.agentcore.knowledge.IMemory;
 
 /**
  * Idee: Ein eigenens Protocol für die Agenten. Zusätzlich zu einem Protocol für die TNG-Platform. Hier werden also die
@@ -28,14 +33,27 @@ import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 public class AgentProtocol implements IAgentProtocol {
 	Log log = LogFactory.getLog(getClass());
 
-	static final String[] OPERATIONS = { CMD_AGT_PING, CMD_AGT_PONG, CMD_AGT_GET_SERVICES, CMD_AGT_GET_BEANNAMES,
-																					CMD_AGT_NOP, ACK_AGT_PING, ACK_AGT_PONG, ACK_AGT_GET_SERVICES,
-																					ACK_AGT_GET_BEANNAMES, ACK_AGT_NOP };
+	static final String[] OPERATIONS = { 
+		CMD_AGT_PING, 
+		CMD_AGT_PONG, 
+		CMD_AGT_GET_SERVICES, 
+		CMD_AGT_GET_BEANNAMES,
+		CMD_AGT_NOP,
+		CMD_AGT_REMOTE_DOACTION,
+		ACK_AGT_PING, 
+		ACK_AGT_PONG, 
+		ACK_AGT_GET_SERVICES,
+		ACK_AGT_GET_BEANNAMES,
+		ACK_AGT_NOP,
+		ACK_AGT_REMOTE_ACTIONRESULT
+	};
 
 	IJiacSender _topicSender;
 	IJiacSender _queueSender;
 	/** Der agent erbringt die leistungen, getServices, execService, .. etc. */
 	IAgent _agent;
+	/** Agent's factbase.*/
+	IMemory memory;
 
 	/**
 	 * @param sender der Sender MIT dem eine Antwort verschickt wird
@@ -55,6 +73,20 @@ public class AgentProtocol implements IAgentProtocol {
 
 	public void setQueueSender(IJiacSender sender) {
 		_queueSender = sender;
+	}
+
+	/**
+	 * @return the memory
+	 */
+	public IMemory getMemory() {
+		return memory;
+	}
+
+	/**
+	 * @param memory the memory to set
+	 */
+	public void setMemory(IMemory memory) {
+		this.memory = memory;
 	}
 
 	/**
@@ -134,6 +166,8 @@ public class AgentProtocol implements IAgentProtocol {
 					receivedMsg.getEndPoint(), null);
 			// END TESTING CODE
 			
+		} else if (ACK_AGT_REMOTE_ACTIONRESULT.equals(operation)) {
+			//TODO send actionresult back to requester
 		} else if (ACK_AGT_GET_BEANNAMES.equals(operation)) {
 			List<String> beanNames = extractBeanNames(receivedMsg);
 			
@@ -196,6 +230,16 @@ public class AgentProtocol implements IAgentProtocol {
 					receivedMsg.getEndPoint(),
 					null);
 			//END TESTING CODE
+		} else if (CMD_AGT_REMOTE_DOACTION.equals(operation)) {
+			//TODO publish DoAction object and send back result
+			log.debug(CMD_AGT_REMOTE_DOACTION);
+			ActionResult result = processDoRemoteAction(((DoRemoteAction)receivedMsg.getPayload()).getAction());
+			replyMsg = new JiacMessage(
+					ACK_AGT_REMOTE_ACTIONRESULT,
+					new RemoteActionResult(result),
+					receivedMsg.getStartPoint(),
+					receivedMsg.getEndPoint(),
+					null);
 		} else if (CMD_AGT_GET_BEANNAMES.equals(operation)) {
 			List beanNames = getBeanNames();
 			//BEGIN TESTING CODE
@@ -285,6 +329,13 @@ public class AgentProtocol implements IAgentProtocol {
 
 	public static String[] getOperations() {
 		return OPERATIONS;
+	}
+
+	private ActionResult processDoRemoteAction(DoAction action) {
+		log.debug("processDoRemoteAction");
+		memory.write(action);
+		//memory.read(new ActionResult(null, action, null, null, null), Long.MAX_VALUE);
+		return null;
 	}
 
 }

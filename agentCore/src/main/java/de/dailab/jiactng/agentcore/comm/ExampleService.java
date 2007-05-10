@@ -29,11 +29,11 @@ public class ExampleService extends AbstractAgentBean implements IService {
 
 	// erstmal nur lokal aufrufen und ergbins nach system.out schreiben
 	public void doAction(DoAction actionName) {
-		if (SERVICE_GETTIME.equals(actionName.getThisAction().getName())) {
+		if (SERVICE_GETTIME.equals(actionName.getAction().getName())) {
 			System.out.println(getTime());
-		} else if (SERVICE_GETSYSINFO.equals(actionName.getThisAction().getName())) {
+		} else if (SERVICE_GETSYSINFO.equals(actionName.getAction().getName())) {
 			System.out.println(getSysInfo());
-		} else if (SERVICE_TIME_DIFFERENCE.equals(actionName.getThisAction().getName())) {
+		} else if (SERVICE_TIME_DIFFERENCE.equals(actionName.getAction().getName())) {
 			System.out.println(getTimeDifference(new Date()).toString());
 		}
 	}

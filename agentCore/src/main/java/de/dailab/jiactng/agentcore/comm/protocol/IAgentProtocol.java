@@ -12,6 +12,7 @@ public interface IAgentProtocol extends IProtocolHandler {
 	public static final String CMD_AGT_GET_SERVICES = "AGT_GET_SERVICES";
 	public static final String CMD_AGT_GET_BEANNAMES = "AGT_GET_BEANNAMES";
 	public static final String CMD_AGT_NOP = "AGT_NOP";
+	public static final String CMD_AGT_REMOTE_DOACTION = "AGT_REMOTE_DOACTION";
 
 	// Dies sind die positiven Antworten auf die Kommandos
 	public static final String ACK_AGT_PING = "ACK_AGT_PING";
@@ -19,6 +20,7 @@ public interface IAgentProtocol extends IProtocolHandler {
 	public static final String ACK_AGT_GET_SERVICES = "ACK_AGT_SERVICES";
 	public static final String ACK_AGT_GET_BEANNAMES = "ACK_GET_BEANNAMES";
 	public static final String ACK_AGT_NOP = "ACK_AGT_NOP";
+	public static final String ACK_AGT_REMOTE_ACTIONRESULT = "AGT_REMOTE_ACTIONRESULT";
 	
 	// Created for Testing Purposes
 	public static final String ACK_AGT_GET_SERVICES_SUCESS = "ACK_SERVICES_SUCESS";

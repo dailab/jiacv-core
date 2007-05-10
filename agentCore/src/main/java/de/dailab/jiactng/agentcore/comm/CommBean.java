@@ -13,6 +13,10 @@ import org.apache.commons.logging.LogFactory;
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
+import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.ActionResult;
+import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.DoRemoteAction;
 import de.dailab.jiactng.agentcore.comm.message.EndPoint;
 import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
 import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
@@ -23,8 +27,11 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessageFactory;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 import de.dailab.jiactng.agentcore.comm.protocol.AgentProtocol;
 import de.dailab.jiactng.agentcore.comm.protocol.BasicJiacProtocol;
+import de.dailab.jiactng.agentcore.comm.protocol.IAgentProtocol;
 import de.dailab.jiactng.agentcore.comm.protocol.IProtocolHandler;
 import de.dailab.jiactng.agentcore.comm.protocol.NodeProtocol;
+import de.dailab.jiactng.agentcore.environment.IEffector;
+import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 /**
  * Die CommBean hält zwei Communicatoren, einen für topiczugriff und einen für queuezugriff. Über diesen laufen die
@@ -32,7 +39,7 @@ import de.dailab.jiactng.agentcore.comm.protocol.NodeProtocol;
  * 
  * @author janko
  */
-public class CommBean extends AbstractAgentBean {
+public class CommBean extends AbstractAgentBean implements IEffector {
 	Log log = LogFactory.getLog(getClass());
 
 	// über den Communicator läuft die JMS communication
@@ -109,6 +116,7 @@ public class CommBean extends AbstractAgentBean {
 		if (IProtocolHandler.AGENT_PROTOCOL.equals(getProtocolType())) {
 			protocol = (IProtocolHandler) new AgentProtocol(topicSender, queueSender);
 			((AgentProtocol) protocol).setAgent(thisAgent);
+			((AgentProtocol) protocol).setMemory(memory);
 		} else if (IProtocolHandler.PLATFORM_PROTOCOL.equals(getProtocolType())) {
 			protocol = (IProtocolHandler) new NodeProtocol(topicSender, queueSender);
 			((NodeProtocol) protocol).setAgent(thisAgent);
@@ -325,6 +333,40 @@ public class CommBean extends AbstractAgentBean {
 
 	public void setAgentNodeName(String agentNodeName) {
 		_agentNodeName = agentNodeName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void doAction(DoAction doAction) {
+		if (doAction.getAction().getName().equals("DoRemoteAction")) {
+			log.debug("DoRemoteAction");
+			DoRemoteAction raction = new DoRemoteAction((DoAction)doAction.getParams()[0]);
+			IEndPoint address = ((AgentDescription)doAction.getParams()[1]).getEndpoint();
+			send(IAgentProtocol.CMD_AGT_REMOTE_DOACTION, raction, address);
+			doAction.getSession().addToSessionHistory(this);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ArrayList<Action> getActions() {
+		Class[] params = new Class[2];
+		params[0] = DoAction.class;
+		params[1] = AgentDescription.class;
+		
+		Class[] results = new Class[1];
+		results[0] = ActionResult.class;
+		ArrayList<Action> actions = new ArrayList<Action>();
+		Action doRemoteAction = new Action(
+				"DoRemoteAction",
+				this,
+				params,
+				results
+		);
+		actions.add(doRemoteAction);
+		return actions;
 	}
 
 }

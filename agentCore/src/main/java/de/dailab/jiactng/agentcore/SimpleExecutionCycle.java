@@ -93,9 +93,10 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 				}
 			}
 			// perform one doAction
-			DoAction act = memory.remove(new DoAction(null, null, null));
+			DoAction act = memory.remove(new DoAction(null, null, null, null));
 			if (act != null) {
-				act.getThisAction().getProviderBean().doAction(act);
+				memory.write(act.getSession());
+				act.getAction().getProviderBean().doAction(act);
 			}
 
 		}

@@ -54,10 +54,10 @@ public class QueueMessageListener implements MessageListener {
 	private void debugMsg(ObjectMessage msg, String addressProperty) throws JMSException {
 		JiacMessage jMsg = (JiacMessage) msg.getObject();
 		String payLoadString = convertPayLoadToString(jMsg.getPayload());
-		log.info("Output:" + payLoadString);
+		log.debug("Output:" + payLoadString);
 		// System.out.println("Von:" + jMsg.getStartPoint() + " An:" + jMsg.getEndPoint() + " Content:"
 		// + jMsg.getPayload().toString());
-		log.info("AddressProperty: " + addressProperty);
+		log.debug("AddressProperty: " + addressProperty);
 	}
 
 	private String convertPayLoadToString(Object payload) {

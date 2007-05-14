@@ -303,7 +303,7 @@ public class Agent extends AbstractLifecycle implements IAgent,
 
 			// if bean is effector, add all actions to memory
 			if (ab instanceof IEffector) {
-				ArrayList<Action> acts = ((IEffector) ab).getActions();
+				ArrayList<? extends Action> acts = ((IEffector) ab).getActions();
 				for (Action item : acts) {
 					memory.write(item);
 				}

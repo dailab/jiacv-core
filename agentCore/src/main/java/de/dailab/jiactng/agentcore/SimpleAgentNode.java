@@ -75,11 +75,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Das ServiceDirectory des AgentNodes */
 	private ServiceDirectory _serviceDirectory = null;
 
-	// /**
-	// * The protocol enablers on this node
-	// */
-	// private List<AbstractProtocolEnabler> protocolEnablers = null;
-
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
 		public void run() {
@@ -476,6 +471,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void doInit() {
 		log = LogFactory.getLog(getName());
+                if (_embeddedBroker != null) {
+                    try {
+                        _embeddedBroker.init();
+                    } catch (LifecycleException le) {
+                        // @todo exception handling
+                        le.printStackTrace();
+                    }
+                }
 		_threadPool = Executors.newCachedThreadPool();
 		agentFutures = new HashMap<String, Future>();
 
@@ -521,6 +524,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
 	 */
 	public void doStart() {
+            if (_embeddedBroker != null) {
+                    try {
+                        _embeddedBroker.start();
+                    } catch (LifecycleException le) {
+                        // @todo exception handling
+                        le.printStackTrace();
+                    }
+                }
 		// call start on all beans of the agentnode
 		// TODO testing
 		if (agentNodeBeans != null) {
@@ -678,12 +689,5 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public void setServiceDirectory(ServiceDirectory serviceDirectory) {
 		_serviceDirectory = serviceDirectory;
 	}
-
-	// /**
-	// * Setter for the protocol enablers
-	// */
-	// public void setProtocolEnablers(List<AbstractProtocolEnabler> enablers) {
-	// this.protocolEnablers = enablers;
-	// }
 
 }

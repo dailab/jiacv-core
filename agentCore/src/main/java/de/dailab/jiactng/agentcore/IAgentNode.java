@@ -136,11 +136,6 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    */
   public ArrayList<ILifecycle> getAgentNodeBeans();
   
-//  /**
-//   * Setter for protocol enablers
-//   */
-//  public void setProtocolEnablers(List<AbstractProtocolEnabler> enablers);
-  
   /**
    * Liefert das platformweite ServiceDirectory 
    */

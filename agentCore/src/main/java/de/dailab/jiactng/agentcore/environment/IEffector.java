@@ -31,7 +31,7 @@ public interface IEffector extends IAgentBean {
 	 * @see de.dailab.jiactng.agentcore.action.Action
 	 * @return An ArrayList containing all actions from this component.
 	 */
-	public ArrayList<Action> getActions();
+	public ArrayList<? extends Action> getActions();
 
 	/**
 	 * Executes a selected action. This method should be implemented by the

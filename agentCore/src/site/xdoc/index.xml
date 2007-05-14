@@ -23,6 +23,106 @@
          <a href="images/StaticStructure.png">
 	      <img src="images/StaticStructure.png"/>
 	     </a>
+	  <subsection name="Management interface">
+	    <p>The management interface of JIAC TNG is based on 
+	       <a href="http://java.sun.com/j2se/1.5.0/docs/guide/jmx/">JMX</a> 
+	       (Java Management Extensions). Every JVM contains a MBean server
+	       where all manageable resources (agent nodes and agents) are 
+	       registered. Agent Nodes are registered with the object name 
+	       "de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=<i>myNodeName</i>" 
+	       and agents with the object name "de.dailab.jiactng.agentcore:type=Agent,name=<i>myAgentName</i>".
+	       The interfaces <code>SimpleAgentNodeMBean</code> and <code>AgentMBean</code> 
+	       specify the manageable attributes (getter and setter methods) and 
+	       the executable operations (all other methods) of these resources.
+	    </p>
+	    <p>Every object has the possibility to manage all resources. To manage
+	       resources which are located in the same JVM (agent node) you have 
+	       to allow local invocations by setting the appropriate property, to
+	       get a reference to the MBean server and to specify the respective
+	       name of the resources.
+	       <source>
+System.setProperty("jmx.invoke.getters", "");
+MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+try {
+    ObjectName node = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=myAgentNode");
+    ObjectName agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=myAgent");
+} catch (Exception e) {
+    System.err.println("Wrong parameter format for construction of the object name of resources");
+}</source>
+	       The method <code>getAttribute</code> of the MBean server enables to
+	       read the current attribute values of agent nodes (Name, UUID, Host, 
+	       Agents, LifecycleState or Owner) and agents (Name, AgentNodeUUID, 
+	       LifecycleState or Owner).
+	       <source>
+try {
+    String owner = (String) mbs.getAttribute(node, "Owner");
+} catch (JMException e) {
+    System.err.println("Error when getting agent node's owner");
+}</source>
+	       The method <code>invoke</code> of the MBean server enables to execute
+	       operations on agent nodes (addAgents, init, start, stop, cleanup or 
+	       shutdown) and agents (remove, init, start, stop or cleanup).
+	       <source>
+try {
+    mbs.invoke(node, "addAgents", new Object[] {"myPath/mySpringConfigurationXMLFile"}, new String[] {"java.lang.String"});
+} catch (JMException e) {
+    System.err.println("Error when adding new agents to the agent node");
+}</source>
+	       The method <code>addNotificationListener</code> of the MBean server 
+	       enables to subscribe for notifications about changed attribute values 
+	       on agent nodes (LifecycleState, Agents) and agents (LifecycleState).
+	       The class of the subscribing object must implement the interface 
+	       <code>NotificationListener</code> with the method <code>handleNotification</code>.
+	       <source>
+AttributeChangeNotificationFilter acnf = new AttributeChangeNotificationFilter();
+try {
+    acnf.enableAttribute("LifecycleState");
+    acnf.enableAttribute("Agents");
+} catch (IllegalArgumentException e) {
+    System.err.println("Wrong attribute name when enabling attribute change notifications");
+}
+try {
+    mbs.addNotificationListener(node, this, acnf, null);
+} catch (InstanceNotFoundException e) {
+    System.err.println("Agent node with the specified object name not registered");
+}</source>
+	    </p>
+	    <p>To manage resources which are located in another JVM (agent node) you 
+	       have to use a MBean server connection instead of the reference. Different
+	       protocol implementations already exist (e.g. rmi, soap, ws, jms) but 
+	       only the RMI connector is part of JRE version 1.5 or higher. If you want
+	       to use a RMI registry as a lookup service, you have to specify the host
+	       and port of the registry as well as the name of the agent node within the
+	       URL path instead of specify host, port and JMX-ID of the agent node directly.
+	       <source>
+try {
+    JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + <i>myRegistryHost</i> + ":" + <i>myRegistryPort</i> + "/" + <i>myAgentNodeName</i>);
+    JMXConnector jmxc = JMXConnectorFactory.connect(url);
+    MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
+}
+catch (MalformedURLException e) {
+    System.err.println("One of the URL parts are syntactically incorrect or the local host name can not be identified");
+}
+catch (IOException) {
+    System.err.println("Communication problem when creating connector or connection");
+}</source>
+	       Condition for the remote management is that the agent node has created
+	       a corresponding connector server for the choosed protocol. This can be
+	       achieved by extension of the agent node's spring configuration.
+	       <source>
+&lt;bean name="<i>myPlatform</i>" class="de.dailab.jiactng.agentcore.SimpleAgentNode"&gt;
+  &lt;property name="jmxConnectors"&gt;
+    &lt;set&gt;
+      &lt;map&gt;
+        &lt;entry key="protocol" value="rmi"/&gt;
+        &lt;entry key="registryHost" value="<i>myRegistryHost</i>"/&gt;
+        &lt;entry key="registryPort" value="<i>myRegistryPort</i>"/&gt;
+      &lt;/map&gt;
+    &lt;/set&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;</source>
+	    </p>
+	  </subsection>
     </section>
   </body>
 </document>

@@ -10,8 +10,8 @@
     <section name="agentCore Documentation"> 
       <p>This section provides an overview about agentCore.</p>
       <p>The next figure gives an overview about the hierarchy of
-         classes and interfaces related to all lifecycle-aware 
-         elements (agent nodes, agents and agent beans) of JIAC TNG.
+         classes and interfaces related to all lifecycle-aware and
+         manageable elements (agent nodes, agents and agent beans) of JIAC TNG.
          It contains all methods specified by the interfaces, all
          attributes of the classes and all methods implemented by the 
          classes additional to their implemented interfaces. The type
@@ -31,25 +31,30 @@
 	       registered. Agent Nodes are registered with the object name 
 	       "de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=<i>myNodeName</i>" 
 	       and agents with the object name "de.dailab.jiactng.agentcore:type=Agent,name=<i>myAgentName</i>".
-	       The interfaces <code>SimpleAgentNodeMBean</code> and <code>AgentMBean</code> 
+	       The interfaces <a href="apidocs/de/dailab/jiactng/agentcore/SimpleAgentNodeMBean.html"><code>SimpleAgentNodeMBean</code></a> 
+	       and <a href="apidocs/de/dailab/jiactng/agentcore/AgentMBean.html"><code>AgentMBean</code></a> 
 	       specify the manageable attributes (getter and setter methods) and 
 	       the executable operations (all other methods) of these resources.
 	    </p>
-	    <p>Every object has the possibility to manage all resources. To manage
-	       resources which are located in the same JVM (agent node) you have 
-	       to allow local invocations by setting the appropriate property, to
-	       get a reference to the MBean server and to specify the respective
-	       name of the resources.
+	    <p>While no security settings are made, every object has the possibility 
+	       to manage all resources. To manage resources which are located in the 
+	       same JVM (agent node) you have to
+	       <ul>
+	         <li>allow local invocations by setting the appropriate property</li>
+	         <li>get a reference to the <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServer.html">MBean server</a></li>
+	         <li>specify the respective <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/ObjectName.html">object name</a> of the resources</li>
+	       </ul>
 	       <source>
 System.setProperty("jmx.invoke.getters", "");
 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 try {
-    ObjectName node = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=myAgentNode");
-    ObjectName agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=myAgent");
+    ObjectName node = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=<i>myAgentNode</i>");
+    ObjectName agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=<i>myAgent</i>");
 } catch (Exception e) {
     System.err.println("Wrong parameter format for construction of the object name of resources");
 }</source>
-	       The method <code>getAttribute</code> of the MBean server enables to
+	       The method <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServer.html#getAttribute(javax.management.ObjectName, java.lang.String)"><code>getAttribute</code></a> 
+	       of the MBean server enables to
 	       read the current attribute values of agent nodes (Name, UUID, Host, 
 	       Agents, LifecycleState or Owner) and agents (Name, AgentNodeUUID, 
 	       LifecycleState or Owner).
@@ -59,20 +64,22 @@ try {
 } catch (JMException e) {
     System.err.println("Error when getting agent node's owner");
 }</source>
-	       The method <code>invoke</code> of the MBean server enables to execute
+	       The method <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServer.html#invoke(javax.management.ObjectName, java.lang.String, java.lang.Object[], java.lang.String[])"><code>invoke</code></a> 
+	       of the MBean server enables to execute
 	       operations on agent nodes (addAgents, init, start, stop, cleanup or 
 	       shutdown) and agents (remove, init, start, stop or cleanup).
 	       <source>
 try {
-    mbs.invoke(node, "addAgents", new Object[] {"myPath/mySpringConfigurationXMLFile"}, new String[] {"java.lang.String"});
+    mbs.invoke(node, "addAgents", new Object[] {"<i>myPath</i>/<i>mySpringConfigurationXMLFile</i>"}, new String[] {"java.lang.String"});
 } catch (JMException e) {
     System.err.println("Error when adding new agents to the agent node");
 }</source>
-	       The method <code>addNotificationListener</code> of the MBean server 
-	       enables to subscribe for notifications about changed attribute values 
+	       The method <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServer.html#addNotificationListener(javax.management.ObjectName, javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)"><code>addNotificationListener</code></a> 
+	       of the MBean server enables to subscribe for notifications about changed attribute values 
 	       on agent nodes (LifecycleState, Agents) and agents (LifecycleState).
 	       The class of the subscribing object must implement the interface 
-	       <code>NotificationListener</code> with the method <code>handleNotification</code>.
+	       <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/NotificationListener.html"><code>NotificationListener</code></a> 
+	       with the method <code>handleNotification</code>.
 	       <source>
 AttributeChangeNotificationFilter acnf = new AttributeChangeNotificationFilter();
 try {
@@ -88,8 +95,13 @@ try {
 }</source>
 	    </p>
 	    <p>To manage resources which are located in another JVM (agent node) you 
-	       have to use a MBean server connection instead of the reference. Different
-	       protocol implementations already exist (e.g. rmi, soap, ws, jms) but 
+	       have to use a <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServerConnection.html">MBean server connection</a> 
+	       instead of the reference. Different
+	       protocol implementations for a JMX connector already exist (e.g. 
+	       <a href="http://java.sun.com/j2se/1.5.0/docs/">RMI</a>, 
+	       <a href="http://mx4j.sourceforge.net/">SOAP</a>, 
+	       <a href="https://ws-jmx-connector.dev.java.net/">WS</a>, 
+	       <a href="http://lingo.codehaus.org/">JMS</a>) but 
 	       only the RMI connector is part of JRE version 1.5 or higher. If you want
 	       to use a RMI registry as a lookup service, you have to specify the host
 	       and port of the registry as well as the name of the agent node within the

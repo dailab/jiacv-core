@@ -23,6 +23,69 @@
          <a href="images/StaticStructure.png">
 	      <img src="images/StaticStructure.png"/>
 	     </a>
+	     
+	  <subsection name="Measurement data">
+	    <p>The data below are measured by using the test class 
+	       <code>SetupMeasurement</code> with the following environment:
+	      <ul>
+	        <li>Processor: Intel Centrino Duo 2.00GHz</li>
+	        <li>Memory: 1.00GB RAM</li>
+	        <li>Operating system: Windows XP Professional 2002 SP2</li>
+	        <li>Java version: JDK 1.5.0_05</li>
+	      </ul>
+	    </p>
+	    <table>
+	      <tr>
+	        <td>Scenario</td>
+	        <td>Setup time (ms)</td>
+	        <td>Heap memory usage (kB)</td>
+	        <td>Non-heap memory usage (kB)</td>
+	        <td>Number of live threads</td>
+	        <td>Number of loaded classes</td>
+	      </tr>
+          <tr>
+	        <td>JVM without any application</td>
+	        <td>-</td>
+	        <td>266</td>
+	        <td>12060</td>
+	        <td>4</td>
+	        <td>375</td>
+	      </tr>
+	      <tr>
+	        <td>Agent node without any features</td>
+	        <td>541</td>
+	        <td>876</td>
+	        <td>14601</td>
+	        <td>4</td>
+            <td>1120</td>
+	      </tr>
+	      <tr>
+	        <td>Agent node only with one small agent</td>
+	        <td>631</td>
+	        <td>992</td>
+	        <td>14798</td>
+	        <td>7</td>
+            <td>1179</td>
+	      </tr>
+	      <tr>
+	        <td>Agent node only with RMI connector</td>
+	        <td>728</td>
+	        <td>1128</td>
+	        <td>15417</td>
+	        <td>11</td>
+            <td>1439</td>
+	      </tr>
+	      <tr>
+	        <td>Agent node only with communication</td>
+	        <td></td>
+	        <td></td>
+	        <td></td>
+	        <td></td>
+	        <td></td>
+	      </tr>
+	    </table>
+	  </subsection>
+	  
 	  <subsection name="Management interface">
 	    <p>The management interface of JIAC TNG is based on 
 	       <a href="http://java.sun.com/j2se/1.5.0/docs/guide/jmx/">JMX</a> 

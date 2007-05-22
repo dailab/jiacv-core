@@ -39,9 +39,7 @@ public class QueueMessageListener implements MessageListener {
 				ObjectMessage oMsg = (ObjectMessage) msg;
 				String msgRecipient = oMsg.getStringProperty(Constants.ADDRESS_PROPERTY);
 				debugMsg(oMsg, msgRecipient);
-				// System.out
-				// .println("An '" + msgReceipient + "' gerichtete Nachricht erhalten:\n
-				// " + oMsg.getObject().toString());
+//				System.out.println("An '" + msgRecipient + "' gerichtete Nachricht erhalten:\n" + oMsg.getObject().toString());
 				_commBean.messageReceivedFromQueue(msg);
 				_protocol.processMessage(msg);
 				msg.acknowledge();

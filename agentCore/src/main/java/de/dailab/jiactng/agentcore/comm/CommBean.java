@@ -74,6 +74,12 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	@Override
 	public void doInit() throws Exception {
 		super.doInit();
+		
+		if (_connectionFactory == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
+	
+		TopicReceiver topicReceiver;
+		TopicSender topicSender;
+		
 		if (thisAgent != null && thisAgent.getAgentNode() != null) {
 			setAgentNodeName(thisAgent.getAgentNode().getName());
 		}
@@ -81,8 +87,12 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 
 		_topicCommunicator = new TopicCommunicator();
 		// Ein topic wird verwendet, zum lesen und schreiben - das defaultTopic
-		TopicReceiver topicReceiver = new TopicReceiver(this, _connectionFactory, _defaultTopicName);
-		TopicSender topicSender = new TopicSender(_connectionFactory, _defaultTopicName);
+		if (_defaultTopicName != null){
+			topicReceiver = new TopicReceiver(this, _connectionFactory, _defaultTopicName);
+			topicSender = new TopicSender(_connectionFactory, _defaultTopicName);
+		} else {
+			throw new Exception("No Default Topic Name Set!");
+		}
 
 		_communicator = new QueueCommunicator();
 		// auf eine Queue mit dem Namen der eigenen Addresse hören
@@ -240,7 +250,7 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	 * @param message
 	 */
 	private void informQueueListener(Message message) {
-		for (Iterator iter = _commListener.iterator(); iter.hasNext();) {
+		for (Iterator<CommMessageListener> iter = _commListener.iterator(); iter.hasNext();) {
 			CommMessageListener listener = (CommMessageListener) iter.next();
 			listener.messageReceivedFromQueue(message);
 		}
@@ -252,7 +262,7 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	 * @param message
 	 */
 	private void informTopicListener(Message message) {
-		for (Iterator iter = _commListener.iterator(); iter.hasNext();) {
+		for (Iterator<CommMessageListener> iter = _commListener.iterator(); iter.hasNext();) {
 			CommMessageListener listener = (CommMessageListener) iter.next();
 			listener.messageReceivedFromTopic(message);
 		}

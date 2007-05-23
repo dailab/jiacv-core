@@ -28,6 +28,7 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.ontology.AgentBeanDescription;
+import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
@@ -578,4 +579,7 @@ public class Agent extends AbstractLifecycle implements IAgent,
 		return agentId;
 	}
 
+	public AgentDescription getAgentDescription() {
+		return memory.read(new ThisAgentDescription(null, null, null, null));
+	}
 }

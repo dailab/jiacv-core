@@ -111,4 +111,32 @@ public class Action implements IFact {
 		return results;
 	}
 
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @param parameters the parameters to set
+	 */
+	public void setParameters(Class[] parameters) {
+		this.parameters = parameters;
+	}
+
+	/**
+	 * @param providerBean the providerBean to set
+	 */
+	public void setProviderBean(IEffector providerBean) {
+		this.providerBean = providerBean;
+	}
+
+	/**
+	 * @param results the results to set
+	 */
+	public void setResults(Class[] results) {
+		this.results = results;
+	}
+
 }

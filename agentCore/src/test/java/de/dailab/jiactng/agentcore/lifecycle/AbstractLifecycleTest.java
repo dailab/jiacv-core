@@ -7,11 +7,18 @@
 
 package de.dailab.jiactng.agentcore.lifecycle;
 
-import junit.framework.*;
-import javax.management.MBeanNotificationInfo;
-import org.springframework.context.ApplicationContext;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.CLEANED_UP;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.INITIALIZED;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.INITIALIZING;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STARTED;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STOPPED;
+import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.UNDEFINED;
 
-import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.*;
+import javax.management.MBeanNotificationInfo;
+
+import junit.framework.TestCase;
+
+import org.springframework.context.ApplicationContext;
 /**
  *
  * @author joachim

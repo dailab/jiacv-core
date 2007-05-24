@@ -159,6 +159,7 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	 * sendet auf die defaultQueue
 	 * 
 	 * @param message
+	 * @deprecated
 	 */
 	public void send(IJiacMessage message) {
 		_communicator.send(message);
@@ -180,6 +181,7 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	 * @param operation
 	 * @param payload
 	 * @param receiverAddress
+	 * @deprecated
 	 */
 	public void send(String operation, IJiacContent payload, IEndPoint receiverAddress) {
 		IJiacMessage msg = JiacMessageFactory.createJiacMessage(operation, payload, _address, receiverAddress, null);

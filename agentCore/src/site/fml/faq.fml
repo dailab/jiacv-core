@@ -82,6 +82,52 @@
             </answer>
         </faq>
     </part>
+    <part id="Agent">
+	    <title>Agents</title>
+          <faq id="faq1_Agent">
+            <question>How do I create my own Agent?</question>
+            <answer>
+            	..
+            </answer>
+          </faq>
+          <faq id="faq2_Agent">
+            <question>How are Agents and Lifecycles related ?</question>
+            <answer>
+            	..
+            </answer>
+          </faq>          
+          <faq id="faq3_Agent">
+            <question>Does an Agent has to have a lifecycle? If it has to, do I have to implement it by myself ?</question>
+            <answer>
+            	..
+            </answer>
+          </faq>	    
+          <faq id="faq4_Agent">
+            <question>What kind of and how much ressources does one agent require ? Is it advisable to keep the number of Agents for my application low ?</question>
+            <answer>
+            	..
+            </answer>
+          </faq>
+          <faq id="faq5_Agent">
+            <question>How do I let the Agents do what I want ?</question>
+            <answer>
+            	..
+            </answer>
+          </faq>  
+          <faq id="faq6_Agent">            
+            <question>Is there a 'Hello World' Agent ? Where ?</question>
+            <answer>
+            	..
+            </answer> 
+          </faq>
+          <faq id="faq7_Agent">            
+            <question>Is there a more complex example of Agents ? Where ?</question>
+            <answer>
+            	..
+            </answer> 
+          </faq>
+          
+    </part>
     <part id="management">
         <title>Monitoring and Control</title>
         <faq id="how-manage">

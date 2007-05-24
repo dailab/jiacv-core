@@ -4,11 +4,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import junit.framework.TestCase;
-
-import org.sercho.masp.space.SimpleObjectSpace;
-import org.sercho.masp.space.event.EventedSpaceWrapper;
-import org.sercho.masp.space.event.EventedTupleSpace;
-
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 public class MemoryTest extends TestCase {

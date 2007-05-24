@@ -61,6 +61,8 @@ public class EndPoint implements IEndPoint {
 	}
 
 	public boolean equals(Object o) {
+		if (!(o instanceof EndPoint)) return false;
+		
 		EndPoint recipient = (EndPoint) o;
 		if (recipient != null && _universalId.equals(recipient.getUniversalId()) && _localId.equals(recipient.getLocalId()))
 			return true;

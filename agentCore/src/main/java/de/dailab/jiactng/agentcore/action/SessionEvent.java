@@ -9,16 +9,19 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * 
  * @author axle
  */
-abstract class SessionEvent implements IFact {
+public class SessionEvent implements IFact {
 
 	/** The session of the session this session event belongs to. */
-	protected Session session;
+	private Session session;
+	
+	/** Redundant for the sake of SimpleSpace. */
+	private String sessionId;
 	
 	/** The action this session event will trigger or be result of. */
-	protected Action action;
+	private Action action;
 	
 	/** The object that created this event. */
-	protected Object source;
+	private Object source;
 	
 	/**
 	 * Subclasses use this constructor to set the session and action
@@ -28,8 +31,9 @@ abstract class SessionEvent implements IFact {
 	 * @param action the action this event is trigger or result of
 	 * @param source the originator of this event
 	 */
-	protected SessionEvent(Session session, Action action, Object source) {
+	public SessionEvent(Session session, Action action, Object source) {
 		this.session = session;
+		if (session != null) this.sessionId = session.getId();
 		this.action = action;
 		this.source = source;
 	}
@@ -74,19 +78,20 @@ abstract class SessionEvent implements IFact {
 	 */
 	public void setSession(Session session) {
 		this.session = session;
+		if (session != null) this.sessionId = session.getId();
 	}
 
 	/**
 	 * @return the session id of the session this event belongs to
 	 */
 	public String getSessionId() {
-		return session.getId();
+		return sessionId;
 	}
 	
 	/**
 	 * @param id sets the id of the session
 	 */
 	public void setSessionId(String id) {
-		this.session.setId(id);
+		this.sessionId = id;
 	}
 }

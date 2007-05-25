@@ -579,6 +579,10 @@ public class Agent extends AbstractLifecycle implements IAgent,
 		return agentId;
 	}
 
+	/**
+	 * Returns the agent description of this agent.
+	 * @return the agent description of this agent
+	 */
 	public AgentDescription getAgentDescription() {
 		return memory.read(new ThisAgentDescription(null, null, null, null));
 	}

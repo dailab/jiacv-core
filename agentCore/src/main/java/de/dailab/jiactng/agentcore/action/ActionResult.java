@@ -25,7 +25,7 @@ public class ActionResult extends SessionEvent {
 		this.resultOf = resultOf;
 		this.success = success;
 		this.results = results;
-		if (session != null) session.addToSessionHistory(this);
+		if (getSession() != null) getSession().addToSessionHistory(this);
 	}
 
 	/**

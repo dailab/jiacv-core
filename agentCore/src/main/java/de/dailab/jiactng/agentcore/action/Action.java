@@ -22,7 +22,7 @@ public class Action implements IFact {
 	private String name;
 
 	/** The component that holds the funtionality for this action */
-	private IEffector providerBean;
+	private transient IEffector providerBean;
 
 	/** The classes of the input-parameters of this action */
 	private Class[] parameters;
@@ -44,6 +44,27 @@ public class Action implements IFact {
 		this.providerBean = providerBean;
 		this.parameters = parameters;
 		this.results = results;
+	}
+	
+	/**
+	 * Copying constructor
+	 * @param action the action to create an action from
+	 */
+	public Action(Action action) {
+		this.name = action.getName();
+		this.providerBean =action.getProviderBean();
+		if (action.parameters != null) {
+			this.parameters = new Class[action.getParameters().length];
+			for (int i=0; i<action.getParameters().length;i++) {
+				this.parameters[i] = action.getParameters()[i];
+			}
+		}
+		if (action.getResults() != null) {
+			this.results = new Class[action.getResults().length];
+			for (int i=0; i<action.getResults().length; i++) {
+				this.results[i] = action.getResults()[i];
+			}
+		}
 	}
 
 	/**

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
+import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 /**
  * Interface for agents. This interfaces defines functionalities, that are
@@ -124,5 +125,11 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @see org.apache.commons.logging.Log;
    */
   public Log getLog(IAgentBean bean);
+  
+  /**
+   * Returns the agent description of this agent.
+   * @return the agent description of this agent
+   */
+  public AgentDescription getAgentDescription();
 
 }

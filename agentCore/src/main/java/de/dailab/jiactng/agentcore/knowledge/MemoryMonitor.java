@@ -138,7 +138,8 @@ public class MemoryMonitor extends AbstractAgentBean implements ActionListener,
 //    myThread.start();
 //    active = true;
 	  spacePanel=new SwingObjectVisualizerPanel();
-	  spacePanel.showObject(memory.readAllOfType(IFact.class), "Knowledge");
+//	  spacePanel.showObject(memory.readAllOfType(IFact.class), "Knowledge");
+	  spacePanel.showObject("Press Refresh Button", "Knowledge");
 
 	  JPanel panel=new JPanel();
 	  panel.setLayout(new BorderLayout());

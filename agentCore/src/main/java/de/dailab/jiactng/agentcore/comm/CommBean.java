@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.comm;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Message;
@@ -11,12 +12,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
+import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.DoRemoteAction;
+import de.dailab.jiactng.agentcore.action.RemoteAction;
 import de.dailab.jiactng.agentcore.comm.message.EndPoint;
 import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
 import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
@@ -32,6 +35,8 @@ import de.dailab.jiactng.agentcore.comm.protocol.IProtocolHandler;
 import de.dailab.jiactng.agentcore.comm.protocol.NodeProtocol;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import de.dailab.jiactng.agentcore.ontology.OtherAgentDescription;
+import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 
 /**
  * Die CommBean hält zwei Communicatoren, einen für topiczugriff und einen für queuezugriff. Über diesen laufen die
@@ -84,6 +89,7 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 			setAgentNodeName(thisAgent.getAgentNode().getName());
 		}
 		_address = (EndPoint) EndPointFactory.createEndPoint(getAgentNodeName());
+		memory.update(new ThisAgentDescription(null, null, null, null), new ThisAgentDescription(null, null, null, _address));
 
 		_topicCommunicator = new TopicCommunicator();
 		// Ein topic wird verwendet, zum lesen und schreiben - das defaultTopic
@@ -114,6 +120,46 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void doStart() throws Exception {
+		super.doStart();
+		Set<Action> actions = memory.readAll(new Action(null, null, null, null));
+		for (Action action:actions) {
+			System.out.println("CommBean::Found Action: "+action.getName());
+		}
+		ArrayList<IAgent> agents = thisAgent.getAgentNode().findAgents();
+		for (IAgent agent:agents) {
+			System.out.println("CommBean::Found Agent: "+agent.getAgentName());
+		}
+		ThisAgentDescription tad=memory.read(new ThisAgentDescription(null, null, null, null));
+		OtherAgentDescription descr=new OtherAgentDescription(tad);
+		
+		//Addvertise all actions to other agents of this node
+		//TODO filter those actions that must not be distributed
+		//TODO advertise actions to agents on other nodes
+		for (IAgent agent:agents) {
+			if (!descr.getAid().equals(agent.getAgentDescription().getAid())) {
+				System.out.println("Sending from "+descr.getAid()+" to "+agent.getAgentDescription().getAid());
+				for (Action action:actions) {
+	//				send(operation, payload, receiverAddress)
+					log.debug("Sending "+IAgentProtocol.ADV_REMOTE_ACTION+" to "+agent.getAgentDescription().getEndpoint());
+					
+					JiacMessage message = new JiacMessage(
+							IAgentProtocol.ADV_REMOTE_ACTION,
+							new RemoteAction(action, descr),
+							agent.getAgentDescription().getEndpoint(),
+							descr.getEndpoint(),
+							null);
+					
+					send(message, agent.getAgentDescription().getEndpoint().toString());
+				}
+			}
+		}
+	}
+
+	/**
 	 * Erzeugt ein Protokoll für den Queue-/Topic-Listener.
 	 * 
 	 * @param topicSender der Sender, der antworten des Protokolls in n Topic verschickt.
@@ -127,6 +173,7 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 			protocol = (IProtocolHandler) new AgentProtocol(topicSender, queueSender);
 			((AgentProtocol) protocol).setAgent(thisAgent);
 			((AgentProtocol) protocol).setMemory(memory);
+			((AgentProtocol) protocol).setCommBean(this);
 		} else if (IProtocolHandler.PLATFORM_PROTOCOL.equals(getProtocolType())) {
 			protocol = (IProtocolHandler) new NodeProtocol(topicSender, queueSender);
 			((NodeProtocol) protocol).setAgent(thisAgent);
@@ -352,11 +399,19 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	 */
 	public void doAction(DoAction doAction) {
 		if (doAction.getAction().getName().equals("DoRemoteAction")) {
+			// do nothing at the moment
 			log.debug("DoRemoteAction");
-			DoRemoteAction raction = new DoRemoteAction((DoAction)doAction.getParams()[0]);
-			IEndPoint address = ((AgentDescription)doAction.getParams()[1]).getEndpoint();
-			send(IAgentProtocol.CMD_AGT_REMOTE_DOACTION, raction, address);
-			doAction.getSession().addToSessionHistory(this);
+//			DoRemoteAction raction = new DoRemoteAction((DoAction)doAction.getParams()[0]);
+//			IEndPoint address = ((AgentDescription)doAction.getParams()[1]).getEndpoint();
+//			send(IAgentProtocol.CMD_AGT_REMOTE_DOACTION, raction, address);
+//			doAction.getSession().addToSessionHistory(this);
+		} else {
+			RemoteAction ra = memory.read(new RemoteAction(doAction.getAction(), null));
+			if (ra != null) {
+				log.debug("Found RemoteAction "+ra.getAction().getName()+" provisioned by "+ra.getAgentDescription().getName());
+			} else {
+				log.error("Cannot find RemoteAction for DoAction "+doAction.getAction().getName());
+			}
 		}
 	}
 

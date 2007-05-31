@@ -36,7 +36,7 @@ public class ServiceDirectoryMemory {
 	 */
 	public void doInit() {
 		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("FactBase"));
-		space = destroyer.destroybleSpace;
+		space = destroyer.space;
 	}
 
 	/**

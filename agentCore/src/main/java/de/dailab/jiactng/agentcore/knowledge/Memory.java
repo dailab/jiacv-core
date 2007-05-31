@@ -41,7 +41,7 @@ public class Memory extends AbstractLifecycle implements IMemory {
 	@Override
 	public void doInit() throws LifecycleException {
 		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("FactBase"));
-		space = destroyer.destroybleSpace;
+		space = destroyer.space;
 	}
 
     /**

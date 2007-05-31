@@ -498,7 +498,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// call init and set references for all agents
 		for (IAgent a : _agents) {
-			log.warn("Initializing agent: " + a.getAgentName());
+			log.info("Initializing agent: " + a.getAgentName());
 			try {
 				a.init();
 			} catch (LifecycleException e) {
@@ -565,7 +565,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			e.printStackTrace();
 		}
 
-		log.warn("AgentNode " + getName() + " started with " + _agents.size() + " agents");
+		log.info("AgentNode " + getName() + " started with " + _agents.size() + " agents");
 	}
 
 	/*

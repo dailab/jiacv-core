@@ -2,13 +2,15 @@ package de.dailab.jiactng.agentcore.action;
 
 import java.util.ArrayList;
 
+import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**
- * This class is used as a superclass for everything that is connected to the execution of an action. The idea is, that
- * all phases of action execution (an consequently all objects associated with those phases) have a commen superclass
- * and thus can have the same session-id.
+ * This class is used as a superclass for everything that is connected to the
+ * execution of an action. The idea is, that all phases of action execution (an
+ * consequently all objects associated with those phases) have a commen
+ * superclass and thus can have the same session-id.
  * 
  * @author moekon
  */
@@ -16,50 +18,59 @@ public class Session implements IFact {
 
 	/** The actual ID of the session. */
 	private String id;
-	
+
 	/** The creation time of the session object. */
 	private long creationTime;
 
 	/** Stores the reference to the creator of this session. */
-	private Object source;
-	
+	private ResultReceiver source;
+
 	/**
 	 * The history of the session. This list contains all sources of the session
-	 * (i.E. of actions, results, etc.) in order of appearance.
-	 * TODO should be of type ArrayList<SessionEvent>
+	 * (i.E. of actions, results, etc.) in order of appearance. TODO should be
+	 * of type ArrayList<SessionEvent>
 	 */
 	private ArrayList<Object> history;
 
 	/**
-	 * Constructor for a new session. Can be called with any kind of object
-	 * as source, usually the class, that initiated the session.
+	 * Constructor for a new session. Can be called with any kind of object as
+	 * source, usually the class, that initiated the session.
 	 * 
-	 * @param source the source that created the new session
+	 * @param source
+	 *            the source that created the new session
 	 */
-	public Session(Object source) {
-		this(IdFactory.createSessionId(source.hashCode()), System.currentTimeMillis(), source, new ArrayList<Object>());
+	public Session(ResultReceiver source) {
+		this(IdFactory.createSessionId((source != null) ? source.hashCode()
+				: Session.class.hashCode()), System.currentTimeMillis(),
+				source, new ArrayList<Object>());
 	}
-	
+
 	/**
 	 * Constructor to set all values of session by hand.
 	 * 
-	 * @param id the session id
-	 * @param creationTime the time of creation of this session
-	 * @param source the creator object of this session
-	 * @param history the history of this session
+	 * @param id
+	 *            the session id
+	 * @param creationTime
+	 *            the time of creation of this session
+	 * @param source
+	 *            the creator object of this session
+	 * @param history
+	 *            the history of this session
 	 */
-	public Session(String id, long creationTime, Object source, ArrayList<Object> history) {
+	public Session(String id, long creationTime, ResultReceiver source,
+			ArrayList<Object> history) {
 		this.id = id;
 		this.creationTime = creationTime;
 		this.source = source;
 		this.history = history;
 	}
-	
+
 	/**
-	 * Copying constructor. This session will be initiated with the values of the
-	 * parameter <code>session</code>.
+	 * Copying constructor. This session will be initiated with the values of
+	 * the parameter <code>session</code>.
 	 * 
-	 * @param session the session to copy the values from
+	 * @param session
+	 *            the session to copy the values from
 	 */
 	public Session(Session session) {
 		this.id = session.getId();
@@ -78,7 +89,8 @@ public class Session implements IFact {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(String id) {
 		this.id = id;
@@ -87,14 +99,15 @@ public class Session implements IFact {
 	/**
 	 * @return the source
 	 */
-	public Object getSource() {
+	public ResultReceiver getSource() {
 		return source;
 	}
 
 	/**
-	 * @param source the source to set
+	 * @param source
+	 *            the source to set
 	 */
-	public void setSource(Object source) {
+	public void setSource(ResultReceiver source) {
 		this.source = source;
 	}
 
@@ -106,7 +119,8 @@ public class Session implements IFact {
 	}
 
 	/**
-	 * @param creationTime the creationTime to set
+	 * @param creationTime
+	 *            the creationTime to set
 	 */
 	public void setCreationTime(long creationTime) {
 		this.creationTime = creationTime;
@@ -122,7 +136,8 @@ public class Session implements IFact {
 	}
 
 	/**
-	 * @param history the history to set
+	 * @param history
+	 *            the history to set
 	 */
 	public void setHistory(ArrayList<Object> history) {
 		this.history = history;
@@ -131,7 +146,8 @@ public class Session implements IFact {
 	/**
 	 * Will add the given object to the session history.
 	 * 
-	 * @param event the object to add to history
+	 * @param event
+	 *            the object to add to history
 	 */
 	public void addToSessionHistory(Object event) {
 		if (history == null) {
@@ -139,11 +155,12 @@ public class Session implements IFact {
 		}
 		history.add(event);
 	}
-	
+
 	/**
 	 * Will remove the object indexed by the given number from the history.
 	 * 
-	 * @param index the index of the object to remove
+	 * @param index
+	 *            the index of the object to remove
 	 * @return the removed object
 	 */
 	public Object removeFromSessionHistory(int index) {
@@ -153,7 +170,8 @@ public class Session implements IFact {
 	/**
 	 * Will remove the given object from the history if present.
 	 * 
-	 * @param o the object to remove
+	 * @param o
+	 *            the object to remove
 	 * @return true, if history contained the given object
 	 */
 	public boolean removeFromSessionHistory(Object o) {

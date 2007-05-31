@@ -6,6 +6,7 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
@@ -76,7 +77,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 				if (LifecycleStates.STARTED.equals(a.getState())) {
 					try {
 						Thread.sleep(BE_NICE_TIMER);
-						
 						a.execute();
 					} catch (Exception ex) {
 						ex.printStackTrace();
@@ -94,9 +94,21 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			}
 			// perform one doAction
 			DoAction act = memory.remove(new DoAction(null, null, null, null));
+
 			if (act != null) {
-				memory.write(act.getSession());
-				act.getAction().getProviderBean().doAction(act);
+				if (act.getAction().getProviderBean() != null) {
+					memory.write(act.getSession());
+					act.getAction().getProviderBean().doAction(act);
+				} else {
+					System.err.println("--- found action without bean: "
+							+ act.getAction().getName());
+				}
+			}
+
+			ActionResult actionResult = memory.remove(new ActionResult(null,
+					null, null, null));
+			if(actionResult !=null) {
+				actionResult.getSession().getSource().receiveResult(actionResult);
 			}
 
 		}

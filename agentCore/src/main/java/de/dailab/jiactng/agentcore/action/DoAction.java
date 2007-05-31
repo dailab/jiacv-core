@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.action;
 
+import de.dailab.jiactng.agentcore.environment.ResultReceiver;
+
 /**
  * Used to submit an action for execution. An agent will check its memory
  * periodically for DoAction-objects, an it will call the approriate component
@@ -17,6 +19,8 @@ public class DoAction extends SessionEvent {
 	/** The input-parameters for the action-call */
 	private Object[] params;
 
+	private String owner;
+	
 	/**
 	 * Constructor for a new action-call. The created object should be written
 	 * to the agents memory to trigger the action execution. Note that it may be
@@ -30,7 +34,7 @@ public class DoAction extends SessionEvent {
 	 * @param params
 	 *            the input-parameters for the call.
 	 */
-	public DoAction(Action thisAction, Object source, Object[] params) {
+	public DoAction(Action thisAction, ResultReceiver source, Object[] params) {
 		this(new Session(source), thisAction, source, params);
 	}
 
@@ -49,7 +53,7 @@ public class DoAction extends SessionEvent {
 	 * @param params
 	 *            the input-parameters for the call.
 	 */
-	public DoAction(Session session, Action thisAction, Object source, Object[] params) {
+	public DoAction(Session session, Action thisAction, ResultReceiver source, Object[] params) {
 		super(session, thisAction, source);
 		if (session != null) session.addToSessionHistory(this);
 		this.params = params;
@@ -68,5 +72,13 @@ public class DoAction extends SessionEvent {
 	 */
 	public void setParams(Object[] params) {
 		this.params = params;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
 	}
 }

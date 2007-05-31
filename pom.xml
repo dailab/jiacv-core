@@ -802,9 +802,9 @@
 
 	<modules>
 		<module>CIConfiguration</module>
-		<module>ontologies</module>
+		<!--module>ontologies</module-->
 		<module>ModuleTemplate</module>
-		<module>microJIAC</module>
+		<!--module>microJIAC</module-->
 		<module>agentCore</module>
 		<module>agentInterpreter</module>
 		<module>basicServices</module>

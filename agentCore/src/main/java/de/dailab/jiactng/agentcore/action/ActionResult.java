@@ -17,7 +17,7 @@ public class ActionResult extends SessionEvent {
 	 * @param results the result values if any
 	 * @param source the object that created the results
 	 */
-	public ActionResult(Action action, Session session, Object[] results, Object source) {
+	public ActionResult(Action action, Session session, Object[] results, DoAction source) {
 		super(session, action, source);
 //		this.session = session;
 		this.results = results;

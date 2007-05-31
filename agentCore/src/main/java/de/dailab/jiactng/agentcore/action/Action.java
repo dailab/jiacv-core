@@ -111,7 +111,7 @@ public class Action implements IFact {
 	 *         memory) to return the results of the action.
 	 */
 	public ActionResult createActionResult(Session resultOf, Object[] results,
-			Object source) {
+			DoAction source) {
 		return new ActionResult(this, resultOf, results, source);
 	}
 

@@ -30,6 +30,7 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 	@Override
 	public void doInit() throws Exception {
 		super.doInit();
+		processActionMap();
 	}
 
 	@Override
@@ -66,26 +67,7 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 				}
 
 				memory.removeAll(new Action(null, null, null, null));
-				HashMap<String, ObjectTuple> newMap = new HashMap<String, ObjectTuple>();
-				for (String s : actionMap.keySet()) {
-					ObjectTuple ot = actionMap.get(s);
-					Action a = (Action) ot.getArg1();
-					try {
-						if (a.getProviderBean() != null
-								&& null == memory.read(new Action(s, null,
-										null, null))) {
-							memory.write(a);
-							newMap.put(s, ot);
-						} else {
-							// do nothing, as action will be removed
-						}
-
-					} catch (Exception ex) {
-						ex.printStackTrace();
-						actionMap.put(s, null);
-					}
-				}
-				actionMap = newMap;
+				processActionMap();
 			}
 			try {
 				Thread.sleep(100);
@@ -93,6 +75,29 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private void processActionMap() {
+		HashMap<String, ObjectTuple> newMap = new HashMap<String, ObjectTuple>();
+		for (String s : actionMap.keySet()) {
+			ObjectTuple ot = actionMap.get(s);
+			Action a = (Action) ot.getArg1();
+			try {
+				if (a.getProviderBean() != null
+						&& null == memory.read(new Action(s, null,
+								null, null))) {
+					memory.write(a);
+					newMap.put(s, ot);
+				} else {
+					// do nothing, as action will be removed
+				}
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				actionMap.put(s, null);
+			}
+		}
+		actionMap = newMap;
 	}
 
 	public void doAction(DoAction doAction) {

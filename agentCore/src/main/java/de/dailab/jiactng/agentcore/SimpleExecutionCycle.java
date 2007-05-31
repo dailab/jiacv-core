@@ -6,8 +6,11 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import java.util.ArrayList;
+
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
@@ -107,8 +110,17 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 			ActionResult actionResult = memory.remove(new ActionResult(null,
 					null, null, null));
-			if(actionResult !=null) {
-				actionResult.getSession().getSource().receiveResult(actionResult);
+			if (actionResult != null) {
+				 ((ResultReceiver)((DoAction)actionResult.getSource()).getSource()).receiveResult(
+				 actionResult);
+//				ArrayList history = actionResult.getSession().getHistory();
+//				for (int i = history.size() - 1; i >= 0; i--) {
+//					if (history.get(i) instanceof DoAction) {
+//						((ResultReceiver) ((DoAction) history.get(i))
+//								.getSource()).receiveResult(actionResult);
+//						break;
+//					}
+//				}
 			}
 
 		}

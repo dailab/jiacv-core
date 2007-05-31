@@ -30,7 +30,9 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 	@Override
 	public void doInit() throws Exception {
 		super.doInit();
-		processActionMap();
+		synchronized (actionMap) {
+			processActionMap();
+		}
 	}
 
 	@Override
@@ -59,7 +61,7 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 
 	public void run() {
 		while (flag.booleanValue()) {
-			synchronized (flag) {
+			synchronized (actionMap) {
 				Set<Action> actions = memory.readAll(new Action(null, null,
 						null, null));
 				for (Action a : actions) {
@@ -84,8 +86,7 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 			Action a = (Action) ot.getArg1();
 			try {
 				if (a.getProviderBean() != null
-						&& null == memory.read(new Action(s, null,
-								null, null))) {
+						&& null == memory.read(new Action(s, null, null, null))) {
 					memory.write(a);
 					newMap.put(s, ot);
 				} else {

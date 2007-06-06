@@ -801,9 +801,9 @@
 	</scm>
 
 	<modules>
-		<module>CIConfiguration</module>
+		<!--module>CIConfiguration</module-->
 		<!--module>ontologies</module-->
-		<module>ModuleTemplate</module>
+		<!--module>ModuleTemplate</module-->
 		<!--module>microJIAC</module-->
 		<module>agentCore</module>
 		<module>agentInterpreter</module>

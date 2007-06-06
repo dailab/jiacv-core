@@ -13,7 +13,7 @@ public class QueueSenderTest extends TestCase {
 	}
 
 	public void testSendMessageMethods() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 }

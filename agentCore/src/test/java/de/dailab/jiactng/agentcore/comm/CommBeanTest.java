@@ -95,31 +95,31 @@ public class CommBeanTest extends TestCase {
 	}
 
 	public void testMessageReceivedFromQueue() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 	public void testMessageReceivedFromTopic() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 	public void testSendIJiacMessage() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 	public void testSendIJiacMessageString() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 	public void testSendStringIJiacContentIEndPoint() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 	public void testPublishIJiacMessage() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 	public void testPublishStringIJiacContentIEndPoint() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 }

@@ -360,6 +360,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					}
 				}
 				String path = (String) conf.get("path");
+				String authenticator = (String) conf.get("authenticator");
 
 				if (protocol.equals("rmi")) {
 					// check use of RMI registry
@@ -373,8 +374,18 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 				// create connector server
 				JMXServiceURL jurl = new JMXServiceURL(protocol, null, port, path);
+				HashMap<String,Object> env = new HashMap<String,Object>();
+				if (authenticator != null) {
+					try {
+						Object auth = Class.forName(authenticator).newInstance();
+						env.put(JMXConnectorServer.AUTHENTICATOR, auth);
+					}
+					catch (Exception e) {
+						System.err.println("WARNING: Initialisation of JMX authentication failed, because can not create instance of " + authenticator);
+					}
+				}
 				System.out.println("Creating Connector: " + jurl);
-				JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, null, mbs);
+				JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, env, mbs);
 				cs.start();
 				_connectorServer.add(cs);
 

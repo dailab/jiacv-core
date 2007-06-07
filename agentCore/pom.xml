@@ -105,6 +105,12 @@
 					<include>**/*.xml</include>
 				</includes>
 			</testResource>
+			<testResource>
+				<directory>${basedir}/src/test/conf</directory>
+				<includes>
+					<include>**/*.*</include>
+				</includes>
+			</testResource>
 		</testResources>
 
 	</build>

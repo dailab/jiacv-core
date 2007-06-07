@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore;
 
 //import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
+import java.io.FileNotFoundException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -25,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
@@ -47,6 +49,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** Log-instance for the agentnode */
 	protected Log log = null;
+	
+	/** A customized logging configuration will be used instead of the default configuration. */
+	private String loggingConfig;
 
 	/** this one's fake */
 	protected String _uuid = null;
@@ -272,25 +277,27 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void onEvent(LifecycleEvent evt) {
 		Object source = evt.getSource();
-		if (_agents.contains(source)) {
-			IAgent agent = (IAgent) source;
-			switch (evt.getState()) {
-				case STARTED:
-					Future f1 = _threadPool.submit(agent);
-					agentFutures.put(agent.getAgentName(), f1);
-					break;
-				case STOPPED:
-					Future f2 = agentFutures.get(agent.getAgentName());
-					if (f2 == null) {
-						(new LifecycleException("Agentfuture not found")).printStackTrace();
-					} else {
-						// if soft-cancel fails, do a force-cancel.
-						if (!f2.cancel(false) && !f2.isDone()) {
-							log.warn("Agent " + agent.getAgentName() + " did not respond then stopping. Thread is forcecanceled.");
-							f2.cancel(true);
+		if (_agents != null) {
+			if (_agents.contains(source)) {
+				IAgent agent = (IAgent) source;
+				switch (evt.getState()) {
+					case STARTED:
+						Future f1 = _threadPool.submit(agent);
+						agentFutures.put(agent.getAgentName(), f1);
+						break;
+					case STOPPED:
+						Future f2 = agentFutures.get(agent.getAgentName());
+						if (f2 == null) {
+							(new LifecycleException("Agentfuture not found")).printStackTrace();
+						} else {
+							// if soft-cancel fails, do a force-cancel.
+							if (!f2.cancel(false) && !f2.isDone()) {
+								log.warn("Agent " + agent.getAgentName() + " did not respond then stopping. Thread is forcecanceled.");
+								f2.cancel(true);
+							}
 						}
-					}
-					break;
+						break;
+				}
 			}
 		}
 		if (source == _serviceDirectory) {
@@ -391,9 +398,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// set references for all agents
 		addLifecycleListener(this);
-		for (IAgent a : _agents) {
-			a.setAgentNode(this);
-			a.addLifecycleListener(this.lifecycle.createLifecycleListener());
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				a.setAgentNode(this);
+				a.addLifecycleListener(this.lifecycle.createLifecycleListener());
+			}
 		}
 
 		// listener am servicedrirectory setzen 
@@ -425,15 +434,17 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
 		// deregister all agents as JMX resource
-		for (IAgent a : _agents) {
-			try {
-				ObjectName name = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=" + a.getAgentName());
-				if (mbs.isRegistered(name)) {
-					mbs.unregisterMBean(name);
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				try {
+					ObjectName name = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=" + a.getAgentName());
+					if (mbs.isRegistered(name)) {
+						mbs.unregisterMBean(name);
+					}
+					System.out.println("Agent " + a.getAgentName() + " deregistered as JMX resource.");
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-				System.out.println("Agent " + a.getAgentName() + " deregistered as JMX resource.");
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 
@@ -461,7 +472,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 		this._connectorServer = null;
 
-		log.warn("AgentNode " + getName() + " has been closed.");
+		if (log != null) {
+			log.warn("AgentNode " + getName() + " has been closed.");
+		}
 	}
 
 	/*
@@ -496,16 +509,19 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		// call init and set references for all agents
-		for (IAgent a : _agents) {
-			log.info("Initializing agent: " + a.getAgentName());
-			try {
-				a.init();
-			} catch (LifecycleException e) {
-				// TODO:
-				e.printStackTrace();
+		// call init and set references for all agents if any
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				log.info("Initializing agent: " + a.getAgentName());
+				try {
+					a.init();
+				} catch (LifecycleException e) {
+					// TODO:
+					e.printStackTrace();
+				}
 			}
 		}
+		
 		// das servicedirectory separat initialisieren - is auch ne AgentBean
 		try {
 			if (_serviceDirectory != null) {
@@ -545,13 +561,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		// call start() and instantiate Threads for all agents
-		for (IAgent a : _agents) {
-			try {
-				a.start();
-			} catch (Exception ex) {
-				// TODO
-				ex.printStackTrace();
+		// call start() and instantiate Threads for all agents if any
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				try {
+					a.start();
+				} catch (Exception ex) {
+					// TODO
+					ex.printStackTrace();
+				}
 			}
 		}
 
@@ -565,7 +583,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			e.printStackTrace();
 		}
 
-		log.info("AgentNode " + getName() + " started with " + _agents.size() + " agents");
+		log.info("AgentNode " + getName() + " started with " + (_agents!=null?_agents.size():"0") + " agents");
 	}
 
 	/*
@@ -574,13 +592,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStop()
 	 */
 	public void doStop() {
-		// call stop() for all agents
-		for (IAgent a : _agents) {
-			try {
-				a.stop();
-			} catch (LifecycleException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		// call stop() for all agents if any
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				try {
+					a.stop();
+				} catch (LifecycleException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -613,13 +633,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doCleanup()
 	 */
 	public void doCleanup() {
-		// call cleanup for all agents
-		for (IAgent a : _agents) {
-			try {
-				a.cleanup();
-			} catch (LifecycleException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		// call cleanup for all agents if any
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				try {
+					a.cleanup();
+				} catch (LifecycleException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -635,7 +657,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				}
 			}
 		}
-		_threadPool.shutdown();
+		if (_threadPool != null) {
+			_threadPool.shutdown();
+		}
 	}
 
 	/*
@@ -688,6 +712,26 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	public void setServiceDirectory(ServiceDirectory serviceDirectory) {
 		_serviceDirectory = serviceDirectory;
+	}
+
+	/**
+	 * @return the loggingConfig
+	 */
+	public String getLoggingConfig() {
+		return loggingConfig;
+	}
+
+	/**
+	 * @param loggingConfig the loggingConfig to set
+	 */
+	public void setLoggingConfig(String loggingConfig) {
+		this.loggingConfig = loggingConfig;
+		
+		try {
+			Log4jConfigurer.initLogging(loggingConfig);
+		} catch (FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+		}
 	}
 
 }

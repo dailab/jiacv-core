@@ -181,6 +181,25 @@ catch (MalformedURLException e) {
 catch (IOException) {
     System.err.println("Communication problem when creating connector or connection");
 }</source>
+	       For client authentication you have to specify username and password:
+	       <source>
+try {
+    JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + <i>myRegistryHost</i> + ":" + <i>myRegistryPort</i> + "/" + <i>myAgentNodeName</i>);
+    HashMap&lt;String,Object&gt; env = new HashMap&lt;String,Object&gt;();
+    String[] creds = {<i>myUserName</i>, <i>myPassword</i>};
+    env.put(JMXConnector.CREDENTIALS, creds);
+    JMXConnector jmxc = JMXConnectorFactory.connect(url, env);
+    MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
+}
+catch (MalformedURLException e) {
+    System.err.println("One of the URL parts are syntactically incorrect or the local host name can not be identified");
+}
+catch (IOException) {
+    System.err.println("Communication problem when creating connector or connection");
+}
+catch (SecurityException) {
+    System.err.println("Authentication failed");
+}</source>
 	       Condition for the remote management is that the agent node has created
 	       a corresponding connector server for the choosed protocol. This can be
 	       achieved by extension of the agent node's spring configuration.
@@ -196,6 +215,43 @@ catch (IOException) {
     &lt;/set&gt;
   &lt;/property&gt;
 &lt;/bean&gt;</source>
+	       To require authentication for remote management you may add an authenticator 
+	       and a user management agent to the agent node:
+	       <source>
+&lt;bean name="<i>myPlatform</i>" class="de.dailab.jiactng.agentcore.SimpleAgentNode"&gt;
+  &lt;property name="jmxConnectors"&gt;
+    &lt;set&gt;
+      &lt;map&gt;
+        &lt;entry key="protocol" value="rmi"/&gt;
+        &lt;entry key="registryHost" value="<i>myRegistryHost</i>"/&gt;
+        &lt;entry key="registryPort" value="<i>myRegistryPort</i>"/&gt;
+        &lt;entry key="authenticator" value="de.dailab.usermanagement.auth.JiacJMXAuthenticator"/&gt;
+      &lt;/map&gt;
+    &lt;/set&gt;
+  &lt;/property&gt;
+  &lt;property name="agents"&gt;
+    &lt;list&gt;
+      &lt;ref bean="UserManagementAgent"/&gt;
+    &lt;/list&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;bean name="UserManagementAgent" class="de.dailab.jiactng.agentcore.Agent"&gt;
+  &lt;property name="memory"&gt;&lt;ref bean="memory"/&gt;&lt;/property&gt;
+  &lt;property name="execution"&gt;&lt;ref bean="simpleExecCycle"/&gt;&lt;/property&gt;
+  &lt;property name="agentBeans"&gt;
+    &lt;list&gt;
+      &lt;ref bean="UserManagementAgentBean"/&gt;
+    &lt;/list&gt;
+  &lt;/property&gt;
+&lt;/bean&gt;
+
+&lt;bean name="UserManagementAgentBean" class="de.dailab.usermanagement.agent.UserManagementAgentBean" singleton="false"&gt;
+&lt;/bean&gt;</source>
+           To be allowed to remotely manage this agent node you have to be registered as user
+           of provider "admin" within the user management agent. See documentation of module 
+           <a href="../basicServices/userManagement/">userManagement</a> for a description 
+           how to define users.
 	    </p>
 	  </subsection>
     </section>

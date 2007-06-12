@@ -216,7 +216,7 @@ catch (SecurityException) {
   &lt;/property&gt;
 &lt;/bean&gt;</source>
 	       To require authentication for remote management you may add an authenticator 
-	       and a user management agent to the agent node:
+	       (e.g. based on a user management agent) to the agent node:
 	       <source>
 &lt;bean name="<i>myPlatform</i>" class="de.dailab.jiactng.agentcore.SimpleAgentNode"&gt;
   &lt;property name="jmxConnectors"&gt;
@@ -251,7 +251,8 @@ catch (SecurityException) {
            To be allowed to remotely manage this agent node you have to be registered as user
            of provider "admin" within the user management agent. See documentation of module 
            <a href="../basicServices/userManagement/">userManagement</a> for a description 
-           how to define users.
+           how to define users. Instead of this user management you may use any other authenticators
+           which implement the interface <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/remote/JMXAuthenticator.html">JMXAuthenticator</a>.
 	    </p>
 	  </subsection>
     </section>

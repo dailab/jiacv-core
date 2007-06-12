@@ -22,6 +22,8 @@ public class SessionEvent implements IFact {
 	
 	/** The object that created this event. */
 	private Object source;
+
+	private Object metaData;
 	
 	/**
 	 * Subclasses use this constructor to set the session and action
@@ -94,4 +96,13 @@ public class SessionEvent implements IFact {
 	public void setSessionId(String id) {
 		this.sessionId = id;
 	}
+	
+	public Object getMetaData() {
+		return metaData;
+	}
+
+	public void setMetaData(Object metaData) {
+		this.metaData = metaData;
+	}
+	
 }

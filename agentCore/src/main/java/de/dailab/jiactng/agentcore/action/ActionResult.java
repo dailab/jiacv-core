@@ -5,9 +5,6 @@ public class ActionResult extends SessionEvent {
 	/** The return values of the action. */
 	private Object[] results;
 
-//	/** Whether this result means success or not. */
-//	private boolean success;
-
 	/**
 	 * An <code>ActionResult</code> will be used as return object for a <code>DoAction</code> request.
 	 * 

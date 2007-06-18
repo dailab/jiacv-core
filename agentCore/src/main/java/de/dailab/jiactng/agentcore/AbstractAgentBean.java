@@ -74,11 +74,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 		this.beanName = name;
 	}
 
-	/**
-	 * Getter for the beanName. This method returns the qualified name of the bean. The qualfied name consists of the
-	 * agentname and the beanname.
-	 * 
-	 * @return the qualified name of the bean.
+	/* (non-Javadoc)
+	 * @see de.dailab.jiactng.agentcore.AgentBeanMBean#getBeanName()
 	 */
 	public final String getBeanName() {
 		return beanName;

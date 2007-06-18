@@ -304,7 +304,8 @@ public class Agent extends AbstractLifecycle implements IAgent,
 
 			// if bean is effector, add all actions to memory
 			if (ab instanceof IEffector) {
-				ArrayList<? extends Action> acts = ((IEffector) ab).getActions();
+				ArrayList<? extends Action> acts = ((IEffector) ab)
+						.getActions();
 				for (Action item : acts) {
 					memory.write(item);
 				}
@@ -581,9 +582,18 @@ public class Agent extends AbstractLifecycle implements IAgent,
 
 	/**
 	 * Returns the agent description of this agent.
+	 * 
 	 * @return the agent description of this agent
 	 */
 	public AgentDescription getAgentDescription() {
 		return memory.read(new ThisAgentDescription(null, null, null, null));
+	}
+
+	public ArrayList<String> getAgentBeanNames() {
+		ArrayList<String> ret = new ArrayList<String>();
+		for (IAgentBean bean : getAgentBeans()) {
+			ret.add(bean.getBeanName());
+		}
+		return ret;
 	}
 }

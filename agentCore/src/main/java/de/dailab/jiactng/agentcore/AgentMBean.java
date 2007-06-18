@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore;
 
+import java.util.ArrayList;
+
 /**
  * JMX compliant management interface of agents to get information
  * about them and to change their lifecycle states.
@@ -74,5 +76,8 @@ public interface AgentMBean {
      * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#cleanup()}
 	 */
 	public void cleanup() throws Exception;
+	
+	
+	public ArrayList<String> getAgentBeanNames();
 
 }

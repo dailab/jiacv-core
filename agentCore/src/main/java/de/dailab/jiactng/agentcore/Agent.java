@@ -108,6 +108,8 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	 */
 	private long beanExecutionTimeout = 50000;
 
+	private ArrayList<Action> actionList = null;
+
 	/**
 	 * Getter for the memory-component
 	 * 
@@ -264,6 +266,7 @@ public class Agent extends AbstractLifecycle implements IAgent,
 		// update state information in agent's memory
 		updateState(LifecycleStates.CLEANED_UP);
 
+		this.actionList = null;
 		this.execution.cleanup();
 		this.memory.cleanup();
 	}
@@ -278,6 +281,7 @@ public class Agent extends AbstractLifecycle implements IAgent,
 		// initialize agent elements
 		this.agentLog = agentNode.getLog(this);
 
+		this.actionList = new ArrayList<Action>();
 		this.memory.init();
 		this.memory.write(new ThisAgentDescription(this.agentId,
 				this.agentName, LifecycleStates.INITIALIZING.name(), null));
@@ -308,6 +312,7 @@ public class Agent extends AbstractLifecycle implements IAgent,
 						.getActions();
 				for (Action item : acts) {
 					memory.write(item);
+					actionList.add(item);
 				}
 			}
 		}
@@ -595,5 +600,13 @@ public class Agent extends AbstractLifecycle implements IAgent,
 			ret.add(bean.getBeanName());
 		}
 		return ret;
+	}
+
+	public ArrayList<Action> getActionList() {
+		return actionList;
+	}
+
+	public void setActionList(ArrayList<Action> actionList) {
+		this.actionList = actionList;
 	}
 }

@@ -11,15 +11,12 @@ import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
-import de.dailab.jiactng.agentcore.knowledge.IMemory;
-import de.dailab.jiactng.agentcore.knowledge.ObjectTuple;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
-import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 
 public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 		IEffector, ResultReceiver {
 
-	private static HashMap<String, ObjectTuple> actionMap = new HashMap<String, ObjectTuple>();
+	private static HashMap<String, Action> actionMap = new HashMap<String, Action>();
 
 	private Future myThread = null;
 
@@ -30,9 +27,9 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 	@Override
 	public void doInit() throws Exception {
 		super.doInit();
-		synchronized (actionMap) {
-			processActionMap();
-		}
+		// synchronized (actionMap) {
+		// processActionMap();
+		// }
 	}
 
 	@Override
@@ -42,6 +39,12 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 		synchronized (flag) {
 			this.flag = new Boolean(true);
 		}
+		ArrayList<Action> actions = thisAgent.getActionList();
+		synchronized (actionMap) {
+			for (Action a : actions) {
+				actionMap.put(thisAgent.getAgentName() + ":" + a.getName(), a);
+			}
+		}
 		myThread = thisAgent.getThreadPool().submit(this);
 	}
 
@@ -50,6 +53,12 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 		super.doStop();
 		synchronized (flag) {
 			this.flag = new Boolean(false);
+		}
+		ArrayList<Action> actions = thisAgent.getActionList();
+		synchronized (actionMap) {
+			for (Action a : actions) {
+				actionMap.remove(thisAgent.getAgentName() + ":" + a.getName());
+			}
 		}
 		// myThread.cancel(true);
 	}
@@ -62,14 +71,35 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 	public void run() {
 		while (flag.booleanValue()) {
 			synchronized (actionMap) {
-				Set<Action> actions = memory.readAll(new Action(null, null,
+
+				Set<Action> memActions = memory.readAll(new Action(null, null,
 						null, null));
-				for (Action a : actions) {
-					actionMap.put(a.getName(), new ObjectTuple(a, memory));
+
+				// check all memActions against actionMap:
+				for (Action memAct : memActions) {
+					boolean found = false;
+					for (String s : actionMap.keySet()) {
+						Action mapAct = actionMap.get(s);
+						if (memAct.getName().equals(mapAct)) {
+							found = true;
+						}
+					}
+					if (found == false) {
+						memory.remove(new Action(memAct.getName(), null, null,
+								null));
+					}
 				}
 
-				memory.removeAll(new Action(null, null, null, null));
-				processActionMap();
+				// check actionMap against memActions:
+				for (String s : actionMap.keySet()) {
+					Action mapAct = actionMap.get(s);
+					if(memory.read(new Action(mapAct.getName(), null, null,
+							null))==null) {
+						memory.write(mapAct);
+					}
+				}
+
+				// processActionMap();
 			}
 			try {
 				Thread.sleep(100);
@@ -80,15 +110,14 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 	}
 
 	private void processActionMap() {
-		HashMap<String, ObjectTuple> newMap = new HashMap<String, ObjectTuple>();
+		HashMap<String, Action> newMap = new HashMap<String, Action>();
 		for (String s : actionMap.keySet()) {
-			ObjectTuple ot = actionMap.get(s);
-			Action a = (Action) ot.getArg1();
+			Action a = actionMap.get(s);
 			try {
 				if (a.getProviderBean() != null
 						&& null == memory.read(new Action(s, null, null, null))) {
 					memory.write(a);
-					newMap.put(s, ot);
+					newMap.put(s, a);
 				} else {
 					// do nothing, as action will be removed
 				}
@@ -103,13 +132,12 @@ public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 
 	public void doAction(DoAction doAction) {
 		Action toDo = doAction.getAction();
-		ObjectTuple ot = actionMap.get(toDo.getName());
-		Action orgAct = (Action) ot.getArg1();
-		IMemory orgMem = (IMemory) ot.getArg2();
-		DoAction newDo = new DoAction(orgAct, this, toDo.getParameters());
-		ThisAgentDescription tha = orgMem.read(new ThisAgentDescription(null,
-				null, null, null));
-		orgMem.write(newDo);
+		Action orgAct = actionMap.get(toDo.getName());
+		// IMemory orgMem = (IMemory) ot.getArg2();
+		// DoAction newDo = new DoAction(orgAct, this, toDo.getParameters());
+		// ThisAgentDescription tha = orgMem.read(new ThisAgentDescription(null,
+		// null, null, null));
+		// orgMem.write(newDo);
 	}
 
 	public ArrayList<? extends Action> getActions() {

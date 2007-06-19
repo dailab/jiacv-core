@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.BeanNameAware;
 
+import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
@@ -131,5 +132,9 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @return the agent description of this agent
    */
   public AgentDescription getAgentDescription();
+  
+  public ArrayList<Action> getActionList();
+  
+  public void setActionList(ArrayList<Action> actionList);
 
 }

@@ -106,7 +106,7 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	 * as well. TODO do something more intelligent, possibly recover the bean
 	 * without stopping the agent.
 	 */
-	private long beanExecutionTimeout = 50000;
+	private long beanExecutionTimeout = 5*60*1000;
 
 	private ArrayList<Action> actionList = null;
 

@@ -1,5 +1,9 @@
 package de.dailab.jiactng.agentcore.util;
 
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
 /**
  * Collection of ID creation methods.
  * TODO concept for id and naming.
@@ -7,6 +11,14 @@ package de.dailab.jiactng.agentcore.util;
  * @author axle
  */
 public final class IdFactory {
+	
+	/**
+	 * The default length of a session id. Use generate(int) if you want another length. 
+	 */
+	public final static int DEFAULT_LENGTH = 12;
+	private final static int NANO_SLEEP = 5;
+	private static Set<String> allocatedSessions = new HashSet<String>();
+
 
 	/**
 	 * Constructor hidden to avoid instantiation.
@@ -61,6 +73,89 @@ public final class IdFactory {
 		return new StringBuffer("s:")
 			.append(Long.toHexString(System.currentTimeMillis() + hashcode))
 			.toString();
+	}
+	
+	/**
+	 * Generates a session id with the specific length. The session consists of digits and 
+	 * chars a to f. A session will not be generated twice. If all possible session id with 
+	 * the specific length are allocated this methode will not return and hangs in a 
+	 * infinite loop. 
+	 * @param length
+	 * @return
+	 */
+	public static String generate(int length) {
+		StringBuilder buffer = new StringBuilder("");
+		String output = null;
+
+		Random random = new Random();
+		int one_random_int = 0;
+
+		for (int i = 0; i < length; i++) {
+			one_random_int = random.nextInt(16);
+			if (one_random_int == 10) {
+				buffer.append("a");
+			}
+			else if (one_random_int == 11) {
+				buffer.append("b");
+			}
+			else if (one_random_int == 12) {
+				buffer.append("c");
+			}
+			else if (one_random_int == 13) {
+				buffer.append("d");
+			}
+			else if (one_random_int == 14) {
+				buffer.append("e");
+			}
+			else if (one_random_int == 15) {
+				buffer.append("f");
+			}
+			else {
+				buffer.append(one_random_int);
+			}
+			
+			try {
+				// for very small NANOs trustless
+				Thread.sleep(0, NANO_SLEEP);
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		output = buffer.toString();
+		
+		// solange output schon im Set existiert, soll 
+		// eine neue Session generiert werden
+		// und zu output zugewiesen werden. 
+		while ( allocatedSessions.contains(output) ) {
+			// könnte auch ne Katastrophe auf dem Stack geben, wenn alle IDs schon vergeben sind
+			output = generate(length);
+		}
+		allocatedSessions.add(output);
+		
+		return output;
+	}
+	
+	/**
+	 * Generates a session id with the default session id length. This methode calls 
+	 * generate(int). 
+	 * @return
+	 */
+	public static String generate() {
+		return generate(DEFAULT_LENGTH);
+	}
+	
+	/**
+	 * If a session id not be needed any more, the session can be devaluated with this methode 
+	 * and other processes can allocate this session id. If this not will be done, in long 
+	 * life (long running) systems the amount of available unique session ids could be 
+	 * exhausted. This depends on the session id length and the amount of processes with a 
+	 * unique session id. 
+	 * @param session
+	 */
+	public static void devaluate(String session) {
+		allocatedSessions.remove(session);
 	}
 
 }

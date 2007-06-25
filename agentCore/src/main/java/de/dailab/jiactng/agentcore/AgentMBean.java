@@ -12,11 +12,19 @@ public interface AgentMBean {
 
 	/**
 	 * Getter for attribute "Name" of the managed agent.
+	 * @return the name of this agent
 	 */
 	public String getName();
 
 	/**
+	 * Getter for attribute "AgentId" of the managed agent.
+	 * @return the agent identifier of this agent
+	 */
+	public String getAgentId();
+
+	/**
 	 * Getter for attribute "AgentNodeUUID" of the managed agent.
+	 * @return the UUID of the agent node where this agent is running on
 	 */
 	public String getAgentNodeUUID();
 
@@ -27,6 +35,7 @@ public interface AgentMBean {
 
 	/**
 	 * Getter for attribute "LifecycleState" of the managed agent.
+	 * @return the lifecycle state of this agent
 	 */
 	public String getLifecycleState();
 	
@@ -36,6 +45,7 @@ public interface AgentMBean {
 
 	/**
 	 * Getter for attribute "Owner" of the managed agent.
+	 * @return the owner of this agent
 	 */
 	public String getOwner();
 
@@ -76,8 +86,11 @@ public interface AgentMBean {
      * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#cleanup()}
 	 */
 	public void cleanup() throws Exception;
-	
-	
+
+	/**
+	 * Getter for attribute "AgentBeanNames" of the managed agent.
+	 * @return name of agent beans contained in this agent
+	 */
 	public ArrayList<String> getAgentBeanNames();
 
 }

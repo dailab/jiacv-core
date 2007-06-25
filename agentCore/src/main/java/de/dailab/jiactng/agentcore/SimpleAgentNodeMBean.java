@@ -13,21 +13,25 @@ public interface SimpleAgentNodeMBean {
 
 	/**
 	 * Getter for attribute "Name" of the managed agent node.
+	 * @return the name of this agent node
 	 */
 	public String getName();
 
 	/**
 	 * Getter for attribute "UUID" of the managed agent node.
+	 * @return the UUID of this agent node
 	 */
 	public String getUUID();
 
 	/**
 	 * Getter for attribute "Host" of the managed agent node.
+	 * @return the host where this agent node is running
 	 */
 	public String getHost() throws UnknownHostException;
 
 	/**
 	 * Getter for attribute "Agents" of the managed agent node.
+	 * @return the name of agents running on this agent node
 	 */
 	public ArrayList<String> getAgents();
 
@@ -39,6 +43,7 @@ public interface SimpleAgentNodeMBean {
 
 	/**
 	 * Getter for attribute "LifecycleState" of the managed agent node.
+	 * @return the lifecycle state of this agent node
 	 */
 	public String getLifecycleState();
 	
@@ -46,11 +51,23 @@ public interface SimpleAgentNodeMBean {
 	
 	//public long getStartTime();
 
+	/**
+	 * Getter for attribute "Owner" of the managed agent node.
+	 * @return the owner of this agent node
+	 */
 	public String getOwner();
 	
-	//public String getJiacVersion();
+	/**
+	 * Getter for attribute "JiacVersion" of the managed agent node.
+	 * @return the version of JIAC TNG used by this agent node
+	 */
+	public String getJiacVersion();
 	
-	//public String getJiacVendor();
+	/**
+	 * Getter for attribute "JiacVendor" of the managed agent node.
+	 * @return the vendor of JIAC TNG used by this agent node
+	 */
+	public String getJiacVendor();
 
 	/**
 	 * Initializes the managed agent node.

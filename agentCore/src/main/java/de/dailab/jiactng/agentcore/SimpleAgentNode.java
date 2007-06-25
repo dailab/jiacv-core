@@ -28,6 +28,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
 
+import de.dailab.jiactng.Version;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -83,6 +84,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
 		public void run() {
+			System.out.println("\nShutting down agent node ...");
 			try {
 				shutdown();
 			} catch (Exception e) {
@@ -186,6 +188,24 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public Log getLog(IAgent agent, IAgentBean bean) {
 		return LogFactory.getLog(getName() + ":" + agent.getAgentName() + ":" + bean.getBeanName());
+	}
+
+	/**
+	 * Getter for attribute "JiacVersion" of the managed agent node.
+	 * @return the version of JIAC TNG
+	 */
+	public String getJiacVersion() {
+		return "JIAC TNG " + Version.getName() + 
+			" version " + Version.getNumber() + 
+			" (" + Version.getTimestamp() + ")";
+	}
+
+	/**
+	 * Getter for attribute "JiacVendor" of the managed agent node.
+	 * @return the vendor of JIAC TNG
+	 */
+	public String getJiacVendor() {
+		return "DAI-Labor, TU Berlin";
 	}
 
 	/*

@@ -2,6 +2,8 @@ package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
 
+import javax.management.openmbean.CompositeData;
+
 /**
  * JMX compliant management interface of agents to get information
  * about them and to change their lifecycle states.
@@ -48,6 +50,36 @@ public interface AgentMBean {
 	 * @return the owner of this agent
 	 */
 	public String getOwner();
+
+	/**
+	 * Returns the timeout after which the execution of a bean of the managed agent will be stopped.
+	 * @return the timeout in milliseconds
+	 */
+	public long getBeanExecutionTimeout();
+
+	/**
+	 * Getter for attribute "ActionNames" of the managed agent.
+	 * @return name of actions provided by this agent
+	 */
+	public ArrayList<String> getActionNames();
+
+	/**
+	 * Getter for attribute "Logger" of the managed agent.
+	 * @return information about the logger of this agent
+	 */
+	public CompositeData getLogger();
+
+	/**
+	 * Getter for attribute "MemoryClass" of the managed agent.
+	 * @return implementation of the memory of this agent
+	 */
+	public String getMemoryClass();
+
+	/**
+	 * Getter for attribute "ExecutionCycleClass" of the managed agent.
+	 * @return implementation of the execution cycle of this agent
+	 */
+	public String getExecutionCycleClass();
 
 	/**
 	 * Undeploys this agent from its agent node.

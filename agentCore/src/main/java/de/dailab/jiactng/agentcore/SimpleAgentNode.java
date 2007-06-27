@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -18,6 +19,13 @@ import javax.management.AttributeChangeNotification;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.ObjectName;
+import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
@@ -29,11 +37,14 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
+import de.dailab.jiactng.agentcore.comm.CommBean;
+import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.servicediscovery.IServiceDescription;
 import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
@@ -731,6 +742,21 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
+	 * Getter for attribute "AgentNodeBeanClasses" of the managed agent node.
+	 * @return the class of agent beans running in this agent node
+	 */
+	public ArrayList<String> getAgentNodeBeanClasses() {
+		if (getAgentNodeBeans() == null) {
+			return null;
+		}
+		ArrayList<String> ret = new ArrayList<String>();
+		for (ILifecycle bean : getAgentNodeBeans()) {
+			ret.add(bean.getClass().getName());
+		}
+		return ret;		
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public void setAgentNodeBeans(ArrayList<ILifecycle> agentnodebeans) {
@@ -763,6 +789,118 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		} catch (FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		}
+	}
+
+	/**
+	 * Getter for attribute "Logger" of the managed agent node.
+	 * @return information about class and levels of the logger of this agent node
+	 */
+	public CompositeData getLogger() {
+		if (log == null) {
+			return null;
+		}
+		String[] itemNames = new String[] {"class", "debug", "error", "fatal", "info", "trace", "warn"};
+		try {
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] {"Implementation of the logger instance", "debug", "error", "fatal", "info", "trace", "warn"}, new OpenType[] {SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN});
+			return new CompositeDataSupport(type, itemNames, new Object[] {log.getClass().getName(), log.isDebugEnabled(), log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(), log.isTraceEnabled(), log.isWarnEnabled()});
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+	 * Getter for attribute "AmqBroker" of the managed agent node.
+	 * @return the configuration of the embedded ActiveMQ broker of this agent node
+	 */
+	public CompositeData getAmqBrokerValues() {
+		if ((_embeddedBroker == null) || (_embeddedBroker.getValues() == null)) {
+			return null;
+		}
+		BrokerValues values = _embeddedBroker.getValues();
+		String[] itemNames = new String[] {"DiscoveryAddress", "DiscoveryMethod", "Name", "Url", "Jmx", "Persistent", "Port", "Protocol"};
+		try {
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "ActiveMQ broker values", itemNames, new String[] {"DiscoveryAddress", "DiscoveryMethod", "Name", "Url", "Jmx", "Persistent", "Port", "Protocol"}, new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.STRING, SimpleType.STRING});
+			return new CompositeDataSupport(type, itemNames, new Object[] {values.getDiscoveryAddress(), values.getDiscoveryMethod(), values.getName(), values.getUrl(), values.isJmx(), values.isPersistent(), values.getPort(), values.getProtocol()});
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}	
+	}
+
+	/**
+	 * Getter for attribute "ServiceDirectoryData" of the managed agent node.
+	 * @return information about the service directory of this agent node
+	 */
+	public CompositeData getServiceDirectoryData() {
+		if (_serviceDirectory == null) {
+			return null;
+		}
+		
+		// create commBean data
+		String[] commBeanItemNames = new String[] {"UniversalId", "LocalId", "QueueReceiverQueueName", "QueueSenderDestinationName", "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName", "ProtocolType"};
+		CompositeDataSupport commBeanData = null;
+		CompositeType commBeanType = null;
+		try {
+			commBeanType = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Communication bean data", commBeanItemNames, new String[] {"UniversalId", "LocalId", "QueueReceiverQueueName", "QueueSenderDestinationName", "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName", "ProtocolType"}, new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING});
+			CommBean commBean = _serviceDirectory.getCommBean();
+			if (commBean != null) {
+				Object[] commBeanValues = new Object[] {null, null, null, null, null, null, commBean.getDefaultQueueName(), commBean.getDefaultTopicName(), commBean.getProtocolType()};
+				if (commBean.getAddress() != null) {
+					commBeanValues[0] = commBean.getAddress().getUniversalId();
+					commBeanValues[1] = commBean.getAddress().getLocalId();
+				}
+				if (commBean.getCommunicator() != null) {
+					if (commBean.getCommunicator().getReceiver() != null) {
+						commBeanValues[2] = commBean.getCommunicator().getReceiver().getQueueName();						
+					}
+					if (commBean.getCommunicator().getSender() != null) {
+						commBeanValues[3] = commBean.getCommunicator().getSender().getDestinationName();						
+					}
+				}
+				if (commBean.getTopicCommunicator() != null) {
+					if (commBean.getTopicCommunicator().getReceiver() != null) {
+						commBeanValues[4] = commBean.getTopicCommunicator().getReceiver().getTopicName();						
+					}
+					if (commBean.getTopicCommunicator().getSender() != null) {
+						commBeanValues[5] = commBean.getTopicCommunicator().getSender().getTopicName();						
+					}
+				}
+				commBeanData = new CompositeDataSupport(commBeanType, commBeanItemNames, commBeanValues);
+			}
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+		}
+		
+		// get name of all services
+		List<IServiceDescription> allServices = _serviceDirectory.getAllServices();
+		int size = allServices.size();
+		String[] allServiceNames = new String[size];
+		for (int i=0; i<size; i++) {
+			allServiceNames[i] = allServices.get(i).getName();
+		}
+		
+		// get name of all web services
+		List<IServiceDescription> allWebServices = _serviceDirectory.getAllWebServices();
+		size = allWebServices.size();
+		String[] allWebServiceNames = new String[size];
+		for (int i=0; i<size; i++) {
+			allWebServiceNames[i] = allWebServices.get(i).getName();
+		}
+		
+		// create service directory data
+		String[] itemNames = new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "CommBean"};
+		try {
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Service directory data", itemNames, new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "CommBean"}, new OpenType[] {SimpleType.INTEGER, SimpleType.INTEGER, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), commBeanType});
+			return new CompositeDataSupport(type, itemNames, new Object[] {_serviceDirectory.getPublishTimer(), _serviceDirectory.getServiceNumber(), allWebServiceNames, allServiceNames, commBeanData});
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}	
 	}
 
 }

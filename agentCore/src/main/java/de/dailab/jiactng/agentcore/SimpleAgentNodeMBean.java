@@ -3,6 +3,8 @@ package de.dailab.jiactng.agentcore;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import javax.management.openmbean.CompositeData;
+
 /**
  * JMX compliant management interface of agent nodes to get information
  * about them and to change their lifecycle states.
@@ -68,6 +70,36 @@ public interface SimpleAgentNodeMBean {
 	 * @return the vendor of JIAC TNG used by this agent node
 	 */
 	public String getJiacVendor();
+
+	/**
+	 * Getter for attribute "LoggingConfig" of the managed agent node.
+	 * @return the filename of the logging configuration
+	 */
+	public String getLoggingConfig();
+
+	/**
+	 * Getter for attribute "Logger" of the managed agent node.
+	 * @return information about the logger of this agent node
+	 */
+	public CompositeData getLogger();
+
+	/**
+	 * Getter for attribute "AgentNodeBeanClasses" of the managed agent node.
+	 * @return the class of agent beans running in this agent node
+	 */
+	public ArrayList<String> getAgentNodeBeanClasses();
+
+	/**
+	 * Getter for attribute "AmqBroker" of the managed agent node.
+	 * @return the configuration of the embedded ActiveMQ broker of this agent node
+	 */
+	public CompositeData getAmqBrokerValues();
+
+	/**
+	 * Getter for attribute "ServiceDirectoryData" of the managed agent node.
+	 * @return information about the service directory of this agent node
+	 */
+	public CompositeData getServiceDirectoryData();
 
 	/**
 	 * Initializes the managed agent node.

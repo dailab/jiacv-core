@@ -16,6 +16,12 @@ import java.util.concurrent.TimeoutException;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
 
 import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.InitializingBean;
@@ -609,4 +615,58 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	public void setActionList(ArrayList<Action> actionList) {
 		this.actionList = actionList;
 	}
+
+	/**
+	 * Getter for attribute "ActionNames" of the managed agent.
+	 * @return name of actions provided by this agent
+	 */
+	public ArrayList<String> getActionNames() {
+		ArrayList<String> ret = new ArrayList<String>();
+		for (Action action : getActionList()) {
+			ret.add(action.getName());
+		}
+		return ret;		
+	}
+
+	/**
+	 * Getter for attribute "Logger" of the managed agent.
+	 * @return information about the logger of this agent
+	 */
+	public CompositeData getLogger() {
+		if (agentLog == null) {
+			return null;
+		}
+		String[] itemNames = new String[] {"class", "debug", "error", "fatal", "info", "trace", "warn"};
+		try {
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] {"Implementation of the logger instance", "debug", "error", "fatal", "info", "trace", "warn"}, new OpenType[] {SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN});
+			return new CompositeDataSupport(type, itemNames, new Object[] {agentLog.getClass().getName(), agentLog.isDebugEnabled(), agentLog.isErrorEnabled(), agentLog.isFatalEnabled(), agentLog.isInfoEnabled(), agentLog.isTraceEnabled(), agentLog.isWarnEnabled()});
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}		
+	}
+
+	/**
+	 * Getter for attribute "MemoryClass" of the managed agent.
+	 * @return implementation of the memory of this agent
+	 */
+	public String getMemoryClass() {
+		if (memory == null) {
+			return null;
+		}
+		return memory.getClass().getName();
+	}
+
+	/**
+	 * Getter for attribute "ExecutionCycleClass" of the managed agent.
+	 * @return implementation of the execution cycle of this agent
+	 */
+	public String getExecutionCycleClass() {
+		if (execution == null) {
+			return null;
+		}
+		return execution.getClass().getName();	
+	}
+
 }

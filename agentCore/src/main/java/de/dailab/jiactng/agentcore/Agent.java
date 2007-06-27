@@ -648,14 +648,22 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	}
 
 	/**
-	 * Getter for attribute "MemoryClass" of the managed agent.
+	 * Getter for attribute "MemoryData" of the managed agent.
 	 * @return implementation of the memory of this agent
 	 */
-	public String getMemoryClass() {
+	public CompositeData getMemoryData() {
 		if (memory == null) {
 			return null;
 		}
-		return memory.getClass().getName();
+		String[] itemNames = new String[] {"class", "matcher", "updater"};
+		try {
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Memory information", itemNames, new String[] {"Implementation of the memory instance", "Implementation of the matcher instance", "Implementation of the updater instance"}, new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.STRING});
+			return new CompositeDataSupport(type, itemNames, new Object[] {memory.getClass().getName(), (memory.getMatcher() == null)? null:memory.getMatcher().getClass().getName(), (memory.getUpdater() == null)? null:memory.getUpdater().getClass().getName()});
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}		
 	}
 
 	/**

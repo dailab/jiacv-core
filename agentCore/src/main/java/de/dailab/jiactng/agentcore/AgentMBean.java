@@ -70,10 +70,10 @@ public interface AgentMBean {
 	public CompositeData getLogger();
 
 	/**
-	 * Getter for attribute "MemoryClass" of the managed agent.
+	 * Getter for attribute "MemoryData" of the managed agent.
 	 * @return implementation of the memory of this agent
 	 */
-	public String getMemoryClass();
+	public CompositeData getMemoryData();
 
 	/**
 	 * Getter for attribute "ExecutionCycleClass" of the managed agent.

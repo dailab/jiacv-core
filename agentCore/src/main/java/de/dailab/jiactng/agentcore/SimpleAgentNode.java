@@ -903,4 +903,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}	
 	}
 
+	/**
+	 * Activates the java security policy defined in the given policy file by setting 
+	 * the system property <code>java.security.policy</code> and activating the 
+	 * default security manager.
+	 * @param filename the name of the policy file
+	 * @see System#setSecurityManager(SecurityManager)
+	 */
+	public void setAuthorizationPolicyFilename(String filename) {
+		System.setProperty("java.security.policy", filename);
+		System.setSecurityManager(new SecurityManager());
+	}
 }

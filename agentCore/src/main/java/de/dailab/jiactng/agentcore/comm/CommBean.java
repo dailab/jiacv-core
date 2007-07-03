@@ -18,7 +18,6 @@ import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
-import de.dailab.jiactng.agentcore.action.DoRemoteAction;
 import de.dailab.jiactng.agentcore.action.RemoteAction;
 import de.dailab.jiactng.agentcore.comm.message.EndPoint;
 import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
@@ -39,15 +38,15 @@ import de.dailab.jiactng.agentcore.ontology.OtherAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 
 /**
- * Die CommBean hält zwei Communicatoren, einen für topiczugriff und einen für queuezugriff. Über diesen laufen die
- * JMSzugriffe
+ * The CommBean holds two communicators, one for topic access and the other for queue access. Both are used for
+ * the JMS calls.
  * 
  * @author janko
  */
 public class CommBean extends AbstractAgentBean implements IEffector {
 	Log log = LogFactory.getLog(getClass());
 
-	// über den Communicator läuft die JMS communication
+	// ï¿½ber den Communicator lï¿½uft die JMS communication
 	QueueCommunicator _communicator;
 	// eigene Adresse
 	IEndPoint _address;
@@ -63,7 +62,7 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 
 	List<CommMessageListener> _commListener = new ArrayList<CommMessageListener>();
 
-	// defaultmässig wird das BasicProkoll erzeugt
+	// defaultmï¿½ssig wird das BasicProkoll erzeugt
 	String _protocolType = IProtocolHandler.BASIC_PROTOCOL;
 
 	/* aus dem Namen wird die Adresse gebildet */
@@ -101,10 +100,10 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 		}
 
 		_communicator = new QueueCommunicator();
-		// auf eine Queue mit dem Namen der eigenen Addresse hören
+		// auf eine Queue mit dem Namen der eigenen Addresse hï¿½ren
 		QueueReceiver queueReceiver = new QueueReceiver(_connectionFactory, getAddress().toString());
 		_communicator.setReceiver(queueReceiver);
-		// gesendet wird defaultmässig auf die defaultQueue.. (?)
+		// gesendet wird defaultmï¿½ssig auf die defaultQueue.. (?)
 		QueueSender queueSender = new QueueSender(_connectionFactory, getAddress().toString());
 		_communicator.setSender(queueSender);
 		IProtocolHandler queueProtocol = createProtocol(topicSender, queueSender);
@@ -160,12 +159,12 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	}
 
 	/**
-	 * Erzeugt ein Protokoll für den Queue-/Topic-Listener.
+	 * Erzeugt ein Protokoll fï¿½r den Queue-/Topic-Listener.
 	 * 
 	 * @param topicSender der Sender, der antworten des Protokolls in n Topic verschickt.
 	 * @param queueSender der Sender, der antworten des Protokolls in ne Queue verschickt.
-	 * @return entsprechend des Protokolltyps, wird dieses zurückgeliefert, sonst ein neues standardprotokoll
-	 *         zurückgegeben.
+	 * @return entsprechend des Protokolltyps, wird dieses zurï¿½ckgeliefert, sonst ein neues standardprotokoll
+	 *         zurï¿½ckgegeben.
 	 */
 	private IProtocolHandler createProtocol(TopicSender topicSender, QueueSender queueSender) {
 		IProtocolHandler protocol;
@@ -318,7 +317,7 @@ public class CommBean extends AbstractAgentBean implements IEffector {
 	}
 
 	/**
-	 * Fügt einen CommListner der Commbean zu.
+	 * Fï¿½gt einen CommListner der Commbean zu.
 	 * 
 	 * @param listener
 	 */

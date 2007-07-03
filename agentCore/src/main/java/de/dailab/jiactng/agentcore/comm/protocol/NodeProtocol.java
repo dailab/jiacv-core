@@ -16,7 +16,6 @@ import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.comm.CommBean;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
-import de.dailab.jiactng.agentcore.comm.Util;
 import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
@@ -98,7 +97,7 @@ public class NodeProtocol implements INodeProtocol {
 	}
 
 	/*
-	 * temporäre hilfsmethode. wenn später ordentlich auf commands reagiert wird, sollt edort festgelegt werden, mit
+	 * temporï¿½re hilfsmethode. wenn spï¿½ter ordentlich auf commands reagiert wird, sollt edort festgelegt werden, mit
 	 * welchen sender gesendet wird.
 	 */
 	private IJiacSender getDefaultSender() {
@@ -132,7 +131,7 @@ public class NodeProtocol implements INodeProtocol {
 		} else if (ACK_PING.equals(operation)) {
 			log.warn("Alles Roger.. hab ein Pong-Ack gekriegt, von " + receivedMsg.getStartPoint());
 		} else if (ACK_NOP.equals(operation)) {
-			log.debug("Ich werd' verrückt.. hab ein NOP-Ack gekriegt, von " + receivedMsg.getStartPoint());
+			log.debug("Ich werd' verrï¿½ckt.. hab ein NOP-Ack gekriegt, von " + receivedMsg.getStartPoint());
 		}
 		return sendInfo;
 	}
@@ -157,7 +156,7 @@ public class NodeProtocol implements INodeProtocol {
 	 * Hier sind die interessanten, service-bringenden Funktionen versteckt
 	 * 
 	 * @param receivedMsg die NAchricht auf die reagiert werden soll.
-	 * @return eigentlich soll die zu verschickende Antwort zurückgegeben werden, momentan wird direkt aus dieser methode
+	 * @return eigentlich soll die zu verschickende Antwort zurï¿½ckgegeben werden, momentan wird direkt aus dieser methode
 	 *         versendet.. (das ist mist)
 	 */
 	private SendInfo doCommand(IJiacMessage receivedMsg) {
@@ -237,7 +236,7 @@ public class NodeProtocol implements INodeProtocol {
 	/**
 	 * Fragt die platform nach ihren Agenten
 	 * 
-	 * @param receivedMsg in der receivedMsg sind empfängeradresse drin
+	 * @param receivedMsg in der receivedMsg sind empfï¿½ngeradresse drin
 	 * @param sender der sender mit dem verschikt werden soll
 	 */
 	public int requestAgentDescriptions(IJiacMessage receivedMsg, IJiacSender sender) {
@@ -276,9 +275,10 @@ public class NodeProtocol implements INodeProtocol {
 		List<AgentDescription> agentDescs = new ArrayList<AgentDescription>();
 		for (Iterator iter = agents.iterator(); iter.hasNext();) {
 			IAgent agent = (IAgent) iter.next();
-			AgentDescription agentDescription = new AgentDescription(agent.getAgentName(), agent.getAgentName()
-																							+ PLATFORM_VS_AGENT_SEPARATOR + platformName, Util.getLcsName(agent
-																							.getState()), getCommEndPointFromAgent(agent));
+			AgentDescription agentDescription = new AgentDescription(
+                agent.getAgentName(),
+                agent.getAgentName() + PLATFORM_VS_AGENT_SEPARATOR + platformName, agent.getState().name(), getCommEndPointFromAgent(agent)
+            );
 			agentDescs.add(agentDescription);
 		}
 		return agentDescs;
@@ -306,7 +306,7 @@ public class NodeProtocol implements INodeProtocol {
 	 * @param msg die AntwortNachricht
 	 * @param destination die ZielDestination
 	 * @param senderAddress die ReplyTo-Destination der JMSMessage
-	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht möglich war.
+	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht mï¿½glich war.
 	 */
 	private int doReply(IJiacMessage msg, Destination destination, Destination senderAddress, IJiacSender sender) {
 		log.debug("Knoten schickt antwort...");
@@ -323,7 +323,7 @@ public class NodeProtocol implements INodeProtocol {
 	 * @param msg die AntwortNachricht
 	 * @param destination die ZielDestination
 	 * @param senderAddress die ReplyTo-Destination der JMSMessage
-	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht möglich war.
+	 * @return PROCESSING_SUCCESS, wenn versendet; PROCESSING_FAILED wenn Versenden nicht mï¿½glich war.
 	 */
 	private int doReply(IJiacMessage msg, String destinationName, Destination senderAddress, IJiacSender sender) {
 		log.debug("Knoten schickt antwort...");

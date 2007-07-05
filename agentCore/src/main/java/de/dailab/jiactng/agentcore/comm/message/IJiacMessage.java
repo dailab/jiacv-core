@@ -10,6 +10,12 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * Momentan existiert FileContent und ObjectContent.
  * 
  * @author janko
+ * 
+ * 
+ * FIXME: refactoring request:
+ *      1. remove all JMS stuff from here!
+ *      2. destinations have to be set in the action. we want to support series message and subsequent destination
+ *         changes this message will also effect our previously issued inform actions!
  */
 public interface IJiacMessage extends IFact {
 
@@ -22,7 +28,7 @@ public interface IJiacMessage extends IFact {
 
 	/**
 	 * Liefert den Endpunkt der Nachricht. Dieser wird in der JMS-Nachricht als Property gesetzt, damit danach im Consumer
-	 * selektiert werden kann Der Endpoint ist der Empfänger der Nachricht.
+	 * selektiert werden kann Der Endpoint ist der Empfï¿½nger der Nachricht.
 	 * 
 	 * @return
 	 */

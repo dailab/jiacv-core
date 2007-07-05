@@ -6,7 +6,15 @@ import junit.framework.TestCase;
 
 public class LoggingTest extends TestCase {
 	public void testLogging() {
-		new ClassPathXmlApplicationContext(
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
 		"de/dailab/jiactng/agentcore/loggingTest.xml");
+		
+		// shutdown agent node
+		SimpleAgentNode nodeRef = (SimpleAgentNode) context.getBean("myPlatform");
+		try {
+			nodeRef.shutdown();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

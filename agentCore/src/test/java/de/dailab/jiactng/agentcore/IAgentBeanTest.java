@@ -51,6 +51,8 @@ public class IAgentBeanTest extends TestCase {
       assertEquals(ILifecycle.LifecycleStates.STARTED, bean.getState());
       bean.stop();
       assertEquals(ILifecycle.LifecycleStates.STOPPED, bean.getState());
+      bean.cleanup();
+      assertEquals(ILifecycle.LifecycleStates.CLEANED_UP, bean.getState());
       bean.init();
       assertEquals(ILifecycle.LifecycleStates.INITIALIZED, bean.getState());
     } catch (Exception ex) {

@@ -67,33 +67,30 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
         try {
             
             start();
-            fail("not initialized");
             
-        } catch (IllegalStateException expected) {
+        } catch (IllegalStateException ise) {
             
-            assertEquals(IllegalStateException.class, expected.getClass());
+            fail(ise.toString());
             
         }
         
         try {
             
             stop();
-            fail("not initialized");
             
-        } catch (IllegalStateException expected) {
+        } catch (IllegalStateException ise) {
             
-            assertEquals(IllegalStateException.class, expected.getClass());
+            fail(ise.toString());
             
         }
         
         try {
             
             cleanup();
-            fail("not initialized");
             
-        } catch (IllegalStateException expected) {
+        } catch (IllegalStateException ise) {
             
-            assertEquals(IllegalStateException.class, expected.getClass());
+            fail(ise.toString());
             
         }
         
@@ -149,19 +146,20 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
             
             cleanup();
             
-        } catch (IllegalStateException expected) {
+        } catch (IllegalStateException ise) {
          
-            assertEquals(IllegalStateException.class, expected.getClass());
+            fail(ise.toString());
             
         }
         
         try {
             
             stop();
+            fail("instance never started!");
             
-        } catch (IllegalStateException ise) {
+        } catch (IllegalStateException expected) {
             
-            fail(ise.toString());
+            assertEquals(IllegalStateException.class, expected.getClass());
             
         }
         
@@ -189,9 +187,9 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
             
             cleanup();
             
-        } catch (IllegalStateException expected) {
+        } catch (IllegalStateException ise) {
          
-            assertEquals(IllegalStateException.class, expected.getClass());
+            fail(ise.toString());
             
         }
         
@@ -199,9 +197,9 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
             
             start();
             
-        } catch (IllegalStateException expected) {
+        } catch (IllegalStateException ise) {
          
-            assertEquals(IllegalStateException.class, expected.getClass());
+            fail(ise.toString());
             
         }
         

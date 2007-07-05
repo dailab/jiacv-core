@@ -46,8 +46,20 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * You may override this method to change the lifecycle event propagation behavior.
      */
     public void init() throws LifecycleException {
-        
-        lifecycle.beforeInit();
+        try {
+        	lifecycle.beforeInit();
+        }
+        catch (IllegalStateException e) {
+        	switch (getState()) {
+        		case INITIALIZED:
+        		case STOPPED:
+        		case STARTED:
+        			// already initialized => do nothing
+            		return;
+            	default:
+                	throw new LifecycleException("Initialization not allowed in state " + getState(), e);
+        	}
+        }
         
         try {
             
@@ -75,8 +87,18 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * You may override this method to change the lifecycle event propagation behavior.
      */
     public void start() throws LifecycleException {
-        
-        lifecycle.beforeStart();
+        try {
+        	lifecycle.beforeStart();
+        }
+        catch (IllegalStateException e) {
+        	switch (getState()) {
+        		case STARTED:
+        			// already started => do nothing
+        			return;
+        		default:
+        			throw new LifecycleException("Starting not allowed in state " + getState(), e);
+        	}
+        }
         
         try {
             
@@ -104,8 +126,21 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * You may override this method to change the lifecycle event propagation behavior.
      */
     public void stop() throws LifecycleException {
-        
-        lifecycle.beforeStop();
+        try {
+        	lifecycle.beforeStop();
+        }
+        catch (IllegalStateException e) {
+        	switch (getState()) {
+        		case INITIALIZED:
+        		case STOPPED:
+        		case UNDEFINED:
+        		case CLEANED_UP:
+        			// already stopped => do nothing
+            		return;
+            	default:
+                	throw new LifecycleException("Stopping not allowed in state " + getState(), e);
+        	}
+        }
         
         try {
             
@@ -133,8 +168,19 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * You may override this method to change the lifecycle event propagation behavior.
      */
     public void cleanup() throws LifecycleException {
-        
-        lifecycle.beforeCleanup();
+        try {
+        	lifecycle.beforeCleanup();
+        }
+        catch (IllegalStateException e) {
+        	switch (getState()) {
+        		case UNDEFINED:
+        		case CLEANED_UP:
+        			// already cleaned up => do nothing
+            		return;
+            	default:
+                    throw new LifecycleException("Cleaning up not allowed in state " + getState(), e);
+        	}
+        }
         
         try {
             
@@ -191,7 +237,6 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * @see de.dailab.jiactng.agentcore.AgentMBean#getLifecycleState()
      */
     public String getLifecycleState() {
-        System.out.println("Get LifecycleState ...");
         return getState().toString();
     }
     

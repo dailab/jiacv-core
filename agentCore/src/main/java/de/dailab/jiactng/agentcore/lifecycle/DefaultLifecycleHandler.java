@@ -30,7 +30,7 @@ public class DefaultLifecycleHandler {
      * Indicates wether this <code>Lifecycle</code> may accept only transitions
      * following the state graph
      */
-    protected boolean strict = false;
+    protected boolean strict = true;
        
     /**
      * The <code>Lifecycle</code>'s current state
@@ -156,21 +156,24 @@ public class DefaultLifecycleHandler {
     }
     
     /**
-     * Call this method when entering <code>init()</code>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * Call this method when entering <code>init()</code>. It sets the state to
+     * INITIALIZING and informs all listener.
+     * @throws IllegalStateException if strict mode and the current state is not VOID
+     * @see {@link LifecycleStates#INITIALIZING}
+     * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
+     * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void beforeInit() throws LifecycleException {
+    public void beforeInit() throws IllegalStateException {
         
-        if (isStrict()) {
+        /*
+         * in strict mode the init transition is allowed only from VOID state
+         */
+    	if (isStrict()) {
+    		if (!(state.equals(UNDEFINED) || state.equals(CLEANED_UP))) {
+    			throw new IllegalStateException();
+    		}
+    	}
             
-            if (!(state.equals(UNDEFINED) || state.equals(CLEANED_UP))) {
-                
-                throw new IllegalStateException();
-                
-            }
-            
-        }
-        
         LifecycleStates oldState = state;
         state = INITIALIZING;
         
@@ -181,10 +184,14 @@ public class DefaultLifecycleHandler {
     }
     
     /**
-     * Call this method when leaving <CODE>init()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * Call this method when leaving <CODE>init()</CODE>. It sets the state to
+     * INITIALIZED and informs all listener.
+     * @throws IllegalStateException never
+     * @see {@link LifecycleStates#INITIALIZED}
+     * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
+     * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void afterInit() throws LifecycleException {
+    public void afterInit() throws IllegalStateException {
         
         LifecycleStates oldState = state;
         state = INITIALIZED;
@@ -196,24 +203,35 @@ public class DefaultLifecycleHandler {
     }
     
     /**
-     * Call this method when entering <CODE>start()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * Call this method when entering <CODE>start()</CODE>. It sets the state to
+     * STARTING and informs all listener. In strict mode the transition 
+     * <CODE>init()<CODE> will be done before if the current state is VOID.
+     * @throws IllegalStateException if strict mode and the current state is not READY or VOID
+     * @see {@link LifecycleStates#STARTING}
+     * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
+     * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void beforeStart() throws LifecycleException {
+    public void beforeStart() throws IllegalStateException {
         
         /*
-         * In strict mode the start transition is allowed only from READY state
+         * In strict mode the start transition is allowed only from READY or VOID state
+         * In case of VOID an init transition will be automatically done before. 
          */
-        if (isStrict()) {
-            
-            if (!(state.equals(INITIALIZED) || state.equals(STOPPED))) {
-                
-                throw new IllegalStateException();
-                
-            }
-            
-        } 
-        
+    	if (isStrict()) {
+    		switch (state) {
+    			case INITIALIZED:
+    			case STOPPED:
+    				break;
+    			case UNDEFINED:
+    			case CLEANED_UP:
+    				try {
+    					lifecycle.init();
+    					break;
+    				} catch (Exception e) {}
+    			default: throw new IllegalStateException();
+    		}
+    	}
+
         LifecycleStates oldState = state;
         state = STARTING;
         
@@ -224,10 +242,14 @@ public class DefaultLifecycleHandler {
     }
     
     /**
-     * Call this method when leaving <CODE>start()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * Call this method when leaving <CODE>start()</CODE>. It sets the state to
+     * STARTED and informs all listener.
+     * @throws IllegalStateException never
+     * @see {@link LifecycleStates#STARTED}
+     * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
+     * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void afterStart() throws LifecycleException {
+    public void afterStart() throws IllegalStateException {
         
         LifecycleStates oldState = state;
         state = STARTED;
@@ -239,21 +261,24 @@ public class DefaultLifecycleHandler {
     }
     
     /**
-     * Call this method when entering <CODE>stop()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * Call this method when entering <CODE>stop()</CODE>. It sets the state to
+     * STOPPING and informs all listener.
+     * @throws IllegalStateException if strict mode and the current state is not STARTED
+     * @see {@link LifecycleStates#STOPPING}
+     * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
+     * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void beforeStop() throws LifecycleException {
+    public void beforeStop() throws IllegalStateException {
         
-        if (isStrict()) {
+        /*
+         * in strict mode the stop transition is allowed only from STARTED state
+         */
+    	if (isStrict()) {
+    		if (!state.equals(STARTED)) {
+    			throw new IllegalStateException();
+    		}
+    	}
             
-            if (!state.equals(STARTED)) {
-                
-                throw new IllegalStateException();
-                
-            }
-            
-        } 
-        
         LifecycleStates oldState = state;
         state = STOPPING;
         
@@ -264,10 +289,14 @@ public class DefaultLifecycleHandler {
     }
     
     /**
-     * Call this method when leaving <CODE>stop()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * Call this method when leaving <CODE>stop()</CODE>. It sets the state to
+     * STOPPED and informs all listener.
+     * @throws IllegalStateException never
+     * @see {@link LifecycleStates#STOPPED}
+     * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
+     * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void afterStop() throws LifecycleException {
+    public void afterStop() throws IllegalStateException {
         
         LifecycleStates oldState = state;
         state = STOPPED;
@@ -279,20 +308,33 @@ public class DefaultLifecycleHandler {
     }
     
     /**
-     * Call this method when entering <CODE>cleanup()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * Call this method when entering <CODE>cleanup()</CODE>. It sets the state to
+     * CLEANING_UP and informs all listener. In strict mode the transition 
+     * <CODE>stop()<CODE> will be done before if the current state is STARTED.
+     * @throws IllegalStateException if strict mode and the current state is not READY or STARTED
+     * @see {@link LifecycleStates#CLEANING_UP}
+     * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
+     * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void beforeCleanup() throws LifecycleException {
+    public void beforeCleanup() throws IllegalStateException {
         
-        if (isStrict()) {
-            
-            if (!(state.equals(STOPPED) || state.equals(INITIALIZED))) {
-                
-                throw new IllegalStateException();
-                
-            }
-            
-        }
+        /*
+         * In strict mode the cleanup transition is allowed only from READY or STARTED state.
+         * In case of STARTED a stop transition will be automatically done before. 
+         */
+    	if (isStrict()) {
+    		switch (state) {
+				case INITIALIZED:
+				case STOPPED:
+					break;
+				case STARTED:
+					try {
+						lifecycle.stop();
+						break;
+					} catch (Exception e) {}
+				default: throw new IllegalStateException();
+    		}
+    	}
         
         LifecycleStates oldState = state;
         state = CLEANING_UP;
@@ -304,10 +346,14 @@ public class DefaultLifecycleHandler {
     }
     
     /**
-     * Call this method when leaving <CODE>cleanup()</CODE>.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * Call this method when leaving <CODE>cleanup()</CODE>. It sets the state to
+     * CLEANED_UP and informs all listener. 
+     * @throws IllegalStateException never
+     * @see {@link LifecycleStates#CLEANED_UP}
+     * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
+     * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void afterCleanup() throws LifecycleException {
+    public void afterCleanup() throws IllegalStateException {
         
         LifecycleStates oldState = state;
         state = CLEANED_UP;

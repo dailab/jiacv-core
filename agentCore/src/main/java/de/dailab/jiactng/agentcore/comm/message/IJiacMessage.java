@@ -14,8 +14,8 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * 
  * FIXME: refactoring request:
  *      1. remove all JMS stuff from here!
- *      2. destinations have to be set in the action. we want to support series message and subsequent destination
- *         changes this message will also effect our previously issued inform actions!
+ *      2. destinations have to be set in the action. We want to support series message and subsequent destination
+ *         changes on this message will also effect our previously issued inform actions!
  */
 public interface IJiacMessage extends IFact {
 

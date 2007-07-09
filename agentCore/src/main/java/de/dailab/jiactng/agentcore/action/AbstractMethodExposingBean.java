@@ -25,7 +25,7 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
  * @see ReturnTypes
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public abstract class AbstractMethodExposingBean extends AbstractAgentBean implements IEffector {
     private static final Class[] EMPTY_CLASSES= new Class[0];
@@ -75,7 +75,7 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
             int modifiers= method.getModifiers();
             
             // jump over static or non-accessible methods
-            if(Modifier.isStatic(modifiers) || !(Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers))) {
+            if(Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) {
                 continue;
             }
             

@@ -60,7 +60,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param group  the group to join
      */
     @Expose
-    protected abstract void joinGroup(IGroupAddress group);
+    public abstract void joinGroup(IGroupAddress group);
     
     /**
      * An invocation of this action will remove this agent from the specified group.
@@ -68,7 +68,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param group  the group to leave
      */
     @Expose
-    protected abstract void leaveGroup(IGroupAddress group);
+    public abstract void leaveGroup(IGroupAddress group);
     
     /**
      * This action will create a new message box for this agent. Messages that are sent to it
@@ -77,7 +77,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param messageBox    the address of the new message box
      */
     @Expose
-    protected abstract void createMessageBox(IMessageBoxAddress messageBox);
+    public abstract void createMessageBox(IMessageBoxAddress messageBox);
     
     /**
      * This action destroys the message box with the specified address.
@@ -85,7 +85,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param messageBox    the address to the message box which should be destroyed
      */
     @Expose
-    protected abstract void destroyMessageBox(IMessageBoxAddress messageBox);
+    public abstract void destroyMessageBox(IMessageBoxAddress messageBox);
     
     /**
      * Sends a message to the specified group. The group address might referenced
@@ -95,7 +95,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param group     the logical address of the group
      */
     @Expose
-    protected abstract void informGroup(IJiacMessage message, IGroupAddress group);
+    public abstract void informGroup(IJiacMessage message, IGroupAddress group);
     
     /**
      * Sends a message to another agents message box.
@@ -104,7 +104,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param messageBox    the address of the target message box
      */
     @Expose
-    protected abstract void informOne(IJiacMessage message, IMessageBoxAddress messageBox);
+    public abstract void informOne(IJiacMessage message, IMessageBoxAddress messageBox);
     
     /**
      * Request a remote action invocation.
@@ -113,5 +113,5 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param agentDescription  the agent description of the provider agent
      */
     @Expose
-    protected abstract void requestRemoteAction(DoAction doAction, AgentDescription agentDescription);
+    public abstract void requestRemoteAction(DoAction doAction, AgentDescription agentDescription);
  }

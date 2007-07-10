@@ -13,19 +13,14 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class ExampleExposingBean extends AbstractMethodExposingBean {
-    private final Log _log;
     
     public ExampleExposingBean() {
-        _log= LogFactory.getLog(getClass());
+        
     }
     
-    @Override
-    protected Log getLog() {
-        return _log;
-    }
     
     @Expose
     public boolean getFlag() {

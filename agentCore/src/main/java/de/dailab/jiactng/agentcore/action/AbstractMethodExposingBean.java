@@ -41,12 +41,13 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
             try {
                 Method method= getClass().getMethod(name.substring(sep + 1), action.getParameters());
                 Object result= method.invoke(this, doAction.getParams());
-                // TODO: where to go with the result?
+    			memory.write(doAction.getAction().createActionResult(
+    					doAction.getSession(), new Object[] { result }, doAction));
                 
                 return;
             } catch (NoSuchMethodException nsme) {
                 // simply fall through
-                getLog().debug("action name '" + name + "' contains method separation but is a method of mine"); 
+                log.debug("action name '" + name + "' contains method separation but is a method of mine"); 
             } catch (IllegalAccessException iae) {
                 // should not happen
                 throw new IllegalArgumentException("doAction references an non-accessible method", iae);
@@ -116,5 +117,4 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
     
     protected void overrideDoAction(DoAction doAction) {}
     protected List<? extends Action> overrideGetActions() {return Collections.emptyList();}
-    protected abstract Log getLog();
 }

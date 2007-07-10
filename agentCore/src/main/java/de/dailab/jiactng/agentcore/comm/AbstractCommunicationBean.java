@@ -4,10 +4,9 @@
 package de.dailab.jiactng.agentcore.comm;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
-import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.annotation.Expose;
+import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
-import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 /**
  * This bean specifies the way an agent communicates. It implements a message-based approach for information
@@ -17,41 +16,6 @@ import de.dailab.jiactng.agentcore.ontology.AgentDescription;
  * @version $Revision$
  */
 public abstract class AbstractCommunicationBean extends AbstractMethodExposingBean {
-//    /**
-//     * Action name for joining a group. An invocation will associate this agent with a further logical destination.
-//     */
-//    public final static String DO_JOIN_GROUP= AbstractCommunicationBean.class.getName() + "#joinGroup";
-//    
-//    /**
-//     * Action name for leaving a group.
-//     */
-//    public final static String DO_LEAVE_GROUP= AbstractCommunicationBean.class.getName() + "#leaveGroup";
-//    
-//    /**
-//     * Action name for creating a message box for this agent exclusivly.
-//     */
-//    public final static String DO_CREATE_MESSAGE_BOX= AbstractCommunicationBean.class.getName() + "#createMessageBox";
-//    
-//    /**
-//     * Action name for destroying an existing message box.
-//     */
-//    public final static String DO_DESTROY_MESSAGE_BOX= AbstractCommunicationBean.class.getName() + "#destroyMessageBox";
-//    
-//    /**
-//     * Action name for sending a message to a group of agents.
-//     */
-//    public final static String DO_INFORM_GROUP= AbstractCommunicationBean.class.getName() + "#informGroup";
-//    
-//    /**
-//     * Action name for sending a message directly to a message box.
-//     */
-//    public final static String DO_INFORM_ONE= AbstractCommunicationBean.class.getName() + "#informOne";
-//    
-//    /**
-//     * Action name for a remote action invocation.
-//     */
-//    public final static String DO_REQUEST_REMOTE_ACTION= AbstractCommunicationBean.class.getName() + "#requestRemoteAction";
-    
     protected AbstractCommunicationBean() {}
 
     /**
@@ -60,7 +24,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param group  the group to join
      */
     @Expose
-    public abstract void joinGroup(IGroupAddress group);
+    public abstract void joinGroup(IGroupAddress group) throws CommunicationException;
     
     /**
      * An invocation of this action will remove this agent from the specified group.
@@ -68,7 +32,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param group  the group to leave
      */
     @Expose
-    public abstract void leaveGroup(IGroupAddress group);
+    public abstract void leaveGroup(IGroupAddress group) throws CommunicationException;
     
     /**
      * This action will create a new message box for this agent. Messages that are sent to it
@@ -77,7 +41,7 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param messageBox    the address of the new message box
      */
     @Expose
-    public abstract void createMessageBox(IMessageBoxAddress messageBox);
+    public abstract void createMessageBox(IMessageBoxAddress messageBox) throws CommunicationException;
     
     /**
      * This action destroys the message box with the specified address.
@@ -85,33 +49,20 @@ public abstract class AbstractCommunicationBean extends AbstractMethodExposingBe
      * @param messageBox    the address to the message box which should be destroyed
      */
     @Expose
-    public abstract void destroyMessageBox(IMessageBoxAddress messageBox);
+    public abstract void destroyMessageBox(IMessageBoxAddress messageBox) throws CommunicationException;
     
     /**
-     * Sends a message to the specified group. The group address might referenced
-     * a closed group or an open group.
+     * This method sends a message to the given destination.
      * 
      * @param message   the message to send
-     * @param group     the logical address of the group
+     * @param address   the address which points 
      */
     @Expose
-    public abstract void informGroup(IJiacMessage message, IGroupAddress group);
+    public abstract void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException;
     
-    /**
-     * Sends a message to another agents message box.
-     * 
-     * @param message       the message to send
-     * @param messageBox    the address of the target message box
-     */
     @Expose
-    public abstract void informOne(IJiacMessage message, IMessageBoxAddress messageBox);
+    public abstract void sendInSession(IJiacMessage message, IEndPoint endpoint, String sessionId) throws CommunicationException;
     
-    /**
-     * Request a remote action invocation.
-     * 
-     * @param doAction          the identifier object for the remote action
-     * @param agentDescription  the agent description of the provider agent
-     */
-    @Expose
-    public abstract void requestRemoteAction(DoAction doAction, AgentDescription agentDescription);
- }
+//    public abstract IGroupAddress createGroupAddress(String groupName);
+//    public abstract IMessageBoxAddress createMessageBoxAddress(String boxName);
+}

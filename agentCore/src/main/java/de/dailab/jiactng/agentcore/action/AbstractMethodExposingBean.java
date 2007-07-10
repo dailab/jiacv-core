@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.annotation.Expose;
 import de.dailab.jiactng.agentcore.action.annotation.ReturnTypes;
@@ -47,21 +45,22 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
                 return;
             } catch (NoSuchMethodException nsme) {
                 // simply fall through
-                log.debug("action name '" + name + "' contains method separation but is a method of mine"); 
+                log.debug("action name '" + name + "' contains method separation but is not a method of mine"); 
             } catch (IllegalAccessException iae) {
                 // should not happen
-                throw new IllegalArgumentException("doAction references an non-accessible method", iae);
+                throw new IllegalArgumentException("doAction references a non-accessible method", iae);
             } catch (InvocationTargetException ite) {
                 // should not happen -> type checking have to be implemented in the DoAction constructor!
                 
                 Throwable cause= ite.getCause();
-                
-                // delegate runtime exceptions
-                if(cause != null && cause instanceof RuntimeException) {
-                    throw (RuntimeException) cause;
-                }
-                
-                throw new RuntimeException("action invocation failed", ite);
+                memory.write(action.createActionResult(doAction.getSession(), new Object[]{cause != null ? cause : ite}, doAction));
+                return;
+//                // delegate runtime exceptions
+//                if(cause != null && cause instanceof RuntimeException) {
+//                    throw (RuntimeException) cause;
+//                }
+//                
+//                throw new RuntimeException("action invocation failed", ite);
             }
         }
         

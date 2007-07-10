@@ -9,7 +9,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * Specifies an address for inter-agent communication.
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public interface ICommunicationAddress extends IFact {
     /**
@@ -19,4 +19,11 @@ public interface ICommunicationAddress extends IFact {
      * @return
      */
     String getAddress();
+    
+    /**
+     * Checks whether the destination this address references exists.
+     * 
+     * @return
+     */
+    boolean exists();
 }

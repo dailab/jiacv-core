@@ -75,10 +75,16 @@
 			<version>20060512</version>
 		</dependency>
 
-		<dependency>
+		<!-- dependency>
 			<groupId>org.apache</groupId>
 			<artifactId>activemq</artifactId>
 			<version>4.1.0-incubator</version>
+		</dependency -->
+	
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>apache-activemq</artifactId>
+			<version>4.1.1</version>
 		</dependency>
 
 		<dependency>

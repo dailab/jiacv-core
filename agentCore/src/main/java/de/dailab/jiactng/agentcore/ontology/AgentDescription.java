@@ -4,7 +4,7 @@ import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
- * Klasse zum Beschreiben eines Agenten. Sie enthält also META-Infos über den Agenten.
+ * Klasse zum Beschreiben eines Agenten. Sie enthï¿½lt also META-Infos ï¿½ber den Agenten.
  * Es ist nicht der Agent selbst.
  * @author janko
  * @author axle
@@ -75,6 +75,8 @@ public class AgentDescription implements IFact {
 
 	/**
 	 * @return the endpoint
+     * 
+     * TODO: vielleicht geht das hier noch schicker
 	 */
 	public IEndPoint getEndpoint() {
 		return endpoint;

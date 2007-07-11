@@ -4,7 +4,7 @@ public final class Version
 {	
 	private final static String NAME  		= "agentCore";	
 	private final static String NUMBER  	= "0.0.1-SNAPSHOT";
-	private final static String TIMESTAMP	= "11.07.2007 15:13:46";
+	private final static String TIMESTAMP	= "11.07.2007 15:36:49";
 	
 	/**
 	 *	@return jiac revision name 

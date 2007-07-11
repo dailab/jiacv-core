@@ -5,8 +5,6 @@ import java.io.Serializable;
  * ein Endpunkt einer Kommunikation - stellt also eine Adresse auf dem JIAC-JMS-Bus dar
  * @author janko
  *
- * 
- * FIXME: move this to de.dailab.jiactng.agentcore.comm
  */
 public interface IEndPoint extends Serializable {
 
@@ -17,7 +15,7 @@ public interface IEndPoint extends Serializable {
 	public String getUniversalId();
 	
 	/**
-	 * Gibt eine Platformweit eindeutige Id zurï¿½ck.
+	 * Gibt eine Platformweit eindeutige Id zurück.
 	 * @return
 	 */
 	public String getLocalId();

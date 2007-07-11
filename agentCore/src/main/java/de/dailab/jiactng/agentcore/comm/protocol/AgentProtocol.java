@@ -13,19 +13,15 @@ import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
-import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.DoRemoteAction;
-import de.dailab.jiactng.agentcore.action.RemoteAction;
 import de.dailab.jiactng.agentcore.action.RemoteActionResult;
-import de.dailab.jiactng.agentcore.comm.CommBean;
 import de.dailab.jiactng.agentcore.comm.IJiacSender;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
-import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 
 /**
  * Idee: Ein eigenens Protocol für die Agenten. Zusätzlich zu einem Protocol für die TNG-Platform. Hier werden also die
@@ -49,8 +45,7 @@ public class AgentProtocol implements IAgentProtocol {
 		ACK_AGT_GET_SERVICES,
 		ACK_AGT_GET_BEANNAMES,
 		ACK_AGT_NOP,
-		ACK_AGT_REMOTE_ACTIONRESULT,
-		ADV_REMOTE_ACTION
+		ACK_AGT_REMOTE_ACTIONRESULT
 	};
 
 	IJiacSender _topicSender;
@@ -59,8 +54,6 @@ public class AgentProtocol implements IAgentProtocol {
 	IAgent _agent;
 	/** Agent's factbase.*/
 	IMemory memory;
-	/** The CommBean that created this AgentProtocol. */
-	CommBean commBean;
 
 	/**
 	 * @param sender der Sender MIT dem eine Antwort verschickt wird
@@ -131,33 +124,18 @@ public class AgentProtocol implements IAgentProtocol {
 		if (msg != null) {
 			String operation = msg.getOperation();
 			if (operation != null) {
+				String type = operation.substring(0, 3);
 				IJiacMessage replyMessage = null;
-				if (operation.startsWith("ACK")) {
+				if ("ACK".equals(type)) {
 					replyMessage = doAcknowledge(msg);
-				} else if (operation.startsWith("CMD")) {
-					//ist es ein Kommando
-					replyMessage = doCommand(msg);
 				} else {
-					//kein Präfix, ist was anderes
-					return processOperation(msg);
+					// kein special Prefix, dann ist es ein Kommando
+					replyMessage = doCommand(msg);
 				}
 				// return doReply(replyMessage, destination, msg.getSender());
 				Destination senderDest = replyMessage == null ? null : replyMessage.getSender();
 				return doReply(replyMessage, destination, senderDest, getDefaultSender());
 			}
-		}
-		return PROCESSING_FAILED;
-	}
-
-	private int processOperation(IJiacMessage msg) {
-		String operation = msg.getOperation();
-		if (ADV_REMOTE_ACTION.equals(operation)) {
-			RemoteAction remoteAction = (RemoteAction)msg.getPayload();
-			memory.write(remoteAction);
-			Action action=remoteAction.getAction();
-			action.setProviderBean(commBean);
-			memory.write(action);
-			return PROCESSING_SUCCESS;
 		}
 		return PROCESSING_FAILED;
 	}
@@ -353,18 +331,11 @@ public class AgentProtocol implements IAgentProtocol {
 		return OPERATIONS;
 	}
 
-	private ActionResult processDoRemoteAction(DoAction doAction) {
+	private ActionResult processDoRemoteAction(DoAction action) {
 		log.debug("processDoRemoteAction");
-		memory.write(doAction);
-		//memory.read(new ActionResult(null, doAction, null, null, null), Long.MAX_VALUE);
+		memory.write(action);
+		//memory.read(new ActionResult(null, action, null, null, null), Long.MAX_VALUE);
 		return null;
-	}
-
-	/**
-	 * @param commBean the commBean to set
-	 */
-	public void setCommBean(CommBean commBean) {
-		this.commBean = commBean;
 	}
 
 }

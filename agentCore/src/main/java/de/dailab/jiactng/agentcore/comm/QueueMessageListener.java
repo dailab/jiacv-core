@@ -29,8 +29,8 @@ public class QueueMessageListener implements MessageListener {
 	}
 
 	/**
-	 * Empfängt die JMS Nachrichten, leitet an die CommBean und an das Protocol weiter. momentan wird jede ObjektNachricht
-	 * bestätigt.
+	 * Empfängt die JMS Nachrichten, leitet an die CommBean und an das Protocol weiter.
+	 * momentan wird jede ObjektNachricht bestätigt.
 	 */
 	public void onMessage(Message msg) {
 		log.debug("JiacMessageListener msg received");

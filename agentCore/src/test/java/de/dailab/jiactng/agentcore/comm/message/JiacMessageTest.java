@@ -28,14 +28,14 @@ public class JiacMessageTest extends TestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
-
+	/* Function set to private
 	public void testJiacMessageStringIJiacContentIEndPoint() {
 		JiacMessage jMsg = new JiacMessage(operation, payload, recipient );
 		assertEquals(operation, jMsg.getOperation());
 		assertEquals(payload, jMsg.getPayload());
 		assertEquals(recipient, jMsg.getEndPoint());
 	}
-	
+	*/
 
 	public void testJiacMessageStringIJiacContentIEndPointIEndPointDestination() {
 		JiacMessage jMsg = new JiacMessage(operation, payload, recipient, startPoint, replyTo );
@@ -53,15 +53,44 @@ public class JiacMessageTest extends TestCase {
 		assertEquals(recipient.getUniversalId() , jMsg.getJiacDestination());
 		
 		platformRecipient.setLocalId(platformRecipient.getLocalId() + JiacMessage.PLATFORM_ENDPOINT_EXTENSION);
-		jMsg.setEndPoint(platformRecipient);
+		jMsg = new JiacMessage(operation, payload, platformRecipient, startPoint, replyTo);
 		
 		assertEquals(platformRecipient.toString(), jMsg.getJiacDestination());
 		
 		platformRecipient.setLocalId("local");
 		platformRecipient.setUniversalId("universal");
-		jMsg.setEndPoint(platformRecipient);
+		jMsg = new JiacMessage(operation, payload, platformRecipient, startPoint, replyTo);
 		System.out.println(jMsg.getJiacDestination());
 		
+	}
+	
+	public void testNullPointerException(){
+		boolean caught = false;
+		try {
+			JiacMessage jMsg = new JiacMessage(operation, payload, null, startPoint, replyTo);
+		} catch (NullPointerException e) {
+			caught = true;
+		} finally {
+			assertTrue("No Recipient declared", caught);
+		}
+		
+		caught = false;
+		try {
+			JiacMessage jMsg = new JiacMessage(operation, payload, recipient, null, replyTo);
+		} catch (NullPointerException e) {
+			caught = true;
+		} finally {
+			assertTrue("No StartPoint declared", caught);
+		}
+		
+		caught = false;
+		try {
+			JiacMessage jMsg = new JiacMessage(operation, payload, null, null, replyTo);
+		} catch (NullPointerException e) {
+			caught = true;
+		} finally {
+			assertTrue("No Endpoints declared", caught);
+		}
 	}
 	
 }

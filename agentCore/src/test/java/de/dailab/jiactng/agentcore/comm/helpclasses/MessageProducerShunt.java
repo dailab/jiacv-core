@@ -8,6 +8,7 @@ import javax.jms.MessageProducer;
 public class MessageProducerShunt implements MessageProducer {
 
 	Message justSent = null;
+	long _timeToLive = 0;
 	
 	public void close(){}
 	public Destination getDestination(){return null;}
@@ -15,12 +16,14 @@ public class MessageProducerShunt implements MessageProducer {
 	public boolean getDisableMessageTimestamp(){return true; }
 	public int getPriority(){return 0;}
 	public int getDeliveryMode(){return 0;}
-	public long getTimeToLive(){return 0;}
+	public long getTimeToLive(){return _timeToLive;}
 	public void setDeliveryMode(int deliveryMode){}
 	public void setDisableMessageID(boolean value){}
 	public void setDisableMessageTimestamp(boolean value){}
 	public void setPriority(int defaultPriority){}
-	public void setTimeToLive(long timeToLive){}
+	public void setTimeToLive(long timeToLive){
+		_timeToLive = timeToLive;
+	}
 	
 	public void send(Destination destination, Message message){}
 	public void send(Destination destination, Message message, int deliveryMode, int priority, long timeToLive){}

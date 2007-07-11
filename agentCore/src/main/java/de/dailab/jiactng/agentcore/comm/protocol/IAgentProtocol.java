@@ -22,10 +22,6 @@ public interface IAgentProtocol extends IProtocolHandler {
 	public static final String ACK_AGT_NOP = "ACK_AGT_NOP";
 	public static final String ACK_AGT_REMOTE_ACTIONRESULT = "AGT_REMOTE_ACTIONRESULT";
 	
-	// No response necessary
-	/** Advertisements for actions which are usable remotely. */
-	public static final String ADV_REMOTE_ACTION = "REMOTE_ACTION_ADVERTISEMENT";
-	
 	// Created for Testing Purposes
 	public static final String ACK_AGT_GET_SERVICES_SUCESS = "ACK_SERVICES_SUCESS";
 	public static final String ACK_AGT_PONG_SUCESS = "ACK_AGT_PONG_SUCESS";

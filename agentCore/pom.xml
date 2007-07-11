@@ -120,6 +120,36 @@
 		</testResources -->
 
 		<plugins>						      		      
+
+        <!-- Assembly -->
+  			<plugin>
+  				<artifactId>maven-assembly-plugin</artifactId>
+  				<version>2.1</version>
+  				<executions>
+  					<execution>
+  						<phase>package</phase>
+  						<goals>
+  							<goal>assembly</goal>
+  						</goals>
+  					</execution>
+  				</executions>
+  				<configuration>
+  					<descriptors>
+  						<descriptor>
+  							${basedir}/standalone.assembly
+  						</descriptor>
+  					</descriptors>
+  					<outputDirectory>
+  						${project.build.directory}
+  					</outputDirectory>
+  					<workDirectory>
+  						${project.build.directory}/assembly/work
+  					</workDirectory>
+  				</configuration>
+  			</plugin>
+        <!-- End Assembly -->
+
+
 	      	<plugin>
 	        	<artifactId>maven-antrun-plugin</artifactId>
 	        	<executions>

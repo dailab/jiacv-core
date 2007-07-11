@@ -25,13 +25,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 /**
  * UtilityKlasse, die statische Methoden kapselt.
  * 
  * @author janko
- * 
- * FIXME: und wer faengt hier die moeglichen NullPointerExceptions?
  */
 public class Util {
 
@@ -75,7 +74,7 @@ public class Util {
 	}
 
 	/**
-	 * Erzeugt einen InitialenKontext fï¿½r den ActiveMQ zugriff.
+	 * Erzeugt einen InitialenKontext für den ActiveMQ zugriff.
 	 * 
 	 * @param factoryClassname der Name der ConnectionFactoryKlasse, die zum instanziieren von Connections verwendet
 	 *          werden soll
@@ -189,7 +188,7 @@ public class Util {
 	 * Hier wird der Selektor zum Filtern von Platform-Ping-Messages erzeugt
 	 * 
 	 * @param platformId die Id des senders
-	 * @return der String, der einen Selektor angibt, in dem das PING_PLATFORM_ID_PROPERTY ungleich dem ï¿½bergebenen ist
+	 * @return der String, der einen Selektor angibt, in dem das PING_PLATFORM_ID_PROPERTY ungleich dem übergebenen ist
 	 */
 	public static String createPlatformPingSelector(String platformId) {
 		String messageSelector = Constants.PING_PLATFORM_ID_PROPERTY + "<>'" + platformId + "'";
@@ -200,7 +199,7 @@ public class Util {
 	/**
 	 * Eine eindeutige Platform-Id, die IPadresse+":"+zeit
 	 * 
-	 * @id eine id um die erzeugte ID zusï¿½tzlich eindeutiger machen zu kï¿½nnen
+	 * @id eine id um die erzeugte ID zusätzlich eindeutiger machen zu können
 	 * @return
 	 */
 	public static String createPlatformId(long id) {
@@ -295,7 +294,7 @@ public class Util {
 	}
 
 	/**
-	 * Holt aus eine JMSMessage die JiacMessage raus, bei Fehler wird null zurï¿½ckgegeben
+	 * Holt aus eine JMSMessage die JiacMessage raus, bei Fehler wird null zurückgegeben
 	 * 
 	 * @param msg
 	 * @return die in der JMSMessage enthaltene JiacMessage, oder null bei fehler
@@ -322,7 +321,7 @@ public class Util {
 	/**
 	 * Erzeugt mit einer Session eine neue Queue
 	 * 
-	 * @param session die Session fï¿½r die die Queue erzeugt wird
+	 * @param session die Session für die die Queue erzeugt wird
 	 * @param destName
 	 * @return die erzeugte Queue, oder null wenn eingabewerte null waren
 	 */
@@ -337,7 +336,7 @@ public class Util {
 	/**
 	 * Erzeugt mit einer Session eine neue Topic
 	 * 
-	 * @param session die Session fï¿½r die die Topic erzeugt wird
+	 * @param session die Session für die die Topic erzeugt wird
 	 * @param destName
 	 * @return die erzeugte Topic, oder null wenn eingabewerte null waren
 	 */
@@ -350,7 +349,7 @@ public class Util {
 	}
 
 	/**
-	 * Erzeugt aus der eigenen IPAdresse einen kï¿½rzeren eindeutigen String, der einigemassen human readable ist. Es wird
+	 * Erzeugt aus der eigenen IPAdresse einen kürzeren eindeutigen String, der einigemassen human readable ist. Es wird
 	 * einfach in ein neues Zahlensystem mit 62 zeichen gewandelt.
 	 * 
 	 * @param ipAddress
@@ -397,7 +396,7 @@ public class Util {
 		if (msg != null && props != null) {
 			for (Iterator iter = props.keySet().iterator(); iter.hasNext();) {
 				String key = (String) iter.next();
-				Object value = props.getProperty(key);
+				Object value = props.get(key);
 				try {
 					if (value instanceof String) {
 						msg.setStringProperty(key, (String) value);
@@ -425,4 +424,35 @@ public class Util {
 			}
 		}
 	}
+
+	/**
+	 * Wandelt LifeCycleState in ein Lesbaren String um. Nur Testhalber, wenns einfacher geht.. ändern!
+	 * 
+	 * @param state
+	 * @return human readable String
+	 */
+	public static String getLcsName(ILifecycle.LifecycleStates state) {
+		if (state == ILifecycle.LifecycleStates.CLEANED_UP) {
+			return "CLEANED_UP";
+		} else if (state == ILifecycle.LifecycleStates.CLEANING_UP) {
+			return "CLEANING_UP";
+		} else if (state == ILifecycle.LifecycleStates.INITIALIZED) {
+			return "INITIALIZED";
+		} else if (state == ILifecycle.LifecycleStates.INITIALIZING) {
+			return "INITIALIZING";
+		} else if (state == ILifecycle.LifecycleStates.STARTED) {
+			return "STARTED";
+		} else if (state == ILifecycle.LifecycleStates.STARTING) {
+			return "STARTING";
+		} else if (state == ILifecycle.LifecycleStates.STOPPED) {
+			return "STOPPED";
+		} else if (state == ILifecycle.LifecycleStates.STOPPING) {
+			return "STOPPING";
+		} else if (state == ILifecycle.LifecycleStates.UNDEFINED) {
+			return "UNDEFINED";
+		} else {
+			return "xUNDEFINEDx";
+		}
+	}
+
 }

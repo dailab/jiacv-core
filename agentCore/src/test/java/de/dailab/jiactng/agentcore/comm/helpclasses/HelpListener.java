@@ -46,7 +46,7 @@ public class HelpListener implements de.dailab.jiactng.agentcore.comm.CommMessag
 	}
 
 	public void messageReceivedFromQueue(Message message){
-//		System.err.println("Hurra! Eine Nachricht! Packen wir sie ein! " + messages.size());
+//		System.err.println("Hurra! Eine Nachricht! Packen wir sie ein!");
 		queueMessages.add(message);
 //		System.err.println(messages.size());
 	}

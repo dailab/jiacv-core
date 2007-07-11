@@ -12,4 +12,8 @@ public class FakeDestination implements Destination {
 	public String getName(){
 		return _name;
 	}
+	
+	public String toString(){
+		return _name;
+	}
 }

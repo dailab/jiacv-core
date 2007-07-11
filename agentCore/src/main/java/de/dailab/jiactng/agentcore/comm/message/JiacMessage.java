@@ -19,7 +19,7 @@ public class JiacMessage implements IJiacMessage {
 	String _operation;
 	Destination _replyToDestination;
 
-	public JiacMessage(String operation, IJiacContent payload, IEndPoint recipient) {
+	private JiacMessage(String operation, IJiacContent payload, IEndPoint recipient) {
 		setOperation(operation);
 		setPayload(payload);
 		setEndPoint(recipient);
@@ -34,10 +34,16 @@ public class JiacMessage implements IJiacMessage {
 	 *          nicht definiert
 	 */
 	public JiacMessage(String operation, IJiacContent payload, IEndPoint recipient, IEndPoint startpoint,
-																					Destination sender) {
+																					Destination sender) throws NullPointerException{
 		this(operation, payload, recipient);
 		setSender(sender);
 		setStartPoint(startpoint);
+		if (recipient == null){
+			throw new NullPointerException("No recipient declared!");
+		}
+		if (startpoint == null){
+			throw new NullPointerException("No startpoint declared!");
+		}
 	}
 
 	public IJiacContent getPayload() {
@@ -52,7 +58,7 @@ public class JiacMessage implements IJiacMessage {
 		return _endpoint;
 	}
 
-	public void setEndPoint(IEndPoint recipient) {
+	private void setEndPoint(IEndPoint recipient) {
 		_endpoint = recipient;
 	}
 
@@ -60,7 +66,7 @@ public class JiacMessage implements IJiacMessage {
 		return _startpoint;
 	}
 
-	public void setStartPoint(IEndPoint startpoint) {
+	private void setStartPoint(IEndPoint startpoint) {
 		_startpoint = startpoint;
 	}
 

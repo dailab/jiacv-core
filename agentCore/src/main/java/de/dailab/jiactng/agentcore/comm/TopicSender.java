@@ -7,6 +7,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.Topic;
@@ -109,7 +110,8 @@ public class TopicSender implements IJiacSender {
 			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
 			// Hier wird entschieden, dass es sich um nen TopicPublisher handelt
-			publisher = ((TopicSession) _session).createPublisher(_topic);
+			publisher = (TopicPublisher) createProducer(_topic);
+//			publisher = ((TopicSession) _session).createPublisher(_topic);
 			// publisher.setTimeToLive(_topicTimeToLive);
 			publisher.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 			ObjectMessage msg = _session.createObjectMessage(message);
@@ -124,6 +126,16 @@ public class TopicSender implements IJiacSender {
 		}
 	}
 
+	protected MessageProducer createProducer(Destination destination){
+		TopicPublisher publisher = null;
+		try {
+			publisher = ((TopicSession) _session).createPublisher(_topic);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		return publisher;
+	}
+	
 	private void dbgLog(String text) {
 		log.debug("[TopicSender:" + getDebugId() + "]>>> " + text);
 	}

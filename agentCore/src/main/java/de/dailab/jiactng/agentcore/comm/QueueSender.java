@@ -13,6 +13,7 @@ import javax.jms.Session;
 import org.apache.activemq.pool.ConnectionPool;
 
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 
 /**
  * Ein JMS Sender für Jiac Tng.. Soll aber Springkonform sein, d.h. öffentliche Properties, die als gesetzt angesehen
@@ -36,8 +37,6 @@ public class QueueSender implements IJiacSender {
 	 */
 	Destination _defaultReplyDestination;
 
-	int _defaultTimeout = 1000;
-
 	public QueueSender(ConnectionFactory connectionFactory, String queueName) {
 		_connectionFactory = (QueueConnectionFactory)connectionFactory;
 		_destinationName = queueName;
@@ -50,11 +49,13 @@ public class QueueSender implements IJiacSender {
 			_connection = _connectionFactory.createConnection();
 			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			_destination = createQueue(_destinationName);
-			_defaultReplyDestination = _destination;
+			_defaultReplyDestination = _destination; // wirklich Sinnvoll?
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
 	}
+
+	int _defaultTimeout = 1000;
 
 	private Queue createQueue(String queueName) throws JMSException {
 		_destinationName = queueName;
@@ -70,13 +71,36 @@ public class QueueSender implements IJiacSender {
 	/**
 	 * Verschickt per JMS eine JIAC-Nachricht.
 	 * 
-	 * @param message die Nachricht
-	 * @param destinationName eine im JNDI hinterlegte Destination
+	 * @param message the message to send
+	 * @param replyToDestination a destination from within the JNDI to which to reply to. If null the startPoint is used.
 	 * @param timeToLive in ms
 	 */
 	public void sendMessage(IJiacMessage message, Destination replyToDestination, long timeToLive) {
+		Destination destination = _destination;
+		
+		// Check if EndPoint is set and create Destination to it.
+		if (message.getEndPoint() != null){
+			try {
+				destination = _session.createQueue(message.getEndPoint().toString());
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if (replyToDestination == null){
+			// Check if StartPoint is set and create Homedestination to reply to
+			if (message.getStartPoint() != null){
+				try {
+					replyToDestination = _session.createQueue(message.getStartPoint().toString());
+				} catch (JMSException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		
 		try {
-			sendMessage(message, _destination, replyToDestination, timeToLive);
+			sendMessage(message, destination, replyToDestination, timeToLive);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -84,14 +108,35 @@ public class QueueSender implements IJiacSender {
 
 	/**
 	 * Verschickt per JMS eine JIAC-Nachricht.
+	 * Sollte kein Empfänger oder Absender angegeben sein, werden die Lücken durch Defaults gefüllt.
 	 * 
 	 * @param message die Nachricht
-	 * @param destinationName eine im JNDI hinterlegte Destination
-	 * @param timeToLive in ms
 	 */
 	public void send(IJiacMessage message) {
+		Destination destination = _destination;
+		Destination replyToDest = _defaultReplyDestination;
+		
+		// Check if EndPoint is set and create Destination to it.
+		if (message.getEndPoint() != null){
+			try {
+				destination = _session.createQueue(message.getEndPoint().toString());
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// Check if StartPoint is set and create Homedestination to reply to
+		if (message.getStartPoint() != null){
+			try {
+				replyToDest = _session.createQueue(message.getStartPoint().toString());
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// tries to send the message
 		try {
-			sendMessage(message, _destination, _defaultReplyDestination, _defaultTimeout);
+			sendMessage(message, destination, replyToDest, _defaultTimeout);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -102,11 +147,50 @@ public class QueueSender implements IJiacSender {
 	 * 
 	 * @param message die Nachricht
 	 * @param destinationName eine im JNDI hinterlegte Destination
-	 * @param timeToLive in ms
 	 */
 	public void send(IJiacMessage message, String destinationName) {
+		Destination destination = _destination;
+		Destination replyToDest = _defaultReplyDestination;
+		
+		// Check if destinationName is set
+		if ((destinationName == null) || (destinationName == "")){
+			// if destinationName isn't set extract address from message
+			// Check if EndPoint is set and create Destination to it.
+			if (message.getEndPoint() != null){
+				try {
+					destination = _session.createQueue(message.getEndPoint().toString());
+				} catch (JMSException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			// if destinationName is set create Destination from it
+			try {
+				destination = _session.createQueue(destinationName);
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		// Check if StartPoint is set and create Homedestination to reply to
+		if (message.getStartPoint() != null){
+			try {
+				replyToDest = _session.createQueue(message.getStartPoint().toString());
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		/*
+		 * At last send the message.
+		 * destination created from destinationName if possible. 
+		 * 	Otherwise retrieved from the message if possible
+		 * 	Otherwise retrieved from Defaultvalues of this Sender
+		 * replyToDest checked out of message if possible
+		 * 	Otherwise retrieved from Defaultvalues of this Sender
+		 */
 		try {
-			sendMessage(message, createQueue(destinationName), _defaultReplyDestination, _defaultTimeout);
+			sendMessage(message, destination, replyToDest, _defaultTimeout);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -120,8 +204,32 @@ public class QueueSender implements IJiacSender {
 	 * @param timeToLive in ms
 	 */
 	public void send(IJiacMessage message, Destination destination) {
+		// if destination == null get it from the message or the defaults
+		if (destination == null){
+			if (message.getEndPoint() != null){
+				try {
+					destination = _session.createQueue(message.getEndPoint().toString());
+				} catch (JMSException e) {
+					e.printStackTrace();
+				}
+			} else {
+				destination = _destination;
+			}
+		}
+		
+		Destination replyToDest = _defaultReplyDestination;
+				
+		// Check if StartPoint is set and create Homedestination to reply to
+		if (message.getStartPoint() != null){
+			try {
+				replyToDest = _session.createQueue(message.getStartPoint().toString());
+			} catch (JMSException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		try {
-			sendMessage(message, destination, _defaultReplyDestination, _defaultTimeout);
+			sendMessage(message, destination, replyToDest, _defaultTimeout);
 			_destination = destination;
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -137,19 +245,46 @@ public class QueueSender implements IJiacSender {
 	 * @param timeToLive in ms
 	 */
 	public void sendMessage(IJiacMessage message, Destination destination, Destination replyToDestination, long timeToLive) {
+		// if parameterDestinations == null, try to get destinations from message
+		// if messageDestiatnions == null too, use defaultValues
+		if (destination == null){
+			destination = _destination;
+			if (message.getEndPoint() != null){
+				try {
+					destination = _session.createQueue(message.getEndPoint().toString());
+				} catch (JMSException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		System.err.println("Destination: " + destination);
+		if (replyToDestination == null){
+			replyToDestination = _defaultReplyDestination;
+			if (message.getStartPoint() != null){
+				try {
+					replyToDestination = _session.createQueue(message.getStartPoint().toString());
+				} catch (JMSException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
 		dbgLog("sending... to " + destination.toString() + " / '" + message.getEndPoint().toString() + "'");
 		MessageProducer producer = null;
 		try {
 			dbgLog(" schicke JiacMsg ab:\n" + message.toString());
-			producer = _session.createProducer(destination);
+			producer = createProducer(destination);
 			producer.setTimeToLive(timeToLive);
 			ObjectMessage objectMessage = _session.createObjectMessage(message);
 			objectMessage.setStringProperty(Constants.ADDRESS_PROPERTY, message.getJiacDestination());
 			System.out.println(Constants.ADDRESS_PROPERTY + "===" + message.getJiacDestination());
-			if (replyToDestination == null) {
-				replyToDestination = _defaultReplyDestination;
-			}
+			// wird oben nun miterledigt.
+//			if (replyToDestination == null) {
+//				replyToDestination = _defaultReplyDestination;
+//			} 
 			objectMessage.setJMSReplyTo(replyToDestination);
+			objectMessage.setJMSDestination(destination);
+
 			dbgLog(" verpackt in dieser ObjectMsg:\n" + objectMessage.toString());
 			producer.send(objectMessage);
 		} catch (JMSException e) {
@@ -159,6 +294,16 @@ public class QueueSender implements IJiacSender {
 			Util.closeAll(null, null, producer, null);
 		}
 		dbgLog("Sending done");
+	}
+	
+	protected MessageProducer createProducer(Destination destination){
+		MessageProducer producer = null;
+		try {
+			producer = _session.createProducer(destination);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		return producer;
 	}
 
 	private void dbgLog(String text) {

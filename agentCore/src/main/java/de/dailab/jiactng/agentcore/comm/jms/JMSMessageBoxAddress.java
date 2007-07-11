@@ -14,6 +14,7 @@ import de.dailab.jiactng.agentcore.comm.jms.JMSCommunicationSystem.AddressProper
  * @author Marcel Patzlaff
  * @version $Revision$
  */
+@SuppressWarnings("serial")
 class JMSMessageBoxAddress extends JMSCommunicationAddress implements IMessageBoxAddress {
     public JMSMessageBoxAddress(String address) {
         super(address);
@@ -21,6 +22,11 @@ class JMSMessageBoxAddress extends JMSCommunicationAddress implements IMessageBo
 
     public final boolean isLocal() {
         return JMSCommunicationSystem.checkAddressProperty(this, AddressProperty.LOCAL);
+    }
+
+    @Override
+    public String toString() {
+        return "message-box://" + getAddress();
     }
 
     @Override

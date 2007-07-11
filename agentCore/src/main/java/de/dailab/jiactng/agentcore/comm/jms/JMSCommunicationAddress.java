@@ -30,4 +30,7 @@ abstract class JMSCommunicationAddress implements ICommunicationAddress {
     }
     
     abstract Destination convertToDestination(Session session) throws JMSException;
+    
+    @Override
+    public abstract String toString();
 }

@@ -14,6 +14,7 @@ import de.dailab.jiactng.agentcore.comm.jms.JMSCommunicationSystem.AddressProper
  * @author Marcel Patzlaff
  * @version $Revision$
  */
+@SuppressWarnings("serial")
 class JMSGroupAddress extends JMSCommunicationAddress implements IGroupAddress {
     public JMSGroupAddress(String address) {
         super(address);
@@ -23,6 +24,11 @@ class JMSGroupAddress extends JMSCommunicationAddress implements IGroupAddress {
         return JMSCommunicationSystem.checkAddressProperty(this, AddressProperty.CLOSED);
     }
 
+    @Override
+    public String toString() {
+        return "group://" + getAddress();
+    }
+    
     @Override
     Destination convertToDestination(Session session) throws JMSException {
         return session.createTopic(getAddress());

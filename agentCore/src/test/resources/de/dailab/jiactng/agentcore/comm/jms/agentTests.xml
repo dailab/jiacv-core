@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+  - Application context definition for "example" DispatcherServlet.
+  -->
+<beans>
+
+  <bean name="PingPongPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+    <property name="agents">
+      <list>
+        <ref bean="Pinger"/>
+        <ref bean="Ponger"/>
+      </list>
+    </property>
+  </bean>
+
+
+  <bean name="Pinger" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
+    <property name="memory"><ref bean="memory"/></property>
+    <property name="execution"><ref bean="simpleExecCycle"/></property>
+    <property name="agentBeans">
+      <list>
+        <ref bean="communicationBean"/>
+        <ref bean="pingerBean"/>
+      </list>
+    </property>
+  </bean>
+  
+  <bean name="Ponger" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
+    <property name="memory"><ref bean="memory"/></property>
+    <property name="execution"><ref bean="simpleExecCycle"/></property>
+    <property name="agentBeans">
+      <list>
+        <ref bean="communicationBean"/>
+        <ref bean="pongerBean"/>
+      </list>
+    </property>
+  </bean>
+  
+  <bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
+    <!--property name="timeOut" value="-1"/-->
+  </bean>
+  
+  <bean name="pongerBean" class="de.dailab.jiactng.agentcore.comm.jms.PongerBean" singleton="false"/>
+  <bean name="pingerBean" class="de.dailab.jiactng.agentcore.comm.jms.PingerBean" singleton="false"/>
+
+  <bean name="communicationBean" class="de.dailab.jiactng.agentcore.comm.jms.JMSCommunicationBean" singleton="false">
+   <property name="connectionFactory"><ref bean="amqConnectionFactory"/></property>
+   <property name="agentNodeName" value="dietbert"/>
+  </bean>
+
+  <bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false">
+  </bean>
+  
+  <bean name="amqConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory" singleton="false">
+  </bean>
+
+</beans>

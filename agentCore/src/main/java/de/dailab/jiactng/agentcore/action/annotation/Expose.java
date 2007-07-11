@@ -20,7 +20,7 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
  * @see ReturnTypes
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

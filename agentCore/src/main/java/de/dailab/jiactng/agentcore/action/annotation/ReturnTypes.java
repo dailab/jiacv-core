@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  * @see Expose
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 
 @Retention(RetentionPolicy.RUNTIME)

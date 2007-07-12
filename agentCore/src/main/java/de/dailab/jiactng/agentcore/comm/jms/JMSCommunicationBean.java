@@ -112,7 +112,7 @@ public class JMSCommunicationBean extends AbstractCommunicationBean {
 
     @Override
     public void createMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
-        assertValidArgument("messageBoxAddress is not valid", messageBox, JMSMessageBoxAddress.class);
+        assertValidArgument("messageBox is not valid", messageBox, JMSMessageBoxAddress.class);
         try {
             _receiver.receive((JMSCommunicationAddress) messageBox, null);
         } catch (JMSException je) {
@@ -122,7 +122,7 @@ public class JMSCommunicationBean extends AbstractCommunicationBean {
 
     @Override
     public void destroyMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
-        assertValidArgument("messageBoxAddress is not valid", messageBox, JMSMessageBoxAddress.class);
+        assertValidArgument("messageBox is not valid", messageBox, JMSMessageBoxAddress.class);
         try {
             _receiver.stopReceive((JMSCommunicationAddress) messageBox, null);
         } catch (JMSException je) {
@@ -132,7 +132,7 @@ public class JMSCommunicationBean extends AbstractCommunicationBean {
 
     @Override
     public void joinGroup(IGroupAddress group) throws CommunicationException {
-        assertValidArgument("messageBoxAddress is not valid", group, JMSGroupAddress.class);
+        assertValidArgument("group is not valid", group, JMSGroupAddress.class);
         try {
             _receiver.receive((JMSCommunicationAddress) group, null);
         } catch (JMSException je) {
@@ -142,7 +142,7 @@ public class JMSCommunicationBean extends AbstractCommunicationBean {
 
     @Override
     public void leaveGroup(IGroupAddress group) throws CommunicationException {
-        assertValidArgument("messageBoxAddress is not valid", group, JMSGroupAddress.class);
+        assertValidArgument("group is not valid", group, JMSGroupAddress.class);
         try {
             _receiver.stopReceive((JMSCommunicationAddress) group, null);
         } catch (JMSException je) {

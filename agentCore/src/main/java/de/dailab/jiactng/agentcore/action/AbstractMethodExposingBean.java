@@ -16,7 +16,6 @@ import java.util.Set;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.annotation.Expose;
-import de.dailab.jiactng.agentcore.action.annotation.ReturnTypes;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 
 /**
@@ -24,7 +23,6 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
  * {@link Expose} annotation.
  * 
  * @see Expose
- * @see ReturnTypes
  * 
  * @author Marcel Patzlaff
  * @version $Revision$
@@ -166,8 +164,7 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
             Class returnType= method.getReturnType();
             Class[] returnTypes;
             if(returnType.isArray()) {
-                ReturnTypes rtAnno= method.getAnnotation(ReturnTypes.class);
-                returnTypes= rtAnno != null ? rtAnno.value() : new Class[]{returnType};
+                returnTypes= expAnno.returnTypes().length > 0 ? expAnno.returnTypes() : new Class[]{returnType};
             } else {
                 returnTypes= returnType == void.class ? EMPTY_CLASSES : new Class[]{returnType};
             }

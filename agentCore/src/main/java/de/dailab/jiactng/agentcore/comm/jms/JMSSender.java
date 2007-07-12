@@ -107,7 +107,6 @@ class JMSSender {
             producer.setTimeToLive(timeToLive);
             ObjectMessage objectMessage = _session.createObjectMessage(message);
             objectMessage.setStringProperty(Constants.ADDRESS_PROPERTY, message.getJiacDestination());
-            System.out.println(Constants.ADDRESS_PROPERTY + "===" + message.getJiacDestination());
  
 //            objectMessage.setJMSReplyTo(replyToDestination);
             objectMessage.setJMSDestination(destination);

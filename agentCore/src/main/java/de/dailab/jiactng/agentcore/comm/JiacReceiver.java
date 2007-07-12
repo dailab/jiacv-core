@@ -31,6 +31,7 @@ public class JiacReceiver implements MessageListener{
 	Session _session;
 	Destination _queue;
 	CommBeanV2 _parent;
+	MessageConsumer _consumer = null;
 	
 	IProtocolHandler _protocol;
 	
@@ -56,9 +57,7 @@ public class JiacReceiver implements MessageListener{
 			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			_queue = _session.createQueue(_parent.getAddress().toString());
 			MessageConsumer consumer = _session.createConsumer(_queue);
-			consumer.setMessageListener(this);
-			ConsumerData consumerData = new ConsumerData(consumer, _queue.toString(), this, null);
-			_consumerList.add(consumerData);
+			_consumer = consumer;
 			_connection.start();
 		} catch (Exception e) {
 			log.error(e.getStackTrace());
@@ -69,6 +68,7 @@ public class JiacReceiver implements MessageListener{
 	public void doCleanup(){
 		try {
 			this.stopReceiveAll();
+			_consumer.close();
 			_session.close();
 			_connection.close();
 		} catch (JMSException e) {

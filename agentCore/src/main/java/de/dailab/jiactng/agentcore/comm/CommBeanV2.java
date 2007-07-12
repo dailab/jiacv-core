@@ -237,6 +237,14 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 	}
 	
 	/**
+	 * Stops receivment of all messages from all destinations by closing and removing consumer.
+	 * Exception: the standardqueue for the commbean used will remain open until doCleanup() is called.
+	 */
+	public void stopReceiveAll(){
+		_receiver.stopReceiveAll();
+	}
+	
+	/**
 	 * Initialisiert einen neuen Consumer für eine temporäre Queue und hängt den gegebenen Listener dran. und gibt die
 	 * erzeugte temporary Queue zurück.
 	 * 

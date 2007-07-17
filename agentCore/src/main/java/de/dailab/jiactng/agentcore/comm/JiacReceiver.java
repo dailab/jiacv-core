@@ -24,6 +24,16 @@ import org.apache.commons.logging.LogFactory;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.protocol.IProtocolHandler;
 
+/**
+ * 
+ * JiacReceiver is a ServiceClass for CommBeanV2, offering functionality for managing messagelisteners
+ * on JMS destinations. 
+ * 
+ * @author Loeffelholz
+ *
+ */
+
+
 public class JiacReceiver implements MessageListener{
 	Log log = LogFactory.getLog(getClass());
 	ConnectionFactory _connectionFactory;
@@ -31,6 +41,7 @@ public class JiacReceiver implements MessageListener{
 	Session _session;
 	Destination _queue;
 	CommBeanV2 _parent;
+	
 	MessageConsumer _consumer = null;
 	
 	IProtocolHandler _protocol;
@@ -42,64 +53,75 @@ public class JiacReceiver implements MessageListener{
 	String _debugId;
 
 	public JiacReceiver(ConnectionFactory connectionFactory, CommBeanV2 parent) {
-		//log.debug("Creating JiacReceiver");
+		log.debug("Creating JiacReceiver");
 		_connectionFactory = (ConnectionFactory) connectionFactory;
 		_parent = parent;
-
+		
 		doInit();
 	}
 
+	/**
+	 * Initializes the JiacReceiver creating a MessageConsumer for receiving messages to the CommBean
+	 */
 	public void doInit() {
-		//log.debug("JiacReceiver initializing");
+		log.debug("JiacReceiver initializing");
 		try {
-			//log.debug("QueueReceiver.init");
 			_connection = _connectionFactory.createConnection();
 			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			_queue = _session.createQueue(_parent.getAddress().toString());
-			MessageConsumer consumer = _session.createConsumer(_queue);
-			_consumer = consumer;
+			_consumer = _session.createConsumer(_queue);
+			_consumer.setMessageListener(this);
 			_connection.start();
 		} catch (Exception e) {
 			log.error(e.getStackTrace());
-			e.printStackTrace();
 		}
+		
+		log.debug("JiacReceiver initilized");
 	}
 	
+	/**
+	 * commence Cleanup procedures, closing all consumers and connections.
+	 */
 	public void doCleanup(){
+		log.debug("JiacReceiver.doCleanup");
 		try {
 			this.stopReceiveAll();
 			_consumer.close();
 			_session.close();
 			_connection.close();
 		} catch (JMSException e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 	}
 	
 	private Queue createQueue(String queueName) {
+		log.debug("creating Queue: " + queueName);
+		
 		Queue queue = null;
 		try {
 			_destinationName = queueName;
 			queue = _session.createQueue(queueName);
 			_destination = queue;
 		} catch (JMSException e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 		return queue;
 	}
 	
 	private Topic createTopic(String topicName) {
+		log.debug("creating Topic: " + topicName);
+		
 		Topic topic = null;
 		try {
 			topic = _session.createTopic(topicName);
 		} catch (JMSException e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 		return topic;
 	}
 	
 	/**
-	 * Initialisiert einen neuen Consumer für die gegebenene destination und hängt den gegebenen Listener dran.
+	 * Initializing a new Consumer using the given destination and setting the given Listener to it.
 	 * 
 	 * @param listener the MessageListener used to get onto the messages
 	 * @param destinationName the Name of the destination from which the Messages will be sent
@@ -107,6 +129,7 @@ public class JiacReceiver implements MessageListener{
 	 * @param selector a selector to get only special messages
 	 */
 	public void receive(MessageListener listener, String destinationName, boolean topic, String selector) {
+		log.debug("Creating destination for JiacReceiver.receive");
 		Destination destination = null;
 		if (topic)
 			destination = createTopic(destinationName);
@@ -118,20 +141,22 @@ public class JiacReceiver implements MessageListener{
 	}
 
 	/**
-	 * Initialisiert einen neuen Consumer für die gegebenene destination und hängt den gegebenen Listener dran.
+	 * Initializing a new Consumer using the given destination and setting the given Listener to it.
 	 * 
 	 * @param listener the MessageListener used to get onto the messages
 	 * @param destination the destination from which the Messages will be sent
 	 * @param selector a selector to get only special messages
 	 */
 	public void receive(MessageListener listener, Destination destination, String selector) {
+		log.debug("JiacReceiver.receive");
+		
 		try {
 			MessageConsumer consumer = _session.createConsumer(destination, selector);
 			consumer.setMessageListener(listener);
 			ConsumerData consumerData = new ConsumerData(consumer, destination.toString(), listener, selector);
 			_consumerList.add(consumerData);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 		
 	}
@@ -145,6 +170,8 @@ public class JiacReceiver implements MessageListener{
 	 * @param selector			a selector to recieve only special messages
 	 */
 	public void stopReceive(String destinationName, boolean topic, MessageListener listener, String selector){
+		log.debug("creating Destination for JiacReceiver.stopReceive");
+		
 		Destination destination = null;
 		if (topic)
 			destination = createTopic(destinationName);
@@ -163,6 +190,8 @@ public class JiacReceiver implements MessageListener{
 	 * @param selector			a selector to recieve only special messages
 	 */
 	public void stopReceive(Destination destination, MessageListener listener, String selector){
+		log.debug("JiacReceiver.stopReceive");
+		
 		ListIterator<ConsumerData> list = _consumerList.listIterator();
 		
 		while (list.hasNext()){ // lets go and find it
@@ -179,7 +208,7 @@ public class JiacReceiver implements MessageListener{
 							// after finding it let's close it.
 							consumerData.getConsumer().close();
 						} catch (JMSException e) {
-							e.printStackTrace();
+							log.error(e.getStackTrace());
 						} // end try
 						
 						// one last thing to do... let's remove it from the list.
@@ -192,14 +221,18 @@ public class JiacReceiver implements MessageListener{
 		
 	}
 	
+	/**
+	 * stops receiving Messages from all enlisted Destinations except the Commbean itself.
+	 */
 	public void stopReceiveAll(){
+		log.debug("JiacReceiver.stopReceiveAll");
 		ListIterator<ConsumerData> list = _consumerList.listIterator();
 		
 		while(list.hasNext()){
 			try {
 				list.next().getConsumer().close();
 			} catch (JMSException e) {
-				e.printStackTrace();
+				log.error(e.getStackTrace());
 			}
 		}
 		_consumerList.clear();	
@@ -210,13 +243,15 @@ public class JiacReceiver implements MessageListener{
 	 * receives messages from the defaultQueue of the CommBean
 	 */
 	public void onMessage(Message message){
+		log.debug("JiacReceiver receiving Message");
+		
 		Destination dest= null;
 		try {
 			dest = message.getJMSReplyTo();
 		} catch (JMSException e1) {
-			e1.printStackTrace();
+			log.error(e1.getStackTrace());
 		}
-		//log.debug("Message received from " + dest);
+		log.debug("Message received from " + dest);
 		if ((message != null) && (message instanceof ObjectMessage)) {
 			ObjectMessage objectMessage = (ObjectMessage) message;
 			try {
@@ -224,12 +259,12 @@ public class JiacReceiver implements MessageListener{
 				if (content instanceof IJiacMessage) {
 					IJiacMessage jiacMessage = (IJiacMessage) content;
 					Object payload = jiacMessage.getPayload();
-					//log.debug("<<<received Payload:" + payload);
+					log.debug("<<<received Payload:" + payload.toString());
 //					_protocol.processMessage(message);
 				}
 				message.acknowledge();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error(e.getStackTrace());
 			}
 		}
 	}
@@ -237,15 +272,16 @@ public class JiacReceiver implements MessageListener{
 	// and now... all regarding services for "outsiders"
 	
 	/**
-	 * Initialisiert einen neuen Consumer für eine temporäre Queue und hängt den gegebenen Listener dran. und gibt die
-	 * erzeugte temporary Queue zurück.
+	 * Initializes a new Consumer for a temporary Queue and setting the given Listener, returning the created
+	 * temporary Queue
 	 * 
-	 * @param selektor	To select only special Messages from the destination
+	 * @param selector	To select only special Messages from the destination
 	 * @param listener	the Listener whom should get all the messages from this Destination
 	 * @param selector	a selector to recieve only special messages
-	 * @return die Queue auf die gesendet werden kann
+	 * @return TemporaryQueue to send to and receive from
 	 */
 	public TemporaryQueue receiveFromTemporaryQueue(MessageListener listener, String selector) {
+		log.debug("creating TemporaryQueue");
 		try {
 			TemporaryQueue temporaryQueue = _session.createTemporaryQueue();
 			MessageConsumer consumer = _session.createConsumer(temporaryQueue, selector);
@@ -256,21 +292,22 @@ public class JiacReceiver implements MessageListener{
 
 			return temporaryQueue;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 		return null;
 	}
 	
 	/**
-	 * Initialisiert einen neuen Consumer für eine temporäre Queue und hängt den gegebenen Listener dran. und gibt die
-	 * erzeugte temporary Queue zurück.
+	 * Initializes a new Consumer for a temporary Topic and setting the given Listener, returning the created
+	 * temporary Queue
 	 * 
-	 * @param selektor	To select only special Messages from the destination
+	 * @param selector	To select only special Messages from the destination
 	 * @param listener	the Listener whom should get all the messages from this Destination
 	 * @param selector	a selector to recieve only special messages
-	 * @return die Queue auf die gesendet werden kann
+	 * @return TemporaryQueue to send to and receive from
 	 */
 	public TemporaryTopic receiveFromTemporaryTopic(MessageListener listener, String selector) {
+		log.debug("creating TemporaryTopic");
 		try {
 			TemporaryTopic temporaryTopic = _session.createTemporaryTopic();
 			MessageConsumer consumer = _session.createConsumer(temporaryTopic, selector);
@@ -281,7 +318,7 @@ public class JiacReceiver implements MessageListener{
 
 			return temporaryTopic;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 		return null;
 	}

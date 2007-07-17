@@ -13,6 +13,8 @@ import javax.jms.ObjectMessage;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.comm.CommBeanV2;
 import de.dailab.jiactng.agentcore.comm.helpclasses.TestContent;
@@ -37,10 +39,10 @@ public class TestCommBean implements MessageListener {
 	private static boolean transacted = false;
 	private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(username, password, url);
 	
-	
 	private static Connection connection;
 	private static Session session; 
-		
+	
+	Log log = LogFactory.getLog(getClass());
 	
 	/**
 	 * @param args
@@ -52,6 +54,8 @@ public class TestCommBean implements MessageListener {
 	}
 	
 	public void run(){
+		log.debug("begin of demonstration");
+		
 		IJiacContent payload = new TestContent();
 		
 		CommBeanV2 cBean = new CommBeanV2();
@@ -72,9 +76,8 @@ public class TestCommBean implements MessageListener {
 		boolean topic = false;
 		boolean isTalking = true;
 		
-		// Begin with the First One
-		System.out.println("Bitte einen Namen fuer die CommBean eingeben");
 		
+		System.out.println("Bitte einen Namen fuer die CommBean eingeben");
 		try {
 			input = keyboard.readLine();
 		} catch (IOException e) {
@@ -84,7 +87,6 @@ public class TestCommBean implements MessageListener {
 		
 		// Topic
 		System.out.println("Bitte den Namen des Topics eingeben");
-		
 		try {
 			input = keyboard.readLine();
 		} catch (IOException e) {
@@ -96,20 +98,22 @@ public class TestCommBean implements MessageListener {
 		
 		doInit();
 		topicChannel = setupChannel(topicName, true);
-		System.out.println("Setting up topicChannel to " + topicChannel);
+		log.debug("Setting up topicChannel to " + topicChannel);
 		listenChannel = setupChannel(cBeanName, false);
-		System.out.println("Setting up listenChannel to " + listenChannel);
+		log.debug("Setting up listenChannel to " + listenChannel);
 		cBean = setupCommBean(cBean, cBeanName);
 		
 		cBean.receive(this, listenChannel, null);
 		cBean.receive(this, topicChannel, null);
 		
+		System.out.println("type \"quit\" to terminate the chat");
 		while(isTalking){
+			log.debug("Let's begin with the Chat");
 			System.out.println("Bitte etwas eingeben ({[t.Name]/[q.Name]}.Nachricht)");
 			try {
 				input = keyboard.readLine();
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error(e.getStackTrace());
 			}
 			
 			if (0 == input.toString().compareToIgnoreCase("quit")){
@@ -121,6 +125,7 @@ public class TestCommBean implements MessageListener {
 				cBean.send(jMessage, topicChannel);
 			
 			} else if ( ((input.startsWith("t.") || (input.startsWith("q.")))) && (input != "") ){
+				boolean isValidInput = false;
 				
 				topic = targetIsTopic(input);
 				text = input.substring(input.indexOf(".") + 1);
@@ -133,6 +138,7 @@ public class TestCommBean implements MessageListener {
 					cBean.send(jMessage, chatChannel);
 				}
 			}
+			
 			
 		}
 		
@@ -147,18 +153,18 @@ public class TestCommBean implements MessageListener {
 	
 	public void doInit(){
 		// Connection and Session Setup
-		System.out.println("initializing connection");
+		log.debug("initializing connection");
 		try {
 			connection = connectionFactory.createConnection();
 			connection.start();
 			session = connection.createSession(transacted, Session.AUTO_ACKNOWLEDGE);
 		} catch (JMSException e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 	}
 
 	private Destination setupChannel(String channelName, boolean topic){
-		System.out.println("Setting up Channel");
+		log.debug("Setting up Channel");
 		Destination chatChannel = null;
 		try {
 			if (topic)
@@ -166,21 +172,21 @@ public class TestCommBean implements MessageListener {
 			else
 				chatChannel = session.createQueue(channelName);
 		} catch (JMSException e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 		return chatChannel;
 	}
 	
 	
 	private CommBeanV2 setupCommBean(CommBeanV2 cBean, String cBeanName){
-		System.out.println("Setting up CommBean");
+		log.debug("Setting up CommBean");
 		// CommBean Setup
 		cBean.setConnectionFactory(connectionFactory);
 		cBean.setAgentNodeName(cBeanName);
 		try {
 			cBean.doInit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 		return cBean;
 	}
@@ -202,7 +208,7 @@ public class TestCommBean implements MessageListener {
 				topic = (message.getJMSDestination().toString().startsWith("topic"));
 				origin = message.getJMSDestination().toString().substring(8);
 			} catch (JMSException e) {
-				e.printStackTrace();
+				log.error(e.getStackTrace());
 			}
 			content = jMessage.getPayload();
 			if (content instanceof TestContent){
@@ -216,13 +222,13 @@ public class TestCommBean implements MessageListener {
 	
 	
 	public void doCleanup(){
-		System.out.println("Commencing Cleanup");
+		log.debug("Commencing Cleanup");
 		try {
 			session.close();
 			connection.close();
 		} catch (JMSException e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
-		System.out.println("Cleanup completed");
+		log.debug("Cleanup completed");
 	}
 }

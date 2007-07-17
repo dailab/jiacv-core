@@ -79,13 +79,15 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 	
 	public CommBeanV2() {
 		super();
+		log.debug("CommBeanV2 created");
 	}
 
 	/**
-	 * Erzeugt zwei Communicatoren mit dem defaultTopic und der DefaultQueue
+	 * Initialisiert die CommBean. Notwendige Parameter: AgentNodeName
 	 */
 	@Override
 	public void doInit() throws Exception {
+		log.debug("doInit");
 		super.doInit();
 	
 		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
@@ -103,12 +105,15 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 		
 		_sender = new JiacSender(_connectionFactory);
 		_receiver = new JiacReceiver(_connectionFactory, this);
+		log.debug("doneInit");
 		
 	}
 	
 	public void doCleanup(){
+		log.debug("doCleanup");
 		_receiver.doCleanup();
 		_sender.doCleanup();
+		log.debug("doneCleanup");
 	}
 
 
@@ -234,14 +239,6 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 	 */
 	public void stopReceive(Destination destination, MessageListener listener, String selector){
 		_receiver.stopReceive(destination, listener, selector);
-	}
-	
-	/**
-	 * Stops receivment of all messages from all destinations by closing and removing consumer.
-	 * Exception: the standardqueue for the commbean used will remain open until doCleanup() is called.
-	 */
-	public void stopReceiveAll(){
-		_receiver.stopReceiveAll();
 	}
 	
 	/**

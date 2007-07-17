@@ -19,7 +19,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 
 /**
- * JiacSender is used within the CommBean to send JMS Messages through an ActiveMQBroker
+ * JiacSender is used within the CommBeanV2 to send JMS Messages through an ActiveMQBroker
  * @author Loeffelholz
  *
  */
@@ -37,58 +37,62 @@ public class JiacSender implements IJiacSender{
 	private int _defaultTimeOut = 0;
 
 	public JiacSender(ConnectionFactory connectionFactory) {
-		//log.debug("Creating JiacSender");
+		log.debug("Creating JiacSender");
 		_connectionFactory = (ConnectionFactory)connectionFactory;
 		doInit();
 	}
 	
 	public void doInit() {
+		log.debug("JiacSender.doInit");
 		try {
-			//log.debug("JiacSender initializing");
-			System.out.println("JiacSender.init");
+			log.debug("JiacSender initializing");
 			_connection = _connectionFactory.createConnection();
 			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		} catch (Exception e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 	}
 	
 	public void doCleanup(){
+		log.debug("JiacSender.doCleanup");
 		try {
 			_session.close();
 			_connection.close();
 		} catch (JMSException e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 	}
 	
 	
 	private Queue createQueue(String queueName) {
+		log.debug("creating Queue: " + queueName);
 		Queue queue = null;
 		try {
 			queue = _session.createQueue(queueName);
 		} catch (JMSException e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 		return queue;
 	}
 	
 	private Topic createTopic(String topicName) {
+		log.debug("creating Topic: " + topicName);
 		Topic topic = null;
 		try {
 			topic = _session.createTopic(topicName);
 		} catch (JMSException e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 		return topic;
 	}
 	
 	protected MessageProducer createProducer(Destination destination){
+		log.debug("creating MessageProducer for Destination: " + destination.toString());
 		MessageProducer producer = null;
 		try {
 			producer = _session.createProducer(destination);
 		} catch (JMSException e) {
-			e.printStackTrace();
+			log.error(e.getStackTrace());
 		}
 		return producer;
 	}
@@ -114,7 +118,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			sendMessage(message, null, null, false, _defaultTimeOut);
 		} catch (Exception e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 	}
 
@@ -122,7 +126,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			sendMessage(message, null, null, true, _defaultTimeOut);
 		} catch (Exception e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 	}
 	
@@ -130,6 +134,7 @@ public class JiacSender implements IJiacSender{
 	 * JiacMessage, DestinationName
 	 */
 	public void send(IJiacMessage message, String destinationName, boolean topic) {
+		log.debug("creating Destination: " + destinationName);
 		Destination destination = null;
 		if ((destinationName != null) || (destinationName != "")){
 			if (topic)
@@ -137,10 +142,11 @@ public class JiacSender implements IJiacSender{
 			else
 				destination = createQueue(destinationName);
 		}
+		
 		try {
 			sendMessage(message, destination, null, topic, _defaultTimeOut);
 		} catch (Exception e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 	}
 	
@@ -160,7 +166,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			sendMessage(message, destination, null, (destination.getClass() == Topic.class), _defaultTimeOut);
 		} catch (Exception e) {
-			e.printStackTrace(System.err);
+			log.error(e.getStackTrace());
 		}
 	}
 
@@ -170,11 +176,14 @@ public class JiacSender implements IJiacSender{
 	
 	/*
 	 * the real sendMessage :-)
+	 * 
+	 * sends message to destination using replyToDestination as replyToAdress giving the message timeToLive in ms
+	 * timeToLive = 0 means: no timeout
 	 */
 	public void sendMessage(IJiacMessage message, Destination destination, Destination replyToDestination, boolean topic, long timeToLive) {
 		// if parameterDestinations == null, try to get destinations from message
 		// if messageDestinations == null too, use defaultValues
-//		System.err.println("Sending Message to " + destination.toString());
+		log.debug("Sending Message to " + destination.toString());
 		if (destination == null){
 			if (message.getEndPoint() != null){
 				if (topic)
@@ -183,7 +192,6 @@ public class JiacSender implements IJiacSender{
 					destination = createQueue(message.getEndPoint().toString());
 			}
 		}
-		//log.debug("Sending Message to " + destination);
 		
 		if (replyToDestination == null){
 			replyToDestination = _defaultReplyTo;
@@ -191,32 +199,32 @@ public class JiacSender implements IJiacSender{
 				try {
 					replyToDestination = _session.createQueue(message.getStartPoint().toString());
 				} catch (JMSException e) {
-					e.printStackTrace();
+					log.error(e.getStackTrace());
 				}
 			}
 		}
-		//log.debug("using replytoDestination " + replyToDestination);
+		log.debug("using replytoDestination " + replyToDestination);
 		
-		//log.debug("Begin of sending procedure... now!");
+		log.debug("Begin of sending procedure... now!");
 		MessageProducer producer = null;
+
 		try {
 			producer = createProducer(destination);
 			producer.setTimeToLive(timeToLive);
 			ObjectMessage objectMessage = _session.createObjectMessage(message);
 			objectMessage.setStringProperty(Constants.ADDRESS_PROPERTY, message.getJiacDestination());
-			System.out.println(Constants.ADDRESS_PROPERTY + "===" + message.getJiacDestination());
- 
+			
+			log.debug("Jiac-Recipient: " + message.getJiacDestination());
+
 			objectMessage.setJMSReplyTo(replyToDestination);
 			objectMessage.setJMSDestination(destination);
 
 			producer.send(objectMessage);
+			producer.close();
 		} catch (JMSException e) {
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-		} finally {
-			Util.closeAll(null, null, producer, null);
+			log.error(e.getStackTrace());
 		}
-		//log.debug("Sending Procedure done");
+		log.debug("Sending Procedure done");
 	}
 	
 	

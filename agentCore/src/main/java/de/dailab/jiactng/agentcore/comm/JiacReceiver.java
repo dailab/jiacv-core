@@ -128,7 +128,7 @@ public class JiacReceiver implements MessageListener{
 	 * @param topic    is the destination to listen on a topic? (true/false)
 	 * @param selector a selector to get only special messages
 	 */
-	public void receive(MessageListener listener, String destinationName, boolean topic, String selector) {
+	public Destination receive(MessageListener listener, String destinationName, boolean topic, String selector) {
 		log.debug("Creating destination for JiacReceiver.receive");
 		Destination destination = null;
 		if (topic)
@@ -137,6 +137,7 @@ public class JiacReceiver implements MessageListener{
 			destination = createQueue(destinationName);
 		
 		receive(listener, destination, selector);
+		return destination;
 		
 	}
 

@@ -83,7 +83,7 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 	}
 
 	/**
-	 * Initialisiert die CommBean. Notwendige Parameter: AgentNodeName
+	 * Initialisiert die CommBean. Notwendige Parameter: ConnectionFactory, AgentNodeName
 	 */
 	@Override
 	public void doInit() throws Exception {
@@ -91,17 +91,24 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 		super.doInit();
 	
 		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
-		if ((_agentNodeName == null) || (_agentNodeName == ""))
-			throw new Exception("No AgentNodeName set!");
 		
-		if (thisAgent != null && thisAgent.getAgentNode() != null) {
-			setAgentNodeName(thisAgent.getAgentNode().getName());
+		if (thisAgent != null) {
+			_address = (EndPoint) EndPointFactory.createEndPoint(thisAgent.getAgentName());
+		
+			if (thisAgent.getAgentNode() != null) {
+				setAgentNodeName(thisAgent.getAgentNode().getName());
+			}
+		} else {
+			_address = (EndPoint) EndPointFactory.createEndPoint(getAgentNodeName());
 		}
 		
 		
-		_address = (EndPoint) EndPointFactory.createEndPoint(getAgentNodeName());
+		// TODO: Plattformname wieder rausnehmen. AgentNodeName verwenden
 		_platformName = _address.getUniversalId();
-		_platformAddress = new EndPoint(_platformName, "PLATFORM");
+		_platformAddress = new EndPoint(getAgentNodeName());
+		
+		if ((_agentNodeName == null) || (_agentNodeName == ""))
+			throw new Exception("No AgentNodeName set!");
 		
 		_sender = new JiacSender(_connectionFactory);
 		_receiver = new JiacReceiver(_connectionFactory, this);
@@ -180,6 +187,10 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 		_sender.publish(message);
 	}
 
+	public void publish(IJiacMessage message, String destinationName) {
+		_sender.send(message, destinationName, true);
+	}
+	
 	public void publish(String operation, IJiacContent payload, IEndPoint receiverAddress) {
 		IJiacMessage msg = new JiacMessage(operation, payload, receiverAddress, _address, null);
 		publish(msg);
@@ -202,9 +213,11 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 	 * @param listener the MessageListener used to get onto the messages
 	 * @param destinationName the Name of the destination from which the Messages will be sent
 	 * @param topic    is the destination to listen on a topic? (true/false)
+	 * 
+	 * @return Destination the Destination the listener was set to.
 	 */
-	public void receive(MessageListener listener, String destinationName, boolean topic, String selector) {
-		_receiver.receive(listener, destinationName, topic, selector);
+	public Destination receive(MessageListener listener, String destinationName, boolean topic, String selector) {
+		return _receiver.receive(listener, destinationName, topic, selector);
 	}
 	
 	/**

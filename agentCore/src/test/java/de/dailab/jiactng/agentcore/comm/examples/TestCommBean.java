@@ -103,14 +103,12 @@ public class TestCommBean implements MessageListener {
 		
 		
 		doInit();
-		topicChannel = setupChannel(topicName, true);
-		log.debug("Setting up topicChannel to " + topicChannel);
-		listenChannel = setupChannel(cBeanName, false);
-		log.debug("Setting up listenChannel to " + listenChannel);
+		log.debug("Setting up topicChannel to " + topicName);
+		log.debug("Setting up listenChannel to " + cBeanName);
 		cBean = setupCommBean(cBean, cBeanName);
 		
-		cBean.receive(this, listenChannel, null);
-		cBean.receive(this, topicChannel, null);
+		listenChannel = cBean.receive(this, cBeanName, false, null);
+		topicChannel = cBean.receive(this, topicName, true, null);
 		
 		System.out.println("type \"quit\" to terminate the chat");
 		while(isTalking){
@@ -140,8 +138,7 @@ public class TestCommBean implements MessageListener {
 					text = text.substring(text.indexOf(".") + 1);
 					payload = new TestContent(text);
 					JiacMessage jMessage = new JiacMessage("Chatting", payload, receiver, startpoint, listenChannel);
-					chatChannel = setupChannel(targetName, topic);
-					cBean.send(jMessage, chatChannel);
+					cBean.send(jMessage, targetName, topic);
 				}
 			}
 			
@@ -172,29 +169,8 @@ public class TestCommBean implements MessageListener {
 		
 		// Connection and Session Setup
 		log.debug("initializing connection");
-		try {
-			connection = connectionFactory.createConnection();
-			connection.start();
-			session = connection.createSession(transacted, Session.AUTO_ACKNOWLEDGE);
-		} catch (JMSException e) {
-			log.error(e.getCause());
-		}
 	}
 
-	private Destination setupChannel(String channelName, boolean topic){
-		log.debug("Setting up Channel");
-		Destination chatChannel = null;
-		try {
-			if (topic)
-				chatChannel = session.createTopic(channelName);
-			else
-				chatChannel = session.createQueue(channelName);
-		} catch (JMSException e) {
-			log.error(e.getCause());
-		}
-		return chatChannel;
-	}
-	
 	
 	private CommBeanV2 setupCommBean(CommBeanV2 cBean, String cBeanName){
 		log.debug("Setting up CommBean");
@@ -241,13 +217,6 @@ public class TestCommBean implements MessageListener {
 	
 	public void doCleanup(){
 		log.debug("Commencing Cleanup");
-		try {
-			session.close();
-			connection.close();
-		} catch (JMSException e) {
-			log.error(e.getCause());
-		}
-		log.debug("Cleanup completed");
 		
 		try {
 			broker.doStop();
@@ -256,5 +225,6 @@ public class TestCommBean implements MessageListener {
 			log.error(e.getCause());
 		}
 		
+		log.debug("Cleanup completed");
 	}
 }

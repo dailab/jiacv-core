@@ -49,7 +49,7 @@ public class JiacSender implements IJiacSender{
 			_connection = _connectionFactory.createConnection();
 			_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 	}
 	
@@ -59,7 +59,7 @@ public class JiacSender implements IJiacSender{
 			_session.close();
 			_connection.close();
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 	}
 	
@@ -70,7 +70,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			queue = _session.createQueue(queueName);
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return queue;
 	}
@@ -81,7 +81,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			topic = _session.createTopic(topicName);
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return topic;
 	}
@@ -92,7 +92,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			producer = _session.createProducer(destination);
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return producer;
 	}
@@ -118,7 +118,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			sendMessage(message, null, null, false, _defaultTimeOut);
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 	}
 
@@ -126,7 +126,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			sendMessage(message, null, null, true, _defaultTimeOut);
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 	}
 	
@@ -146,7 +146,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			sendMessage(message, destination, null, topic, _defaultTimeOut);
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 	}
 	
@@ -166,7 +166,7 @@ public class JiacSender implements IJiacSender{
 		try {
 			sendMessage(message, destination, null, (destination.getClass() == Topic.class), _defaultTimeOut);
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 	}
 
@@ -199,7 +199,7 @@ public class JiacSender implements IJiacSender{
 				try {
 					replyToDestination = _session.createQueue(message.getStartPoint().toString());
 				} catch (JMSException e) {
-					log.error(e.getStackTrace());
+					log.error(e.getCause());
 				}
 			}
 		}
@@ -222,7 +222,7 @@ public class JiacSender implements IJiacSender{
 			producer.send(objectMessage);
 			producer.close();
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		log.debug("Sending Procedure done");
 	}

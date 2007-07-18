@@ -94,9 +94,9 @@ public class CommBeanV2 extends AbstractAgentBean implements IEffector {
 		if ((_agentNodeName == null) || (_agentNodeName == ""))
 			throw new Exception("No AgentNodeName set!");
 		
-//		if (thisAgent != null && thisAgent.getAgentNode() != null) {
-//			setAgentNodeName(thisAgent.getAgentNode().getName());
-//		}
+		if (thisAgent != null && thisAgent.getAgentNode() != null) {
+			setAgentNodeName(thisAgent.getAgentNode().getName());
+		}
 		
 		
 		_address = (EndPoint) EndPointFactory.createEndPoint(getAgentNodeName());

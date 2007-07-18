@@ -50,15 +50,17 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 			broker.addNetworkConnector(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
 			connector.getDiscoveryAgent().setBrokerName(values.getName());
 		} catch (BindException be) {
-			// address is in use already
+			log.error(be.getCause().toString());
+			log.warn("No Broker will be started");
+			broker = null;
 		}
 		log.debug("embedded broker initialized. url = " + values.getUrl());
 	}
 
 	public void doStart() throws Exception {
-		log.debug("starting broker");
 		// start broker
 		if (broker != null) {
+			log.debug("starting broker");
 			connector.start();
 			broker.start();
 			log.debug("broker started");
@@ -68,18 +70,24 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 	}
 
 	public void doStop() throws Exception {
-		log.debug("stopping broker");
 		// stop broker
 		if (broker != null) {
+			log.debug("stopping broker");
 			connector.stop();
 			broker.stop();
 			log.debug("broker stopped");
+		} else {
+			log.warn("No Broker found to stop");
 		}
 	}
 
 	public void doCleanup() throws Exception {
-		log.debug("cleaning up broker");
-		log.debug("broker cleaned up");
+		if (broker != null){
+			log.debug("cleaning up broker");
+			log.debug("broker cleaned up");
+		} else {
+			log.warn("No Broker to cleanup");
+		}
 	}
 
 	/**
@@ -98,7 +106,7 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 		try {
 			cleanup();
 		} catch (LifecycleException le) {
-			le.printStackTrace();
+			log.error(le.getCause());
 		}
 	}
 

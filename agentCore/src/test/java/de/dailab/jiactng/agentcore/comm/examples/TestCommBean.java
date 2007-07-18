@@ -22,6 +22,8 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.EndPoint;
 import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
+import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
+import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 
 
 /**
@@ -42,6 +44,9 @@ public class TestCommBean implements MessageListener {
 	private static Connection connection;
 	private static Session session; 
 	
+	BrokerValues values = BrokerValues.getDefaultInstance();
+	JmsBrokerAMQ broker = new JmsBrokerAMQ();
+	
 	Log log = LogFactory.getLog(getClass());
 	
 	/**
@@ -54,6 +59,7 @@ public class TestCommBean implements MessageListener {
 	}
 	
 	public void run(){
+		
 		log.debug("begin of demonstration");
 		
 		IJiacContent payload = new TestContent();
@@ -113,7 +119,7 @@ public class TestCommBean implements MessageListener {
 			try {
 				input = keyboard.readLine();
 			} catch (IOException e) {
-				log.error(e.getStackTrace());
+				log.error(e.getCause());
 			}
 			
 			if (0 == input.toString().compareToIgnoreCase("quit")){
@@ -152,6 +158,18 @@ public class TestCommBean implements MessageListener {
 	}
 	
 	public void doInit(){
+		// Broker Setup
+
+		broker.setValues(values);
+		broker.setLog(log);
+		try {
+			broker.doInit();
+			broker.doStart();
+		} catch (Exception e1) {
+			log.error(e1.getCause());
+		}
+		
+		
 		// Connection and Session Setup
 		log.debug("initializing connection");
 		try {
@@ -159,7 +177,7 @@ public class TestCommBean implements MessageListener {
 			connection.start();
 			session = connection.createSession(transacted, Session.AUTO_ACKNOWLEDGE);
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 	}
 
@@ -172,7 +190,7 @@ public class TestCommBean implements MessageListener {
 			else
 				chatChannel = session.createQueue(channelName);
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return chatChannel;
 	}
@@ -186,7 +204,7 @@ public class TestCommBean implements MessageListener {
 		try {
 			cBean.doInit();
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return cBean;
 	}
@@ -208,7 +226,7 @@ public class TestCommBean implements MessageListener {
 				topic = (message.getJMSDestination().toString().startsWith("topic"));
 				origin = message.getJMSDestination().toString().substring(8);
 			} catch (JMSException e) {
-				log.error(e.getStackTrace());
+				log.error(e.getCause());
 			}
 			content = jMessage.getPayload();
 			if (content instanceof TestContent){
@@ -227,8 +245,16 @@ public class TestCommBean implements MessageListener {
 			session.close();
 			connection.close();
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		log.debug("Cleanup completed");
+		
+		try {
+			broker.doStop();
+			broker.doCleanup();
+		} catch (Exception e) {
+			log.error(e.getCause());
+		}
+		
 	}
 }

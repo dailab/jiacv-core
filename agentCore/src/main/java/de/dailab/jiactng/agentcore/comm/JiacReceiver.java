@@ -73,7 +73,7 @@ public class JiacReceiver implements MessageListener{
 			_consumer.setMessageListener(this);
 			_connection.start();
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		
 		log.debug("JiacReceiver initilized");
@@ -90,7 +90,7 @@ public class JiacReceiver implements MessageListener{
 			_session.close();
 			_connection.close();
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 	}
 	
@@ -103,7 +103,7 @@ public class JiacReceiver implements MessageListener{
 			queue = _session.createQueue(queueName);
 			_destination = queue;
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return queue;
 	}
@@ -115,7 +115,7 @@ public class JiacReceiver implements MessageListener{
 		try {
 			topic = _session.createTopic(topicName);
 		} catch (JMSException e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return topic;
 	}
@@ -156,7 +156,7 @@ public class JiacReceiver implements MessageListener{
 			ConsumerData consumerData = new ConsumerData(consumer, destination.toString(), listener, selector);
 			_consumerList.add(consumerData);
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		
 	}
@@ -208,7 +208,7 @@ public class JiacReceiver implements MessageListener{
 							// after finding it let's close it.
 							consumerData.getConsumer().close();
 						} catch (JMSException e) {
-							log.error(e.getStackTrace());
+							log.error(e.getCause());
 						} // end try
 						
 						// one last thing to do... let's remove it from the list.
@@ -232,7 +232,7 @@ public class JiacReceiver implements MessageListener{
 			try {
 				list.next().getConsumer().close();
 			} catch (JMSException e) {
-				log.error(e.getStackTrace());
+				log.error(e.getCause());
 			}
 		}
 		_consumerList.clear();	
@@ -249,7 +249,7 @@ public class JiacReceiver implements MessageListener{
 		try {
 			dest = message.getJMSReplyTo();
 		} catch (JMSException e1) {
-			log.error(e1.getStackTrace());
+			log.error(e1.getCause());
 		}
 		log.debug("Message received from " + dest);
 		if ((message != null) && (message instanceof ObjectMessage)) {
@@ -264,7 +264,7 @@ public class JiacReceiver implements MessageListener{
 				}
 				message.acknowledge();
 			} catch (Exception e) {
-				log.error(e.getStackTrace());
+				log.error(e.getCause());
 			}
 		}
 	}
@@ -292,7 +292,7 @@ public class JiacReceiver implements MessageListener{
 
 			return temporaryQueue;
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return null;
 	}
@@ -318,7 +318,7 @@ public class JiacReceiver implements MessageListener{
 
 			return temporaryTopic;
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getCause());
 		}
 		return null;
 	}

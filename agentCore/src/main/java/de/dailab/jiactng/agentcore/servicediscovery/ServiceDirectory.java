@@ -9,11 +9,12 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.dailab.jiactng.agentcore.comm.CommBean;
+import de.dailab.jiactng.agentcore.comm.GroupAddress;
+import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.jms.CommBeanV2;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
-import de.dailab.jiactng.agentcore.comm.protocol.IServiceProtocol;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 
 /**
@@ -26,7 +27,11 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	Log log = LogFactory.getLog(getClass());
 	
 	// um auf die topic zu schreiben
-	CommBean _commBean;
+	CommBeanV2 _commBean;
+	
+	// TO DO: HIER DIE GEWÜNSCHTE SERVICETOPIC ERSTELLEN
+	ICommunicationAddress _serviceTopic = new GroupAddress("ServiceTopic");
+	
 	// zum speichern der Servicebeschreibungen
 	ServiceDirectoryMemory memory;
 	
@@ -114,8 +119,8 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 */
 	private JiacMessage createJiacMessage(IServiceDescription serviceDesc) {
 		IJiacContent content = new ObjectContent(serviceDesc);
-		JiacMessage msg = new JiacMessage(IServiceProtocol.PUB_SERVICE, content, null, _commBean.getAddress(), _commBean
-																						.getCommunicator().getSender().getDefaultReplyDestination());
+		
+		JiacMessage msg = new JiacMessage(content, _serviceTopic);
 		return msg;
 	}
 
@@ -207,11 +212,11 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 		return null;
 	}
 
-	public CommBean getCommBean() {
+	public CommBeanV2 getCommBean() {
 		return _commBean;
 	}
 
-	public void setCommBean(CommBean commBean) {
+	public void setCommBean(CommBeanV2 commBean) {
 		_commBean = commBean;
 	}
 

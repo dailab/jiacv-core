@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.comm.message;
 
 import javax.jms.Destination;
 
+import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
@@ -9,7 +10,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * verschiedenen inhalte bieten sollen.
  * Momentan existiert FileContent und ObjectContent.
  * 
- * @author janko
+ * @author janko, löffelholz
  */
 public interface IJiacMessage extends IFact {
 
@@ -21,46 +22,10 @@ public interface IJiacMessage extends IFact {
 	public IJiacContent getPayload();
 
 	/**
-	 * Liefert den Endpunkt der Nachricht. Dieser wird in der JMS-Nachricht als Property gesetzt, damit danach im Consumer
-	 * selektiert werden kann Der Endpoint ist der Empfänger der Nachricht.
+	 * Who did sent me this Message?
 	 * 
-	 * @return
+	 * @return ICommunicationAddress	the address from where the Message is sent.
 	 */
-	public IEndPoint getEndPoint();
+	public ICommunicationAddress getSender();
 
-	/**
-	 * Der Typ der Nachricht, Befehl/Ergebnis/Fehlerhinweis
-	 * 
-	 * @return
-	 */
-	public String getOperation();
-
-	/**
-	 * Der Sender ist die JMS-Queue oder Topic
-	 * 
-	 * @return
-	 */
-	public Destination getSender();
-
-	/**
-	 * Der Sender ist die JMS-Queue oder Topic
-	 * 
-	 * @return
-	 */
-	public void setSender(Destination destination);
-
-	/**
-	 * Der Absender der Nachricht
-	 * 
-	 * @return
-	 */
-	public IEndPoint getStartPoint();
-
-	/**
-	 * Ermittelt die jiacAdressierung aus vorhandenen daten. Unterscheidet zwischen To-Agent und To-Platform Adresse.
-	 * Dieser Wert wird dann als Property an der JMS-Message gesetzt, so dass danach selektiert werden kann.
-	 * 
-	 * @return
-	 */
-	public String getJiacDestination();
 }

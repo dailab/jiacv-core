@@ -37,7 +37,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
-import de.dailab.jiactng.agentcore.comm.CommBean;
 import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
@@ -835,72 +834,72 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @return information about the service directory of this agent node
 	 */
 	public CompositeData getServiceDirectoryData() {
-		if (_serviceDirectory == null) {
+//		if (_serviceDirectory == null) {
+//			return null;
+//		}
+//		
+//		// create commBean data
+//		String[] commBeanItemNames = new String[] {"UniversalId", "LocalId", "QueueReceiverQueueName", "QueueSenderDestinationName", "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName", "ProtocolType"};
+//		CompositeDataSupport commBeanData = null;
+//		CompositeType commBeanType = null;
+//		try {
+//			commBeanType = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Communication bean data", commBeanItemNames, new String[] {"UniversalId", "LocalId", "QueueReceiverQueueName", "QueueSenderDestinationName", "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName", "ProtocolType"}, new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING});
+//			CommBean commBean = _serviceDirectory.getCommBean();
+//			if (commBean != null) {
+//				Object[] commBeanValues = new Object[] {null, null, null, null, null, null, commBean.getDefaultQueueName(), commBean.getDefaultTopicName(), commBean.getProtocolType()};
+//				if (commBean.getAddress() != null) {
+//					commBeanValues[0] = commBean.getAddress().getUniversalId();
+//					commBeanValues[1] = commBean.getAddress().getLocalId();
+//				}
+//				if (commBean.getCommunicator() != null) {
+//					if (commBean.getCommunicator().getReceiver() != null) {
+//						commBeanValues[2] = commBean.getCommunicator().getReceiver().getQueueName();						
+//					}
+//					if (commBean.getCommunicator().getSender() != null) {
+//						commBeanValues[3] = commBean.getCommunicator().getSender().getDestinationName();						
+//					}
+//				}
+//				if (commBean.getTopicCommunicator() != null) {
+//					if (commBean.getTopicCommunicator().getReceiver() != null) {
+//						commBeanValues[4] = commBean.getTopicCommunicator().getReceiver().getTopicName();						
+//					}
+//					if (commBean.getTopicCommunicator().getSender() != null) {
+//						commBeanValues[5] = commBean.getTopicCommunicator().getSender().getTopicName();						
+//					}
+//				}
+//				commBeanData = new CompositeDataSupport(commBeanType, commBeanItemNames, commBeanValues);
+//			}
+//		}
+//		catch (OpenDataException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		// get name of all services
+//		List<IServiceDescription> allServices = _serviceDirectory.getAllServices();
+//		int size = allServices.size();
+//		String[] allServiceNames = new String[size];
+//		for (int i=0; i<size; i++) {
+//			allServiceNames[i] = allServices.get(i).getName();
+//		}
+//		
+//		// get name of all web services
+//		List<IServiceDescription> allWebServices = _serviceDirectory.getAllWebServices();
+//		size = allWebServices.size();
+//		String[] allWebServiceNames = new String[size];
+//		for (int i=0; i<size; i++) {
+//			allWebServiceNames[i] = allWebServices.get(i).getName();
+//		}
+//		
+//		// create service directory data
+//		String[] itemNames = new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "CommBean"};
+//		try {
+//			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Service directory data", itemNames, new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "CommBean"}, new OpenType[] {SimpleType.INTEGER, SimpleType.INTEGER, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), commBeanType});
+//			return new CompositeDataSupport(type, itemNames, new Object[] {_serviceDirectory.getPublishTimer(), _serviceDirectory.getServiceNumber(), allWebServiceNames, allServiceNames, commBeanData});
+//		}
+//		catch (OpenDataException e) {
+//			e.printStackTrace();
 			return null;
-		}
-		
-		// create commBean data
-		String[] commBeanItemNames = new String[] {"UniversalId", "LocalId", "QueueReceiverQueueName", "QueueSenderDestinationName", "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName", "ProtocolType"};
-		CompositeDataSupport commBeanData = null;
-		CompositeType commBeanType = null;
-		try {
-			commBeanType = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Communication bean data", commBeanItemNames, new String[] {"UniversalId", "LocalId", "QueueReceiverQueueName", "QueueSenderDestinationName", "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName", "ProtocolType"}, new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING});
-			CommBean commBean = _serviceDirectory.getCommBean();
-			if (commBean != null) {
-				Object[] commBeanValues = new Object[] {null, null, null, null, null, null, commBean.getDefaultQueueName(), commBean.getDefaultTopicName(), commBean.getProtocolType()};
-				if (commBean.getAddress() != null) {
-					commBeanValues[0] = commBean.getAddress().getUniversalId();
-					commBeanValues[1] = commBean.getAddress().getLocalId();
-				}
-				if (commBean.getCommunicator() != null) {
-					if (commBean.getCommunicator().getReceiver() != null) {
-						commBeanValues[2] = commBean.getCommunicator().getReceiver().getQueueName();						
-					}
-					if (commBean.getCommunicator().getSender() != null) {
-						commBeanValues[3] = commBean.getCommunicator().getSender().getDestinationName();						
-					}
-				}
-				if (commBean.getTopicCommunicator() != null) {
-					if (commBean.getTopicCommunicator().getReceiver() != null) {
-						commBeanValues[4] = commBean.getTopicCommunicator().getReceiver().getTopicName();						
-					}
-					if (commBean.getTopicCommunicator().getSender() != null) {
-						commBeanValues[5] = commBean.getTopicCommunicator().getSender().getTopicName();						
-					}
-				}
-				commBeanData = new CompositeDataSupport(commBeanType, commBeanItemNames, commBeanValues);
-			}
-		}
-		catch (OpenDataException e) {
-			e.printStackTrace();
-		}
-		
-		// get name of all services
-		List<IServiceDescription> allServices = _serviceDirectory.getAllServices();
-		int size = allServices.size();
-		String[] allServiceNames = new String[size];
-		for (int i=0; i<size; i++) {
-			allServiceNames[i] = allServices.get(i).getName();
-		}
-		
-		// get name of all web services
-		List<IServiceDescription> allWebServices = _serviceDirectory.getAllWebServices();
-		size = allWebServices.size();
-		String[] allWebServiceNames = new String[size];
-		for (int i=0; i<size; i++) {
-			allWebServiceNames[i] = allWebServices.get(i).getName();
-		}
-		
-		// create service directory data
-		String[] itemNames = new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "CommBean"};
-		try {
-			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Service directory data", itemNames, new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "CommBean"}, new OpenType[] {SimpleType.INTEGER, SimpleType.INTEGER, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), commBeanType});
-			return new CompositeDataSupport(type, itemNames, new Object[] {_serviceDirectory.getPublishTimer(), _serviceDirectory.getServiceNumber(), allWebServiceNames, allServiceNames, commBeanData});
-		}
-		catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
-		}	
+//		}	
 	}
 
 	/**

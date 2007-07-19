@@ -16,8 +16,8 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.dailab.jiactng.agentcore.comm.CommBeanV2;
 import de.dailab.jiactng.agentcore.comm.helpclasses.TestContent;
+import de.dailab.jiactng.agentcore.comm.jms.CommBeanV2;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.EndPoint;
@@ -28,6 +28,8 @@ import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 
 /**
  * TestCommBeans is a simple example for communicating over queues and topics using a CommBeanV2
+ * 
+ * Example out of order until further notice!
  * 
  * @author Loeffelholz
  *
@@ -107,8 +109,8 @@ public class TestCommBean implements MessageListener {
 		log.debug("Setting up listenChannel to " + cBeanName);
 		cBean = setupCommBean(cBean, cBeanName);
 		
-		listenChannel = cBean.receive(this, cBeanName, false, null);
-		topicChannel = cBean.receive(this, topicName, true, null);
+//		listenChannel = cBean.receive(this, cBeanName, false, null);
+//		topicChannel = cBean.receive(this, topicName, true, null);
 		
 		System.out.println("type \"quit\" to terminate the chat");
 		while(isTalking){
@@ -125,8 +127,8 @@ public class TestCommBean implements MessageListener {
 				System.out.println("Kommunikation wird beendet");
 				
 				payload = new TestContent(cBeanName + " meldet sich ab.");
-				JiacMessage jMessage = new JiacMessage("Chatting", payload, receiver, startpoint, listenChannel);
-				cBean.send(jMessage, topicChannel);
+//				JiacMessage jMessage = new JiacMessage(payload, listenChannel);
+//				cBean.send(jMessage, topicChannel);
 			
 			} else if ( ((input.startsWith("t.") || (input.startsWith("q.")))) && (input != "") ){
 				boolean isValidInput = false;
@@ -137,8 +139,8 @@ public class TestCommBean implements MessageListener {
 					targetName = text.substring(0, text.indexOf("."));
 					text = text.substring(text.indexOf(".") + 1);
 					payload = new TestContent(text);
-					JiacMessage jMessage = new JiacMessage("Chatting", payload, receiver, startpoint, listenChannel);
-					cBean.send(jMessage, targetName, topic);
+//					JiacMessage jMessage = new JiacMessage(payload, listenChannel);
+//					cBean.send(jMessage, targetName, topic);
 				}
 			}
 			

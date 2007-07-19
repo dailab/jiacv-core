@@ -5,13 +5,14 @@ package de.dailab.jiactng.agentcore.comm.jms;
 
 import javax.jms.Destination;
 
+import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class DummyMessage implements IJiacMessage {
     private IJiacContent _content;
@@ -36,7 +37,7 @@ public class DummyMessage implements IJiacMessage {
         return _content;
     }
 
-    public Destination getSender() {
+    public ICommunicationAddress getSender() {
         return null;
     }
 

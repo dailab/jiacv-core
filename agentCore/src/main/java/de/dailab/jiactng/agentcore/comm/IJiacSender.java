@@ -36,6 +36,6 @@ public interface IJiacSender {
 	 * Evtl. unsinnig bei TopicSendern
 	 * @return
 	 */
-	public Destination getReplyToDestination();
+	public ICommunicationAddress getReplyToDestination();
 	
 }

@@ -3,7 +3,6 @@
  */
 package de.dailab.jiactng.agentcore.comm;
 
-import de.dailab.jiactng.agentcore.comm.jms.JMSCommunicationAddressFactory;
 
 /**
  * @author Marcel Patzlaff
@@ -20,7 +19,7 @@ public abstract class CommunicationAddressFactory {
                      * TODO remove this stuff and introduce a static class which represents the agentNode
                      *      This class might then be used to acquire information about the nodes configuration.
                      */
-                    INSTANCE= new JMSCommunicationAddressFactory();
+//                    INSTANCE= new JMSCommunicationAddressFactory();
                 }
             }
         }

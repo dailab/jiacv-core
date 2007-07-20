@@ -15,5 +15,5 @@ public interface ISessionCommunicator {
     void associate(ICommunicationAddress address);
     void send(IJiacMessage message, ICommunicationAddress address);
     IJiacMessage receive();
-    IJiacSender receiveFrom(ICommunicationAddress address);
+    IJiacMessage receiveFrom(ICommunicationAddress address);
 }

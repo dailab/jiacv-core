@@ -5,12 +5,9 @@ package de.dailab.jiactng.agentcore.comm;
  * @author loeffelholz
  *
  */
-public class GroupAddress implements IGroupAddress {
-
-	String _address;
-	
+public class GroupAddress extends CommunicationAddress implements IGroupAddress {
 	public GroupAddress(String address) {
-		_address = address;
+		super(address);
 	}
 
 	public boolean isClosed() {
@@ -18,13 +15,8 @@ public class GroupAddress implements IGroupAddress {
 		return false;
 	}
 
-	public boolean exists() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public String getAddress() {
-		return _address;
-	}
-
+    @Override
+    public String toString() {
+        return "://group:" + getAddress();
+    }
 }

@@ -5,20 +5,21 @@ package de.dailab.jiactng.agentcore.comm;
  * @author loeffelholz
  *
  */
-public class CommunicationAddress implements ICommunicationAddress {
-
+public abstract class CommunicationAddress implements ICommunicationAddress {
+    private final String _address;
 	
-	public CommunicationAddress() {
-		// TODO Auto-generated constructor stub
+	protected CommunicationAddress(String address) {
+		_address= address;
 	}
 
-	public boolean exists() {
+	public final boolean exists() {
 		return false;
 	}
 
-	public String getAddress() {
-		
-		return null;
+	public final String getAddress() {
+		return _address;
 	}
 
+    @Override
+    public abstract String toString();
 }

@@ -3,27 +3,28 @@ package de.dailab.jiactng.agentcore.comm.examples;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
-import javax.jms.Session;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
+import javax.jms.Session;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.dailab.jiactng.agentcore.comm.helpclasses.TestContent;
-import de.dailab.jiactng.agentcore.comm.jms.CommBeanV2;
-import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
-import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.message.EndPoint;
-import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
 import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
+import de.dailab.jiactng.agentcore.comm.helpclasses.TestContent;
+import de.dailab.jiactng.agentcore.comm.jms.JMSMessageTransport;
+import de.dailab.jiactng.agentcore.comm.message.EndPoint;
+import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
+import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 
 
 /**
@@ -40,7 +41,6 @@ public class TestCommBean implements MessageListener {
 	private static String username = ActiveMQConnection.DEFAULT_USER;
 	private static String password = ActiveMQConnection.DEFAULT_PASSWORD;
 	private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
-	private static boolean transacted = false;
 	private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(username, password, url);
 	
 	private static Connection connection;
@@ -66,7 +66,7 @@ public class TestCommBean implements MessageListener {
 		
 		IJiacContent payload = new TestContent();
 		
-		CommBeanV2 cBean = new CommBeanV2();
+		JMSMessageTransport cBean = new JMSMessageTransport();
 		Destination chatChannel = null;
 		Destination listenChannel = null;
 		Destination topicChannel = null;
@@ -174,11 +174,11 @@ public class TestCommBean implements MessageListener {
 	}
 
 	
-	private CommBeanV2 setupCommBean(CommBeanV2 cBean, String cBeanName){
+	private JMSMessageTransport setupCommBean(JMSMessageTransport cBean, String cBeanName){
 		log.debug("Setting up CommBean");
 		// CommBean Setup
 		cBean.setConnectionFactory(connectionFactory);
-		cBean.setAgentNodeName(cBeanName);
+//		cBean.setAgentNodeName(cBeanName);
 		try {
 			cBean.doInit();
 		} catch (Exception e) {

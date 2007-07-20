@@ -9,28 +9,47 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport;
+import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.GroupAddress;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
-import de.dailab.jiactng.agentcore.comm.jms.CommBeanV2;
+import de.dailab.jiactng.agentcore.comm.IGroupAddress;
+import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 
 /**
- * ServiceDirectoryBean soll Beschreibungen aller Services die auf einem AgentNode existieren, verfügbar halten. Dazu
+ * ServiceDirectoryBean soll Beschreibungen aller Services die auf einem AgentNode existieren, verfï¿½gbar halten. Dazu
  * wird die CommBean benutzt. Es soll der memory benutzt werden.
  * 
  * @author janko
+ * 
+ * FIXME: MessageTransport muss konfiguriert werden
+ *        
  */
 public class ServiceDirectory extends AbstractLifecycle implements IServiceDirectory, Runnable {
+    private class ServiceDirectoryMessageDelegate implements IMessageTransportDelegate {
+        public void onAsynchronousException(Exception e) {
+            log.error("asynchronous error on message transport", e);
+        }
+
+        public void onMessage(IJiacMessage message, ICommunicationAddress from, String selector) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+    }
+    
 	Log log = LogFactory.getLog(getClass());
 	
 	// um auf die topic zu schreiben
-	CommBeanV2 _commBean;
+	AbstractMessageTransport _messageTransport;
 	
-	// TO DO: HIER DIE GEWÜNSCHTE SERVICETOPIC ERSTELLEN
-	ICommunicationAddress _serviceTopic = new GroupAddress("ServiceTopic");
+	// TO DO: HIER DIE GEWï¿½NSCHTE SERVICETOPIC ERSTELLEN
+	IGroupAddress _serviceTopic = new GroupAddress("ServiceTopic");
 	
 	// zum speichern der Servicebeschreibungen
 	ServiceDirectoryMemory memory;
@@ -47,9 +66,10 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	}
 
 	public void doInit() throws Exception {
-		if (_commBean != null) {
-			_commBean.setAgentNodeName(_agentNodeName);
-			_commBean.init();
+		if (_messageTransport != null) {
+            _messageTransport.setDefaultDelegate(new ServiceDirectoryMessageDelegate());
+//			_messageTransport.setAgentNodeName(_agentNodeName);
+			_messageTransport.doInit();
 		}
 	}
 
@@ -58,8 +78,8 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	public void doStop() throws Exception {}
 
 	public void doCleanup() throws Exception {
-		if (_commBean != null) {
-			_commBean.cleanup();
+		if (_messageTransport != null) {
+			_messageTransport.doCleanup();
 		}
 		memory.doCleanup();
 	}
@@ -79,7 +99,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 * Methode die den Namen liefert unter der der Thread des ServiceDirectory im ThreadPool gespeichert wird
 	 * 
 	 * @param nodeName
-	 * @return ein String als Schlüssel für den ServiceDirectory-Thread
+	 * @return ein String als Schlï¿½ssel fï¿½r den ServiceDirectory-Thread
 	 */
 	public String getFutureName(String nodeName) {
 		return "ServiceDirectory:" + nodeName;
@@ -106,7 +126,11 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 			if (serviceDesc.getExpireDate().after(actualDate)) {
 				long timeDiff = serviceDesc.getExpireDate().getTime()-actualDate.getTime();
 				log.debug("service:"+serviceDesc.getName()+" has "+timeDiff+" ms to live.");
-				_commBean.publish(createJiacMessage(serviceDesc));
+                try {
+                    _messageTransport.send(createJiacMessage(serviceDesc), _serviceTopic);
+                } catch (CommunicationException ce) {
+                    log.error("error while publishing service description", ce);
+                }
 			}
 		}
 	}
@@ -159,9 +183,9 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	}
 
 	/**
-	 * Liefert die Anzahl der registrierten Services zurück
+	 * Liefert die Anzahl der registrierten Services zurï¿½ck
 	 * 
-	 * @return Liefert die Anzahl der registrierten Services zurück
+	 * @return Liefert die Anzahl der registrierten Services zurï¿½ck
 	 */
 	public int getServiceNumber() {
 		return memory.readAllOfType(IServiceDescription.class).size();
@@ -212,12 +236,14 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 		return null;
 	}
 
-	public CommBeanV2 getCommBean() {
-		return _commBean;
+    // TODO rename this method
+	public AbstractMessageTransport getCommBean() {
+		return _messageTransport;
 	}
 
-	public void setCommBean(CommBeanV2 commBean) {
-		_commBean = commBean;
+    // TODO rename this method
+	public void setCommBean(AbstractMessageTransport commBean) {
+		_messageTransport = commBean;
 	}
 
 	public int getPublishTimer() {

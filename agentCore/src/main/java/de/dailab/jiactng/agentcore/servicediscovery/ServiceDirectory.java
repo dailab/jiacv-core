@@ -10,8 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport;
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
-import de.dailab.jiactng.agentcore.comm.GroupAddress;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport.IMessageTransportDelegate;
@@ -49,7 +49,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	AbstractMessageTransport _messageTransport;
 	
 	// TO DO: HIER DIE GEW�NSCHTE SERVICETOPIC ERSTELLEN
-	IGroupAddress _serviceTopic = new GroupAddress("ServiceTopic");
+	IGroupAddress _serviceTopic = CommunicationAddressFactory.createGroupAddress("ServiceTopic");
 	
 	// zum speichern der Servicebeschreibungen
 	ServiceDirectoryMemory memory;

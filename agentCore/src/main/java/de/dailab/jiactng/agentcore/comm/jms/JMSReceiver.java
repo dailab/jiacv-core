@@ -10,7 +10,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
@@ -19,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport.IMessageTransportDelegate;
-import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
  * 
@@ -41,15 +39,6 @@ class JMSReceiver {
         return result.toString();
     }
     
-    protected static IJiacMessage unpack(Message message) throws Exception {
-        if(message instanceof ObjectMessage) {
-            ObjectMessage objectMessage= (ObjectMessage) message;
-            return (IJiacMessage) objectMessage.getObject();
-        } else {
-            throw new IllegalArgumentException("message '" + message + "' is of unknown type");
-        }
-    }
-    
     protected class JMSMessageListener implements MessageListener {
         private final ICommunicationAddress _address;
         private final String _selector;
@@ -63,7 +52,7 @@ class JMSReceiver {
         public void onMessage(Message message) {
             log.debug("receiving message");
             try {
-                _delegate.onMessage(unpack(message), _address, _selector);
+                _delegate.onMessage(JMSMessageTransport.unpack(message), _address, _selector);
             } catch (Exception e) {
                 _delegate.onAsynchronousException(e);
             }

@@ -5,7 +5,9 @@ package de.dailab.jiactng.agentcore.comm;
  * @author loeffelholz
  *
  */
-public class GroupAddress extends CommunicationAddress implements IGroupAddress {
+class GroupAddress extends CommunicationAddress implements IGroupAddress {
+    static final String PREFIX= "group";
+    
 	public GroupAddress(String address) {
 		super(address);
 	}
@@ -15,8 +17,7 @@ public class GroupAddress extends CommunicationAddress implements IGroupAddress 
 		return false;
 	}
 
-    @Override
-    public String toString() {
-        return "://group:" + getAddress();
+    public String getScheme() {
+        return PREFIX + "/" + getAddress();
     }
 }

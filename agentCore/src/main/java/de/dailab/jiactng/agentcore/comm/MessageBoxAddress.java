@@ -5,7 +5,8 @@ package de.dailab.jiactng.agentcore.comm;
  * @author loeffelholz
  *
  */
-public class MessageBoxAddress extends CommunicationAddress implements IMessageBoxAddress {
+class MessageBoxAddress extends CommunicationAddress implements IMessageBoxAddress {
+    static final String PREFIX= "msgbox";
 	public MessageBoxAddress(String address) {
 		super(address);
 	}
@@ -14,8 +15,7 @@ public class MessageBoxAddress extends CommunicationAddress implements IMessageB
 		return false;
 	}
 
-    @Override
-    public String toString() {
-        return "://msgbox:" + getAddress();
+    public String getScheme() {
+        return PREFIX + "/" + getAddress();
     }
 }

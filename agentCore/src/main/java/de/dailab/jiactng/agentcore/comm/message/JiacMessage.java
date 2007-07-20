@@ -1,7 +1,5 @@
 package de.dailab.jiactng.agentcore.comm.message;
 
-import javax.jms.Destination;
-
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 
 

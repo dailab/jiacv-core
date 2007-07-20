@@ -1,7 +1,5 @@
 package de.dailab.jiactng.agentcore.comm.message;
 
-import javax.jms.Destination;
-
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
@@ -10,7 +8,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * verschiedenen inhalte bieten sollen.
  * Momentan existiert FileContent und ObjectContent.
  * 
- * @author janko, löffelholz
+ * @author janko, lï¿½ffelholz
  */
 public interface IJiacMessage extends IFact {
 

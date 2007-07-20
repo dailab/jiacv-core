@@ -1,15 +1,23 @@
 package de.dailab.jiactng.agentcore.comm.jms;
 
+import javax.jms.BytesMessage;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.ObjectMessage;
+import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport;
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
+import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 
 /**
  * Die CommBean beinhaltet einen JiacSender und einen JiacReceiver.
@@ -23,6 +31,37 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 
 public class JMSMessageTransport extends AbstractMessageTransport {
+    private final static String SENDER_KEY= "JiacTNGSenderAddress";
+    
+    static IJiacMessage unpack(Message message) throws JMSException {
+        IJiacContent payload;
+        if(message instanceof BytesMessage) {
+            int length= (int)((BytesMessage) message).getBodyLength();
+            byte[] data= new byte[length];
+            ((BytesMessage) message).readBytes(data);
+            payload= new BinaryContent(data);
+        } else {
+            payload= (IJiacContent) ((ObjectMessage)message).getObject();
+        }
+        ICommunicationAddress sender= CommunicationAddressFactory.createFromScheme(message.getStringProperty(SENDER_KEY));
+        // TODO read out more headers
+        return new JiacMessage(payload, sender);
+    }
+    
+    static Message pack(IJiacMessage message, Session session) throws JMSException {
+        IJiacContent payload= message.getPayload();
+        Message result;
+        if(payload instanceof BinaryContent) {
+            result= session.createBytesMessage();
+            ((BytesMessage)result).writeBytes(((BinaryContent)payload).getData());
+        } else {
+            result= session.createObjectMessage();
+            ((ObjectMessage)result).setObject(payload);
+        }
+        result.setStringProperty(SENDER_KEY, message.getSender().getScheme());
+        return result;
+    }
+    
 	Log log = LogFactory.getLog(getClass());
 	// Zur Zeit sind logs auskommentiert.
 	

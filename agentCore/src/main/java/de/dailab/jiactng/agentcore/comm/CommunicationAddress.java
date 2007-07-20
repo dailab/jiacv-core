@@ -5,7 +5,7 @@ package de.dailab.jiactng.agentcore.comm;
  * @author loeffelholz
  *
  */
-public abstract class CommunicationAddress implements ICommunicationAddress {
+abstract class CommunicationAddress implements ICommunicationAddress {
     private final String _address;
 	
 	protected CommunicationAddress(String address) {
@@ -21,5 +21,7 @@ public abstract class CommunicationAddress implements ICommunicationAddress {
 	}
 
     @Override
-    public abstract String toString();
+    public final String toString() {
+        return getScheme();
+    }
 }

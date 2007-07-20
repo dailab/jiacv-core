@@ -5,6 +5,7 @@ package de.dailab.jiactng.agentcore.comm;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.action.annotation.Expose;
+import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
@@ -15,7 +16,31 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @version $Revision$
  */
 public class CommunicationBean extends AbstractMethodExposingBean {
+    private final class MessageTransportDelegate implements IMessageTransportDelegate {
+        public void onAsynchronousException(Exception e) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void onMessage(IJiacMessage message, ICommunicationAddress from, String selector) {
+            // TODO Auto-generated method stub
+            
+        }
+    }
+    
     public CommunicationBean() {}
+
+    @Override
+    public void doCleanup() throws Exception {
+        // TODO Auto-generated method stub
+        super.doCleanup();
+    }
+
+    @Override
+    public void doInit() throws Exception {
+        // TODO Auto-generated method stub
+        super.doInit();
+    }
 
     /**
      * An invocation of this action will associate this agent with a group (a logical destination)
@@ -68,4 +93,6 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     public void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
         
     }
+    
+    
 }

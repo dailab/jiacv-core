@@ -14,7 +14,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class PingerBean extends AbstractAgentBean implements ResultReceiver {
     private static String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.AbstractCommunicationBean#send";
@@ -26,7 +26,7 @@ public class PingerBean extends AbstractAgentBean implements ResultReceiver {
         IJiacMessage  message= new DummyMessage(new ObjectContent("Ping"));
             DoAction doAction= action.createDoAction(new Object[]{
                 message,
-                CommunicationAddressFactory.getDefault().createGroupAddress(PingPongTestCase.DUMMY_ADDRESS)
+                CommunicationAddressFactory.createGroupAddress(PingPongTestCase.DUMMY_ADDRESS)
             },
             this
         );

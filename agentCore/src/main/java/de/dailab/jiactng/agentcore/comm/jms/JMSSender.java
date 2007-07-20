@@ -4,8 +4,8 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
@@ -73,10 +73,10 @@ class JMSSender {
 
 		producer = _session.createProducer(destination);
 		producer.setTimeToLive(timeToLive);
-		ObjectMessage objectMessage = _session.createObjectMessage(message);
-		objectMessage.setJMSDestination(destination);
-
-		producer.send(objectMessage);
+        
+        Message jmsMessage= JMSMessageTransport.pack(message, _session);
+        jmsMessage.setJMSDestination(destination);
+		producer.send(jmsMessage);
 		producer.close();
 		log.debug("Sending Procedure done");
 	}

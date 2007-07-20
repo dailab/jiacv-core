@@ -26,4 +26,6 @@ public interface ICommunicationAddress extends IFact {
      * @return
      */
     boolean exists();
+    
+    String getScheme();
 }

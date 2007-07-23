@@ -1,23 +1,42 @@
 package de.dailab.jiactng.agentcore.comm;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * 
  * @author loeffelholz
+ * @author Marcel Patzlaff
  *
  */
-class GroupAddress extends CommunicationAddress implements IGroupAddress {
+final class GroupAddress extends CommunicationAddress implements IGroupAddress {
     static final String PREFIX= "group";
     
-	public GroupAddress(String address) {
-		super(address);
+	GroupAddress(String name) throws URISyntaxException {
+		super(PREFIX, name.toLowerCase());
 	}
-
-	public boolean isClosed() {
+    
+    GroupAddress(URI uri) {
+        super(uri, PREFIX);
+    }
+    
+    private GroupAddress(GroupAddress copy, String transportId) throws URISyntaxException {
+        super(copy, transportId);
+    }
+    
+    public boolean isClosed() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-    public String getScheme() {
-        return PREFIX + "/" + getAddress();
+    @SuppressWarnings("unchecked")
+    public IGroupAddress toUnboundAddress() {
+        return super.toUnboundAddress();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    GroupAddress bind(String transportId) throws URISyntaxException {
+        return new GroupAddress(this, transportId);
     }
 }

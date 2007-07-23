@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.jms;
+package de.dailab.jiactng.agentcore.comm.transport.jms;
 /**
  * This package is the root for the JMS specific implementation of
  * JIAC-TNGs communication system. Currently this is the default implementation

@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.jms;
+package de.dailab.jiactng.agentcore.comm.transport.jms;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
-import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport.IMessageTransportDelegate;
 
 /**
  * 
@@ -52,15 +51,15 @@ class JMSReceiver {
         public void onMessage(Message message) {
             log.debug("receiving message");
             try {
-                _delegate.onMessage(JMSMessageTransport.unpack(message), _address, _selector);
+                _parent.delegateMessage(JMSMessageTransport.unpack(message), _address, _selector);
             } catch (Exception e) {
-                _delegate.onAsynchronousException(e);
+                _parent.delegateException(e);
             }
         }
         
         void initialise(Session session) throws JMSException {
             try {
-                String add= _address.getAddress();
+                String add= _address.getName();
                 Destination dest= _address instanceof IGroupAddress ? session.createTopic(add) : session.createQueue(add);
                 _consumer= session.createConsumer(dest, _selector);
                 _consumer.setMessageListener(this);
@@ -80,13 +79,13 @@ class JMSReceiver {
 	private ConnectionFactory _connectionFactory;
 	private Connection _connection;
 	private Session _session;
-    private IMessageTransportDelegate _delegate;
+    private JMSMessageTransport _parent;
     private Map<String, JMSMessageListener> _listeners;
 	
-	public JMSReceiver(ConnectionFactory connectionFactory, IMessageTransportDelegate delegate) throws JMSException {
+	public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent) throws JMSException {
 		log.debug("Creating JMSReceiver");
 		_connectionFactory = (ConnectionFactory) connectionFactory;
-		_delegate = delegate;
+		_parent = parent;
         _listeners= new HashMap<String, JMSMessageListener>();
 		doInit();
 	}

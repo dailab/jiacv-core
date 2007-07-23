@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.jms;
+package de.dailab.jiactng.agentcore.comm.transport.jms;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -53,9 +53,9 @@ class JMSSender {
 		log.debug("creating Destination: " + address);
 		Destination destination = null;
 		if (address instanceof IGroupAddress) {
-			destination = _session.createTopic(address.getAddress());
+			destination = _session.createTopic(address.getName());
         } else {
-			destination = _session.createQueue(address.getAddress());
+			destination = _session.createQueue(address.getName());
         }
 		
 		sendMessage(message, destination, _defaultTimeOut);

@@ -22,4 +22,7 @@ public interface IGroupAddress extends ICommunicationAddress {
      *          and <code>false</code> otherwise.
      */
     boolean isClosed();
+    
+    @SuppressWarnings("unchecked")
+    IGroupAddress toUnboundAddress();
 }

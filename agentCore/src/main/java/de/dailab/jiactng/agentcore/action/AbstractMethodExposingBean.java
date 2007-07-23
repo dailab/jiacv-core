@@ -3,6 +3,10 @@
  */
 package de.dailab.jiactng.agentcore.action;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -15,7 +19,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
-import de.dailab.jiactng.agentcore.action.annotation.Expose;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 
 /**
@@ -28,6 +31,23 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
  * @version $Revision$
  */
 public abstract class AbstractMethodExposingBean extends AbstractAgentBean implements IEffector {
+    /**
+     * This annotation can be used to mark methods in a bean inherited from {@link AbstractMethodExposingBean}
+     * as actions. So marked methods will be exposed automatically.
+     * 
+     * Make sure that the visibility of these methods is <code>public</code>
+     * because otherwise this annotation will be ignored.
+     * 
+     * If the annotated method returns an array of objects, you can provide
+     * additional type informations.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    protected static @interface Expose {
+        String name() default "";
+        Class[] returnTypes() default {};
+    }
+    
     /**
      * Utility method which collects all exposed methods along the given hierarchy.
      * Methods which are annotated in more specialised classes will have precedence. 

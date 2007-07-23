@@ -20,11 +20,11 @@ import org.apache.commons.logging.LogFactory;
 import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.comm.helpclasses.TestContent;
-import de.dailab.jiactng.agentcore.comm.jms.JMSMessageTransport;
 import de.dailab.jiactng.agentcore.comm.message.EndPoint;
 import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport;
 
 
 /**

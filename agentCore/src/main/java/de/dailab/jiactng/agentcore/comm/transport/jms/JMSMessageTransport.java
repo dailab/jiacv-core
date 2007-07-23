@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.jms;
+package de.dailab.jiactng.agentcore.comm.transport.jms;
 
 import javax.jms.BytesMessage;
 import javax.jms.ConnectionFactory;
@@ -10,7 +10,6 @@ import javax.jms.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -18,6 +17,7 @@ import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport;
 
 /**
  * Die CommBean beinhaltet einen JiacSender und einen JiacReceiver.
@@ -43,7 +43,7 @@ public class JMSMessageTransport extends AbstractMessageTransport {
         } else {
             payload= (IJiacContent) ((ObjectMessage)message).getObject();
         }
-        ICommunicationAddress sender= CommunicationAddressFactory.createFromScheme(message.getStringProperty(SENDER_KEY));
+        ICommunicationAddress sender= CommunicationAddressFactory.createFromURI(message.getStringProperty(SENDER_KEY));
         // TODO read out more headers
         return new JiacMessage(payload, sender);
     }
@@ -58,22 +58,26 @@ public class JMSMessageTransport extends AbstractMessageTransport {
             result= session.createObjectMessage();
             ((ObjectMessage)result).setObject(payload);
         }
-        result.setStringProperty(SENDER_KEY, message.getSender().getScheme());
+        result.setStringProperty(SENDER_KEY, message.getSender().toURI().toString());
         return result;
     }
     
 	Log log = LogFactory.getLog(getClass());
 	// Zur Zeit sind logs auskommentiert.
 	
-	ConnectionFactory _connectionFactory;
-
+	private ConnectionFactory _connectionFactory;
 	private JMSSender _sender;
 	private JMSReceiver _receiver;
 	
 	public JMSMessageTransport() {
-		super();
+		super("jms");
 		log.debug("JMSMessageTransport created");
 	}
+    
+    public JMSMessageTransport(String transportIdentifier) {
+        super(transportIdentifier);
+        log.debug("JMSMessageTransport created");
+    }
 
 	/**
 	 * Initialisiert die CommBean. Notwendige Parameter: ConnectionFactory, AgentNodeName
@@ -85,7 +89,7 @@ public class JMSMessageTransport extends AbstractMessageTransport {
 		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
 		
 		_sender = new JMSSender(_connectionFactory);
-		_receiver = new JMSReceiver(_connectionFactory, getDefaultDelegate());
+		_receiver = new JMSReceiver(_connectionFactory, this);
 		log.debug("doneInit");
 		
 	}

@@ -5,10 +5,6 @@ package de.dailab.jiactng.agentcore.action;
 
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import de.dailab.jiactng.agentcore.action.annotation.Expose;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**

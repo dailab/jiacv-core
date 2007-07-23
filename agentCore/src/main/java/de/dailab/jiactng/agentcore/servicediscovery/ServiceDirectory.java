@@ -9,16 +9,16 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
-import de.dailab.jiactng.agentcore.comm.AbstractMessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
+import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport;
+import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 
 /**
@@ -32,13 +32,12 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
  */
 public class ServiceDirectory extends AbstractLifecycle implements IServiceDirectory, Runnable {
     private class ServiceDirectoryMessageDelegate implements IMessageTransportDelegate {
-        public void onAsynchronousException(Exception e) {
+        public void onAsynchronousException(AbstractMessageTransport source, Exception e) {
             log.error("asynchronous error on message transport", e);
         }
 
-        public void onMessage(IJiacMessage message, ICommunicationAddress from, String selector) {
+        public void onMessage(AbstractMessageTransport source, IJiacMessage message, ICommunicationAddress from, String selector) {
             // TODO Auto-generated method stub
-            
         }
         
     }

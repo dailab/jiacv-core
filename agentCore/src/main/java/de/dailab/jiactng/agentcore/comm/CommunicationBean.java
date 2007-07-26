@@ -3,10 +3,14 @@
  */
 package de.dailab.jiactng.agentcore.comm;
 
+import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,8 +18,10 @@ import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
-import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport;
-import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport.IMessageTransportDelegate;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
+import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
+
 
 /**
  * This bean specifies the way an agent communicates. It implements a message-based approach for information
@@ -25,13 +31,21 @@ import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport.IMess
  * @version $Revision$
  */
 public class CommunicationBean extends AbstractMethodExposingBean {
+    private static <T> T saveCast(Object object, Class<T> targetType) {
+        if(!targetType.isInstance(object)) {
+            throw new IllegalArgumentException("argument is not valid");
+        }
+        
+        return targetType.cast(object);
+    }
+    
     private final class MessageTransportDelegate implements IMessageTransportDelegate {
-        public void onAsynchronousException(AbstractMessageTransport source, Exception e) {
+        public void onAsynchronousException(MessageTransport source, Exception e) {
             processError(source, e);
         }
 
-        public void onMessage(AbstractMessageTransport source, IJiacMessage message, ICommunicationAddress at, String selector) {
-            processMessage(source, message, at, selector);
+        public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at, String selector) {
+            processMessage(source, message, saveCast(at, CommunicationAddress.class), selector);
         }
     }
     
@@ -43,62 +57,57 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     
     private final IJiacMessageListener _defaultListener;
     private final IMessageTransportDelegate _defaultDelegate;
+    private IMessageBoxAddress _defaultMessageBox;
     
-    private Map<String, AbstractMessageTransport> _transports;
+    private Map<String, MessageTransport> _transports;
     
-    private final Map<String, Set<ListenerContext>> _selectorToListenerMap;
-    private final Map<CommunicationAddress, Set<ListenerContext>> _addressToListenerMap;
+    private final Map<String, WildcardListenerContext> _selectorToListenerMap;
+    private final Map<CommunicationAddress, List<ListenerContext>> _addressToListenerMap;
     
     private Log _log;
-    
-    private boolean _delayNotification= false;
     
     public CommunicationBean() {
         _defaultListener= new MemoryDelegationMessageListener();
         _defaultDelegate= new MessageTransportDelegate();
-        _transports= new HashMap<String, AbstractMessageTransport>();
-        _selectorToListenerMap= new HashMap<String, Set<ListenerContext>>();
-        _addressToListenerMap= new HashMap<CommunicationAddress, Set<ListenerContext>>();
+        _transports= new HashMap<String, MessageTransport>();
+        _selectorToListenerMap= new HashMap<String, WildcardListenerContext>();
+        _addressToListenerMap= new HashMap<CommunicationAddress, List<ListenerContext>>();
     }
 
     // ~ START OF CONFIGURATION AND INITIALISATION STUFF ~ //
-    public synchronized void setTransports(Set<AbstractMessageTransport> transports) {
-        Set<AbstractMessageTransport> workingCopy;
+    public synchronized void setTransports(Set<MessageTransport> transports) {
+        Set<MessageTransport> workingCopy;
         if(transports == null) {
             workingCopy= Collections.emptySet();
         } else {
-            workingCopy= new HashSet<AbstractMessageTransport>();
+            workingCopy= new HashSet<MessageTransport>();
             workingCopy.addAll(transports);
         }
-        try {
-            _delayNotification= true;
-            // first remove all existing transports
-            if(_transports.size() > 0) {
-                Set<AbstractMessageTransport> toRemove= new HashSet<AbstractMessageTransport>();
-                toRemove.addAll(_transports.values());
-                // only remove transports that are not in the workingCopy
-                toRemove.removeAll(workingCopy);
-                
-                // only add transports that are not yet installed
-                workingCopy.removeAll(_transports.values());
-                
-                for(AbstractMessageTransport transport : toRemove) {
-                    removeTransport(transport.getTransportIdentifier());
-                }
-            }
+
+        // first remove all existing transports
+        if(_transports.size() > 0) {
+            Set<MessageTransport> toRemove= new HashSet<MessageTransport>();
+            toRemove.addAll(_transports.values());
+            // only remove transports that are not in the workingCopy
+            toRemove.removeAll(workingCopy);
             
-            for(AbstractMessageTransport transport : workingCopy) {
-                addTransport(transport);
+            // only add transports that are not yet installed
+            workingCopy.removeAll(_transports.values());
+            
+            for(MessageTransport transport : toRemove) {
+                removeTransport(transport.getTransportIdentifier());
             }
-        } finally {
-            _delayNotification= false;
+        }
+        
+        for(MessageTransport transport : workingCopy) {
+            addTransport(transport);
         }
     }
     
     @Override
     public synchronized void doCleanup() throws Exception {
-        for(AbstractMessageTransport transport : _transports.values()) {
-            try{
+        for(MessageTransport transport : _transports.values()) {
+            try {
                 transport.doCleanup();
             } catch(Exception e) {
                 _log.warn("transport '" + transport.getTransportIdentifier() + "' did not cleanup correctly", e);
@@ -113,8 +122,8 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         super.doInit();
         _log= thisAgent.getLog(this);
         
-        for(Iterator<AbstractMessageTransport> iter= _transports.values().iterator(); iter.hasNext();) {
-            AbstractMessageTransport transport= iter.next();
+        for(Iterator<MessageTransport> iter= _transports.values().iterator(); iter.hasNext();) {
+            MessageTransport transport= iter.next();
             transport.setDefaultDelegate(_defaultDelegate);
             try {
                 transport.doInit();
@@ -125,12 +134,15 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             }
         }
         
+        // create the default message box for this agent
+        establishMessageBox((_defaultMessageBox= CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName())));
+        
         if(_transports.size() <= 0) {
             _log.warn("no transports available yet!");
         }
     }
     
-    public synchronized void addTransport(AbstractMessageTransport transport) {
+    public synchronized void addTransport(MessageTransport transport) {
         String id= transport.getTransportIdentifier();
         if(_transports.containsKey(id)) {
             throw new IllegalArgumentException("the transport '" + id +  "' already exists");
@@ -157,7 +169,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     }
     
     public synchronized void removeTransport(String transportIdentifier) {
-        AbstractMessageTransport transport= _transports.remove(transportIdentifier);
+        MessageTransport transport= _transports.remove(transportIdentifier);
         
         if(transport == null) {
             return;
@@ -234,23 +246,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             throw new IllegalArgumentException("address must not be null");
         }
         
-        if(_transports.size() <= 0) {
-            throw new CommunicationException("no transport available");
-        }
-        
-//        if(address instanceof IMessageBoxAddress) {
-//            // first look which capabilities the communication bean at the specified location has
-//        } else {
-//            // TODO: Broker capabilities... now we just send the message through all transports
-//            for(AbstractMessageTransport transport : _transports.values()) {
-//                transport.send(message, address);
-//            }
-//        }
-        
-        // TODO: lookup stuff
-        for(AbstractMessageTransport transport : _transports.values()) {
-            transport.send(message, address);
-        }
+        internalSend(saveCast(message, JiacMessage.class), saveCast(address, CommunicationAddress.class));
     }
     
     @Expose
@@ -259,7 +255,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             throw new IllegalArgumentException("address must not be null");
         }
         
-        internalRegister(_defaultListener, address, null);
+        internalRegister(_defaultListener, saveCast(address, CommunicationAddress.class), null);
     }
     
     @Expose
@@ -268,7 +264,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             throw new IllegalArgumentException("address must not be null");
         }
         
-        internalUnregister(_defaultListener, address, null);
+        internalUnregister(_defaultListener, saveCast(address, CommunicationAddress.class), null);
     }
     // ~ END OF ACTIONS ~ //
     
@@ -279,10 +275,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
         
         if(address == null && selector == null) {
-            throw new IllegalArgumentException("either the address or the selector have to non-null");
+            throw new IllegalArgumentException("either the address or the selector have to be non-null");
         }
         
-        internalRegister(listener, address, selector);
+        internalRegister(listener, saveCast(address, CommunicationAddress.class), selector);
     }
     
     
@@ -304,10 +300,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
         
         if(address == null && selector == null) {
-            throw new IllegalArgumentException("either the address or the selector have to non-null");
+            throw new IllegalArgumentException("either the address or the selector have to be non-null");
         }
         
-        internalUnregister(listener, address, selector);
+        internalUnregister(listener, saveCast(address, CommunicationAddress.class), selector);
     }
     
     public synchronized void unregister(IJiacMessageListener listener, String selector) throws CommunicationException {
@@ -323,45 +319,162 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     }
     // ~ END OF METHODS FOR LISTENER ADMINISTRATION ~ //
     
-    protected void processMessage(AbstractMessageTransport source, IJiacMessage message, ICommunicationAddress at, String selector) {
-        
-    }
     
-    protected void processError(AbstractMessageTransport source, Exception error) {
-        
-    }
-    
-    private void internalRegister(IJiacMessageListener listener, ICommunicationAddress address, String selector) throws CommunicationException {
-        ListenerContext context= new ListenerContext(listener, address, selector);
-        if(selector != null) {
-            Set<ListenerContext> registered= _selectorToListenerMap.get(selector);
-            if(registered == null) {
-                registered= new HashSet<ListenerContext>();
-//                registered
-            }
-        } else {
-            
+    // ~ INTERNAL METHODS ~ //
+    protected synchronized void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at, String selector) {
+        // TODO: built message procession
+        try {
+            _defaultListener.receive(message, at.bind(source.getTransportIdentifier()));
+        } catch (URISyntaxException use) {
+            // should not happen
+            _log.error("could not bind address to '" + source.getTransportIdentifier() + "'", use);
+            _defaultListener.receive(message, at);
         }
     }
     
-    private void internalUnregister(IJiacMessageListener listener, ICommunicationAddress address, String selector) throws CommunicationException {
+    protected void processError(MessageTransport source, Exception error) {
+        // TODO: error handling
+        _log.error("message transport '" + source.getTransportIdentifier() + "' threw an exception", error);
+    }
+ 
+    /**
+     * Assumes that both the message and the address are valid.
+     */
+    private synchronized void internalSend(JiacMessage message, CommunicationAddress address) throws CommunicationException {
+        if(_transports.size() <= 0) {
+            throw new CommunicationException("no transport available");
+        }
         
+        CommunicationAddress unboundAddress= address.toUnboundAddress();
+        
+        // first check whether the sender is correct
+        if(!_addressToListenerMap.containsKey(unboundAddress)) {
+            message.setSender(_defaultMessageBox);
+        }
+        
+        if(address instanceof MessageBoxAddress) {
+            // 1:1 communication
+            MessageTransport transport= null;
+            if(address.isBoundToTransport()) {
+                String transportId= address.toURI().getScheme();
+                transport= _transports.get(transportId);
+            } else {
+                // TODO: lookup for transport
+                transport= _transports.values().iterator().next();
+            }
+            
+            if(transport != null) {
+                transport.send(message, unboundAddress);
+            } else {
+                throw new CommunicationException("does not have transport for '" + address + "'");
+            }
+        } else {
+            // 1:n communication
+            for(MessageTransport transport : _transports.values()) {
+                transport.send(message, unboundAddress);
+            }
+        }
+    }
+    
+    /**
+     * Assumes that the listener is non-null and either the address or the selector is non-null.
+     */
+    private synchronized void internalRegister(IJiacMessageListener listener, CommunicationAddress address, String selector) throws CommunicationException {
+        CommunicationAddress unboundAddress= address.toUnboundAddress();
+        if(unboundAddress == null) {
+            WildcardListenerContext context= _selectorToListenerMap.get(selector);
+            if(context != null) {
+                if(context.listener == listener)
+                    return;
+                
+                throw new CommunicationException("there already exists a wildcard listener for selector '" + selector + "'");
+            }
+            
+            context= new WildcardListenerContext(listener, selector);
+            if(isActive()) {
+                for(ICommunicationAddress registered : _addressToListenerMap.keySet()) {
+                    List<ListenerContext> registeredContexts= _addressToListenerMap.get(registered);
+                    try {
+                        for(MessageTransport transport : _transports.values()) {
+                            transport.listen(address, context.selector);
+                        }
+                    } finally {
+                        registeredContexts.add(context);
+                    }
+                }
+            }
+        } else {
+            ListenerContext context= new ListenerContext(listener, selector);
+            List<ListenerContext> registeredContexts= _addressToListenerMap.get(unboundAddress);
+            
+            if(registeredContexts == null) {
+                registeredContexts= new LinkedList<ListenerContext>();
+                _addressToListenerMap.put(unboundAddress, registeredContexts);
+            }
+            
+            if(registeredContexts.contains(context) && context.listener != listener) {
+                throw new CommunicationException("cannot register additional listener for ");
+            }
+            
+            registeredContexts.add(context);
+            
+            if(isActive()) {
+                for(MessageTransport transport : _transports.values()) {
+                    transport.listen(address, context.selector);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Assumse that the listener is non-null and either the address or the selector is non-null.
+     */
+    private synchronized void internalUnregister(IJiacMessageListener listener, CommunicationAddress address, String selector) throws CommunicationException {
+        
+    }
+    
+    private boolean isActive() {
+        switch(getState()) {
+            case INITIALIZING: case INITIALIZED: case STARTING: case STARTED: case CLEANING_UP:
+                return true;
+            default:
+                return false;
+        }
     }
 }
 
 class ListenerContext {
-    private final IJiacMessageListener _listener;
-    private ICommunicationAddress _address;
-    private final String _selector;
+    public static final Comparator<ListenerContext> COMPARATOR= new Comparator<ListenerContext>() {
+        public int compare(ListenerContext o1, ListenerContext o2) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+    };
     
-    ListenerContext(IJiacMessageListener listener, ICommunicationAddress address, String selector) {
-        _listener= listener;
-        _address= address;
-        _selector= selector;
+    protected final IJiacMessageListener listener;
+    protected final String selector;
+    
+    ListenerContext(IJiacMessageListener listener, String selector) {
+        this.listener= listener;
+        this.selector= selector;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj;
+        if(obj == null) {
+            return false;
+        }
+        
+        ListenerContext other= (ListenerContext) obj;
+        return selector == null ? other.selector == null : other.selector == null ? false : selector.equals(other.selector);
+    }
+}
+
+class WildcardListenerContext extends ListenerContext {
+    protected final Set<ICommunicationAddress> blacklist;
+    
+    WildcardListenerContext(IJiacMessageListener listener, String selector) {
+        super(listener, selector);
+        blacklist= new HashSet<ICommunicationAddress>();
     }
 }

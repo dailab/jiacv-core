@@ -10,6 +10,8 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 /**
  * Specifies an address for inter-agent communication.
  * 
+ * This interface is <strong>not</strong> intended to be subclassed by clients!
+ * 
  * @author Marcel Patzlaff
  * @version $Revision$
  */
@@ -28,7 +30,36 @@ public interface ICommunicationAddress extends IFact {
      * @return
      */
     boolean exists();
+    
+    /**
+     * Checks whether this address is bound to a specific transport type.
+     * Currently this information is only evaluated when addressing a
+     * message box.
+     * 
+     * @return      <code>true</code> if this address is bound to a transport and
+     *              <code>false</code> otherwise.
+     */
     boolean isBoundToTransport();
+    
+    /**
+     * This method can be used to obtain the URI which defines this communication
+     * address.
+     * 
+     * @return      the URI for this address.
+     */
     URI toURI();
+    
+    /**
+     * If this address is bound to a specific transport then this method
+     * returns the generic unbound address. Otherwise it returns a reference to
+     * itself.
+     * 
+     * @param <T>   the type of the address. It can be one of {@link ICommunicationAddress},
+     *              {@link IMessageBoxAddress} or {@link IGroupAddress}.
+     * @return      the generic unbound address for this address
+     * 
+     * @see         IMessageBoxAddress#toUnboundAddress()
+     * @see         IGroupAddress#toUnboundAddress()
+     */
     <T extends ICommunicationAddress> T toUnboundAddress();
 }

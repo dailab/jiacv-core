@@ -17,7 +17,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * @version $Revision$
  */
 public class PingerBean extends AbstractAgentBean implements ResultReceiver {
-    private static String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.AbstractCommunicationBean#send";
+    private static String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.CommunicationBean#send";
     
     public void startPingProcess() {
         System.out.println("start the ping process...");

@@ -17,7 +17,7 @@ public final class CommunicationAddressFactory {
         try {
             return new GroupAddress(groupName);
         } catch (URISyntaxException use) {
-            throw new IllegalArgumentException("groupName is not valid");
+            throw new IllegalArgumentException("groupName is not valid", use);
         }
     }
     
@@ -25,7 +25,7 @@ public final class CommunicationAddressFactory {
         try {
             return new MessageBoxAddress(boxName);
         } catch (URISyntaxException use) {
-            throw new IllegalArgumentException("boxName is not valid");
+            throw new IllegalArgumentException("boxName is not valid", use);
         }
     }
     

@@ -4,16 +4,22 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
- * Eine InterAgent-Message in Jiac. Die Nutzdaten sind vom Typ IJiacContent, die in verschiednen implementierungen
- * verschiedenen inhalte bieten sollen.
- * Momentan existiert FileContent und ObjectContent.
+ * This interface defines the message type used for inter-agent-communication.
  * 
- * @author janko, l�ffelholz
+ * It provides meta-information about the message content, a payload section
+ * and a sender field.
+ * 
+ * This interface is <strong>not</strong> intended to be subclassed by clients!
+ * 
+ * @author Janko Dimitroff
+ * @author Martin Loeffelholz
+ * @author Marcel Patzlaff
  */
 public interface IJiacMessage extends IFact {
 
 	/**
-	 * Liefert die Nutzdaten
+	 * Returns the payload of this message. There are several different payload
+     * types available.
 	 * 
 	 * @return
 	 */
@@ -25,5 +31,4 @@ public interface IJiacMessage extends IFact {
 	 * @return ICommunicationAddress	the address from where the Message is sent.
 	 */
 	public ICommunicationAddress getSender();
-
 }

@@ -17,8 +17,8 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
-import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport;
-import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport.IMessageTransportDelegate;
+import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
+import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 
 /**
@@ -32,11 +32,11 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
  */
 public class ServiceDirectory extends AbstractLifecycle implements IServiceDirectory, Runnable {
     private class ServiceDirectoryMessageDelegate implements IMessageTransportDelegate {
-        public void onAsynchronousException(AbstractMessageTransport source, Exception e) {
+        public void onAsynchronousException(MessageTransport source, Exception e) {
             log.error("asynchronous error on message transport", e);
         }
 
-        public void onMessage(AbstractMessageTransport source, IJiacMessage message, ICommunicationAddress from, String selector) {
+        public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress from, String selector) {
             // TODO Auto-generated method stub
         }
         
@@ -45,7 +45,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	Log log = LogFactory.getLog(getClass());
 	
 	// um auf die topic zu schreiben
-	AbstractMessageTransport _messageTransport;
+	MessageTransport _messageTransport;
 	
 	// TO DO: HIER DIE GEW�NSCHTE SERVICETOPIC ERSTELLEN
 	IGroupAddress _serviceTopic = CommunicationAddressFactory.createGroupAddress("ServiceTopic");
@@ -236,12 +236,12 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	}
 
     // TODO rename this method
-	public AbstractMessageTransport getCommBean() {
+	public MessageTransport getCommBean() {
 		return _messageTransport;
 	}
 
     // TODO rename this method
-	public void setCommBean(AbstractMessageTransport commBean) {
+	public void setCommBean(MessageTransport commBean) {
 		_messageTransport = commBean;
 	}
 

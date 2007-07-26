@@ -17,7 +17,7 @@ import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport;
+import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 
 /**
  * Die CommBean beinhaltet einen JiacSender und einen JiacReceiver.
@@ -30,7 +30,7 @@ import de.dailab.jiactng.agentcore.comm.transport.AbstractMessageTransport;
  */
 
 
-public class JMSMessageTransport extends AbstractMessageTransport {
+public class JMSMessageTransport extends MessageTransport {
     private final static String SENDER_KEY= "JiacTNGSenderAddress";
     
     static IJiacMessage unpack(Message message) throws JMSException {

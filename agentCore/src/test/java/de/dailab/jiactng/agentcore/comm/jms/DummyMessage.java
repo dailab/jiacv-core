@@ -14,6 +14,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
+@SuppressWarnings("serial")
 public class DummyMessage implements IJiacMessage {
     private IJiacContent _content;
     

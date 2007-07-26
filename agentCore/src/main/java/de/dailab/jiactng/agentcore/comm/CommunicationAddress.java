@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 
 /**
  * 
- * @author loeffelholz
+ * @author Martin Loeffelholz
  * @author Marcel Patzlaff
  *
  */

@@ -13,16 +13,16 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public abstract class AbstractMessageTransport {
+public abstract class MessageTransport {
     public static interface IMessageTransportDelegate {
-        void onAsynchronousException(AbstractMessageTransport source, Exception e);
-        void onMessage(AbstractMessageTransport source, IJiacMessage message, ICommunicationAddress at, String selector);
+        void onAsynchronousException(MessageTransport source, Exception e);
+        void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at, String selector);
     }
     
     private final String _transportIdentifier;
     private IMessageTransportDelegate _delegate;
     
-    protected AbstractMessageTransport(String transportIdentifier) {
+    protected MessageTransport(String transportIdentifier) {
         _transportIdentifier= transportIdentifier.toLowerCase();
     }
     

@@ -13,12 +13,12 @@ public class JiacMessage implements IJiacMessage {
 
 	public static final String PLATFORM_ENDPOINT_EXTENSION = "TNG";
 
-	IJiacContent _payload;
-	ICommunicationAddress _address;
+	private IJiacContent _payload;
+	private ICommunicationAddress _sender;
 	
 	public JiacMessage(IJiacContent payload, ICommunicationAddress address) {
 		_payload = payload;
-		_address = address;
+		_sender = address;
 	}
 
 	public IJiacContent getPayload() {
@@ -32,7 +32,10 @@ public class JiacMessage implements IJiacMessage {
 	}
 	
 	public ICommunicationAddress getSender(){
-		return _address;
+		return _sender;
 	}
-	
-	}
+    
+    public synchronized void setSender(ICommunicationAddress sender) {
+        _sender= sender;
+    }
+}

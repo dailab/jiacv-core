@@ -10,5 +10,5 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @version $Revision$
  */
 public interface IJiacMessageListener {
-    void receive(IJiacMessage message, ICommunicationAddress from);
+    void receive(IJiacMessage message, ICommunicationAddress at);
 }

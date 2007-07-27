@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
@@ -69,8 +67,6 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     private final Map<String, WildcardListenerContext> _selectorToListenerMap;
     private final Map<CommunicationAddress, List<ListenerContext>> _addressToListenerMap;
     
-    private Log _log;
-    
     public CommunicationBean() {
         _defaultListener= new MemoryDelegationMessageListener();
         _defaultDelegate= new MessageTransportDelegate();
@@ -115,7 +111,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             try {
                 transport.doCleanup();
             } catch(Exception e) {
-                _log.warn("transport '" + transport.getTransportIdentifier() + "' did not cleanup correctly", e);
+                log.warn("transport '" + transport.getTransportIdentifier() + "' did not cleanup correctly", e);
             }
         }
         // TODO: maybe we should empty the transports map? Or might this bean be reused?
@@ -125,7 +121,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     @Override
     public synchronized void doInit() throws Exception {
         super.doInit();
-        _log= thisAgent.getLog(this);
+        log= thisAgent.getLog(this);
         
         for(Iterator<MessageTransport> iter= _transports.values().iterator(); iter.hasNext();) {
             MessageTransport transport= iter.next();
@@ -133,7 +129,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             try {
                 transport.doInit();
             } catch (Exception e) {
-                _log.error("transport '" + transport.getTransportIdentifier() + "' did not initialise correctly -> remove it", e);
+                log.error("transport '" + transport.getTransportIdentifier() + "' did not initialise correctly -> remove it", e);
                 try {transport.doCleanup();} catch(Exception x){};
                 iter.remove();
             }
@@ -143,7 +139,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         establishMessageBox((_defaultMessageBox= CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName())));
         
         if(_transports.size() <= 0) {
-            _log.warn("no transports available yet!");
+            log.warn("no transports available yet!");
         }
     }
     
@@ -176,7 +172,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
                 try {
                     transport.doCleanup();
                 } catch(Exception e) {
-                    _log.warn("transport '" + transportIdentifier + "' did not cleanup correctly", e);
+                    log.warn("transport '" + transportIdentifier + "' did not cleanup correctly", e);
                 }
             }
         }
@@ -323,14 +319,14 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             _defaultListener.receive(message, at.bind(source.getTransportIdentifier()));
         } catch (URISyntaxException use) {
             // should not happen
-            _log.error("could not bind address to '" + source.getTransportIdentifier() + "'", use);
+            log.error("could not bind address to '" + source.getTransportIdentifier() + "'", use);
             _defaultListener.receive(message, at);
         }
     }
     
     protected void processError(MessageTransport source, Exception error) {
         // TODO: error handling
-        _log.error("message transport '" + source.getTransportIdentifier() + "' threw an exception", error);
+        log.error("message transport '" + source.getTransportIdentifier() + "' threw an exception", error);
     }
  
     /**

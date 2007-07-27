@@ -22,6 +22,7 @@ import de.dailab.jiactng.agentcore.comm.IGroupAddress;
  */
 public class PingPongTestCase extends TestCase {
     public static String DUMMY_ADDRESS= "dummyAddress";
+    public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.CommunicationBean#send";
 
     private BrokerService _broker;
     private IAgentNode _node;
@@ -60,6 +61,9 @@ public class PingPongTestCase extends TestCase {
     
     public void testPingPong() throws Exception {
         _pingerBean.startPingProcess();
+        if(!_pingerBean.waitForPong()) {
+            fail("no pong received");
+        }
     }
 
     @Override
@@ -68,9 +72,4 @@ public class PingPongTestCase extends TestCase {
         _broker.stop();
         super.tearDown();
     }
-    
-    public void testComment(){
-    	assertTrue(true);
-    }
-    
 }

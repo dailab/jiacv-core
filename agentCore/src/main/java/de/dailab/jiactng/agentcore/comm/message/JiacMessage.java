@@ -16,6 +16,10 @@ public class JiacMessage implements IJiacMessage {
 	private IJiacContent _payload;
 	private ICommunicationAddress _sender;
 	
+    public JiacMessage(IJiacContent payload) {
+        this(payload, null);
+    }
+    
 	public JiacMessage(IJiacContent payload, ICommunicationAddress address) {
 		_payload = payload;
 		_sender = address;
@@ -27,15 +31,15 @@ public class JiacMessage implements IJiacMessage {
 
 	
 	public String toString() {
-		return ("[Payload: " + getPayload().toString() 
-				+ ", Address: " + getSender().toString());
+		return ("[Payload: " + getPayload() 
+				+ ", Sender: " + getSender() + "]");
 	}
 	
 	public ICommunicationAddress getSender(){
 		return _sender;
 	}
     
-    public synchronized void setSender(ICommunicationAddress sender) {
+    public void setSender(ICommunicationAddress sender) {
         _sender= sender;
     }
 }

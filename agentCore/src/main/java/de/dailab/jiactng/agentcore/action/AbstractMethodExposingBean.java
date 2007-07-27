@@ -155,10 +155,11 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
                 log.debug("action name '" + name + "' contains method separation but is not a method of mine"); 
             } catch (IllegalAccessException iae) {
                 // should not happen
+                log.debug("cannot access action", iae);
                 throw new IllegalArgumentException("doAction references a non-accessible method", iae);
             } catch (InvocationTargetException ite) {
                 // should not happen -> type checking have to be implemented in the DoAction constructor!
-                
+                log.debug("error while invoking action", ite);
                 Throwable cause= ite.getCause();
                 memory.write(action.createActionResult(doAction.getSession(), new Object[]{cause != null ? cause : ite}, doAction));
                 return;

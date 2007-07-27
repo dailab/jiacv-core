@@ -8,15 +8,20 @@ import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
+import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.ActionResult;
+import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
+import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class PongerBean extends AbstractAgentBean {
+public class PongerBean extends AbstractAgentBean implements ResultReceiver {
     private class MessageObserver implements SpaceObserver<IFact> {
 
         @SuppressWarnings("unchecked")
@@ -33,6 +38,15 @@ public class PongerBean extends AbstractAgentBean {
                 ObjectContent content= (ObjectContent) message.getPayload();
                 System.out.println("PongerBean:: received " + content.getObject());
 
+                Action action= memory.read(new Action(PingPongTestCase.ACTION_NAME, null, null, null));
+                IJiacMessage  pongMessage= new JiacMessage(new ObjectContent("Pong"));
+                    DoAction doAction= action.createDoAction(new Object[]{
+                        pongMessage,
+                        message.getSender().toUnboundAddress()
+                    },
+                    PongerBean.this
+                );
+                memory.write(doAction);
             }
         }
     }
@@ -40,6 +54,10 @@ public class PongerBean extends AbstractAgentBean {
     @Override
     public void doInit() throws Exception {
         super.doInit();
-        memory.attach(new MessageObserver(), new DummyMessage(null));
+        memory.attach(new MessageObserver(), new JiacMessage(null));
+    }
+
+    public void receiveResult(ActionResult result) {
+        log.debug(result);
     }
 }

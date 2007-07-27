@@ -58,6 +58,7 @@ public class JMSMessageTransport extends MessageTransport {
             result= session.createObjectMessage();
             ((ObjectMessage)result).setObject(payload);
         }
+        
         result.setStringProperty(SENDER_KEY, message.getSender().toURI().toString());
         return result;
     }
@@ -70,13 +71,11 @@ public class JMSMessageTransport extends MessageTransport {
 	private JMSReceiver _receiver;
 	
 	public JMSMessageTransport() {
-		super("jms");
-		log.debug("JMSMessageTransport created");
+		this("jms");
 	}
     
     public JMSMessageTransport(String transportIdentifier) {
         super(transportIdentifier);
-        log.debug("JMSMessageTransport created");
     }
 
 	/**

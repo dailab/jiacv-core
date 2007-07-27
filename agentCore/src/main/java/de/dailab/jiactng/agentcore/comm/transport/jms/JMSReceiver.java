@@ -83,7 +83,6 @@ class JMSReceiver {
     private Map<String, JMSMessageListener> _listeners;
 	
 	public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent) throws JMSException {
-		log.debug("Creating JMSReceiver");
 		_connectionFactory = (ConnectionFactory) connectionFactory;
 		_parent = parent;
         _listeners= new HashMap<String, JMSMessageListener>();
@@ -94,21 +93,22 @@ class JMSReceiver {
 	 * Initializes the JiacReceiver creating a MessageConsumer for receiving messages to the CommBean
 	 */
 	public void doInit() throws JMSException {
-		log.debug("JMSReceiver initialising");
+		log.debug("doInit");
 		_connection = _connectionFactory.createConnection();
 		_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		_connection.start();
-		log.debug("JMSReceiver initilised");
+		log.debug("doneInit");
 	}
 	
 	/**
 	 * commence Cleanup procedures, closing all consumers and connections.
 	 */
 	public void doCleanup() throws JMSException {
-		log.debug("JMSReceiver.doCleanup");
+		log.debug("doCleanup");
 		stopListenAll();
 		_session.close();
 		_connection.close();
+        log.debug("doneCleanup");
 	}
 	
 	/**
@@ -138,8 +138,6 @@ class JMSReceiver {
 	 * @param selector			a selector to recieve only special messages
 	 */
 	public synchronized void stopListen(ICommunicationAddress address, String selector){
-		log.debug("JMSReceiver.stopListen");
-		
         String key= getStringRepresentation(address, selector);
         JMSMessageListener listener= _listeners.remove(key);
         
@@ -152,8 +150,6 @@ class JMSReceiver {
 	 * stops receiving Messages from all enlisted Destinations except the Commbean itself.
 	 */
 	public synchronized void stopListenAll(){
-		log.debug("JiacReceiver.stopListenAll");
-		
         for(JMSMessageListener listener : _listeners.values()) {
             listener.destroy();
         }

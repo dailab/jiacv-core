@@ -51,6 +51,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     
     private final class MemoryDelegationMessageListener implements IJiacMessageListener {
         public void receive(IJiacMessage message, ICommunicationAddress from) {
+            System.out.println("received message '" + message.toString() + "' at '" + from + "'");
             memory.write(message);
         }
     }
@@ -61,6 +62,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     
     private Map<String, MessageTransport> _transports;
     
+    /**
+     * This map contains all listeners which where only registered to a selector.
+     * They are added to all further communication addresses automatically.
+     */
     private final Map<String, WildcardListenerContext> _selectorToListenerMap;
     private final Map<CommunicationAddress, List<ListenerContext>> _addressToListenerMap;
     
@@ -75,7 +80,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     }
 
     // ~ START OF CONFIGURATION AND INITIALISATION STUFF ~ //
-    public synchronized void setTransports(Set<MessageTransport> transports) {
+    public synchronized void setTransports(Set<MessageTransport> transports) throws Exception {
         Set<MessageTransport> workingCopy;
         if(transports == null) {
             workingCopy= Collections.emptySet();
@@ -142,29 +147,20 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
     }
     
-    public synchronized void addTransport(MessageTransport transport) {
+    public synchronized void addTransport(MessageTransport transport) throws Exception {
         String id= transport.getTransportIdentifier();
         if(_transports.containsKey(id)) {
             throw new IllegalArgumentException("the transport '" + id +  "' already exists");
         }
         
-        switch(getState()) {
-            case CLEANED_UP: case CLEANING_UP: {
-                throw new IllegalStateException("you cannot add any further transport while in destruction state");
+        try {
+            if(isActive()) {
+                transport.setDefaultDelegate(_defaultDelegate);
+                transport.doInit();
+                registerAllToTransport(transport);
             }
-
-            case INITIALIZED: case STARTED: {
-                try {
-                    transport.setDefaultDelegate(_defaultDelegate);
-                    transport.doInit();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                // fall through
-            }
-            default: {
-                _transports.put(id, transport);
-            }
+        } finally {
+            _transports.put(id, transport);
         }
     }
     
@@ -348,7 +344,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         CommunicationAddress unboundAddress= address.toUnboundAddress();
         
         // first check whether the sender is correct
-        if(!_addressToListenerMap.containsKey(unboundAddress)) {
+        if(message.getSender() == null || !_addressToListenerMap.containsKey(unboundAddress)) {
             message.setSender(_defaultMessageBox);
         }
         
@@ -380,14 +376,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
      * Assumes that the listener is non-null and either the address or the selector is non-null.
      */
     private synchronized void internalRegister(IJiacMessageListener listener, CommunicationAddress address, String selector) throws CommunicationException {
-        CommunicationAddress unboundAddress= address.toUnboundAddress();
-        if(unboundAddress == null) {
+        if(address == null) {
             WildcardListenerContext context= _selectorToListenerMap.get(selector);
             if(context != null) {
-                if(context.listener == listener)
-                    return;
-                
-                throw new CommunicationException("there already exists a wildcard listener for selector '" + selector + "'");
+                return;
             }
             
             context= new WildcardListenerContext(listener, selector);
@@ -396,7 +388,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
                     List<ListenerContext> registeredContexts= _addressToListenerMap.get(registered);
                     try {
                         for(MessageTransport transport : _transports.values()) {
-                            transport.listen(address, context.selector);
+                            transport.listen(registered, context.selector);
                         }
                     } finally {
                         registeredContexts.add(context);
@@ -404,6 +396,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
                 }
             }
         } else {
+            CommunicationAddress unboundAddress= address.toUnboundAddress();
             ListenerContext context= new ListenerContext(listener, selector);
             List<ListenerContext> registeredContexts= _addressToListenerMap.get(unboundAddress);
             
@@ -413,7 +406,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             }
             
             if(registeredContexts.contains(context) && context.listener != listener) {
-                throw new CommunicationException("cannot register additional listener for ");
+                return;
             }
             
             registeredContexts.add(context);
@@ -426,16 +419,33 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
     }
     
+    private synchronized void registerAllToTransport(MessageTransport transport) throws CommunicationException {
+        for(ICommunicationAddress address : _addressToListenerMap.keySet()) {
+            for(ListenerContext context : _addressToListenerMap.get(address)) {
+                transport.listen(address, context.selector);
+            }
+        }
+    }
+    
     /**
      * Assumse that the listener is non-null and either the address or the selector is non-null.
      */
     private synchronized void internalUnregister(IJiacMessageListener listener, CommunicationAddress address, String selector) throws CommunicationException {
-        
+        if(address == null) {
+            WildcardListenerContext context= _selectorToListenerMap.get(selector);
+            if(context == null) {
+                return;
+            }
+            
+            if(isActive()) {
+                
+            }
+        }
     }
     
     private boolean isActive() {
         switch(getState()) {
-            case INITIALIZING: case INITIALIZED: case STARTING: case STARTED: case CLEANING_UP:
+            case INITIALIZING: case INITIALIZED: case STARTING: case STARTED:
                 return true;
             default:
                 return false;

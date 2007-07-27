@@ -32,25 +32,25 @@ class JMSSender {
 	private int _defaultTimeOut = 1000;
 
 	public JMSSender(ConnectionFactory connectionFactory) throws JMSException {
-		log.debug("Creating JMSSender");
 		_connectionFactory = (ConnectionFactory)connectionFactory;
 		doInit();
 	}
 	
 	public void doInit() throws JMSException {
-		log.debug("JMSSender initialising");
+		log.debug("doInit");
 		_connection = _connectionFactory.createConnection();
 		_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        log.debug("doneInit");
 	}
 	
 	public void doCleanup() throws JMSException {
-		log.debug("JMSSender.doCleanup");
+		log.debug("doCleanup");
 		_session.close();
 		_connection.close();
+        log.debug("doneCleanup");
 	}
 
 	public void send(IJiacMessage message, ICommunicationAddress address) throws JMSException {
-		log.debug("creating Destination: " + address);
 		Destination destination = null;
 		if (address instanceof IGroupAddress) {
 			destination = _session.createTopic(address.getName());
@@ -61,23 +61,18 @@ class JMSSender {
 		sendMessage(message, destination, _defaultTimeOut);
 	}
 	
-	/*
-	 * the real sendMessage :-)
-	 * 
-	 * sends message to destination using replyToDestination as replyToAdress giving the message timeToLive in ms
-	 * timeToLive = 0 means: no timeout
-	 */
-	public void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {
-		log.debug("Begin of sending procedure... now!");
+	private void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {
+        log.debug("start sending...");
 		MessageProducer producer = null;
 
 		producer = _session.createProducer(destination);
 		producer.setTimeToLive(timeToLive);
         
+        log.debug("pack message");
         Message jmsMessage= JMSMessageTransport.pack(message, _session);
         jmsMessage.setJMSDestination(destination);
 		producer.send(jmsMessage);
 		producer.close();
-		log.debug("Sending Procedure done");
+        log.debug("sending done");
 	}
 }

@@ -236,4 +236,30 @@ public class Action implements IFact {
         
         return true;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder= new StringBuilder();
+        builder.append("Action:\n name=").append(name).append("; ");
+        builder.append("\n parameters=");
+        prettyPrintArray(builder, parameters);
+        builder.append(";\n results=");
+        prettyPrintArray(builder, results);
+        builder.append('\n');
+        return builder.toString();
+    }
+    
+    private void prettyPrintArray(StringBuilder builder, Class[] array) {
+        builder.append('[');
+        int last= array.length - 1;
+        for(int i= 0; i <= last; ++i) {
+            builder.append(array[i].getName());
+            
+            if(i < last) {
+                builder.append("; ");
+            }
+        }
+        
+        builder.append(']');
+    }
 }

@@ -48,4 +48,9 @@ public class RemoteAction implements IJiacContent {
 	public void setAgentDescription(AgentDescription agentDescription) {
 		this.agentDescription = agentDescription;
 	}
+
+    @Override
+    public String toString() {
+        return "RemoteAction for " + action.toString();
+    }
 }

@@ -30,7 +30,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class ServiceBean extends AbstractMethodExposingBean implements IEffector, ResultReceiver {
     private static final String SERVICE_BROADCAST_ADDRESS= "JiacTNG/service/broadcast";
@@ -46,6 +46,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
      */
     private class ServiceExecutionListener implements IJiacMessageListener {
         public void receive(IJiacMessage message, ICommunicationAddress at) {
+            log.debug("execution listener received something");
             IJiacContent content= message.getPayload();
             if(content instanceof RemoteActionResult) {
                 processActionResult((RemoteActionResult) content);
@@ -62,6 +63,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
      */
     private class ServiceManagementListener implements IJiacMessageListener {
         public void receive(IJiacMessage message, ICommunicationAddress at) {
+            log.debug("management listener received something");
             IJiacContent content= message.getPayload();
             
             if(content instanceof RemoteAction) {
@@ -255,6 +257,10 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     
     void processAction(DoRemoteAction doRemoteAction, ICommunicationAddress requestSource) {
         DoAction doAction= doRemoteAction.getAction();
+        // set this bean as result receiver
+        doAction.setSource(this);
+        doAction.getSession().setSource(this);
+        
         Action action= doAction.getAction();
         Action current= memory.read(new Action(action.getName(), null, action.getParameters(), action.getResults()));
         

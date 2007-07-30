@@ -23,7 +23,11 @@ public class Session implements IFact {
 	private long creationTime;
 
 	/** Stores the reference to the creator of this session. */
-	private ResultReceiver source;
+    /* 
+     * FIXME: this source is transient now... examine whether this provides issues
+     *        -> remember that session objects are serialised in the Remote* classes!
+     */
+	private transient ResultReceiver source;
 
 	/**
 	 * The history of the session. This list contains all sources of the session

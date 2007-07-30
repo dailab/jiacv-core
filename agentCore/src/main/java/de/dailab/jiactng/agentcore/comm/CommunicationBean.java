@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,8 +85,8 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         _defaultListener= new MemoryDelegationMessageListener();
         _defaultDelegate= new MessageTransportDelegate();
         _transports= new HashMap<String, MessageTransport>();
-        _selectorToListenerMap= new HashMap<String, WildcardListenerContext>();
-        _addressToListenerMap= new HashMap<CommunicationAddress, List<ListenerContext>>();
+        _selectorToListenerMap= new Hashtable<String, WildcardListenerContext>();
+        _addressToListenerMap= new Hashtable<CommunicationAddress, List<ListenerContext>>();
     }
 
     // ~ START OF CONFIGURATION AND INITIALISATION STUFF ~ //
@@ -388,9 +389,30 @@ public class CommunicationBean extends AbstractMethodExposingBean {
      * delegates received messages to the default listener
      */
     protected synchronized void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at, String selector) {
-        // TODO: built message procession
+        ListenerContext recipientContext= null;
+
+        if(selector != null) {
+            recipientContext= _selectorToListenerMap.get(selector);
+        }
+        
+        if(recipientContext == null) {
+            for(ListenerContext context : _addressToListenerMap.get(at.toUnboundAddress())) {
+                if(context.selector != null) {
+                    if(selector != null && context.selector.equals(selector)) {
+                        // we found the perfect match
+                        recipientContext= context;
+                        break;
+                    }
+                } else {
+                    // we found a match with no selector but we look for a better one
+                    recipientContext= context;
+                }
+            }
+        }
+        
         try {
-            _defaultListener.receive(message, at.bind(source.getTransportIdentifier()));
+            IJiacMessageListener recipient= recipientContext != null ? recipientContext.listener : _defaultListener;
+            recipient.receive(message, at.bind(source.getTransportIdentifier()));
         } catch (URISyntaxException use) {
             // should not happen
             log.error("could not bind address to '" + source.getTransportIdentifier() + "'", use);

@@ -22,11 +22,13 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 
 /**
- * Die CommBean beinhaltet einen JiacSender und einen JiacReceiver.
- * Der Sender 	�bernimmt das verschicken von Nachrichten welche dem IJiacMessage 
- * 				Interface entsprechen. Dazu wird auf einen JMS Broker zur�ckgegriffen.
- * Der Receiver	erm�glicht es mittels MessageListeners an JMS Destinations zu lauschen.
- * 				Der Empfang verl�uft dabei asynchron und Eventgetriggert.
+ * The JMSMessageTransports holds a JMSReceiver and a JMSSender.
+ * All Messages received from any of the listeners will be delegated
+ * to the defaultDelegate set to this transport.
+ * 
+ * 
+ * Notes: 
+ * A defaultDelegate should be set with setDefaultDelegate before using it.
  * 
  * @author Janko, Loeffelholz
  */
@@ -35,6 +37,13 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 public class JMSMessageTransport extends MessageTransport {
     private final static String SENDER_KEY= "JiacTNG-sender-address";
     
+    /**
+     * Retrieves JiacMessages from JMSMessages
+     * 
+     * @param message	a JMSMessage received
+     * @return			the JiacMessage included within the JMSMessage
+     * @throws JMSException
+     */
     static IJiacMessage unpack(Message message) throws JMSException {
         IJiacContent payload;
         if(message instanceof BytesMessage) {
@@ -64,6 +73,14 @@ public class JMSMessageTransport extends MessageTransport {
         return result;
     }
     
+    /**
+     * Puts a JiacMessage into a JMSMessage which could then be send using JMS
+     * 
+     * @param message	the JiacMessage to sent
+     * @param session	a (jms)session needed to create the message
+     * @return	Message a jmsmessage to send over a jms broker
+     * @throws JMSException
+     */
     static Message pack(IJiacMessage message, Session session) throws JMSException {
         IJiacContent payload= message.getPayload();
         Message result;
@@ -100,10 +117,11 @@ public class JMSMessageTransport extends MessageTransport {
     }
 
 	/**
-	 * Initialisiert die CommBean. Notwendige Parameter: ConnectionFactory, AgentNodeName
+	 * Initializes the JMSMessageTransport 
+	 * Notes: ConnectionFactory needed!
 	 */
 	@Override
-	public void doInit() throws Exception {
+	public synchronized void doInit() throws Exception {
 		log.debug("doInit");
 	
 		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
@@ -114,7 +132,11 @@ public class JMSMessageTransport extends MessageTransport {
 		
 	}
 	
-	public void doCleanup() {
+	
+	/**
+	 * cleans up the JMSMessageTransports and the classes it holds
+	 */
+	public synchronized void doCleanup() {
 		log.debug("doCleanup");
         try {_receiver.doCleanup();} catch (Exception e) {log.warn("cleaned up receiver", e);}
 		try {_sender.doCleanup();} catch (Exception e) {log.warn("cleaned up sender", e);}
@@ -126,6 +148,7 @@ public class JMSMessageTransport extends MessageTransport {
 	 */
 
 	/**
+	 * Sends the given JiacMessage
 	 * 
 	 * @param message 	a JiacMessage
 	 * @param commAdd 	a CommunicationAddress, which might be a GroupAddress or
@@ -144,11 +167,10 @@ public class JMSMessageTransport extends MessageTransport {
 	 */
 
 	/**
-	 * Initialisiert einen neuen Consumer f�r die gegebenene destination und h�ngt den gegebenen Listener dran.
+	 * Initializes a new listener for the given address and selector
 	 * 
-	 * @param listener the MessageListener used to get onto the messages
-	 * @param destinationName the Name of the destination from which the Messages will be sent
-	 * @param topic    is the destination to listen on a topic? (true/false)
+	 * @param address 	the address to listen to
+	 * @param selector	if you want to get only special messages use this to select them
 	 */
 	public void listen(ICommunicationAddress address, String selector) throws CommunicationException {
         try {
@@ -159,11 +181,12 @@ public class JMSMessageTransport extends MessageTransport {
 	}
 	
 	/**
-	 * Stops receivment of the Messages from a given destination by removing the consumer
-	 * aligned to it from the consumerlist (especially useful for temporaryDestinations)
+	 * Stops receivment of the Messages from a given address by removing the listener
+	 * aligned to it from the listenerlist (especially useful for temporaryDestinations)
 	 * 
-	 * @param destinationName	the name of the destination we don't want to listen anymore to
-	 * @param selector			a selector to recieve only special messages
+	 * @param address	the address you had listen to
+	 * @param selector	the selector given with the address when you started to
+	 * 					listen to it
 	 */
 	public void stopListen(ICommunicationAddress address, String selector) { 
 		_receiver.stopListen(address, selector);

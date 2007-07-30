@@ -131,7 +131,7 @@ class JMSReceiver {
 	 * Initializes the JiacReceiver creating and starting session and connection.
 	 * throws an JMSException if something goes wrong doing so.
 	 */
-	public void doInit() throws JMSException {
+	public synchronized void doInit() throws JMSException {
 		log.debug("doInit");
 		_connection = _connectionFactory.createConnection();
 		_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -142,7 +142,7 @@ class JMSReceiver {
 	/**
 	 * commence Cleanup procedures, closing all consumers and connections.
 	 */
-	public void doCleanup() throws JMSException {
+	public synchronized void doCleanup() throws JMSException {
 		log.debug("doCleanup");
 		stopListenAll();
 		_session.close();

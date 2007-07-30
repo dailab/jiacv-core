@@ -19,6 +19,8 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author moekon
  */
 public class Action implements IFact {
+    private final static Class[] EMPTY_CLASSES= new Class[0];
+    
 
 	/** the name of the action */
 	private String name;
@@ -49,8 +51,8 @@ public class Action implements IFact {
 		super();
 		this.name = name;
 		this.providerBean = providerBean;
-		this.parameters = parameters;
-		this.results = results;
+        setParameters(parameters);
+		setResults(results);
 	}
 
 	/**
@@ -166,7 +168,7 @@ public class Action implements IFact {
 	 *            the parameters to set
 	 */
 	public void setParameters(Class[] parameters) {
-		this.parameters = parameters;
+		this.parameters = parameters == null ? EMPTY_CLASSES : parameters;
 	}
 
 	/**
@@ -182,7 +184,56 @@ public class Action implements IFact {
 	 *            the results to set
 	 */
 	public void setResults(Class[] results) {
-		this.results = results;
+		this.results = results == null ? EMPTY_CLASSES : results;
 	}
 
+    @Override
+    public int hashCode() {
+        int hash= name.hashCode();
+        
+        for(int i= 0; i < parameters.length; ++i) {
+            hash ^= parameters[i].hashCode();
+        }
+        
+        for(int i= 0; i < results.length; ++i) {
+            hash ^= results[i].hashCode();
+        }
+        
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null || !(obj instanceof Action)) {
+            return false;
+        }
+        
+        Action other= (Action) obj;
+
+        if(!name.equals(other.name)) {
+            return false;
+        }
+        
+        if(parameters.length != other.parameters.length) {
+            return false;
+        }
+        
+        if(results.length != other.results.length) {
+            return false;
+        }
+        
+        for(int i= 0; i < parameters.length; ++i) {
+            if(!parameters[i].equals(other.parameters[i])) {
+                return false;
+            }
+        }
+        
+        for(int i= 0; i < results.length; ++i) {
+            if(!results[i].equals(other.results[i])) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 }

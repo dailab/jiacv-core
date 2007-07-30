@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.transport.jms;
 
+import java.util.Enumeration;
+
 import javax.jms.BytesMessage;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -31,7 +33,7 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 
 
 public class JMSMessageTransport extends MessageTransport {
-    private final static String SENDER_KEY= "JiacTNGSenderAddress";
+    private final static String SENDER_KEY= "JiacTNG-sender-address";
     
     static IJiacMessage unpack(Message message) throws JMSException {
         IJiacContent payload;
@@ -44,8 +46,22 @@ public class JMSMessageTransport extends MessageTransport {
             payload= (IJiacContent) ((ObjectMessage)message).getObject();
         }
         ICommunicationAddress sender= CommunicationAddressFactory.createFromURI(message.getStringProperty(SENDER_KEY));
-        // TODO read out more headers
-        return new JiacMessage(payload, sender);
+
+        IJiacMessage result= new JiacMessage(payload, sender);
+        for(Enumeration keys= message.getPropertyNames(); keys.hasMoreElements(); ) {
+            Object keyObj= keys.nextElement();
+            
+            if(keyObj instanceof String) {
+                String key= (String) keyObj;
+                Object valueObj= message.getObjectProperty(key);
+                
+                if(valueObj instanceof String) {
+                    result.setHeader(key, (String)valueObj);
+                }
+            }
+        }
+        
+        return result;
     }
     
     static Message pack(IJiacMessage message, Session session) throws JMSException {
@@ -60,6 +76,11 @@ public class JMSMessageTransport extends MessageTransport {
         }
         
         result.setStringProperty(SENDER_KEY, message.getSender().toURI().toString());
+        
+        for(String key : message.getHeaderKeys()) {
+            result.setStringProperty(key, message.getHeader(key));
+        }
+        
         return result;
     }
     

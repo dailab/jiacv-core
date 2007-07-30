@@ -29,6 +29,14 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTrans
  * @version $Revision$
  */
 public class CommunicationBean extends AbstractMethodExposingBean {
+	/**
+	 * a save way to cast from object to targetType
+	 * 
+	 * @param <T>
+	 * @param object
+	 * @param targetType
+	 * @return
+	 */
     private static <T> T saveCast(Object object, Class<T> targetType) {
         if(!targetType.isInstance(object)) {
             throw new IllegalArgumentException("argument is not valid");
@@ -37,6 +45,11 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         return targetType.cast(object);
     }
     
+    /**
+     * Helpclass used to manage incoming messages and exceptions,
+     * routing them to processError or processMessage
+     *
+     */
     private final class MessageTransportDelegate implements IMessageTransportDelegate {
         public void onAsynchronousException(MessageTransport source, Exception e) {
             processError(source, e);
@@ -76,6 +89,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     }
 
     // ~ START OF CONFIGURATION AND INITIALISATION STUFF ~ //
+    /**
+     * sets transports to the set given. All transports allready set which are not within the
+     * set given as parameter will be removed.
+     */
     public synchronized void setTransports(Set<MessageTransport> transports) throws Exception {
         Set<MessageTransport> workingCopy;
         if(transports == null) {
@@ -95,11 +112,12 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             // only add transports that are not yet installed
             workingCopy.removeAll(_transports.values());
             
+            // remove transports other than which we want to set
             for(MessageTransport transport : toRemove) {
                 removeTransport(transport.getTransportIdentifier());
             }
         }
-        
+        // now add what has to be add
         for(MessageTransport transport : workingCopy) {
             addTransport(transport);
         }
@@ -129,7 +147,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             try {
                 transport.doInit();
             } catch (Exception e) {
-                log.error("transport '" + transport.getTransportIdentifier() + "' did not initialise correctly -> remove it", e);
+                log.error("transport '" + transport.getTransportIdentifier() + "' did not initialised correctly -> will be removed", e);
                 try {transport.doCleanup();} catch(Exception x){};
                 iter.remove();
             }
@@ -143,6 +161,13 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
     }
     
+    /**
+     * Adds transport to the list of transports hold by this CommunicationBean
+     * Notes: transport only added when not enlisted yet
+     * 
+     * @param transport	to add
+     * @throws Exception is thrown if transport allready hold by this CommunicationBean
+     */
     public synchronized void addTransport(MessageTransport transport) throws Exception {
         String id= transport.getTransportIdentifier();
         if(_transports.containsKey(id)) {
@@ -160,13 +185,19 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
     }
     
+    
+    /**
+     * removes and cleans up a transport hold by this CommunicationBean
+     * 
+     * @param transportIdentifier of the transport to remove
+     */
     public synchronized void removeTransport(String transportIdentifier) {
         MessageTransport transport= _transports.remove(transportIdentifier);
         
         if(transport == null) {
             return;
         }
-        
+   
         switch(getState()) {
             case INITIALIZED: case STARTED: case STOPPED: {
                 try {
@@ -226,7 +257,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
      * This method sends a message to the given destination.
      * 
      * @param message   the message to send
-     * @param address   the address which points 
+     * @param address   the address to send to 
      */
     @Expose
     public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
@@ -241,6 +272,11 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         internalSend(saveCast(message, JiacMessage.class), saveCast(address, CommunicationAddress.class));
     }
     
+    /**
+     * registers to a given Address and starts to listen to it.
+     * @param address
+     * @throws CommunicationException
+     */
     @Expose
     public synchronized void register(ICommunicationAddress address) throws CommunicationException {
         if(address == null) {
@@ -250,6 +286,11 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         internalRegister(_defaultListener, saveCast(address, CommunicationAddress.class), null);
     }
     
+    /**
+     * stops to listen to communication on a given Address
+     * @param address
+     * @throws CommunicationException
+     */
     @Expose
     public synchronized void unregister(ICommunicationAddress address) throws CommunicationException {
         if(address == null) {
@@ -261,6 +302,12 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     // ~ END OF ACTIONS ~ //
     
     // ~ METHODS FOR LISTENER ADMINISTRATION ~ //
+    
+    /**
+     * registers a given listener to an address
+     * if all messages shall be received selector == null
+     * Notes: Listener and either address or selector must not be null
+     */
     public synchronized void register(IJiacMessageListener listener, ICommunicationAddress address, String selector) throws CommunicationException {
         if(listener == null) {
             throw new IllegalArgumentException("listener must not be null");
@@ -273,7 +320,14 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         internalRegister(listener, saveCast(address, CommunicationAddress.class), selector);
     }
     
-    
+    /**
+     * register a listener to all addresses the commbean listens
+     *
+     * @param listener	where the messages should be delegated to
+     * @param selector	filterstring for deciding which messages should be delegated
+     * 					must not be null!
+     * @throws CommunicationException
+     */
     public synchronized void register(IJiacMessageListener listener, String selector) throws CommunicationException {
         if(listener == null) {
             throw new IllegalArgumentException("listener must not be null");
@@ -286,6 +340,16 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         internalRegister(listener, null, selector);
     }
     
+    /**
+     * Unregisters a listener either from an address or from all messages 
+     * associated with with a given selector
+     * Notes: either address or selector must not be null
+     * 
+     * @param listener	that wants to unregister
+     * @param address	The address the listener should stop listen to
+     * @param selector	The selector given while the listener was registered (null if none was given)
+     * @throws CommunicationException
+     */
     public synchronized void unregister(IJiacMessageListener listener, ICommunicationAddress address, String selector) throws CommunicationException {
         if(listener == null) {
             throw new IllegalArgumentException("listener must not be null");
@@ -298,6 +362,13 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         internalUnregister(listener, saveCast(address, CommunicationAddress.class), selector);
     }
     
+    /**
+     * Unregisters a listener from listening to messages filtered with a given selector
+     * 
+     * @param listener the listener that should stop to listen
+     * @param selector the selector given while the listener registered
+     * @throws CommunicationException
+     */
     public synchronized void unregister(IJiacMessageListener listener, String selector) throws CommunicationException {
         if(listener == null) {
             throw new IllegalArgumentException("listener must not be null");
@@ -313,6 +384,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     
     
     // ~ INTERNAL METHODS ~ //
+    /**
+     * delegates received messages to the default listener
+     */
     protected synchronized void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at, String selector) {
         // TODO: built message procession
         try {
@@ -324,6 +398,12 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
     }
     
+    /**
+     * if an error occures....
+     * 
+     * @param source
+     * @param error
+     */
     protected void processError(MessageTransport source, Exception error) {
         // TODO: error handling
         log.error("message transport '" + source.getTransportIdentifier() + "' threw an exception", error);
@@ -415,6 +495,13 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
     }
     
+    /**
+     * registers all addresses the CommunicationBean listens to, on a transport, so
+     * that the transport will listen to it.
+     * 
+     * @param transport	the transport to register the addresses to
+     * @throws CommunicationException
+     */
     private synchronized void registerAllToTransport(MessageTransport transport) throws CommunicationException {
         for(ICommunicationAddress address : _addressToListenerMap.keySet()) {
             for(ListenerContext context : _addressToListenerMap.get(address)) {

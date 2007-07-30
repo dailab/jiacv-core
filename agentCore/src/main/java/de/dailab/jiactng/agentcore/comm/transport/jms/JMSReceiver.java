@@ -20,14 +20,30 @@ import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 
 /**
  * 
- * JiacReceiver is a ServiceClass for CommBeanV2, offering functionality for managing messagelisteners
- * on JMS destinations. 
+ * 
+ * JMSReceiver is creating consumers for JMS-Destinations and delegates the messages up to its "parent"
+ * JMSReceiver is hold by a JMSMessageTransport, which extends a MessageTransport. 
+ * The delegate where the message will be handed over to is set through a setter in the extended part of
+ * the class.
  * 
  * @author Loeffelholz
  *
  */
 class JMSReceiver {
-    protected static String getStringRepresentation(ICommunicationAddress address, String selector) {
+
+	Log log = LogFactory.getLog(getClass());
+	private ConnectionFactory _connectionFactory;
+	private Connection _connection;
+	private Session _session;
+    private JMSMessageTransport _parent;
+    private Map<String, JMSMessageListener> _listeners;
+	
+    /**
+	 * @param address
+	 * @param selector
+	 * @return 	a standardized String Expression for address and selector
+	 */
+	protected static String getStringRepresentation(ICommunicationAddress address, String selector) {
         StringBuilder result= new StringBuilder();
         result.append(address.toString());
         
@@ -38,6 +54,14 @@ class JMSReceiver {
         return result.toString();
     }
     
+    
+    /**
+     * Helping class for organizing destinations.
+     * It holds the consumer, the addres, a selector and is stored 
+     * within the _listeners list, where it is mapped with a key
+     * depending on address and selector if selector != null.
+     *
+     */
     protected class JMSMessageListener implements MessageListener {
         private final ICommunicationAddress _address;
         private final String _selector;
@@ -47,7 +71,9 @@ class JMSReceiver {
             _address= address;
             _selector= selector;
         }
-        
+        /**
+         * if a message arrives it is handed over the the delegate in the superior MessageTransport.
+         */
         public void onMessage(Message message) {
             log.debug("receiving message");
             try {
@@ -57,6 +83,15 @@ class JMSReceiver {
             }
         }
         
+        
+        /**
+         * setting up consumer. This will be the listener to all consumers created here.
+         * if something goes wrong creating the consumer, the consumer is destroyed 
+         * and and an exception is thrown.
+         * 
+         * @param session	the JMSSession used for creating the consumers
+         * @throws JMSException	
+         */
         void initialise(Session session) throws JMSException {
             try {
                 String add= _address.getName();
@@ -70,17 +105,20 @@ class JMSReceiver {
             
         }
         
+        /**
+         * cleans up the consumer.
+         */
         void destroy() {
-            
+            if (_consumer != null){
+            	try {
+					_consumer.close();
+				} catch (JMSException e) {
+					log.error(e.getCause());
+				}
+            }
         }
     }
     
-	Log log = LogFactory.getLog(getClass());
-	private ConnectionFactory _connectionFactory;
-	private Connection _connection;
-	private Session _session;
-    private JMSMessageTransport _parent;
-    private Map<String, JMSMessageListener> _listeners;
 	
 	public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent) throws JMSException {
 		_connectionFactory = (ConnectionFactory) connectionFactory;
@@ -90,7 +128,8 @@ class JMSReceiver {
 	}
 
 	/**
-	 * Initializes the JiacReceiver creating a MessageConsumer for receiving messages to the CommBean
+	 * Initializes the JiacReceiver creating and starting session and connection.
+	 * throws an JMSException if something goes wrong doing so.
 	 */
 	public void doInit() throws JMSException {
 		log.debug("doInit");
@@ -114,9 +153,8 @@ class JMSReceiver {
 	/**
 	 * Initializing a new Consumer using a given ICommunicationAddress
 	 * 
-	 * @param listener
-	 * @param commAdd
-	 * @param selector
+	 * @param address 	the address that should be listen to.
+	 * @param selector	if you just want these special messages.
 	 */
 	public synchronized void listen(ICommunicationAddress address, String selector) throws JMSException {
         // first check if we already have a listener like that
@@ -124,7 +162,7 @@ class JMSReceiver {
         if(_listeners.containsKey(key)) {
             return;
         }
-        
+        // then creating a listener if needed and map it with the others.
         JMSMessageListener listener= new JMSMessageListener(address, selector);
         listener.initialise(_session);
         _listeners.put(key, listener);
@@ -134,8 +172,8 @@ class JMSReceiver {
 	 * Stops receivment of the Messages from a given destination by removing the consumer
 	 * aligned to it from the consumerlist (especially useful for temporaryDestinations)
 	 * 
-	 * @param destinationName	the name of the destination we don't want to listen anymore to
-	 * @param selector			a selector to recieve only special messages
+	 * @param address	the communicationaddress we don't want to listen anymore to
+	 * @param selector	the selector given while the listener was created in the first place
 	 */
 	public synchronized void stopListen(ICommunicationAddress address, String selector){
         String key= getStringRepresentation(address, selector);
@@ -147,7 +185,7 @@ class JMSReceiver {
 	}
 	
 	/**
-	 * stops receiving Messages from all enlisted Destinations except the Commbean itself.
+	 * stops receiving Messages from all enlisted Destinations.
 	 */
 	public synchronized void stopListenAll(){
         for(JMSMessageListener listener : _listeners.values()) {
@@ -155,5 +193,7 @@ class JMSReceiver {
         }
         
         _listeners.clear();
-	}	
+	}
+	
+	
 }

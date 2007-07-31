@@ -93,7 +93,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     
     private Map<Action, RemoteActionContext> _actionToContext;
     private Map<String, ICommunicationAddress> _sessionsFromExternalClients;
-    private Map<String, ResultReceiver> _sessionsToExternalProviders;
+    private Map<String, DoAction> _sessionsToExternalProviders;
     
     
     private final Set<Action> _offeredActions= new HashSet<Action>();
@@ -136,7 +136,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         }
         _actionToContext= new Hashtable<Action, RemoteActionContext>();
         _sessionsFromExternalClients= new Hashtable<String, ICommunicationAddress>();
-        _sessionsToExternalProviders= new Hashtable<String, ResultReceiver>();
+        _sessionsToExternalProviders= new Hashtable<String, DoAction>();
         _executionListener= new ServiceExecutionListener();
         _managementListener= new ServiceManagementListener();
         _serviceBroadcastGroup= CommunicationAddressFactory.createGroupAddress(SERVICE_BROADCAST_ADDRESS);
@@ -213,7 +213,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             ResultReceiver receiver= (ResultReceiver) doAction.getSource();
             
             if(receiver != null) {
-                _sessionsToExternalProviders.put(doAction.getSessionId(), receiver);
+                _sessionsToExternalProviders.put(doAction.getSessionId(), doAction);
             }
             
             request.setHeader(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL);
@@ -302,8 +302,8 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     void processActionResult(RemoteActionResult remoteActionResult) {
         ActionResult result= remoteActionResult.getResult();
         log.debug("got action result for session '" + result.getSessionId() + "'");
-        ResultReceiver receiver= _sessionsToExternalProviders.get(result.getSessionId());
-        ((DoAction)result.getSource()).setSource(receiver);
+        DoAction doAction= _sessionsToExternalProviders.get(result.getSessionId());
+        result.setSource(doAction);
         memory.write(result);
     }
     

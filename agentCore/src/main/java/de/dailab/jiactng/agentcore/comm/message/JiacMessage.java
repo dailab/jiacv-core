@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.comm.message;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,8 +55,23 @@ public class JiacMessage implements IJiacMessage {
     }
 
     public String toString() {
-		return ("[Payload: " + getPayload() 
-				+ ", Sender: " + getSender() + "]");
+        StringBuilder builder= new StringBuilder();
+        builder.append("[Headers: {");
+        int counter= _headers.size() - 1;
+        
+        for(Iterator<String> keys= _headers.keySet().iterator(); keys.hasNext(); --counter) {
+            String key= keys.next();
+            builder.append(key).append("=>").append(_headers.get(key));
+            
+            if(counter > 0) {
+                builder.append(";");
+            }
+        }
+        
+        builder.append("}");
+        builder.append(", Payload: ").append(getPayload()).append(", Sender: ").append(getSender());
+        builder.append("]");
+		return builder.toString();
 	}
 	
 	public ICommunicationAddress getSender(){

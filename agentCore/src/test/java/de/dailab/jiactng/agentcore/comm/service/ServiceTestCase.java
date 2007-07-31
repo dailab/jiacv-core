@@ -15,7 +15,7 @@ import de.dailab.jiactng.agentcore.SimpleAgentNode;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class ServiceTestCase extends TestCase {
     public static String DUMMY_ADDRESS= "dummyAddress";
@@ -54,11 +54,9 @@ public class ServiceTestCase extends TestCase {
     }
     
     public void testServices() throws Exception {
-//        System.out.println("try to print something...");
-//        assertEquals("could not log", null, _clientBean.printHelloWorld());
-//        
-//        System.out.println("and now measure performance...");
-//        assertEquals("could not log", null, _clientBean.printTimes());
+        Thread.sleep(2000);
+        assertEquals("could not log", null, _clientBean.printHelloWorld());
+        assertEquals("could not log", null, _clientBean.printTimes());
     }
 
     @Override

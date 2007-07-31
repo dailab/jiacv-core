@@ -21,7 +21,7 @@ public class SessionEvent implements IFact {
 	private Action action;
 	
 	/** The object that created this event. */
-	private Object source;
+	private transient Object source;
 
 	private Object metaData;
 	

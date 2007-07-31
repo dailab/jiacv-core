@@ -9,13 +9,13 @@ import de.dailab.jiactng.agentcore.action.Action;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class OpenBean extends AbstractMethodExposingBean {
     @Override
     public void doInit() throws Exception {
         super.doInit();
-        
+        log.debug("initialise OpenBean... ");
         ServiceBean serviceBean= null;
         for(IAgentBean bean : thisAgent.getAgentBeans()) {
             if(bean instanceof ServiceBean) {
@@ -25,7 +25,7 @@ public class OpenBean extends AbstractMethodExposingBean {
         }
         
         if(serviceBean == null) {
-            log.error("this agent has not serviceBean");
+            log.error("this agent has no serviceBean");
         }
         
         for(Action action : getActions()) {
@@ -33,12 +33,12 @@ public class OpenBean extends AbstractMethodExposingBean {
         }
     }
     
-    @Expose
+    @Expose(name = "log")
     public void log(String message) {
         log.debug("I was forced to log something:: '" + message + "'");
     }
     
-    @Expose
+    @Expose(name = "getCurrentTime")
     public long getCurrentTime() {
         log.debug("somebody want MY time... tztz");
         return System.currentTimeMillis();

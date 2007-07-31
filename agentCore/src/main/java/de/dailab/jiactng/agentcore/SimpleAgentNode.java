@@ -187,7 +187,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.IAgentNode#getLog(de.dailab.jiactng.agentcore.IAgent)
 	 */
 	public Log getLog(IAgent agent) {
-		return LogFactory.getLog(getName() + ":" + agent.getAgentName());
+		return LogFactory.getLog(getName() + "." + agent.getAgentName());
 	}
 
 	/*
@@ -197,7 +197,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 *      de.dailab.jiactng.agentcore.AbstractAgentBean)
 	 */
 	public Log getLog(IAgent agent, IAgentBean bean) {
-		return LogFactory.getLog(getName() + ":" + agent.getAgentName() + ":" + bean.getBeanName());
+		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName());
 	}
 
 	/**

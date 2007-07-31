@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
+import de.dailab.jiactng.agentcore.comm.Selector;
 
 /**
  * 
@@ -43,12 +44,12 @@ class JMSReceiver {
 	 * @param selector
 	 * @return 	a standardized String Expression for address and selector
 	 */
-	protected static String getStringRepresentation(ICommunicationAddress address, String selector) {
+	protected static String getStringRepresentation(ICommunicationAddress address, Selector selector) {
         StringBuilder result= new StringBuilder();
         result.append(address.toString());
         
         if(selector != null) {
-            result.append('?').append(selector);
+            result.append('?').append(selector.getKey()).append('=').append(selector.getValue());
         }
         
         return result.toString();
@@ -64,10 +65,10 @@ class JMSReceiver {
      */
     protected class JMSMessageListener implements MessageListener {
         private final ICommunicationAddress _address;
-        private final String _selector;
+        private final Selector _selector;
         private MessageConsumer _consumer;
         
-        protected JMSMessageListener(ICommunicationAddress address, String selector) {
+        protected JMSMessageListener(ICommunicationAddress address, Selector selector) {
             _address= address;
             _selector= selector;
         }
@@ -96,7 +97,7 @@ class JMSReceiver {
             try {
                 String add= _address.getName();
                 Destination dest= _address instanceof IGroupAddress ? session.createTopic(add) : session.createQueue(add);
-                _consumer= session.createConsumer(dest, _selector);
+                _consumer= session.createConsumer(dest, _selector == null ? null : (_selector.getKey() + " = '" + _selector.getValue() + "'"));
                 _consumer.setMessageListener(this);
             } catch (JMSException e) {
                 destroy();
@@ -156,7 +157,7 @@ class JMSReceiver {
 	 * @param address 	the address that should be listen to.
 	 * @param selector	if you just want these special messages.
 	 */
-	public synchronized void listen(ICommunicationAddress address, String selector) throws JMSException {
+	public synchronized void listen(ICommunicationAddress address, Selector selector) throws JMSException {
         // first check if we already have a listener like that
         String key= getStringRepresentation(address, selector);
         if(_listeners.containsKey(key)) {
@@ -175,7 +176,7 @@ class JMSReceiver {
 	 * @param address	the communicationaddress we don't want to listen anymore to
 	 * @param selector	the selector given while the listener was created in the first place
 	 */
-	public synchronized void stopListen(ICommunicationAddress address, String selector){
+	public synchronized void stopListen(ICommunicationAddress address, Selector selector){
         String key= getStringRepresentation(address, selector);
         JMSMessageListener listener= _listeners.remove(key);
         

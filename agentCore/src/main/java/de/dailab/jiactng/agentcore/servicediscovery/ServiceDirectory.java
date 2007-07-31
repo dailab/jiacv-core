@@ -13,6 +13,7 @@ import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
+import de.dailab.jiactng.agentcore.comm.Selector;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
@@ -36,7 +37,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
             log.error("asynchronous error on message transport", e);
         }
 
-        public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress from, String selector) {
+        public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress from, Selector selector) {
             // TODO Auto-generated method stub
         }
         

@@ -15,6 +15,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * 
  */
 public class DoAction extends SessionEvent {
+    private final static Object[] EMPTY_OBJECTS= new Object[0];
 
 	/** The input-parameters for the action-call */
 	private Object[] params;
@@ -56,7 +57,7 @@ public class DoAction extends SessionEvent {
 	public DoAction(Session session, Action thisAction, ResultReceiver source, Object[] params) {
 		super(session, thisAction, source);
 		if (session != null) session.addToSessionHistory(this);
-		this.params = params;
+		setParams(params);
 	}
 	/**
 	 * Getter for the input-parameters of the action-call.
@@ -71,7 +72,7 @@ public class DoAction extends SessionEvent {
 	 * @param params the params to set
 	 */
 	public void setParams(Object[] params) {
-		this.params = params;
+		this.params = params == null ? EMPTY_OBJECTS : params;
 	}
 
 	public String getOwner() {
@@ -81,4 +82,20 @@ public class DoAction extends SessionEvent {
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
+    
+    public String typeCheck() {
+        Class[] types= getAction().getParameters();
+        
+        if(types.length != params.length) {
+            return "type length is '" + types.length + "' but param length is '" + params.length + "'";
+        }
+        
+        for(int i= 0; i < types.length; ++i) {
+            if(!types[i].isInstance(params[i])) {
+                return "param" + i + " '" + params[i] + "' mismatch the type '" + types[i] + "'";
+            }
+        }
+        
+        return null;
+    }
 }

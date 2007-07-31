@@ -22,6 +22,7 @@ import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.IJiacMessageListener;
+import de.dailab.jiactng.agentcore.comm.Selector;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
@@ -34,9 +35,8 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  */
 public class ServiceBean extends AbstractMethodExposingBean implements IEffector, ResultReceiver {
     private static final String SERVICE_BROADCAST_ADDRESS= "JiacTNG/service/broadcast";
-    private static final String PROTOCOL_KEY="JiacTNG-protocol-ID";
     private static final String SERVICE_PROTOCOL= "JiacTNG-service-protocol";
-    private static final String SERVICE_OFFER_KEY= "Jiac-TNG-service-offer";
+    private static final String SERVICE_OFFER_KEY= "JiacTNGServiceOffer";
     
     private static final String ADD_OFFER= "add";
     private static final String REMOVE_OFFER= "remove";
@@ -51,7 +51,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             if(content instanceof RemoteActionResult) {
                 processActionResult((RemoteActionResult) content);
             } else if (content instanceof DoRemoteAction) {
-                processAction((DoRemoteAction) content, at.toUnboundAddress());
+                processAction((DoRemoteAction) content, message.getSender().toUnboundAddress());
             } else {
                 log.warn("unexpected content for this protocol '" + content + "'");
             }
@@ -70,7 +70,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                 String task= message.getHeader(SERVICE_OFFER_KEY);
                 
                 if(task.equals(ADD_OFFER)) {
-                    insertAction((RemoteAction) content);
+                    insertAction((RemoteAction) content, message.getSender().toUnboundAddress());
                 } else if(task.equals(REMOVE_OFFER)) {
                     removeAction((RemoteAction) content);
                 } else {
@@ -92,14 +92,19 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     private IJiacMessageListener _managementListener;
     
     private Map<Action, RemoteActionContext> _actionToContext;
-    private Map<String, ICommunicationAddress> _currentSessions;
+    private Map<String, ICommunicationAddress> _sessionsFromExternalClients;
+    private Map<String, ResultReceiver> _sessionsToExternalProviders;
     
     
     private final Set<Action> _offeredActions= new HashSet<Action>();
     
     @Override
     public void doCleanup() throws Exception {
-        _communicationBean.unregister(_executionListener, PROTOCOL_KEY + "=" + SERVICE_PROTOCOL);
+        log.debug("cleanup ServiceBean...");
+        _communicationBean.unregister(
+            _executionListener,
+            _communicationBean.getDefaultMessageBoxAddress(),
+            new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL));
         _communicationBean.unregister(_managementListener, _serviceBroadcastGroup, null);
         _serviceBroadcastGroup= null;
         _managementListener= null;
@@ -111,13 +116,14 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         }
         
         _actionToContext= null;
-        _currentSessions= null;
+        _sessionsFromExternalClients= null;
         super.doCleanup();
     }
 
     @Override
     public void doInit() throws Exception {
         super.doInit();
+        log.debug("initialise ServiceBean...");
         for(IAgentBean bean : thisAgent.getAgentBeans()) {
             if(bean instanceof CommunicationBean) {
                 _communicationBean= (CommunicationBean) bean;
@@ -129,18 +135,22 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             throw new IllegalStateException("could not find communication bean");
         }
         _actionToContext= new Hashtable<Action, RemoteActionContext>();
-        _currentSessions= new Hashtable<String, ICommunicationAddress>();
+        _sessionsFromExternalClients= new Hashtable<String, ICommunicationAddress>();
+        _sessionsToExternalProviders= new Hashtable<String, ResultReceiver>();
         _executionListener= new ServiceExecutionListener();
         _managementListener= new ServiceManagementListener();
         _serviceBroadcastGroup= CommunicationAddressFactory.createGroupAddress(SERVICE_BROADCAST_ADDRESS);
         _communicationBean.register(_managementListener, _serviceBroadcastGroup, null);
-        _communicationBean.register(_executionListener, PROTOCOL_KEY + "=" + SERVICE_PROTOCOL);
+        _communicationBean.register(
+            _executionListener,
+            _communicationBean.getDefaultMessageBoxAddress(),
+            new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL));
     }
 
     @Override
     public void doStart() throws Exception {
         super.doStart();
-        
+        log.debug("starting ServiceBean...");
         synchronized (_offeredActions) {
             for(Action action : _offeredActions) {
                 updateActionOffer(action, ADD_OFFER);
@@ -150,6 +160,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
 
     @Override
     public void doStop() throws Exception {
+        log.debug("stopping ServiceBean...");
         synchronized (_offeredActions) {
             for(Action action : _offeredActions) {
                 updateActionOffer(action, REMOVE_OFFER);
@@ -169,7 +180,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     public void offerAction(Action action) throws CommunicationException {
         synchronized(_offeredActions) {
             if(_offeredActions.add(action)) {
-                if(isActive()) {
+                if(isStarted()) {
                     updateActionOffer(action, ADD_OFFER);
                 }
             }
@@ -186,7 +197,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     public void withdrawAction(Action action) throws CommunicationException {
         synchronized (_offeredActions) {
             if(_offeredActions.remove(action)) {
-                if(isActive()) {
+                if(isStarted()) {
                     updateActionOffer(action, REMOVE_OFFER);
                 }
             }
@@ -199,8 +210,15 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         
         if(context != null) {
             IJiacMessage request= new JiacMessage(new DoRemoteAction(doAction));
-            request.setHeader(PROTOCOL_KEY, SERVICE_PROTOCOL);
+            ResultReceiver receiver= (ResultReceiver) doAction.getSource();
+            
+            if(receiver != null) {
+                _sessionsToExternalProviders.put(doAction.getSessionId(), receiver);
+            }
+            
+            request.setHeader(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL);
             try {
+                log.debug("send request for remote action to '" + context.providerAddress + "'");
                 _communicationBean.send(request, context.providerAddress);
             } catch (CommunicationException ce) {
                 log.error("could not send DoRemoteAction to '" + context.providerAddress + "'", ce);
@@ -213,12 +231,13 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     public void receiveResult(ActionResult result) {
         DoAction doAction= (DoAction) result.getSource();
         String sessionId= doAction.getSessionId();
-        ICommunicationAddress recipient= _currentSessions.remove(sessionId);
+        ICommunicationAddress recipient= _sessionsFromExternalClients.remove(sessionId);
         
         if(recipient != null) {
             IJiacMessage response= new JiacMessage(new RemoteActionResult(result));
-            response.setHeader(PROTOCOL_KEY, SERVICE_PROTOCOL);
+            response.setHeader(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL);
             try {
+                log.debug("send result for session '" + sessionId + "' to '" + recipient + "'");
                 _communicationBean.send(response, recipient);
             } catch (CommunicationException ce) {
                 log.error("could not send RemoteActionResult to '" + recipient + "'", ce);
@@ -228,11 +247,12 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         }
     }
     
-    void insertAction(RemoteAction remoteAction) {
+    void insertAction(RemoteAction remoteAction, ICommunicationAddress provider) {
         synchronized(_workLock) {
             Action action= remoteAction.getAction();
             
             if(memory.read(new Action(action.getName(), null, action.getParameters(), action.getResults())) == null) {
+                _actionToContext.put(action, new RemoteActionContext(remoteAction, provider));
                 action.setProviderBean(this);
                 memory.write(action);
                 log.debug("new remote action available: '" + action + "'");
@@ -247,8 +267,11 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             Action action= remoteAction.getAction();
             _actionToContext.remove(action);
             Action current= memory.read(new Action(action.getName(), null, action.getParameters(), action.getResults()));
-            if(current.getProviderBean() == this) {
-                memory.read(current);
+            if(current == null) {
+                log.debug("action '" + action + "' is already removed");
+            } else if(current.getProviderBean() == this) {
+                log.debug("removed action '" + action + "' from memory");
+                memory.remove(current);
             } else {
                 log.debug("this bean is not the provider of action '" + action + "'");
             }
@@ -256,6 +279,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     }
     
     void processAction(DoRemoteAction doRemoteAction, ICommunicationAddress requestSource) {
+        log.debug("got some request from '" + requestSource + "'");
         DoAction doAction= doRemoteAction.getAction();
         // set this bean as result receiver
         doAction.setSource(this);
@@ -265,7 +289,8 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         Action current= memory.read(new Action(action.getName(), null, action.getParameters(), action.getResults()));
         
         if(current != null) {
-            _currentSessions.put(doAction.getSessionId(), requestSource);
+            _sessionsFromExternalClients.put(doAction.getSessionId(), requestSource);
+            action.setProviderBean(current.getProviderBean());
             memory.write(doAction);
             log.debug("delegated doAction request");
         } else {
@@ -275,12 +300,16 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     }
     
     void processActionResult(RemoteActionResult remoteActionResult) {
-        memory.write(remoteActionResult.getResult());
+        ActionResult result= remoteActionResult.getResult();
+        log.debug("got action result for session '" + result.getSessionId() + "'");
+        ResultReceiver receiver= _sessionsToExternalProviders.get(result.getSessionId());
+        ((DoAction)result.getSource()).setSource(receiver);
+        memory.write(result);
     }
     
-    private boolean isActive() {
+    private boolean isStarted() {
         switch(getState()) {
-            case INITIALIZED: case STARTING: case STARTED: {
+            case STARTED: {
                 return true;
             }
             default: {

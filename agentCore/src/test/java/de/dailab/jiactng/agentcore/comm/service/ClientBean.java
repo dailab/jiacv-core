@@ -6,15 +6,16 @@ package de.dailab.jiactng.agentcore.comm.service;
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
+import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class ClientBean extends AbstractAgentBean implements ResultReceiver {
-    private final static String LOG_ACTION= "de.dailab.jiactng.agentcore.comm.service.OpenBean#log";
-    private final static String TIME_ACTION= "de.dailab.jiactng.agentcore.comm.service.OpenBean#getCurrentTime";
+    private final static String LOG_ACTION= "log";
+    private final static String TIME_ACTION= "getCurrentTime";
     
     private final Object _timeLock= new Object();
     private final Object _logLock= new Object();
@@ -37,10 +38,18 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
     }
     
     public Object printHelloWorld() {
+        log.debug("use remote action to print hello world");
         synchronized (_logLock) {
+            
             Action action= memory.read(new Action(LOG_ACTION, null, null, null));
             if(action == null) {
                 return "action '" + LOG_ACTION + "' not found";
+            }
+            
+            DoAction doAction= action.createDoAction(new Object[]{"Hallo Welt"}, this);
+            String check;
+            if((check= doAction.typeCheck()) != null) {
+                throw new IllegalStateException("something wrong here [" + check + "]");
             }
             
             memory.write(action.createDoAction(new Object[]{"Hallo Welt"}, this));
@@ -57,6 +66,7 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
     }
     
     public Object printTimes() {
+        log.debug("use remote action to calculate delays");
         synchronized (_timeLock) {
             long start= System.currentTimeMillis();
             

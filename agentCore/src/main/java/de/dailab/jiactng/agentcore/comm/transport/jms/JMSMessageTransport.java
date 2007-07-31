@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.Selector;
 import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
@@ -35,8 +36,6 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 
 
 public class JMSMessageTransport extends MessageTransport {
-    private final static String SENDER_KEY= "JiacTNG-sender-address";
-    
     /**
      * Retrieves JiacMessages from JMSMessages
      * 
@@ -54,7 +53,7 @@ public class JMSMessageTransport extends MessageTransport {
         } else {
             payload= (IJiacContent) ((ObjectMessage)message).getObject();
         }
-        ICommunicationAddress sender= CommunicationAddressFactory.createFromURI(message.getStringProperty(SENDER_KEY));
+        ICommunicationAddress sender= CommunicationAddressFactory.createFromURI(message.getStringProperty(IJiacMessage.SENDER_KEY));
 
         IJiacMessage result= new JiacMessage(payload, sender);
         for(Enumeration keys= message.getPropertyNames(); keys.hasMoreElements(); ) {
@@ -92,7 +91,7 @@ public class JMSMessageTransport extends MessageTransport {
             ((ObjectMessage)result).setObject(payload);
         }
         
-        result.setStringProperty(SENDER_KEY, message.getSender().toURI().toString());
+        result.setStringProperty(IJiacMessage.SENDER_KEY, message.getSender().toURI().toString());
         
         for(String key : message.getHeaderKeys()) {
             result.setStringProperty(key, message.getHeader(key));
@@ -172,7 +171,7 @@ public class JMSMessageTransport extends MessageTransport {
 	 * @param address 	the address to listen to
 	 * @param selector	if you want to get only special messages use this to select them
 	 */
-	public void listen(ICommunicationAddress address, String selector) throws CommunicationException {
+	public void listen(ICommunicationAddress address, Selector selector) throws CommunicationException {
         try {
             _receiver.listen(address, selector);
         } catch (JMSException jms) {
@@ -188,7 +187,7 @@ public class JMSMessageTransport extends MessageTransport {
 	 * @param selector	the selector given with the address when you started to
 	 * 					listen to it
 	 */
-	public void stopListen(ICommunicationAddress address, String selector) { 
+	public void stopListen(ICommunicationAddress address, Selector selector) { 
 		_receiver.stopListen(address, selector);
 	}
     

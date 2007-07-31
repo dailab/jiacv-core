@@ -7,6 +7,7 @@ import java.net.URI;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.Selector;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
@@ -16,7 +17,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 public abstract class MessageTransport {
     public static interface IMessageTransportDelegate {
         void onAsynchronousException(MessageTransport source, Exception e);
-        void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at, String selector);
+        void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at, Selector selector);
     }
     
     private final String _transportIdentifier;
@@ -62,14 +63,14 @@ public abstract class MessageTransport {
     public abstract void doCleanup() throws Exception;
     
     public abstract void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException;
-    public abstract void listen(ICommunicationAddress address, String selector) throws CommunicationException;
-    public abstract void stopListen(ICommunicationAddress address, String selector) throws CommunicationException;
+    public abstract void listen(ICommunicationAddress address, Selector selector) throws CommunicationException;
+    public abstract void stopListen(ICommunicationAddress address, Selector selector) throws CommunicationException;
     
     public final void delegateException(Exception exception) {
         _delegate.onAsynchronousException(this, exception);
     }
     
-    public final void delegateMessage(IJiacMessage message, ICommunicationAddress at, String selector) {
+    public final void delegateMessage(IJiacMessage message, ICommunicationAddress at, Selector selector) {
         _delegate.onMessage(this, message, at, selector);
     }
 }

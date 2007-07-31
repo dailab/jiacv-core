@@ -7,7 +7,7 @@
 <beans>
 
   <bean name="ServiceTestPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
-    <property name="loggingConfig" value="classpath:myLog4j.properties"/>
+    <property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/service/serviceLog4j.properties"/>
     <property name="agents">
       <list>
         <ref bean="Provider"/>

@@ -137,23 +137,19 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
     protected static final char METHOD_SEPARATING_CHAR= '#';
     
     public final void doAction(DoAction doAction) {
-        Action action= doAction.getAction();
-        String name= doAction.getAction().getName();
-        // check for hashmark
-        int sep= name.indexOf(METHOD_SEPARATING_CHAR);
+log.debug("typechecking is '" + doAction.typeCheck() + "'");
         
-        if(sep > 0 && sep < name.length() - 1) {
+        Action action= doAction.getAction();
+//        String name= doAction.getAction().getName();
+        Method method= searchMethod(action.getName(), action.getParameters());
+        if(method != null) {
             try {
-                Method method= getClass().getMethod(name.substring(sep + 1), action.getParameters());
                 Object result= method.invoke(this, doAction.getParams());
     			memory.write(doAction.getAction().createActionResult(
     					doAction.getSession(), new Object[] { result }, doAction));
-                
+                log.debug("action processed and result written...");
                 return;
-            } catch (NoSuchMethodException nsme) {
-                // simply fall through
-                log.debug("action name '" + name + "' contains method separation but is not a method of mine"); 
-            } catch (IllegalAccessException iae) {
+            }  catch (IllegalAccessException iae) {
                 // should not happen
                 log.debug("cannot access action", iae);
                 throw new IllegalArgumentException("doAction references a non-accessible method", iae);
@@ -169,10 +165,13 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
 //                }
 //                
 //                throw new RuntimeException("action invocation failed", ite);
+            } catch (Exception re) {
+                log.debug("something went wrong with this action '" + action.getName() + "' '" + method + "'", re);
             }
         }
         
         // if we are here, then we have no method with 'name'
+        log.debug("did not found exposed method -> call overrideDoAction");
         overrideDoAction(doAction);
     }
 
@@ -214,4 +213,37 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
     
     protected void overrideDoAction(DoAction doAction) {}
     protected List<? extends Action> overrideGetActions() {return Collections.emptyList();}
+    
+    private Method searchMethod(String name, Class[] parameters) {
+        String originalName= name;
+        String assumedMethodName= null;
+        // check for hashmark
+        int sep= name.indexOf(METHOD_SEPARATING_CHAR);
+        
+        if(sep > 0 && sep < name.length() - 1) {
+            assumedMethodName= name.substring(sep + 1);
+        }
+        
+        for(Method method : getExposedPublicMethods(getClass())) {
+            Expose exposeAnno= method.getAnnotation(Expose.class);
+            Class[] mpar= method.getParameterTypes();
+            if(mpar.length == parameters.length) {
+                if(exposeAnno.name().equals(originalName) || (assumedMethodName != null && method.getName().equals(assumedMethodName))) {
+                    boolean found= true;
+                    for(int i= 0; i < mpar.length; ++i) {
+                        if(!mpar[i].equals(parameters[i])) {
+                            found= false;
+                            break;
+                        }
+                    }
+                    
+                    if(found) {
+                        return method;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
 }

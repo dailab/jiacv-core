@@ -18,6 +18,8 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author Marcel Patzlaff
  */
 public interface IJiacMessage extends IFact {
+    public final static String SENDER_KEY= "JiacTNGSenderAddress";
+    public final static String PROTOCOL_KEY="JiacTNGProtocolID";
 
 	/**
 	 * Returns the payload of this message. There are several different payload

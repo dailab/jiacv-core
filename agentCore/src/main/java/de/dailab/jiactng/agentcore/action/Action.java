@@ -240,10 +240,10 @@ public class Action implements IFact {
     @Override
     public String toString() {
         StringBuilder builder= new StringBuilder();
-        builder.append("Action:\n name=").append(name).append("; ");
+        builder.append("Action:\n name='").append(name).append("'");
         builder.append("\n parameters=");
         prettyPrintArray(builder, parameters);
-        builder.append(";\n results=");
+        builder.append("\n results=");
         prettyPrintArray(builder, results);
         builder.append('\n');
         return builder.toString();

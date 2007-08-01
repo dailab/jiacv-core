@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.examples;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -8,6 +9,7 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -43,7 +45,9 @@ public class TestCommBean implements IMessageTransportDelegate {
 	BrokerValues values = BrokerValues.getDefaultInstance();
 	JmsBrokerAMQ broker = new JmsBrokerAMQ();
 	
-	Log log = LogFactory.getLog(getClass());
+	/** A customized logging configuration will be used instead of the default configuration. */
+	private String loggingConfig = "de/dailab/jiactng/agentcore/comm/examples/myLog4j.properties";
+	Log log = getLog("JMSTransportTest");
 	
 	/**
 	 * @param args
@@ -54,6 +58,7 @@ public class TestCommBean implements IMessageTransportDelegate {
 	}
 	
 	public void run() throws Exception {
+		setupLoggingConfig();
 		log.debug("begin of demonstration");
 		
 		IJiacContent payload = new TestContent();
@@ -92,8 +97,8 @@ public class TestCommBean implements IMessageTransportDelegate {
 		
 		doInit();
 		log.debug("Setting up groupAddress to " + groupName);
+		groupAddress= CommunicationAddressFactory.createGroupAddress(groupName);
 		log.debug("Setting up messageBoxAddress to " + cBeanName);
-        groupAddress= CommunicationAddressFactory.createGroupAddress(groupName);
         messageBoxAddress= CommunicationAddressFactory.createMessageBoxAddress(cBeanName);
         
 		cBean = setupCommBean(cBean, groupAddress, messageBoxAddress);
@@ -117,11 +122,12 @@ public class TestCommBean implements IMessageTransportDelegate {
 				cBean.send(jMessage, groupAddress);
 			
 			} else if ( ((input.startsWith("g.") || (input.startsWith("m.")))) && (input != "") ) {
-				boolean isValidInput = false;
+				log.debug("got something to send");
 				
-				isGroup = targetIsGroup(input);
+				isGroup = input.startsWith("g.");
 				text = input.substring(input.indexOf(".") + 1);
 				if (text.contains(".")){
+					log.debug("seems to be a valid something");
 					targetName = text.substring(0, text.indexOf("."));
 					text = text.substring(text.indexOf(".") + 1);
 					payload = new TestContent(text);
@@ -130,6 +136,7 @@ public class TestCommBean implements IMessageTransportDelegate {
                         jMessage,
                         isGroup ? CommunicationAddressFactory.createGroupAddress(targetName) 
                                 : CommunicationAddressFactory.createMessageBoxAddress(targetName));
+					log.debug("Message sent to: " + targetName + " reads: " + text);
 				}
 			}
 			
@@ -139,10 +146,6 @@ public class TestCommBean implements IMessageTransportDelegate {
 		cBean.doCleanup();
 		doCleanup();
 		System.out.println("Bye bye");
-	}
-	
-	private boolean targetIsGroup(String input){
-		return (input.substring(0, input.indexOf(".")).compareToIgnoreCase("g") == 0);
 	}
 	
 	public void doInit(){
@@ -180,13 +183,23 @@ public class TestCommBean implements IMessageTransportDelegate {
 	public Log getLog(String extension) {
         return LogFactory.getLog(getClass().getName() + "." + extension);
     }
+	
+	private void setupLoggingConfig() {
+		
+		try {
+			Log4jConfigurer.initLogging(this.loggingConfig);
+		} catch (FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+		}
+	}
 
     public void onAsynchronousException(MessageTransport source, Exception e) {
         log.error("caught asynchronous exception", e);
     }
 
     public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at) {
-        IJiacContent content = message.getPayload();
+        log.debug("onMessage called");
+    	IJiacContent content = message.getPayload();
         if (content instanceof TestContent){
             TestContent tContent = (TestContent) content;
             System.err.println("Incoming over " + at);

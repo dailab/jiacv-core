@@ -1,23 +1,15 @@
 package de.dailab.jiactng.agentcore.comm.protocol;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import javax.jms.Destination;
 
+import junit.framework.TestCase;
 import de.dailab.jiactng.agentcore.comm.helpclasses.FakeDestination;
-import de.dailab.jiactng.agentcore.comm.message.EndPoint;
-import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
-import junit.framework.TestCase;
 
 public class AgentProtocolTest extends TestCase {
 	
 	private static String _operation = "testOperation";
-	private static EndPoint _recipient = (EndPoint) EndPointFactory.createEndPoint("testPlatform");
-	private static EndPoint _startPoint = (EndPoint) EndPointFactory.createEndPoint("testPlatform");
 	private static Destination _replyTo = new FakeDestination("replyTo");
 	private static IJiacContent _payload = null;
 	private static JiacMessage _jMsg;

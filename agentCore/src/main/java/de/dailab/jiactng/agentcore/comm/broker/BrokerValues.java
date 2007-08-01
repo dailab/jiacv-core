@@ -1,6 +1,8 @@
 package de.dailab.jiactng.agentcore.comm.broker;
 
-import de.dailab.jiactng.agentcore.comm.Util;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 /**
  * Kapselt Werte, die einen ActiveMQ-Broker steuern. Mit diesen Werten kann dann ein embedded Broker erzeugt/gestartet
@@ -76,7 +78,7 @@ public class BrokerValues {
 	}
 
 	/**
-	 * Erzeugt eine Instanz mit defaultwerten.. um einfach einen Broker erzeugen zu können.
+	 * Erzeugt eine Instanz mit defaultwerten.. um einfach einen Broker erzeugen zu kï¿½nnen.
 	 * 
 	 * @return
 	 */
@@ -129,7 +131,20 @@ public class BrokerValues {
 	 * @return die Url als String
 	 */
 	public String createUrl() {
-		String ipStr = Util.getLocalIp();
-		return _protocol + PROTOCOL_IP_SEPARATOR + ipStr + IP_PORT_SEPARATOR + _port;
+        try {
+            for(Enumeration<NetworkInterface> interfaces= NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements();){
+                Enumeration<InetAddress> addresses= interfaces.nextElement().getInetAddresses();
+                while(addresses.hasMoreElements()) {
+                    InetAddress current= addresses.nextElement();
+                    if(current.isLoopbackAddress()) {
+                        return _protocol + PROTOCOL_IP_SEPARATOR + current.toString() + IP_PORT_SEPARATOR + _port;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // fall through
+        }
+        
+		return _protocol + PROTOCOL_IP_SEPARATOR + "localhost" + IP_PORT_SEPARATOR + _port;
 	}
 }

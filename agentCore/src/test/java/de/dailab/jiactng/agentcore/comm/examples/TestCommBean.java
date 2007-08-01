@@ -4,26 +4,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
+import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.IGroupAddress;
+import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.comm.helpclasses.TestContent;
-import de.dailab.jiactng.agentcore.comm.message.EndPoint;
-import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
+import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport;
 
 
@@ -36,16 +33,13 @@ import de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport;
  *
  */
 
-public class TestCommBean implements MessageListener {
+public class TestCommBean implements IMessageTransportDelegate {
 
 	private static String username = ActiveMQConnection.DEFAULT_USER;
 	private static String password = ActiveMQConnection.DEFAULT_PASSWORD;
 	private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
 	private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(username, password, url);
-	
-	private static Connection connection;
-	private static Session session; 
-	
+
 	BrokerValues values = BrokerValues.getDefaultInstance();
 	JmsBrokerAMQ broker = new JmsBrokerAMQ();
 	
@@ -54,34 +48,28 @@ public class TestCommBean implements MessageListener {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		TestCommBean tcb = new TestCommBean();
-		
 		tcb.run();
 	}
 	
-	public void run(){
-		
+	public void run() throws Exception {
 		log.debug("begin of demonstration");
 		
 		IJiacContent payload = new TestContent();
 		
 		JMSMessageTransport cBean = new JMSMessageTransport();
-		Destination chatChannel = null;
-		Destination listenChannel = null;
-		Destination topicChannel = null;
+		IMessageBoxAddress messageBoxAddress = null;
+		IGroupAddress groupAddress = null;
 		
 		String cBeanName = "";
-		String topicName = "";
-		EndPoint startpoint = (EndPoint) EndPointFactory.createEndPoint("cBean");
-		EndPoint receiver = (EndPoint) EndPointFactory.createEndPoint("cBean");
-		
+		String groupName = "";
 		
 		BufferedReader keyboard = new BufferedReader (new InputStreamReader (System.in));
 		String input = "";
 		String text = "";
 		String targetName = "";
-		boolean topic = false;
+		boolean isGroup = false;
 		boolean isTalking = true;
 		
 		
@@ -94,28 +82,26 @@ public class TestCommBean implements MessageListener {
 		cBeanName = input.toLowerCase();
 		
 		// Topic
-		System.out.println("Bitte den Namen des Topics eingeben");
+		System.out.println("Bitte den Namen der Gruppe eingeben");
 		try {
 			input = keyboard.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		topicName = input.toLowerCase();
-		
-		
+		groupName = input.toLowerCase();
 		
 		doInit();
-		log.debug("Setting up topicChannel to " + topicName);
-		log.debug("Setting up listenChannel to " + cBeanName);
-		cBean = setupCommBean(cBean, cBeanName);
-		
-//		listenChannel = cBean.receive(this, cBeanName, false, null);
-//		topicChannel = cBean.receive(this, topicName, true, null);
+		log.debug("Setting up groupAddress to " + groupName);
+		log.debug("Setting up messageBoxAddress to " + cBeanName);
+        groupAddress= CommunicationAddressFactory.createGroupAddress(groupName);
+        messageBoxAddress= CommunicationAddressFactory.createMessageBoxAddress(cBeanName);
+        
+		cBean = setupCommBean(cBean, groupAddress, messageBoxAddress);
 		
 		System.out.println("type \"quit\" to terminate the chat");
 		while(isTalking){
 			log.debug("Let's begin with the Chat");
-			System.out.println("Bitte etwas eingeben ({[t.Name]/[q.Name]}.Nachricht)");
+			System.out.println("Bitte etwas eingeben ({[g.Name]/[m.Name]}.Nachricht)");
 			try {
 				input = keyboard.readLine();
 			} catch (IOException e) {
@@ -127,20 +113,23 @@ public class TestCommBean implements MessageListener {
 				System.out.println("Kommunikation wird beendet");
 				
 				payload = new TestContent(cBeanName + " meldet sich ab.");
-//				JiacMessage jMessage = new JiacMessage(payload, listenChannel);
-//				cBean.send(jMessage, topicChannel);
+				JiacMessage jMessage = new JiacMessage(payload, messageBoxAddress);
+				cBean.send(jMessage, groupAddress);
 			
-			} else if ( ((input.startsWith("t.") || (input.startsWith("q.")))) && (input != "") ){
+			} else if ( ((input.startsWith("g.") || (input.startsWith("m.")))) && (input != "") ) {
 				boolean isValidInput = false;
 				
-				topic = targetIsTopic(input);
+				isGroup = targetIsGroup(input);
 				text = input.substring(input.indexOf(".") + 1);
 				if (text.contains(".")){
 					targetName = text.substring(0, text.indexOf("."));
 					text = text.substring(text.indexOf(".") + 1);
 					payload = new TestContent(text);
-//					JiacMessage jMessage = new JiacMessage(payload, listenChannel);
-//					cBean.send(jMessage, targetName, topic);
+					JiacMessage jMessage = new JiacMessage(payload, messageBoxAddress);
+					cBean.send(
+                        jMessage,
+                        isGroup ? CommunicationAddressFactory.createGroupAddress(targetName) 
+                                : CommunicationAddressFactory.createMessageBoxAddress(targetName));
 				}
 			}
 			
@@ -152,8 +141,8 @@ public class TestCommBean implements MessageListener {
 		System.out.println("Bye bye");
 	}
 	
-	private boolean targetIsTopic(String input){
-		return (input.substring(0, input.indexOf(".")).compareToIgnoreCase("t") == 0);
+	private boolean targetIsGroup(String input){
+		return (input.substring(0, input.indexOf(".")).compareToIgnoreCase("g") == 0);
 	}
 	
 	public void doInit(){
@@ -174,49 +163,39 @@ public class TestCommBean implements MessageListener {
 	}
 
 	
-	private JMSMessageTransport setupCommBean(JMSMessageTransport cBean, String cBeanName){
+	private JMSMessageTransport setupCommBean(JMSMessageTransport cBean, IGroupAddress group, IMessageBoxAddress messageBox) {
 		log.debug("Setting up CommBean");
-		// CommBean Setup
 		cBean.setConnectionFactory(connectionFactory);
-//		cBean.setAgentNodeName(cBeanName);
 		try {
+            cBean.setDefaultDelegate(this);
 			cBean.doInit();
+            cBean.listen(group, null);
+            cBean.listen(messageBox, null);
 		} catch (Exception e) {
 			log.error(e.getCause());
 		}
 		return cBean;
 	}
-	
-	
-	public void onMessage(Message message){
-//		System.err.println("Message received");
-		boolean topic = true;
-		String origin = "";
-		ObjectMessage objMessage = null;
-		JiacMessage jMessage = null;
-		IJiacContent content;
-		TestContent tContent = new TestContent();
-		
-		if (message instanceof ObjectMessage){
-			objMessage = (ObjectMessage) message;
-			try {
-				jMessage = (JiacMessage) objMessage.getObject();
-				topic = (message.getJMSDestination().toString().startsWith("topic"));
-				origin = message.getJMSDestination().toString().substring(8);
-			} catch (JMSException e) {
-				log.error(e.getCause());
-			}
-			content = jMessage.getPayload();
-			if (content instanceof TestContent){
-				tContent = (TestContent) content;
-				System.err.println("Incoming over " + (topic ? "topic: " : "queue: ") + origin);
-				System.err.println("Message from " + jMessage.getSender().toString().substring(8) + " reads:");
-				System.err.println(tContent.getContent());
-			}
-		}
-	}
-	
-	
+    
+	public Log getLog(String extension) {
+        return LogFactory.getLog(getClass().getName() + "." + extension);
+    }
+
+    public void onAsynchronousException(MessageTransport source, Exception e) {
+        log.error("caught asynchronous exception", e);
+    }
+
+    public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at) {
+        IJiacContent content = message.getPayload();
+        if (content instanceof TestContent){
+            TestContent tContent = (TestContent) content;
+            System.err.println("Incoming over " + at);
+            System.err.println("Message from " + message.getSender() + " reads:");
+            System.err.println(tContent.getContent());
+        }
+        
+    }
+
 	public void doCleanup(){
 		log.debug("Commencing Cleanup");
 		

@@ -2,8 +2,8 @@ package de.dailab.jiactng.agentcore.comm.message;
 
 import javax.jms.Destination;
 
-import de.dailab.jiactng.agentcore.comm.helpclasses.FakeDestination;
 import junit.framework.TestCase;
+import de.dailab.jiactng.agentcore.comm.helpclasses.FakeDestination;
 
 /**
  * tests for different construction and getting the jiacDestination
@@ -13,11 +13,7 @@ import junit.framework.TestCase;
  */
 
 public class JiacMessageTest extends TestCase {
-
-	
 	private static String operation = "testOperation";
-	private static EndPoint recipient = (EndPoint) EndPointFactory.createEndPoint("testPlatform");
-	private static EndPoint startPoint = (EndPoint) EndPointFactory.createEndPoint("testPlatform");
 	private static Destination replyTo = new FakeDestination("replyTo");
 	private static IJiacContent payload = null;
 	

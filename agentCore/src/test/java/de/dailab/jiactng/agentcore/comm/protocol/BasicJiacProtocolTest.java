@@ -2,19 +2,14 @@ package de.dailab.jiactng.agentcore.comm.protocol;
 
 import javax.jms.Destination;
 
+import junit.framework.TestCase;
 import de.dailab.jiactng.agentcore.comm.helpclasses.FakeDestination;
-import de.dailab.jiactng.agentcore.comm.message.EndPoint;
-import de.dailab.jiactng.agentcore.comm.message.EndPointFactory;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
-import junit.framework.TestCase;
 
 public class BasicJiacProtocolTest extends TestCase {
 
 	private static String _operation = "testOperation";
-	private static EndPoint _recipient = (EndPoint) EndPointFactory.createEndPoint("testPlatform");
-	private static EndPoint _startPoint = (EndPoint) EndPointFactory.createEndPoint("testPlatform");
 	private static Destination _replyTo = new FakeDestination("replyTo");
 	private static IJiacContent _payload = null;
 	private static JiacMessage _jMsg;
@@ -29,7 +24,7 @@ public class BasicJiacProtocolTest extends TestCase {
 	 * @author Martin Loeffelholz
 	 */
 	
-	// ToDo: Funktionale und halbfunktionale Tests der eigentlichen Sendvorgänge + evtl. testProcessMessage
+	// ToDo: Funktionale und halbfunktionale Tests der eigentlichen Sendvorgï¿½nge + evtl. testProcessMessage
 	
 	protected void setUp() throws Exception {
 		super.setUp();

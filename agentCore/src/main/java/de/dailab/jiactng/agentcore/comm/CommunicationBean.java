@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
@@ -58,6 +60,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 
         public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at) {
             processMessage(source, message, saveCast(at.toUnboundAddress(), CommunicationAddress.class));
+        }
+
+        public Log getLog(String extension) {
+            return thisAgent.getLog(CommunicationBean.this, extension);
         }
     }
     

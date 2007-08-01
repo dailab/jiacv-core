@@ -9,9 +9,6 @@ import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -33,8 +30,6 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
  * 
  * @author Janko, Loeffelholz
  */
-
-
 public class JMSMessageTransport extends MessageTransport {
     /**
      * Retrieves JiacMessages from JMSMessages
@@ -100,9 +95,7 @@ public class JMSMessageTransport extends MessageTransport {
         return result;
     }
     
-	Log log = LogFactory.getLog(getClass());
 	// Zur Zeit sind logs auskommentiert.
-	
 	private ConnectionFactory _connectionFactory;
 	private JMSSender _sender;
 	private JMSReceiver _receiver;
@@ -125,8 +118,8 @@ public class JMSMessageTransport extends MessageTransport {
 	
 		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
 		
-		_sender = new JMSSender(_connectionFactory);
-		_receiver = new JMSReceiver(_connectionFactory, this);
+		_sender = new JMSSender(_connectionFactory, createChildLog("sender"));
+		_receiver = new JMSReceiver(_connectionFactory, this, createChildLog("receiver"));
 		log.debug("doneInit");
 		
 	}

@@ -5,6 +5,8 @@ package de.dailab.jiactng.agentcore.comm.transport;
 
 import java.net.URI;
 
+import org.apache.commons.logging.Log;
+
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.Selector;
@@ -23,10 +25,13 @@ public abstract class MessageTransport {
          * regardless if there are several registrations with and without selectors present. 
          */
         void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at);
+        Log getLog(String extension);
     }
     
     private final String _transportIdentifier;
     private IMessageTransportDelegate _delegate;
+    
+    protected Log log;
     
     protected MessageTransport(String transportIdentifier) {
         _transportIdentifier= transportIdentifier.toLowerCase();
@@ -34,6 +39,7 @@ public abstract class MessageTransport {
     
     public final void setDefaultDelegate(IMessageTransportDelegate delegate) {
         _delegate= delegate;
+        log= _delegate.getLog(_transportIdentifier);
     }
     
     /**
@@ -82,5 +88,9 @@ public abstract class MessageTransport {
     
     public final void delegateMessage(IJiacMessage message, ICommunicationAddress at) {
         _delegate.onMessage(this, message, at);
+    }
+    
+    protected Log createChildLog(String name) {
+        return _delegate.getLog(_transportIdentifier + "." + name);
     }
 }

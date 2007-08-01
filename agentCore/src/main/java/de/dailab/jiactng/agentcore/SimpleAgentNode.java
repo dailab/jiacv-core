@@ -8,7 +8,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -19,7 +18,6 @@ import javax.management.AttributeChangeNotification;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.ObjectName;
-import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -43,7 +41,6 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
-import de.dailab.jiactng.agentcore.servicediscovery.IServiceDescription;
 import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
@@ -199,6 +196,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public Log getLog(IAgent agent, IAgentBean bean) {
 		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName());
 	}
+    
+    public Log getLog(IAgent agent, IAgentBean bean, String extension) {
+        return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName() + "." + extension);
+    }
 
 	/**
 	 * Getter for attribute "JiacVersion" of the managed agent node.

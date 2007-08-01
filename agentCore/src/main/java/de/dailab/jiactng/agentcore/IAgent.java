@@ -127,6 +127,8 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    */
   public Log getLog(IAgentBean bean);
   
+  public Log getLog(IAgentBean owner, String extension);
+  
   /**
    * Returns the agent description of this agent.
    * @return the agent description of this agent

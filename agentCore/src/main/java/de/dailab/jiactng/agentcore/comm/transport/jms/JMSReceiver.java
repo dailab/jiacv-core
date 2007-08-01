@@ -13,7 +13,6 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
@@ -31,14 +30,6 @@ import de.dailab.jiactng.agentcore.comm.Selector;
  *
  */
 class JMSReceiver {
-
-	Log log = LogFactory.getLog(getClass());
-	private ConnectionFactory _connectionFactory;
-	private Connection _connection;
-	private Session _session;
-    private JMSMessageTransport _parent;
-    private Map<String, JMSMessageListener> _listeners;
-	
     /**
 	 * @param address
 	 * @param selector
@@ -125,10 +116,17 @@ class JMSReceiver {
         }
     }
     
-	
-	public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent) throws JMSException {
+    protected final Log log;
+    private ConnectionFactory _connectionFactory;
+    private Connection _connection;
+    private Session _session;
+    private JMSMessageTransport _parent;
+    private Map<String, JMSMessageListener> _listeners;
+    
+	public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent, Log log) throws JMSException {
 		_connectionFactory = (ConnectionFactory) connectionFactory;
 		_parent = parent;
+        this.log= log;
         _listeners= new HashMap<String, JMSMessageListener>();
 		doInit();
 	}

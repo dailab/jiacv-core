@@ -13,7 +13,6 @@ import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
-import de.dailab.jiactng.agentcore.comm.Selector;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
@@ -40,7 +39,10 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
         public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress from) {
             // TODO Auto-generated method stub
         }
-        
+
+        public Log getLog(String extension) {
+            return LogFactory.getLog(getClass().getName() + "." + extension);
+        }
     }
     
 	Log log = LogFactory.getLog(getClass());

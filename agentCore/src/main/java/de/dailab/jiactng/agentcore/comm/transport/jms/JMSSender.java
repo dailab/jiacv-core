@@ -9,7 +9,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
@@ -22,7 +21,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  *
  */
 class JMSSender {
-	Log log = LogFactory.getLog(getClass());
+	private final Log _log;
 	
 	private ConnectionFactory _connectionFactory;
 
@@ -31,23 +30,24 @@ class JMSSender {
 	
 	private int _defaultTimeOut = 1000;
 
-	public JMSSender(ConnectionFactory connectionFactory) throws JMSException {
+	public JMSSender(ConnectionFactory connectionFactory, Log log) throws JMSException {
 		_connectionFactory = (ConnectionFactory)connectionFactory;
+        _log= log;
 		doInit();
 	}
 	
 	public void doInit() throws JMSException {
-		log.debug("doInit");
+		_log.debug("doInit");
 		_connection = _connectionFactory.createConnection();
 		_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        log.debug("doneInit");
+        _log.debug("doneInit");
 	}
 	
 	public void doCleanup() throws JMSException {
-		log.debug("doCleanup");
+		_log.debug("doCleanup");
 		_session.close();
 		_connection.close();
-        log.debug("doneCleanup");
+        _log.debug("doneCleanup");
 	}
 
 	public void send(IJiacMessage message, ICommunicationAddress address) throws JMSException {
@@ -62,17 +62,17 @@ class JMSSender {
 	}
 	
 	private void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {
-        log.debug("start sending...");
+        _log.debug("start sending...");
 		MessageProducer producer = null;
 
 		producer = _session.createProducer(destination);
 		producer.setTimeToLive(timeToLive);
         
-        log.debug("pack message");
+        _log.debug("pack message");
         Message jmsMessage= JMSMessageTransport.pack(message, _session);
         jmsMessage.setJMSDestination(destination);
 		producer.send(jmsMessage);
 		producer.close();
-        log.debug("sending done");
+        _log.debug("sending done");
 	}
 }

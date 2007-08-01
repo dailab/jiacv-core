@@ -555,8 +555,12 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	public Log getLog(IAgentBean bean) {
 		return agentNode.getLog(this, bean);
 	}
+    
+	public Log getLog(IAgentBean owner, String extension) {
+        return agentNode.getLog(this, owner, extension);
+    }
 
-	/**
+    /**
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getAgentNodeUUID()
 	 */
 	public String getAgentNodeUUID() {

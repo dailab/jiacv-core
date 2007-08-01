@@ -150,7 +150,7 @@ public class TestCommBean implements IMessageTransportDelegate {
 	
 	public void doInit(){
 		// Broker Setup
-
+		System.out.println("Given Values for Broker: " + values.toString());
 		broker.setValues(values);
 		broker.setLog(log);
 		try {

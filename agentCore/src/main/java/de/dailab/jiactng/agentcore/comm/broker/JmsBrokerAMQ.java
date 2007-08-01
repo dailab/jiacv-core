@@ -37,11 +37,13 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 	public void doInit() throws Exception {
 		log.debug("initializing embedded broker");
 		
-		values.setUrlFromPortAndProtocol();
+		if (values._url == null){
+			values.setUrlFromPortAndProtocol();
+		}
 		
 		broker = new BrokerService();
 		broker.setBrokerName(values.getName());
-		broker.setUseJmx(values.isJmx());
+		broker.setUseJmx(false); // values.isJmx()
 		broker.setPersistent(values.isPersistent());
 		try {
 		

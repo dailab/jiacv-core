@@ -31,7 +31,50 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
  * @author Janko, Loeffelholz
  */
 public class JMSMessageTransport extends MessageTransport {
+
+	// Zur Zeit sind logs auskommentiert.
+	private ConnectionFactory _connectionFactory;
+	private JMSSender _sender;
+	private JMSReceiver _receiver;
+	
+	public JMSMessageTransport() {
+		this("jms");
+	}
+    
+    public JMSMessageTransport(String transportIdentifier) {
+        super(transportIdentifier);
+    }
+
     /**
+	 * Initializes the JMSMessageTransport 
+	 * Notes: ConnectionFactory needed!
+	 */
+	@Override
+	public synchronized void doInit() throws Exception {
+		log.debug("doInit");
+	
+		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
+		
+		_sender = new JMSSender(_connectionFactory, createChildLog("sender"));
+		_receiver = new JMSReceiver(_connectionFactory, this, createChildLog("receiver"));
+		log.debug("doneInit");
+		
+	}
+	
+	
+	/**
+	 * cleans up the JMSMessageTransports and the classes it holds
+	 */
+	public synchronized void doCleanup() {
+		log.debug("doCleanup");
+        try {_receiver.doCleanup();} catch (Exception e) {log.warn("cleaned up receiver", e);}
+		try {_sender.doCleanup();} catch (Exception e) {log.warn("cleaned up sender", e);}
+		log.debug("doneCleanup");
+	}
+
+	
+	
+	/**
      * Retrieves JiacMessages from JMSMessages
      * 
      * @param message	a JMSMessage received
@@ -95,45 +138,6 @@ public class JMSMessageTransport extends MessageTransport {
         return result;
     }
     
-	// Zur Zeit sind logs auskommentiert.
-	private ConnectionFactory _connectionFactory;
-	private JMSSender _sender;
-	private JMSReceiver _receiver;
-	
-	public JMSMessageTransport() {
-		this("jms");
-	}
-    
-    public JMSMessageTransport(String transportIdentifier) {
-        super(transportIdentifier);
-    }
-
-	/**
-	 * Initializes the JMSMessageTransport 
-	 * Notes: ConnectionFactory needed!
-	 */
-	@Override
-	public synchronized void doInit() throws Exception {
-		log.debug("doInit");
-	
-		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
-		
-		_sender = new JMSSender(_connectionFactory, createChildLog("sender"));
-		_receiver = new JMSReceiver(_connectionFactory, this, createChildLog("receiver"));
-		log.debug("doneInit");
-		
-	}
-	
-	
-	/**
-	 * cleans up the JMSMessageTransports and the classes it holds
-	 */
-	public synchronized void doCleanup() {
-		log.debug("doCleanup");
-        try {_receiver.doCleanup();} catch (Exception e) {log.warn("cleaned up receiver", e);}
-		try {_sender.doCleanup();} catch (Exception e) {log.warn("cleaned up sender", e);}
-		log.debug("doneCleanup");
-	}
 
 	/*
 	 * U S E I N G     T H E      S E N D E R
@@ -148,9 +152,10 @@ public class JMSMessageTransport extends MessageTransport {
 	 */
 	public void send(IJiacMessage message, ICommunicationAddress commAdd) throws CommunicationException {
         try {
+        	System.err.println("sender: " + _sender.toString());
             _sender.send(message, commAdd);
         } catch (JMSException jms) {
-            throw new CommunicationException("error while sending message", jms);
+        	throw new CommunicationException("error while sending message", jms);
         }
 	}
 	

@@ -37,6 +37,19 @@ public class BrokerValues {
 		setJmx(jmx);
 	}
 
+	/**
+	 * Erzeugt eine Instanz mit defaultwerten.. um einfach einen Broker erzeugen zu k�nnen.
+	 * 
+	 * @return
+	 */
+	public static BrokerValues getDefaultInstance() {
+		BrokerValues values = new BrokerValues("TngBroker", "tcp://localhost:61616", "multicast", "239.255.2.45:5555", true);
+		values.setProtocol("tcp");
+		values.setPort("61616");
+		return values;
+	}
+
+	
 	public String getDiscoveryAddress() {
 		return _discoveryAddress;
 	}
@@ -77,19 +90,7 @@ public class BrokerValues {
 		_jmx = jmx;
 	}
 
-	/**
-	 * Erzeugt eine Instanz mit defaultwerten.. um einfach einen Broker erzeugen zu k�nnen.
-	 * 
-	 * @return
-	 */
-	public static BrokerValues getDefaultInstance() {
-		BrokerValues values = new BrokerValues("TngBroker", "tcp://localhost:61616", "multicast", "239.255.2.45:5555", true);
-		values.setProtocol("tcp");
-		values.setPort("61616");
-		values.setUrlFromPortAndProtocol();
-		return values;
-	}
-
+	
 	public boolean isPersistent() {
 		return _persistent;
 	}

@@ -228,14 +228,14 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                 if(isActive()) {
                     log.debug("update offers...");
                     for(Action toAdd : toProcess) {
-                        if(_offeredActions.add(toAdd)) {
+//                        if(_offeredActions.add(toAdd)) {
                             // templates matched action which is currently withdrawn
                             try {
                                 updateActionOffer(toAdd, ADD_OFFER);
                             } catch (Exception e) {
                                 log.debug("could not offer action '" + toAdd + "'", e);
                             }
-                        }
+//                        }
                     }
                     
                     for(Action toRemove : _offeredActions) {

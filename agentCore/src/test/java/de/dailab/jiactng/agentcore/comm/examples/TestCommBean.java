@@ -46,7 +46,7 @@ public class TestCommBean implements IMessageTransportDelegate {
 	JmsBrokerAMQ broker = new JmsBrokerAMQ();
 	
 	/** A customized logging configuration will be used instead of the default configuration. */
-	private String loggingConfig = "de/dailab/jiactng/agentcore/comm/examples/myLog4j.properties";
+	private String loggingConfig = "classpath:de/dailab/jiactng/agentcore/comm/examples/myLog4j.properties";
 	Log log = getLog("JMSTransportTest");
 	
 	/**

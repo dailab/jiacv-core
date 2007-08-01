@@ -33,7 +33,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class ServiceBean extends AbstractMethodExposingBean implements IEffector, ResultReceiver {
+public class ServiceBean extends AbstractMethodExposingBean implements IEffector, ResultReceiver, Runnable {
     private static final String SERVICE_BROADCAST_ADDRESS= "JiacTNG/service/broadcast";
     private static final String SERVICE_PROTOCOL= "JiacTNG-service-protocol";
     private static final String SERVICE_OFFER_KEY= "JiacTNGServiceOffer";
@@ -86,17 +86,56 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     
     private CommunicationBean _communicationBean;
     
+    /**
+     * The group to broadcast offering and withdrawing information.
+     */
     private IGroupAddress _serviceBroadcastGroup;
     
+    /**
+     * This listener is responsible to forward the action request
+     * to the specific provider <strong>in this</strong> agent.
+     */
     private IJiacMessageListener _executionListener;
+    
+    /**
+     * The listener that is responsible to update the memory when
+     * remote actions are offered or withdrawn.
+     */
     private IJiacMessageListener _managementListener;
     
+    /**
+     * This map provides information of which communication
+     * address has to be used for a given action.
+     */
     private Map<Action, RemoteActionContext> _actionToContext;
+    
+    /**
+     * This map contains all sessions from external clients that are currently open.
+     */
     private Map<String, ICommunicationAddress> _sessionsFromExternalClients;
+    
+    /**
+     * This map contains all sessions to external providers that are currently open.
+     */
     private Map<String, DoAction> _sessionsToExternalProviders;
     
-    
+    /**
+     * This set contains all concrete actions that are currently offered
+     * (and thus communicated) to other agents.
+     */
     private final Set<Action> _offeredActions= new HashSet<Action>();
+    
+    /**
+     * This set contains all action templates whose matching actions should be provided to other
+     * agents.
+     */
+    private Set<Action> _actionTemplates= new HashSet<Action>();
+
+    public void setActionTemplates(Set<Action> actionTemplates) {
+        if(actionTemplates != null) {
+            _actionTemplates= actionTemplates;
+        }
+    }
     
     @Override
     public void doCleanup() throws Exception {
@@ -156,6 +195,8 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                 updateActionOffer(action, ADD_OFFER);
             }
         }
+        
+        thisAgent.getThreadPool().submit(this);
     }
 
     @Override
@@ -170,40 +211,78 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         super.doStop();
     }
 
+    
+    public void run() {
+        while(isActive()) {
+            Set<Action> toProcess= new HashSet<Action>();
+            synchronized(_actionTemplates) {
+                log.debug("walk through templates...");
+                for(Action template : _actionTemplates) {
+                    for(Action concrete : memory.readAll(template)) {
+                        toProcess.add(concrete);
+                    }
+                }
+            }
+            
+            synchronized(_offeredActions) {
+                if(isActive()) {
+                    log.debug("update offers...");
+                    for(Action toAdd : toProcess) {
+                        if(_offeredActions.add(toAdd)) {
+                            // templates matched action which is currently withdrawn
+                            try {
+                                updateActionOffer(toAdd, ADD_OFFER);
+                            } catch (Exception e) {
+                                log.debug("could not offer action '" + toAdd + "'", e);
+                            }
+                        }
+                    }
+                    
+                    for(Action toRemove : _offeredActions) {
+                        if(!toProcess.remove(toRemove)) {
+                            // no template matched the currently offered action
+                            try {
+                                updateActionOffer(toRemove, REMOVE_OFFER);
+                            } catch (Exception e) {
+                                log.debug("could not withdraw action '" + toRemove + "'", e);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ie) {
+                log.warn("could not sleep", ie);
+            }
+        }
+    }
+    
     /**
      * Offers an action to other agents.
      * 
-     * @param action    the action to expose to other agents
-     * @throws CommunicationException
+     * @param action    the action template to expose to other agents
      */
     @Expose
-    public void offerAction(Action action) throws CommunicationException {
-        synchronized(_offeredActions) {
-            if(_offeredActions.add(action)) {
-                if(isStarted()) {
-                    updateActionOffer(action, ADD_OFFER);
-                }
-            }
+    public boolean offerAction(Action template) {
+        synchronized(_actionTemplates) {
+            return _actionTemplates.add(template);
         }
     }
     
     /**
      * Withdraws a previously offered action.
      * 
-     * @param action    the action to withdraw
-     * @throws CommunicationException
+     * @param action    the action template to withdraw
      */
     @Expose
-    public void withdrawAction(Action action) throws CommunicationException {
-        synchronized (_offeredActions) {
-            if(_offeredActions.remove(action)) {
-                if(isStarted()) {
-                    updateActionOffer(action, REMOVE_OFFER);
-                }
-            }
+    public boolean withdrawAction(Action template) {
+        synchronized(_actionTemplates) {
+            return _actionTemplates.remove(template);
         }
     }
-    
+
     protected void overrideDoAction(DoAction doAction) {
         Action action= doAction.getAction();
         RemoteActionContext context= _actionToContext.get(action);
@@ -307,9 +386,9 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         memory.write(result);
     }
     
-    private boolean isStarted() {
+    private boolean isActive() {
         switch(getState()) {
-            case STARTED: {
+            case INITIALIZED: case STARTING: case STARTED: {
                 return true;
             }
             default: {

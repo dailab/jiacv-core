@@ -21,7 +21,6 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 public class Action implements IFact {
     private final static Class[] EMPTY_CLASSES= new Class[0];
     
-
 	/** the name of the action */
 	private String name;
 
@@ -34,6 +33,13 @@ public class Action implements IFact {
 	/** The classes of the results of this action */
 	private Class[] results;
 
+    /**
+     * This constructor is used to create an action template
+     */
+    public Action() {
+        this(null, null, null, null);
+    }
+    
 	/**
 	 * Constructor. Creates a new action-declaration.
 	 * 
@@ -189,7 +195,7 @@ public class Action implements IFact {
 
     @Override
     public int hashCode() {
-        int hash= name.hashCode();
+        int hash= name == null ? 0 : name.hashCode();
         
         for(int i= 0; i < parameters.length; ++i) {
             hash ^= parameters[i].hashCode();
@@ -210,6 +216,10 @@ public class Action implements IFact {
         
         Action other= (Action) obj;
 
+        if((name == null || other.name == null) && (name != other.name)) {
+            return false;
+        }
+        
         if(!name.equals(other.name)) {
             return false;
         }

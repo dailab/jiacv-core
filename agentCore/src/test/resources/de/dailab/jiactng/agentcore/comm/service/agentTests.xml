@@ -23,7 +23,7 @@
     <property name="agentBeans">
       <list>
         <ref bean="communicationBean"/>
-        <ref bean="serviceBean"/>
+        <ref bean="providerServiceBean"/>
         <ref bean="openBean"/>
       </list>
     </property>
@@ -45,9 +45,19 @@
     <!--property name="timeOut" value="-1"/-->
   </bean>
   
-  <bean name="openBean" class="de.dailab.jiactng.agentcore.comm.service.OpenBean" singleton="false"/>
   <bean name="clientBean" class="de.dailab.jiactng.agentcore.comm.service.ClientBean" singleton="false"/>
   <bean name="serviceBean" class="de.dailab.jiactng.agentcore.comm.service.ServiceBean" singleton="false"/>
+  
+  <bean name="openBean" class="de.dailab.jiactng.agentcore.comm.service.OpenBean" singleton="true"/>
+  <bean name="providerServiceBean" class="de.dailab.jiactng.agentcore.comm.service.ServiceBean" singleton="false">
+    <property name="actionTemplates">
+    	<set>
+    		<bean class="de.dailab.jiactng.agentcore.action.Action" singleton="false">
+    		  <property name="providerBean"><ref bean="openBean"/></property>
+    		</bean>
+    	</set>
+    </property>
+  </bean>
 
   <bean name="communicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false">
     <property name="transports">

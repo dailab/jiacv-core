@@ -78,7 +78,12 @@ class JMSReceiver {
         public void onMessage(Message message) {
             log.debug("receiving message");
             try {
-                _parent.delegateMessage(JMSMessageTransport.unpack(message), _address, _selector);
+                /*
+                 * By default JMS only delivers a message once per session. So it doesn't
+                 * matter for which selector we received it, we won't get it through
+                 * another consumer!
+                 */
+                _parent.delegateMessage(JMSMessageTransport.unpack(message), _address);
             } catch (Exception e) {
                 _parent.delegateException(e);
             }

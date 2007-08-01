@@ -14,24 +14,29 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * @version $Revision$
  */
 public class ClientBean extends AbstractAgentBean implements ResultReceiver {
+    private static class ResultObject {
+        ActionResult actionResult= null;
+    }
+    
     private final static String LOG_ACTION= "log";
     private final static String TIME_ACTION= "getCurrentTime";
     
-    private final Object _timeLock= new Object();
-    private final Object _logLock= new Object();
+    private final static int MAX_TIMEOUT= 10000;
     
-    private long _measuredTime;
+    private final ResultObject _timeLock= new ResultObject();
+    private final ResultObject _logLock= new ResultObject();
     
     public void receiveResult(ActionResult result) {
         Action action= result.getAction();
         log.debug("received result for '" + action + "'");
         if(action.getName().equals(TIME_ACTION)) {
             synchronized (_timeLock) {
-                _measuredTime= ((Long)result.getResults()[0]).longValue();
+                _timeLock.actionResult= result;
                 _timeLock.notify();
             }
         } else if (action.getName().equals(LOG_ACTION)){
             synchronized(_logLock) {
+                _logLock.actionResult= result;
                 _logLock.notify();
             }
         }
@@ -55,14 +60,14 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
             memory.write(action.createDoAction(new Object[]{"Hallo Welt"}, this));
             
             try {
-                _logLock.wait();
+                _logLock.wait(MAX_TIMEOUT);
                 // if we are here, then everything was successful
             } catch (Exception e) {
                 return e;
             }
         }
         
-        return null;
+        return _logLock.actionResult == null ? "timed out" : null;
     }
     
     public Object printTimes() {
@@ -78,12 +83,19 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
             memory.write(action.createDoAction(new Object[0], this));
             
             try {
-                _timeLock.wait();
+                _timeLock.wait(MAX_TIMEOUT);
+                
+                if(_timeLock.actionResult == null) {
+                    return "timed out";
+                }
+                
+                long measuredTime= ((Long)_timeLock.actionResult.getResults()[0]).longValue();
+                
                 long end= System.currentTimeMillis();
                 log.debug("start time: " + start);
-                log.debug("process time: " + _measuredTime);
+                log.debug("process time: " + measuredTime);
                 log.debug("end time: " + end);
-                log.debug("delays: " + (_measuredTime - start) + " -> " + (end - _measuredTime));
+                log.debug("delays: " + (measuredTime - start) + " -> " + (end - measuredTime));
             } catch (Exception e) {
                 return e;
             }

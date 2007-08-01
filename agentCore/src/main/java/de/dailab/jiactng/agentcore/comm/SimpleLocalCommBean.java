@@ -13,6 +13,10 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
+/**
+ * @deprecated this class is due to be removed!
+ */
+@Deprecated
 public class SimpleLocalCommBean extends AbstractAgentBean implements Runnable,
 		IEffector, ResultReceiver {
 

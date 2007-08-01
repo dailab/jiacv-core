@@ -17,7 +17,12 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 public abstract class MessageTransport {
     public static interface IMessageTransportDelegate {
         void onAsynchronousException(MessageTransport source, Exception e);
-        void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at, Selector selector);
+        
+        /**
+         * Transports <strong>must</strong> ensure to deliver a message <strong>only once</strong>
+         * regardless if there are several registrations with and without selectors present. 
+         */
+        void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at);
     }
     
     private final String _transportIdentifier;
@@ -63,6 +68,11 @@ public abstract class MessageTransport {
     public abstract void doCleanup() throws Exception;
     
     public abstract void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException;
+    
+    /**
+     * Providing a selector enables the transport to optimise the inter-transport communication.
+     * But it is <strong>not</strong> a criterion to delegate messages more then once!
+     */
     public abstract void listen(ICommunicationAddress address, Selector selector) throws CommunicationException;
     public abstract void stopListen(ICommunicationAddress address, Selector selector) throws CommunicationException;
     
@@ -70,7 +80,7 @@ public abstract class MessageTransport {
         _delegate.onAsynchronousException(this, exception);
     }
     
-    public final void delegateMessage(IJiacMessage message, ICommunicationAddress at, Selector selector) {
-        _delegate.onMessage(this, message, at, selector);
+    public final void delegateMessage(IJiacMessage message, ICommunicationAddress at) {
+        _delegate.onMessage(this, message, at);
     }
 }

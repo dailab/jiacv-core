@@ -56,8 +56,8 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             processError(source, e);
         }
 
-        public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at, Selector selector) {
-            processMessage(source, message, saveCast(at.toUnboundAddress(), CommunicationAddress.class), selector);
+        public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress at) {
+            processMessage(source, message, saveCast(at.toUnboundAddress(), CommunicationAddress.class));
         }
     }
     
@@ -154,8 +154,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
         }
         
         // create the default message box for this agent
-        _defaultMessageBox= CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName());
-//        establishMessageBox((_defaultMessageBox= CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName())));
+        establishMessageBox((_defaultMessageBox= CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName())));
         
         if(_transports.size() <= 0) {
             log.warn("no transports available yet!");
@@ -392,9 +391,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
     /**
      * delegates received messages to the default listener
      */
-    protected synchronized void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at, Selector selector) {
+    protected synchronized void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
         if(log.isDebugEnabled()) {
-            log.debug("received message ' " + message + "' at '" + at + "' with selector '" + selector + "'");
+            log.debug("received message ' " + message + "' at '" + at + "'");
         }
         ReferenceEqualityCheckSet<IJiacMessageListener> notified= new ReferenceEqualityCheckSet<IJiacMessageListener>();
         CommunicationAddress boundAddress= null;
@@ -409,12 +408,13 @@ public class CommunicationBean extends AbstractMethodExposingBean {
             boolean notify= false;
             
             if(context.selector != null) {
-                if(selector != null && context.selector.equals(selector)) {
-                    // address and selector matched
+                String header= message.getHeader(context.selector.getKey());
+                
+                if(header != null && header.equals(context.selector.getValue())) {
                     notify= true;
                 }
             } else {
-                // address matched but we have no selector set
+                // we have a generic listener with no selector...
                 notify= true;
             }
             if(notify) {

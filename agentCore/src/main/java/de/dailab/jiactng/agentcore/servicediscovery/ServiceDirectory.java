@@ -37,7 +37,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
             log.error("asynchronous error on message transport", e);
         }
 
-        public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress from, Selector selector) {
+        public void onMessage(MessageTransport source, IJiacMessage message, ICommunicationAddress from) {
             // TODO Auto-generated method stub
         }
         

@@ -152,7 +152,6 @@ public class JMSMessageTransport extends MessageTransport {
 	 */
 	public void send(IJiacMessage message, ICommunicationAddress commAdd) throws CommunicationException {
         try {
-        	System.err.println("sender: " + _sender.toString());
             _sender.send(message, commAdd);
         } catch (JMSException jms) {
         	throw new CommunicationException("error while sending message", jms);

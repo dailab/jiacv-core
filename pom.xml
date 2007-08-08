@@ -809,5 +809,6 @@
 		<module>agentInterpreter</module>
 		<module>basicServices</module>
 		<module>examples</module>
+		<module>jiacSecurity</module>
 	</modules>
 </project>

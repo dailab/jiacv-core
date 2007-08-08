@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -18,6 +19,7 @@ import javax.management.AttributeChangeNotification;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.ObjectName;
+import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -37,10 +39,12 @@ import org.springframework.util.Log4jConfigurer;
 import de.dailab.jiactng.Version;
 import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
+import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.servicediscovery.IServiceDescription;
 import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
@@ -835,19 +839,26 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @return information about the service directory of this agent node
 	 */
 	public CompositeData getServiceDirectoryData() {
-//		if (_serviceDirectory == null) {
-//			return null;
-//		}
-//		
-//		// create commBean data
+		if (_serviceDirectory == null) {
+			return null;
+		}
+
+		// create commBean data
 //		String[] commBeanItemNames = new String[] {"UniversalId", "LocalId", "QueueReceiverQueueName", "QueueSenderDestinationName", "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName", "ProtocolType"};
-//		CompositeDataSupport commBeanData = null;
-//		CompositeType commBeanType = null;
-//		try {
+		String[] commBeanItemNames = new String[] {"ConnectorURI", "TransportIdentifier"};
+		CompositeDataSupport commBeanData = null;
+		CompositeType commBeanType = null;
+		try {
 //			commBeanType = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Communication bean data", commBeanItemNames, new String[] {"UniversalId", "LocalId", "QueueReceiverQueueName", "QueueSenderDestinationName", "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName", "ProtocolType"}, new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING});
+			commBeanType = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Message transport data", commBeanItemNames, new String[] {"ConnectorURI", "TransportIdentifier"}, new OpenType[] {SimpleType.STRING, SimpleType.STRING});
 //			CommBean commBean = _serviceDirectory.getCommBean();
-//			if (commBean != null) {
+			MessageTransport commBean = _serviceDirectory.getCommBean();
+			if (commBean != null) {
 //				Object[] commBeanValues = new Object[] {null, null, null, null, null, null, commBean.getDefaultQueueName(), commBean.getDefaultTopicName(), commBean.getProtocolType()};
+				Object[] commBeanValues = new Object[] {null, commBean.getTransportIdentifier()};
+				if (commBean.getConnectorURI() != null) {
+					commBeanValues[0] = commBean.getConnectorURI().toString();
+				}
 //				if (commBean.getAddress() != null) {
 //					commBeanValues[0] = commBean.getAddress().getUniversalId();
 //					commBeanValues[1] = commBean.getAddress().getLocalId();
@@ -869,38 +880,39 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 //					}
 //				}
 //				commBeanData = new CompositeDataSupport(commBeanType, commBeanItemNames, commBeanValues);
-//			}
-//		}
-//		catch (OpenDataException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		// get name of all services
-//		List<IServiceDescription> allServices = _serviceDirectory.getAllServices();
-//		int size = allServices.size();
-//		String[] allServiceNames = new String[size];
-//		for (int i=0; i<size; i++) {
-//			allServiceNames[i] = allServices.get(i).getName();
-//		}
-//		
-//		// get name of all web services
-//		List<IServiceDescription> allWebServices = _serviceDirectory.getAllWebServices();
-//		size = allWebServices.size();
-//		String[] allWebServiceNames = new String[size];
-//		for (int i=0; i<size; i++) {
-//			allWebServiceNames[i] = allWebServices.get(i).getName();
-//		}
-//		
-//		// create service directory data
-//		String[] itemNames = new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "CommBean"};
-//		try {
-//			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Service directory data", itemNames, new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "CommBean"}, new OpenType[] {SimpleType.INTEGER, SimpleType.INTEGER, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), commBeanType});
-//			return new CompositeDataSupport(type, itemNames, new Object[] {_serviceDirectory.getPublishTimer(), _serviceDirectory.getServiceNumber(), allWebServiceNames, allServiceNames, commBeanData});
-//		}
-//		catch (OpenDataException e) {
-//			e.printStackTrace();
+				commBeanData = new CompositeDataSupport(commBeanType, commBeanItemNames, commBeanValues);
+			}
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+		}
+	
+		// get name of all services
+		List<IServiceDescription> allServices = _serviceDirectory.getAllServices();
+		int size = allServices.size();
+		String[] allServiceNames = new String[size];
+		for (int i=0; i<size; i++) {
+			allServiceNames[i] = allServices.get(i).getName();
+		}
+		
+		// get name of all web services
+		List<IServiceDescription> allWebServices = _serviceDirectory.getAllWebServices();
+		size = allWebServices.size();
+		String[] allWebServiceNames = new String[size];
+		for (int i=0; i<size; i++) {
+			allWebServiceNames[i] = allWebServices.get(i).getName();
+		}
+		
+		// create service directory data
+		String[] itemNames = new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "MessageTransport"};
+		try {
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Service directory data", itemNames, new String[] {"PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames", "MessageTransport"}, new OpenType[] {SimpleType.INTEGER, SimpleType.INTEGER, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), commBeanType});
+			return new CompositeDataSupport(type, itemNames, new Object[] {_serviceDirectory.getPublishTimer(), _serviceDirectory.getServiceNumber(), allWebServiceNames, allServiceNames, commBeanData});
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
 			return null;
-//		}	
+		}	
 	}
 
 	/**

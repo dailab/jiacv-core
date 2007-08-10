@@ -421,7 +421,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				}
 				System.out.println("Creating Connector: " + jurl);
 				JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, env, mbs);
-				cs.start();
+				try {
+					cs.start();
+				}
+				catch (Exception e) {
+					System.err.println("WARNING: Start of JMX connector server failed for " + jurl);
+					if ((path != null) && path.startsWith("/jndi/rmi://")) {
+						System.err.println("Please ensure that a rmi registry is started on " + path.substring(12, path.length() - _name.length() - 1));
+					}
+					continue;
+				}
 				_connectorServer.add(cs);
 
 				// register connector server

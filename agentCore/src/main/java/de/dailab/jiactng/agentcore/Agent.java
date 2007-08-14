@@ -6,7 +6,6 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -14,8 +13,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -24,7 +21,6 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
 import org.apache.commons.logging.Log;
-import org.springframework.beans.factory.InitializingBean;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.environment.IEffector;
@@ -33,6 +29,7 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.ontology.AgentBeanDescription;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
@@ -46,8 +43,7 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.IAgent
  */
-public class Agent extends AbstractLifecycle implements IAgent,
-		InitializingBean, AgentMBean {
+public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
 	/**
 	 * The AID (agent identifier). This property is generated and assigned
@@ -116,6 +112,9 @@ public class Agent extends AbstractLifecycle implements IAgent,
 
 	private ArrayList<Action> actionList = null;
 
+	/** The manager of the agent node */
+	protected Manager _manager = null;
+
 	/**
 	 * Getter for the memory-component
 	 * 
@@ -156,6 +155,11 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	 */
 	public void setAgentBeans(ArrayList<IAgentBean> agentbeans) {
 		this.agentBeans = agentbeans;
+
+		// set references for all agent beans
+		for (IAgentBean ab : this.agentBeans) {
+			ab.setThisAgent(this);
+		}
 	}
 
 	/*
@@ -201,7 +205,20 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	 * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String arg0) {
-		this.agentName = arg0;
+		// update management
+		if (isManagementEnabled()) {
+			Manager manager = _manager;
+			disableManagement();
+			this.agentName = arg0;
+			enableManagement(manager);
+		} else {
+			this.agentName = arg0;
+		}
+
+		// update logger
+		if (agentNode != null) {
+			this.agentLog = agentNode.getLog(this);
+		}
 	}
 
 	/*
@@ -222,21 +239,6 @@ public class Agent extends AbstractLifecycle implements IAgent,
 		// clean up agent
 		stop();
 		cleanup();
-
-		// deregister agent as JMX resource
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		try {
-			ObjectName name = new ObjectName(
-					"de.dailab.jiactng.agentcore:type=Agent,name="
-							+ this.agentName);
-			if (mbs.isRegistered(name)) {
-				mbs.unregisterMBean(name);
-			}
-			System.out.println("Agent " + this.agentName
-					+ " deregistered as JMX resource.");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 		// remove agent from the agent list of the agent node
 		if (agentNode != null) {
@@ -285,8 +287,6 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	@Override
 	public void doInit() throws LifecycleException {
 		// initialize agent elements
-		this.agentLog = agentNode.getLog(this);
-
 		this.actionList = new ArrayList<Action>();
 		this.memory.init();
 		this.memory.write(new ThisAgentDescription(this.agentId,
@@ -300,7 +300,6 @@ public class Agent extends AbstractLifecycle implements IAgent,
 		for (IAgentBean ab : this.agentBeans) {
 			try {
 				ab.setMemory(memory);
-				ab.setThisAgent(this);
 				ab.init();
 				if (ab instanceof ILifecycle) {
 					ab.addLifecycleListener(this);
@@ -410,29 +409,6 @@ public class Agent extends AbstractLifecycle implements IAgent,
 				new ThisAgentDescription(null, null, newState.name(), null));
 	}
 
-	/**
-	 * Initialisation-method. This method is called by Spring after startup
-	 * (through the InitializingBean-Interface) and is used to start the agent
-	 * after all beans haven been instantiated by Spring. Currently only
-	 * registers the agent as JMX resource.
-	 * 
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-	 */
-	public void afterPropertiesSet() throws Exception {
-		// register agent as JMX resource
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-		try {
-			ObjectName name = new ObjectName(
-					"de.dailab.jiactng.agentcore:type=Agent,name="
-							+ this.agentName);
-			mbs.registerMBean(this, name);
-			System.out.println("Agent " + this.agentName
-					+ " registered as JMX resource.");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -520,7 +496,18 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	 * @see de.dailab.jiactng.agentcore.IAgent#setAgentNode(de.dailab.jiactng.agentcore.IAgentNode)
 	 */
 	public void setAgentNode(IAgentNode agentNode) {
-		this.agentNode = agentNode;
+		// update management
+		if (isManagementEnabled()) {
+			Manager manager = _manager;
+			disableManagement();
+			this.agentNode = agentNode;
+			enableManagement(manager);
+		} else {
+			this.agentNode = agentNode;
+		}
+
+		// update logger
+		this.agentLog = this.agentNode.getLog(this);
 	}
 
 	/*
@@ -553,10 +540,16 @@ public class Agent extends AbstractLifecycle implements IAgent,
 	}
 
 	public Log getLog(IAgentBean bean) {
+		if (agentNode == null) {
+			return null;
+		}
 		return agentNode.getLog(this, bean);
 	}
     
 	public Log getLog(IAgentBean owner, String extension) {
+		if (agentNode == null) {
+			return null;
+		}
         return agentNode.getLog(this, owner, extension);
     }
 
@@ -681,4 +674,66 @@ public class Agent extends AbstractLifecycle implements IAgent,
 		return execution.getClass().getName();	
 	}
 
+	/**
+     * Registers the agent and all its resources for management
+     * @param manager the manager to be used for registration
+	 */
+	public void enableManagement(Manager manager) {
+		// do nothing if management already enabled
+		if (isManagementEnabled()) {
+			return;
+		}
+		
+		// register agent for management
+		try {
+			manager.registerAgent(this);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to register agent " + getAgentName() + " of agent node " + getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+
+		// register agent beans for management
+		for (IAgentBean ab : this.agentBeans) {
+			ab.enableManagement(manager);
+		}
+		
+		_manager = manager;
+	}
+	  
+	/**
+	 * Deregisters the agent and all its resources from management
+	 * @param manager
+	 */
+	public void disableManagement() {
+		// do nothing if management already disabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+		
+		// deregister agent beans from management
+		for (IAgentBean ab : this.agentBeans) {
+			ab.disableManagement();
+		}
+		
+		// deregister agent from management
+		try {
+			_manager.unregisterAgent(this);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister agent " + getAgentName() + " of agent node " + getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+		
+		_manager = null;
+	}
+
+	/**
+	 * Checks wether the management of this object is enabled or not.
+	 * @return true if the management is enabled, otherwise false
+	 */
+	public boolean isManagementEnabled() {
+		return _manager != null;
+	}
+	  
 }

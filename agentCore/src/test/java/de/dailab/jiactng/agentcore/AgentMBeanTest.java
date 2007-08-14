@@ -15,6 +15,8 @@ import javax.management.relation.MBeanServerNotificationFilter;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
+
 import junit.framework.TestCase;
 
 /**
@@ -24,6 +26,8 @@ import junit.framework.TestCase;
  */
 public class AgentMBeanTest extends TestCase implements NotificationListener {
 
+	private final String nodeName = "myPlatform";
+	private final String agentName = "TestAgent";
 	private ObjectName node = null;
 	private ObjectName agent = null;
 	private MBeanServer mbs = null;
@@ -33,6 +37,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	private String registrationNotification = "";
 	private ArrayList agentListNotification = null;
 	private SimpleAgentNode nodeRef = null;
+	private JmxManager manager = null;
 
 	/**
 	 * Sets up the test environment. It enables the JMX interface, registers as listener
@@ -43,8 +48,9 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	protected void setUp() throws Exception {
 		super.setUp();
 		System.setProperty("jmx.invoke.getters", "");
-		node = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=myPlatform");
-		agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=TestAgent");
+		manager = new JmxManager();
+		node = manager.getMgmtNameOfAgentNode(nodeName);
+		agent = manager.getMgmtNameOfAgent(nodeName, agentName);
 		mbs = ManagementFactory.getPlatformMBeanServer();
 
 		// add listener for (de)registration of the agent
@@ -95,6 +101,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		registrationNotification = null;
 		agentListNotification = null;
 		nodeRef = null;
+		manager = null;
 	}
 	
 	
@@ -144,7 +151,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	public void testGetName() {
 		String name = "";
 		try {
-			name = (String) mbs.getAttribute(agent, "Name");
+			name = (String) manager.getAttributeOfAgent(nodeName, agentName, "Name");
 		} catch (Exception e) {
 			fail("Error while getting agent's name");
 		}
@@ -197,7 +204,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	protected void doAction(String action) {
 		try {
-			mbs.invoke(agent, action, new Object[] {}, new String[] {});
+			manager.invokeAgent(nodeName, agentName, action, new Object[] {}, new String[] {});
 		} catch (Exception e) {
 			fail("Error while " + action + " agent");
 		}
@@ -215,7 +222,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		// check JMX interface
 		state = "";
 		try {
-			state = (String) mbs.getAttribute(agent, "LifecycleState");
+			state = (String) manager.getAttributeOfAgent(nodeName, agentName, "LifecycleState");
 		} catch (Exception e) {
 			fail("Error while getting agent's state");
 		}

@@ -10,8 +10,9 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
+import de.dailab.jiactng.agentcore.management.Manageable;
 
-public interface IAgentBean extends ILifecycle, BeanNameAware {
+public interface IAgentBean extends ILifecycle, BeanNameAware, Manageable {
 
   /**
    * Setter for the agent-reference to the agent that holds this bean.

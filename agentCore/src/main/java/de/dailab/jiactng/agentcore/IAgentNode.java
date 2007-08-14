@@ -9,6 +9,7 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
+import de.dailab.jiactng.agentcore.management.Manageable;
 import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 
 /**
@@ -18,7 +19,7 @@ import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
  * @author Joachim Fuchs
  * @author Thomas Konnerth
  */
-public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListener {
+public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListener, Manageable {
 
   /**
    * Returns the unique identifier for this agentnode. The identifier is created

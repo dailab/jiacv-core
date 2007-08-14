@@ -2,7 +2,6 @@ package de.dailab.jiactng.agentcore;
 
 //import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
 import java.io.FileNotFoundException;
-import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -16,9 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.management.AttributeChangeNotification;
-import javax.management.MBeanServer;
 import javax.management.Notification;
-import javax.management.ObjectName;
 import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
@@ -26,9 +23,6 @@ import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXServiceURL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,6 +38,8 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.management.Manager;
+import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
 import de.dailab.jiactng.agentcore.servicediscovery.IServiceDescription;
 import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 import de.dailab.jiactng.agentcore.util.IdFactory;
@@ -80,9 +76,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Storage for the agentFutures. Used to stop/cancel agentthreads. */
 	private HashMap<String, Future> agentFutures = null;
 
-	/** The list of JMX connector servers for remote management. */
-	private ArrayList<JMXConnectorServer> _connectorServer = new ArrayList<JMXConnectorServer>();
-
 	/** Configuration of a set of JMX connector server. */
 	private Set<Map> _jmxConnectors = null;
 
@@ -91,6 +84,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** Das ServiceDirectory des AgentNodes */
 	private ServiceDirectory _serviceDirectory = null;
+	
+	/** The manager of the agent node */
+	private Manager _manager = null;
 
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
@@ -138,11 +134,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.IAgentNode#addAgent(de.dailab.jiactng.agentcore.IAgent)
 	 */
 	public void addAgent(IAgent agent) {
+		agent.setAgentNode(this);
+
 		// TODO: statechanges?
 		ArrayList<String> oldAgentList = getAgents();
 		_agents.add(agent);
 		agent.addLifecycleListener(this.lifecycle.createLifecycleListener());
 		agentListChanged(oldAgentList, getAgents());
+		
+		// register agent for management
+		agent.enableManagement(_manager);
 	}
 
 	/*
@@ -152,6 +153,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void removeAgent(IAgent agent) {
 		// TODO: statechanges?
+		
+		// deregister agent from management
+		agent.disableManagement();
+
+		// remove agent
 		ArrayList<String> oldAgentList = getAgents();
 		_agents.remove(agent);
 		agentListChanged(oldAgentList, getAgents());
@@ -284,7 +290,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		Collection newAgents = appContext.getBeansOfType(IAgent.class).values();
 		for (Object a : newAgents) {
 			IAgent agent = (IAgent) a;
-			agent.setAgentNode(this);
 			addAgent(agent);
 			try {
 				agent.init();
@@ -302,7 +307,17 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.IAgentNode#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String name) {
-		_name = name;
+		if (isManagementEnabled()) {
+			Manager manager = _manager;
+			disableManagement();
+			_name = name;
+			enableManagement(manager);
+		} else {
+			_name = name;
+		}
+
+		// update logger
+		log = LogFactory.getLog(_name);
 	}
 
 	/**
@@ -366,97 +381,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-
 		// create shutdown hook for graceful termination
 		Runtime.getRuntime().addShutdownHook(shutdownhook);
-
-		// create all connector server for remote management
-		if (_jmxConnectors != null) {
-			// Enable remote management
-			if (!_jmxConnectors.isEmpty()) {
-				System.setProperty("com.sun.management.jmxremote", "");
-			}
-			// Create and register all specified JMX connector servers
-			for (Map conf : _jmxConnectors) {
-				// get parameters of connector server
-				String protocol = (String) conf.get("protocol");
-				if (protocol == null) {
-					System.out.println("WARNING: No protocol specified for a JMX connector server");
-					continue;
-				}
-				String portStr = (String) conf.get("port");
-				int port = 0;
-				if (portStr != null) {
-					try {
-						port = Integer.parseInt(portStr);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				String path = (String) conf.get("path");
-				String authenticator = (String) conf.get("authenticator");
-
-				if (protocol.equals("rmi")) {
-					// check use of RMI registry
-					String registryPort = (String) conf.get("registryPort");
-					String registryHost = (String) conf.get("registryHost");
-					if ((registryPort != null) || (registryHost != null)) {
-						path = "/jndi/rmi://" + ((registryHost == null) ? "localhost" : registryHost)
-																										+ ((registryPort == null) ? "" : ":" + registryPort) + "/" + _name;
-					}
-				}
-
-				// create connector server
-				JMXServiceURL jurl = new JMXServiceURL(protocol, null, port, path);
-				HashMap<String,Object> env = new HashMap<String,Object>();
-				if (authenticator != null) {
-					try {
-						Object auth = Class.forName(authenticator).newInstance();
-						env.put(JMXConnectorServer.AUTHENTICATOR, auth);
-					}
-					catch (Exception e) {
-						System.err.println("WARNING: Initialisation of JMX authentication failed, because can not create instance of " + authenticator);
-					}
-				}
-				System.out.println("Creating Connector: " + jurl);
-				JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, env, mbs);
-				try {
-					cs.start();
-				}
-				catch (Exception e) {
-					System.err.println("WARNING: Start of JMX connector server failed for " + jurl);
-					if ((path != null) && path.startsWith("/jndi/rmi://")) {
-						System.err.println("Please ensure that a rmi registry is started on " + path.substring(12, path.length() - _name.length() - 1));
-					}
-					continue;
-				}
-				_connectorServer.add(cs);
-
-				// register connector server
-				JMXServiceURL address = cs.getAddress();
-				System.out.println("Registering URL for agent node: " + address);
-				// TODO register the connector server
-				System.out.println("Registered URL: " + address);
-				System.out.println("Service URL successfully registered");
-			}
-		}
-
-		// register agent node as JMX resource
-		try {
-			ObjectName name = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=" + _name);
-			mbs.registerMBean(this, name);
-			System.out.println("Agent node " + _name + " registered as JMX resource.");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 
 		// set references for all agents
 		addLifecycleListener(this);
 		if (_agents != null) {
 			for (IAgent a : _agents) {
 				a.setAgentNode(this);
-				a.addLifecycleListener(this.lifecycle.createLifecycleListener());
+				a.addLifecycleListener(this.lifecycle.createLifecycleListener());				
 			}
 		}
 
@@ -464,6 +397,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		if (_serviceDirectory != null) {
 			_serviceDirectory.addLifecycleListener(this.lifecycle.createLifecycleListener());
 		}
+		
+		// enable management of agent node and all its resources
+		enableManagement(new JmxManager());
 		
 		// start agent node
 		init();
@@ -486,46 +422,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		stop();
 		cleanup();
 
-		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-
-		// deregister all agents as JMX resource
-		if (_agents != null) {
-			for (IAgent a : _agents) {
-				try {
-					ObjectName name = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=" + a.getAgentName());
-					if (mbs.isRegistered(name)) {
-						mbs.unregisterMBean(name);
-					}
-					System.out.println("Agent " + a.getAgentName() + " deregistered as JMX resource.");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
+		// disable management of agent node and all its resources
+		disableManagement();
+		
 		_agents = null;
-
-		// unregister agent node as JMX resource
-		try {
-			ObjectName name = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=" + _name);
-			if (mbs.isRegistered(name)) {
-				mbs.unregisterMBean(name);
-			}
-			System.out.println("Agent node " + _name + " deregistered as JMX resource.");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// Stop all connector servers
-		for (JMXConnectorServer cs : this._connectorServer) {
-			System.out.println("Stop the connector server: " + cs.getAddress().toString());
-			try {
-				cs.stop();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		this._connectorServer = null;
 
 		if (log != null) {
 			log.warn("AgentNode " + getName() + " has been closed.");
@@ -538,7 +438,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
 	 */
 	public void doInit() {
-		log = LogFactory.getLog(getName());
                 if (_embeddedBroker != null) {
                     try {
                         _embeddedBroker.init();
@@ -935,4 +834,79 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		System.setProperty("java.security.policy", filename);
 		System.setSecurityManager(new SecurityManager());
 	}
+
+	/**
+     * Registers the agent node and all its resources for management
+     * @param manager
+	 */
+	public void enableManagement(Manager manager) {
+		// do nothing if management already enabled
+		if (isManagementEnabled()) {
+			return;
+		}
+		
+		// register agent node for management
+		try {
+			manager.registerAgentNode(this);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to register agent node " + this.getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+
+		// register agents for management
+		if (_agents != null) {
+			for (IAgent a : this._agents) {
+				a.enableManagement(manager);
+			}
+		}
+
+		// enable remote management
+		if (_jmxConnectors != null) {
+			manager.enableRemoteManagement(_name, _jmxConnectors);
+		}
+		
+		_manager = manager;
+	}
+	  
+	/**
+	 * Deregisters the agent node and all its resources from management
+	 * @param manager
+	 */
+	public void disableManagement() {
+		// do nothing if management already disabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+		
+		// disable remote management
+		_manager.disableRemoteManagement(getName());
+
+		// deregister agents from management
+		if (_agents != null) {
+			for (IAgent a : this._agents) {
+				a.disableManagement();
+			}
+		}
+		
+		// deregister agent node from management
+		try {
+			_manager.unregisterAgentNode(this);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister agent node " + this.getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}		
+		
+		_manager = null;
+	}
+
+	/**
+	 * Checks wether the management of this object is enabled or not.
+	 * @return true if the management is enabled, otherwise false
+	 */
+	public boolean isManagementEnabled() {
+		return _manager != null;
+	}
+	  
 }

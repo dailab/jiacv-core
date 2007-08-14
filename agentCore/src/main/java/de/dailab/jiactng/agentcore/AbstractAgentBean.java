@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * Abstract superclass of all agentbeans. This includes core-components as well
@@ -19,9 +20,12 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
  * @author Thomas Konnerth
  */
 public abstract class AbstractAgentBean extends AbstractLifecycle implements
-		IAgentBean {
+		IAgentBean, AbstractAgentBeanMBean {
 
 	protected Log log = null;
+
+	/** The manager of the agent node */
+	private Manager _manager = null;
 
 	/**
 	 * Creates an agent bean that uses lifecycle support in loose mode
@@ -60,7 +64,17 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 * @see de.dailab.jiactng.agentcore.IAgentBean#setThisAgent(de.dailab.jiactng.agentcore.IAgent)
 	 */
 	public final void setThisAgent(IAgent agent) {
-		this.thisAgent = agent;
+		// update management
+		if (isManagementEnabled()) {
+			Manager manager = _manager;
+			disableManagement();
+			this.thisAgent = agent;
+			enableManagement(manager);
+		} else {
+			this.thisAgent = agent;
+		}
+
+		// update logger
 		this.log = thisAgent.getLog(this);
 	}
 
@@ -79,7 +93,20 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 * @see de.dailab.jiactng.agentcore.IAgentBean#setBeanName(java.lang.String)
 	 */
 	public final void setBeanName(String name) {
-		this.beanName = name;
+		// update management
+		if (isManagementEnabled()) {
+			Manager manager = _manager;
+			disableManagement();
+			this.beanName = name;
+			enableManagement(manager);
+		} else {
+			this.beanName = name;
+		}
+
+		// update logger
+		if (thisAgent != null) {
+			this.log = thisAgent.getLog(this);
+		}
 	}
 
 	/*
@@ -99,6 +126,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
 	 */
 	public void doInit() throws Exception {
+		if (log == null) {
+			this.log = thisAgent.getLog(this);
+		}
 	}
 
 	/*
@@ -133,4 +163,56 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	public void execute() {
 	};
 
+	/**
+     * Registers the agent bean and all its resources for management
+     * @param manager
+	 */
+	public void enableManagement(Manager manager) {
+		// do nothing if management already enabled
+		if (isManagementEnabled()) {
+			return;
+		}
+		
+		// register agent bean for management
+		try {
+			manager.registerAgentBean(this, thisAgent);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to register agent bean " + beanName + " of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+		
+		_manager = manager;
+	}
+	  
+	/**
+	 * Deregisters the agent bean and all its resources from management
+	 * @param manager
+	 */
+	public void disableManagement() {
+		// do nothing if management already disabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+		
+		// deregister agent bean from management
+		try {
+			_manager.unregisterAgentBean(this, thisAgent);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister agent bean " + beanName + " of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}		
+		
+		_manager = null;
+	}
+
+	/**
+	 * Checks wether the management of this object is enabled or not.
+	 * @return true if the management is enabled, otherwise false
+	 */
+	public boolean isManagementEnabled() {
+		return _manager != null;
+	}
+	  
 }

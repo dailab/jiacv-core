@@ -16,20 +16,26 @@ import javax.management.relation.MBeanServerNotificationFilter;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
+
 import junit.framework.TestCase;
 
 public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationListener {
 
+	private final String nodeName = "myPlatform";
+	private final String agentName = "TestAgent";
+	private final String newAgentName = "NewAgent";
+	private MBeanServer mbs = null;
 	private ObjectName node = null;
 	private ObjectName agent = null;
 	private ObjectName newAgent = null;
-	private MBeanServer mbs = null;
 	private ClassPathXmlApplicationContext context = null;
 	private String currentLifecycleState = "";
 	private String previousLifecycleState = "";
 	private String registrationNotification = "";
 	private ArrayList agentListNotification = null;
 	private SimpleAgentNode nodeRef = null;
+	private JmxManager manager = null;
 
 	/**
 	 * Sets up the test environment. It enables the JMX interface, registers as listener
@@ -40,10 +46,11 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	protected void setUp() throws Exception {
 		super.setUp();
 		System.setProperty("jmx.invoke.getters", "");
-		node = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=myPlatform");
-		agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=TestAgent");
-		newAgent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=NewAgent");
 		mbs = ManagementFactory.getPlatformMBeanServer();
+		manager = new JmxManager();
+		node = manager.getMgmtNameOfAgentNode(nodeName);
+		agent = manager.getMgmtNameOfAgent(nodeName, agentName);
+		newAgent = manager.getMgmtNameOfAgent(nodeName, newAgentName);
 
 		// add listener for (de)registration of the agent node
 		MBeanServerNotificationFilter msnf = new MBeanServerNotificationFilter();
@@ -78,10 +85,6 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 			nodeRef.shutdown();
 		}
 		mbs.removeNotificationListener(new ObjectName("JMImplementation:type=MBeanServerDelegate"), this);
-		mbs = null;
-		node = null;
-		agent = null;
-		newAgent = null;
 		context.close();
 		context = null;
 		currentLifecycleState = null;
@@ -89,6 +92,11 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		registrationNotification = null;
 		agentListNotification = null;
 		nodeRef = null;
+		node = null;
+		agent = null;
+		newAgent = null;
+		manager = null;
+		mbs = null;
 	}
 
 
@@ -123,7 +131,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	public void testGetName() {
 		String name = "";
 		try {
-			name = (String) mbs.getAttribute(node, "Name");
+			name = (String) manager.getAttributeOfAgentNode(nodeName, "Name");
 		} catch (Exception e) {
 			fail("Error while getting agent node's name");
 		}
@@ -143,7 +151,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		// get host by JMX
 		String host = "";
 		try {
-			host = (String) mbs.getAttribute(node, "Host");
+			host = (String) manager.getAttributeOfAgentNode(nodeName, "Host");
 		} catch (Exception e) {
 			if (!intendedHost.equals("")) {
 				fail("Error while getting agent node's host");
@@ -160,7 +168,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	public void testGetOwner() {
 		String owner = "";
 		try {
-			owner = (String) mbs.getAttribute(node, "Owner");
+			owner = (String) manager.getAttributeOfAgentNode(nodeName, "Owner");
 		} catch (Exception e) {
 			fail("Error while getting agent node's owner");
 		}
@@ -174,7 +182,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	public void testGetAgents() {
 		ArrayList agents = new ArrayList();
 		try {
-			agents = (ArrayList) mbs.getAttribute(node, "Agents");
+			agents = (ArrayList) manager.getAttributeOfAgentNode(nodeName, "Agents");
 		} catch (Exception e) {
 			fail("Error while getting agent node's agents");
 		}
@@ -192,7 +200,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	 */
 	public void testAddAgents() {
 		try {
-			mbs.invoke(node, "addAgents", new Object[] {"de/dailab/jiactng/agentcore/agentCreationTest"}, new String[] {"java.lang.String"});
+			manager.invokeAgentNode(nodeName, "addAgents", new Object[] {"de/dailab/jiactng/agentcore/agentCreationTest"}, new String[] {"java.lang.String"});
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Error while adding new agents to the agent node");
@@ -271,7 +279,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	 */
 	protected void doAction(String action) {
 		try {
-			mbs.invoke(node, action, new Object[] {}, new String[] {});
+			manager.invokeAgentNode(nodeName, action, new Object[] {}, new String[] {});
 		} catch (Exception e) {
 			fail("Error while " + action + " agent node");
 		}
@@ -289,7 +297,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		// check JMX interface
 		state = "";
 		try {
-			state = (String) mbs.getAttribute(node, "LifecycleState");
+			state = (String) manager.getAttributeOfAgentNode(nodeName, "LifecycleState");
 		} catch (Exception e) {
 			fail("Error while getting agent node's state");
 		}

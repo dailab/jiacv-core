@@ -6,7 +6,7 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
 
 /**
  * Common management interface of all agent beans.
- * @author keiser
+ * @author Jan Keiser
  */
 public interface AbstractAgentBeanMBean extends AbstractLifecycleMBean {
 

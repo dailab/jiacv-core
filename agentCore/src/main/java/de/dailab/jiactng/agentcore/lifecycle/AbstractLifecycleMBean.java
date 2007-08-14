@@ -1,5 +1,9 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
+/**
+ * Common management interface of all lifecycle-aware resources.
+ * @author Jan Keiser
+ */
 public interface AbstractLifecycleMBean {
 
 	/**

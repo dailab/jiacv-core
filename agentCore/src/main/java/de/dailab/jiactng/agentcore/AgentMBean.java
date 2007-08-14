@@ -4,13 +4,15 @@ import java.util.ArrayList;
 
 import javax.management.openmbean.CompositeData;
 
+import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
+
 /**
  * JMX compliant management interface of agents to get information
  * about them and to change their lifecycle states.
  * 
  * @author Jan Keiser
  */
-public interface AgentMBean {
+public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Getter for attribute "Name" of the managed agent.
@@ -35,12 +37,6 @@ public interface AgentMBean {
 
 	//public URL[] getAddresses();
 
-	/**
-	 * Getter for attribute "LifecycleState" of the managed agent.
-	 * @return the lifecycle state of this agent
-	 */
-	public String getLifecycleState();
-	
 	//public long getInitTime();
 	
 	//public long getStartTime();
@@ -86,38 +82,6 @@ public interface AgentMBean {
      * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
 	 */
 	public void remove() throws Exception;
-
-	/**
-	 * Initializes the managed agent.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
-     * 
-     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#init()}
-	 */
-	public void init() throws Exception;
-
-	/**
-	 * Starts the managed agent.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
-	 *
-     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#start()}
-	 */
-	public void start() throws Exception;
-
-	/**
-	 * Stops the managed agent.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
-     * 
-     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#stop()}
-	 */
-	public void stop() throws Exception;
-
-	/**
-	 * Cleanes up the managed agent.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
-     * 
-     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#cleanup()}
-	 */
-	public void cleanup() throws Exception;
 
 	/**
 	 * Getter for attribute "AgentBeanNames" of the managed agent.

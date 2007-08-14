@@ -5,13 +5,15 @@ import java.util.ArrayList;
 
 import javax.management.openmbean.CompositeData;
 
+import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
+
 /**
  * JMX compliant management interface of agent nodes to get information
  * about them and to change their lifecycle states.
  * 
  * @author Jan Keiser
  */
-public interface SimpleAgentNodeMBean {
+public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Getter for attribute "Name" of the managed agent node.
@@ -43,12 +45,6 @@ public interface SimpleAgentNodeMBean {
 	 */
 	public void addAgents(String configFile);
 
-	/**
-	 * Getter for attribute "LifecycleState" of the managed agent node.
-	 * @return the lifecycle state of this agent node
-	 */
-	public String getLifecycleState();
-	
 	//public long getInitTime();
 	
 	//public long getStartTime();
@@ -100,38 +96,6 @@ public interface SimpleAgentNodeMBean {
 	 * @return information about the service directory of this agent node
 	 */
 	public CompositeData getServiceDirectoryData();
-
-	/**
-	 * Initializes the managed agent node.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
-     * 
-     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#init()}
-	 */
-	public void init() throws Exception;
-
-	/**
-	 * Starts the managed agent node.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
-	 *
-     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#start()}
-	 */
-	public void start() throws Exception;
-
-	/**
-	 * Stops the managed agent node.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
-     * 
-     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#stop()}
-	 */
-	public void stop() throws Exception;
-
-	/**
-	 * Cleanes up the managed agent node.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
-     * 
-     * @see {@link de.dailab.jiactng.agentcore.lifecycle.ILifecycle#cleanup()}
-	 */
-	public void cleanup() throws Exception;
 
 	/**
 	 * Shuts down the managed agent node.

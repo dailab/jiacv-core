@@ -151,18 +151,12 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	public void testGetName() {
 		String name = "";
 		try {
-			name = (String) manager.getAttributeOfAgent(nodeName, agentName, "Name");
+			name = (String) manager.getAttributeOfAgent(nodeName, agentName, "AgentName");
 		} catch (Exception e) {
 			fail("Error while getting agent's name");
 		}
-		assertEquals("AgentMBean.getName is wrong", "TestAgent", name);
+		assertEquals("AgentMBean.getAgentName is wrong", "TestAgent", name);
 	}
-	
-/*
-	public void testGetAgentNodeUUID() {
-		fail("Not yet implemented");
-	}	
-*/
 	
 	/**
 	 * Tests if the agent can change its lifecycle state by using the JMX interface 

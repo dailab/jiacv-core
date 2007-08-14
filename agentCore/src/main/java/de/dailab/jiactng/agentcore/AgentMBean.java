@@ -15,10 +15,16 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
 public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
-	 * Getter for attribute "Name" of the managed agent.
+	 * Getter for attribute "AgentName" of the managed agent.
 	 * @return the name of this agent
 	 */
-	public String getName();
+	public String getAgentName();
+
+	/**
+	 * Setter for attribute "AgentName" of the managed agent.
+	 * @param agentname the new name of the agent
+	 */
+	public void setAgentName(String agentname);
 
 	/**
 	 * Getter for attribute "AgentId" of the managed agent.
@@ -27,31 +33,28 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	public String getAgentId();
 
 	/**
-	 * Getter for attribute "AgentNodeUUID" of the managed agent.
-	 * @return the UUID of the agent node where this agent is running on
-	 */
-	public String getAgentNodeUUID();
-
-	//public Service[] getServices();
-	//public String getDeploymentDescriptor();
-
-	//public URL[] getAddresses();
-
-	//public long getInitTime();
-	
-	//public long getStartTime();
-
-	/**
 	 * Getter for attribute "Owner" of the managed agent.
 	 * @return the owner of this agent
 	 */
 	public String getOwner();
 
 	/**
+	 * Setter for attribute "Owner" of the managed agent.
+	 * @param owner the new owner of this agent
+	 */
+	public void setOwner(String owner);
+
+	/**
 	 * Returns the timeout after which the execution of a bean of the managed agent will be stopped.
 	 * @return the timeout in milliseconds
 	 */
 	public long getBeanExecutionTimeout();
+
+	/**
+	 * Sets the timeout after which the execution of a bean of the managed agent will be stopped.
+	 * @return the new timeout in milliseconds
+	 */
+	public void setBeanExecutionTimeout(long beanExecutionTimeout);
 
 	/**
 	 * Getter for attribute "ActionNames" of the managed agent.

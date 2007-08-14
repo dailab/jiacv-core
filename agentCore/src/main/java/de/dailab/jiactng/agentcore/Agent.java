@@ -205,20 +205,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String arg0) {
-		// update management
-		if (isManagementEnabled()) {
-			Manager manager = _manager;
-			disableManagement();
-			this.agentName = arg0;
-			enableManagement(manager);
-		} else {
-			this.agentName = arg0;
-		}
-
-		// update logger
-		if (agentNode != null) {
-			this.agentLog = agentNode.getLog(this);
-		}
+		setAgentName(arg0);
 	}
 
 	/*
@@ -444,6 +431,28 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		return this.agentName;
 	}
 
+	/**
+	 * Setter for the agentname.
+	 * @param agentname the new name of the agent
+	 * @see #setBeanName(java.lang.String)
+	 */
+	public void setAgentName(String agentname) {
+		// update management
+		if (isManagementEnabled()) {
+			Manager manager = _manager;
+			disableManagement();
+			this.agentName = agentname;
+			enableManagement(manager);
+		} else {
+			this.agentName = agentname;
+		}
+
+		// update logger
+		if (agentNode != null) {
+			this.agentLog = agentNode.getLog(this);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -483,16 +492,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#getName()
-	 * @see de.dailab.jiactng.agentcore.AgentMBean#getName()
-	 */
-	public String getName() {
-		return agentName;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see de.dailab.jiactng.agentcore.IAgent#setAgentNode(de.dailab.jiactng.agentcore.IAgentNode)
 	 */
 	public void setAgentNode(IAgentNode agentNode) {
@@ -508,16 +507,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
 		// update logger
 		this.agentLog = this.agentNode.getLog(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#setName(java.lang.String)
-	 */
-	public void setName(String name) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -553,13 +542,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
         return agentNode.getLog(this, owner, extension);
     }
 
-    /**
-	 * @see de.dailab.jiactng.agentcore.AgentMBean#getAgentNodeUUID()
-	 */
-	public String getAgentNodeUUID() {
-		return agentNode.getUUID();
-	}
-
 	/**
 	 * Returns the timeout after which the execution of a bean will be stopped.
 	 * 
@@ -575,7 +557,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * @param beanExecutionTimeout
 	 *            the timeout in milliseconds
 	 */
-	public void setExecutionTimeout(long beanExecutionTimeout) {
+	public void setBeanExecutionTimeout(long beanExecutionTimeout) {
 		this.beanExecutionTimeout = beanExecutionTimeout;
 	}
 

@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @author Joachim Fuchs
  */
-public abstract class AbstractLifecycle extends NotificationBroadcasterSupport implements ILifecycle {
+public abstract class AbstractLifecycle extends NotificationBroadcasterSupport implements ILifecycle, AbstractLifecycleMBean {
     
     /**
      * The lifecycle handler that is used internally.
@@ -240,6 +240,14 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
         return getState().toString();
     }
     
+	/**
+	 * Getter for attribute "Strict" of the managed resource.
+	 * @return the lifecycle mode of this resource
+	 */
+	public boolean isStrict() {
+		return lifecycle.isStrict();
+	}
+	
     /**
      * Uses JMX to send notifications that the attribute "LifecycleState"
      * of the managed lifecycle (e.g. agent) has been changed.

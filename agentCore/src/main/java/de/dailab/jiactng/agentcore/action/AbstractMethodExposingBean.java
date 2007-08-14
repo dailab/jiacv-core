@@ -18,6 +18,17 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
+import javax.management.openmbean.TabularData;
+import javax.management.openmbean.TabularDataSupport;
+import javax.management.openmbean.TabularType;
+
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 
@@ -30,7 +41,7 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public abstract class AbstractMethodExposingBean extends AbstractAgentBean implements IEffector {
+public abstract class AbstractMethodExposingBean extends AbstractAgentBean implements IEffector, AbstractMethodExposingBeanMBean {
     /**
      * This annotation can be used to mark methods in a bean inherited from {@link AbstractMethodExposingBean}
      * as actions. So marked methods will be exposed automatically.
@@ -246,4 +257,51 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         
         return null;
     }
+
+	/**
+	 * Creates management information about the provided actions.
+	 * @return list of action descriptions
+	 */
+	public TabularData getActionList() {
+        ArrayList<? extends Action> actions = getActions();
+        if (actions.isEmpty()) {
+        	return null;
+        }
+
+        try {
+        	// create empty table
+        	String[] itemNames = new String[] {"Name", "Parameters", "Results", "ProviderBean"};
+        	OpenType[] itemTypes = new OpenType[] {SimpleType.STRING, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), SimpleType.STRING};
+        	CompositeType rowType = new CompositeType(actions.get(0).getClass().getName(), "provided action", itemNames, itemNames, itemTypes);
+        	TabularType tabularType = new TabularType(actions.getClass().getName(), "list of provided actions", rowType, new String[] {"Name"});
+        	TabularData actionList = new TabularDataSupport(tabularType);
+
+        	// fill table
+        	for (Action action : actions) {
+        		// get parameter classes
+        		Class[] parameters = action.getParameters();
+        		int size = parameters.length;
+        		String[] parameterList = new String[size];
+        		for (int i=0; i<size; i++) {
+        			parameterList[i] = parameters[i].getName();
+        		}
+        		// get result classes
+        		Class[] results = action.getResults();
+        		size = results.length;
+        		String[] resultList = new String[size];
+        		for (int i=0; i<size; i++) {
+        			resultList[i] = results[i].getName();
+        		}
+        		// create and add action description
+        		Object[] itemValues = new Object[] {action.getName(), parameterList, resultList, action.getProviderBean().getBeanName()};
+        		CompositeData value = new CompositeDataSupport(rowType, itemNames, itemValues);
+        		actionList.put(value);
+        	}
+        	return actionList;
+        }
+        catch (OpenDataException e) {
+        	e.printStackTrace();
+        	return null;
+        }
+	}
 }

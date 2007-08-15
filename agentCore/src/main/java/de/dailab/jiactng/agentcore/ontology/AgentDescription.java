@@ -88,4 +88,56 @@ public class AgentDescription implements IFact {
 	public void setEndpoint(IEndPoint endpoint) {
 		this.endpoint = endpoint;
 	}
+
+    @Override
+    public String toString() {
+        StringBuilder builder= new StringBuilder();
+
+        // name
+        builder.append("Agent:\n name=");
+        if (name != null) {
+        	builder.append("'").append(name).append("'");
+        } else {
+        	builder.append("null");
+        }
+
+        // aid
+        builder.append("\n aid=");
+        if (aid != null) {
+        	builder.append("'").append(aid).append("'");
+        } else {
+        	builder.append("null");
+        }
+
+        // state
+        builder.append("\n state=");
+        if (state != null) {
+        	builder.append("'").append(state).append("'");
+        } else {
+        	builder.append("null");
+        }
+
+        // endpoint
+        if (endpoint != null) {
+        	// local
+        	builder.append("\n endpoint(local)=");
+        	if (endpoint.getLocalId() != null) {
+        		builder.append("'").append(endpoint.getLocalId()).append("'");
+        	} else {
+            	builder.append("null");        		
+        	}
+        	// universal
+        	builder.append("\n endpoint(global)=");
+        	if (endpoint.getUniversalId() != null) {
+        		builder.append("'").append(endpoint.getUniversalId()).append("'");
+        	} else {
+            	builder.append("null");
+        	}
+        } else {
+        	builder.append("\n endpoint=null");
+        }
+
+        builder.append('\n');
+        return builder.toString();
+    }
 }

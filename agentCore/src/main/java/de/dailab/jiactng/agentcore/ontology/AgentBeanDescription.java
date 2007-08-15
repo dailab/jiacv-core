@@ -49,5 +49,27 @@ public class AgentBeanDescription implements IFact {
 		this.state = state;
 	}
 	
-	
+    @Override
+    public String toString() {
+        StringBuilder builder= new StringBuilder();
+
+        // name
+        builder.append("AgentBean:\n name=");
+        if (name != null) {
+        	builder.append("'").append(name).append("'");
+        } else {
+        	builder.append("null");
+        }
+
+        // state
+        builder.append("\n state=");
+        if (state != null) {
+        	builder.append("'").append(state).append("'");
+        } else {
+        	builder.append("null");
+        }
+
+        builder.append('\n');
+        return builder.toString();
+    }	
 }

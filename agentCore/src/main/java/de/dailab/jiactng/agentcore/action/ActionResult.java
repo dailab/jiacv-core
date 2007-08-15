@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.action;
 
+import java.util.Arrays;
+
 public class ActionResult extends SessionEvent {
 
 	/** The return values of the action. */
@@ -63,5 +65,16 @@ public class ActionResult extends SessionEvent {
 //		this.success = success;
 //	}
 	
-	
+    @Override
+    public String toString() {
+        StringBuilder builder= new StringBuilder();
+        builder.append("ActionResult:\n results=");
+        if (results != null) {
+        	builder.append(Arrays.asList(results).toString());
+        } else {
+        	builder.append("null");
+        }
+        builder.append('\n');
+        return builder.toString();
+    }	
 }

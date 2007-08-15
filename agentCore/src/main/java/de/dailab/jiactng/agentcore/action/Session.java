@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.action;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
@@ -181,4 +182,41 @@ public class Session implements IFact {
 	public boolean removeFromSessionHistory(Object o) {
 		return history.remove(o);
 	}
+
+    @Override
+    public String toString() {
+        StringBuilder builder= new StringBuilder();
+
+        // id
+        builder.append("Session:\n id=");
+        if (id != null) {
+        	builder.append("'").append(id).append("'");
+        } else {
+        	builder.append("null");
+        }
+
+        // time
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(creationTime);
+        builder.append("\n created='").append(calendar.getTime().toString()).append("'");
+
+        // source
+        builder.append("\n source=");
+        if (source != null) {
+        	builder.append("'").append(source.getBeanName()).append("'");
+        } else {
+        	builder.append("null");
+        }
+        
+        // history
+        builder.append("\n history=");
+        if (history != null) {
+        	builder.append(history.toString());
+        } else {
+        	builder.append("null");
+        }
+
+        builder.append('\n');
+        return builder.toString();
+    }
 }

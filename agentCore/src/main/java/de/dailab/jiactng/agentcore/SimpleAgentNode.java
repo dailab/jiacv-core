@@ -479,7 +479,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// das servicedirectory separat initialisieren - is auch ne AgentBean
 		try {
 			if (_serviceDirectory != null) {
-				_serviceDirectory.setAgentNodeName(getName());
 				_serviceDirectory.init();
 			}
 		} catch (LifecycleException e) {
@@ -681,6 +680,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	public void setServiceDirectory(ServiceDirectory serviceDirectory) {
 		_serviceDirectory = serviceDirectory;
+		_serviceDirectory.setAgentNode(this);
 	}
 
 	/**
@@ -861,6 +861,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
+		// register service directory for management
+		if (_serviceDirectory != null) {
+			_serviceDirectory.enableManagement(manager);
+		}
+
 		// enable remote management
 		if (_jmxConnectors != null) {
 			manager.enableRemoteManagement(_name, _jmxConnectors);
@@ -881,6 +886,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		
 		// disable remote management
 		_manager.disableRemoteManagement(getName());
+
+		// deregister service directory from management
+		if (_serviceDirectory != null) {
+			_serviceDirectory.disableManagement();
+		}
 
 		// deregister agents from management
 		if (_agents != null) {

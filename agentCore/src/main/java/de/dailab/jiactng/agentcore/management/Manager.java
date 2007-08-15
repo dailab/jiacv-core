@@ -121,6 +121,16 @@ public interface Manager {
 	public void registerAgentNode(IAgentNode agentNode) throws Exception;
 
 	/**
+	 * Registers an agent node resource for management. The agent node contains only
+	 * one resource of the specified type.
+	 * @param nodeName the name of the agent node
+	 * @param resourceType the type of the agent node resource
+	 * @param resource the agent node resource to be registered
+	 * @throws Exception The name of the agent node or the type of the resource is incorrect or the agent node resource is already registered.
+	 */
+	public void registerAgentNodeResource(String nodeName, String resourceType, Object resource) throws Exception;
+
+	/**
 	 * Registers an agent node resource for management. The agent node may contain more
 	 * than one resource of the specified type.
 	 * @param nodeName the name of the agent node
@@ -162,6 +172,15 @@ public interface Manager {
 	 * @throws Exception The name of the agent node is incorrect or the agent node is not registered.
 	 */
 	public void unregisterAgentNode(IAgentNode agentNode) throws Exception;
+
+	/**
+	 * Unregisters an agent node resource from management. The agent node contains only
+	 * one resource of the specified type.
+	 * @param nodeName the name of the agent node
+	 * @param resourceType the type of the agent node resource
+	 * @throws Exception One of the parameters is incorrect or the agent node resource is not registered.
+	 */
+	public void unregisterAgentNodeResource(String nodeName, String resourceType) throws Exception;
 
 	/**
 	 * Unregisters an agent node resource from management. The agent node may contain more

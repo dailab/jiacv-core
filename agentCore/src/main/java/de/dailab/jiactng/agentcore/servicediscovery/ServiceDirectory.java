@@ -2,13 +2,24 @@ package de.dailab.jiactng.agentcore.servicediscovery;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -19,7 +30,10 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.management.Manageable;
+import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * ServiceDirectoryBean soll Beschreibungen aller Services die auf einem AgentNode existieren, verfï¿½gbar halten. Dazu
@@ -30,7 +44,7 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
  * FIXME: MessageTransport muss konfiguriert werden
  *        
  */
-public class ServiceDirectory extends AbstractLifecycle implements IServiceDirectory, Runnable {
+public class ServiceDirectory extends AbstractLifecycle implements IServiceDirectory, Runnable, Manageable, ServiceDirectoryMBean {
     private class ServiceDirectoryMessageDelegate implements IMessageTransportDelegate {
         public void onAsynchronousException(MessageTransport source, Exception e) {
             log.error("asynchronous error on message transport", e);
@@ -50,17 +64,20 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	// um auf die topic zu schreiben
 	MessageTransport _messageTransport;
 	
-	// TO DO: HIER DIE GEWï¿½NSCHTE SERVICETOPIC ERSTELLEN
+	// TO DO: HIER DIE GEWÜNSCHTE SERVICETOPIC ERSTELLEN
 	IGroupAddress _serviceTopic = CommunicationAddressFactory.createGroupAddress("ServiceTopic");
 	
 	// zum speichern der Servicebeschreibungen
 	ServiceDirectoryMemory memory;
 	
-	/* um die CommBean zu initialisieren, aus dem Namen wird die Adresse gebildet */
-	String _agentNodeName;
+	/* Agent node of this service directory */
+	IAgentNode _agentNode;
 
 	/* Time in milliseconds between publishment of services */
 	int _publishTimer = 10000;
+
+	/** The manager of the service directory */
+	private Manager _manager = null;
 
 	public ServiceDirectory() {
 		super();
@@ -101,7 +118,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 * Methode die den Namen liefert unter der der Thread des ServiceDirectory im ThreadPool gespeichert wird
 	 * 
 	 * @param nodeName
-	 * @return ein String als Schlï¿½ssel fï¿½r den ServiceDirectory-Thread
+	 * @return ein String als Schlüssel für den ServiceDirectory-Thread
 	 */
 	public String getFutureName(String nodeName) {
 		return "ServiceDirectory:" + nodeName;
@@ -138,9 +155,9 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	}
 
 	/**
-	 * bastelt JiacNachrciht zusammen. Sie soll an eine ServicTopic gehen.
+	 * bastelt JiacNachricht zusammen. Sie soll an eine ServicTopic gehen.
 	 * 
-	 * @param serviceDesc die zu verschiekende Servicebeschreibung
+	 * @param serviceDesc die zu verschickende Servicebeschreibung
 	 * @return die Nachricht die per JMS verschickt wird.
 	 */
 	private JiacMessage createJiacMessage(IServiceDescription serviceDesc) {
@@ -185,9 +202,9 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	}
 
 	/**
-	 * Liefert die Anzahl der registrierten Services zurï¿½ck
+	 * Liefert die Anzahl der registrierten Services zurück
 	 * 
-	 * @return Liefert die Anzahl der registrierten Services zurï¿½ck
+	 * @return Liefert die Anzahl der registrierten Services zurück
 	 */
 	public int getServiceNumber() {
 		return memory.readAllOfType(IServiceDescription.class).size();
@@ -257,11 +274,134 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	}
 
 	public String getAgentNodeName() {
-		return _agentNodeName;
+		return _agentNode.getName();
 	}
 
-	public void setAgentNodeName(String agentNodeName) {
-		_agentNodeName = agentNodeName;
+	public void setAgentNode(IAgentNode agentNode) {
+		_agentNode = agentNode;
 	}
 
+	/**
+	 * Information about the facts stored in the service directory memory.
+	 * @return information about facts stored in service directory memory
+	 */
+	public CompositeData getMemory() {
+	    Set<IFact> facts = memory.readAllOfType(IFact.class);
+	    if (facts.isEmpty()) {
+	    	return null;
+	    }
+
+	    // create map with current memory state
+		Map<String,List<String>> map = new Hashtable<String,List<String>>();
+	    for (IFact fact : facts) {
+	    	String classname = fact.getClass().getName();
+	    	List<String> values = map.get(classname);
+	    	if (values == null) {
+	    		values = new ArrayList<String>();
+	    		map.put(classname, values);
+	    	}
+    		values.add(fact.toString());
+	    }
+
+	    // create composite data
+	    CompositeData data = null;
+	    int size = map.size();
+	    String[] itemNames = new String[size];
+	    OpenType[] itemTypes = new OpenType[size];
+	    Object[] itemValues = new Object[size];
+	    Object[] classes = map.keySet().toArray();
+	    try {
+	    	for (int i=0; i<size; i++) {
+	    		String classname = (String) classes[i];
+	    		itemNames[i] = classname;
+	    		itemTypes[i] = new ArrayType(1, SimpleType.STRING);
+	    		List<String> values = map.get(classname);
+	    		String[] value = new String[values.size()];
+	    		Iterator<String> it = values.iterator();	    		
+	    		int j = 0;
+	    		while (it.hasNext()) {
+	    			value[j] = it.next();
+	    			j++;
+	    		}
+	    		itemValues[i] = value;
+	    	}
+	    	CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the service directory memory", itemNames, itemNames, itemTypes);
+	    	data = new CompositeDataSupport(compositeType, itemNames, itemValues);
+	    }
+	    catch (OpenDataException e) {
+	    	e.printStackTrace();
+	    }
+
+	    return data;		
+	}
+
+	/**
+	 * Gets information about the logger of service directory.
+	 * @return information about levels of the logger
+	 */
+	public CompositeData getLog() {
+		if (log == null) {
+			return null;
+		}
+		String[] itemNames = new String[] {"DebugEnabled", "ErrorEnabled", "FatalEnabled", "InfoEnabled", "TraceEnabled", "WarnEnabled"};
+		try {
+			CompositeType type = new CompositeType(log.getClass().getName(), "Logger information", itemNames, itemNames, new OpenType[] {SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN});
+			return new CompositeDataSupport(type, itemNames, new Object[] {log.isDebugEnabled(), log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(), log.isTraceEnabled(), log.isWarnEnabled()});
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
+     * Registers the service directory for management.
+     * @param manager the manager to be used for registration
+	 */
+	public void enableManagement(Manager manager) {
+		// do nothing if management already enabled
+		if (isManagementEnabled()) {
+			return;
+		}
+		
+		// register service directory for management
+		try {
+			manager.registerAgentNodeResource(getAgentNodeName(), "ServiceDirectory", this);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to register service directory of agent node " + getAgentNodeName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+
+		_manager = manager;
+	}
+	  
+	/**
+	 * Deregisters the service directory from management.
+	 */
+	public void disableManagement() {
+		// do nothing if management already disabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+		
+		// deregister service directory from management
+		try {
+			_manager.unregisterAgentNodeResource(getAgentNodeName(), "ServiceDirectory");
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister service directory of agent node " + getAgentNodeName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+		
+		_manager = null;
+	}
+
+	/**
+	 * Checks wether the management of this object is enabled or not.
+	 * @return true if the management is enabled, otherwise false
+	 */
+	public boolean isManagementEnabled() {
+		return _manager != null;
+	}  
 }

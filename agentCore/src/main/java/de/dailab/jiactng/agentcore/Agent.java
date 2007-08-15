@@ -137,6 +137,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	public void setMemory(IMemory memory) {
 		this.memory = memory;
+		memory.setThisAgent(this);
 	}
 
 	/*
@@ -679,7 +680,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		for (IAgentBean ab : this.agentBeans) {
 			ab.enableManagement(manager);
 		}
-		
+
+		// register memory for management
+		memory.enableManagement(manager);
+
 		_manager = manager;
 	}
 	  
@@ -692,7 +696,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		if (!isManagementEnabled()) {
 			return;
 		}
-		
+
+		// deregister memory from management
+		memory.disableManagement();
+
 		// deregister agent beans from management
 		for (IAgentBean ab : this.agentBeans) {
 			ab.disableManagement();

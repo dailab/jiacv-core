@@ -6,9 +6,20 @@
  */
 package de.dailab.jiactng.agentcore.knowledge;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
 import javax.security.auth.DestroyFailedException;
 
 import org.sercho.masp.space.ObjectMatcher;
@@ -19,8 +30,10 @@ import org.sercho.masp.space.event.EventedTupleSpace;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
+import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * @author Thomas Konnerth
@@ -28,10 +41,16 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  * 
  * @see de.dailab.jiactng.agentcore.knowledge.IMemory
  */
-public class Memory extends AbstractLifecycle implements IMemory {
+public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 
 	private SpaceDestroyer<IFact> destroyer;
 	private EventedTupleSpace<IFact> space;
+
+	/** The agent which contains this memory */
+	private IAgent thisAgent = null;
+
+	/** The manager of the memory */
+	private Manager _manager = null;
 
     /**
      * During initialization the TupleSpace is created.
@@ -186,4 +205,117 @@ public class Memory extends AbstractLifecycle implements IMemory {
 	public void detach(SpaceObserver<? super IFact> observer) {
 		space.detach(observer);
 	}
+
+	/**
+	 * Sets the reference to the agent which contains this memory.
+	 * @param agent the agent which contains this memory
+	 */
+	public void setThisAgent(IAgent agent) {
+		thisAgent = agent;
+	}
+
+	/**
+	 * Information about the facts stored in the memory.
+	 * @return information about facts stored in memory
+	 */
+	public CompositeData getSpace() {
+	    Set<IFact> facts = readAllOfType(IFact.class);
+	    if (facts.isEmpty()) {
+	    	return null;
+	    }
+
+	    // create map with current memory state
+		Map<String,List<String>> map = new Hashtable<String,List<String>>();
+	    for (IFact fact : facts) {
+	    	String classname = fact.getClass().getName();
+	    	List<String> values = map.get(classname);
+	    	if (values == null) {
+	    		values = new ArrayList<String>();
+	    		map.put(classname, values);
+	    	}
+    		values.add(fact.toString());
+	    }
+
+	    // create composite data
+	    CompositeData data = null;
+	    int size = map.size();
+	    String[] itemNames = new String[size];
+	    OpenType[] itemTypes = new OpenType[size];
+	    Object[] itemValues = new Object[size];
+	    Object[] classes = map.keySet().toArray();
+	    try {
+	    	for (int i=0; i<size; i++) {
+	    		String classname = (String) classes[i];
+	    		itemNames[i] = classname;
+	    		itemTypes[i] = new ArrayType(1, SimpleType.STRING);
+	    		List<String> values = map.get(classname);
+	    		String[] value = new String[values.size()];
+	    		Iterator<String> it = values.iterator();	    		
+	    		int j = 0;
+	    		while (it.hasNext()) {
+	    			value[j] = it.next();
+	    			j++;
+	    		}
+	    		itemValues[i] = value;
+	    	}
+	    	CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the memory", itemNames, itemNames, itemTypes);
+	    	data = new CompositeDataSupport(compositeType, itemNames, itemValues);
+	    }
+	    catch (OpenDataException e) {
+	    	e.printStackTrace();
+	    }
+
+	    return data;
+	}
+
+	/**
+     * Registers the memory for management.
+     * @param manager the manager to be used for registration
+	 */
+	public void enableManagement(Manager manager) {
+		// do nothing if management already enabled
+		if (isManagementEnabled()) {
+			return;
+		}
+		
+		// register memory for management
+		try {
+			manager.registerAgentResource(thisAgent, "Memory", this);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to register memory of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+
+		_manager = manager;
+	}
+	  
+	/**
+	 * Deregisters the memory from management.
+	 */
+	public void disableManagement() {
+		// do nothing if management already disabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+		
+		// deregister memory from management
+		try {
+			_manager.unregisterAgentResource(thisAgent, "Memory");
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister memory of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+		
+		_manager = null;
+	}
+
+	/**
+	 * Checks wether the management of this object is enabled or not.
+	 * @return true if the management is enabled, otherwise false
+	 */
+	public boolean isManagementEnabled() {
+		return _manager != null;
+	}	  
 }

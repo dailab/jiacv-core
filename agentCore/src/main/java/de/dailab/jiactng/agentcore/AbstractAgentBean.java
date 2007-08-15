@@ -32,7 +32,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	protected Log log = null;
 
 	/** The manager of the agent node */
-	private Manager _manager = null;
+	protected Manager _manager = null;
 
 	/**
 	 * Creates an agent bean that uses lifecycle support in loose mode

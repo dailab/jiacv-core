@@ -280,7 +280,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		this.memory.write(new ThisAgentDescription(this.agentId,
 				this.agentName, LifecycleStates.INITIALIZING.name(), null));
 
-		this.execution.setAgent(this);
 		this.execution.init();
 		((AbstractAgentBean) this.execution).setMemory(memory);
 
@@ -479,6 +478,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	public void setExecution(IExecutionCycle execution) {
 		this.execution = execution;
+		this.execution.setAgent(this);
 	}
 
 	/*
@@ -682,7 +682,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		}
 
 		// register memory for management
-		memory.enableManagement(manager);
+		if (memory != null) {
+			memory.enableManagement(manager);
+		}
+
+		// register execution cycle for management
+		if (execution != null) {
+			execution.enableManagement(manager);
+		}
 
 		_manager = manager;
 	}
@@ -698,7 +705,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		}
 
 		// deregister memory from management
-		memory.disableManagement();
+		if (memory != null) {
+			memory.disableManagement();
+		}
+
+		// deregister execution cycle from management
+		if (execution != null) {
+			execution.disableManagement();
+		}
 
 		// deregister agent beans from management
 		for (IAgentBean ab : this.agentBeans) {

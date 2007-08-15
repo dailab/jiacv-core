@@ -6,12 +6,11 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import java.util.ArrayList;
-
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * A simple ExecutionCycle implementation. This class implements a round robin
@@ -181,4 +180,47 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		this.agent = agent;
 	}
 
+	/**
+     * Registers the execution cycle for management
+     * @param manager
+	 */
+	public void enableManagement(Manager manager) {
+		// do nothing if management already enabled
+		if (isManagementEnabled()) {
+			return;
+		}
+		
+		// register execution cycle for management
+		try {
+			manager.registerAgentResource(agent, "ExecutionCycle", this);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to register execution cycle of agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+		
+		_manager = manager;
+	}
+	  
+	/**
+	 * Deregisters the execution cycle from management
+	 * @param manager
+	 */
+	public void disableManagement() {
+		// do nothing if management already disabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+		
+		// deregister execution cycle from management
+		try {
+			_manager.unregisterAgentResource(agent, "ExecutionCycle");
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister execution cycle of agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}		
+		
+		_manager = null;
+	}
 }

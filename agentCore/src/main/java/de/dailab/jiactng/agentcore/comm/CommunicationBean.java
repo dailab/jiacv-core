@@ -69,7 +69,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 
 	private final class MemoryDelegationMessageListener implements IJiacMessageListener {
 		public void receive(IJiacMessage message, ICommunicationAddress from) {
-			log.debug("writing message '" + message.toString() + "' at '" + from + "' into memory");
+			if (log.isDebugEnabled()){
+				log.debug("writing message '" + message.toString() + "' at '" + from + "' into memory");
+			}
 			memory.write(message);
 		}
 	}
@@ -101,6 +103,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * set given as parameter will be removed.
 	 */
 	public synchronized void setTransports(Set<MessageTransport> transports) throws Exception {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean is setting it's transports to: " + transports.toString());
+		}
+		
 		Set<MessageTransport> workingCopy;
 		if(transports == null) {
 			workingCopy= Collections.emptySet();
@@ -122,7 +128,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 			// remove transports other than which we want to set
 			for(MessageTransport transport : toRemove) {
 				removeTransport(transport.getTransportIdentifier());
-			}
+			}			
 		}
 		// now add what has to be add
 		for(MessageTransport transport : workingCopy) {
@@ -132,28 +138,47 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 
 	@Override
 	public synchronized void doCleanup() throws Exception {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean starts commencing cleanup");
+			log.info("Cleaning up transports");
+		}
+		
 		for(MessageTransport transport : _transports.values()) {
 			try {
 				transport.doCleanup();
 			} catch(Exception e) {
-				log.warn("transport '" + transport.getTransportIdentifier() + "' did not cleanup correctly", e);
+				if (log.isWarnEnabled()){
+					log.warn("transport '" + transport.getTransportIdentifier() + "' did not cleanup correctly", e);
+				}
 			}
 		}
 		// TODO: maybe we should empty the transports map? Or might this bean be reused?
 		super.doCleanup();
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean commenced cleanup");
+		}
 	}
 
 	@Override
 	public synchronized void doInit() throws Exception {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean begins with initialization");
+		}
 		super.doInit();
-
+		
+		if (log.isInfoEnabled()){
+			log.info("initializing Transports");
+		}
+		
 		for(Iterator<MessageTransport> iter= _transports.values().iterator(); iter.hasNext();) {
 			MessageTransport transport= iter.next();
 			transport.setDefaultDelegate(_defaultDelegate);
 			try {
 				transport.doInit();
 			} catch (Exception e) {
-				log.error("transport '" + transport.getTransportIdentifier() + "' did not initialised correctly -> will be removed", e);
+				if (log.isErrorEnabled()){
+					log.error("transport '" + transport.getTransportIdentifier() + "' did not initialised correctly -> will be removed", e);
+				}
 				try {transport.doCleanup();} catch(Exception x){};
 				iter.remove();
 			}
@@ -163,7 +188,13 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 		establishMessageBox((_defaultMessageBox= CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName())));
 
 		if(_transports.size() <= 0) {
-			log.warn("no transports available yet!");
+			if (log.isWarnEnabled()) {
+				log.warn("no transports available yet!");
+			}
+		}
+		
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean has finished it's initialization");
 		}
 	}
 
@@ -175,6 +206,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * @throws Exception is thrown if transport allready hold by this CommunicationBean
 	 */
 	public synchronized void addTransport(MessageTransport transport) throws Exception {
+		if (log.isInfoEnabled()){
+			log.info("Adding Transport '" + transport + "' to CommunicationBean");
+		}
+		
 		String id= transport.getTransportIdentifier();
 		if(_transports.containsKey(id)) {
 			throw new IllegalArgumentException("the transport '" + id +  "' already exists");
@@ -198,6 +233,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * @param transportIdentifier of the transport to remove
 	 */
 	public synchronized void removeTransport(String transportIdentifier) {
+		if (log.isInfoEnabled()){
+			log.info("Transport '" + transportIdentifier + "' removed from CommunicationBean");
+		}
+		
 		MessageTransport transport= _transports.remove(transportIdentifier);
 
 		if(transport == null) {
@@ -209,7 +248,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 			try {
 				transport.doCleanup();
 			} catch(Exception e) {
-				log.warn("transport '" + transportIdentifier + "' did not cleanup correctly", e);
+				if (log.isWarnEnabled()){
+					log.warn("transport '" + transportIdentifier + "' did not cleanup correctly", e);
+				}
 			}
 		}
 		}
@@ -229,6 +270,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	@Expose
 	public synchronized void joinGroup(IGroupAddress group) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean is joining group '" + group + "'");
+		}
+		
 		register(group);
 	}
 
@@ -239,6 +284,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	@Expose
 	public synchronized void leaveGroup(IGroupAddress group) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean is leaving group '" + group + "'");
+		}
 		unregister(group);
 	}
 
@@ -250,6 +298,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	@Expose
 	public synchronized void establishMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean is establishing MessageBox '" + messageBox + "'");
+		}
 		register(messageBox);
 	}
 
@@ -260,6 +311,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	@Expose
 	public synchronized void destroyMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean is destroying MessageBox '" + messageBox + "'");
+		}
 		unregister(messageBox);
 	}
 
@@ -271,6 +325,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	@Expose
 	public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean is sending Message to address '" + address.toString() + "'");
+		}
 		if(message == null) {
 			throw new IllegalArgumentException("message must not be null");
 		}
@@ -289,6 +346,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	@Expose
 	public synchronized void register(ICommunicationAddress address) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean begins to listen at address '" + address + "'");
+		}
 		if(address == null) {
 			throw new IllegalArgumentException("address must not be null");
 		}
@@ -303,6 +363,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	@Expose
 	public synchronized void unregister(ICommunicationAddress address) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean stops to listen at address '" + address + "'");
+		}
 		if(address == null) {
 			throw new IllegalArgumentException("address must not be null");
 		}
@@ -319,6 +382,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * Notes: Listener and either address or selector must not be null
 	 */
 	public synchronized void register(IJiacMessageListener listener, ICommunicationAddress address, Selector selector) throws CommunicationException {
+		if(log.isInfoEnabled()){
+			log.info("Listener '" + listener + "' begins to listen at address '" + address + "' with Selector '" + selector + "'");
+		}
 		if(listener == null) {
 			throw new IllegalArgumentException("listener must not be null");
 		}
@@ -339,6 +405,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * @throws CommunicationException
 	 */
 	public synchronized void register(IJiacMessageListener listener, Selector selector) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("WildcardListener '" + listener + "' begins to listen with Selector '" + selector + "'");
+		}
 		if(listener == null) {
 			throw new IllegalArgumentException("listener must not be null");
 		}
@@ -361,6 +430,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * @throws CommunicationException
 	 */
 	public synchronized void unregister(IJiacMessageListener listener, ICommunicationAddress address, Selector selector) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("Listener '" + listener + "' stops to listen at address '" + address + "' with selector '" + selector + "'");
+		}
 		if(listener == null) {
 			throw new IllegalArgumentException("listener must not be null");
 		}
@@ -380,6 +452,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * @throws CommunicationException
 	 */
 	public synchronized void unregister(IJiacMessageListener listener, Selector selector) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("WildcardListener '" + listener + "' stops to listen with selector '" + selector + "'");
+		}
 		if(listener == null) {
 			throw new IllegalArgumentException("listener must not be null");
 		}
@@ -398,6 +473,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * delegates received messages to the default listener
 	 */
 	protected synchronized void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
+		if (log.isInfoEnabled()){
+			log.info("CommunicationBean is receiving Message over transport '" + source.getTransportIdentifier() + "' from '" + at + "'");
+		}
+		
 		if(log.isDebugEnabled()) {
 			log.debug("received message ' " + message + "' at '" + at + "'");
 		}
@@ -406,7 +485,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 		try {
 			boundAddress= at.bind(source.getTransportIdentifier());
 		} catch (URISyntaxException use) {
-			log.info("could not bound address '" + at + "' to transport '" + source.getTransportIdentifier() + "'" , use);
+			if (log.isWarnEnabled()){
+				log.warn("could not bound address '" + at + "' to transport '" + source.getTransportIdentifier() + "'" , use);
+			}
 			boundAddress= at;
 		}
 
@@ -429,7 +510,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 						try {
 							current.receive(message, boundAddress);
 						} catch (RuntimeException re) {
-							log.warn("listener threw a runtime exception", re);
+							if (log.isWarnEnabled()){
+								log.warn("listener threw a runtime exception", re);
+							}
 						}
 					}
 				}
@@ -450,7 +533,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	protected void processError(MessageTransport source, Exception error) {
 		// TODO: error handling
-		log.error("message transport '" + source.getTransportIdentifier() + "' threw an exception", error);
+		if (log.isErrorEnabled()){
+			log.error("message transport '" + source.getTransportIdentifier() + "' threw an exception", error);
+		}
 	}
 
 	/**
@@ -460,8 +545,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 		if(_transports.size() <= 0) {
 			throw new CommunicationException("no transport available");
 		}
-
-		log.debug("send message...");
+		
+		if(log.isDebugEnabled()){
+			log.debug("send message...");
+		}
 		CommunicationAddress unboundAddress= address.toUnboundAddress();
 
 		// first check whether the sender is correct
@@ -470,7 +557,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 		}
 
 		if(address instanceof MessageBoxAddress) {
-			log.debug("address is a message box address -> choosing one transport");
+			if (log.isDebugEnabled()){
+				log.debug("address is a message box address -> choosing one transport");
+			}
 			// 1:1 communication
 			MessageTransport transport= null;
 			if(address.isBoundToTransport()) {
@@ -487,7 +576,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 				throw new CommunicationException("does not have transport for '" + address + "'");
 			}
 		} else {
-			log.debug("address is a group address -> choosing all transports");
+			if (log.isDebugEnabled()){
+				log.debug("address is a group address -> choosing all transports");
+			}
 			// 1:n communication
 			for(MessageTransport transport : _transports.values()) {
 				transport.send(message, unboundAddress);
@@ -507,17 +598,23 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 				for(IJiacMessageListener registered : context.listeners) {
 					// check whether the listener is new, otherwise ignore this registration
 					if(registered == listener) {
-						log.warn("listener is already registered for this selector '" + selector + "'");
+						if (log.isWarnEnabled()){
+							log.warn("listener is already registered for this selector '" + selector + "'");
+						}
 						return;
 					}
 				}
-				log.debug("added further listener for selector '" + selector + "'");
+				if(log.isDebugEnabled()){
+					log.debug("added further listener for selector '" + selector + "'");
+				}
 				context.listeners.add(listener);
 				return;
 			}
 
 			// currently there are no listener registered for this selector
-			log.debug("new listener for selector '" + selector + "'");
+			if (log.isDebugEnabled()){
+				log.debug("new listener for selector '" + selector + "'");
+			}
 			context= new WildcardListenerContext(selector);
 			context.listeners.add(listener);
 			_selectorToListenerMap.put(selector, context);
@@ -525,7 +622,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 				List<ListenerContext> registeredContexts= _addressToListenerMap.get(registered);
 				try {
 					if(isActive()) {
-						log.debug("isActive -> registering wildcard listener for '" + registered + "' : '" + context.selector + "'");
+						if (log.isDebugEnabled()){
+							log.debug("isActive -> registering wildcard listener for '" + registered + "' : '" + context.selector + "'");
+						}
 						for(MessageTransport transport : _transports.values()) {
 							transport.listen(registered, context.selector);
 						}
@@ -539,6 +638,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 				}
 			}
 		} else {
+			// Listener is nonWildcardlistener
 			CommunicationAddress unboundAddress= address.toUnboundAddress();
 			ListenerContext context= new ListenerContext(selector);
 			List<ListenerContext> registeredContexts= _addressToListenerMap.get(unboundAddress);
@@ -553,43 +653,56 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 					for(IJiacMessageListener registered : context.listeners) {
 						// check whether the listener is new, otherwise ignore this registration
 						if(registered == listener) {
-							log.warn("listener is already registered for '" + unboundAddress + "' : '" + selector + "'");
+							if (log.isWarnEnabled()){
+								log.warn("listener is already registered for '" + unboundAddress + "' : '" + selector + "'");
+							}
 							return;
 						}
 					}
-					log.debug("added further listener for '" + unboundAddress + "' : '" + selector + "'");
+					if (log.isDebugEnabled()){
+						log.debug("added further listener for '" + unboundAddress + "' : '" + selector + "'");
+					}
 					context.listeners.add(listener);
 					//	**************************************************************
 					//	Müsste der Context nicht wieder in die Map eingehangen werden?
 					//	**************************************************************
 					return;
 				}
-			}
+			} else {
 
-			// currently there are no listeners registered for this address - selector combination
-			log.debug("new listener for '" + unboundAddress + "' : '" + selector + "'");
-			context.listeners.add(listener);
+				// currently there are no listeners registered for this address - selector combination
+				if (log.isDebugEnabled()){
+					log.debug("new listener for '" + unboundAddress + "' : '" + selector + "'");
+				}
+				context.listeners.add(listener);
 
-			if(registeredContexts == null) {
 				registeredContexts= new LinkedList<ListenerContext>();
 				registeredContexts.add(context);
+				
+				if (log.isDebugEnabled()){
+					log.debug("appending wildcardlisteners to new address");
+				}
 				
 				// append all wildcardlisteners to this new location
 				for (Selector key : _selectorToListenerMap.keySet()){
 					WildcardListenerContext wcContext = _selectorToListenerMap.get(key);
 					registeredContexts.add(wcContext);
 				}
-				
-				_addressToListenerMap.put(unboundAddress, registeredContexts);
-			}
 
-			// Hier fehlte noch eine Einbindung der Wildcardlistener für neue Addressen
+				_addressToListenerMap.put(unboundAddress, registeredContexts);
 			
-			if(isActive()) {
-				log.debug("isActive -> registering listener for '" + unboundAddress + "' : '" + context.selector + "'");
-				for (ListenerContext listenContext : registeredContexts){
-					for(MessageTransport transport : _transports.values()) {
-						transport.listen(address, context.selector);
+				if (log.isDebugEnabled()){
+					log.debug("registering new address and listeners on transports");
+				}
+				
+				if(isActive()) {
+					if (log.isDebugEnabled()){
+						log.debug("isActive -> registering listener for '" + unboundAddress + "' : '" + context.selector + "'");
+					}
+					for (ListenerContext listenContext : registeredContexts){
+						for(MessageTransport transport : _transports.values()) {
+							transport.listen(address, listenContext.selector);
+						}
 					}
 				}
 			}
@@ -604,6 +717,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * @throws CommunicationException
 	 */
 	private synchronized void registerAllToTransport(MessageTransport transport) throws CommunicationException {
+		if (log.isInfoEnabled()){
+			log.info("Registering all addresses and listeners on transport '" + transport.getTransportIdentifier() + "'");
+		}
 		for(ICommunicationAddress address : _addressToListenerMap.keySet()) {
 			for(ListenerContext context : _addressToListenerMap.get(address)) {
 				transport.listen(address, context.selector);
@@ -616,9 +732,16 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	private synchronized void internalUnregister(IJiacMessageListener listener, CommunicationAddress address, Selector selector) throws CommunicationException {
 		if(address == null) {
+			
+			if (log.isDebugEnabled()){
+				log.debug("Removing wildcardListener '" + listener.toString() + "' with selector '" + selector + "'");
+			}
+			
 			WildcardListenerContext context = _selectorToListenerMap.remove(selector);
 			if(context == null) {
-				log.warn("Aborted Unregister: There was no WildcardListener associated with the selector '" + selector + "'");
+				if (log.isWarnEnabled()){
+					log.warn("Aborted Unregister: There was no WildcardListener associated with the selector '" + selector + "'");
+				}
 				return;
 			} else {
 				// there are wildcardlistener(s) registered for this selector
@@ -626,7 +749,11 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 				context.listeners.remove(listener);
 				if (context.listeners.isEmpty()){
 					// given listener was only wildcardlistener listening with this selector
-
+					
+					if (log.isDebugEnabled()){
+						log.debug("WildcardListener was last one with this selector, cleaning up registered addresses");
+					}
+					
 					for(ICommunicationAddress registered : _addressToListenerMap.keySet()) {
 						// go through all addresses registered
 						// there are nonewildcardlisteners out there... let's check if one of them listens with our selector...
@@ -650,9 +777,12 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 
 						if ((!noneWildCardListenerListening) && (wildcardListenerContext != null)){
 							// stop to listen on this channel
+														
 							try {
 								if(isActive()) {
-									log.debug("isActive -> UNregistering wildcard listener for '" + registered + "' : '" + context.selector + "'");
+									if (log.isDebugEnabled()){
+										log.debug("isActive -> UNregistering wildcard listener for '" + registered + "' : '" + context.selector + "'");
+									}
 									for(MessageTransport transport : _transports.values()) {
 										transport.stopListen(registered, context.selector);
 									}
@@ -669,6 +799,10 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 
 				} else { // there are still wildcardlisteners listening with the given selector
 					// so let's put it back on the map
+					if (log.isDebugEnabled()){
+						log.debug("There is a WildcardListener listening on  - selector combination");
+					}
+					
 					_selectorToListenerMap.put(selector, context);
 				}
 			} // end if wildcardlistener for selector exists
@@ -678,78 +812,121 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 			CommunicationAddress unboundAddress = address.toUnboundAddress();
 			List<ListenerContext> registeredContexts = _addressToListenerMap.get(unboundAddress);
 
-			if(registeredContexts == null) {
-				log.warn("Aborted Unregister: There is no listener registered for this address '" + address + "'");
-				return;
+			if (log.isDebugEnabled()){
+				log.debug("Removing nonWildcardListener with address '" + address + "' and selector '" + selector + "'");
+			}
 
+			if(registeredContexts == null) {
+				if (log.isWarnEnabled()){
+					log.warn("Aborted Unregister: There is no listener registered for this address '" + address + "'");
+				}
+				return;
 			} else {
 				// there are listeners registered for this address
 				
 				boolean gotcha = false;
 				boolean removed = false;
+				boolean wildcard = false;
 				
-				for (ListenerContext context : registeredContexts){
-					
-					if (!(context instanceof WildcardListenerContext)){
-						if (context.selector == selector){
-							// first let's remove the listener
-
-							gotcha = context.listeners.remove(listener);
-
-							// then check if all listeners here are gone
-							if (gotcha){ 
-								if (context.listeners.isEmpty()){
-									removed = true;
-									try {
-										if(isActive()) {
-											log.debug("isActive -> UNregistering listener for '" + unboundAddress + "' : '" + context.selector + "'");
-											for(MessageTransport transport : _transports.values()) {
-												transport.stopListen(unboundAddress, context.selector);
-											}
-										}
-									} finally {
-										registeredContexts.remove(context);
-										_addressToListenerMap.put(unboundAddress, registeredContexts);
-									}
-								}
-								break;
-							} else {
-								log.warn("Aborted Unregister: Listener was not registered for '" + unboundAddress + "' : '" + context.selector + "'");
-								return;
-							}
-						}
-					}
+				// check if wildcardListener listens on same selector				
+				WildcardListenerContext wclContext = _selectorToListenerMap.get(selector);
+				if (wclContext != null){
+					wildcard = true;
 				}
 				
+				// check if there is a nonWildCardlistener that listens on this address with the given selector
+				ListenerContext searchContext = new ListenerContext(selector);
+				int index = registeredContexts.indexOf(searchContext);
 				
-				if (removed){
-					// a whole context was removed -> check if it was the last nonWildCardListenerContext
-					int nonWCListenerCount = 0;
-					
-					for (ListenerContext context : registeredContexts){
-						if (!(context instanceof WildcardListenerContext)){
-							nonWCListenerCount++;
-						}
+				if (index == 0){
+					if (log.isWarnEnabled()){
+						log.warn("Aborted Unregister: Listener was not registered for '" + unboundAddress + "' : '" + selector + "'");
 					}
-					
-					if (nonWCListenerCount == 0){
-						// only wildcardlisteners are listening on this address -> make them stop listen too
-						for (ListenerContext context : registeredContexts){
+				} else {
+					// Listeners with selector on address were found
+					ListenerContext context = registeredContexts.remove(index);
+
+					// first let's remove the listener
+					gotcha = context.listeners.remove(listener);
+				
+					// then check if all listeners here are gone
+					if (gotcha){ 
+						if (context.listeners.isEmpty()){
+							// keep the context out of the list and so remove it.
+							removed = true;
 							try {
-								if(isActive()) {
-									log.debug("isActive -> UNregistering WildcardListener for '" + unboundAddress + "' : '" + context.selector + "'");
+								if(isActive() && !wildcard) {
+									if (log.isDebugEnabled()){
+										log.debug("isActive -> UNregistering listener for '" + unboundAddress + "' : '" + context.selector + "'");
+									}
 									for(MessageTransport transport : _transports.values()) {
 										transport.stopListen(unboundAddress, context.selector);
 									}
 								}
 							} finally {
-								_addressToListenerMap.remove(unboundAddress);
+								if (log.isErrorEnabled()){
+									log.error("Listener '" + listener + "' was not correctly unregistered for '" + unboundAddress + "' : '" + context.selector + "'");
+								}
+							}
+						} else {
+							// there are still listeners on it so put the context back where it belongs
+							registeredContexts.add(context);
+						}
+					} else {
+						if (log.isWarnEnabled()){
+							log.warn("Aborted Unregister: Listener was not registered for '" + unboundAddress + "' : '" + context.selector + "'");
+						}
+						return;
+					}
+							
+					
+					if (removed){
+						// a whole context was removed -> check if it was the last nonWildCardListenerContext
+
+						if (log.isDebugEnabled()){
+							log.debug("Listener was last one on address '" + address + "' with selector '" + selector + "'");
+							log.debug("checking if it was the last nonWildcardListener at the given address");
+						}
+
+
+						int nonWCListenerCount = 0;
+
+						for (ListenerContext listenerContext : registeredContexts){
+							if (!(listenerContext instanceof WildcardListenerContext)){
+								nonWCListenerCount++;
 							}
 						}
+
+						if (nonWCListenerCount == 0){
+							// only wildcardlisteners are listening on this address -> make them stop listen too
+
+							if (log.isDebugEnabled()){
+								log.debug("Listener was last nonWildcardListener at address -> address is closed");
+							}
+
+
+							for (ListenerContext otherContext : registeredContexts){
+								try {
+									if(isActive()) {
+										if (log.isDebugEnabled()){
+											log.debug("isActive -> UNregistering WildcardListener for '" + unboundAddress + "' : '" + otherContext.selector + "'");
+										}
+										for(MessageTransport transport : _transports.values()) {
+											transport.stopListen(unboundAddress, otherContext.selector);
+										}
+									}
+								} finally {
+									_addressToListenerMap.remove(unboundAddress);
+								}
+							}
+						} else {
+							_addressToListenerMap.put(unboundAddress, registeredContexts);
+						}
+
 					}
-					
+
+
 				}
-				
 
 			}
 		}

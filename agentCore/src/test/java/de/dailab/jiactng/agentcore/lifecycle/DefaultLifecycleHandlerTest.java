@@ -343,7 +343,6 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
     
     public void onEvent(LifecycleEvent evt) {
         
-        System.out.println("*** " + evt.getSource() + " > " + evt.getState());
         eventBeforeLastEvent = lastEvent;
         lastEvent = evt;
         

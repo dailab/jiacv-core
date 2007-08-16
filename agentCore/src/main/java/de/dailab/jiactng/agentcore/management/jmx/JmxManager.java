@@ -206,7 +206,6 @@ public class JmxManager implements Manager {
 	public void registerAgentNode(IAgentNode agentNode) throws MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
 		ObjectName name = getMgmtNameOfAgentNode(agentNode.getName());
 		mbs.registerMBean(agentNode, name);
-		System.out.println("Agent node " + agentNode.getName() + " registered as JMX resource.");
 	}
 
 	/**
@@ -226,7 +225,6 @@ public class JmxManager implements Manager {
 	public void registerAgentNodeResource(String nodeName, String resourceType, Object resource) throws MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
 		ObjectName name = getMgmtNameOfAgentNodeResource(nodeName, resourceType);
 		mbs.registerMBean(resource, name);
-		System.out.println(resourceType + " of agent node " + nodeName + " registered as JMX resource.");
 	}
 
 	/**
@@ -247,7 +245,6 @@ public class JmxManager implements Manager {
 	public void registerAgentNodeResource(String nodeName, String resourceType, String resourceName, Object resource) throws MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
 		ObjectName name = getMgmtNameOfAgentNodeResource(nodeName, resourceType, resourceName);
 		mbs.registerMBean(resource, name);
-		System.out.println(resourceType + " " + resourceName + " of agent node " + nodeName + " registered as JMX resource.");
 	}
 
 	/**
@@ -264,7 +261,6 @@ public class JmxManager implements Manager {
 	public void registerAgent(IAgent agent) throws MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
 		ObjectName name = getMgmtNameOfAgent(agent.getAgentNode().getName(), agent.getAgentName());
 		mbs.registerMBean(agent, name);
-		System.out.println("Agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " registered as JMX resource.");
 	}
 
 	/**
@@ -284,7 +280,6 @@ public class JmxManager implements Manager {
 	public void registerAgentResource(IAgent agent, String resourceType, Object resource) throws MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
 		ObjectName name = getMgmtNameOfAgentResource(agent.getAgentNode().getName(), agent.getAgentName(), resourceType);
 		mbs.registerMBean(resource, name);
-		System.out.println(resourceType + " of agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " registered as JMX resource.");
 	}
 
 	/**
@@ -302,7 +297,6 @@ public class JmxManager implements Manager {
 	public void registerAgentBean(IAgentBean agentBean, IAgent agent) throws MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
 		ObjectName name = getMgmtNameOfAgentBean(agent.getAgentNode().getName(), agent.getAgentName(), agentBean.getBeanName());
 		mbs.registerMBean(agentBean, name);
-		System.out.println("Agent bean " + agentBean.getBeanName() + " of agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " registered as JMX resource.");
 	}
 
 	/**
@@ -318,7 +312,6 @@ public class JmxManager implements Manager {
 	public void unregisterAgentNode(IAgentNode agentNode) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
 		ObjectName name = getMgmtNameOfAgentNode(agentNode.getName());
 		mbs.unregisterMBean(name);
-		System.out.println("Agent node " + agentNode.getName() + " deregistered as JMX resource.");
 	}
 
 	/**
@@ -336,7 +329,6 @@ public class JmxManager implements Manager {
 	public void unregisterAgentNodeResource(String nodeName, String resourceType) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
 		ObjectName name = getMgmtNameOfAgentNodeResource(nodeName, resourceType);
 		mbs.unregisterMBean(name);
-		System.out.println(resourceType + " of agent node " + nodeName + " deregistered as JMX resource.");
 	}
 
 	/**
@@ -355,7 +347,6 @@ public class JmxManager implements Manager {
 	public void unregisterAgentNodeResource(String nodeName, String resourceType, String resourceName) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
 		ObjectName name = getMgmtNameOfAgentNodeResource(nodeName, resourceType, resourceName);
 		mbs.unregisterMBean(name);
-		System.out.println(resourceType + " " + resourceName + " of agent node " + nodeName + " deregistered as JMX resource.");
 	}
 
 	/**
@@ -371,7 +362,6 @@ public class JmxManager implements Manager {
 	public void unregisterAgent(IAgent agent) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
 		ObjectName name = getMgmtNameOfAgent(agent.getAgentNode().getName(), agent.getAgentName());
 		mbs.unregisterMBean(name);
-		System.out.println("Agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " deregistered as JMX resource.");
 	}
 
 	/**
@@ -389,7 +379,6 @@ public class JmxManager implements Manager {
 	public void unregisterAgentResource(IAgent agent, String resourceType) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
 		ObjectName name = getMgmtNameOfAgentResource(agent.getAgentNode().getName(), agent.getAgentName(), resourceType);
 		mbs.unregisterMBean(name);
-		System.out.println(resourceType + " of agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " deregistered as JMX resource.");
 	}
 
 	/**
@@ -406,7 +395,6 @@ public class JmxManager implements Manager {
 	public void unregisterAgentBean(IAgentBean agentBean, IAgent agent) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
 		ObjectName name = getMgmtNameOfAgentBean(agent.getAgentNode().getName(), agent.getAgentName(), agentBean.getBeanName());
 		mbs.unregisterMBean(name);
-		System.out.println("Agent bean " + agentBean.getBeanName() + " of agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " deregistered as JMX resource.");
 	}
 
 	/**

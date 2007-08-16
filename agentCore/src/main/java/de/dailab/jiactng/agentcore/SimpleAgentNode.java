@@ -428,7 +428,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		_agents = null;
 
 		if (log != null) {
-			log.warn("AgentNode " + getName() + " has been closed.");
+			log.info("AgentNode " + getName() + " has been closed.");
 		}
 	}
 

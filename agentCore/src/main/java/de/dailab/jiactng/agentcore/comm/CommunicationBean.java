@@ -103,7 +103,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * set given as parameter will be removed.
 	 */
 	public synchronized void setTransports(Set<MessageTransport> transports) throws Exception {
-		if (log.isInfoEnabled()){
+		if ((log != null) && log.isInfoEnabled()){
 			log.info("CommunicationBean is setting it's transports to: " + transports.toString());
 		}
 		
@@ -161,7 +161,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 
 	@Override
 	public synchronized void doInit() throws Exception {
-		if (log.isInfoEnabled()){
+		if ((log != null) && log.isInfoEnabled()){
 			log.info("CommunicationBean begins with initialization");
 		}
 		super.doInit();
@@ -206,7 +206,7 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * @throws Exception is thrown if transport allready hold by this CommunicationBean
 	 */
 	public synchronized void addTransport(MessageTransport transport) throws Exception {
-		if (log.isInfoEnabled()){
+		if ((log != null) && log.isInfoEnabled()){
 			log.info("Adding Transport '" + transport + "' to CommunicationBean");
 		}
 		

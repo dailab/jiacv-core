@@ -37,21 +37,30 @@ class JMSSender {
 	}
 	
 	public void doInit() throws JMSException {
-		_log.debug("doInit");
+		if (_log.isDebugEnabled()){
+			_log.debug("JMSSender is initializing...");
+		}
 		_connection = _connectionFactory.createConnection();
 		_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        _log.debug("doneInit");
+        if (_log.isDebugEnabled()){
+        	_log.debug("JMSSender initialized.");
+        }
 	}
 	
 	public void doCleanup() throws JMSException {
-		_log.debug("doCleanup");
+		if(_log.isDebugEnabled()){
+			_log.debug("JMSSender is commencing cleanup...");
+		}
 		_session.close();
 		_connection.close();
-        _log.debug("doneCleanup");
+        if (_log.isDebugEnabled()){
+        	_log.debug("JMSSender cleaned up.");
+        }
 	}
 
 	public void send(IJiacMessage message, ICommunicationAddress address) throws JMSException {
 		Destination destination = null;
+		
 		if (address instanceof IGroupAddress) {
 			destination = _session.createTopic(address.getName());
         } else {
@@ -62,17 +71,23 @@ class JMSSender {
 	}
 	
 	private void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {
-        _log.debug("start sending...");
+		if (_log.isDebugEnabled()){
+			_log.debug("JMSSender start sending message to '" + destination + "'");
+		}
 		MessageProducer producer = null;
 
 		producer = _session.createProducer(destination);
 		producer.setTimeToLive(timeToLive);
         
-        _log.debug("pack message");
+        if (_log.isDebugEnabled()){
+        	_log.debug("pack message");
+        }
         Message jmsMessage= JMSMessageTransport.pack(message, _session);
         jmsMessage.setJMSDestination(destination);
 		producer.send(jmsMessage);
 		producer.close();
-        _log.debug("sending done");
+        if (_log.isDebugEnabled()){
+        	_log.debug("JMSSender sent Message to '" + destination + "'");
+        }
 	}
 }

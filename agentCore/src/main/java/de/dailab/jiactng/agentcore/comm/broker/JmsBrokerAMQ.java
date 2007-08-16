@@ -35,7 +35,14 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 
 	// ---------------------- Lifecycle
 	public void doInit() throws Exception {
-		log.debug("initializing embedded broker");
+		if (log == null){
+			System.err.println("No log set for Embedded Broker -> init aborted!");
+			return;
+		}
+		
+		if (log.isInfoEnabled()){
+			log.info("initializing embedded broker");
+		}
 		
 		if (values._url == null){
 			values.setUrlFromPortAndProtocol();
@@ -56,39 +63,60 @@ public class JmsBrokerAMQ extends AbstractLifecycle {
 			log.warn("No Broker will be started");
 			broker = null;
 		}
-		log.debug("embedded broker initialized. url = " + values.getUrl());
+		if(log.isInfoEnabled()) {
+			log.info("embedded broker initialized. url = " + values.getUrl());
+		}
 	}
 
 	public void doStart() throws Exception {
+		
 		// start broker
 		if (broker != null) {
-			log.debug("starting broker");
+			if (log.isInfoEnabled()){
+				log.info("EmbeddedBroker is starting...");
+			}
 			connector.start();
 			broker.start();
-			log.debug("broker started");
+			if(log.isInfoEnabled()){
+				log.info("broker started");
+			}
 		} else {
-			log.warn("no broker found to start");
+			if (log.isErrorEnabled()){
+				log.error("no broker found to start!");
+			}
 		}
 	}
 
 	public void doStop() throws Exception {
 		// stop broker
 		if (broker != null) {
-			log.debug("stopping broker");
+			if (log.isInfoEnabled()){
+				log.info("stopping embedded broker");
+			}
 			connector.stop();
 			broker.stop();
-			log.debug("broker stopped");
+			
+			if(log.isInfoEnabled()){
+				log.debug("embedded broker stopped");
+			}
 		} else {
-			log.warn("No Broker found to stop");
+			if (log.isWarnEnabled()){
+				log.warn("No Broker found to Stop");
+			}
 		}
 	}
 
 	public void doCleanup() throws Exception {
 		if (broker != null){
-			log.debug("cleaning up broker");
-			log.debug("broker cleaned up");
+			if (log.isInfoEnabled()){
+				log.info("cleaning up broker");
+				log.info("broker cleaned up");
+			}
+			
 		} else {
-			log.warn("No Broker to cleanup");
+			if (log.isWarnEnabled()){
+				log.warn("No Broker to cleanup");
+			}
 		}
 	}
 

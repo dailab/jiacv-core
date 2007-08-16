@@ -51,13 +51,17 @@ public class JMSMessageTransport extends MessageTransport {
 	 */
 	@Override
 	public synchronized void doInit() throws Exception {
-		log.debug("doInit");
+		if (log.isDebugEnabled()) {
+			log.debug("JMSMessageTransport initializing...");
+		}
 	
 		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
 		
 		_sender = new JMSSender(_connectionFactory, createChildLog("sender"));
 		_receiver = new JMSReceiver(_connectionFactory, this, createChildLog("receiver"));
-		log.debug("doneInit");
+		if (log.isDebugEnabled()){
+			log.debug("JMSMessageTransport initialized");
+		}
 		
 	}
 	
@@ -66,10 +70,14 @@ public class JMSMessageTransport extends MessageTransport {
 	 * cleans up the JMSMessageTransports and the classes it holds
 	 */
 	public synchronized void doCleanup() {
-		log.debug("doCleanup");
+		if (log.isDebugEnabled()){
+			log.debug("JMSMessageTransport commences Cleanup");
+		}
         try {_receiver.doCleanup();} catch (Exception e) {log.warn("cleaned up receiver", e);}
 		try {_sender.doCleanup();} catch (Exception e) {log.warn("cleaned up sender", e);}
-		log.debug("doneCleanup");
+		if (log.isDebugEnabled()){
+			log.debug("JMSMessageTransport cleaned up");
+		}
 	}
 
 	
@@ -151,9 +159,18 @@ public class JMSMessageTransport extends MessageTransport {
 	 * 					a MessageBoxAddress
 	 */
 	public void send(IJiacMessage message, ICommunicationAddress commAdd) throws CommunicationException {
-        try {
+        if (log.isDebugEnabled()){
+        	log.debug("JMSMessageTransport sends Message to address '" 
+        			+ commAdd.toUnboundAddress().toString());
+        }
+		
+		try {
             _sender.send(message, commAdd);
         } catch (JMSException jms) {
+        	if (log.isErrorEnabled()){
+        		log.error("Sending of Message to address '" + commAdd.toUnboundAddress().toString() + "' through JMS failed!");
+        		log.error("Errorcause reads '" + jms.getCause() + "'");
+        	}
         	throw new CommunicationException("error while sending message", jms);
         }
 	}
@@ -169,9 +186,17 @@ public class JMSMessageTransport extends MessageTransport {
 	 * @param selector	if you want to get only special messages use this to select them
 	 */
 	public void listen(ICommunicationAddress address, Selector selector) throws CommunicationException {
-        try {
+        if (log.isDebugEnabled()){
+        	log.debug("JMSMessageTransports starts to listen at '" + address.toUnboundAddress() 
+        			+ "' with selector'" + selector + "'");
+        }
+		try {
             _receiver.listen(address, selector);
         } catch (JMSException jms) {
+        	if (log.isErrorEnabled()){
+        		log.error("Listening to address '" + address.toUnboundAddress().toString() + "' through JMS failed!");
+        		log.error("Errorcause reads '" + jms.getCause() + "'");
+        	}
             throw new CommunicationException("error while registrating", jms);
         }
 	}

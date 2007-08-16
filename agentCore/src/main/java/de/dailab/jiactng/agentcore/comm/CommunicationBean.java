@@ -922,12 +922,8 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 						} else {
 							_addressToListenerMap.put(unboundAddress, registeredContexts);
 						}
-
 					}
-
-
 				}
-
 			}
 		}
 	}

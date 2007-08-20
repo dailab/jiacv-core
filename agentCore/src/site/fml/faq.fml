@@ -141,7 +141,7 @@
                 the tool "jconsole" of JDK1.5+ (Java Development Kit, version 1.5 or higher) on the 
                 host where the application runs, connect to the JVM (Java Virtual Machine) of the
                 application, change to the tab "MBeans" and open the tree under domain
-                <code>de.dailab.jiactng.agentcore</code>. For each element you can read its attributes,
+                <code>de.dailab.jiactng</code>. For each element you can read/change its attributes,
                 invoke operations on it and subscribe for notifications. Instead of managing the 
                 application manually with tools you may also implement your own Java program which
                 manages your application automatically by using the JMX API. If your program runs in

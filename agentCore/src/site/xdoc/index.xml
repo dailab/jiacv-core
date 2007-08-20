@@ -90,14 +90,14 @@
 	    <p>The management interface of JIAC TNG is based on 
 	       <a href="http://java.sun.com/j2se/1.5.0/docs/guide/jmx/">JMX</a> 
 	       (Java Management Extensions). Every JVM contains a MBean server
-	       where all manageable resources (agent nodes and agents) are 
-	       registered. Agent Nodes are registered with the object name 
-	       "de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=<i>myNodeName</i>" 
-	       and agents with the object name "de.dailab.jiactng.agentcore:type=Agent,name=<i>myAgentName</i>".
-	       The interfaces <a href="apidocs/de/dailab/jiactng/agentcore/SimpleAgentNodeMBean.html"><code>SimpleAgentNodeMBean</code></a> 
-	       and <a href="apidocs/de/dailab/jiactng/agentcore/AgentMBean.html"><code>AgentMBean</code></a> 
+	       where all manageable resources (agent nodes, agents and agent beans) are 
+	       registered. The interfaces <a href="apidocs/de/dailab/jiactng/agentcore/SimpleAgentNodeMBean.html">
+               <code>SimpleAgentNodeMBean</code></a>,
+	       <a href="apidocs/de/dailab/jiactng/agentcore/AgentMBean.html"><code>AgentMBean</code></a>
+	       and <a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBeanMBean.html">
+	       <code>AbstractAgentBeanMBean</code></a>
 	       specify the manageable attributes (getter and setter methods) and 
-	       the executable operations (all other methods) of these resources.
+	       the executable operations (all other public methods) of these resources.
 	    </p>
 	    <p>While no security settings are made, every object has the possibility 
 	       to manage all resources. To manage resources which are located in the 
@@ -110,27 +110,39 @@
 	       <source>
 System.setProperty("jmx.invoke.getters", "");
 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+JmxManager manager = new JmxManager();
 try {
-    ObjectName node = new ObjectName("de.dailab.jiactng.agentcore:type=SimpleAgentNode,name=<i>myAgentNode</i>");
-    ObjectName agent = new ObjectName("de.dailab.jiactng.agentcore:type=Agent,name=<i>myAgent</i>");
+    ObjectName node = manager.getMgmtNameOfAgentNode("<i>myAgentNodeName</i>");
+    ObjectName agent = manager.getMgmtNameOfAgent("<i>myAgentNodeName</i>", "<i>myAgentName</i>");
+    ObjectName bean = manager.getMgmtNameOfAgentBean("<i>myAgentNodeName</i>", "<i>myAgentName</i>", "<i>myAgentBeanName</i>");
 } catch (Exception e) {
     System.err.println("Wrong parameter format for construction of the object name of resources");
 }</source>
 	       The method <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServer.html#getAttribute(javax.management.ObjectName, java.lang.String)"><code>getAttribute</code></a> 
 	       of the MBean server enables to
-	       read the current attribute values of agent nodes (Name, UUID, Host, 
-	       Agents, LifecycleState or Owner) and agents (Name, AgentNodeUUID, 
-	       LifecycleState or Owner).
+	       read the current attribute values of agent nodes (e.g. Name, UUID, Host, 
+	       Agents, LifecycleState or Owner), agents (e.g. AgentName, AgentId, 
+	       LifecycleState, Owner or AgentBeanNames) and agent beans (e.g. BeanName or LifecycleState).
 	       <source>
 try {
     String owner = (String) mbs.getAttribute(node, "Owner");
 } catch (JMException e) {
     System.err.println("Error when getting agent node's owner");
 }</source>
+	       The method <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServer.html#setAttribute(javax.management.ObjectName, javax.management.Attribute)"><code>setAttribute</code></a> 
+	       of the MBean server enables to
+	       change attribute values of agents (AgentName, Owner or BeanExecutionTimeout)
+	       and agent beans (BeanName).
+	       <source>
+try {
+    mbs.setAttribute(agent, new Attribute("BeanExecutionTimeout", 15000));
+} catch (JMException e) {
+    System.err.println("Error when changing agent's timout for bean executions");
+}</source>
 	       The method <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServer.html#invoke(javax.management.ObjectName, java.lang.String, java.lang.Object[], java.lang.String[])"><code>invoke</code></a> 
 	       of the MBean server enables to execute
 	       operations on agent nodes (addAgents, init, start, stop, cleanup or 
-	       shutdown) and agents (remove, init, start, stop or cleanup).
+	       shutdown), agents (remove, init, start, stop or cleanup) and agent beans (init, start, stop or cleanup).
 	       <source>
 try {
     mbs.invoke(node, "addAgents", new Object[] {"<i>myPath</i>/<i>mySpringConfigurationXMLFile</i>"}, new String[] {"java.lang.String"});
@@ -139,7 +151,7 @@ try {
 }</source>
 	       The method <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/MBeanServer.html#addNotificationListener(javax.management.ObjectName, javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)"><code>addNotificationListener</code></a> 
 	       of the MBean server enables to subscribe for notifications about changed attribute values 
-	       on agent nodes (LifecycleState, Agents) and agents (LifecycleState).
+	       on agent nodes (LifecycleState, Agents), agents (LifecycleState) and agent beans (LifecycleState).
 	       The class of the subscribing object must implement the interface 
 	       <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/NotificationListener.html"><code>NotificationListener</code></a> 
 	       with the method <code>handleNotification</code>.

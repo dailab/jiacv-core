@@ -38,9 +38,6 @@ public abstract class MessageTransport {
     }
     
     public final void setDefaultDelegate(IMessageTransportDelegate delegate) {
-    	if (log.isInfoEnabled()){
-    		log.info("defaultDelegate is set to " + delegate);
-    	}
         _delegate = delegate;
         log = _delegate.getLog(_transportIdentifier);
     }

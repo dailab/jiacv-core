@@ -160,15 +160,14 @@ public class JMSMessageTransport extends MessageTransport {
 	 */
 	public void send(IJiacMessage message, ICommunicationAddress commAdd) throws CommunicationException {
         if (log.isDebugEnabled()){
-        	log.debug("JMSMessageTransport sends Message to address '" 
-        			+ commAdd.toUnboundAddress().toString());
+        	log.debug("JMSMessageTransport sends Message to address '" + commAdd.toUnboundAddress());
         }
 		
 		try {
             _sender.send(message, commAdd);
         } catch (JMSException jms) {
         	if (log.isErrorEnabled()){
-        		log.error("Sending of Message to address '" + commAdd.toUnboundAddress().toString() + "' through JMS failed!");
+        		log.error("Sending of Message to address '" + commAdd.toUnboundAddress() + "' through JMS failed!");
         		log.error("Errorcause reads '" + jms.getCause() + "'");
         	}
         	throw new CommunicationException("error while sending message", jms);
@@ -194,7 +193,7 @@ public class JMSMessageTransport extends MessageTransport {
             _receiver.listen(address, selector);
         } catch (JMSException jms) {
         	if (log.isErrorEnabled()){
-        		log.error("Listening to address '" + address.toUnboundAddress().toString() + "' through JMS failed!");
+        		log.error("Listening to address '" + address.toUnboundAddress() + "' through JMS failed!");
         		log.error("Errorcause reads '" + jms.getCause() + "'");
         	}
             throw new CommunicationException("error while registrating", jms);

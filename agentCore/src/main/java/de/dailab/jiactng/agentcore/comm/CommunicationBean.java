@@ -21,6 +21,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
+import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.util.ReferenceEqualityCheckSet;
 
 
@@ -31,7 +32,7 @@ import de.dailab.jiactng.agentcore.util.ReferenceEqualityCheckSet;
  * @author Marcel Patzlaff, Martin Loeffelholz
  * @version $Revision$
  */
-public class CommunicationBean extends AbstractMethodExposingBean {
+public class CommunicationBean extends AbstractMethodExposingBean implements CommunicationBeanMBean {
 	/**
 	 * a save way to cast from object to targetType
 	 * 
@@ -181,6 +182,9 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 				}
 				try {transport.doCleanup();} catch(Exception x){};
 				iter.remove();
+
+				// deregister message transport from management
+				deregisterTransport(transport.getTransportIdentifier());
 			}
 		}
 
@@ -217,12 +221,17 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 
 		try {
 			if(isActive()) {
+				// init message transport
 				transport.setDefaultDelegate(_defaultDelegate);
 				transport.doInit();
 				registerAllToTransport(transport);
 			}
 		} finally {
+			// add message transport
 			_transports.put(id, transport);
+
+			// register message transport for management
+			registerTransport(transport);
 		}
 	}
 
@@ -233,16 +242,24 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 * @param transportIdentifier of the transport to remove
 	 */
 	public synchronized void removeTransport(String transportIdentifier) {
-		if (log.isInfoEnabled()){
-			log.info("Transport '" + transportIdentifier + "' removed from CommunicationBean");
-		}
-		
+		// remove message transport
 		MessageTransport transport= _transports.remove(transportIdentifier);
 
 		if(transport == null) {
+			if (log.isWarnEnabled()){
+				log.warn("Transport '" + transportIdentifier + "' not found to remove from CommunicationBean");
+			}			
 			return;
 		}
 
+		if (log.isInfoEnabled()){
+			log.info("Transport '" + transportIdentifier + "' removed from CommunicationBean");
+		}
+
+		// deregister message transport from management
+		deregisterTransport(transportIdentifier);
+
+		// cleanup message transport
 		switch(getState()) {
 		case INITIALIZED: case STARTED: case STOPPED: {
 			try {
@@ -325,8 +342,8 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 	 */
 	@Expose
 	public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
-		if (log.isInfoEnabled()){
-			log.info("CommunicationBean is sending Message to address '" + address.toString() + "'");
+		if (log.isDebugEnabled()){
+			log.debug("CommunicationBean is sending Message to address '" + address.toString() + "'");
 		}
 		if(message == null) {
 			throw new IllegalArgumentException("message must not be null");
@@ -935,6 +952,82 @@ public class CommunicationBean extends AbstractMethodExposingBean {
 			return true;
 		default:
 			return false;
+		}
+	}
+
+	/**
+     * Registers the communication bean and all message transports for management
+     * @param manager the manager to be used for registration
+	 */
+	public void enableManagement(Manager manager) {
+		// do nothing if management already enabled
+		if (isManagementEnabled()) {
+			return;
+		}
+
+		// register communication bean
+		super.enableManagement(manager);
+		
+		// register all message transports for management
+		for (MessageTransport transport : _transports.values()) {
+			registerTransport(transport);
+		}
+	}
+
+	/**
+	 * Deregisters the communication bean and all message transports from management
+	 */
+	public void disableManagement() {
+		// do nothing if management already disabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+		
+		// deregister all message transports from management
+		for (String transportId : _transports.keySet()) {
+			deregisterTransport(transportId);
+		}
+		
+		super.disableManagement();
+	}
+
+	/**
+	 * Registers a message transport for management.
+	 * @param transport the message transport to be registered
+	 */
+	private final void registerTransport(MessageTransport transport) {
+		// do nothing if management is not enabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+
+		// register message transport for management
+		try {
+			_manager.registerAgentBeanResource(this, thisAgent, "MessageTransport", transport.getTransportIdentifier(), transport);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to register message transport " + transport.getTransportIdentifier() + " of agent bean " + beanName + " of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
+		}
+	}
+
+	/**
+	 * Deregisters a message transport from management.
+	 * @param transportId the identifier of the message transport
+	 */
+	private final void deregisterTransport(String transportId) {
+		// do nothing if management is not enabled
+		if (!isManagementEnabled()) {
+			return;
+		}
+
+		// deregister message transport from management
+		try {
+			_manager.unregisterAgentBeanResource(this, thisAgent, "MessageTransport", transportId);
+		}
+		catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister message transport " + transportId + " of agent bean " + beanName + " of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());					
 		}
 	}
 }

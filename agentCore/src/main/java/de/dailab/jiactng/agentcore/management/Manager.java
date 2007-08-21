@@ -167,6 +167,18 @@ public interface Manager {
 	public void registerAgentBean(IAgentBean agentBean, IAgent agent) throws Exception;
 
 	/**
+	 * Registers an agent bean resource for management. The agent bean may contain more
+	 * than one resource of the specified type.
+	 * @param agentBean the agent bean which contains the resource
+	 * @param agent the agent which contains this agent bean
+	 * @param resourceType the type of the agent bean resource
+	 * @param resourceName the name of the agent bean resource
+	 * @param resource the agent bean resource to be registered
+	 * @throws Exception The name of the agent bean, agent, agent node or type or name of the resource is incorrect or the agent bean resource is already registered.
+	 */
+	public void registerAgentBeanResource(IAgentBean agentBean, IAgent agent, String resourceType, String resourceName, Object resource) throws Exception;
+
+	/**
 	 * Unregisters an agent node from management.
 	 * @param agentNode the agent node to be unregistered
 	 * @throws Exception The name of the agent node is incorrect or the agent node is not registered.
@@ -215,6 +227,17 @@ public interface Manager {
 	 * @throws Exception The name of the agent bean, agent or agent node is incorrect or the agent bean is not registered.
 	 */
 	public void unregisterAgentBean(IAgentBean agentBean, IAgent agent) throws Exception;
+
+	/**
+	 * Unregisters an agent bean resource from management. The agent bean may contain more
+	 * than one resource of the specified type.
+	 * @param agentBean the agent bean which contains the resource
+	 * @param agent the agent which contains the agent bean
+	 * @param resourceType the type of the agent bean resource
+	 * @param resourceName the name of the agent bean resource
+	 * @throws Exception The name of the agent bean, agent, agent node or type or name of the resource is incorrect or the agent bean resource is not registered.
+	 */
+	public void unregisterAgentBeanResource(IAgentBean agentBean, IAgent agent, String resourceType, String resourceName) throws Exception;
 
 	/**
 	 * Gets the value of an attribute of an agent node.

@@ -16,7 +16,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public abstract class MessageTransport {
+public abstract class MessageTransport implements MessageTransportMBean {
     public static interface IMessageTransportDelegate {
         void onAsynchronousException(MessageTransport source, Exception e);
         

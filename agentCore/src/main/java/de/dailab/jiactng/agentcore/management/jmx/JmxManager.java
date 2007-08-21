@@ -300,6 +300,27 @@ public class JmxManager implements Manager {
 	}
 
 	/**
+	 * Registers an agent bean resource as JMX resource. The agent bean may contain more
+	 * than one resource of the specified type.
+	 * @param agentBean the agent bean which contains the resource
+	 * @param agent the agent which contains this agent bean
+	 * @param resourceType the type of the agent bean resource
+	 * @param resourceName the name of the agent bean resource
+	 * @param resource the agent bean resource to be registered
+	 * @throws MalformedObjectNameException The name of the agent bean, agent, agent node or name or type of the resource contains an illegal character or does not follow the rules for quoting.
+	 * @throws NullPointerException The name of the agent bean, agent, agent node or name or type of the resource is unknown
+	 * @throws InstanceAlreadyExistsException The agent bean resource is already under the control of the MBean server.
+	 * @throws MBeanRegistrationException The preRegister (MBeanRegistration  interface) method of the agent bean resource has thrown an exception. The agent bean resource will not be registered.
+	 * @throws NotCompliantMBeanException The agent bean resource is not a JMX compliant MBean.
+	 * @see #getMgmtNameOfAgentBeanResource(String, String, String, String, String)
+	 * @see MBeanServer#registerMBean(Object, ObjectName)
+	 */
+	public void registerAgentBeanResource(IAgentBean agentBean, IAgent agent, String resourceType, String resourceName, Object resource) throws MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
+		ObjectName name = getMgmtNameOfAgentBeanResource(agent.getAgentNode().getName(), agent.getAgentName(), agentBean.getBeanName(), resourceType, resourceName);
+		mbs.registerMBean(resource, name);
+	}
+
+	/**
 	 * Unregisters an agent node as JMX resource.
 	 * @param agentNode the agent node to be unregistered
 	 * @throws MalformedObjectNameException The name of the agent node contains an illegal character or does not follow the rules for quoting.
@@ -394,6 +415,25 @@ public class JmxManager implements Manager {
 	 */
 	public void unregisterAgentBean(IAgentBean agentBean, IAgent agent) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
 		ObjectName name = getMgmtNameOfAgentBean(agent.getAgentNode().getName(), agent.getAgentName(), agentBean.getBeanName());
+		mbs.unregisterMBean(name);
+	}
+
+	/**
+	 * Unregisters an agent bean resource as JMX resource. The agent bean may contain more
+	 * than one resource of the specified type.
+	 * @param agentBean the agent bean which contains the resource
+	 * @param agent the agent which contains the agent bean
+	 * @param resourceType the type of the agent bean resource
+	 * @param resourceName the name of the agent bean resource
+	 * @throws MalformedObjectNameException The name of the agent bean, agent, agent node or type or name of the resource contains an illegal character or does not follow the rules for quoting.
+	 * @throws NullPointerException The name of the agent bean, agent, agent node or type or name of the resource is unknown
+	 * @throws InstanceNotFoundException The agent bean resource is not registered in the MBean server.
+	 * @throws MBeanRegistrationException The preDeregister ((MBeanRegistration interface) method of the agent bean resource has thrown an exception.
+	 * @see #getMgmtNameOfAgentBeanResource(String, String, String, String, String)
+	 * @see MBeanServer#unregisterMBean(ObjectName)
+	 */
+	public void unregisterAgentBeanResource(IAgentBean agentBean, IAgent agent, String resourceType, String resourceName) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
+		ObjectName name = getMgmtNameOfAgentBeanResource(agent.getAgentNode().getName(), agent.getAgentName(), agentBean.getBeanName(), resourceType, resourceName);
 		mbs.unregisterMBean(name);
 	}
 

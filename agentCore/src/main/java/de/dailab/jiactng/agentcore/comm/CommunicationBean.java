@@ -14,6 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
+
 import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
@@ -490,8 +498,8 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
 	 * delegates received messages to the default listener
 	 */
 	protected synchronized void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
-		if (log.isInfoEnabled()){
-			log.info("CommunicationBean is receiving Message over transport '" + source.getTransportIdentifier() + "' from '" + at + "'");
+		if (log.isDebugEnabled()){
+			log.debug("CommunicationBean is receiving Message over transport '" + source.getTransportIdentifier() + "' from '" + at + "'");
 		}
 		
 		if(log.isDebugEnabled()) {
@@ -1029,6 +1037,42 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
 			System.err.println("WARNING: Unable to deregister message transport " + transportId + " of agent bean " + beanName + " of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
 			System.err.println(e.getMessage());					
 		}
+	}
+
+	public CompositeData getSelectorsOfAddresses() {
+	    CompositeData data = null;
+	    int size = _addressToListenerMap.size();
+	    String[] itemNames = new String[size];
+	    OpenType[] itemTypes = new OpenType[size];
+	    Object[] itemValues = new Object[size];
+	    Object[] addresses = _addressToListenerMap.keySet().toArray();
+	    try {
+	    	for (int i=0; i<size; i++) {
+	    		ICommunicationAddress address = (ICommunicationAddress) addresses[i];
+	    		itemNames[i] = address.getName();
+	    		itemTypes[i] = new ArrayType(1, SimpleType.STRING);
+	    		List<ListenerContext> values = _addressToListenerMap.get(address);
+	    		String[] value = new String[values.size()];
+	    		Iterator<ListenerContext> it = values.iterator();	    		
+	    		int j = 0;
+	    		while (it.hasNext()) {
+	    			Selector selector = it.next().selector;
+	    			if (selector == null) {
+	    				value[j] = "null";
+	    			} else {
+	    				value[j] = selector.toString();
+	    			}
+	    			j++;
+	    		}
+	    		itemValues[i] = value;
+	    	}
+	    	CompositeType compositeType = new CompositeType(_addressToListenerMap.getClass().getName(), "addresses of the communication bean", itemNames, itemNames, itemTypes);
+	    	data = new CompositeDataSupport(compositeType, itemNames, itemValues);
+	    }
+	    catch (OpenDataException e) {
+	    	e.printStackTrace();
+	    }
+	    return data;		
 	}
 }
 

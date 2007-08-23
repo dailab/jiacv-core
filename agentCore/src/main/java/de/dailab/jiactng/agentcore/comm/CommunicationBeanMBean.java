@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.comm;
 
+import javax.management.openmbean.CompositeData;
+
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBeanMBean;
 
 /**
@@ -13,4 +15,6 @@ public interface CommunicationBeanMBean extends AbstractMethodExposingBeanMBean 
 	 * @param transportIdentifier of the transport to remove
 	 */
 	public void removeTransport(String transportIdentifier);
+	
+	public CompositeData getSelectorsOfAddresses();
 }

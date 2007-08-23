@@ -110,6 +110,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	public void setEmbeddedBroker(JmsBrokerAMQ embeddedBroker) {
 		_embeddedBroker = embeddedBroker;
+		_embeddedBroker.setAgentNode(this);
 	}
 
 	/**
@@ -438,14 +439,26 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
 	 */
 	public void doInit() {
-                if (_embeddedBroker != null) {
-                    try {
-                        _embeddedBroker.init();
-                    } catch (LifecycleException le) {
-                        // @todo exception handling
-                        le.printStackTrace();
-                    }
-                }
+		// init message broker
+        if (_embeddedBroker != null) {
+        	try {
+        		_embeddedBroker.init();
+            } catch (LifecycleException le) {
+            	// @todo exception handling
+            	le.printStackTrace();
+            }
+        }
+
+		// init service directory
+		try {
+			if (_serviceDirectory != null) {
+				_serviceDirectory.init();
+			}
+		} catch (LifecycleException e) {
+			// TODO:
+			e.printStackTrace();
+		}
+
 		_threadPool = Executors.newCachedThreadPool();
 		agentFutures = new HashMap<String, Future>();
 
@@ -475,16 +488,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				}
 			}
 		}
-		
-		// das servicedirectory separat initialisieren - is auch ne AgentBean
-		try {
-			if (_serviceDirectory != null) {
-				_serviceDirectory.init();
-			}
-		} catch (LifecycleException e) {
-			// TODO:
-			e.printStackTrace();
-		}
 	}
 
 	/*
@@ -493,15 +496,27 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
 	 */
 	public void doStart() {
-            if (_embeddedBroker != null) {
-                    try {
-                        _embeddedBroker.start();
-                    } catch (LifecycleException le) {
-                        // @todo exception handling
-                        le.printStackTrace();
-                    }
-                }
-		// call start on all beans of the agentnode
+		// start message broker
+        if (_embeddedBroker != null) {
+        	try {
+        		_embeddedBroker.start();
+            } catch (LifecycleException le) {
+            	// @todo exception handling
+                le.printStackTrace();
+            }
+        }
+
+		// start service directory
+		try {
+			if (_serviceDirectory != null) {
+				_serviceDirectory.start();
+			}
+		} catch (LifecycleException e) {
+			// TODO:
+			e.printStackTrace();
+		}
+
+        // call start on all beans of the agentnode
 		// TODO testing
 		if (agentNodeBeans != null) {
 			for (ILifecycle anb : agentNodeBeans) {
@@ -524,16 +539,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					ex.printStackTrace();
 				}
 			}
-		}
-
-		// das servicedirectory separat starten - is auch ne AgentBean
-		try {
-			if (_serviceDirectory != null) {
-				_serviceDirectory.start();
-			}
-		} catch (LifecycleException e) {
-			// TODO:
-			e.printStackTrace();
 		}
 
 		log.info("AgentNode " + getName() + " started with " + (_agents!=null?_agents.size():"0") + " agents");
@@ -569,7 +574,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				}
 			}
 		}
-		// das servicedirectory separat stoppen - is auch ne AgentBean
+
+        // stop service directory
 		try {
 			if (_serviceDirectory != null) {
 				_serviceDirectory.stop();
@@ -578,6 +584,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			// TODO:
 			e.printStackTrace();
 		}
+
+		// stop message broker
+        if (_embeddedBroker != null) {
+            try {
+                _embeddedBroker.stop();
+            } catch (LifecycleException le) {
+                // @todo exception handling
+                le.printStackTrace();
+            }
+        }
 	}
 
 	/*
@@ -613,6 +629,26 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		if (_threadPool != null) {
 			_threadPool.shutdown();
 		}
+
+        // cleanup service directory
+		try {
+			if (_serviceDirectory != null) {
+				_serviceDirectory.stop();
+			}
+		} catch (LifecycleException e) {
+			// TODO:
+			e.printStackTrace();
+		}
+
+		// cleanup message broker
+		if (_embeddedBroker != null) {
+            try {
+                _embeddedBroker.cleanup();
+            } catch (LifecycleException le) {
+                // @todo exception handling
+                le.printStackTrace();
+            }
+        }
 	}
 
 	/*
@@ -866,6 +902,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			_serviceDirectory.enableManagement(manager);
 		}
 
+		// register message broker for management
+		if (_embeddedBroker != null) {
+			_embeddedBroker.enableManagement(manager);
+		}
+
 		// enable remote management
 		if (_jmxConnectors != null) {
 			manager.enableRemoteManagement(_name, _jmxConnectors);
@@ -886,6 +927,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		
 		// disable remote management
 		_manager.disableRemoteManagement(getName());
+
+		// deregister message broker from management
+		if (_embeddedBroker != null) {
+			_embeddedBroker.disableManagement();
+		}
 
 		// deregister service directory from management
 		if (_serviceDirectory != null) {

@@ -73,8 +73,8 @@ public class JMSMessageTransport extends MessageTransport {
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport commences Cleanup");
 		}
-        try {_receiver.doCleanup();} catch (Exception e) {log.warn("cleaned up receiver", e);}
-		try {_sender.doCleanup();} catch (Exception e) {log.warn("cleaned up sender", e);}
+        try {_receiver.doCleanup();} catch (Exception e) {log.warn("clean up receiver failed", e);}
+		try {_sender.doCleanup();} catch (Exception e) {log.warn("clean up sender failed", e);}
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport cleaned up");
 		}

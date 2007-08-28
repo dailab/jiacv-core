@@ -42,6 +42,7 @@ class JMSSender {
 		}
 		_connection = _connectionFactory.createConnection();
 		_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		_connection.start();
         if (_log.isDebugEnabled()){
         	_log.debug("JMSSender initialized.");
         }

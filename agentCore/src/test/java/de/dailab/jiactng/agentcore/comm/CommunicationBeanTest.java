@@ -7,12 +7,16 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.activemq.broker.BrokerService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
+import de.dailab.jiactng.agentcore.SimpleAgentNode;
+import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
+import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
@@ -20,7 +24,7 @@ public class CommunicationBeanTest extends TestCase {
 
 	public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.CommunicationBean#send";
 
-	private static BrokerService _broker;
+	private static JmsBrokerAMQ _broker;
 	private static IAgentNode _communicationPlatform;
 	private static IAgent _communicator;
 	private static boolean setupDone = false;
@@ -33,19 +37,25 @@ public class CommunicationBeanTest extends TestCase {
 
 	private static Map<Selector, WildcardListenerContext> _selectorToListenerMap;
 	private static Map<ICommunicationAddress, List<ListenerContext>> _addressToListenerMap;
+	private static Log _log = null;
 
 	@Override
 	protected void setUp() throws Exception {
 
 		if (!setupDone){
 			setupDone = true;
+			_log = LogFactory.getLog("CommunicationBeanTestLog");
 			super.setUp();
-			_broker= new BrokerService();
-			String destination= "localhost:61616";
-			System.out.println("setup Broker on " + destination);
-			_broker.setPersistent(false);
-			_broker.setUseJmx(true);
-			_broker.addConnector("tcp://" + destination);
+			BrokerValues values = BrokerValues.getDefaultInstance();
+			_broker = new JmsBrokerAMQ();
+			_broker.setValues(values);
+			_broker.setLog(_log);
+			try {
+				_broker.doInit();
+				_broker.doStart();
+			} catch (Exception e1) {
+				_log.error(e1.getCause());
+			}
 			_broker.start();
 			System.out.println("broker started");
 
@@ -56,8 +66,6 @@ public class CommunicationBeanTest extends TestCase {
 			
 			_communicator =  beanlist.get(0);
 			
-//			_communicationPlatform.init();
-//			_communicationPlatform.start();
 			_beans = _communicator.getAgentBeans(); 
 
 			Iterator<IAgentBean> it = _beans.iterator();
@@ -261,10 +269,11 @@ public class CommunicationBeanTest extends TestCase {
 	protected void tearDown() throws Exception {
 		if(lastTestDone){
 			super.tearDown();
-//			((SimpleAgentNode)_communicator.shutdown();
+			((SimpleAgentNode)_communicationPlatform).shutdown();
 //			_communicationPlatform.stop();
 //			_communicationPlatform.cleanup();
-//			_broker.stop();
+			_broker.doStop();
+			_broker.doCleanup();
 			
 		}
 	}

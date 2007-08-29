@@ -146,18 +146,19 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
 	}
 
 	@Override
-	public synchronized void doCleanup() throws Exception {
+	public void doCleanup() throws Exception {
 		if (log.isInfoEnabled()){
 			log.info("CommunicationBean starts commencing cleanup");
 			log.info("Cleaning up transports");
 		}
-		
-		for(MessageTransport transport : _transports.values()) {
-			try {
-				transport.doCleanup();
-			} catch(Exception e) {
-				if (log.isWarnEnabled()){
-					log.warn("transport '" + transport.getTransportIdentifier() + "' did not cleanup correctly", e);
+		synchronized(_transports) {
+			for(MessageTransport transport : _transports.values()) {
+				try {
+					transport.doCleanup();
+				} catch(Exception e) {
+					if (log.isWarnEnabled()){
+						log.warn("transport '" + transport.getTransportIdentifier() + "' did not cleanup correctly", e);
+					}
 				}
 			}
 		}

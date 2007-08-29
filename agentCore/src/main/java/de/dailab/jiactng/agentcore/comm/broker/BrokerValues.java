@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.comm.broker;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 /**
@@ -132,20 +133,28 @@ public class BrokerValues {
 	 * @return die Url als String
 	 */
 	public String createUrl() {
-        try {
-            for(Enumeration<NetworkInterface> interfaces= NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements();){
-                Enumeration<InetAddress> addresses= interfaces.nextElement().getInetAddresses();
-                while(addresses.hasMoreElements()) {
-                    InetAddress current= addresses.nextElement();
-                    if(current.isLoopbackAddress()) {
-                        return _protocol + PROTOCOL_IP_SEPARATOR + current.toString() + IP_PORT_SEPARATOR + _port;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // fall through
-        }
-        
-		return _protocol + PROTOCOL_IP_SEPARATOR + "localhost" + IP_PORT_SEPARATOR + _port;
+//        try {
+//        	Enumeration<NetworkInterface> interfaces= NetworkInterface.getNetworkInterfaces();
+//            while(interfaces.hasMoreElements()){
+//                Enumeration<InetAddress> addresses= interfaces.nextElement().getInetAddresses();
+//                while(addresses.hasMoreElements()) {
+//                    InetAddress current= addresses.nextElement();
+//                    if(current.isLoopbackAddress()) {
+//                        return _protocol + PROTOCOL_IP_SEPARATOR + current.toString() + IP_PORT_SEPARATOR + _port;
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            // fall through
+//        }
+//        
+		InetAddress current = null;
+		try {
+			current = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		
+		return _protocol + PROTOCOL_IP_SEPARATOR + current.getHostAddress() + IP_PORT_SEPARATOR + _port;
 	}
 }

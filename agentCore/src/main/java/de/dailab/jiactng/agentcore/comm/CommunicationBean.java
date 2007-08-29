@@ -494,7 +494,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
 	/**
 	 * delegates received messages to the default listener
 	 */
-	protected synchronized void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
+	protected void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
 		if (log.isDebugEnabled()){
 			log.debug("CommunicationBean is receiving Message over transport '" + source.getTransportIdentifier() + "' from '" + at + "'");
 		}
@@ -512,28 +512,30 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
 			}
 			boundAddress= at;
 		}
+		
+		synchronized(_addressToListenerMap){
+			for(ListenerContext context : _addressToListenerMap.get(at)) {
+				boolean notify= false;
 
-		for(ListenerContext context : _addressToListenerMap.get(at)) {
-			boolean notify= false;
+				if(context.selector != null) {
+					String header= message.getHeader(context.selector.getKey());
 
-			if(context.selector != null) {
-				String header= message.getHeader(context.selector.getKey());
-
-				if(header != null && header.equals(context.selector.getValue())) {
+					if(header != null && header.equals(context.selector.getValue())) {
+						notify= true;
+					}
+				} else {
+					// we have a generic listener with no selector...
 					notify= true;
 				}
-			} else {
-				// we have a generic listener with no selector...
-				notify= true;
-			}
-			if(notify) {
-				for(IJiacMessageListener current : context.listeners) {
-					if(current != _defaultListener && notified.add(current)) {
-						try {
-							current.receive(message, boundAddress);
-						} catch (RuntimeException re) {
-							if (log.isWarnEnabled()){
-								log.warn("listener threw a runtime exception", re);
+				if(notify) {
+					for(IJiacMessageListener current : context.listeners) {
+						if(current != _defaultListener && notified.add(current)) {
+							try {
+								current.receive(message, boundAddress);
+							} catch (RuntimeException re) {
+								if (log.isWarnEnabled()){
+									log.warn("listener threw a runtime exception", re);
+								}
 							}
 						}
 					}
@@ -777,9 +779,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
 				if (context.listeners.isEmpty()){
 					// given listener was only wildcardlistener listening with this selector
 					
-					if (log.isDebugEnabled()){
-						log.debug("WildcardListener was last one with this selector, cleaning up registered addresses");
-					}
+					log.debug("WildcardListener was last one with this selector, cleaning up registered addresses");
 					
 					for(ICommunicationAddress registered : _addressToListenerMap.keySet()) {
 						// go through all addresses registered

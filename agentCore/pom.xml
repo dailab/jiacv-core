@@ -46,18 +46,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.sercho.masp.utilities</groupId>
-			<artifactId>Swing</artifactId>
-			<version>1.0-beta-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>2.0.6</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>2.0.6</version>
@@ -70,22 +58,24 @@
 		</dependency>
 
 		<dependency>
-			<groupId>jsr262-ri</groupId>
-			<artifactId>jmxws</artifactId>
-			<version>20060512</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-core</artifactId>
 			<version>4.1.1</version>
 		</dependency>
 
-		<dependency>
+<!-- only necessary for JMX-Webservice connector, will only be needed in Projects -->
+		<!--dependency> 
+			<groupId>jsr262-ri</groupId>
+			<artifactId>jmxws</artifactId>
+			<version>20060512</version>
+		</dependency-->
+	
+<!-- unknown, will be removed soon, if not needed -->
+		<!--dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>forms</artifactId>
 			<version>1.0.7</version>
-		</dependency>
+		</dependency-->
 
 	</dependencies>
 

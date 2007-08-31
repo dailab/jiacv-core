@@ -219,7 +219,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public String getJiacVersion() {
 		return "JIAC TNG " + Version.getName() + 
 			" version " + Version.getNumber() + 
-			" (" + Version.getTimestamp() + ")";
+			" (" + Version.getTimestamp() + 
+			")";
 	}
 
 	/**
@@ -484,7 +485,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					a.init();
 				} catch (LifecycleException e) {
 					// TODO:
-					e.printStackTrace();
+//					e.printStackTrace();
+					System.out.println(e.getMessage());
 				}
 			}
 		}

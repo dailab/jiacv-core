@@ -110,8 +110,13 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			ActionResult actionResult = memory.remove(new ActionResult(null,
 					null, null, null));
 			if (actionResult != null) {
+				// entweder den ResultReceiver informieren oder das Ergebnis in den Memory schreiben
+				if(((DoAction)actionResult.getSource())== null || ((DoAction)actionResult.getSource()).getSource()==null) {
+					memory.write(actionResult);
+				} else {
 				 ((ResultReceiver)((DoAction)actionResult.getSource()).getSource()).receiveResult(
 				 actionResult);
+				}
 //				ArrayList history = actionResult.getSession().getHistory();
 //				for (int i = history.size() - 1; i >= 0; i--) {
 //					if (history.get(i) instanceof DoAction) {

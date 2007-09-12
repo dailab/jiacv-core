@@ -25,11 +25,11 @@ public class ServiceDirectoryTest extends TestCase {
 		}
 	}
 
-//	/**
-//	 * 
-//	 *
-//	 */
-//	public void testRegisterService() {
+	/**
+	 * 
+	 *
+	 */
+	public void testRegisterService() {
 //		String serviceName = "TestService";
 //		IServiceDescription desc1 = new ServiceDescription(null, "Service1 ID", serviceName, null, null, null, null, null,
 //																						null, null, null);
@@ -41,10 +41,10 @@ public class ServiceDirectoryTest extends TestCase {
 //		IServiceDescription desc1a = new ServiceDescription(null, "Service1a ID", "TestService", null, null, null, null,
 //																						null, null, null, null);
 //		assertFalse(desc1a.equals(sd.toArray()[0]));
-//
-//	}
-//
-//	public void testDeRegisterService() {
+
+	}
+
+	public void testDeRegisterService() {
 //		String serviceName = "TestService";
 //		IServiceDescription desc1 = new ServiceDescription(null, "Service1 ID", serviceName, null, null, null, null, null,
 //																						null, null, null);
@@ -62,9 +62,9 @@ public class ServiceDirectoryTest extends TestCase {
 //		Set<ServiceDescription> sd2 = sDir.findServiceByName(serviceName);
 //
 //		assertFalse(sd2.contains(desc1));
-//	}
-//
-//	public void testFindServiceByName() {
+	}
+
+	public void testFindServiceByName() {
 //		String serviceName1 = "TestService1";
 //		String serviceName2 = "TestService2";
 //		String serviceName3 = "TestService3";
@@ -89,9 +89,9 @@ public class ServiceDirectoryTest extends TestCase {
 //		sd = sDir.findServiceByName(serviceName3);
 //		assertEquals(1, sd.size());
 //		assertEquals(desc3, sd.toArray()[0]);
-//	}
-//
-//	public void testGetServiceNumber() {
+	}
+
+	public void testGetServiceNumber() {
 //		String serviceName = "TestService";
 //		IServiceDescription desc1 = new ServiceDescription(null, "Service1 ID", serviceName, null, null, null, null, null,
 //																						null, null, null);
@@ -105,6 +105,6 @@ public class ServiceDirectoryTest extends TestCase {
 //
 //		int number = sDir.getServiceNumber();
 //		assertEquals(3, number);
-//	}
+	}
 
 }

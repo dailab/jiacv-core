@@ -1,20 +1,24 @@
 package de.dailab.jiactng.agentcore.servicediscovery;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Eine Implementation für die Servicebeschreibung
- * Wenn wsdl-Beschreibung null ist, wird davon ausgegangen, dass es kein WebService ist.
+ * Eine Implementation für die Servicebeschreibung Wenn wsdl-Beschreibung null
+ * ist, wird davon ausgegangen, dass es kein WebService ist.
  * @author janko
  */
 public class ServiceDescription implements IServiceDescription {
 
 	private Date _expireDate;
-	private String _id;
+	private String _id;  // soll eigentlich ordinal sein, aber momentan bug in hibernate.. lieber string nehmen
 	private String _name;
-	private String[] _keywords;
-	private ServiceParameter[] _inputParams;
-	private ServiceParameter[] _outputParams;
+	private Set<String> _keywords;
+	private List<ServiceParameter> _inputParams;
+	private List<ServiceParameter> _outputParams;
 	private String _preCondition;
 	private String _postCondition;
 	private String _providerAddress;
@@ -36,9 +40,9 @@ public class ServiceDescription implements IServiceDescription {
 	 * @param qoSRating
 	 * @param wsdl wsdl beschreibung
 	 */
-	public ServiceDescription(Date expireDate, String id, String name, String[] keywords, ServiceParameter[] inputParams,
-																					ServiceParameter[] outputParams, String preCondition, String postCondition,
-																					String providerAddress, String qoSRating, String wsdl) {
+	public ServiceDescription(Date expireDate, String id, String name, Set<String> keywords,
+			List<ServiceParameter> inputParams, List<ServiceParameter> outputParams, String preCondition,
+			String postCondition, String providerAddress, String qoSRating, String wsdl) {
 		super();
 		_expireDate = expireDate;
 		_id = id;
@@ -53,6 +57,12 @@ public class ServiceDescription implements IServiceDescription {
 		_wsdl = wsdl;
 	}
 
+	// default constructor.. extra für hibernate
+	public ServiceDescription() {
+		_keywords = new HashSet<String>();
+	}
+	
+	
 	public Date getExpireDate() {
 		return _expireDate;
 	}
@@ -61,11 +71,11 @@ public class ServiceDescription implements IServiceDescription {
 		return _id;
 	}
 
-	public ServiceParameter[] getInputParameter() {
+	public List<ServiceParameter> getInputParameter() {
 		return _inputParams;
 	}
 
-	public String[] getKeywords() {
+	public Set<String> getKeywords() {
 		return _keywords;
 	}
 
@@ -73,7 +83,7 @@ public class ServiceDescription implements IServiceDescription {
 		return _name;
 	}
 
-	public ServiceParameter[] getOutputParameter() {
+	public List<ServiceParameter> getOutputParameter() {
 		return _outputParams;
 	}
 
@@ -81,7 +91,7 @@ public class ServiceDescription implements IServiceDescription {
 		return _postCondition;
 	}
 
-	public String getPrecondition() {
+	public String getPreCondition() {
 		return _preCondition;
 	}
 
@@ -98,9 +108,9 @@ public class ServiceDescription implements IServiceDescription {
 	}
 
 	public boolean isWebService() {
-		return _wsdl != null && _wsdl.length()>0;
+		return _wsdl != null && _wsdl.length() > 0;
 	}
-	
+
 	public int hashCode() {
 		long hashCode = 0;
 		int cnt = 1; // einfach mal mit 1 initialisieren, um div0 zu verhindern
@@ -208,45 +218,62 @@ public class ServiceDescription implements IServiceDescription {
 			}
 
 			if (_expireDateEquals && _idEquals && _nameEquals && _preEquals && _postEquals && _providerEquals && _qosEquals
-																							&& _wsdlEquals && equalsKeywords(desc._keywords)
-																							&& equalsServiceParameter(_inputParams, desc._inputParams)
-																							&& equalsServiceParameter(_outputParams, desc._outputParams)) {
+					&& _wsdlEquals && equalsKeywords(desc._keywords) && equalsServiceParameter(_inputParams, desc._inputParams)
+					&& equalsServiceParameter(_outputParams, desc._outputParams)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean equalsKeywords(String[] keywords) {
-		if (keywords != null && _keywords != null && keywords.length == _keywords.length) {
-			// achtung es wird auf die reihenfolge geachtet.. das ist evtl. nicht gewünscht
-			for (int i = 0; i < keywords.length; i++) {
-				if (!keywords[i].equals(_keywords[i])) {
-					// sobald ein element ungleich ist.. wird false geliefert
+	// private boolean equalsKeywords(String[] keywords) {
+	// if (keywords != null && _keywords != null && keywords.length ==
+	// _keywords.length) {
+	// // achtung es wird auf die reihenfolge geachtet.. das ist evtl. nicht
+	// gewünscht
+	// for (int i = 0; i < keywords.length; i++) {
+	// if (!keywords[i].equals(_keywords[i])) {
+	// // sobald ein element ungleich ist.. wird false geliefert
+	// return false;
+	// }
+	// // alle elemente waren gleich, true liefern
+	// return true;
+	// }
+	// }
+	// if (keywords == null && _keywords == null) {
+	// return true;
+	// }
+	// return false;
+	// }
+
+	private boolean equalsKeywords(Set<String> keywords) {
+		if (keywords != null && _keywords != null && keywords.size() == _keywords.size()) {
+			for (String keyword : keywords) {
+				if (!_keywords.contains(keyword)) {
 					return false;
 				}
-				// alle elemente waren gleich, true liefern
-				return true;
 			}
+			// alle elemente waren gleich, true liefern
+			return true;
 		}
 		if (keywords == null && _keywords == null) {
 			return true;
 		}
 		return false;
 	}
-
-	private boolean equalsServiceParameter(ServiceParameter[] localParams, ServiceParameter[] params) {
-		if (localParams != null && params != null && localParams.length == params.length) {
-			for (int i = 0; i < localParams.length; i++) {
-				if (!localParams[i].equals(params[i])) {
+	
+	private boolean equalsServiceParameter(List<ServiceParameter> thisParams, List<ServiceParameter> params) {
+		if (thisParams != null && params != null && thisParams.size() == params.size()) {			
+			for (ServiceParameter param : thisParams) {
+				if (!thisParams.contains(param)) {
 					// sobald ein element ungleich ist.. wird false geliefert
 					return false;
 				}
-				// alle elemente waren gleich, true liefern
-				return true;
 			}
+			// alle elemente waren gleich, true liefern
+			return true;
 		}
-		if (localParams == null && params == null) {
+		if (thisParams == null && params == null) {
 			return true;
 		}
 		return false;
@@ -260,11 +287,11 @@ public class ServiceDescription implements IServiceDescription {
 		_id = id;
 	}
 
-	public void setInputParams(ServiceParameter[] inputParams) {
+	public void setInputParameter(List<ServiceParameter> inputParams) {
 		_inputParams = inputParams;
 	}
 
-	public void setKeywords(String[] keywords) {
+	public void setKeywords(Set<String> keywords) {
 		_keywords = keywords;
 	}
 
@@ -272,7 +299,7 @@ public class ServiceDescription implements IServiceDescription {
 		_name = name;
 	}
 
-	public void setOutputParams(ServiceParameter[] outputParams) {
+	public void setOutputParameter(List<ServiceParameter> outputParams) {
 		_outputParams = outputParams;
 	}
 
@@ -292,13 +319,20 @@ public class ServiceDescription implements IServiceDescription {
 		_qoSRating = qoSRating;
 	}
 
-	public void setWsdl(String wsdl) {
+	public void setWsdlDescription(String wsdl) {
 		_wsdl = wsdl;
 	}
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		sb.append('[').append(_name).append(',').append("WS:").append(isWebService()).append(']');
+		sb.append('[').append(_name).append(',')
+		.append(_expireDate).append(',')
+		.append("[keywords:").append(Arrays.toString(_keywords.toArray(new String[0]))).append(']').append(',')
+				.append("[InputParams:").append(Arrays.toString(_inputParams.toArray(new ServiceParameter[0]))).append(']').append(',')
+    .append("[OutputParams:").append(Arrays.toString(_outputParams.toArray(new ServiceParameter[0]))).append(']').append(',')
+    .append(_providerAddress).append(',')
+    .append(_qoSRating).append(',')
+		.append("Webservice?:").append(isWebService()).append(']');
 		return sb.toString();
 	}
 }

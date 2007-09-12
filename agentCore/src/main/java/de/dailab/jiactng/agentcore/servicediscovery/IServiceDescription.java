@@ -1,6 +1,8 @@
 package de.dailab.jiactng.agentcore.servicediscovery;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
@@ -20,15 +22,15 @@ public interface IServiceDescription extends IFact {
 
 	public Date getExpireDate();
 
-	public String[] getKeywords();
+	public Set<String> getKeywords();
 
 	public String getProviderAddress();
 
-	public ServiceParameter[] getInputParameter();
+	public List<ServiceParameter> getInputParameter();
 
-	public ServiceParameter[] getOutputParameter();
+	public List<ServiceParameter> getOutputParameter();
 
-	public String getPrecondition();
+	public String getPreCondition();
 
 	public String getPostCondition();
 

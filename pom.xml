@@ -773,7 +773,8 @@
 				<sendOnError>true</sendOnError>
 				<sendOnWarning>true</sendOnWarning>
 				<configuration>
-					<address>jiactng-dev@dai-labor.de</address>
+					<address>axel.hessler@dai-labor.de</address>
+					<!-- address>jiactng-dev@dai-labor.de</address -->
 				</configuration>
 			</notifier>
 		</notifiers>

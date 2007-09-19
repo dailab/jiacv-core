@@ -8,6 +8,9 @@
 
 	<bean name="CommunicationPlatform"
 		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+		<property name="embeddedBroker">
+			<ref bean="amqBroker" />
+		</property>
 		<property name="agents">
 			<list>
 				<ref bean="Communicator" />
@@ -27,6 +30,7 @@
 		<property name="agentBeans">
 			<list>
 				<ref bean="communicationBean" />
+				<ref bean="chatGUIBean" />
 			</list>
 		</property>
 	</bean>
@@ -68,5 +72,26 @@
 		<property name="brokerURL" value="tcp://localhost:61616"></property>
 	</bean>
 
+	<bean name="amqBroker"
+		class="de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ"
+		singleton="true">
+		<property name="values">
+			<ref bean="BrokerValues" />
+		</property>
+	</bean>
+
+	<bean name="BrokerValues"
+		class="de.dailab.jiactng.agentcore.comm.broker.BrokerValues">
+		<property name="jmx" value="false"></property>
+		<property name="discoveryAddress" value="239.255.2.45:5555"></property>
+		<property name="discoveryMethod" value="multicast"></property>
+		<property name="url" value="tcp://localhost:61616"></property>
+		<property name="name" value="PlatformBroker"></property>
+	</bean>
+
+	<bean name="chatGUIBean"
+		class="de.dailab.jiactng.agentcore.comm.examples.ChatGuiBean"
+		singleton="false">
+	</bean>
 
 </beans>

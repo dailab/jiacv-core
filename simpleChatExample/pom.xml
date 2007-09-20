@@ -4,6 +4,13 @@
   <artifactId>SimpleChatExample</artifactId>
   <version>0.0.1</version>
   <description>A simple example for a gui-driven chat using the communicationbean for jiac-tng</description>
+  
+  <parent>
+        <groupId>de.dailab.jiactng</groupId>
+        <artifactId>examples</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+  
   <dependencies>
     <dependency>
       <groupId>com.jgoodies</groupId>

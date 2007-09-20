@@ -25,7 +25,6 @@ import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IJiacMessageListener;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
-import de.dailab.jiactng.agentcore.comm.helpclasses.TestContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 

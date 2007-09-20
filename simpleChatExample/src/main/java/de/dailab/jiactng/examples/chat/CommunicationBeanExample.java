@@ -23,7 +23,7 @@ public class CommunicationBeanExample {
 	/** A customized logging configuration will be used instead of the default configuration. */
 	public Log log = LogFactory.getLog(getClass().getName());
 	
-	private String loggingConfig = "classpath:de/dailab/jiactng/agentcore/comm/examples/myLog4j.properties";
+	private String loggingConfig = "classpath:de/dailab/jiactng/examples/chat/myLog4j.properties";
 	private static ClassPathXmlApplicationContext _xmlCommunicationBeanContext;
 	
 	private static SimpleAgentNode _communicationPlatform;
@@ -72,7 +72,7 @@ public class CommunicationBeanExample {
 		
 		setupLoggingConfig();
 				
-		_xmlCommunicationBeanContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/communicationTestContext.xml");
+		_xmlCommunicationBeanContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/examples/chat/communicationTestContext.xml");
 		
 		_communicationPlatform = (SimpleAgentNode) _xmlCommunicationBeanContext.getBean("CommunicationPlatform");
 

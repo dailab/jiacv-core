@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.dailab.jiactng.examples</groupId>
+  <artifactId>SimpleChatExample</artifactId>
+  <version>0.0.1</version>
+  <description>A simple example for a gui-driven chat using the communicationbean for jiac-tng</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.jgoodies</groupId>
+      <artifactId>forms</artifactId>
+      <version>1.0.7</version>
+    </dependency>
+    <dependency>
+      <groupId>de.dailab.jiactng</groupId>
+      <artifactId>agentCore</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>

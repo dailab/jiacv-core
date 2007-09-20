@@ -2,80 +2,115 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
-  - Application context definition for "example" DispatcherServlet.
-  -->
+	- Application context definition for "example" DispatcherServlet.
+-->
 <beans>
 
-  <bean name="ServiceTestPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
-    <property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/service/serviceLog4j.properties"/>
-    <property name="agents">
-      <list>
-        <ref bean="Provider"/>
-        <ref bean="User"/>
-      </list>
-    </property>
-  </bean>
+	<bean name="ServiceTestPlatform"
+		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+		<property name="loggingConfig"
+			value="classpath:de/dailab/jiactng/agentcore/comm/service/serviceLog4j.properties" />
+		<property name="agents">
+			<list>
+				<ref bean="Provider" />
+				<ref bean="User" />
+			</list>
+		</property>
+	</bean>
 
 
-  <bean name="Provider" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
-    <property name="memory"><ref bean="memory"/></property>
-    <property name="execution"><ref bean="simpleExecCycle"/></property>
-    <property name="agentBeans">
-      <list>
-        <ref bean="communicationBean"/>
-        <ref bean="providerServiceBean"/>
-        <ref bean="openBean"/>
-      </list>
-    </property>
-  </bean>
-  
-  <bean name="User" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
-    <property name="memory"><ref bean="memory"/></property>
-    <property name="execution"><ref bean="simpleExecCycle"/></property>
-    <property name="agentBeans">
-      <list>
-        <ref bean="communicationBean"/>
-        <ref bean="serviceBean"/>
-        <ref bean="clientBean"/>
-      </list>
-    </property>
-  </bean>
-  
-  <bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
-    <!--property name="timeOut" value="-1"/-->
-  </bean>
-  
-  <bean name="clientBean" class="de.dailab.jiactng.agentcore.comm.service.ClientBean" singleton="false"/>
-  <bean name="serviceBean" class="de.dailab.jiactng.agentcore.comm.service.ServiceBean" singleton="false"/>
-  
-  <bean name="openBean" class="de.dailab.jiactng.agentcore.comm.service.OpenBean" singleton="true"/>
-  <bean name="providerServiceBean" class="de.dailab.jiactng.agentcore.comm.service.ServiceBean" singleton="false">
-    <property name="actionTemplates">
-    	<set>
-    		<bean class="de.dailab.jiactng.agentcore.action.Action" singleton="false">
-    		  <property name="providerBean"><ref bean="openBean"/></property>
-    		</bean>
-    	</set>
-    </property>
-  </bean>
+	<bean name="Provider" class="de.dailab.jiactng.agentcore.Agent"
+		singleton="false">
+		<property name="memory">
+			<ref bean="memory" />
+		</property>
+		<property name="execution">
+			<ref bean="simpleExecCycle" />
+		</property>
+		<property name="agentBeans">
+			<list>
+				<ref bean="communicationBean" />
+				<ref bean="providerServiceBean" />
+				<ref bean="openBean" />
+			</list>
+		</property>
+	</bean>
 
-  <bean name="communicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false">
-    <property name="transports">
-      <set>
-        <ref bean="jmsTransport"/>
-      </set>
-    </property>
-  </bean>
+	<bean name="User" class="de.dailab.jiactng.agentcore.Agent"
+		singleton="false">
+		<property name="memory">
+			<ref bean="memory" />
+		</property>
+		<property name="execution">
+			<ref bean="simpleExecCycle" />
+		</property>
+		<property name="agentBeans">
+			<list>
+				<ref bean="communicationBean" />
+				<ref bean="serviceBean" />
+				<ref bean="clientBean" />
+			</list>
+		</property>
+	</bean>
 
-  <bean name="jmsTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport" singleton="false">
-    <constructor-arg type="java.lang.String" value="jms"/>
-    <property name="connectionFactory"><ref bean="amqConnectionFactory"/></property>
-  </bean>
+	<bean name="memory"
+		class="de.dailab.jiactng.agentcore.knowledge.Memory"
+		singleton="false">
+		<!--property name="timeOut" value="-1"/-->
+	</bean>
 
-  <bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false">
-  </bean>
-  
-  <bean name="amqConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory" singleton="false">
-  </bean>
+	<bean name="clientBean"
+		class="de.dailab.jiactng.agentcore.comm.service.ClientBean"
+		singleton="false" />
+	<bean name="serviceBean"
+		class="de.dailab.jiactng.agentcore.comm.service.ServiceBean"
+		singleton="false" />
+
+	<bean name="openBean"
+		class="de.dailab.jiactng.agentcore.comm.service.OpenBean"
+		singleton="true" />
+	<bean name="providerServiceBean"
+		class="de.dailab.jiactng.agentcore.comm.service.ServiceBean"
+		singleton="false">
+		<property name="actionTemplates">
+			<set>
+				<bean class="de.dailab.jiactng.agentcore.action.Action"
+					singleton="false">
+					<property name="providerBean">
+						<ref bean="openBean" />
+					</property>
+				</bean>
+			</set>
+		</property>
+	</bean>
+
+	<bean name="communicationBean"
+		class="de.dailab.jiactng.agentcore.comm.CommunicationBean"
+		singleton="false">
+		<property name="transports">
+			<set>
+				<ref bean="jmsTransport" />
+			</set>
+		</property>
+	</bean>
+
+	<bean name="jmsTransport"
+		class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
+		singleton="false">
+		<constructor-arg type="java.lang.String" value="jms" />
+		<property name="connectionFactory">
+			<ref bean="amqConnectionFactory" />
+		</property>
+	</bean>
+
+	<bean name="simpleExecCycle"
+		class="de.dailab.jiactng.agentcore.SimpleExecutionCycle"
+		singleton="false">
+	</bean>
+
+	<bean name="amqConnectionFactory"
+		class="org.apache.activemq.spring.ActiveMQConnectionFactory"
+		singleton="false">
+	</bean>
 
 </beans>

@@ -3,7 +3,9 @@
 
 <beans>
 
-  <bean name="myPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
-    <property name="loggingConfig" value="classpath:myLog4j.properties"/>
-  </bean>
+	<bean name="myPlatform"
+		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+		<property name="loggingConfig"
+			value="classpath:myLog4j.properties" />
+	</bean>
 </beans>

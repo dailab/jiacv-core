@@ -59,6 +59,7 @@ public class JmsTransportExample implements IMessageTransportDelegate {
 	
 	public void run() throws Exception {
 		setupLoggingConfig();
+		
 		log.debug("begin of demonstration");
 		
 		IJiacContent payload = new TestContent();

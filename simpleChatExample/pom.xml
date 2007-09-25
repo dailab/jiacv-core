@@ -1,26 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>de.dailab.jiactng.examples</groupId>
-  <artifactId>SimpleChatExample</artifactId>
-  <version>0.0.1</version>
-  <description>A simple example for a gui-driven chat using the communicationbean for jiac-tng</description>
-  
-  <parent>
-        <groupId>de.dailab.jiactng</groupId>
-        <artifactId>examples</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-  
-  <dependencies>
-    <dependency>
-      <groupId>com.jgoodies</groupId>
-      <artifactId>forms</artifactId>
-      <version>1.0.7</version>
-    </dependency>
-    <dependency>
-      <groupId>de.dailab.jiactng</groupId>
-      <artifactId>agentCore</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ==================================================================================
+	|
+	|   This pom.xml    : http://maven.apache.org/maven-model/maven.html
+	|
+	|   Getting Started : http://maven.apache.org/guides/getting-started/index.html
+	|   Guides          : http://maven.apache.org/guides/index.html
+	|
+	================================================================================ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      	http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>de.dailab.jiactng</groupId>
+		<artifactId>examples</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.dailab.jiactng.examples</groupId>
+	<artifactId>SimpleChatExample</artifactId>
+	<name>${project.groupId} - ${project.artifactId}</name>
+	<version>0.0.1</version>
+	<description>A simple example for a gui-driven chat using the communicationbean for jiac-tng</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.jgoodies</groupId>
+			<artifactId>forms</artifactId>
+			<version>1.0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>de.dailab.jiactng</groupId>
+			<artifactId>agentCore</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
 </project>

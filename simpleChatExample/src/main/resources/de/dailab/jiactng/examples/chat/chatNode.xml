@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+	- Application context definition for usage within CommunicationBean related tests and examples 
+-->
+<beans>
+	<bean name="CommunicationPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+		<property name="embeddedBroker">
+			<ref bean="amqBroker" />
+		</property>
+	</bean>
+
+	<bean name="amqBroker" class="de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ" singleton="true">
+		<property name="values">
+			<ref bean="BrokerValues" />
+		</property>
+	</bean>
+
+	<bean name="BrokerValues" class="de.dailab.jiactng.agentcore.comm.broker.BrokerValues">
+		<property name="jmx" value="false"></property>
+		<property name="discoveryAddress" value="239.255.2.45:5555"></property>
+		<property name="discoveryMethod" value="multicast"></property>
+		<property name="url" value="tcp://localhost:61616"></property>
+		<property name="name" value="PlatformBroker"></property>
+	</bean>
+</beans>

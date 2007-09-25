@@ -2,17 +2,22 @@ package de.dailab.jiactng.examples.chat;
 
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
@@ -37,14 +42,92 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	private JLabel _addressLine;
 	private JLabel _inputDescription;
 	private JList _messagesReceived;
+	private ListCellRenderer _renderer = new MessageCellRenderer();
 	private volatile String[] _messages;
 	private JTextField _inputField;
 	private int _newMessageIndex = 0;
 	private final int _maxMessages = 20;
 	private JPanel _panel;
 	
+	private final DefaultListModel _messageListModel = new DefaultListModel(); 
+	
 	private CommunicationBean _cBean;
 	private ArrayList<ICommunicationAddress> addressList = new ArrayList<ICommunicationAddress>();
+	
+	
+	private class ListElement {
+		public String message = "";
+		public ICommunicationAddress from;
+		public ICommunicationAddress at;
+		
+		public ListElement(){
+			message = "message";
+		}
+		
+		public ListElement(String messageText){
+			message = messageText;
+		}
+		
+		public String toString(){
+			return message;
+		}
+		
+	}
+	
+	private class ListElementHead extends ListElement {
+		public ListElementHead(String messageText){
+			super(messageText);
+		}
+		
+		public ListElementHead( ListElement le){
+			this.message = le.message;
+			this.from = le.from;
+			this.at = le.at;
+		}
+		
+		public String toString(){
+			return "message received from: " + from + " at " + at;
+		}
+		
+	}
+	
+	class MessageCellRenderer implements ListCellRenderer {
+		  protected DefaultListCellRenderer defaultRenderer = new DefaultListCellRenderer();
+
+		  public Component getListCellRendererComponent(JList list, Object value, int index,
+		      boolean isSelected, boolean cellHasFocus) {
+			  String listFont = list.getFont().getName();
+			  int listFontSize = list.getFont().getSize();
+
+			  JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
+					  isSelected, cellHasFocus);
+
+			  if (value instanceof ListElementHead) {
+				  ListElementHead listThis = (ListElementHead) value;
+
+				  renderer.setText(listThis.toString());
+				  renderer.setFont(new Font(listFont, Font.ITALIC, listFontSize) );
+				  
+				  if (!isSelected) {
+					  renderer.setForeground(Color.RED);
+				  }
+				  
+			  } else {
+				 ListElement listThat = (ListElement) value;
+				 
+				 renderer.setText(listThat.toString());
+				 renderer.setFont(list.getFont());
+				 
+				 if (!isSelected) {
+					  renderer.setForeground(list.getForeground());
+				  }
+				 
+			  }
+			  
+			  return renderer;
+		  }
+	}
+
 	
 	public ChatGuiBean() {
 		setBeanName("CommunicationGuiBean");
@@ -59,12 +142,24 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			log.debug("Payload is instanceof TestContent");
 		}
 		
-		printLine("Message arrived from " + message.getSender());
+//		printLine("Message arrived from " + message.getSender() + " at " + at.toUnboundAddress().toString());
 		
 		if (payload != null){
-			printLine(payload.getContent());
+//			printLine(payload.getContent());
+			
+			ListElement le = new ListElement(payload.getContent());
+			le.from = message.getSender();
+			le.at = at;
+			ListElementHead leh = new ListElementHead(le);
+			
+			
+			_messageListModel.add(_newMessageIndex++ % _maxMessages, leh);
+			_messageListModel.add(_newMessageIndex++ % _maxMessages, le);
+			
+			System.err.println(_messageListModel.size());
+//			_messagesReceived.getCellRenderer()
 		} else {
-			printLine("Content could not be decyphered");
+//			printLine("Content could not be decyphered");
 		}
 	}
 	
@@ -179,7 +274,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 				"left:50dlu:grow, 50dlu:grow, left:50dlu:grow", // Columspecification
 				"center:10dlu:none, " + // LabelRow
 				"center:10dlu:none, " + // AddressRow
-				"center:200dlu:grow(1.0), " + // ListRow
+				"center:pref:grow, " + // ListRow
 				"center:20dlu:none, " + //InputDescription 
 				"center:10dlu:none, center:3dlu:none"	// InputRow
 				);
@@ -209,13 +304,19 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		_messages = new String[_maxMessages+1];
 		_messages[0] = "no messages yet";
 		
-		
-		_messagesReceived = new JList(_messages);
+//		_messageListModel.setSize(_maxMessages +1);
+	   
+		_messagesReceived = new JList( _messageListModel);
 		_messagesReceived.setBackground(Color.BLUE);
 		_messagesReceived.setForeground(Color.LIGHT_GRAY);
 		_messagesReceived.setFixedCellHeight(14);
+		_messagesReceived.setCellRenderer(_renderer);
 		_messagesReceived.validate();
 		
+		
+	    JScrollPane scrollPane = new JScrollPane(_messagesReceived);
+	    scrollPane.setMinimumSize(new Dimension(100, 200));
+	    scrollPane.setPreferredSize(new Dimension(100,300));
 		
 		_inputDescription = new JLabel("Format: [g|m].[Name of group or messagebox].[Messagetext]");
 		
@@ -277,15 +378,15 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 				_inputField.setText("");
 			}
 		});
-	
 		
 		_panel.add(_topline, cc.xywh(1, 1, 3, 1));
 		_panel.add(_addressLine, cc.xywh(1, 2, 3, 1));
-		_panel.add(_messagesReceived, cc.xywh(1, 3, 3, 1));
+//		_panel.add(_messagesReceived, cc.xywh(1, 3, 3, 1));
+		_panel.add(scrollPane, cc.xywh(1, 3, 3, 1));
 		_panel.add(_inputDescription, cc.xywh(1, 4, 3, 1));
 		_panel.add(_inputField, cc.xywh(1, 5, 3, 1));
 		_panel.setBackground(Color.LIGHT_GRAY);
-				
+		
 		// add components to the Frame and make it visible
 		_f.add(_panel);
 
@@ -315,12 +416,12 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
 			_addressLine.validate();
 			
-			printLine("CommunicationBean installed, ready to chat");
+//			printLine("CommunicationBean installed, ready to chat");
 		} else {
 			_messages[1] = "CommunicationBean not installed!";
 		}
 		
-		printLine("type \"help\" to get some help");
+//		printLine("type \"help\" to get some help");
 		
 		_f.pack();
 		_f.setVisible( true ); 

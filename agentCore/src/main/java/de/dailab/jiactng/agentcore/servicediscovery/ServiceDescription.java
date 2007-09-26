@@ -355,7 +355,15 @@ public class ServiceDescription implements IServiceDescription {
 		return sb.toString();
 	}
 	
+	/** 
+	 * hilfsmethode.. wenns die woanders schon gibt.. bitte diese entfernen
+	 * testet ob liste nur nulls enthält
+	 * @param list
+	 * @return true, wenn liste null oder leer ist oder nur nullen enthält, false sonst
+	 */
 	private static boolean containsNullOnly(List<?> list) {
+		if (list == null ) 
+			return true;
 		for(Object o : list) {
 			if (o!= null) {
 				return false;

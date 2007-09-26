@@ -239,12 +239,24 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	
 	private void changeAddress(String address){
 		try {
+			ICommunicationAddress oldAddress = _messageBoxAddress.toUnboundAddress();
 			_cBean.destroyMessageBox(_messageBoxAddress);
 			_messageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress(address);
 			_cBean.register(this, _messageBoxAddress, null);
 			_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
 			_addressLine.validate();
+			TestContent payload = new TestContent(oldAddress + " is now known as " + _messageBoxAddress.toUnboundAddress());
+			JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
+			try {
+				_cBean.send(
+						jMessage,
+						CommunicationAddressFactory.createGroupAddress("all")
+						); 
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			}
 			_f.repaint();
+			
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}

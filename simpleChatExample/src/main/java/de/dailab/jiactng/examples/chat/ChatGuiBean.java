@@ -46,7 +46,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	private volatile String[] _messages;
 	private JTextField _inputField;
 	private int _newMessageIndex = 0;
-	private final int _maxMessages = 20;
+	private final int _maxMessages = 50;
 	private JPanel _panel;
 	
 	private final DefaultListModel _messageListModel = new DefaultListModel(); 
@@ -142,10 +142,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			log.debug("Payload is instanceof TestContent");
 		}
 		
-//		printLine("Message arrived from " + message.getSender() + " at " + at.toUnboundAddress().toString());
-		
 		if (payload != null){
-//			printLine(payload.getContent());
 			
 			ListElement le = new ListElement(payload.getContent());
 			le.from = message.getSender();
@@ -156,19 +153,16 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			_messageListModel.add(_newMessageIndex++ % _maxMessages, leh);
 			_messageListModel.add(_newMessageIndex++ % _maxMessages, le);
 			
-			System.err.println(_messageListModel.size());
-//			_messagesReceived.getCellRenderer()
 		} else {
-//			printLine("Content could not be decyphered");
+			printLine("Content could not be decyphered");
 		}
 	}
 	
 	private void printLine(String line){
-		_messages[_newMessageIndex+1 %_maxMessages] = "";
-		_messages[_newMessageIndex] = line;
-		_newMessageIndex = ++_newMessageIndex %_maxMessages;
-		_f.repaint();
+		ListElement le = new ListElement(line);
+		_messageListModel.add(_newMessageIndex++ % _maxMessages, le);
 	}
+	
 	
 	private void printHelp(){
 		printLine("type  \"pack\" to resize the window; ");
@@ -303,9 +297,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		
 		_messages = new String[_maxMessages+1];
 		_messages[0] = "no messages yet";
-		
-//		_messageListModel.setSize(_maxMessages +1);
-	   
+			   
 		_messagesReceived = new JList( _messageListModel);
 		_messagesReceived.setBackground(Color.BLUE);
 		_messagesReceived.setForeground(Color.LIGHT_GRAY);
@@ -381,7 +373,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		
 		_panel.add(_topline, cc.xywh(1, 1, 3, 1));
 		_panel.add(_addressLine, cc.xywh(1, 2, 3, 1));
-//		_panel.add(_messagesReceived, cc.xywh(1, 3, 3, 1));
 		_panel.add(scrollPane, cc.xywh(1, 3, 3, 1));
 		_panel.add(_inputDescription, cc.xywh(1, 4, 3, 1));
 		_panel.add(_inputField, cc.xywh(1, 5, 3, 1));
@@ -416,15 +407,27 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
 			_addressLine.validate();
 			
-//			printLine("CommunicationBean installed, ready to chat");
+			TestContent payload = new TestContent("m." + _messageBoxAddress.toString().substring(7) + " is ready to chat");
+			JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
+			try {
+				_cBean.send(
+						jMessage,
+						CommunicationAddressFactory.createGroupAddress("all")
+						); 
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			}
+			
+			printLine("CommunicationBean installed, ready to chat");
 		} else {
-			_messages[1] = "CommunicationBean not installed!";
+		 	printLine("CommunicationBean not installed!");
 		}
 		
-//		printLine("type \"help\" to get some help");
+		printLine("type \"help\" to get some help");
 		
 		_f.pack();
 		_f.setVisible( true ); 
+		
 	}
 		
 	@Override
@@ -434,6 +437,16 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			_cBean.destroyMessageBox(_messageBoxAddress);
 		}
 		_f.setVisible(false);
+		TestContent payload = new TestContent("m." + _messageBoxAddress.toString().substring(7) + " has left the chat");
+		JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
+		try {
+			_cBean.send(
+					jMessage,
+					CommunicationAddressFactory.createGroupAddress("all")
+					); 
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
 		log.debug("ChatGuiBean has stopped");
 	}
 	

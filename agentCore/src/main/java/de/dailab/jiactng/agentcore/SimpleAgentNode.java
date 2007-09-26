@@ -275,6 +275,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @return list of agent names
 	 */
 	public ArrayList<String> getAgents() {
+		if (_agents == null){
+			return new ArrayList<String>();
+		}
 		ArrayList<String> result = new ArrayList<String>();
 		for (IAgent a : _agents) {
 			result.add(a.getAgentName());

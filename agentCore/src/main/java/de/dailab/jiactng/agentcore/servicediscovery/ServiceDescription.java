@@ -9,6 +9,7 @@ import java.util.Set;
 /**
  * Eine Implementation für die Servicebeschreibung Wenn wsdl-Beschreibung null
  * ist, wird davon ausgegangen, dass es kein WebService ist.
+ * @TODO equals, hashCode nachziehen
  * @author janko
  */
 public class ServiceDescription implements IServiceDescription {
@@ -18,12 +19,14 @@ public class ServiceDescription implements IServiceDescription {
 	private String _name;
 	private Set<String> _keywords;
 	private List<ServiceParameter> _inputParams;
+	/** wenn null, gibts keine returnwerte	 */
 	private List<ServiceParameter> _outputParams;
 	private String _preCondition;
 	private String _postCondition;
 	private String _providerAddress;
 	private String _qoSRating;
 	private String _wsdl;
+	private ServiceParameter _inputWrapper;
 
 	/**
 	 * Full Constructor...
@@ -299,8 +302,16 @@ public class ServiceDescription implements IServiceDescription {
 		_name = name;
 	}
 
+	/**
+	 * leere Liste, oder Liste nur mit nulls wird ignoriert; -> die outputParams werden auf null gesetzt
+	 * @param outputParams
+	 */
 	public void setOutputParameter(List<ServiceParameter> outputParams) {
-		_outputParams = outputParams;
+		if (containsNullOnly(outputParams)) {
+			_outputParams = null;
+		} else {
+			_outputParams = outputParams;
+		}
 	}
 
 	public void setPostCondition(String postCondition) {
@@ -323,6 +334,14 @@ public class ServiceDescription implements IServiceDescription {
 		_wsdl = wsdl;
 	}
 
+	public ServiceParameter getInputWrapper() {
+		return _inputWrapper;
+	}
+
+	public void setInputWrapper(ServiceParameter wrapper) {
+		_inputWrapper = wrapper;
+	}
+	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append('[').append(_name).append(',')
@@ -334,5 +353,14 @@ public class ServiceDescription implements IServiceDescription {
     .append(_qoSRating).append(',')
 		.append("Webservice?:").append(isWebService()).append(']');
 		return sb.toString();
+	}
+	
+	private static boolean containsNullOnly(List<?> list) {
+		for(Object o : list) {
+			if (o!= null) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

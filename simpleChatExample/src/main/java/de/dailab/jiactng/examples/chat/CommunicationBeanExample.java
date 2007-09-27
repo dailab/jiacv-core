@@ -67,9 +67,14 @@ public class CommunicationBeanExample {
 		
 		while(true){
 			System.out.println();
-			System.out.println("Please type quit to do so");
 			System.out.println();
-			System.out.println("Other Options:");
+			System.out.println();
+			System.out.println();
+			System.out.println("=============================");
+			System.out.println("= Please type quit to do so =");
+			System.out.println("=============================");
+			System.out.println();
+			System.out.println("Other type Options:");
 			System.out.println(" \"addAgent\"");
 			System.out.println(" \"ListAgents\"");
 			System.out.println(" \"removeAgent\"");

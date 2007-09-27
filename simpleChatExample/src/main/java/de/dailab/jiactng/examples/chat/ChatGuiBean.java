@@ -231,7 +231,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		ICommunicationAddress unbound = _messageBoxAddress.toUnboundAddress();
 		printLine(unbound.toString());
 		for (ICommunicationAddress address : addressList){
-			printLine(address.toUnboundAddress().toString());
+			unbound = address.toUnboundAddress();
+			printLine(unbound.toString());
 		}
 	}
 	

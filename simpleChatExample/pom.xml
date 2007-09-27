@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- ==================================================================================
 	|
 	|   This pom.xml    : http://maven.apache.org/maven-model/maven.html
@@ -10,13 +10,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       	http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                      	
+	<modelVersion>4.0.0</modelVersion>
+	
 	<parent>
 		<groupId>de.dailab.jiactng</groupId>
 		<artifactId>examples</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-
-	<modelVersion>4.0.0</modelVersion>
+	
 	<groupId>de.dailab.jiactng.examples</groupId>
 	<artifactId>SimpleChatExample</artifactId>
 	<name>${project.groupId} - ${project.artifactId}</name>
@@ -33,6 +35,36 @@
 			<groupId>de.dailab.jiactng</groupId>
 			<artifactId>agentCore</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+		</dependency>		
 	</dependencies>
+	
+	<build>
+  		<plugins>
+  			<plugin>
+  				<artifactId>maven-assembly-plugin</artifactId>
+  				<version>2.1</version>
+  				<executions>
+  					<execution>
+  						<phase>package</phase>
+  						<goals>
+  							<goal>assembly</goal>
+  						</goals>
+  					</execution>
+  				</executions>
+  				<configuration>
+  					<descriptors>
+  						<descriptor>
+  							${basedir}/standalone.assembly
+  						</descriptor>
+  					</descriptors>
+  					<outputDirectory>
+  						${project.build.directory}
+  					</outputDirectory>
+  					<workDirectory>
+  						${project.build.directory}/assembly/work
+  					</workDirectory>
+  				</configuration>
+  			</plugin>
+  		</plugins>
+  	</build>
 </project>

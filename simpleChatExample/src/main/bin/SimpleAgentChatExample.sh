@@ -17,4 +17,4 @@ do
     fi
 done
 
-$JAVA_HOME/bin/java -cp $LOCALCLASSPATH de.dailab.jiactng.examples.chat.CommunicationBeanExample
+$JAVA_HOME/bin/java -cp $LOCALCLASSPATH de.dailab.jiactng.examples.chat.SimpleChatExample

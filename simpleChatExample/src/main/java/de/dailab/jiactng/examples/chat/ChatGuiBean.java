@@ -254,7 +254,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			}
 
 			try {
-				_cBean.register(address);
+				_cBean.register(this, address, null);
 				addressList.add(address);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
@@ -284,7 +284,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			}
 
 			try {
-				_cBean.unregister(address);
+				_cBean.unregister(this, address, null);
 				addressList.remove(address);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
@@ -298,10 +298,10 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 * @author Martin Loeffelholz
 	 */
 	private void stopListenToAll(){
-		if (_cBean != null){
+		if ((_cBean != null) && (!addressList.isEmpty())){
 			for (ICommunicationAddress address : addressList){
 				try {
-					_cBean.unregister(address);
+					_cBean.unregister(this, address, null);
 				} catch (CommunicationException e) {
 					e.printStackTrace();
 				}
@@ -549,8 +549,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			_messageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress(_beanName);
 			_cBean.register(this, _messageBoxAddress, null);
 			
-			_cBean.register(this, CommunicationAddressFactory.createGroupAddress("all"), null);
-			addressList.add(CommunicationAddressFactory.createGroupAddress("all"));
+			listenTo("g.all");
 			
 			_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
 			_addressLine.validate();
@@ -586,10 +585,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 */
 	public void doStop() throws Exception {
 		super.doStop();
-		if (_messageBoxAddress != null){
-			_cBean.destroyMessageBox(_messageBoxAddress);
-		}
-		_f.setVisible(false);
+		
 		TestContent payload = new TestContent("m." + _messageBoxAddress.toString().substring(7) + " has left the chat");
 		JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
 		try {
@@ -601,6 +597,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			e.printStackTrace();
 		}
 		log.debug("ChatGuiBean has stopped");
+		_f.setVisible(false);
 	}
 	
 	@Override
@@ -611,6 +608,11 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 */
 	public void doCleanup() throws Exception {
 		super.doCleanup();
+		if (_messageBoxAddress != null){
+			_cBean.unregister(this, _messageBoxAddress, null);
+		}
+		stopListenToAll();
+		
 		_f = null;
 		_cBean = null;
 		log.debug("Cleanup was finished");

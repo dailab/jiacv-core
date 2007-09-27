@@ -21,7 +21,7 @@ import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
-public class CommunicationBeanExample {
+public class SimpleChatExample {
     private static ByteArrayResource getChatAgentConfiguration(String agentName) {
         ByteArrayOutputStream buffer= new ByteArrayOutputStream();
         PrintStream printer= new PrintStream(buffer);
@@ -154,7 +154,7 @@ public class CommunicationBeanExample {
 				}
 			}
 			
-			
+						
 			if (input.equalsIgnoreCase("quit")){
 				System.out.println();
 				System.out.println();
@@ -208,7 +208,7 @@ public class CommunicationBeanExample {
     
     
     public static void main(String[] args) {
-        CommunicationBeanExample cbe = new CommunicationBeanExample();
+        SimpleChatExample cbe = new SimpleChatExample();
         cbe.run();
     }
 }

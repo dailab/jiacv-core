@@ -2,41 +2,62 @@ package de.dailab.jiactng.examples.chat;
 
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
-import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 public class CommunicationBeanExample {
-
+    private static ByteArrayResource getChatAgentConfiguration(String agentName) {
+        ByteArrayOutputStream buffer= new ByteArrayOutputStream();
+        PrintStream printer= new PrintStream(buffer);
+        printer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        printer.println("<!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">");
+        printer.println("<beans>");
+        printer.append("<bean name=\"").append(agentName).append("\" parent=\"chatAgentTemplate\" singleton=\"false\" />");
+        printer.println("</beans>");
+        printer.flush();
+        printer.close();
+        return new ByteArrayResource(buffer.toByteArray());
+    }
 
 	/** A customized logging configuration will be used instead of the default configuration. */
 	public Log log = LogFactory.getLog(getClass().getName());
 	
 	private String loggingConfig = "classpath:de/dailab/jiactng/examples/chat/myLog4j.properties";
-	private static ClassPathXmlApplicationContext _xmlCommunicationBeanContext;
+	private ClassPathXmlApplicationContext _xmlCommunicationBeanContext;
 	
-	private static SimpleAgentNode _communicationPlatform;
-	
-	
-	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		CommunicationBeanExample cbe = new CommunicationBeanExample();
-		cbe.run();
-	}
+	private SimpleAgentNode _communicationPlatform;
+    
+    private void addAgent(String agentName) {
+        GenericApplicationContext context= new GenericApplicationContext(_xmlCommunicationBeanContext);
+        XmlBeanDefinitionReader xmlReader= new XmlBeanDefinitionReader(context);
+        xmlReader.loadBeanDefinitions(getChatAgentConfiguration(agentName));
+        context.refresh();
+
+        IAgent newAgent = (IAgent) context.getBean(agentName);
+        _communicationPlatform.addAgent(newAgent);
+        try {
+            newAgent.init();
+            newAgent.start();
+        } catch (LifecycleException e) {
+            e.printStackTrace();
+        }
+    }
 
 	public void run(){
 		setup();
@@ -70,19 +91,7 @@ public class CommunicationBeanExample {
 				}
 				
 				if (input != null){
-					ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("de/dailab/jiactng/examples/chat/chatAgentTemplate.xml");
-					IAgent newAgent = (IAgent) context.getBean("dummyCommunicatorName");
-					newAgent.setBeanName(input);
-
-					_communicationPlatform.addAgent(newAgent);
-					try {
-						newAgent.init();
-						newAgent.start();
-					} catch (LifecycleException e) {
-						e.printStackTrace();
-					}
-				
-					
+                    addAgent(input);
 				}
 			}
 			
@@ -158,7 +167,10 @@ public class CommunicationBeanExample {
 		
 		setupLoggingConfig();
 				
-		_xmlCommunicationBeanContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/examples/chat/chatNode.xml");
+		_xmlCommunicationBeanContext = new ClassPathXmlApplicationContext(new String[]{
+            "de/dailab/jiactng/examples/chat/chatNode.xml",
+            "de/dailab/jiactng/examples/chat/chatAgentTemplate.xml"
+        });
 		
 		_communicationPlatform = (SimpleAgentNode) _xmlCommunicationBeanContext.getBean("CommunicationPlatform");
 
@@ -188,4 +200,10 @@ public class CommunicationBeanExample {
 			fnfe.printStackTrace();
 		}
 	}
+    
+    
+    public static void main(String[] args) {
+        CommunicationBeanExample cbe = new CommunicationBeanExample();
+        cbe.run();
+    }
 }

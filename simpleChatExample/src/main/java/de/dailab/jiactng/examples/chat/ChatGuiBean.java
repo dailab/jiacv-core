@@ -210,8 +210,10 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 */
 	private void printHelp(){
 		printLine("type  \"pack\" to resize the window; ");
+		printLine("type \"clear\" to clear the window");
 		printLine("To send a Message, type \"g.<Name>.\" for a group or \"m.<Name>.\" ");
 		printLine("for a messagebox address followed by your message.");
+		printLine("Also see formatdescription over the inputfield.");
 		printLine("To change your Address, type \"c.<newMessageBoxName>\"");
 		printLine("To Listen to a new Address, type \"listen.[g|m].<AddressName>\"");
 		printLine("To stop listen to a Address, type \"stopListen.[g|m].<AddressName>\"");
@@ -226,7 +228,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 */
 	private void printAddressList(){
 		printLine("List of Addresses Listening To:");
-		printLine(_messageBoxAddress.toUnboundAddress().toString());
+		ICommunicationAddress unbound = _messageBoxAddress.toUnboundAddress();
+		printLine(unbound.toString());
 		for (ICommunicationAddress address : addressList){
 			printLine(address.toUnboundAddress().toString());
 		}
@@ -428,6 +431,12 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 					
 				} else if (command.equalsIgnoreCase("ListAddresses")){
 					printAddressList();
+					
+				}else if (command.equalsIgnoreCase("clear")){
+					_messagesReceived.clearSelection();
+					_messageListModel.clear();
+					_newMessageIndex = 0;
+					printLine("type \"help\" for help");
 					
 				} else if (command.startsWith("c.")){
 					changeAddress(command.substring(command.indexOf(".")+1).toLowerCase());

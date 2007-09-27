@@ -98,7 +98,7 @@ public class CommunicationBeanExample {
 			if (input.equalsIgnoreCase("listAgents")){
 				System.out.println();
 				System.out.println("Agents enlisted onto this Node:");
-				System.out.println("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
+				System.out.println("===============================");
 				ArrayList<String> agentList =_communicationPlatform.getAgents();
 				
 				if (agentList != null){

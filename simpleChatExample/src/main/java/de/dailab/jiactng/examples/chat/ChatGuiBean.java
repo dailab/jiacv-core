@@ -29,6 +29,7 @@ import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IJiacMessageListener;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
+import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 
@@ -59,45 +60,33 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 *
 	 */
 	private class ListElement {
-		public String message = "";
+		public byte[] message;
 		public ICommunicationAddress from;
 		public ICommunicationAddress at;
+		public String fontName = _messagesReceived.getFont().getName();
+		public int fontSize = _messagesReceived.getFont().getSize();
+		public int fontStyle = Font.PLAIN;
+		public Color fontColor = _messagesReceived.getForeground();
 		
 		public ListElement(){
-			message = "message";
+			message = "message".getBytes();
 		}
 		
 		public ListElement(String messageText){
-			message = messageText;
+			message = messageText.getBytes();
+		}
+		
+		public ListElement(byte[] messageTextInBytes){
+			this.message = messageTextInBytes;
 		}
 		
 		public String toString(){
-			return message;
-		}
-		
-	}
-	
-	/**
-	 * A class mostly similar to a normal listelement, but used to contain especially the addressinformations
-	 * of messages received, so they can be used for replymethods more comfortable than in the beginning
-	 * which will get implemented in a later version
-	 * 
-	 * @author Martin Loeffelholz
-	 *
-	 */
-	private class ListElementHead extends ListElement {
-		public ListElementHead(String messageText){
-			super(messageText);
-		}
-		
-		public ListElementHead( ListElement le){
-			this.message = le.message;
-			this.from = le.from;
-			this.at = le.at;
-		}
-		
-		public String toString(){
-			return "message received from: " + from + " at " + at;
+			StringBuilder outMessage = new StringBuilder();
+			for (byte digit : message){
+				outMessage.append((char) (digit & 0xFF));
+			}
+			
+			return outMessage.toString();
 		}
 		
 	}
@@ -114,35 +103,19 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 
 		  public Component getListCellRendererComponent(JList list, Object value, int index,
 		      boolean isSelected, boolean cellHasFocus) {
-			  String listFont = list.getFont().getName();
-			  int listFontSize = list.getFont().getSize();
 
-			  JLabel renderer = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
+			  JLabel listEntry = (JLabel) defaultRenderer.getListCellRendererComponent(list, value, index,
 					  isSelected, cellHasFocus);
-
-			  if (value instanceof ListElementHead) {
-				  ListElementHead listThis = (ListElementHead) value;
-
-				  renderer.setText(listThis.toString());
-				  renderer.setFont(new Font(listFont, Font.ITALIC, listFontSize) );
-				  
-				  if (!isSelected) {
-					  renderer.setForeground(Color.RED);
-				  }
-				  
-			  } else {
+			  if (value instanceof ListElement){
 				 ListElement listThat = (ListElement) value;
 				 
-				 renderer.setText(listThat.toString());
-				 renderer.setFont(list.getFont());
-				 
-				 if (!isSelected) {
-					  renderer.setForeground(list.getForeground());
-				  }
+				 listEntry.setText(listThat.toString());
+				 listEntry.setFont(new Font (listThat.fontName, listThat.fontStyle, listThat.fontSize));
+				 listEntry.setForeground(listThat.fontColor);
 				 
 			  }
 			  
-			  return renderer;
+			  return listEntry;
 		  }
 	}
 
@@ -168,27 +141,32 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		ICommunicationAddress atUnbound = at.toUnboundAddress();
 		log.debug("message received from: " + message.getSender() + " at " + atUnbound);
 		
-		TestContent payload = null;
-		if (message.getPayload() instanceof TestContent) {
-			payload = ( TestContent) message.getPayload();
-			log.debug("Payload is instanceof TestContent");
-		} else {
-			log.debug("Payload is NOT instanceof TestContent");
-		}
+		BinaryContent binaryPayload = null;
+		if (message.getPayload() instanceof BinaryContent){
+			binaryPayload = (BinaryContent) message.getPayload();
+			log.debug("Payload is instanceof BinaryContent");
+		} 
 		
-		if (payload != null){
+		if (binaryPayload != null){
 			
-			ListElement le = new ListElement(payload.getContent());
+			ListElement le = new ListElement("Received Mesage from " + message.getSender() + " at " + at);
 			le.from = message.getSender();
 			le.at = at;
-			ListElementHead leh = new ListElementHead(le);
+			le.fontColor = Color.red;
+			le.fontStyle = Font.ITALIC;
+			printLine(le);
 			
-			
-			_messageListModel.add(_newMessageIndex++, leh);
-			_messageListModel.add(_newMessageIndex++, le);
+			le = new ListElement (binaryPayload.getData());
+			le.at = at;
+			le.from = message.getSender();
+			printLine(le);
 			
 		} else {
-			printLine("Content could not be decyphered");
+			ListElement le = new ListElement("Received Message from " + message.getSender() + " at " + at);
+			le.fontColor = Color.red;
+			le.fontStyle = Font.ITALIC;
+			printLine(le);
+			printLine("Content could not be decyphered!");
 		}
 	}
 	
@@ -204,21 +182,49 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	}
 	
 	/**
+	 * prints the given line into the JList
+	 * 
+	 * @param line 		the Line to put on the List
+	 * @param fontStyle	the Style for the font as defined in constants of the class Font
+	 * @param fontColor	a color as defined in the class Color, if set to null the default color is used
+	 */
+	private void printLine(String line, int fontStyle, Color fontColor){
+		ListElement le = new ListElement(line);
+		
+		if (fontColor != null){
+			le.fontColor = fontColor;
+		}
+		le.fontStyle = fontStyle;
+		_messageListModel.add(_newMessageIndex++, le);	
+	}
+	
+	/**
+	 * prints the given Listelement into the JList.
+	 * mostly used for messagelogging purposes 
+	 * 
+	 * @param le the Listelement to display in the list
+	 */
+	private void printLine(ListElement le){
+		_messageListModel.add(_newMessageIndex++, le);
+	}
+	
+	/**
 	 * prints a list of all commands to the chatwindow
 	 * 
 	 * @author Martin Loeffelholz
 	 */
 	private void printHelp(){
-		printLine("type  \"pack\" to resize the window; ");
-		printLine("type \"clear\" to clear the window");
-		printLine("To send a Message, type \"g.<Name>.\" for a group or \"m.<Name>.\" ");
-		printLine("for a messagebox address followed by your message.");
-		printLine("Also see formatdescription over the inputfield.");
-		printLine("To change your Address, type \"c.<newMessageBoxName>\"");
-		printLine("To Listen to a new Address, type \"listen.[g|m].<AddressName>\"");
-		printLine("To stop listen to a Address, type \"stopListen.[g|m].<AddressName>\"");
-		printLine("To stop listen to all but your very own address, type \"stopListenAll\"");
-		printLine("To get a List of all used Addresses, type \"ListAddresses\" ");
+		final Color helpColor = Color.YELLOW;
+		printLine("type  \"pack\" to resize the window; ", Font.ITALIC, helpColor);
+		printLine("type \"clear\" to clear the window", Font.ITALIC, helpColor);
+		printLine("To send a Message, type \"g.<Name>.\" for a group or \"m.<Name>.\" ", Font.ITALIC, helpColor);
+		printLine("for a messagebox address followed by your message.", Font.ITALIC, helpColor);
+		printLine("Also see formatdescription over the inputfield.", Font.ITALIC, helpColor);
+		printLine("To change your Address, type \"c.<newMessageBoxName>\"", Font.ITALIC, helpColor);
+		printLine("To Listen to a new Address, type \"listen.[g|m].<AddressName>\"", Font.ITALIC, helpColor);
+		printLine("To stop listen to a Address, type \"stopListen.[g|m].<AddressName>\"", Font.ITALIC, helpColor);
+		printLine("To stop listen to all but your very own address, type \"stopListenAll\"", Font.ITALIC, helpColor);
+		printLine("To get a List of all used Addresses, type \"ListAddresses\" ", Font.ITALIC, helpColor);
 	}
 	
 	/**
@@ -320,7 +326,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 */
 	private void sendStatusMessage(String line){
 		if (_cBean != null){
-			TestContent payload = new TestContent(line);
+			BinaryContent payload = new BinaryContent(line.getBytes());
 			JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
 			try {
 				_cBean.send(
@@ -459,7 +465,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 					boolean isGroup;
 					String text;
 					String targetName;
-					TestContent payload;
+					BinaryContent payload;
 
 					isGroup = command.startsWith("g.");
 					text = command.substring(command.indexOf(".") + 1);
@@ -467,7 +473,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 						log.debug("seems to be a valid something");
 						targetName = text.substring(0, text.indexOf("."));
 						text = text.substring(text.indexOf(".") + 1);
-						payload = new TestContent(text);
+						payload = new BinaryContent(text.getBytes());
 						JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
 						try {
 							_cBean.send(
@@ -558,7 +564,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
 			_addressLine.validate();
 			
-			TestContent payload = new TestContent("m." + _messageBoxAddress.toString().substring(7) + " is ready to chat");
+			String messageText = "m." + _messageBoxAddress.toString().substring(7) + " is ready to chat";
+			BinaryContent payload = new BinaryContent(messageText.getBytes());
 			JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
 			try {
 				_cBean.send(
@@ -591,7 +598,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		super.doStop();
 		log.debug("ChatGuiBean is stopping");
 		
-		TestContent payload = new TestContent("m." + _messageBoxAddress.toString().substring(7) + " has left the chat");
+		String messageText = "m." + _messageBoxAddress.toString().substring(7) + " has left the chat";
+		BinaryContent payload = new BinaryContent(messageText.getBytes());
 		JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
 		try {
 			_cBean.send(

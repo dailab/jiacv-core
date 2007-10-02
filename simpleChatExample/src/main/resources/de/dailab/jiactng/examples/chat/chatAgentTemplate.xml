@@ -43,7 +43,7 @@
 	<bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false" />
 
 	<bean name="amqConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory" singleton="false">
-		<property name="brokerURL" value="tcp://localhost:61616" />
+		<property name="brokerURL" value="vm://localhost:61616" />
 	</bean>
 
 	<bean name="chatGUIBean" class="de.dailab.jiactng.examples.chat.ChatGuiBean" singleton="false" />

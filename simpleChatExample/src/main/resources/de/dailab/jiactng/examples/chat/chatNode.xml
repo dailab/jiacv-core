@@ -18,7 +18,7 @@
 	</bean>
 
 	<bean name="BrokerValues" class="de.dailab.jiactng.agentcore.comm.broker.BrokerValues">
-		<property name="jmx" value="false"></property>
+		<property name="jmx" value="true"></property>
 		<property name="discoveryAddress" value="239.255.2.45:5555"></property>
 		<property name="discoveryMethod" value="multicast"></property>
 		<property name="url" value="tcp://localhost:61616"></property>

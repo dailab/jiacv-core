@@ -24,6 +24,17 @@
 	      <img src="images/StaticStructure.png"/>
 	     </a>
 	     
+      <p>The next figure shows the startup procedure of a JIAC TNG
+         application. Firstly the spring framework creates the agent node,
+         agents and agent beans and sets the properties of these elements
+         according to the application context. Afterwards it invokes the
+         method afterPropertiesSet() of the agent node, which enables the
+         management, and initializes and starts all elements.</p>
+         
+         <a href="images/Startup.png">
+	      <img src="images/Startup.png"/>
+	     </a>
+
 	  <subsection name="Measurement data">
 	    <p>The data below are measured by using the test class 
 	       <code>SetupMeasurement</code> with the following environment:

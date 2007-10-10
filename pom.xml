@@ -671,7 +671,7 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
-		<repository>
+		<!-- repository>
 			<id>Ibiblio Org</id>
 			<url>http://www.ibiblio.org/maven2/</url>
 			<snapshots>
@@ -680,7 +680,7 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
-		</repository>
+		</repository-->
 		<repository>
 		  <id>codehaus-release-repo</id>
 		  <name>Codehaus Release Repo</name>
@@ -773,8 +773,8 @@
 				<sendOnError>true</sendOnError>
 				<sendOnWarning>true</sendOnWarning>
 				<configuration>
-					<!--address>axel.hessler@dai-labor.de</address-->
-					<address>jiactng-dev@dai-labor.de</address>
+					<address>axle@dai-lab.de</address>
+					<!-- address>jiactng-dev@dai-labor.de</address-->
 				</configuration>
 			</notifier>
 		</notifiers>
@@ -786,12 +786,9 @@
 	</issueManagement>
 
 	<mailingLists>
-		<mailingList>
+		<mailingList>																
 			<name>JIAC TNG Developer Mailing List</name>
 			<post>jiactng-dev@dai-labor.de</post>
-			<!-- archive>http://lists.dai-labor.de/pipermail/masp-developers/</archive-->
-			<!-- subscribe>https://lists.dai-labor.de/cgi-bin/mailman/listinfo/masp-developers</subscribe-->
-			<!-- unsubscribe>https://lists.dai-labor.de/cgi-bin/mailman/listinfo/masp-developers</unsubscribe-->
 		</mailingList>
 	</mailingLists>
 
@@ -809,6 +806,6 @@
 		<module>agentInterpreter</module>
 		<module>basicServices</module>
 		<module>examples</module>
-		<module>jiacSecurity</module>
+		<!-- module>jiacSecurity</module-->
 	</modules>
 </project>

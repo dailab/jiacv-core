@@ -773,8 +773,8 @@
 				<sendOnError>true</sendOnError>
 				<sendOnWarning>true</sendOnWarning>
 				<configuration>
-					<address>axle@dai-lab.de</address>
-					<!-- address>jiactng-dev@dai-labor.de</address-->
+					<!--address>axle@dai-lab.de</address-->
+					<address>jiactng-dev@dai-labor.de</address>
 				</configuration>
 			</notifier>
 		</notifiers>
@@ -793,9 +793,9 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/trunk/</connection>
-		<developerConnection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/trunk/</developerConnection>
-		<url>https://cvs.dai-labor.de/jiac/jiac-tng/trunk/</url>
+		<connection>scm:svn:http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</connection>
+		<developerConnection>scm:svn:http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</developerConnection>
+		<url>http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</url>
 	</scm>
 
 	<modules>

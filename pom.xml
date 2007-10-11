@@ -773,8 +773,8 @@
 				<sendOnError>true</sendOnError>
 				<sendOnWarning>true</sendOnWarning>
 				<configuration>
-					<!--address>axle@dai-lab.de</address-->
-					<address>jiactng-dev@dai-labor.de</address>
+					<address>axle@dai-lab.de</address>
+					<!-- address>jiactng-dev@dai-labor.de</address-->
 				</configuration>
 			</notifier>
 		</notifiers>

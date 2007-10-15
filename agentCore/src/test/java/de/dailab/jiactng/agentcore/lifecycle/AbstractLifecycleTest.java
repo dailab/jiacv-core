@@ -2,7 +2,7 @@
  * MockLifecycleTest.java
  * JUnit based test
  *
- * Created on 8. März 2007, 14:10
+ * Created on 8. Maerz 2007, 14:10
  */
 
 package de.dailab.jiactng.agentcore.lifecycle;

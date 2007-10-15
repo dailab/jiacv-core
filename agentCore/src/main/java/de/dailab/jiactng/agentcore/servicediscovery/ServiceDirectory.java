@@ -36,7 +36,7 @@ import de.dailab.jiactng.agentcore.management.Manageable;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
- * ServiceDirectoryBean soll Beschreibungen aller Services die auf einem AgentNode existieren, verfï¿½gbar halten. Dazu
+ * ServiceDirectoryBean soll Beschreibungen aller Services die auf einem AgentNode existieren, verfuegbar halten. Dazu
  * wird die CommBean benutzt. Es soll der memory benutzt werden.
  * 
  * @author janko
@@ -64,7 +64,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	// um auf die topic zu schreiben
 	MessageTransport _messageTransport;
 	
-	// TO DO: HIER DIE GEWÜNSCHTE SERVICETOPIC ERSTELLEN
+	// TO DO: HIER DIE GEWUENSCHTE SERVICETOPIC ERSTELLEN
 	IGroupAddress _serviceTopic = CommunicationAddressFactory.createGroupAddress("ServiceTopic");
 	
 	// zum speichern der Servicebeschreibungen
@@ -118,7 +118,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 * Methode die den Namen liefert unter der der Thread des ServiceDirectory im ThreadPool gespeichert wird
 	 * 
 	 * @param nodeName
-	 * @return ein String als Schlüssel für den ServiceDirectory-Thread
+	 * @return ein String als Schluessel fuer den ServiceDirectory-Thread
 	 */
 	public String getFutureName(String nodeName) {
 		return "ServiceDirectory:" + nodeName;
@@ -202,9 +202,9 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	}
 
 	/**
-	 * Liefert die Anzahl der registrierten Services zurück
+	 * Liefert die Anzahl der registrierten Services zurueck
 	 * 
-	 * @return Liefert die Anzahl der registrierten Services zurück
+	 * @return Liefert die Anzahl der registrierten Services zurueck
 	 */
 	public int getServiceNumber() {
 		return memory.readAllOfType(IServiceDescription.class).size();

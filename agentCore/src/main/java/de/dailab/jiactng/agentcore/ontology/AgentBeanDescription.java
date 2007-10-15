@@ -3,7 +3,7 @@ package de.dailab.jiactng.agentcore.ontology;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
- * Klasse zum Beschreiben einer AgentBean. Sie enthält die 
+ * Klasse zum Beschreiben einer AgentBean. Sie enthaelt die 
  * Meta-Infos zur AgentBean. Es ist nicht die Beans selbst.
  * @author axle
  */

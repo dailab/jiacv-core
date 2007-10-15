@@ -129,7 +129,7 @@ public final class IdFactory {
 		// eine neue Session generiert werden
 		// und zu output zugewiesen werden. 
 		while ( allocatedSessions.contains(output) ) {
-			// könnte auch ne Katastrophe auf dem Stack geben, wenn alle IDs schon vergeben sind
+			// koennte auch ne Katastrophe auf dem Stack geben, wenn alle IDs schon vergeben sind
 			output = generate(length);
 		}
 		allocatedSessions.add(output);

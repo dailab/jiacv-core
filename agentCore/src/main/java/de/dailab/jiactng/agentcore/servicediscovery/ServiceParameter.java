@@ -11,7 +11,7 @@ public class ServiceParameter implements IFact {
 
 	String _type;
 	String _name;
-	String _id; // für hibernate eingeführt.. wegen bugs in hibernate isses n string; "autincrement spalten werden im sqlstatement trotzdem aufgeführt.--> fehler"
+	String _id; // fuer hibernate eingefuehrt.. wegen bugs in hibernate isses n string; "autincrement spalten werden im sqlstatement trotzdem aufgefuehrt.--> fehler"
 	// achtung.. equals/hashCode-methode beachtet id nicht.
 
 	// gibt an, ob es ein Array ist, 
@@ -34,7 +34,7 @@ public class ServiceParameter implements IFact {
 		setType(type);
 	}
 
-	// default constructor.. für hibernate
+	// default constructor.. fuer hibernate
 	public ServiceParameter() {
 	}
 

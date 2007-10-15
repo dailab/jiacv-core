@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Eine Implementation für die Servicebeschreibung Wenn wsdl-Beschreibung null
+ * Eine Implementation fuer die Servicebeschreibung Wenn wsdl-Beschreibung null
  * ist, wird davon ausgegangen, dass es kein WebService ist.
  * @TODO equals, hashCode nachziehen
  * @author janko
@@ -60,7 +60,7 @@ public class ServiceDescription implements IServiceDescription {
 		_wsdl = wsdl;
 	}
 
-	// default constructor.. extra für hibernate
+	// default constructor.. extra fuer hibernate
 	public ServiceDescription() {
 		_keywords = new HashSet<String>();
 	}
@@ -233,7 +233,7 @@ public class ServiceDescription implements IServiceDescription {
 	// if (keywords != null && _keywords != null && keywords.length ==
 	// _keywords.length) {
 	// // achtung es wird auf die reihenfolge geachtet.. das ist evtl. nicht
-	// gewünscht
+	// gewuenscht
 	// for (int i = 0; i < keywords.length; i++) {
 	// if (!keywords[i].equals(_keywords[i])) {
 	// // sobald ein element ungleich ist.. wird false geliefert
@@ -357,9 +357,9 @@ public class ServiceDescription implements IServiceDescription {
 	
 	/** 
 	 * hilfsmethode.. wenns die woanders schon gibt.. bitte diese entfernen
-	 * testet ob liste nur nulls enthält
+	 * testet ob liste nur nulls enthaelt
 	 * @param list
-	 * @return true, wenn liste null oder leer ist oder nur nullen enthält, false sonst
+	 * @return true, wenn liste null oder leer ist oder nur nullen enthaelt, false sonst
 	 */
 	private static boolean containsNullOnly(List<?> list) {
 		if (list == null ) 

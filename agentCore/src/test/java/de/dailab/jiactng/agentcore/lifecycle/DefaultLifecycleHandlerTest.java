@@ -2,7 +2,7 @@
  * DefaultLifecycleHandlerTest.java
  * JUnit based test
  *
- * Created on 7. März 2007, 15:43
+ * Created on 7. Maerz 2007, 15:43
  */
 
 package de.dailab.jiactng.agentcore.lifecycle;

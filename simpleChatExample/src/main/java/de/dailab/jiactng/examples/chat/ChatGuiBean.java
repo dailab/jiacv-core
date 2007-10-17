@@ -33,6 +33,16 @@ import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 
+
+/**
+ * This Bean is just building and providing a GUI for useage with the JIAC-TNG framework including the communicationBean,
+ * demonstrating simple chat capabilities with a simple gui.
+ * For this Bean to work properly there have to be a communicationBean within the agent that wishes to use it.
+ * 
+ * @author Martin Loeffelholz
+ *
+ */
+
 public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMessageListener{
 
 	private String _beanName = "CommunicationBean";
@@ -142,13 +152,15 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		log.debug("message received from: " + message.getSender() + " at " + atUnbound);
 		
 		BinaryContent binaryPayload = null;
+		// Check if the payload within the message is of a supported type
 		if (message.getPayload() instanceof BinaryContent){
 			binaryPayload = (BinaryContent) message.getPayload();
 			log.debug("Payload is instanceof BinaryContent");
 		} 
 		
 		if (binaryPayload != null){
-			
+			// payload was binary
+			// create ListElement to print some text into the _messagesReceived(output)field
 			ListElement le = new ListElement("Received Mesage from " + message.getSender() + " at " + at);
 			le.from = message.getSender();
 			le.at = at;
@@ -162,6 +174,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 			printLine(le);
 			
 		} else {
+			// if payload within Message was of unsupported type..
 			ListElement le = new ListElement("Received Message from " + message.getSender() + " at " + at);
 			le.fontColor = Color.red;
 			le.fontStyle = Font.ITALIC;
@@ -187,6 +200,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 * @param line 		the Line to put on the List
 	 * @param fontStyle	the Style for the font as defined in constants of the class Font
 	 * @param fontColor	a color as defined in the class Color, if set to null the default color is used
+	 * 
+	 * @author Martin Loeffelholz
 	 */
 	private void printLine(String line, int fontStyle, Color fontColor){
 		ListElement le = new ListElement(line);
@@ -203,6 +218,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 * mostly used for messagelogging purposes 
 	 * 
 	 * @param le the Listelement to display in the list
+	 * 
+	 * @author Martin Loeffelholz
 	 */
 	private void printLine(ListElement le){
 		_messageListModel.add(_newMessageIndex++, le);
@@ -428,7 +445,9 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		_inputField = new JTextField(20);
 		_inputField.setFocusCycleRoot(true);
 		
-		
+		/**
+		 * An ActionListener is created. Here all commands from the inputfield will be processed.
+		 */
 		_inputField.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				String command = evt.getActionCommand();

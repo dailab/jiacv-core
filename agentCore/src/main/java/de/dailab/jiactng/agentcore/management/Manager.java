@@ -159,6 +159,17 @@ public interface Manager {
 	public void registerAgentResource(IAgent agent, String resourceType, Object resource) throws Exception;
 
 	/**
+	 * Registers an agent resource for management. The agent may contain more
+	 * than one resource of the specified type.
+	 * @param agent the agent which contains the resource
+	 * @param resourceType the type of the agent resource
+	 * @param resourceName the name of the agent resource
+	 * @param resource the agent resource to be registered
+	 * @throws Exception The name of the agent or agent node or the type or name of resource is incorrect or the agent resource is already registered.
+	 */
+	public void registerAgentResource(IAgent agent, String resourceType, String resourceName, Object resource) throws Exception;
+
+	/**
 	 * Registers an agent bean for management.
 	 * @param agentBean the agent bean to be registered
 	 * @param agent the agent which contains this agent bean
@@ -219,6 +230,16 @@ public interface Manager {
 	 * @throws Exception The name of the agent or agent node or the type of resource is incorrect or the agent resource is not registered.
 	 */
 	public void unregisterAgentResource(IAgent agent, String resourceType) throws Exception;
+
+	/**
+	 * Unregisters an agent resource from management. The agent may contain more
+	 * than one resource of the specified type.
+	 * @param agent the agent which contains the resource
+	 * @param resourceType the type of the agent resource
+	 * @param resourceName the name of the agent resource
+	 * @throws Exception The name of the agent or agent node or the type or name of resource is incorrect or the agent resource is not registered.
+	 */
+	public void unregisterAgentResource(IAgent agent, String resourceType, String resourceName) throws Exception;
 
 	/**
 	 * Unregisters an agent bean from management.

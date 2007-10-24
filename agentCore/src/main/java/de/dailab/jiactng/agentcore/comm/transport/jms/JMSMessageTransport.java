@@ -99,7 +99,12 @@ public class JMSMessageTransport extends MessageTransport {
         } else {
             payload= (IJiacContent) ((ObjectMessage)message).getObject();
         }
-        ICommunicationAddress sender= CommunicationAddressFactory.createFromURI(message.getStringProperty(IJiacMessage.SENDER_KEY));
+        
+        String senderKey= message.getStringProperty(IJiacMessage.SENDER_KEY);
+        ICommunicationAddress sender= null;
+        if (senderKey != null) {
+            sender= CommunicationAddressFactory.createFromURI(senderKey);
+        }
 
         IJiacMessage result= new JiacMessage(payload, sender);
         for(Enumeration keys= message.getPropertyNames(); keys.hasMoreElements(); ) {

@@ -56,9 +56,11 @@ public class JmsBrokerAMQ extends AbstractLifecycle implements Manageable, JmsBr
 		broker.setManagementContext(context);
         try {
         	TransportConnector connector = broker.addConnector(values.getUrl());
-            connector.setDiscoveryUri(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
-            broker.addNetworkConnector(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
-            connector.getDiscoveryAgent().setBrokerName(values.getName());
+            if(values.getDiscoveryMethod() != null && values.getDiscoveryAddress() != null) {
+                connector.setDiscoveryUri(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
+                broker.addNetworkConnector(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
+                connector.getDiscoveryAgent().setBrokerName(values.getName());
+            }
         } catch (Exception e) {
             log.error(e.toString());
         }

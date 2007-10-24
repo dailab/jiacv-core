@@ -7,7 +7,6 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
 /**
  * Ein Interface fuer Services. Frage: sollen die IEffector erweitern ? Oder nur IAgentBean ?
  * @author janko
- * ‰‰hh, was ?
  */
 public interface IService extends IEffector {
 

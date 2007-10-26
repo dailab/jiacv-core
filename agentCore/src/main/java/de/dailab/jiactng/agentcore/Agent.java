@@ -302,9 +302,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			if (ab instanceof IEffector) {
 				ArrayList<? extends Action> acts = ((IEffector) ab)
 						.getActions();
-				for (Action item : acts) {
-					memory.write(item);
-					actionList.add(item);
+				if (acts !=null) {
+					for (Action item : acts) {
+						memory.write(item);
+						actionList.add(item);
+					}
 				}
 			}
 		}

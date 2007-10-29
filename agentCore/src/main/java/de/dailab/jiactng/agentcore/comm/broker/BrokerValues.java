@@ -1,9 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.broker;
 
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
 
 /**
  * Kapselt Werte, die einen ActiveMQ-Broker steuern. Mit diesen Werten kann dann ein embedded Broker erzeugt/gestartet

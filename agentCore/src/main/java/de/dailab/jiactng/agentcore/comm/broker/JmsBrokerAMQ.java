@@ -59,7 +59,7 @@ public class JmsBrokerAMQ extends AbstractLifecycle implements Manageable, JmsBr
         	TransportConnector connector = broker.addConnector(values.getUrl());
             if(values.getDiscoveryMethod() != null && values.getDiscoveryAddress() != null) {
                 connector.setDiscoveryUri(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
-                broker.addNetworkConnector(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
+//                broker.addNetworkConnector(new URI(getDiscoveryUri(values.getDiscoveryMethod(), values.getDiscoveryAddress())));
                 connector.getDiscoveryAgent().setBrokerName(values.getName());
             }
         } catch (Exception e) {
@@ -69,9 +69,9 @@ public class JmsBrokerAMQ extends AbstractLifecycle implements Manageable, JmsBr
 
     	// start broker
         log.debug("starting broker");
-        for (Object connector : broker.getTransportConnectors()) {
-        	((TransportConnector) connector).start();
-        }
+//        for (Object connector : broker.getTransportConnectors()) {
+//        	((TransportConnector) connector).start();
+//        }
         broker.start();
         log.debug("broker started");
      }
@@ -103,9 +103,9 @@ public class JmsBrokerAMQ extends AbstractLifecycle implements Manageable, JmsBr
     public void doCleanup() throws Exception {
     	// stop broker
         log.debug("stopping broker");
-        for (Object connector : broker.getTransportConnectors()) {
-          	((TransportConnector) connector).stop();
-        }
+//        for (Object connector : broker.getTransportConnectors()) {
+//          	((TransportConnector) connector).stop();
+//        }
         broker.stop();
         log.debug("broker stopped");
     }

@@ -58,17 +58,6 @@
 			<timezone>+1</timezone>
 		</developer>
 		<developer>
-			<id>joachim</id>
-			<name>Joachim Fuchs</name>
-			<email>joachim.fuchs@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
 			<id>moekon</id>
 			<name>Thomas Konnerth</name>
 			<email>thomas.konnerth@dai-labor.de</email>
@@ -773,8 +762,8 @@
 				<sendOnError>true</sendOnError>
 				<sendOnWarning>true</sendOnWarning>
 				<configuration>
-					<!--address>axle@dai-lab.de</address-->
-					<address>jiactng-dev@dai-labor.de</address>
+					<address>axle@dai-lab.de</address>
+					<!-- address>jiactng-dev@dai-labor.de</address-->
 				</configuration>
 			</notifier>
 		</notifiers>

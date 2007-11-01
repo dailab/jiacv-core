@@ -133,25 +133,31 @@
         <faq id="how-manage">
             <question>How do I manage a running application?</question>
             <answer><p>
-                Applications implemented with JIAC TNG use JMX (Java Management Extensions,
-                http://java.sun.com/j2se/1.5.0/docs/guide/jmx/) to provide management functionality 
-                of agents and agent nodes for remote monitoring and control on condition that the
-                application was started with system property <code>com.sun.management.jmxremote</code>
-                (see example "HelloWorld"). While a special tool does not yet exist, humans may start
-                the tool "jconsole" of JDK1.5+ (Java Development Kit, version 1.5 or higher) on the 
-                host where the application runs, connect to the JVM (Java Virtual Machine) of the
-                application, change to the tab "MBeans" and open the tree under domain
-                <code>de.dailab.jiactng</code>. For each element you can read/change its attributes,
-                invoke operations on it and subscribe for notifications. Instead of managing the 
-                application manually with tools you may also implement your own Java program which
-                manages your application automatically by using the JMX API. If your program runs in
-                the same JVM as the application you don't need to integrate a connector but you need
-                to set the system property <code>jmx.invoke.getters</code> (see test cases
-                "AgentMBeanTest" and "SimpleAgentNodeMBeanTest"). Otherwise you have to set the property
-                <code>jmxConnectors</code> of the agent node with the protocols of the JMX connectors 
-                to be used (see example "HelloWorld") and to integrate a connector client into your 
-                program. Connector servers not yet registered by using any kind of discovery mechanisms, 
-                so existing servers can not be looked up automatically at the moment.</p>
+                Applications implemented with JIAC TNG use <a href="http://java.sun.com/j2se/1.5.0/docs/guide/jmx/">JMX</a> 
+                (Java Management Extensions) to provide remote monitoring and control 
+                of their agent nodes, agents, agent beans and other resources. For each resource you can 
+                read/change its attributes, invoke operations on it and subscribe for notifications. Please read the 
+                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.odt">tutorial</a>
+                or have a look at the example 
+                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/examples/HelloWorld/src/main/">"HelloWorld"</a> 
+                to learn more about the configuration of the remote management and the extensibility of 
+                the management interface. You can manage an application by using the 
+                <a href="index.html#Management interface">management API</a> directly or an existing
+                <a href="faq.html#management-tools">management tool</a> with a corresponding JMX connector.</p>
+            </answer>
+        </faq>
+        <faq id="management-tools">
+            <question>Which management tools are available?</question>
+            <answer><p>
+                A special management tool for JIAC TNG applications does not yet exist, but you can 
+                use the generic JMX clients 
+                <a href="http://java.sun.com/j2se/1.5.0/docs/guide/management/jconsole.html">"jConsole"</a> 
+                or <a href="http://www.jmanage.org/">"jManage"</a>. The first one is a desktop 
+                application of JDK1.5+ (Java Development Kit, version 1.5 or higher) where the second
+                one is a web application which is exemplarily installed on a 
+                <a href="http://130.149.154.198:9090">DAI-Labor server</a>. Please read the 
+                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.odt">tutorial</a>
+                for a short description on how to use these tools.</p>
             </answer>
         </faq>
     </part>

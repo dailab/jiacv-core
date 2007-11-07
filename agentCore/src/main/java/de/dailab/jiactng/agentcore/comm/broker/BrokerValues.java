@@ -37,7 +37,7 @@ public class BrokerValues {
 	}
 
 	/**
-	 * Erzeugt eine Instanz mit defaultwerten.. um einfach einen Broker erzeugen zu k�nnen.
+	 * Erzeugt eine Instanz mit defaultwerten.. um einfach einen Broker erzeugen zu koennen.
 	 * 
 	 * @return
 	 */

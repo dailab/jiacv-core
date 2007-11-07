@@ -24,7 +24,7 @@ public class BasicJiacProtocolTest extends TestCase {
 	 * @author Martin Loeffelholz
 	 */
 	
-	// ToDo: Funktionale und halbfunktionale Tests der eigentlichen Sendvorg�nge + evtl. testProcessMessage
+	// ToDo: Funktionale und halbfunktionale Tests der eigentlichen Sendvorgaenge + evtl. testProcessMessage
 	
 	protected void setUp() throws Exception {
 		super.setUp();

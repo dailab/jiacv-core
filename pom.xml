@@ -789,7 +789,7 @@
 
 	<modules>
 		<module>CIConfiguration</module>
-		<module>ontologies</module>
+		<!-- module>ontologies</module -->
 		<module>ModuleTemplate</module>
 		<module>agentCore</module>
 		<module>agentInterpreter</module>

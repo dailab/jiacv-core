@@ -24,13 +24,13 @@
   	<artifactId>PingPong</artifactId>  	
   	<packaging>jar</packaging>  	
   	<name>${project.artifactId}</name>   	
-  	<version>0.0.1-SNAPSHOT</version>
+  	
 
   	<dependencies>
   		<dependency>
   			<groupId>de.dailab.jiactng</groupId>
   			<artifactId>agentCore</artifactId>
-  			<version>0.0.1-SNAPSHOT</version>
+  			<version>${project.version}</version>
   		</dependency>
   	</dependencies>
 

@@ -26,6 +26,7 @@ public class ServiceDescription implements IServiceDescription {
 	private String _providerAddress;
 	private String _qoSRating;
 	private String _wsdl;
+	private String _wsdlUrl;
 	private ServiceParameter _inputWrapper;
 
 	/**
@@ -42,10 +43,11 @@ public class ServiceDescription implements IServiceDescription {
 	 * @param providerAddress
 	 * @param qoSRating
 	 * @param wsdl wsdl beschreibung
+	 * @param wsdlUrl 
 	 */
 	public ServiceDescription(Date expireDate, String id, String name, Set<String> keywords,
 			List<ServiceParameter> inputParams, List<ServiceParameter> outputParams, String preCondition,
-			String postCondition, String providerAddress, String qoSRating, String wsdl) {
+			String postCondition, String providerAddress, String qoSRating, String wsdl, String wsdlUrl) {
 		super();
 		_expireDate = expireDate;
 		_id = id;
@@ -58,6 +60,7 @@ public class ServiceDescription implements IServiceDescription {
 		_providerAddress = providerAddress;
 		_qoSRating = qoSRating;
 		_wsdl = wsdl;
+		_wsdlUrl = wsdlUrl;
 	}
 
 	// default constructor.. extra fuer hibernate
@@ -110,6 +113,10 @@ public class ServiceDescription implements IServiceDescription {
 		return _wsdl;
 	}
 
+	public String getWsdlUrl() {
+		return _wsdlUrl;
+	}
+	
 	public boolean isWebService() {
 		return _wsdl != null && _wsdl.length() > 0;
 	}
@@ -178,6 +185,7 @@ public class ServiceDescription implements IServiceDescription {
 			boolean _providerEquals = false;
 			boolean _qosEquals = false;
 			boolean _wsdlEquals = false;
+			boolean _wdslUrlEquals = false;
 
 			if (_expireDate != null && desc._expireDate != null && _expireDate.equals(desc._expireDate)) {
 				_expireDateEquals = true;
@@ -219,9 +227,14 @@ public class ServiceDescription implements IServiceDescription {
 			} else if (_wsdl == null && desc._wsdl == null) {
 				_wsdlEquals = true;
 			}
+			if (_wsdlUrl != null && desc._wsdlUrl != null && _wsdlUrl.equals(desc._wsdlUrl)) {
+				_wdslUrlEquals = true;
+			} else if (_wsdlUrl == null && desc._wsdlUrl == null) {
+				_wdslUrlEquals = true;
+			}
 
 			if (_expireDateEquals && _idEquals && _nameEquals && _preEquals && _postEquals && _providerEquals && _qosEquals
-					&& _wsdlEquals && equalsKeywords(desc._keywords) && equalsServiceParameter(_inputParams, desc._inputParams)
+					&& _wsdlEquals && _wdslUrlEquals && equalsKeywords(desc._keywords) && equalsServiceParameter(_inputParams, desc._inputParams)
 					&& equalsServiceParameter(_outputParams, desc._outputParams)) {
 				return true;
 			}
@@ -333,6 +346,10 @@ public class ServiceDescription implements IServiceDescription {
 	public void setWsdlDescription(String wsdl) {
 		_wsdl = wsdl;
 	}
+	
+	public void setWsdlUrl(String wsdlUrl) {
+		_wsdlUrl = wsdlUrl;
+	}
 
 	public ServiceParameter getInputWrapper() {
 		return _inputWrapper;
@@ -347,12 +364,19 @@ public class ServiceDescription implements IServiceDescription {
 		sb.append('[').append(_name).append(',')
 		.append(_expireDate).append(',')
 		.append("[keywords:").append(Arrays.toString(_keywords.toArray(new String[0]))).append(']').append(',')
-				.append("[InputParams:").append(Arrays.toString(_inputParams.toArray(new ServiceParameter[0]))).append(']').append(',')
-    .append("[OutputParams:").append(Arrays.toString(_outputParams.toArray(new ServiceParameter[0]))).append(']').append(',')
+				.append("[InputParams:").append(parameterToString(_inputParams)).append(']').append(',')
+    .append("[OutputParams:").append(parameterToString(_outputParams)).append(']').append(',')
     .append(_providerAddress).append(',')
     .append(_qoSRating).append(',')
 		.append("Webservice?:").append(isWebService()).append(']');
 		return sb.toString();
+	}
+	
+	private String parameterToString(List<ServiceParameter> param) {
+		if (param != null) {
+			return Arrays.toString(param.toArray(new ServiceParameter[0]));
+		}
+		return "null";
 	}
 	
 	/** 

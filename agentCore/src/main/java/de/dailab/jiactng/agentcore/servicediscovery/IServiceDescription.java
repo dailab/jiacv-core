@@ -42,5 +42,5 @@ public interface IServiceDescription extends IFact {
 	// Inputparameter werden in _einem_ Objekt gekapselt
 	public ServiceParameter getInputWrapper();
 	
-	
+	public String getWsdlUrl();
 }

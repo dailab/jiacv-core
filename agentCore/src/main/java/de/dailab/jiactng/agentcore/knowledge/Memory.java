@@ -317,5 +317,12 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	 */
 	public boolean isManagementEnabled() {
 		return _manager != null;
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	public Set<IFact> readAll() {
+		return space.readAll();
 	}	  
 }

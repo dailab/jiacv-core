@@ -796,6 +796,7 @@
 		<module>basicServices</module>
 		<module>examples</module>
 		<module>jiacSecurity</module>
+		<module>util/ui</module>
 		<module>WebserviceInterface</module>
 	</modules>
 </project>

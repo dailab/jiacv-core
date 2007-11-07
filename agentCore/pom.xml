@@ -16,14 +16,14 @@
 	<parent>
 		<groupId>de.dailab</groupId>
 		<artifactId>jiactng</artifactId>
-		<version>1.0</version>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
 	<groupId>de.dailab.jiactng</groupId>
 	<artifactId>agentCore</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
-	<version>0.0.1-SNAPSHOT</version>
+	
 
 	<dependencies>
 		<dependency>

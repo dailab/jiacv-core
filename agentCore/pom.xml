@@ -57,13 +57,6 @@
 			<artifactId>jmxws</artifactId>
 			<version>20060512</version>
 		</dependency-->
-	
-<!-- unknown, will be removed soon, if not needed -->
-		<!--dependency>
-			<groupId>com.jgoodies</groupId>
-			<artifactId>forms</artifactId>
-			<version>1.0.7</version>
-		</dependency-->
 
 	</dependencies>
 

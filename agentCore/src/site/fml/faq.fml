@@ -5,17 +5,76 @@
         <faq id="whats-agentCore">
             <question>What is agentCore?</question>
             <answer>
-                <p>It provides basic building blocks for JIAC TNG, eg. agent life-cycle, etc.
+                <p>It provides basic building blocks for JIAC TNG, e.g. agent
+                  life-cycle, communication, action handling, management, etc. to
+                  be able to easily implement distributed and manageable applications.
+                  It does not provide any higher-level concepts like services or
+                  ontologies and no other features like security or user management.
+                  It also requires Java 1.5 or higher and thus it does not run on
+                  small devices like mobile phones.
+                </p>
+            </answer>
+        </faq>
+        <faq id="documentation">
+            <question>Which documentation about agentCore is available?</question>
+            <answer>
+                <p>Beside this FAQ and the <a href="apidocs/index.html">JavaDoc</a>
+                  there are a <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.pdf">
+                  tutorial</a> for beginners, a <a href="index.html">website</a>
+                  and an <a href="https://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/Architecture_JIAC-TNG.pdf">
+                  architecture document</a> (in german) with more detailed information
+                  for users, and a
+                  <a href="https://wiki.dai-labor.de/ClusterFAC:JIACTNG-Overview">wiki</a> 
+                  and <a href="http://www.jiac.de:81/forum/phpBB2/">forum</a> (both
+                  in german) with information for developers.
                 </p>
             </answer>
         </faq>
     </part>
     <part id="how-to">
         <title>How to use agentCore</title>
+        <faq id="required-software">
+            <question>Which software has to be installed?</question>
+            <answer>
+                <p>To start programming with agentCore, you will need installed 
+                  <a href="http://java.sun.com/j2se/1.5.0/">Java J2SE 1.5</a> or
+                  higher, <a href="http://maven.apache.org/">Maven 2.0.4</a> or
+                  higher, and optional <a href="http://activemq.apache.org/">
+                  ActiveMQ 4.1</a> or higher on your computer. You have to set
+                  the <code>JAVA_HOME</code> environment-variable to the root-
+                  path of your Java-installation. You will also need to supply                               a <a href="http://www.jiac.de:81/forum/phpBB2/download.php?id=8">
+                  <code>settings.xml</code></a>-file in the <code>.m2</code>-
+                  directory of your home directory to find all needed libraries.
+                </p>
+            </answer>
+        </faq>
         <faq id="how-use">
             <question>How do I use agentCore?</question>
             <answer>
-                <p>I just do not know.</p>
+                <p>To use agentCore, you have to create a maven2-project. Simply
+                  take the <a href="https://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/tng-project.zip">
+                  <code>tng-project.zip</code></a> and unpack it to a directory of
+                  your choice. As the next step, you should take a look at the
+                  <code>pom.xml</code>-file (the build-configuration for maven2)
+                  and edit the entries at the top of the file that are marked with
+                  <code>TODO</code> (the name, vendor and version of your project).
+                  You can now start an empty build of the project by running the
+                  <code>mvn install</code> command in your project-directory from
+                  a console. For the first time, it also downloads all required
+                  libraries into your local maven2-repository. This may take a few
+                  minutes.
+                </p>
+            </answer>
+        </faq>
+        <faq id="use-eclipse">
+            <question>How do I use agentCore in the Eclipse-IDE?</question>
+            <answer>
+                <p>If you want to use the Eclipse-IDE to work on your project, we
+                  recommend that you also run the <code>mvn eclipse:eclipse</code>
+                  command, once the initial build is finished. This will create all
+                  necessary eclipse-project files, and allow simply import the
+                  project into your workspace for further work.
+                </p>
             </answer>
         </faq>
     </part>
@@ -29,8 +88,9 @@
                   VOID, READY and STARTED. Being VOID means being either UNDEFINED
                   or CLEANED_UP, whereas READY means INITIALIZED or STOPPED.
                   STARTED means the active state of the <code>ILifecycle</code> instance.
-                  Check out the lifecycle graph from some project documentation
-                  to learn more about the lifecycle model.
+                  Check out the lifecycle graph from page 15 of the
+                  <a href="https://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/Architecture_JIAC-TNG.pdf">
+                  architecture document</a> to learn more about the lifecycle model.
                 </p>
             </answer>
           </faq>
@@ -49,7 +109,7 @@
             <question>What is the difference between loose and strict lifecycle?</question>
             <answer><p>
               Loose means that there are no restrictions on transitions between
-              lifecycle states. The strict mode requires you to adhere to the lifecycle graph.
+              lifecycle states. The strict mode ensures to follow the lifecycle graph.
               <code>DefaultLifecycleHandler</code> offers a constructor that accepts
               a boolean parameter, indicating wether or not you want the lifecycle
               handler to operate in strict mode. The default is loose handling.</p>
@@ -58,8 +118,9 @@
           <faq id="lifecycle4">
             <question>Can I switch arbitrarily between those lifecycle states?</question>
             <answer><p>
-              In loose mode you can. In strict mode you can switch only between
-              adjacent lifecycle states.</p>
+              In loose mode you can switch directly. In strict mode all intermediate
+              lifecycle states will be passed automatically. But if the intended
+              lifecycle state is already passed before, nothing will be happen.</p>
             </answer>
           </faq>
           <faq id="lifecycle5">
@@ -87,43 +148,91 @@
           <faq id="faq1_Agent">
             <question>How do I create my own Agent?</question>
             <answer>
-            	..
+              <p>To create an agent, you have to define an appropriate
+                <a href="http://springframework.org/">Spring</a>-configuration. The
+                most simple way is to take the predefined configuration <code>
+                jiac_conf.xml</code> contained in the project template
+                <a href="https://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/tng-project.zip">
+                <code>tng-project.zip</code></a> and to edit the lines that are
+                marked with <code>TODO</code>.
+              </p>
+              <p>To start this configuration, you only have to run the class
+                <code>de.dailab.jiactng.agentcore.SimpleAgentNode</code> with
+                the name of the configuration file as parameter.
+              </p>
             </answer>
           </faq>
           <faq id="faq2_Agent">
             <question>How are Agents and Lifecycles related ?</question>
             <answer>
-            	..
+              <p>All agents have a lifecycle, because the class <code>Agent</code>
+                extends the class <code>AbstractLifecycle</code>.
+              </p> 
             </answer>
           </faq>          
           <faq id="faq3_Agent">
             <question>Does an Agent has to have a lifecycle? If it has to, do I have to implement it by myself ?</question>
             <answer>
-            	..
+              <p>The class <code>Agent</code> already handles the lifecycle of an
+                agent and its components. Thus, you don't need to implement it. But
+                if you extend an agent or a component (agentbean) you may overwrite
+                the abstract methods of <code>AbstractLifecycle</code> by always
+                invoking the corresponding method of the super class.
+              </p>
             </answer>
           </faq>	    
           <faq id="faq4_Agent">
             <question>What kind of and how much ressources does one agent require ? Is it advisable to keep the number of Agents for my application low ?</question>
             <answer>
-            	..
+              <p>The <a href="index.html#Measurement data">result of measurements</a>
+                is that a standard agent has three threads and uses approximately
+                120kB of heap memory and 200kB of non-heap memory. Thus it is advisable
+                to have only a maximum of thousands of agents running on one host.
+              </p>
             </answer>
           </faq>
           <faq id="faq5_Agent">
             <question>How do I let the Agents do what I want ?</question>
             <answer>
-            	..
+              <p>The usual way to extend agents with new actions is to create an
+                Agentbean that offers the appropriate actions. First of all, all
+                agentbeans need to implement certain interfaces for lifecycle- and
+                management-operations. Fortunately, most of this is rather generic,
+                and if you have no special needs for your bean, you can simply
+                extend the class <code>de.dailab.jiactng.agentcore.AbstractAgentBean
+                </code>. It implements the necessary interfaces for an agentbean,
+                and provides basic implementations for the initialization- and
+                lifecycle-methods.
+              </p>
+              <p>There are two possible ways to add actions to an agentbean:
+                by implementing the interface <code>
+                de.dailab.jiactng.agentcore.environment.IEffector</code> with its
+                methods <code>getActions()</code> and <code>doAction</code> or by
+                simply extending the class <code>
+                de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean</code>
+                rather than class <code>AbstractAgentBean</code>. The second
+                approach automatically exposes all Java-methods as actions, which
+                are annotated with <code>@Expose(name="myName")</code>.
+              </p>
             </answer>
           </faq>  
           <faq id="faq6_Agent">            
             <question>Is there a 'Hello World' Agent ? Where ?</question>
             <answer>
-            	..
+              <p>Yes, in the example
+                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/examples/HelloWorld/src/main/">
+                "HelloWorld"</a> you will find an implementation of such an agent.
+              </p>
             </answer> 
           </faq>
           <faq id="faq7_Agent">            
             <question>Is there a more complex example of Agents ? Where ?</question>
             <answer>
-            	..
+              <p>Yes, there is an implementation of a
+                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/examples/simpleChatExample/src/main/">
+                chat example</a>, which uses the communication feature of a
+                distributed set of agents.
+              </p>
             </answer> 
           </faq>
           
@@ -137,7 +246,7 @@
                 (Java Management Extensions) to provide remote monitoring and control 
                 of their agent nodes, agents, agent beans and other resources. For each resource you can 
                 read/change its attributes, invoke operations on it and subscribe for notifications. Please read the 
-                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.odt">tutorial</a>
+                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.pdf">tutorial</a>
                 or have a look at the example 
                 <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/examples/HelloWorld/src/main/">"HelloWorld"</a> 
                 to learn more about the configuration of the remote management and the extensibility of 
@@ -156,7 +265,7 @@
                 application of JDK1.5+ (Java Development Kit, version 1.5 or higher) where the second
                 one is a web application which is exemplarily installed on a 
                 <a href="http://130.149.154.198:9090">DAI-Labor server</a>. Please read the 
-                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.odt">tutorial</a>
+                <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.pdf">tutorial</a>
                 for a short description on how to use these tools.</p>
             </answer>
         </faq>

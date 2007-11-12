@@ -41,10 +41,11 @@
                   higher, <a href="http://maven.apache.org/">Maven 2.0.4</a> or
                   higher, and optional <a href="http://activemq.apache.org/">
                   ActiveMQ 4.1</a> or higher on your computer. You have to set
-                  the <code>JAVA_HOME</code> environment-variable to the root-
-                  path of your Java-installation. You will also need to supply                               a <a href="http://www.jiac.de:81/forum/phpBB2/download.php?id=8">
-                  <code>settings.xml</code></a>-file in the <code>.m2</code>-
-                  directory of your home directory to find all needed libraries.
+                  the <code>JAVA_HOME</code> environment-variable to the root-path
+                  of your Java-installation. You will also need to supply a
+                  <a href="http://www.jiac.de:81/forum/phpBB2/download.php?id=8">
+                  <code>settings.xml</code></a>-file in the <code>.m2</code>-directory
+                  of your home directory to find all needed libraries.
                 </p>
             </answer>
         </faq>
@@ -59,7 +60,7 @@
                   and edit the entries at the top of the file that are marked with
                   <code>TODO</code> (the name, vendor and version of your project).
                   You can now start an empty build of the project by running the
-                  <code>mvn install</code> command in your project-directory from
+                  <code>"mvn install"</code> command in your project-directory from
                   a console. For the first time, it also downloads all required
                   libraries into your local maven2-repository. This may take a few
                   minutes.
@@ -70,7 +71,7 @@
             <question>How do I use agentCore in the Eclipse-IDE?</question>
             <answer>
                 <p>If you want to use the Eclipse-IDE to work on your project, we
-                  recommend that you also run the <code>mvn eclipse:eclipse</code>
+                  recommend that you also run the <code>"mvn eclipse:eclipse"</code>
                   command, once the initial build is finished. This will create all
                   necessary eclipse-project files, and allow simply import the
                   project into your workspace for further work.
@@ -87,7 +88,9 @@
                   Basically, there are 3 distinct states a component may have:
                   VOID, READY and STARTED. Being VOID means being either UNDEFINED
                   or CLEANED_UP, whereas READY means INITIALIZED or STOPPED.
-                  STARTED means the active state of the <code>ILifecycle</code> instance.
+                  STARTED means the active state of the
+                  <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/ILifecycle.html">
+                  <code>ILifecycle</code></a> instance.
                   Check out the lifecycle graph from page 15 of the
                   <a href="https://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/Architecture_JIAC-TNG.pdf">
                   architecture document</a> to learn more about the lifecycle model.
@@ -97,12 +100,16 @@
           <faq id="lifecycle2">
             <question>How does the Lifecycle API apply to my code?</question>
             <answer><p>
-              The <code>de.dailab.jiactng.agentcore.lifecycle</code> package contains
-              the <code>ILifecycle</code> interface as well as all necessary code.
-              You may subclass <code>AbstractLifecycle</code> or implement
+              The <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/package-summary.html">
+              <code>de.dailab.jiactng.agentcore.lifecycle</code></a> package contains
+              the <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/ILifecycle.html">
+              <code>ILifecycle</code></a> interface as well as all necessary code.
+              You may subclass <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
+              <code>AbstractLifecycle</code></a> or implement
               <code>ILifecycle</code> to introduce lifecycle management into your
               code. In the latter case check out how <code>AbstractLifecycle</code>
-              employs the <code>DefaultLifecycleHandler</code> class.</p>
+              employs the <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/DefaultLifecycleHandler.html">
+              <code>DefaultLifecycleHandler</code></a> class.</p>
             </answer>
           </faq>
           <faq id="lifecycle3">
@@ -110,7 +117,8 @@
             <answer><p>
               Loose means that there are no restrictions on transitions between
               lifecycle states. The strict mode ensures to follow the lifecycle graph.
-              <code>DefaultLifecycleHandler</code> offers a constructor that accepts
+              <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/DefaultLifecycleHandler.html">
+              <code>DefaultLifecycleHandler</code></a> offers a constructor that accepts
               a boolean parameter, indicating wether or not you want the lifecycle
               handler to operate in strict mode. The default is loose handling.</p>
             </answer>
@@ -126,8 +134,9 @@
           <faq id="lifecycle5">
             <question>How do the lifecycle events come into play?</question>
             <answer><p>
-              You can register a <code>ILifecycleListener</code> with any <code>
-              Lifecycle</code> to receive state change events. This is different from
+              You can register a <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/ILifecycleListener.html">
+              <code>ILifecycleListener</code></a> with any <code>Lifecycle</code>
+              to receive state change events. This is different from
               the JMX state change notifications.</p>
             </answer>
           </faq>
@@ -135,11 +144,14 @@
             <question>Can I create a hierarchy of lifecycle listeners?</question>
             <answer><p>
               Yes. Suppose, there is a lifecycle listener that manages a number
-              of lifecycle objects that make use of the <code>DefaultLifecycleHandler</code>.
-              One of them, which is not a lifecycle listener itself, is managing a bunch of
-              lifecycles as well. To have the top-level object receiving lifecycle events from
-              below, you call <code>createLifecycleListener()</code> on their parent object's lifecycle handler
-              and add it to them. Now all lifecycle events are propagated directly to the top-level object.</p>
+              of lifecycle objects that make use of the 
+              <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/DefaultLifecycleHandler.html">
+              <code>DefaultLifecycleHandler</code></a>.
+              One of them, which is not a lifecycle listener itself, is managing a
+              bunch of lifecycles as well. To have the top-level object receiving
+              lifecycle events from below, you call <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/DefaultLifecycleHandler.html#createLifecycleListener()">
+              <code>createLifecycleListener()</code></a> on their parent object's               lifecycle handler and add it to them. Now all lifecycle events are 
+              propagated directly to the top-level object.</p>
             </answer>
         </faq>
     </part>
@@ -157,7 +169,8 @@
                 marked with <code>TODO</code>.
               </p>
               <p>To start this configuration, you only have to run the class
-                <code>de.dailab.jiactng.agentcore.SimpleAgentNode</code> with
+                <a href="apidocs/de/dailab/jiactng/agentcore/SimpleAgentNode.html#main(java.lang.String[])">
+                <code>de.dailab.jiactng.agentcore.SimpleAgentNode</code></a> with
                 the name of the configuration file as parameter.
               </p>
             </answer>
@@ -165,18 +178,23 @@
           <faq id="faq2_Agent">
             <question>How are Agents and Lifecycles related ?</question>
             <answer>
-              <p>All agents have a lifecycle, because the class <code>Agent</code>
-                extends the class <code>AbstractLifecycle</code>.
+              <p>All agents have a lifecycle, because the class 
+                <a href="apidocs/de/dailab/jiactng/agentcore/Agent.html">
+                <code>Agent</code></a> extends the class 
+                <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
+                <code>AbstractLifecycle</code></a>.
               </p> 
             </answer>
           </faq>          
           <faq id="faq3_Agent">
             <question>Does an Agent has to have a lifecycle? If it has to, do I have to implement it by myself ?</question>
             <answer>
-              <p>The class <code>Agent</code> already handles the lifecycle of an
+              <p>The class <a href="apidocs/de/dailab/jiactng/agentcore/Agent.html">
+                <code>Agent</code></a> already handles the lifecycle of an
                 agent and its components. Thus, you don't need to implement it. But
                 if you extend an agent or a component (agentbean) you may overwrite
-                the abstract methods of <code>AbstractLifecycle</code> by always
+                the abstract methods of <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
+                <code>AbstractLifecycle</code></a> by always
                 invoking the corresponding method of the super class.
               </p>
             </answer>
@@ -199,17 +217,18 @@
                 agentbeans need to implement certain interfaces for lifecycle- and
                 management-operations. Fortunately, most of this is rather generic,
                 and if you have no special needs for your bean, you can simply
-                extend the class <code>de.dailab.jiactng.agentcore.AbstractAgentBean
-                </code>. It implements the necessary interfaces for an agentbean,
+                extend the class <a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBean.html">
+                <code>de.dailab.jiactng.agentcore.AbstractAgentBean</code></a>.
+                It implements the necessary interfaces for an agentbean,
                 and provides basic implementations for the initialization- and
                 lifecycle-methods.
               </p>
               <p>There are two possible ways to add actions to an agentbean:
-                by implementing the interface <code>
-                de.dailab.jiactng.agentcore.environment.IEffector</code> with its
-                methods <code>getActions()</code> and <code>doAction</code> or by
-                simply extending the class <code>
-                de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean</code>
+                by implementing the interface <a href="apidocs/de/dailab/jiactng/agentcore/environment/IEffector.html">
+                <code>de.dailab.jiactng.agentcore.environment.IEffector</code></a>
+                with its methods <a href="apidocs/de/dailab/jiactng/agentcore/environment/IEffector.html#getActions()">
+                <code>getActions()</code></a> and <a href="apidocs/de/dailab/jiactng/agentcore/environment/IEffector.html#doAction(de.dailab.jiactng.agentcore.action.DoAction)">
+                <code>doAction()</code></a> or by simply extending the class <a href="apidocs/de/dailab/jiactng/agentcore/action/AbstractMethodExposingBean.html"><code>de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean</code></a>
                 rather than class <code>AbstractAgentBean</code>. The second
                 approach automatically exposes all Java-methods as actions, which
                 are annotated with <code>@Expose(name="myName")</code>.

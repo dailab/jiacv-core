@@ -93,7 +93,8 @@
                   <code>ILifecycle</code></a> instance.
                   Check out the lifecycle graph from page 15 of the
                   <a href="https://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/Architecture_JIAC-TNG.pdf">
-                  architecture document</a> to learn more about the lifecycle model.
+                  architecture document</a> or read the corresponding section of the
+                  <a href="index.html#Agent Lifecycle">website</a> to learn more about the lifecycle model.
                 </p>
             </answer>
           </faq>

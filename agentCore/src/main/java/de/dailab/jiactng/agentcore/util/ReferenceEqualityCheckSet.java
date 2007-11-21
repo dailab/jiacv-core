@@ -3,18 +3,26 @@
  */
 package de.dailab.jiactng.agentcore.util;
 
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
+ * This set implementation ensures that references are inserted only once.
+ * {@link Object#hashCode()} or {@link Object#equals(Object)} are not used.
+ * <p>
+ * Manipulations of this set are not synchronized!
+ * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
-public class ReferenceEqualityCheckSet<T> implements Iterable<T> {
-    private ArrayList<T> _content= new ArrayList<T>();
+public class ReferenceEqualityCheckSet<E> extends AbstractSet<E>  {
+    private List<E> _content= new ArrayList<E>();
     
-    public synchronized boolean add(T object) {
-        for(T current : _content) {
+    @Override
+    public boolean add(E object) {
+        for(E current : _content) {
             if(current == object) {
                 return false;
             }
@@ -23,10 +31,16 @@ public class ReferenceEqualityCheckSet<T> implements Iterable<T> {
         return _content.add(object);
     }
     
-    public synchronized boolean remote(T object) {
+    @Override
+    public void clear() {
+        _content.clear();
+    }
+
+    @Override
+    public boolean remove(Object o) {
         int index= -1;
         for(int i= 0; i < _content.size(); ++i) {
-            if(_content.get(i) == object) {
+            if(_content.get(i) == o) {
                 _content.remove(index);
                 return true;
             }
@@ -35,11 +49,22 @@ public class ReferenceEqualityCheckSet<T> implements Iterable<T> {
         return false;
     }
     
-    public synchronized int size() {
+    public int size() {
         return _content.size();
     }
     
-    public Iterator<T> iterator() {
+    public Iterator<E> iterator() {
         return _content.iterator();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        for(int i= 0; i < _content.size(); ++i) {
+            if(_content.get(i) == o) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

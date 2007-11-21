@@ -188,7 +188,7 @@
             </answer>
           </faq>          
           <faq id="faq3_Agent">
-            <question>Does an Agent has to have a lifecycle? If it has to, do I have to implement it by myself ?</question>
+            <question>Does an Agent has to have a lifecycle? If it has to, do I have to implement it by myself?</question>
             <answer>
               <p>The class <a href="apidocs/de/dailab/jiactng/agentcore/Agent.html">
                 <code>Agent</code></a> already handles the lifecycle of an
@@ -201,7 +201,7 @@
             </answer>
           </faq>	    
           <faq id="faq4_Agent">
-            <question>What kind of and how much ressources does one agent require ? Is it advisable to keep the number of Agents for my application low ?</question>
+            <question>What kind of and how much ressources does one agent require? Is it advisable to keep the number of Agents for my application low?</question>
             <answer>
               <p>The <a href="index.html#Measurement data">result of measurements</a>
                 is that a standard agent has three threads and uses approximately
@@ -211,7 +211,7 @@
             </answer>
           </faq>
           <faq id="faq5_Agent">
-            <question>How do I let the Agents do what I want ?</question>
+            <question>How do I let the Agents do what I want?</question>
             <answer>
               <p>The usual way to extend agents with new actions is to create an
                 Agentbean that offers the appropriate actions. First of all, all
@@ -237,7 +237,7 @@
             </answer>
           </faq>  
           <faq id="faq6_Agent">            
-            <question>Is there a 'Hello World' Agent ? Where ?</question>
+            <question>Is there a 'Hello World' Agent? Where?</question>
             <answer>
               <p>Yes, in the example
                 <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/examples/HelloWorld/src/main/">
@@ -246,7 +246,7 @@
             </answer> 
           </faq>
           <faq id="faq7_Agent">            
-            <question>Is there a more complex example of Agents ? Where ?</question>
+            <question>Is there a more complex example of Agents and where can I find it?</question>
             <answer>
               <p>Yes, there is an implementation of a
                 <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/examples/simpleChatExample/src/main/">

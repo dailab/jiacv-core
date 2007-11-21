@@ -142,6 +142,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         log.debug("cleanup ServiceBean...");
         _communicationBean.unregister(
             _executionListener,
+            _communicationBean.getDefaultMessageBoxAddress(),
             new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL)
         );
         _communicationBean.unregister(_managementListener, _serviceBroadcastGroup, null);
@@ -182,6 +183,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         _communicationBean.register(_managementListener, _serviceBroadcastGroup, null);
         _communicationBean.register(
             _executionListener,
+            _communicationBean.getDefaultMessageBoxAddress(),
             new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL)
         );
     }

@@ -38,10 +38,9 @@ public class ReferenceEqualityCheckSet<E> extends AbstractSet<E>  {
 
     @Override
     public boolean remove(Object o) {
-        int index= -1;
         for(int i= 0; i < _content.size(); ++i) {
             if(_content.get(i) == o) {
-                _content.remove(index);
+                _content.remove(i);
                 return true;
             }
         }

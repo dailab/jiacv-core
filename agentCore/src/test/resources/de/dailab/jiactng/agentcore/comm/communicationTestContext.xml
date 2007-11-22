@@ -6,8 +6,8 @@
 -->
 <beans>
 
-	<bean name="CommunicationPlatform"
-		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+	<bean name="CommunicationPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+		<property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties"></property>
 		<property name="agents">
 			<list>
 				<ref bean="Communicator" />
@@ -16,8 +16,7 @@
 	</bean>
 
 
-	<bean name="Communicator" class="de.dailab.jiactng.agentcore.Agent"
-		singleton="false">
+	<bean name="Communicator" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
 		<property name="memory">
 			<ref bean="memory" />
 		</property>
@@ -32,15 +31,11 @@
 	</bean>
 
 
-	<bean name="memory"
-		class="de.dailab.jiactng.agentcore.knowledge.Memory"
-		singleton="false">
+	<bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
 		<!--property name="timeOut" value="-1"/-->
 	</bean>
 
-	<bean name="communicationBean"
-		class="de.dailab.jiactng.agentcore.comm.CommunicationBean"
-		singleton="false">
+	<bean name="communicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false">
 		<property name="transports">
 			<set>
 				<ref bean="jmsTransport" />
@@ -48,8 +43,7 @@
 		</property>
 	</bean>
 
-	<bean name="jmsTransport"
-		class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
+	<bean name="jmsTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
 		singleton="false">
 		<constructor-arg type="java.lang.String" value="jms" />
 		<property name="connectionFactory">
@@ -57,14 +51,9 @@
 		</property>
 	</bean>
 
-	<bean name="simpleExecCycle"
-		class="de.dailab.jiactng.agentcore.SimpleExecutionCycle"
-		singleton="false">
-	</bean>
+	<bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false"></bean>
 
-	<bean name="amqConnectionFactory"
-		class="org.apache.activemq.spring.ActiveMQConnectionFactory"
-		singleton="false">
+	<bean name="amqConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory" singleton="false">
 		<property name="brokerURL" value="tcp://localhost:61616"></property>
 	</bean>
 

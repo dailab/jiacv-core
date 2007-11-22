@@ -85,26 +85,18 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
     }
 
     private final IJiacMessageListener _defaultListener;
-
     private final IMessageTransportDelegate _defaultDelegate;
 
     private IMessageBoxAddress _defaultMessageBox;
 
     private Map<String, MessageTransport> _transports;
-
-    /**
-     * This map contains all listeners which where only registered to a selector. They are added to all further
-     * communication addresses automatically.
-     */
-    // protected final Map<Selector, WildcardListenerContext> _selectorToListenerMap;
-    protected final Map<ICommunicationAddress, List<ListenerContext>> _addressToListenerMap;
+    protected final Map<ICommunicationAddress, List<ListenerContext>> addressToListenerMap;
 
     public CommunicationBean() {
         _defaultListener = new MemoryDelegationMessageListener();
         _defaultDelegate = new MessageTransportDelegate();
         _transports = new HashMap<String, MessageTransport>();
-        // _selectorToListenerMap= new Hashtable<Selector, WildcardListenerContext>();
-        _addressToListenerMap = new Hashtable<ICommunicationAddress, List<ListenerContext>>();
+        addressToListenerMap = new Hashtable<ICommunicationAddress, List<ListenerContext>>();
     }
 
     // ~ START OF CONFIGURATION AND INITIALISATION STUFF ~ //
@@ -299,29 +291,20 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
     /**
      * An invocation of this action will associate this agent with a group (a logical destination)
      * 
-     * @param group
-     *            the group to join
+     * @param group         the group to join
      */
     @Expose
     public synchronized void joinGroup(IGroupAddress group) throws CommunicationException {
-        if (log.isInfoEnabled()) {
-            log.info("CommunicationBean is joining group '" + group + "'");
-        }
-
         register(group);
     }
 
     /**
      * An invocation of this action will remove this agent from the specified group.
      * 
-     * @param group
-     *            the group to leave
+     * @param group         the group to leave
      */
     @Expose
     public synchronized void leaveGroup(IGroupAddress group) throws CommunicationException {
-        if (log.isInfoEnabled()) {
-            log.info("CommunicationBean is leaving group '" + group + "'");
-        }
         unregister(group);
     }
 
@@ -329,44 +312,31 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
      * This action will create a new message box for this agent. Messages that are sent to it will be received by this
      * agent exclusivly.
      * 
-     * @param messageBox
-     *            the address of the new message box
+     * @param messageBox    the address of the new message box
      */
     @Expose
     public synchronized void establishMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
-        if (log.isInfoEnabled()) {
-            log.info("CommunicationBean is establishing MessageBox '" + messageBox + "'");
-        }
         register(messageBox);
     }
 
     /**
      * This action destroys the message box with the specified address.
      * 
-     * @param messageBox
-     *            the address to the message box which should be destroyed
+     * @param messageBox    the address to the message box which should be destroyed
      */
     @Expose
     public synchronized void destroyMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
-        if (log.isInfoEnabled()) {
-            log.info("CommunicationBean is destroying MessageBox '" + messageBox + "'");
-        }
         unregister(messageBox);
     }
 
     /**
      * This method sends a message to the given destination.
      * 
-     * @param message
-     *            the message to send
-     * @param address
-     *            the address to send to
+     * @param message       the message to send
+     * @param address       the address to send to
      */
     @Expose
     public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
-        if (log.isDebugEnabled()) {
-            log.debug("CommunicationBean is sending Message to address '" + address.toString() + "'");
-        }
         if (message == null) {
             throw new IllegalArgumentException("message must not be null");
         }
@@ -424,8 +394,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
      */
     public synchronized void register(IJiacMessageListener listener, ICommunicationAddress address, Selector selector) throws CommunicationException {
         if (log.isInfoEnabled()) {
-            log.info("Listener '" + listener + "' begins to listen at address '" + address + "' with Selector '"
-                    + selector + "'");
+            log.info("Listener '" + listener + "' begins to listen at address '" + address + "' with Selector '" + selector + "'");
         }
         if (listener == null) {
             throw new IllegalArgumentException("listener must not be null");
@@ -490,8 +459,8 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
             boundAddress = at;
         }
 
-        synchronized (_addressToListenerMap) {
-            for (ListenerContext context : _addressToListenerMap.get(at)) {
+        synchronized (addressToListenerMap) {
+            for (ListenerContext context : addressToListenerMap.get(at)) {
                 boolean notify = false;
 
                 if (context.selector != null) {
@@ -554,7 +523,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         CommunicationAddress unboundAddress = address.toUnboundAddress();
 
         // first check whether the sender is correct
-        if (message.getSender() == null || !_addressToListenerMap.containsKey(unboundAddress)) {
+        if (message.getSender() == null || !addressToListenerMap.containsKey(unboundAddress)) {
             message.setSender(_defaultMessageBox);
         }
 
@@ -594,17 +563,16 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
     private synchronized void internalRegister(IJiacMessageListener listener, CommunicationAddress address, Selector selector) throws CommunicationException {
         CommunicationAddress unboundAddress = address.toUnboundAddress();
         ListenerContext context = new ListenerContext(selector);
-        List<ListenerContext> registeredContexts = _addressToListenerMap.get(unboundAddress);
+        List<ListenerContext> registeredContexts = addressToListenerMap.get(unboundAddress);
 
         if (registeredContexts != null) {
             // we have already some listener registered for this communication address
             int index = registeredContexts.indexOf(context);
 
             if (index >= 0) {
+                // there is already another listener with same address and selector registered
                 context = registeredContexts.get(index);
-                // there is already another listener with same address and selector registered -> just put it into the
-                // listener list
-                
+
                 // check whether the listener is new, otherwise ignore this registration
                 if(context.listeners.contains(listener)) {
                     if (log.isWarnEnabled()) {
@@ -631,13 +599,13 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         if(registeredContexts == null) {
             // currently there are no listeners registered for this address - selector combination
             if (log.isDebugEnabled()) {
-                log.debug("new listener for '" + unboundAddress + "' : '" + selector + "'");
+                log.debug("first listener for '" + unboundAddress + "'");
             }
             registeredContexts= new LinkedList<ListenerContext>();
-            registeredContexts.add(context);
-            _addressToListenerMap.put(unboundAddress, registeredContexts);
+            addressToListenerMap.put(unboundAddress, registeredContexts);
         }
         
+        registeredContexts.add(context);
         context.listeners.add(listener);
 
         if (log.isDebugEnabled()) {
@@ -651,16 +619,6 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
             }
             for (MessageTransport transport : _transports.values()) {
                 transport.listen(address, context.selector);
-            }
-
-            // now register the new address - selector combinations
-            for (ListenerContext listenContext : registeredContexts) {
-                // for all combinations other then our initial new one...
-                if ((listenContext.selector != null) && (!listenContext.selector.equals(context.selector))) {
-                    for (MessageTransport transport : _transports.values()) {
-                        transport.listen(address, listenContext.selector);
-                    }
-                }
             }
         }
     }
@@ -678,8 +636,8 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
             log.info("Registering all addresses and listeners on transport '" + transport.getTransportIdentifier()
                     + "'");
         }
-        for (ICommunicationAddress address : _addressToListenerMap.keySet()) {
-            for (ListenerContext context : _addressToListenerMap.get(address)) {
+        for (ICommunicationAddress address : addressToListenerMap.keySet()) {
+            for (ListenerContext context : addressToListenerMap.get(address)) {
                 transport.listen(address, context.selector);
             }
         }
@@ -690,7 +648,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
      */
     private synchronized void internalUnregister(IJiacMessageListener listener, CommunicationAddress address, Selector selector) throws CommunicationException {
         CommunicationAddress unboundAddress = address.toUnboundAddress();
-        List<ListenerContext> registeredContexts = _addressToListenerMap.remove(unboundAddress);
+        List<ListenerContext> registeredContexts = addressToListenerMap.remove(unboundAddress);
 
         if (log.isDebugEnabled()) {
             log.debug("Removing nonWildcardListener with address '" + address + "' and selector '" + selector + "'");
@@ -736,7 +694,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         
         if(registeredContexts.size() > 0) {
             // re-add context list because it is still not empty
-            _addressToListenerMap.put(unboundAddress, registeredContexts);
+            addressToListenerMap.put(unboundAddress, registeredContexts);
         }
     }
 
@@ -854,17 +812,17 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
 
     public CompositeData getSelectorsOfAddresses() {
         CompositeData data = null;
-        int size = _addressToListenerMap.size();
+        int size = addressToListenerMap.size();
         String[] itemNames = new String[size];
         OpenType[] itemTypes = new OpenType[size];
         Object[] itemValues = new Object[size];
-        Object[] addresses = _addressToListenerMap.keySet().toArray();
+        Object[] addresses = addressToListenerMap.keySet().toArray();
         try {
             for (int i = 0; i < size; i++) {
                 ICommunicationAddress address = (ICommunicationAddress) addresses[i];
                 itemNames[i] = address.getName();
                 itemTypes[i] = new ArrayType(1, SimpleType.STRING);
-                List<ListenerContext> values = _addressToListenerMap.get(address);
+                List<ListenerContext> values = addressToListenerMap.get(address);
                 String[] value = new String[values.size()];
                 Iterator<ListenerContext> it = values.iterator();
                 int j = 0;
@@ -879,7 +837,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
                 }
                 itemValues[i] = value;
             }
-            CompositeType compositeType = new CompositeType(_addressToListenerMap.getClass().getName(),
+            CompositeType compositeType = new CompositeType(addressToListenerMap.getClass().getName(),
                     "addresses of the communication bean", itemNames, itemNames, itemTypes);
             data = new CompositeDataSupport(compositeType, itemNames, itemValues);
         } catch (OpenDataException e) {
@@ -901,13 +859,19 @@ class ListenerContext {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || obj.getClass() != ListenerContext.class) {
+        if (obj == null || !(obj instanceof ListenerContext)) {
             return false;
         }
 
         ListenerContext other = (ListenerContext) obj;
-        return selector == null ? other.selector == null : other.selector == null ? false : selector
-                .equals(other.selector);
+        return selector == null ? other.selector == null
+                                : other.selector == null ? false 
+                                                         : selector.equals(other.selector);
+    }
+
+    @Override
+    public String toString() {
+        return selector == null ? "*" : selector.toString();
     }
 }
 

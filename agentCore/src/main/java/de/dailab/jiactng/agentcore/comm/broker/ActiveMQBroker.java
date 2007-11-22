@@ -88,12 +88,12 @@ public class ActiveMQBroker extends AbstractLifecycle{
 	}
 	
 	public void doStop() throws Exception {
-		broker.stop();
-		_log.debug("stopping broker");
+		
 	}
 	
 	public void doCleanup() throws Exception {
-		
+		broker.stop();
+		_log.debug("stopping broker");
 	}
 	
 	public void setLog(Log log){

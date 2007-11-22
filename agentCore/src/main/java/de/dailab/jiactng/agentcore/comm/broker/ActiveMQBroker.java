@@ -1,9 +1,11 @@
 package de.dailab.jiactng.agentcore.comm.broker;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +45,6 @@ public class ActiveMQBroker extends AbstractLifecycle{
 	private boolean _jmx = true;
 	
 	public ActiveMQBroker(){
-		_urlList.add(_discoveryMethod + "://" + _discoveryAddress);
 		_urlList.add("tcp://localhost:61616");
 	}
 	
@@ -66,7 +67,11 @@ public class ActiveMQBroker extends AbstractLifecycle{
         try {
             for (String url : _urlList){
             	_log.debug("embedded broker initializing url = " + url);
-            	broker.addConnector(url);
+            	TransportConnector connector = broker.addConnector(url);
+            	if(_discoveryMethod != null && _discoveryAddress != null) {
+                    connector.setDiscoveryUri(new URI(_discoveryMethod + "://" + _discoveryAddress));
+                    connector.getDiscoveryAgent().setBrokerName(_name);
+                }
             }
             
         } catch (Exception e) {

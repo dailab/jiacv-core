@@ -5,6 +5,7 @@
 	- Application context definition for usage within CommunicationBean related tests and examples 
 -->
 <beans>
+	<import resource="classpath:de/dailab/jiactng/agentcore/comm/Broker/activeMQBrokerContext.xml"/>
 
 	<bean name="CommunicationPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
 		<property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties"></property>
@@ -52,10 +53,6 @@
 	</bean>
 
 	<bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false"></bean>
-
-	<bean name="amqConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory" singleton="false">
-		<property name="brokerURL" value="tcp://localhost:61616"></property>
-	</bean>
 
 
 </beans>

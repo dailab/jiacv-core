@@ -31,6 +31,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
+import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
 import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
@@ -84,7 +85,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	private Set<Map> _jmxConnectors = null;
 
 	/** Der eingebettete JMSBroker zur Inter-AgentNode-Kommunikation */
-	JmsBrokerAMQ _embeddedBroker = null;
+	ActiveMQBroker _embeddedBroker = null;
 
 	/** Das ServiceDirectory des AgentNodes */
 	private ServiceDirectory _serviceDirectory = null;
@@ -116,7 +117,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		_uuid = IdFactory.createAgentNodeId(this.hashCode());
 	}
 
-	public void setEmbeddedBroker(JmsBrokerAMQ embeddedBroker) {
+	public void setEmbeddedBroker(ActiveMQBroker embeddedBroker) {
 		_embeddedBroker = embeddedBroker;
 		_embeddedBroker.setAgentNode(this);
 	}
@@ -829,10 +830,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	 *         node
 	 */
 	public CompositeData getAmqBrokerValues() {
-		if ((_embeddedBroker == null) || (_embeddedBroker.getValues() == null)) {
-			return null;
-		}
-		BrokerValues values = _embeddedBroker.getValues();
+//		if ((_embeddedBroker == null) || (_embeddedBroker.getValues() == null)) {
+//			return null;
+//		}
+//		BrokerValues values = _embeddedBroker.getValues();
 		String[] itemNames = new String[] { "DiscoveryAddress",
 				"DiscoveryMethod", "Name", "Url", "Jmx", "Persistent", "Port",
 				"Protocol" };
@@ -847,10 +848,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
 							SimpleType.STRING, SimpleType.STRING });
 			return new CompositeDataSupport(type, itemNames, new Object[] {
-					values.getDiscoveryAddress(), values.getDiscoveryMethod(),
-					values.getName(), values.getUrl(), values.isJmx(),
-					values.isPersistent(), values.getPort(),
-					values.getProtocol() });
+//					values.getDiscoveryAddress(), values.getDiscoveryMethod(),
+//					values.getName(), values.getUrl(), values.isJmx(),
+//					values.isPersistent(), values.getPort(),
+//					values.getProtocol() 
+					});
 		} catch (OpenDataException e) {
 			e.printStackTrace();
 			return null;
@@ -1025,7 +1027,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 
 		// register message broker for management
 		if (_embeddedBroker != null) {
-			_embeddedBroker.enableManagement(manager);
+			/* TODO Managment implementation for revised ActiveMQBroker */
+//			_embeddedBroker.enableManagement(manager);
 		}
 
 		// enable remote management
@@ -1052,7 +1055,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 
 		// deregister message broker from management
 		if (_embeddedBroker != null) {
-			_embeddedBroker.disableManagement();
+			/* TODO Managment implementation for revised ActiveMQBroker */
+//			_embeddedBroker.disableManagement();
 		}
 
 		// deregister service directory from management

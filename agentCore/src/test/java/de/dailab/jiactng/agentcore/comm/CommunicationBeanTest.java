@@ -15,6 +15,7 @@ import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
+import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
 import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
@@ -24,7 +25,7 @@ public class CommunicationBeanTest extends TestCase {
 
 	public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.CommunicationBean#send";
 
-	private static JmsBrokerAMQ _broker;
+	private static ActiveMQBroker _broker;
 	private static IAgentNode _communicationPlatform;
 	private static IAgent _communicator;
     private static int testCount= -1;
@@ -44,18 +45,20 @@ public class CommunicationBeanTest extends TestCase {
 			testCount= 0;
 			_log = LogFactory.getLog("CommunicationBeanTestLog");
 			super.setUp();
-			BrokerValues values = BrokerValues.getDefaultInstance();
-			_broker = new JmsBrokerAMQ();
-			_broker.setValues(values);
+			
+			ClassPathXmlApplicationContext brokerContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml");
+			
+			_broker = (ActiveMQBroker) brokerContext.getBean("activeMQBroker"); 
 			_broker.setLog(_log);
+			_log.info("Broker initializing");
 			try {
 				_broker.doInit();
 				_broker.doStart();
 			} catch (Exception e1) {
 				_log.error(e1.getCause());
 			}
-			_broker.start();
-			System.out.println("broker started");
+//			_broker.start();
+			_log.info("Broker started");
 
 			ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/communicationTestContext.xml");
 			_communicationPlatform = (IAgentNode) xmlContext.getBean("CommunicationPlatform");
@@ -74,6 +77,9 @@ public class CommunicationBeanTest extends TestCase {
 				}
 			}
 
+
+			_log.info("Setting up Test Environment");
+
 			int n = 10;
 
 			for (int i = 0; i <= n; i++){
@@ -89,6 +95,7 @@ public class CommunicationBeanTest extends TestCase {
 	}
 
 	public void testRegister() throws Exception {
+		_log.info("Testing registering Listeners");
         testCount++;
 		System.out.println("Testing registering Listeners");
 
@@ -108,7 +115,7 @@ public class CommunicationBeanTest extends TestCase {
         _addressToListenerMap = _cBean.addressToListenerMap;
         
 		// WildcardListener setup is checked....
-		System.out.println("Begin of SetupCheck of registered Listeners");
+		_log.info("Begin of SetupCheck of registered Listeners");
 		
 		// AddressListener setup is checked...
 		
@@ -126,8 +133,9 @@ public class CommunicationBeanTest extends TestCase {
 	}
 
 	public void testUnregister() throws Exception {
+		_log.info("Checking unregistering of Listeners");
         testCount++;
-		System.out.println("Checking unregistering of Listeners");
+
 		List<ListenerContext> a1List = _addressToListenerMap.get(_addressList.get(1));
 		
 		assertNotNull("Check: Still Listeners on address 1", a1List);
@@ -142,16 +150,16 @@ public class CommunicationBeanTest extends TestCase {
 		
 	}
 
+	
 	@Override
 	protected void tearDown() throws Exception {
 		if(testCount >= 2){
+			_log.info("tearing down testing environment");
 			super.tearDown();
 			((SimpleAgentNode)_communicationPlatform).shutdown();
-//			_communicationPlatform.stop();
-//			_communicationPlatform.cleanup();
 			_broker.doStop();
 			_broker.doCleanup();
-			
+			_log.info("CommunicationBeanTest closed. All Tests done. Good Luck!");
 		}
 	}
 	

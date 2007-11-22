@@ -9,12 +9,14 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
+import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
 import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
 import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.comm.helpclasses.TestContent;
@@ -37,13 +39,12 @@ import de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport;
 
 public class JmsTransportExample implements IMessageTransportDelegate {
 
-	private static String username = ActiveMQConnection.DEFAULT_USER;
-	private static String password = ActiveMQConnection.DEFAULT_PASSWORD;
-	private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
-	private static ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(username, password, url);
+	private static ClassPathXmlApplicationContext brokerContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml");
+	private static ActiveMQBroker broker = (ActiveMQBroker) brokerContext.getBean("activeMQBroker");
+	private static ActiveMQConnectionFactory connectionFactory = (ActiveMQConnectionFactory) brokerContext.getBean("amqConnectionFactory");
 
-	BrokerValues values = BrokerValues.getDefaultInstance();
-	JmsBrokerAMQ broker = new JmsBrokerAMQ();
+	 
+	
 	
 	/** A customized logging configuration will be used instead of the default configuration. */
 	private String loggingConfig = "classpath:de/dailab/jiactng/agentcore/comm/examples/myLog4j.properties";
@@ -151,8 +152,7 @@ public class JmsTransportExample implements IMessageTransportDelegate {
 	
 	public void doInit(){
 		// Broker Setup
-		System.out.println("Given Values for Broker: " + values.toString());
-		broker.setValues(values);
+		System.out.println("Initializing...");
 		broker.setLog(log);
 		try {
 			broker.doInit();

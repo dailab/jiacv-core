@@ -47,10 +47,10 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	private EventedTupleSpace<IFact> space;
 
 	/** The agent which contains this memory */
-	private IAgent thisAgent = null;
+	private transient IAgent thisAgent = null;
 
 	/** The manager of the memory */
-	private Manager _manager = null;
+	private transient Manager _manager = null;
 
     /**
      * During initialization the TupleSpace is created.

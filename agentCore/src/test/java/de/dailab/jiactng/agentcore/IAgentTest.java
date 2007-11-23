@@ -59,7 +59,6 @@ public class IAgentTest extends TestCase {
 
   public void testGetLog() {
     assertNotNull("Agent.getLog is null", agent.getLog(bean));
-    Log log = agent.getLog(bean);
   }
 
   public void testInit() {

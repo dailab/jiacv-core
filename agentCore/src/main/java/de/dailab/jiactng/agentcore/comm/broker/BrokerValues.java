@@ -149,10 +149,10 @@ public class BrokerValues {
 		InetAddress current = null;
 		try {
 			current = InetAddress.getLocalHost();
+			return _protocol + PROTOCOL_IP_SEPARATOR + current.getHostAddress() + IP_PORT_SEPARATOR + _port;
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
+			return _protocol + PROTOCOL_IP_SEPARATOR + "<unknownhost>" + IP_PORT_SEPARATOR + _port;
 		}
-		
-		return _protocol + PROTOCOL_IP_SEPARATOR + current.getHostAddress() + IP_PORT_SEPARATOR + _port;
 	}
 }

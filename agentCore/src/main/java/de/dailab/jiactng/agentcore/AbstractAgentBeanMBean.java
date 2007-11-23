@@ -18,7 +18,7 @@ public interface AbstractAgentBeanMBean extends AbstractLifecycleMBean {
 	
 	/**
 	 * Setter for attribute "BeanName" of the managed agent bean.
-	 * @param the new name of this agent bean
+	 * @param name the new name of this agent bean
 	 */
 	public void setBeanName(String name);
 

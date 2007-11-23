@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
@@ -44,6 +45,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	/**
 	 * Creates an agent bean that may use lifecycle support in strict mode. This
 	 * means, that the lifecycle graph is enforced.
+	 * 
+	 * @param strict
+	 *            Flag, that determines, whether the lifecylce of this agentbean
+	 *            should run in strict mode or not.
+	 * @see ILifecycle
 	 */
 	public AbstractAgentBean(boolean strict) {
 		super(strict);
@@ -65,11 +71,10 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 */
 	protected String beanName = null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentBean#setThisAgent(de.dailab.jiactng.agentcore.IAgent)
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public final void setThisAgent(IAgent agent) {
 		// update management
 		if (isManagementEnabled()) {
@@ -85,20 +90,18 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		this.log = thisAgent.getLog(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentBean#setMemory(de.dailab.jiactng.agentcore.knowledge.IMemory)
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public final void setMemory(IMemory mem) {
 		this.memory = mem;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentBean#setBeanName(java.lang.String)
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public final void setBeanName(String name) {
 		// update management
 		if (isManagementEnabled()) {
@@ -116,11 +119,10 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.AgentBeanMBean#getBeanName()
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public final String getBeanName() {
 		return beanName;
 		// return new StringBuffer(thisAgent.getAgentName()).append(".").append(
@@ -129,90 +131,97 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 
 	/**
 	 * Gets information about the logger of this bean.
+	 * 
 	 * @return information about levels of the logger
 	 */
 	public CompositeData getLog() {
 		if (log == null) {
 			return null;
 		}
-		String[] itemNames = new String[] {"DebugEnabled", "ErrorEnabled", "FatalEnabled", "InfoEnabled", "TraceEnabled", "WarnEnabled"};
+		String[] itemNames = new String[] { "DebugEnabled", "ErrorEnabled",
+				"FatalEnabled", "InfoEnabled", "TraceEnabled", "WarnEnabled" };
 		try {
-			CompositeType type = new CompositeType(log.getClass().getName(), "Logger information", itemNames, itemNames, new OpenType[] {SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN});
-			return new CompositeDataSupport(type, itemNames, new Object[] {log.isDebugEnabled(), log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(), log.isTraceEnabled(), log.isWarnEnabled()});
-		}
-		catch (OpenDataException e) {
+			CompositeType type = new CompositeType(log.getClass().getName(),
+					"Logger information", itemNames, itemNames, new OpenType[] {
+							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
+							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
+							SimpleType.BOOLEAN, SimpleType.BOOLEAN });
+			return new CompositeDataSupport(type, itemNames, new Object[] {
+					log.isDebugEnabled(), log.isErrorEnabled(),
+					log.isFatalEnabled(), log.isInfoEnabled(),
+					log.isTraceEnabled(), log.isWarnEnabled() });
+		} catch (OpenDataException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public void doInit() throws Exception {
 		if (log == null) {
 			this.log = thisAgent.getLog(this);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public void doStart() throws Exception {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStop()
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public void doStop() throws Exception {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doCleanup()
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public void doCleanup() throws Exception {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentBean#execute()
-	 */
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public void execute() {
 	};
 
 	/**
-     * Registers the agent bean and all its resources for management
-     * @param manager
+	 * Registers the agent bean and all its resources for management
+	 * 
+	 * @param manager the manager responsible for this agentbean.
 	 */
 	public void enableManagement(Manager manager) {
 		// do nothing if management already enabled
 		if (isManagementEnabled()) {
 			return;
 		}
-		
+
 		// register agent bean for management
 		try {
 			manager.registerAgentBean(this, thisAgent);
+		} catch (Exception e) {
+			System.err.println("WARNING: Unable to register agent bean "
+					+ beanName + " of agent " + thisAgent.getAgentName()
+					+ " of agent node " + thisAgent.getAgentNode().getName()
+					+ " as JMX resource.");
+			System.err.println(e.getMessage());
 		}
-		catch (Exception e) {
-			System.err.println("WARNING: Unable to register agent bean " + beanName + " of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());					
-		}
-		
+
 		_manager = manager;
 	}
-	  
+
 	/**
 	 * Deregisters the agent bean and all its resources from management
+	 * 
 	 * @param manager
 	 */
 	public void disableManagement() {
@@ -220,25 +229,28 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		if (!isManagementEnabled()) {
 			return;
 		}
-		
+
 		// deregister agent bean from management
 		try {
 			_manager.unregisterAgentBean(this, thisAgent);
+		} catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister agent bean "
+					+ beanName + " of agent " + thisAgent.getAgentName()
+					+ " of agent node " + thisAgent.getAgentNode().getName()
+					+ " as JMX resource.");
+			System.err.println(e.getMessage());
 		}
-		catch (Exception e) {
-			System.err.println("WARNING: Unable to deregister agent bean " + beanName + " of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());					
-		}		
-		
+
 		_manager = null;
 	}
 
 	/**
 	 * Checks wether the management of this object is enabled or not.
+	 * 
 	 * @return true if the management is enabled, otherwise false
 	 */
 	public boolean isManagementEnabled() {
 		return _manager != null;
 	}
-	  
+
 }

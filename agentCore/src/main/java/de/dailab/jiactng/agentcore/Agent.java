@@ -108,7 +108,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * as well. TODO do something more intelligent, possibly recover the bean
 	 * without stopping the agent.
 	 */
-	private long beanExecutionTimeout = 5*60*1000;
+	private long beanExecutionTimeout = 5 * 60 * 1000;
 
 	private ArrayList<Action> actionList = null;
 
@@ -130,30 +130,27 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		agentId = IdFactory.createAgentId(this.hashCode());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#setMemory(de.dailab.jiactng.agentcore.knowledge.IMemory)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setMemory(IMemory memory) {
 		this.memory = memory;
 		memory.setThisAgent(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#getAgentBeans()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public ArrayList<IAgentBean> getAgentBeans() {
 		return agentBeans;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#setAgentBeans(java.util.ArrayList)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setAgentBeans(ArrayList<IAgentBean> agentbeans) {
 		this.agentBeans = agentbeans;
 
@@ -163,11 +160,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#run()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void run() {
 		while (active) {
 			try {
@@ -203,17 +199,17 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * Setter for the agentname. Called by Spring via the BeanNameAware
 	 * interface.
 	 * 
+	 * @param arg0 the name of the agent.
 	 * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String arg0) {
 		setAgentName(arg0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#onEvent(de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void onEvent(LifecycleEvent evt) {
 		// TODO Auto-generated method stub
 
@@ -222,6 +218,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * Stops and undeploys this agent from its agent node (incl. deregistration
 	 * as JMX resource).
+	 * 
+	 * @throws LifecycleException
 	 */
 	public void remove() throws LifecycleException {
 		// clean up agent
@@ -234,10 +232,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#doCleanup()
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void doCleanup() throws LifecycleException {
@@ -267,10 +263,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		this.memory.cleanup();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#doInit()
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void doInit() throws LifecycleException {
@@ -302,7 +296,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			if (ab instanceof IEffector) {
 				ArrayList<? extends Action> acts = ((IEffector) ab)
 						.getActions();
-				if (acts !=null) {
+				if (acts != null) {
 					for (Action item : acts) {
 						memory.write(item);
 						actionList.add(item);
@@ -314,10 +308,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		updateState(LifecycleStates.INITIALIZED);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#doStart()
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void doStart() throws LifecycleException {
@@ -341,10 +333,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		updateState(LifecycleStates.STARTED);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#doStop()
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void doStop() throws LifecycleException {
@@ -398,10 +388,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 				new ThisAgentDescription(null, null, newState.name(), null));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#getAgentState()
+	/**
+	 * {@inheritDoc}
 	 */
 	public LifecycleStates getAgentState() {
 		return LifecycleStates.valueOf(memory.read(
@@ -424,18 +412,19 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 				new AgentBeanDescription(beanName, null)).getState());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#getAgentName()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getAgentName() {
 		return this.agentName;
 	}
 
 	/**
 	 * Setter for the agentname.
-	 * @param agentname the new name of the agent
+	 * 
+	 * @param agentname
+	 *            the new name of the agent
 	 * @see #setBeanName(java.lang.String)
 	 */
 	public void setAgentName(String agentname) {
@@ -455,48 +444,42 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#getThreadPool()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public ExecutorService getThreadPool() {
 		return agentNode.getThreadPool();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#getExecution()
+	/**
+	 * {@inheritDoc}
 	 */
 	public IExecutionCycle getExecution() {
 		return execution;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#setExecution(de.dailab.jiactng.agentcore.IExecutionCycle)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setExecution(IExecutionCycle execution) {
 		this.execution = execution;
 		this.execution.setAgent(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#getAgentNode()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public IAgentNode getAgentNode() {
 		return agentNode;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#setAgentNode(de.dailab.jiactng.agentcore.IAgentNode)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setAgentNode(IAgentNode agentNode) {
 		// update management
 		if (isManagementEnabled()) {
@@ -512,38 +495,43 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		this.agentLog = this.agentNode.getLog(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#getOwner()
-	 * @see de.dailab.jiactng.agentcore.AgentMBean#getOwner()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getOwner() {
 		return owner;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgent#setOwner(java.lang.String)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Log getLog(IAgentBean bean) {
 		if (agentNode == null) {
 			return null;
 		}
 		return agentNode.getLog(this, bean);
 	}
-    
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public Log getLog(IAgentBean owner, String extension) {
 		if (agentNode == null) {
 			return null;
 		}
-        return agentNode.getLog(this, owner, extension);
-    }
+		return agentNode.getLog(this, owner, extension);
+	}
 
 	/**
 	 * Returns the timeout after which the execution of a bean will be stopped.
@@ -582,6 +570,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		return memory.read(new ThisAgentDescription(null, null, null, null));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public ArrayList<String> getAgentBeanNames() {
 		ArrayList<String> ret = new ArrayList<String>();
 		for (IAgentBean bean : getAgentBeans()) {
@@ -590,16 +582,25 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		return ret;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public ArrayList<Action> getActionList() {
 		return actionList;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setActionList(ArrayList<Action> actionList) {
 		this.actionList = actionList;
 	}
 
 	/**
 	 * Getter for attribute "ActionNames" of the managed agent.
+	 * 
 	 * @return name of actions provided by this agent
 	 */
 	public ArrayList<String> getActionNames() {
@@ -607,75 +608,104 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		for (Action action : getActionList()) {
 			ret.add(action.getName());
 		}
-		return ret;		
+		return ret;
 	}
 
 	/**
 	 * Getter for attribute "Logger" of the managed agent.
+	 * 
 	 * @return information about the logger of this agent
 	 */
 	public CompositeData getLogger() {
 		if (agentLog == null) {
 			return null;
 		}
-		String[] itemNames = new String[] {"class", "debug", "error", "fatal", "info", "trace", "warn"};
+		String[] itemNames = new String[] { "class", "debug", "error", "fatal",
+				"info", "trace", "warn" };
 		try {
-			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] {"Implementation of the logger instance", "debug", "error", "fatal", "info", "trace", "warn"}, new OpenType[] {SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN});
-			return new CompositeDataSupport(type, itemNames, new Object[] {agentLog.getClass().getName(), agentLog.isDebugEnabled(), agentLog.isErrorEnabled(), agentLog.isFatalEnabled(), agentLog.isInfoEnabled(), agentLog.isTraceEnabled(), agentLog.isWarnEnabled()});
-		}
-		catch (OpenDataException e) {
+			CompositeType type = new CompositeType(
+					"javax.management.openmbean.CompositeDataSupport",
+					"Logger information", itemNames, new String[] {
+							"Implementation of the logger instance", "debug",
+							"error", "fatal", "info", "trace", "warn" },
+					new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN,
+							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
+							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
+							SimpleType.BOOLEAN });
+			return new CompositeDataSupport(type, itemNames, new Object[] {
+					agentLog.getClass().getName(), agentLog.isDebugEnabled(),
+					agentLog.isErrorEnabled(), agentLog.isFatalEnabled(),
+					agentLog.isInfoEnabled(), agentLog.isTraceEnabled(),
+					agentLog.isWarnEnabled() });
+		} catch (OpenDataException e) {
 			e.printStackTrace();
 			return null;
-		}		
+		}
 	}
 
 	/**
 	 * Getter for attribute "MemoryData" of the managed agent.
+	 * 
 	 * @return implementation of the memory of this agent
 	 */
 	public CompositeData getMemoryData() {
 		if (memory == null) {
 			return null;
 		}
-		String[] itemNames = new String[] {"class", "matcher", "updater"};
+		String[] itemNames = new String[] { "class", "matcher", "updater" };
 		try {
-			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Memory information", itemNames, new String[] {"Implementation of the memory instance", "Implementation of the matcher instance", "Implementation of the updater instance"}, new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.STRING});
-			return new CompositeDataSupport(type, itemNames, new Object[] {memory.getClass().getName(), (memory.getMatcher() == null)? null:memory.getMatcher().getClass().getName(), (memory.getUpdater() == null)? null:memory.getUpdater().getClass().getName()});
-		}
-		catch (OpenDataException e) {
+			CompositeType type = new CompositeType(
+					"javax.management.openmbean.CompositeDataSupport",
+					"Memory information", itemNames, new String[] {
+							"Implementation of the memory instance",
+							"Implementation of the matcher instance",
+							"Implementation of the updater instance" },
+					new OpenType[] { SimpleType.STRING, SimpleType.STRING,
+							SimpleType.STRING });
+			return new CompositeDataSupport(type, itemNames, new Object[] {
+					memory.getClass().getName(),
+					(memory.getMatcher() == null) ? null : memory.getMatcher()
+							.getClass().getName(),
+					(memory.getUpdater() == null) ? null : memory.getUpdater()
+							.getClass().getName() });
+		} catch (OpenDataException e) {
 			e.printStackTrace();
 			return null;
-		}		
+		}
 	}
 
 	/**
 	 * Getter for attribute "ExecutionCycleClass" of the managed agent.
+	 * 
 	 * @return implementation of the execution cycle of this agent
 	 */
 	public String getExecutionCycleClass() {
 		if (execution == null) {
 			return null;
 		}
-		return execution.getClass().getName();	
+		return execution.getClass().getName();
 	}
 
 	/**
-     * Registers the agent and all its resources for management
-     * @param manager the manager to be used for registration
+	 * Registers the agent and all its resources for management
+	 * 
+	 * @param manager
+	 *            the manager to be used for registration
 	 */
 	public void enableManagement(Manager manager) {
 		// do nothing if management already enabled
 		if (isManagementEnabled()) {
 			return;
 		}
-		
+
 		// register agent for management
 		try {
 			manager.registerAgent(this);
-		}
-		catch (Exception e) {
-			System.err.println("WARNING: Unable to register agent " + getAgentName() + " of agent node " + getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());					
+		} catch (Exception e) {
+			System.err.println("WARNING: Unable to register agent "
+					+ getAgentName() + " of agent node "
+					+ getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());
 		}
 
 		// register agent beans for management
@@ -695,9 +725,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
 		_manager = manager;
 	}
-	  
+
 	/**
 	 * Deregisters the agent and all its resources from management
+	 * 
 	 * @param manager
 	 */
 	public void disableManagement() {
@@ -720,25 +751,27 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		for (IAgentBean ab : this.agentBeans) {
 			ab.disableManagement();
 		}
-		
+
 		// deregister agent from management
 		try {
 			_manager.unregisterAgent(this);
+		} catch (Exception e) {
+			System.err.println("WARNING: Unable to deregister agent "
+					+ getAgentName() + " of agent node "
+					+ getAgentNode().getName() + " as JMX resource.");
+			System.err.println(e.getMessage());
 		}
-		catch (Exception e) {
-			System.err.println("WARNING: Unable to deregister agent " + getAgentName() + " of agent node " + getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());					
-		}
-		
+
 		_manager = null;
 	}
 
 	/**
 	 * Checks wether the management of this object is enabled or not.
+	 * 
 	 * @return true if the management is enabled, otherwise false
 	 */
 	public boolean isManagementEnabled() {
 		return _manager != null;
 	}
-	  
+
 }

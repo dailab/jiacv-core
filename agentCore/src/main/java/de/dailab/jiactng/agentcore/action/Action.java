@@ -108,8 +108,6 @@ public class Action implements IFact {
 	 * @see de.dailab.jiactng.agentcore.action.ActionResult
 	 * @param resultOf
 	 *            the DoAction-object that triggered the action.
-	 * @param success
-	 *            flag for successful execution of the action.
 	 * @param results
 	 *            the results that come from executing the action.
 	 * @param source
@@ -193,7 +191,10 @@ public class Action implements IFact {
 		this.results = results == null ? EMPTY_CLASSES : results;
 	}
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
+	@Override
     public int hashCode() {
         int hash= name == null ? 0 : name.hashCode();
         
@@ -208,7 +209,10 @@ public class Action implements IFact {
         return hash;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
+	@Override
     public boolean equals(Object obj) {
         if(obj == null || !(obj instanceof Action)) {
             return false;
@@ -247,7 +251,10 @@ public class Action implements IFact {
         return true;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
+	@Override
     public String toString() {
         StringBuilder builder= new StringBuilder();
         builder.append("Action:\n name='").append(name).append("'");
@@ -259,6 +266,9 @@ public class Action implements IFact {
         return builder.toString();
     }
     
+	/*
+	 * Utility-method for a nicely formatted output
+	 */
     private void prettyPrintArray(StringBuilder builder, Class[] array) {
         builder.append('[');
         int last= array.length - 1;

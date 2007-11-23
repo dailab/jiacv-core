@@ -19,6 +19,12 @@ import de.dailab.jiactng.agentcore.action.ActionResult;
  */
 public interface ResultReceiver extends IAgentBean {
 
+	
+	/**
+	 * This method is called when a result for an action is delivered 
+	 * 
+	 * @param result the result of an action
+	 */
 	public void receiveResult(ActionResult result);
 
 }

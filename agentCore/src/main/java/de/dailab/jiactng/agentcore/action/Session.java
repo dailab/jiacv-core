@@ -24,10 +24,11 @@ public class Session implements IFact {
 	private long creationTime;
 
 	/** Stores the reference to the creator of this session. */
-    /* 
-     * FIXME: this source is transient now... examine whether this provides issues
-     *        -> remember that session objects are serialised in the Remote* classes!
-     */
+	/*
+	 * FIXME: this source is transient now... examine whether this provides
+	 * issues -> remember that session objects are serialised in the Remote*
+	 * classes!
+	 */
 	private transient ResultReceiver source;
 
 	/**
@@ -183,40 +184,44 @@ public class Session implements IFact {
 		return history.remove(o);
 	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder= new StringBuilder();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
 
-        // id
-        builder.append("Session:\n id=");
-        if (id != null) {
-        	builder.append("'").append(id).append("'");
-        } else {
-        	builder.append("null");
-        }
+		// id
+		builder.append("Session:\n id=");
+		if (id != null) {
+			builder.append("'").append(id).append("'");
+		} else {
+			builder.append("null");
+		}
 
-        // time
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(creationTime);
-        builder.append("\n created='").append(calendar.getTime().toString()).append("'");
+		// time
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(creationTime);
+		builder.append("\n created='").append(calendar.getTime().toString())
+				.append("'");
 
-        // source
-        builder.append("\n source=");
-        if (source != null) {
-        	builder.append("'").append(source.getBeanName()).append("'");
-        } else {
-        	builder.append("null");
-        }
-        
-        // history
-        builder.append("\n history=");
-        if (history != null) {
-        	builder.append(history.toString());
-        } else {
-        	builder.append("null");
-        }
+		// source
+		builder.append("\n source=");
+		if (source != null) {
+			builder.append("'").append(source.getBeanName()).append("'");
+		} else {
+			builder.append("null");
+		}
 
-        builder.append('\n');
-        return builder.toString();
-    }
+		// history
+		builder.append("\n history=");
+		if (history != null) {
+			builder.append(history.toString());
+		} else {
+			builder.append("null");
+		}
+
+		builder.append('\n');
+		return builder.toString();
+	}
 }

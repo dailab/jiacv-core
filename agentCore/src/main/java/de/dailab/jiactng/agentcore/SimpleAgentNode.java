@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore;
 
-//import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -32,8 +31,6 @@ import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
 import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
-import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
-import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -117,6 +114,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		_uuid = IdFactory.createAgentNodeId(this.hashCode());
 	}
 
+
+	/**
+	 * Setter fot the embedded broker.
+	 * 
+	 * @param embeddedBroker the broker for this agentnode.
+	 */
 	public void setEmbeddedBroker(ActiveMQBroker embeddedBroker) {
 		_embeddedBroker = embeddedBroker;
 		_embeddedBroker.setAgentNode(this);
@@ -124,25 +127,25 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 
 	/**
 	 * Configuration of a set of JMX connector server.
+	 * 
+	 * @param jmxConnectors the set of connectors.
 	 */
 	public void setJmxConnectors(Set<Map> jmxConnectors) {
 		this._jmxConnectors = jmxConnectors;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#setAgents(java.util.ArrayList)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setAgents(ArrayList<IAgent> agents) {
 		_agents = agents;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#addAgent(de.dailab.jiactng.agentcore.IAgent)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void addAgent(IAgent agent) {
 		agent.setAgentNode(this);
 
@@ -159,11 +162,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		agent.enableManagement(_manager);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#removeAgent(de.dailab.jiactng.agentcore.IAgent)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void removeAgent(IAgent agent) {
 		// TODO: statechanges?
 
@@ -196,32 +198,28 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		sendNotification(n);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#findAgents()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public ArrayList<IAgent> findAgents() {
 		// TODO: Security must decide whether the lifelist should be returned or
 		// not.
 		return _agents;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#getLog(de.dailab.jiactng.agentcore.IAgent)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Log getLog(IAgent agent) {
 		return LogFactory.getLog(getName() + "." + agent.getAgentName());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#getLog(de.dailab.jiactng.agentcore.IAgent,
-	 *      de.dailab.jiactng.agentcore.AbstractAgentBean)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Log getLog(IAgent agent, IAgentBean bean) {
 		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "."
 				+ bean.getBeanName());
@@ -251,20 +249,18 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		return "DAI-Labor, TU Berlin";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#getUUID()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getUUID() {
 		return this._uuid;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#getName()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String getName() {
 		return _name;
 	}
@@ -329,11 +325,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#setBeanName(java.lang.String)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setBeanName(String name) {
 		if (isManagementEnabled()) {
 			Manager manager = _manager;
@@ -478,11 +473,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		}
 	}
 
-	/*
-	 * (non-Javadoc) init all registered agents
-	 * 
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doInit()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void doInit() {
 		// init message broker
 		if (_embeddedBroker != null) {
@@ -536,11 +530,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStart()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void doStart() {
 		// start message broker
 		if (_embeddedBroker != null) {
@@ -591,11 +584,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 				+ (_agents != null ? _agents.size() : "0") + " agents");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doStop()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void doStop() {
 		// call stop() for all agents if any
 		if (_agents != null) {
@@ -643,11 +635,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#doCleanup()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void doCleanup() {
 		// call cleanup for all agents if any
 		if (_agents != null) {
@@ -698,20 +689,18 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public String toString() {
 		return getName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IAgentNode#getThreadPool()
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public ExecutorService getThreadPool() {
 		return _threadPool;
 	}
@@ -830,10 +819,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	 *         node
 	 */
 	public CompositeData getAmqBrokerValues() {
-//		if ((_embeddedBroker == null) || (_embeddedBroker.getValues() == null)) {
-//			return null;
-//		}
-//		BrokerValues values = _embeddedBroker.getValues();
+		// if ((_embeddedBroker == null) || (_embeddedBroker.getValues() ==
+		// null)) {
+		// return null;
+		// }
+		// BrokerValues values = _embeddedBroker.getValues();
 		String[] itemNames = new String[] { "DiscoveryAddress",
 				"DiscoveryMethod", "Name", "Url", "Jmx", "Persistent", "Port",
 				"Protocol" };
@@ -848,10 +838,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
 							SimpleType.STRING, SimpleType.STRING });
 			return new CompositeDataSupport(type, itemNames, new Object[] {
-//					values.getDiscoveryAddress(), values.getDiscoveryMethod(),
-//					values.getName(), values.getUrl(), values.isJmx(),
-//					values.isPersistent(), values.getPort(),
-//					values.getProtocol() 
+			// values.getDiscoveryAddress(), values.getDiscoveryMethod(),
+					// values.getName(), values.getUrl(), values.isJmx(),
+					// values.isPersistent(), values.getPort(),
+					// values.getProtocol()
 					});
 		} catch (OpenDataException e) {
 			e.printStackTrace();
@@ -1028,7 +1018,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		// register message broker for management
 		if (_embeddedBroker != null) {
 			/* TODO Managment implementation for revised ActiveMQBroker */
-//			_embeddedBroker.enableManagement(manager);
+			// _embeddedBroker.enableManagement(manager);
 		}
 
 		// enable remote management
@@ -1056,7 +1046,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		// deregister message broker from management
 		if (_embeddedBroker != null) {
 			/* TODO Managment implementation for revised ActiveMQBroker */
-//			_embeddedBroker.disableManagement();
+			// _embeddedBroker.disableManagement();
 		}
 
 		// deregister service directory from management

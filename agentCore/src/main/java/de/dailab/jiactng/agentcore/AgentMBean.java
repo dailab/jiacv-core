@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
  * JMX compliant management interface of agents to get information
@@ -52,7 +53,7 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Sets the timeout after which the execution of a bean of the managed agent will be stopped.
-	 * @return the new timeout in milliseconds
+	 * @param beanExecutionTimeout the new timeout in milliseconds
 	 */
 	public void setBeanExecutionTimeout(long beanExecutionTimeout);
 
@@ -82,9 +83,10 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Undeploys this agent from its agent node.
+     *
      * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
 	 */
-	public void remove() throws Exception;
+	public void remove() throws LifecycleException;
 
 	/**
 	 * Getter for attribute "AgentBeanNames" of the managed agent.

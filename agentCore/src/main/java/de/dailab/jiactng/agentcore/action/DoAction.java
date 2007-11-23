@@ -15,18 +15,24 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * 
  */
 public class DoAction extends SessionEvent {
-    private final static Object[] EMPTY_OBJECTS= new Object[0];
+	private final static Object[] EMPTY_OBJECTS = new Object[0];
 
 	/** The input-parameters for the action-call */
 	private Object[] params;
 
+	/**
+	 * The owner of this action/invocation / simple implementation of a
+	 * user/tracking
+	 * 
+	 * @TODO: needs real concept and implementation
+	 */
 	private String owner;
-	
+
 	/**
 	 * Constructor for a new action-call. The created object should be written
 	 * to the agents memory to trigger the action execution. Note that it may be
-	 * usefull to store the session object from this object after creation, as it
-	 * will be your only method of retrieving the results of the action-call.
+	 * usefull to store the session object from this object after creation, as
+	 * it will be your only method of retrieving the results of the action-call.
 	 * 
 	 * @param thisAction
 	 *            the action that shall be called.
@@ -42,8 +48,8 @@ public class DoAction extends SessionEvent {
 	/**
 	 * Constructor for a new action-call. The created object should be written
 	 * to the agents memory to trigger the action execution. Note that it may be
-	 * usefull to store the session object from this object after creation, as it
-	 * will be your only method of retrieving the results of the action-call.
+	 * usefull to store the session object from this object after creation, as
+	 * it will be your only method of retrieving the results of the action-call.
 	 * 
 	 * @param session
 	 *            the session
@@ -54,11 +60,15 @@ public class DoAction extends SessionEvent {
 	 * @param params
 	 *            the input-parameters for the call.
 	 */
-	public DoAction(Session session, Action thisAction, ResultReceiver source, Object[] params) {
+	public DoAction(Session session, Action thisAction, ResultReceiver source,
+			Object[] params) {
 		super(session, thisAction, source);
-		if (session != null) session.addToSessionHistory(this);
+		if (session != null) {
+			session.addToSessionHistory(this);
+		}
 		setParams(params);
 	}
+
 	/**
 	 * Getter for the input-parameters of the action-call.
 	 * 
@@ -69,33 +79,56 @@ public class DoAction extends SessionEvent {
 	}
 
 	/**
-	 * @param params the params to set
+	 * Setter for the parameters of the Trigger.
+	 * 
+	 * @param params
+	 *            the params to set
 	 */
 	public void setParams(Object[] params) {
 		this.params = params == null ? EMPTY_OBJECTS : params;
 	}
 
+	/**
+	 * Getter for the owner of this action-invocation.
+	 * 
+	 * @return the name of the owner
+	 */
 	public String getOwner() {
 		return owner;
 	}
 
+	/**
+	 * Setter for the owner of this action-invocation.
+	 * 
+	 * @param owner
+	 *            the name of the user that initiated this action.
+	 */
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
-    
-    public String typeCheck() {
-        Class[] types= getAction().getParameters();
-        
-        if(types.length != params.length) {
-            return "type length is '" + types.length + "' but param length is '" + params.length + "'";
-        }
-        
-        for(int i= 0; i < types.length; ++i) {
-            if(!types[i].isInstance(params[i])) {
-                return "param" + i + " '" + params[i] + "' mismatch the type '" + types[i] + "'";
-            }
-        }
-        
-        return null;
-    }
+
+	/**
+	 * Utility-method for typechecking of this trigger and it's action
+	 * 
+	 * @return null, if the type declaration of the corresponding action and the
+	 *         parameters of this trigger are compatible, or a String describing
+	 *         the mismatch otherwise.
+	 */
+	public String typeCheck() {
+		Class[] types = getAction().getParameters();
+
+		if (types.length != params.length) {
+			return "type length is '" + types.length
+					+ "' but param length is '" + params.length + "'";
+		}
+
+		for (int i = 0; i < types.length; ++i) {
+			if (!types[i].isInstance(params[i])) {
+				return "param" + i + " '" + params[i] + "' mismatch the type '"
+						+ types[i] + "'";
+			}
+		}
+
+		return null;
+	}
 }

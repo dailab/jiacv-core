@@ -80,38 +80,39 @@ public final class IdFactory {
 	 * chars a to f. A session will not be generated twice. If all possible session id with 
 	 * the specific length are allocated this methode will not return and hangs in a 
 	 * infinite loop. 
-	 * @param length
-	 * @return
+	 * 
+	 * @param length the length of the generated id
+	 * @return a string representing a random and unique session id.
 	 */
 	public static String generate(int length) {
 		StringBuilder buffer = new StringBuilder("");
 		String output = null;
 
 		Random random = new Random();
-		int one_random_int = 0;
+		int oneRandomInt = 0;
 
 		for (int i = 0; i < length; i++) {
-			one_random_int = random.nextInt(16);
-			if (one_random_int == 10) {
+			oneRandomInt = random.nextInt(16);
+			if (oneRandomInt == 10) {
 				buffer.append("a");
 			}
-			else if (one_random_int == 11) {
+			else if (oneRandomInt == 11) {
 				buffer.append("b");
 			}
-			else if (one_random_int == 12) {
+			else if (oneRandomInt == 12) {
 				buffer.append("c");
 			}
-			else if (one_random_int == 13) {
+			else if (oneRandomInt == 13) {
 				buffer.append("d");
 			}
-			else if (one_random_int == 14) {
+			else if (oneRandomInt == 14) {
 				buffer.append("e");
 			}
-			else if (one_random_int == 15) {
+			else if (oneRandomInt == 15) {
 				buffer.append("f");
 			}
 			else {
-				buffer.append(one_random_int);
+				buffer.append(oneRandomInt);
 			}
 			
 			try {
@@ -140,7 +141,8 @@ public final class IdFactory {
 	/**
 	 * Generates a session id with the default session id length. This methode calls 
 	 * generate(int). 
-	 * @return
+	 * 
+	 * @return a string representing a random and unique session id with the default length.
 	 */
 	public static String generate() {
 		return generate(DEFAULT_LENGTH);
@@ -152,7 +154,8 @@ public final class IdFactory {
 	 * life (long running) systems the amount of available unique session ids could be 
 	 * exhausted. This depends on the session id length and the amount of processes with a 
 	 * unique session id. 
-	 * @param session
+	 * 
+	 * @param session removes a sessionID from the list of sessions, so it can be reused.
 	 */
 	public static void devaluate(String session) {
 		allocatedSessions.remove(session);

@@ -1,8 +1,5 @@
 /*
  * Created on 27.02.2007
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 package de.dailab.jiactng.agentcore.environment;
 
@@ -10,23 +7,31 @@ import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
+ * Class is left from design, but has no meaning any longer.
+ * 
  * @author moekon
- *
  */
 public interface ISensor extends IAgentBean {
 
 	/**
-	 * @return
+	 * Getter for the environment of this Sensor
+	 * 
+	 * @return the environment with which this Sensor is associated.
 	 */
 	public IAdaptor getEnvironment();
 
 	/**
-	 * @return
+	 * Reads the current data from this sensor
+	 * 
+	 * @return a fact describing the sensors current data.
 	 */
 	public IFact readSensor();
 
 	/**
-	 * @return
+	 * Getter for the type of the Sensor.
+	 * 
+	 * @return true, if this sensor actively creates data, false if the sensor
+	 *         has to be polled.
 	 */
 	public boolean isActive();
 

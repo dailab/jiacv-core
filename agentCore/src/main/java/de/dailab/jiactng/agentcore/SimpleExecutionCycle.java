@@ -18,6 +18,10 @@ import de.dailab.jiactng.agentcore.management.Manager;
  * 
  * @author Thomas Konnerth
  */
+/**
+ * @author moekon
+ *
+ */
 public class SimpleExecutionCycle extends AbstractAgentBean implements
 		IExecutionCycle {
 
@@ -46,9 +50,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	/**
 	 * Constructor for the class. For creation the reference to the agent is
 	 * needed, as the list of adators is taken from that reference.
-	 * 
-	 * @param agent
-	 *            the reference to the agent.
 	 */
 	public SimpleExecutionCycle() {
 		// this.agent = agent;
@@ -178,13 +179,19 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		}
 	}
 
+	
+    /**
+     * {@inheritDoc}
+     */
+	@Override
 	public void setAgent(IAgent agent) {
 		this.agent = agent;
 	}
 
 	/**
      * Registers the execution cycle for management
-     * @param manager
+     * 
+     * @param manager the manager for this executionCycle
 	 */
 	public void enableManagement(Manager manager) {
 		// do nothing if management already enabled

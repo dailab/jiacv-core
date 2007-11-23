@@ -363,7 +363,7 @@ public class ServiceDescription implements IServiceDescription {
 		StringBuffer sb = new StringBuffer();
 		sb.append('[').append(_name).append(',')
 		.append(_expireDate).append(',')
-		.append("[keywords:").append(Arrays.toString(_keywords.toArray(new String[0]))).append(']').append(',')
+		.append("[keywords:").append(Arrays.toString(_keywords.toArray(new String[_keywords.size()]))).append(']').append(',')
 				.append("[InputParams:").append(parameterToString(_inputParams)).append(']').append(',')
     .append("[OutputParams:").append(parameterToString(_outputParams)).append(']').append(',')
     .append(_providerAddress).append(',')
@@ -374,7 +374,7 @@ public class ServiceDescription implements IServiceDescription {
 	
 	private String parameterToString(List<ServiceParameter> param) {
 		if (param != null) {
-			return Arrays.toString(param.toArray(new ServiceParameter[0]));
+			return Arrays.toString(param.toArray(new ServiceParameter[param.size()]));
 		}
 		return "null";
 	}

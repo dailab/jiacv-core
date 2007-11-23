@@ -216,7 +216,7 @@ public class Action implements IFact {
         
         Action other= (Action) obj;
 
-        if((name == null || other.name == null) && (name != other.name)) {
+        if((name == null || other.name == null) && (!name.equals(other.name))) {
             return false;
         }
         

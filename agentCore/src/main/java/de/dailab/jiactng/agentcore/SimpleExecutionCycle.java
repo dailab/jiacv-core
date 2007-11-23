@@ -150,9 +150,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 */
 	@Override
 	public void doInit() {
-		synchronized (syncFlag) {
-
-		}
 	}
 
 	/**

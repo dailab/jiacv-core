@@ -43,8 +43,8 @@ import de.dailab.jiactng.agentcore.management.Manager;
  */
 public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 
-	private SpaceDestroyer<IFact> destroyer;
-	private EventedTupleSpace<IFact> space;
+	private SpaceDestroyer<IFact> destroyer = null;
+	private EventedTupleSpace<IFact> space = null;
 
 	/** The agent which contains this memory */
 	private transient IAgent thisAgent = null;

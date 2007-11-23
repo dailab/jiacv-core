@@ -65,6 +65,10 @@ abstract class CommunicationAddress implements ICommunicationAddress {
             return false;
         }
         
+        if(!(obj instanceof CommunicationAddress)) {
+        	return false;
+        }
+        
         CommunicationAddress other= (CommunicationAddress) obj;
         return toURI().equals(other.toURI());
     }

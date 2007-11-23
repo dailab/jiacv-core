@@ -41,7 +41,7 @@ import de.dailab.jiactng.agentcore.management.Manager;
  */
 public class JmxManager implements Manager {
 	
-	private final String DOMAIN = "de.dailab.jiactng";
+	private final static String DOMAIN = "de.dailab.jiactng";
 	private MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 	private ArrayList<JMXConnectorServer> _connectorServer = new ArrayList<JMXConnectorServer>();
 

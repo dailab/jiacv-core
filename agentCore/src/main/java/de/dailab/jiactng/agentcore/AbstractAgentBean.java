@@ -73,8 +73,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 
     /**
      * {@inheritDoc}
-     */
-	@Override
+     */	
 	public final void setThisAgent(IAgent agent) {
 		// update management
 		if (isManagementEnabled()) {
@@ -93,7 +92,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
     /**
      * {@inheritDoc}
      */
-	@Override
 	public final void setMemory(IMemory mem) {
 		this.memory = mem;
 	}
@@ -101,7 +99,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
     /**
      * {@inheritDoc}
      */
-	@Override
 	public final void setBeanName(String name) {
 		// update management
 		if (isManagementEnabled()) {
@@ -122,7 +119,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
     /**
      * {@inheritDoc}
      */
-	@Override
 	public final String getBeanName() {
 		return beanName;
 		// return new StringBuffer(thisAgent.getAgentName()).append(".").append(
@@ -190,7 +186,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
     /**
      * {@inheritDoc}
      */
-	@Override
 	public void execute() {
 	};
 

@@ -183,7 +183,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
     /**
      * {@inheritDoc}
      */
-	@Override
 	public void setAgent(IAgent agent) {
 		this.agent = agent;
 	}

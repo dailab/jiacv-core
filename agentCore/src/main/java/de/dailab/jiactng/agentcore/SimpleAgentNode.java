@@ -48,8 +48,7 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  * @author Joachim Fuchs
  * @author Thomas Konnerth
  */
-public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
-		InitializingBean, SimpleAgentNodeMBean {
+public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, InitializingBean, SimpleAgentNodeMBean {
 
 	/** The threadPool object */
 	private ExecutorService _threadPool = null;
@@ -114,7 +113,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		_uuid = IdFactory.createAgentNodeId(this.hashCode());
 	}
 
-
 	/**
 	 * Setter fot the embedded broker.
 	 * 
@@ -137,7 +135,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setAgents(ArrayList<IAgent> agents) {
 		_agents = agents;
 	}
@@ -145,7 +142,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void addAgent(IAgent agent) {
 		agent.setAgentNode(this);
 
@@ -165,7 +162,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void removeAgent(IAgent agent) {
 		// TODO: statechanges?
 
@@ -189,19 +186,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	 * @param newAgentList
 	 *            the new list of agent names
 	 */
-	private void agentListChanged(ArrayList<String> oldAgentList,
-			ArrayList<String> newAgentList) {
-		Notification n = new AttributeChangeNotification(this,
-				sequenceNumber++, System.currentTimeMillis(), "Agents changed",
-				"Agents", "java.util.ArrayList<java.lang.String>",
-				oldAgentList, newAgentList);
+	private void agentListChanged(ArrayList<String> oldAgentList, ArrayList<String> newAgentList) {
+		Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
+				"Agents changed", "Agents", "java.util.ArrayList<java.lang.String>", oldAgentList, newAgentList);
 		sendNotification(n);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public ArrayList<IAgent> findAgents() {
 		// TODO: Security must decide whether the lifelist should be returned or
 		// not.
@@ -211,7 +205,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public Log getLog(IAgent agent) {
 		return LogFactory.getLog(getName() + "." + agent.getAgentName());
 	}
@@ -219,15 +213,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public Log getLog(IAgent agent, IAgentBean bean) {
-		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "."
-				+ bean.getBeanName());
+		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName());
 	}
 
 	public Log getLog(IAgent agent, IAgentBean bean, String extension) {
-		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "."
-				+ bean.getBeanName() + "." + extension);
+		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName() + "." + extension);
 	}
 
 	/**
@@ -236,8 +228,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	 * @return the version of JIAC TNG
 	 */
 	public String getJiacVersion() {
-		return "JIAC TNG " + Version.getName() + " version "
-				+ Version.getNumber() + " (" + Version.getTimestamp() + ")";
+		return "JIAC TNG " + Version.getName() + " version " + Version.getNumber() + " (" + Version.getTimestamp() + ")";
 	}
 
 	/**
@@ -252,7 +243,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public String getUUID() {
 		return this._uuid;
 	}
@@ -260,7 +251,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public String getName() {
 		return _name;
 	}
@@ -309,8 +300,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	 *            agents
 	 */
 	public void addAgents(String configFile) {
-		ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(
-				new String[] { configFile + ".xml" });
+		ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(new String[] { configFile + ".xml" });
 		Collection newAgents = appContext.getBeansOfType(IAgent.class).values();
 		for (Object a : newAgents) {
 			IAgent agent = (IAgent) a;
@@ -328,7 +318,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void setBeanName(String name) {
 		if (isManagementEnabled()) {
 			Manager manager = _manager;
@@ -362,15 +352,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 				case STOPPED:
 					Future f2 = agentFutures.get(agent.getAgentName());
 					if (f2 == null) {
-						(new LifecycleException("Agentfuture not found"))
-								.printStackTrace();
+						(new LifecycleException("Agentfuture not found")).printStackTrace();
 					} else {
 						// if soft-cancel fails, do a force-cancel.
 						if (!f2.cancel(false) && !f2.isDone()) {
-							log
-									.warn("Agent "
-											+ agent.getAgentName()
-											+ " did not respond then stopping. Thread is forcecanceled.");
+							log.warn("Agent " + agent.getAgentName() + " did not respond then stopping. Thread is forcecanceled.");
 							f2.cancel(true);
 						}
 					}
@@ -382,23 +368,17 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 			switch (evt.getState()) {
 			case STARTED:
 				Future f1 = _threadPool.submit(_serviceDirectory);
-				agentFutures
-						.put(_serviceDirectory.getFutureName(getName()), f1);
+				agentFutures.put(_serviceDirectory.getFutureName(getName()), f1);
 				break;
 			case STOPPED:
-				Future f2 = agentFutures.get(_serviceDirectory
-						.getFutureName(getName()));
+				Future f2 = agentFutures.get(_serviceDirectory.getFutureName(getName()));
 				if (f2 == null) {
-					(new LifecycleException("ServiceDirectory future not found"))
-							.printStackTrace();
+					(new LifecycleException("ServiceDirectory future not found")).printStackTrace();
 				} else {
 					// if soft-cancel fails, do a force-cancel.
 					if (!f2.cancel(false) && !f2.isDone()) {
-						log
-								.warn("ServiceDirectory "
-										+ _serviceDirectory
-												.getFutureName(getName())
-										+ " did not respond to stopping. Thread is forcecanceled.");
+						log.warn("ServiceDirectory " + _serviceDirectory.getFutureName(getName())
+								+ " did not respond to stopping. Thread is forcecanceled.");
 						f2.cancel(true);
 					}
 				}
@@ -426,16 +406,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		if (_agents != null) {
 			for (IAgent a : _agents) {
 				a.setAgentNode(this);
-				a
-						.addLifecycleListener(this.lifecycle
-								.createLifecycleListener());
+				a.addLifecycleListener(this.lifecycle.createLifecycleListener());
 			}
 		}
 
 		// listener am servicedrirectory setzen
 		if (_serviceDirectory != null) {
-			_serviceDirectory.addLifecycleListener(this.lifecycle
-					.createLifecycleListener());
+			_serviceDirectory.addLifecycleListener(this.lifecycle.createLifecycleListener());
 		}
 
 		// enable management of agent node and all its resources
@@ -476,7 +453,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void doInit() {
 		// init message broker
 		if (_embeddedBroker != null) {
@@ -533,7 +510,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void doStart() {
 		// start message broker
 		if (_embeddedBroker != null) {
@@ -580,14 +557,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 			}
 		}
 
-		log.info("AgentNode " + getName() + " started with "
-				+ (_agents != null ? _agents.size() : "0") + " agents");
+		log.info("AgentNode " + getName() + " started with " + (_agents != null ? _agents.size() : "0") + " agents");
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void doStop() {
 		// call stop() for all agents if any
 		if (_agents != null) {
@@ -638,7 +614,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public void doCleanup() {
 		// call cleanup for all agents if any
 		if (_agents != null) {
@@ -692,7 +668,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public String toString() {
 		return getName();
 	}
@@ -700,7 +676,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	
 	public ExecutorService getThreadPool() {
 		return _threadPool;
 	}
@@ -789,23 +765,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		if (log == null) {
 			return null;
 		}
-		String[] itemNames = new String[] { "class", "debug", "error", "fatal",
-				"info", "trace", "warn" };
+		String[] itemNames = new String[] { "class", "debug", "error", "fatal", "info", "trace", "warn" };
 		try {
-			CompositeType type = new CompositeType(
-					"javax.management.openmbean.CompositeDataSupport",
-					"Logger information", itemNames, new String[] {
-							"Implementation of the logger instance", "debug",
-							"error", "fatal", "info", "trace", "warn" },
-					new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN });
-			return new CompositeDataSupport(type, itemNames, new Object[] {
-					log.getClass().getName(), log.isDebugEnabled(),
-					log.isErrorEnabled(), log.isFatalEnabled(),
-					log.isInfoEnabled(), log.isTraceEnabled(),
-					log.isWarnEnabled() });
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information",
+					itemNames, new String[] { "Implementation of the logger instance", "debug", "error", "fatal", "info",
+							"trace", "warn" }, new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN,
+							SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN });
+			return new CompositeDataSupport(type, itemNames, new Object[] { log.getClass().getName(), log.isDebugEnabled(),
+					log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(), log.isTraceEnabled(), log.isWarnEnabled() });
 		} catch (OpenDataException e) {
 			e.printStackTrace();
 			return null;
@@ -824,19 +791,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		// return null;
 		// }
 		// BrokerValues values = _embeddedBroker.getValues();
-		String[] itemNames = new String[] { "DiscoveryAddress",
-				"DiscoveryMethod", "Name", "Url", "Jmx", "Persistent", "Port",
-				"Protocol" };
+		String[] itemNames = new String[] { "DiscoveryAddress", "DiscoveryMethod", "Name", "Url", "Jmx", "Persistent",
+				"Port", "Protocol" };
 		try {
-			CompositeType type = new CompositeType(
-					"javax.management.openmbean.CompositeDataSupport",
-					"ActiveMQ broker values", itemNames, new String[] {
-							"DiscoveryAddress", "DiscoveryMethod", "Name",
-							"Url", "Jmx", "Persistent", "Port", "Protocol" },
-					new OpenType[] { SimpleType.STRING, SimpleType.STRING,
-							SimpleType.STRING, SimpleType.STRING,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.STRING, SimpleType.STRING });
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport",
+					"ActiveMQ broker values", itemNames, new String[] { "DiscoveryAddress", "DiscoveryMethod", "Name", "Url",
+							"Jmx", "Persistent", "Port", "Protocol" }, new OpenType[] { SimpleType.STRING, SimpleType.STRING,
+							SimpleType.STRING, SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.STRING,
+							SimpleType.STRING });
 			return new CompositeDataSupport(type, itemNames, new Object[] {
 			// values.getDiscoveryAddress(), values.getDiscoveryMethod(),
 					// values.getName(), values.getUrl(), values.isJmx(),
@@ -864,8 +826,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		// "QueueReceiverQueueName", "QueueSenderDestinationName",
 		// "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName",
 		// "DefaultTopicName", "ProtocolType"};
-		String[] commBeanItemNames = new String[] { "ConnectorURI",
-				"TransportIdentifier" };
+		String[] commBeanItemNames = new String[] { "ConnectorURI", "TransportIdentifier" };
 		CompositeDataSupport commBeanData = null;
 		CompositeType commBeanType = null;
 		try {
@@ -879,19 +840,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 			// SimpleType.STRING, SimpleType.STRING, SimpleType.STRING,
 			// SimpleType.STRING, SimpleType.STRING, SimpleType.STRING,
 			// SimpleType.STRING, SimpleType.STRING});
-			commBeanType = new CompositeType(
-					"javax.management.openmbean.CompositeDataSupport",
-					"Message transport data", commBeanItemNames, new String[] {
-							"ConnectorURI", "TransportIdentifier" },
-					new OpenType[] { SimpleType.STRING, SimpleType.STRING });
+			commBeanType = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Message transport data",
+					commBeanItemNames, new String[] { "ConnectorURI", "TransportIdentifier" }, new OpenType[] {
+							SimpleType.STRING, SimpleType.STRING });
 			// CommBean commBean = _serviceDirectory.getCommBean();
 			MessageTransport commBean = _serviceDirectory.getCommBean();
 			if (commBean != null) {
 				// Object[] commBeanValues = new Object[] {null, null, null,
 				// null, null, null, commBean.getDefaultQueueName(),
 				// commBean.getDefaultTopicName(), commBean.getProtocolType()};
-				Object[] commBeanValues = new Object[] { null,
-						commBean.getTransportIdentifier() };
+				Object[] commBeanValues = new Object[] { null, commBean.getTransportIdentifier() };
 				if (commBean.getConnectorURI() != null) {
 					commBeanValues[0] = commBean.getConnectorURI().toString();
 				}
@@ -921,16 +879,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 				// }
 				// commBeanData = new CompositeDataSupport(commBeanType,
 				// commBeanItemNames, commBeanValues);
-				commBeanData = new CompositeDataSupport(commBeanType,
-						commBeanItemNames, commBeanValues);
+				commBeanData = new CompositeDataSupport(commBeanType, commBeanItemNames, commBeanValues);
 			}
 		} catch (OpenDataException e) {
 			e.printStackTrace();
 		}
 
 		// get name of all services
-		List<IServiceDescription> allServices = _serviceDirectory
-				.getAllServices();
+		List<IServiceDescription> allServices = _serviceDirectory.getAllServices();
 		int size = allServices.size();
 		String[] allServiceNames = new String[size];
 		for (int i = 0; i < size; i++) {
@@ -938,8 +894,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		}
 
 		// get name of all web services
-		List<IServiceDescription> allWebServices = _serviceDirectory
-				.getAllWebServices();
+		List<IServiceDescription> allWebServices = _serviceDirectory.getAllWebServices();
 		size = allWebServices.size();
 		String[] allWebServiceNames = new String[size];
 		for (int i = 0; i < size; i++) {
@@ -947,22 +902,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		}
 
 		// create service directory data
-		String[] itemNames = new String[] { "PublishTimer", "ServiceNumber",
-				"AllWebServiceNames", "AllServiceNames", "MessageTransport" };
+		String[] itemNames = new String[] { "PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames",
+				"MessageTransport" };
 		try {
-			CompositeType type = new CompositeType(
-					"javax.management.openmbean.CompositeDataSupport",
-					"Service directory data", itemNames, new String[] {
-							"PublishTimer", "ServiceNumber",
-							"AllWebServiceNames", "AllServiceNames",
-							"MessageTransport" }, new OpenType[] {
-							SimpleType.INTEGER, SimpleType.INTEGER,
-							new ArrayType(1, SimpleType.STRING),
-							new ArrayType(1, SimpleType.STRING), commBeanType });
-			return new CompositeDataSupport(type, itemNames, new Object[] {
-					_serviceDirectory.getPublishTimer(),
-					_serviceDirectory.getServiceNumber(), allWebServiceNames,
-					allServiceNames, commBeanData });
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport",
+					"Service directory data", itemNames, new String[] { "PublishTimer", "ServiceNumber", "AllWebServiceNames",
+							"AllServiceNames", "MessageTransport" }, new OpenType[] { SimpleType.INTEGER, SimpleType.INTEGER,
+							new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), commBeanType });
+			return new CompositeDataSupport(type, itemNames, new Object[] { _serviceDirectory.getPublishTimer(),
+					_serviceDirectory.getServiceNumber(), allWebServiceNames, allServiceNames, commBeanData });
 		} catch (OpenDataException e) {
 			e.printStackTrace();
 			return null;
@@ -998,8 +946,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		try {
 			manager.registerAgentNode(this);
 		} catch (Exception e) {
-			System.err.println("WARNING: Unable to register agent node "
-					+ this.getName() + " as JMX resource.");
+			System.err.println("WARNING: Unable to register agent node " + this.getName() + " as JMX resource.");
 			System.err.println(e.getMessage());
 		}
 
@@ -1065,8 +1012,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode,
 		try {
 			_manager.unregisterAgentNode(this);
 		} catch (Exception e) {
-			System.err.println("WARNING: Unable to deregister agent node "
-					+ this.getName() + " as JMX resource.");
+			System.err.println("WARNING: Unable to deregister agent node " + this.getName() + " as JMX resource.");
 			System.err.println(e.getMessage());
 		}
 

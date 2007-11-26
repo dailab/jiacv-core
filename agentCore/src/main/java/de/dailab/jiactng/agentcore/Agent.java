@@ -133,7 +133,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setMemory(IMemory memory) {
 		this.memory = memory;
 		memory.setThisAgent(this);
@@ -142,7 +141,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public ArrayList<IAgentBean> getAgentBeans() {
 		return agentBeans;
 	}
@@ -150,7 +148,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setAgentBeans(ArrayList<IAgentBean> agentbeans) {
 		this.agentBeans = agentbeans;
 
@@ -163,7 +160,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void run() {
 		while (active) {
 			try {
@@ -209,7 +205,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void onEvent(LifecycleEvent evt) {
 		// TODO Auto-generated method stub
 
@@ -415,7 +410,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public String getAgentName() {
 		return this.agentName;
 	}
@@ -447,7 +441,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public ExecutorService getThreadPool() {
 		return agentNode.getThreadPool();
 	}
@@ -462,7 +455,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setExecution(IExecutionCycle execution) {
 		this.execution = execution;
 		this.execution.setAgent(this);
@@ -471,7 +463,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public IAgentNode getAgentNode() {
 		return agentNode;
 	}
@@ -479,7 +470,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setAgentNode(IAgentNode agentNode) {
 		// update management
 		if (isManagementEnabled()) {
@@ -498,7 +488,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public String getOwner() {
 		return owner;
 	}
@@ -506,7 +495,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setOwner(String owner) {
 		this.owner = owner;
 	}
@@ -514,7 +502,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public Log getLog(IAgentBean bean) {
 		if (agentNode == null) {
 			return null;
@@ -525,7 +512,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public Log getLog(IAgentBean owner, String extension) {
 		if (agentNode == null) {
 			return null;
@@ -573,7 +559,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public ArrayList<String> getAgentBeanNames() {
 		ArrayList<String> ret = new ArrayList<String>();
 		for (IAgentBean bean : getAgentBeans()) {
@@ -585,7 +570,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public ArrayList<Action> getActionList() {
 		return actionList;
 	}
@@ -593,7 +577,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setActionList(ArrayList<Action> actionList) {
 		this.actionList = actionList;
 	}

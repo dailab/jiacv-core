@@ -1,20 +1,25 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project 
+	xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+						http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab</groupId>
 	<artifactId>jiactng</artifactId>
-	<packaging>pom</packaging>
 	<version>0.0.2-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
 	<name>Java-based Intelligent Agent Componentware TNG</name>
-	<!-- url>TODO</url -->
 	<description>
 		JIAC TNG is a framework to fast and efficiently develop agent-based applications and services.
 	</description>
+	<url>http://bewaehrung.aot.cs.tu-berlin.de/dai-repository/jiactng/site/</url>
+	<inceptionYear>2006</inceptionYear>
 	<organization>
 		<name>DAI-Labor</name>
 		<url>http://www.dai-labor.de</url>
 	</organization>
-	<inceptionYear>2006</inceptionYear>
 	<prerequisites>
 		<maven>2.0.3</maven>
 	</prerequisites>
@@ -119,27 +124,31 @@
 			<organizationUrl>http://www.dai-labor.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>burkhardt</id>
+			<name>Michael Burkhardt</name>
+			<email>michael.burkhardt@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>loeffelholz</id>
+			<name>Martin Loeffelholz</name>
+			<email>martin.loeffelholz@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<build>
-    	<extensions>
-        	<extension>
-   				<groupId>de.dailab.jiactng</groupId>
-  				<artifactId>CIConfiguration</artifactId>
-   				<version>${project.version}</version>
-            </extension>
-        </extensions>
-		<testResources>
-			<testResource>
-				<directory>${basedir}/src/test/java</directory>
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-			</testResource>
-			<testResource>
-				<directory>${basedir}/src/test/resources</directory>
-			</testResource>
-		</testResources>
 		<resources>
 			<resource>
 				<directory>${basedir}/src/main/java</directory>
@@ -151,45 +160,20 @@
 				<directory>${basedir}/src/main/resources</directory>
 			</resource>
 		</resources>
+		
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/test/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>${basedir}/src/test/resources</directory>
+			</testResource>
+		</testResources>
+
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.3</version>
-			</plugin>
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<tagBase>https://cvs.dai-labor.de/jiac/jiac-tng/tags</tagBase>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>changes-maven-plugin</artifactId>
-				<version>2.0-beta-2-FREEZED</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>announcement-generate</goal>
-						</goals>
-						<id>announcement-generate</id>
-					</execution>
-					<execution>
-						<goals>
-							<goal>announcement-mail</goal>
-						</goals>
-						<id>announcement-mail</id>
-					</execution>
-				</executions>
-				<configuration>
-					<smtpHost>mail.dai-labor.de</smtpHost>
-					<urlDownload>${project.scm.url}</urlDownload>
-					<smtpPort implementation="java.lang.Integer">25</smtpPort>
-					<toAddresses>
-						<toAddress>jiactng-dev@dai-labor.de</toAddress>
-					</toAddresses>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -198,6 +182,33 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
+					</links>
+					<quiet>true</quiet>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<tagBase>https://cvs.dai-labor.de/jiac/jiac-tng/tags</tagBase>
+				</configuration>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -209,6 +220,29 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<configLocation>prealpha_checks.xml</configLocation>
+				</configuration>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
@@ -228,85 +262,42 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<configLocation>de/dailab/jiactng/ci/checkstyle/prealpha_checks.xml</configLocation>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<!-- goal>check</goal -->
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<configuration>
-					<attach>false</attach>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 
 	<reporting>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.0</version>
 				<configuration>
 					<links>
-						<link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
 					</links>
 					<quiet>true</quiet>
 				</configuration>
 			</plugin>
+			
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jxr-maven-plugin</artifactId>
-				<version>2.0-beta-2-FREEZED</version>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>changelog-maven-plugin</artifactId>
-				<version>2.0-beta-1</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
 				<reportSets>
 					<reportSet>
-						<id>dual-report</id>
-						<configuration>
-							<type>range</type>
-							<range>30</range>
-						</configuration>
 						<reports>
-							<report>changelog</report>
-							<report>file-activity</report>
-							<report>dev-activity</report>
+							<report>changes-report</report>
 						</reports>
 					</reportSet>
 				</reportSets>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.3</version>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<configLocation>prealpha_checks.xml</configLocation>
+				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jdepend-maven-plugin</artifactId>
-				<version>2.0-beta-1-FREEZED</version>
-			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
@@ -317,11 +308,32 @@
 					</includes>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>1.0.1</version>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+			</plugin>
+			
+			<!-- plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changelog-plugin</artifactId>
+			</plugin-->
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jdepend-maven-plugin</artifactId>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>taglist-maven-plugin</artifactId>
@@ -329,289 +341,15 @@
 				<configuration>
 					<tags>
 						<tag>TODO</tag>
+						<tag>ToDo</tag>
 						<tag>@todo</tag>
 						<tag>@deprecated</tag>
 						<tag>FIXME</tag>
-						<tag>XXX</tag>
 					</tags>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>changes-maven-plugin</artifactId>
-				<version>2.0-beta-2-FREEZED</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>changes-report</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<targetJdk>1.5</targetJdk>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.1</version>
-				<configuration>
-					<configLocation>de/dailab/jiactng/ci/checkstyle/prealpha_checks.xml</configLocation>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</reporting>
-
-	<profiles>
-		<!-- Pre-Alpha Release Profile -->
-		<profile>
-			<id>prealpha</id>
-			<activation>
-				<file>
-					<exists>prealpha</exists>
-				</file>
-			</activation>
-			<reporting>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>2.1</version>
-						<configuration>
-							<configLocation>de/dailab/jiactng/ci/checkstyle/prealpha_checks.xml</configLocation>
-						</configuration>
-					</plugin>
-				</plugins>
-			</reporting>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>cobertura-maven-plugin</artifactId>
-						<version>2.0</version>
-						<configuration>
-							<check>
-								<totalBranchRate>35</totalBranchRate>
-								<totalLineRate>30</totalLineRate>
-							</check>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>clean</goal>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>2.1</version>
-						<configuration>
-							<configLocation>de/dailab/jiactng/ci/checkstyle/prealpha_checks.xml</configLocation>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- Alpha Release Profile -->
-		<profile>
-			<id>alpha</id>
-			<activation>
-				<file>
-					<exists>alpha</exists>
-				</file>
-			</activation>
-			<reporting>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>2.1</version>
-						<configuration>
-							<configLocation>de/dailab/jiactng/ci/checkstyle/alpha_checks.xml</configLocation>
-						</configuration>
-					</plugin>
-				</plugins>
-			</reporting>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>cobertura-maven-plugin</artifactId>
-						<version>2.0</version>
-						<configuration>
-							<check>
-								<totalBranchRate>45</totalBranchRate>
-								<totalLineRate>40</totalLineRate>
-							</check>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>clean</goal>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>2.1</version>
-						<configuration>
-							<configLocation>de/dailab/jiactng/ci/checkstyle/alpha_checks.xml</configLocation>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- Beta Release Profile -->
-		<profile>
-			<id>beta</id>
-			<activation>
-				<file>
-					<exists>beta</exists>
-				</file>
-			</activation>
-			<reporting>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>2.1</version>
-						<configuration>
-							<configLocation>de/dailab/jiactng/ci/checkstyle/beta_checks.xml</configLocation>
-						</configuration>
-					</plugin>
-				</plugins>
-			</reporting>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>cobertura-maven-plugin</artifactId>
-						<version>2.0</version>
-						<configuration>
-							<check>
-								<totalBranchRate>65</totalBranchRate>
-								<totalLineRate>60</totalLineRate>
-							</check>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>clean</goal>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>2.1</version>
-						<configuration>
-							<configLocation>de/dailab/jiactng/ci/checkstyle/beta_checks.xml</configLocation>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- Final Release Profile -->
-		<profile>
-			<id>final</id>
-			<activation>
-				<file>
-					<exists>release</exists>
-				</file>
-			</activation>
-			<reporting>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>2.1</version>
-						<configuration>
-							<configLocation>de/dailab/jiactng/ci/checkstyle/release_checks.xml</configLocation>
-						</configuration>
-					</plugin>
-				</plugins>
-			</reporting>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>cobertura-maven-plugin</artifactId>
-						<version>2.0</version>
-						<configuration>
-							<check>
-								<totalBranchRate>85</totalBranchRate>
-								<totalLineRate>80</totalLineRate>
-							</check>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>clean</goal>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-checkstyle-plugin</artifactId>
-						<version>2.1</version>
-						<configuration>
-							<configLocation>de/dailab/jiactng/ci/checkstyle/release_checks.xml</configLocation>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>check</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -623,28 +361,6 @@
 	</dependencies>
 
 	<repositories>
-		<repository>
-			<id>sercho-repository</id>
-			<name>Sercho Maven 2 Repository</name>
-			<url>http://sercho-dev.dai-labor.de/repository/maven2</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>sercho-snapshot-repository</id>
-			<name>Sercho Maven 2 Snapshot Repository</name>
-			<url>http://sercho-dev.dai-labor.de/repository/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
 		<repository>
 			<id>dai-repository</id>
 			<name>DAI Maven 2 Repository</name>
@@ -667,46 +383,14 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
-		<!-- repository>
-			<id>Ibiblio Org</id>
-			<url>http://www.ibiblio.org/maven2/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository-->
 		<repository>
 		  <id>codehaus-release-repo</id>
-		  <name>Codehaus Release Repo</name>
+		  <name>Codehaus Release Repository</name>
 		  <url>http://repository.codehaus.org</url>
 		</repository>
 	</repositories>
 
 	<pluginRepositories>
-		<pluginRepository>
-			<id>sercho-repository</id>
-			<name>Sercho Maven 2 Repository</name>
-			<url>http://sercho-dev.dai-labor.de/repository/maven2</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</pluginRepository>
-		<pluginRepository>
-			<id>sercho-snapshot-repository</id>
-			<name>Sercho Maven 2 Snapshot Repository</name>
-			<url>http://sercho-dev.dai-labor.de/repository/snapshots</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</pluginRepository>
 		<pluginRepository>
 			<id>dai-repository</id>
 			<name>DAI Maven 2 Repository</name>
@@ -791,13 +475,12 @@
 	<scm>
 		<connection>scm:svn:http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</connection>
 		<developerConnection>scm:svn:http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</developerConnection>
+		<tag>HEAD</tag>
 		<url>http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</url>
 	</scm>
 
 	<modules>
-		<module>CIConfiguration</module>
-		<!-- module>ontologies</module -->
-		<module>ModuleTemplate</module>
+		<!--module>ModuleTemplate</module--><!-- This is a template for new modules and testing; usually not required -->		
 		<module>agentCore</module>
 		<module>agentInterpreter</module>
 		<module>basicServices</module>

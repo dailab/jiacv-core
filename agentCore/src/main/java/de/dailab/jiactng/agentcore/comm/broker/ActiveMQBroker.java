@@ -58,6 +58,8 @@ public class ActiveMQBroker extends AbstractLifecycle{
 		broker.setUseJmx(_jmx);
 		broker.setPersistent(_persistent);
 		
+		
+		
    
     	ManagementContext context = new ManagementContext();
 		context.setJmxDomainName("de.dailab.jiactng");
@@ -69,8 +71,10 @@ public class ActiveMQBroker extends AbstractLifecycle{
             	_log.debug("embedded broker initializing url = " + url);
             	TransportConnector connector = broker.addConnector(url);
             	if(_discoveryMethod != null && _discoveryAddress != null) {
-                    connector.setDiscoveryUri(new URI(_discoveryMethod + "://" + _discoveryAddress));
+            		URI uri=new URI(_discoveryMethod + "://" + _discoveryAddress);
+                    connector.setDiscoveryUri(uri);
                     connector.getDiscoveryAgent().setBrokerName(_name);
+                    broker.addNetworkConnector(uri);
                 }
             }
             

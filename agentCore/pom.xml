@@ -15,13 +15,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.1</version>
@@ -61,60 +54,7 @@
 	</dependencies>
 
 	<build>
-		<!-- resources>
-			<resource>
-				<directory>${basedir}/src/main/conf</directory>
-				<includes>
-					<include>*.*</include>
-				</includes>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>${basedir}/src/test/java</directory>
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-			</testResource>
-			<testResource>
-				<directory>${basedir}/src/test/conf</directory>
-				<includes>
-					<include>**/*.*</include>
-				</includes>
-			</testResource>
-		</testResources -->
-
-		<plugins>						      		      
-
-        <!-- Assembly -->
-  			<plugin>
-  				<artifactId>maven-assembly-plugin</artifactId>
-  				<version>2.1</version>
-  				<executions>
-  					<execution>
-  						<phase>package</phase>
-  						<goals>
-  							<goal>assembly</goal>
-  						</goals>
-  					</execution>
-  				</executions>
-  				<configuration>
-  					<descriptors>
-  						<descriptor>
-  							${basedir}/standalone.assembly
-  						</descriptor>
-  					</descriptors>
-  					<outputDirectory>
-  						${project.build.directory}
-  					</outputDirectory>
-  					<workDirectory>
-  						${project.build.directory}/assembly/work
-  					</workDirectory>
-  				</configuration>
-  			</plugin>
-        <!-- End Assembly -->
-
-
+		<plugins>
 	      	<plugin>
 	        	<artifactId>maven-antrun-plugin</artifactId>
 	        	<executions>

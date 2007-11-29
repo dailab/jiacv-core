@@ -28,7 +28,7 @@
 		class="org.apache.activemq.spring.ActiveMQConnectionFactory"
 		singleton="false">
 		
-		<property name="brokerURL" value="vm://PlatformBroker"></property>
+		<property name="brokerURL" value="tcp://localhost:61616"></property>
 	</bean>
 
 </beans>

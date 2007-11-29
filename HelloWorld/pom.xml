@@ -25,12 +25,11 @@
   		<plugins>
   			<plugin>
   				<artifactId>maven-assembly-plugin</artifactId>
-  				<version>2.1</version>
   				<executions>
   					<execution>
   						<phase>package</phase>
   						<goals>
-  							<goal>assembly</goal>
+  							<goal>attached</goal>
   						</goals>
   					</execution>
   				</executions>

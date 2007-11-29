@@ -108,6 +108,17 @@
 			<organizationUrl>http://www.dai-labor.de</organizationUrl>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>bsufka</id>
+			<name>Karsten Bsufka</name>
+			<email>karsten.bsufka@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<build>

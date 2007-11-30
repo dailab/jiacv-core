@@ -19,7 +19,10 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author moekon
  */
 public class Action implements IFact {
-    private final static Class[] EMPTY_CLASSES= new Class[0];
+	/** SerialVersionUID for Serialization */
+	private static final long serialVersionUID = 6644586804009024924L;
+
+	private final static Class[] EMPTY_CLASSES= new Class[0];
     
 	/** the name of the action */
 	private String name;
@@ -220,7 +223,7 @@ public class Action implements IFact {
         
         Action other= (Action) obj;
 
-        if((name == null || other.name == null) && (!name.equals(other.name))) {
+        if((name == null || other.name == null)) {
             return false;
         }
         

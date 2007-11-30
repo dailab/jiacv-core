@@ -83,11 +83,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	private ArrayList<IAgentBean> agentBeans = null;
 
 	/**
-	 * Synchronization object for the Thread
-	 */
-	private Boolean syncObj = new Boolean(true);
-
-	/**
 	 * activity Flag (could be replaced by statecheck
 	 */
 	private boolean active = false;
@@ -161,20 +156,24 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * {@inheritDoc}
 	 */
 	public void run() {
-		while (active) {
+		while (true) {
 			try {
-				synchronized (syncObj) {
-					executionFuture = agentNode.getThreadPool().submit(
-							execution);
-					FutureTask t = ((FutureTask) executionFuture);
-					try {
-						t.get(beanExecutionTimeout, TimeUnit.MILLISECONDS);
-					} catch (TimeoutException to) {
-						System.err.print("this: " + agentName);
-						to.printStackTrace();
-						t.cancel(true);
-						this.stop();
-						agentLog.error("ExecutionCycle did not return");
+				synchronized (this) {
+					if (active) {
+						executionFuture = agentNode.getThreadPool().submit(
+								execution);
+						FutureTask t = ((FutureTask) executionFuture);
+						try {
+							t.get(beanExecutionTimeout, TimeUnit.MILLISECONDS);
+						} catch (TimeoutException to) {
+							System.err.print("this: " + agentName);
+							to.printStackTrace();
+							t.cancel(true);
+							this.stop();
+							agentLog.error("ExecutionCycle did not return");
+						}
+					} else {
+						break;
 					}
 				}
 			} catch (Exception e) {
@@ -195,7 +194,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * Setter for the agentname. Called by Spring via the BeanNameAware
 	 * interface.
 	 * 
-	 * @param arg0 the name of the agent.
+	 * @param arg0
+	 *            the name of the agent.
 	 * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String arg0) {
@@ -232,11 +232,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	@Override
 	public void doCleanup() throws LifecycleException {
-		synchronized (syncObj) {
-			if (executionFuture != null) {
-				executionFuture.cancel(true);
-				executionFuture = null;
-			}
+		if (executionFuture != null) {
+			executionFuture.cancel(true);
+			executionFuture = null;
 		}
 
 		// call cleanup for all agentbeans
@@ -277,9 +275,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			try {
 				ab.setMemory(memory);
 				ab.init();
-				if (ab instanceof ILifecycle) {
-					ab.addLifecycleListener(this);
-				}
+				ab.addLifecycleListener(this);
+
 				memory.write(new AgentBeanDescription(ab.getBeanName(),
 						LifecycleStates.INITIALIZED.name()));
 				setBeanState(ab.getBeanName(), LifecycleStates.INITIALIZED);
@@ -322,7 +319,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			}
 		}
 
-		synchronized (syncObj) {
+		synchronized (this) {
 			active = true;
 		}
 		updateState(LifecycleStates.STARTED);
@@ -346,7 +343,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 				handleBeanException(a, e, LifecycleStates.STOPPING);
 			}
 		}
-		synchronized (syncObj) {
+		synchronized (this) {
 			active = false;
 			if (executionFuture != null) {
 				executionFuture.cancel(false);

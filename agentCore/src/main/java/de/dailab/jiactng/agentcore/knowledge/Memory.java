@@ -43,6 +43,10 @@ import de.dailab.jiactng.agentcore.management.Manager;
  */
 public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 
+	/** SerialVersionUID for Serialization */
+	private static final long serialVersionUID = -5229424084593098741L;
+
+	
 	private SpaceDestroyer<IFact> destroyer = null;
 	private EventedTupleSpace<IFact> space = null;
 

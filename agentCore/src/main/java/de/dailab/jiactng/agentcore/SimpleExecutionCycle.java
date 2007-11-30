@@ -20,7 +20,7 @@ import de.dailab.jiactng.agentcore.management.Manager;
  */
 /**
  * @author moekon
- *
+ * 
  */
 public class SimpleExecutionCycle extends AbstractAgentBean implements
 		IExecutionCycle {
@@ -36,11 +36,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * once in a cycle.
 	 */
 	private IAgent agent = null;
-
-	/**
-	 * Synchronization flag for the thread. Used by the doStep method.
-	 */
-	private Boolean syncFlag = new Boolean(true);
 
 	/**
 	 * Activity flag. Used by statechanges
@@ -75,59 +70,93 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#run()
 	 */
 	public void run() {
-		if (active) {
-			for (IAgentBean a : agent.getAgentBeans()) {
-				if (LifecycleStates.STARTED.equals(a.getState())) {
-					try {
-						Thread.sleep(BE_NICE_TIMER);
-						a.execute();
-					} catch (Exception ex) {
-						ex.printStackTrace();
-						try {
-							a.stop();
-						} catch (LifecycleException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						// Agent.setBeanState(a.beanName,
-						// LifecycleStates.STOPPED);
+		// call execute-methods of beans
+		for (IAgentBean a : agent.getAgentBeans()) {
+			if (a instanceof IActiveAgentBean) {
+				synchronized (this) {
+					if (active) {
+						callBeanExecute((IActiveAgentBean)a);
 					}
-					// throw new RuntimeException(((DummyBean)a).getTest());
 				}
 			}
-			// perform one doAction
-			DoAction act = memory.remove(new DoAction(null, null, null, null));
+		}
 
-			if (act != null) {
-				if (act.getAction().getProviderBean() != null) {
-					memory.write(act.getSession());
-					act.getAction().getProviderBean().doAction(act);
-				} else {
-					System.err.println("--- found action without bean: "
-							+ act.getAction().getName());
+		// process one doAction
+		// TODO: check if read can be used
+		DoAction act = memory.remove(new DoAction(null, null, null, null));
+
+		if (act != null) {
+			synchronized (this) {
+				if (active) {
+					performDoAction(act);
 				}
 			}
+		}
 
-			ActionResult actionResult = memory.remove(new ActionResult(null,
-					null, null, null));
-			if (actionResult != null) {
-				// entweder den ResultReceiver informieren oder das Ergebnis in den Memory schreiben
-				if(((DoAction)actionResult.getSource())== null || ((DoAction)actionResult.getSource()).getSource()==null) {
-					memory.write(actionResult);
-				} else {
-				 ((ResultReceiver)((DoAction)actionResult.getSource()).getSource()).receiveResult(
-				 actionResult);
+		// process one actionResult
+		// TODO: check if read can be used
+		ActionResult actionResult = memory.remove(new ActionResult(null, null,
+				null, null));
+		if (actionResult != null) {
+			synchronized (this) {
+				if (active) {
+					processResult(actionResult);
 				}
-//				ArrayList history = actionResult.getSession().getHistory();
-//				for (int i = history.size() - 1; i >= 0; i--) {
-//					if (history.get(i) instanceof DoAction) {
-//						((ResultReceiver) ((DoAction) history.get(i))
-//								.getSource()).receiveResult(actionResult);
-//						break;
-//					}
-//				}
 			}
+		}
 
+	}
+
+	private void processResult(ActionResult actionResult) {
+		// entweder den ResultReceiver informieren oder das Ergebnis in
+		// den Memory schreiben
+		if (((DoAction) actionResult.getSource()) == null
+				|| ((DoAction) actionResult.getSource()).getSource() == null) {
+			memory.write(actionResult);
+		} else {
+			((ResultReceiver) ((DoAction) actionResult.getSource()).getSource())
+					.receiveResult(actionResult);
+		}
+		// ArrayList history = actionResult.getSession().getHistory();
+		// for (int i = history.size() - 1; i >= 0; i--) {
+		// if (history.get(i) instanceof DoAction) {
+		// ((ResultReceiver) ((DoAction) history.get(i))
+		// .getSource()).receiveResult(actionResult);
+		// break;
+		// }
+		// }
+	}
+
+	private void performDoAction(DoAction act) {
+		if (act.getAction().getProviderBean() != null) {
+			memory.write(act.getSession());
+			act.getAction().getProviderBean().doAction(act);
+		} else {
+			log.error("--- found action without bean: "
+					+ act.getAction().getName());
+		}
+	}
+
+	private void callBeanExecute(IActiveAgentBean a) {
+		if (LifecycleStates.STARTED.equals(a.getState())) {
+			try {
+				Thread.sleep(BE_NICE_TIMER);
+				a.execute();
+			} catch (Exception ex) {
+				log.error("Error when executing bean \'" + a.getBeanName()
+						+ "\'", ex);
+				try {
+					a.stop();
+				} catch (LifecycleException e) {
+					// TODO Auto-generated catch block
+					log.error(
+							"Could not stop Bean \'" + a.getBeanName() + "\'",
+							e);
+				}
+				// Agent.setBeanState(a.beanName,
+				// LifecycleStates.STOPPED);
+			}
+			// throw new RuntimeException(((DummyBean)a).getTest());
 		}
 	}
 
@@ -139,9 +168,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 */
 	@Override
 	public void doCleanup() {
-		synchronized (syncFlag) {
-			active = false;
-		}
 	}
 
 	/**
@@ -160,11 +186,8 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStart()
 	 */
 	@Override
-	public void doStart() {
-		synchronized (syncFlag) {
-			active = true;
-			// agent.getThreadPool().execute(this);
-		}
+	public synchronized void doStart() {
+		active = true;
 	}
 
 	/**
@@ -173,45 +196,48 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStop()
 	 */
 	@Override
-	public void doStop() {
-		synchronized (syncFlag) {
-			active = false;
-		}
+	public synchronized void doStop() {
+		active = false;
 	}
 
-	
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setAgent(IAgent agent) {
 		this.agent = agent;
 	}
 
 	/**
-     * Registers the execution cycle for management
-     * 
-     * @param manager the manager for this executionCycle
+	 * Registers the execution cycle for management
+	 * 
+	 * @param manager
+	 *            the manager for this executionCycle
 	 */
 	public void enableManagement(Manager manager) {
 		// do nothing if management already enabled
 		if (isManagementEnabled()) {
 			return;
 		}
-		
+
 		// register execution cycle for management
 		try {
 			manager.registerAgentResource(agent, "ExecutionCycle", this);
+		} catch (Exception e) {
+			System.err
+					.println("WARNING: Unable to register execution cycle of agent "
+							+ agent.getAgentName()
+							+ " of agent node "
+							+ agent.getAgentNode().getName()
+							+ " as JMX resource.");
+			System.err.println(e.getMessage());
 		}
-		catch (Exception e) {
-			System.err.println("WARNING: Unable to register execution cycle of agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());					
-		}
-		
+
 		_manager = manager;
 	}
-	  
+
 	/**
 	 * Deregisters the execution cycle from management
+	 * 
 	 * @param manager
 	 */
 	public void disableManagement() {
@@ -219,16 +245,20 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		if (!isManagementEnabled()) {
 			return;
 		}
-		
+
 		// deregister execution cycle from management
 		try {
 			_manager.unregisterAgentResource(agent, "ExecutionCycle");
+		} catch (Exception e) {
+			System.err
+					.println("WARNING: Unable to deregister execution cycle of agent "
+							+ agent.getAgentName()
+							+ " of agent node "
+							+ agent.getAgentNode().getName()
+							+ " as JMX resource.");
+			System.err.println(e.getMessage());
 		}
-		catch (Exception e) {
-			System.err.println("WARNING: Unable to deregister execution cycle of agent " + agent.getAgentName() + " of agent node " + agent.getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());					
-		}		
-		
+
 		_manager = null;
 	}
 }

@@ -17,6 +17,9 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  */
 public class Session implements IFact {
 
+	/** SerialVersionUID for Serialization */
+	private static final long serialVersionUID = 8699173523554827559L;
+
 	/** The actual ID of the session. */
 	private String id;
 

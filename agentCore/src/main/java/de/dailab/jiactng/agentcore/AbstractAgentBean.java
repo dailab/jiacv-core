@@ -183,12 +183,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	public void doCleanup() throws Exception {
 	}
 
-    /**
-     * {@inheritDoc}
-     */
-	public void execute() {
-	};
-
 	/**
 	 * Registers the agent bean and all its resources for management
 	 * 

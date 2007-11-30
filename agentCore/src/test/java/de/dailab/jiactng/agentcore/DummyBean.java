@@ -3,6 +3,7 @@
  */
 package de.dailab.jiactng.agentcore;
 
+
 /**
  * The HelloWorldBean. Simply prints Hello World and quits the agent afterwards.
  * 

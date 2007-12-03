@@ -85,6 +85,10 @@ public class SimpleChatExample {
 				e.printStackTrace();
 			}
 			
+			// avoid NullPointerException when shutting down JVM with Ctrl-C
+			if (input == null){
+				return;
+			}
 			
 			if (input.equalsIgnoreCase("addAgent")){
 				System.out.println();

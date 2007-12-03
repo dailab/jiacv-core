@@ -631,6 +631,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		}
 		log.debug("ChatGuiBean has stopped");
 		_f.setVisible(false);
+		_f.dispose();
 	}
 	
 	@Override

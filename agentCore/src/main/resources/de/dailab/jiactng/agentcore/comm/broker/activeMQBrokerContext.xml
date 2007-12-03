@@ -17,7 +17,7 @@
 		<property name="discoveryMethod" value="multicast"></property>
 		<property name="brokerName" value="PlatformBroker"></property>
 		<property name="persistent" value="false"> </property>
-		<property name="urlList">
+		<property name="connectors">
 			<set>
 				<value type= "java.lang.String">tcp://localhost:61616</value>
 			</set>

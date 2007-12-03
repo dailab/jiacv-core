@@ -38,14 +38,14 @@ public class ActiveMQBroker extends AbstractLifecycle{
 	
 
 	private String _name = "ActiveMQBroker";
-	private Set<String> _urlList = new HashSet<String>();
+	private Set<String> _connectors = new HashSet<String>();
 	private String _discoveryMethod = "multicast";
 	private String _discoveryAddress = "239.255.2.45:5555";
 	private boolean _persistent = false;
 	private boolean _jmx = true;
 	
 	public ActiveMQBroker(){
-		_urlList.add("tcp://localhost:61616");
+		_connectors.add("tcp://localhost:61616");
 	}
 	
 	
@@ -67,7 +67,7 @@ public class ActiveMQBroker extends AbstractLifecycle{
 		broker.setManagementContext(context);
 		
         try {
-            for (String url : _urlList){
+            for (String url : _connectors){
             	_log.debug("embedded broker initializing url = " + url);
             	TransportConnector connector = broker.addConnector(url);
             	if(_discoveryMethod != null && _discoveryAddress != null) {
@@ -126,8 +126,8 @@ public class ActiveMQBroker extends AbstractLifecycle{
 		_persistent = persistent;
 	}
 	
-	public void setUrlList(Set<String> urlList){
-		_urlList = urlList;
+	public void setConnectors(Set<String> urlList){
+		_connectors = urlList;
 	}
 	
 	public void setDiscoveryMethod(String discoveryMethod){

@@ -165,6 +165,11 @@ public class SimpleChatExample {
 				break;
 			}
 			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		

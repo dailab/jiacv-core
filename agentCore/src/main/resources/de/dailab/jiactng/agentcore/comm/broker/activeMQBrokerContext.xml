@@ -17,18 +17,18 @@
 		<property name="discoveryMethod" value="multicast"></property>
 		<property name="brokerName" value="PlatformBroker"></property>
 		<property name="persistent" value="false"> </property>
-		<!-- property name="urlList">
+		<property name="urlList">
 			<set>
 				<value type= "java.lang.String">"tcp://localhost:61616"</value>
 			</set>
-		</property -->
+		</property>
 	</bean>
 
 	<bean name="amqConnectionFactory"
 		class="org.apache.activemq.spring.ActiveMQConnectionFactory"
 		singleton="false">
 		
-		<property name="brokerURL" value="tcp://localhost:61616"></property>
+		<property name="brokerURL" value="vm://PlatformBroker"></property>
 	</bean>
 
 </beans>

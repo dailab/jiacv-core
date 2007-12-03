@@ -19,7 +19,7 @@
 		<property name="persistent" value="false"> </property>
 		<property name="urlList">
 			<set>
-				<value type= "java.lang.String">"tcp://localhost:61616"</value>
+				<value type= "java.lang.String">tcp://localhost:61616</value>
 			</set>
 		</property>
 	</bean>

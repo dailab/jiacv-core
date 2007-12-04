@@ -30,7 +30,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
-import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -69,7 +68,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	protected String _name = null;
 
 	/** The agentnodes one beans. */
-	private ArrayList<ILifecycle> agentNodeBeans;
+	private ArrayList<IAgentNodeBean> _agentNodeBeans;
 
 	/** The list of agents. */
 	private ArrayList<IAgent> _agents = null;
@@ -80,8 +79,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Configuration of a set of JMX connector server. */
 	private Set<Map> _jmxConnectors = null;
 
-	/** Der eingebettete JMSBroker zur Inter-AgentNode-Kommunikation */
-	ActiveMQBroker _embeddedBroker = null;
+//	/** Der eingebettete JMSBroker zur Inter-AgentNode-Kommunikation */
+//	ActiveMQBroker _embeddedBroker = null;
 
 	/** Das ServiceDirectory des AgentNodes */
 	private ServiceDirectory _serviceDirectory = null;
@@ -111,16 +110,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// _uuid = new String("p:" + Long.toHexString(System.currentTimeMillis()
 		// + this.hashCode()));
 		_uuid = IdFactory.createAgentNodeId(this.hashCode());
-	}
-
-	/**
-	 * Setter fot the embedded broker.
-	 * 
-	 * @param embeddedBroker the broker for this agentnode.
-	 */
-	public void setEmbeddedBroker(ActiveMQBroker embeddedBroker) {
-		_embeddedBroker = embeddedBroker;
-		_embeddedBroker.setAgentNode(this);
 	}
 
 	/**
@@ -410,6 +399,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
+        if(_agentNodeBeans != null) {
+            for(IAgentNodeBean nodeBean : _agentNodeBeans) {
+                nodeBean.setAgentNode(this);
+                nodeBean.addLifecycleListener(this.lifecycle.createLifecycleListener());
+            }
+        }
+        
 		// listener am servicedrirectory setzen
 		if (_serviceDirectory != null) {
 			_serviceDirectory.addLifecycleListener(this.lifecycle.createLifecycleListener());
@@ -455,16 +451,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	
 	public void doInit() {
-		// init message broker
-		if (_embeddedBroker != null) {
-			try {
-				_embeddedBroker.init();
-			} catch (LifecycleException le) {
-				// @todo exception handling
-				le.printStackTrace();
-			}
-		}
-
 		// init service directory
 		try {
 			if (_serviceDirectory != null) {
@@ -480,8 +466,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// call init on all beans of the agentnodes
 		// TODO testing
-		if (agentNodeBeans != null) {
-			for (ILifecycle anb : agentNodeBeans) {
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
 				log.info("Initializing agentnode bean: " + anb.getClass());
 				try {
 					anb.init();
@@ -512,16 +498,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	
 	public void doStart() {
-		// start message broker
-		if (_embeddedBroker != null) {
-			try {
-				_embeddedBroker.start();
-			} catch (LifecycleException le) {
-				// @todo exception handling
-				le.printStackTrace();
-			}
-		}
-
 		// start service directory
 		try {
 			if (_serviceDirectory != null) {
@@ -534,8 +510,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// call start on all beans of the agentnode
 		// TODO testing
-		if (agentNodeBeans != null) {
-			for (ILifecycle anb : agentNodeBeans) {
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
 				try {
 					anb.start();
 				} catch (LifecycleException lce) {
@@ -579,8 +555,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// call stop on all beans of the agentnode
 		// TODO testing
-		if (agentNodeBeans != null) {
-			for (ILifecycle anb : agentNodeBeans) {
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
 				try {
 					anb.stop();
 				} catch (LifecycleException lce) {
@@ -598,16 +574,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		} catch (LifecycleException e) {
 			// TODO:
 			e.printStackTrace();
-		}
-
-		// stop message broker
-		if (_embeddedBroker != null) {
-			try {
-				_embeddedBroker.stop();
-			} catch (LifecycleException le) {
-				// @todo exception handling
-				le.printStackTrace();
-			}
 		}
 	}
 
@@ -630,8 +596,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// call cleanup on all beans of the agentnode
 		// TODO testing
-		if (agentNodeBeans != null) {
-			for (ILifecycle anb : agentNodeBeans) {
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
 				try {
 					anb.cleanup();
 				} catch (LifecycleException lce) {
@@ -652,16 +618,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		} catch (LifecycleException e) {
 			// TODO:
 			e.printStackTrace();
-		}
-
-		// cleanup message broker
-		if (_embeddedBroker != null) {
-			try {
-				_embeddedBroker.cleanup();
-			} catch (LifecycleException le) {
-				// @todo exception handling
-				le.printStackTrace();
-			}
 		}
 	}
 
@@ -698,8 +654,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public ArrayList<ILifecycle> getAgentNodeBeans() {
-		return this.agentNodeBeans;
+	public ArrayList<IAgentNodeBean> getAgentNodeBeans() {
+		return this._agentNodeBeans;
 	}
 
 	/**
@@ -721,8 +677,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgentNodeBeans(ArrayList<ILifecycle> agentnodebeans) {
-		this.agentNodeBeans = agentnodebeans;
+	public void setAgentNodeBeans(ArrayList<IAgentNodeBean> agentnodebeans) {
+		this._agentNodeBeans = agentnodebeans;
 	}
 
 	public ServiceDirectory getServiceDirectory() {
@@ -962,11 +918,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			_serviceDirectory.enableManagement(manager);
 		}
 
-		// register message broker for management
-		if (_embeddedBroker != null) {
-			/* TODO Managment implementation for revised ActiveMQBroker */
-			// _embeddedBroker.enableManagement(manager);
-		}
+//		// register message broker for management
+//		if (_embeddedBroker != null) {
+//			/* TODO Managment implementation for revised ActiveMQBroker */
+//			// _embeddedBroker.enableManagement(manager);
+//		}
 
 		// enable remote management
 		if (_jmxConnectors != null) {
@@ -990,11 +946,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// disable remote management
 		_manager.disableRemoteManagement(getName());
 
-		// deregister message broker from management
-		if (_embeddedBroker != null) {
-			/* TODO Managment implementation for revised ActiveMQBroker */
-			// _embeddedBroker.disableManagement();
-		}
+//		// deregister message broker from management
+//		if (_embeddedBroker != null) {
+//			/* TODO Managment implementation for revised ActiveMQBroker */
+//			// _embeddedBroker.disableManagement();
+//		}
 
 		// deregister service directory from management
 		if (_serviceDirectory != null) {

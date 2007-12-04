@@ -2,6 +2,10 @@ package de.dailab.jiactng.agentcore.comm.broker;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
 
+/**
+ * @deprecated as {@link JmsBrokerAMQ} is replaced
+ */
+@Deprecated
 public interface JmsBrokerAMQMBean extends AbstractLifecycleMBean {
 
 	public void addConnector(String bindAddress);

@@ -15,17 +15,12 @@ import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
-import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
-import de.dailab.jiactng.agentcore.comm.broker.BrokerValues;
-import de.dailab.jiactng.agentcore.comm.broker.JmsBrokerAMQ;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 public class CommunicationBeanTest extends TestCase {
 
 	public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.CommunicationBean#send";
-
-	private static ActiveMQBroker _broker;
 	private static IAgentNode _communicationPlatform;
 	private static IAgent _communicator;
     private static int testCount= -1;
@@ -46,20 +41,7 @@ public class CommunicationBeanTest extends TestCase {
 			_log = LogFactory.getLog("CommunicationBeanTestLog");
 			super.setUp();
 			
-			ClassPathXmlApplicationContext brokerContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml");
-			
-			_broker = (ActiveMQBroker) brokerContext.getBean("activeMQBroker"); 
-			_broker.setLog(_log);
-			_log.info("Broker initializing");
-			try {
-				_broker.doInit();
-				_broker.doStart();
-			} catch (Exception e1) {
-				_log.error(e1.getCause());
-			}
-//			_broker.start();
-			_log.info("Broker started");
-
+//			ClassPathXmlApplicationContext brokerContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml");
 			ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/communicationTestContext.xml");
 			_communicationPlatform = (IAgentNode) xmlContext.getBean("CommunicationPlatform");
 			
@@ -157,8 +139,6 @@ public class CommunicationBeanTest extends TestCase {
 			_log.info("tearing down testing environment");
 			super.tearDown();
 			((SimpleAgentNode)_communicationPlatform).shutdown();
-			_broker.doStop();
-			_broker.doCleanup();
 			_log.info("CommunicationBeanTest closed. All Tests done. Good Luck!");
 		}
 	}

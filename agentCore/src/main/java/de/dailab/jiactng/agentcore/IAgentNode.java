@@ -130,14 +130,14 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    * 
    * @param agentnodebeans the beans to set 
    */
-  public void setAgentNodeBeans(ArrayList<ILifecycle> agentnodebeans);
+  public void setAgentNodeBeans(ArrayList<IAgentNodeBean> agentnodebeans);
   
   /**
    * Getter for beans of the agentnode.
    * 
    * @return the beans of the agent node
    */
-  public ArrayList<ILifecycle> getAgentNodeBeans();
+  public ArrayList<IAgentNodeBean> getAgentNodeBeans();
   
   /**
    * Liefert das platformweite ServiceDirectory 

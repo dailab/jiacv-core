@@ -11,7 +11,10 @@ import java.net.UnknownHostException;
  * Port und Protocol erzeugt werden - in diesem Fall wird die lokale Ip ermittelt und zur erzeugung der Url verendet.
  * 
  * @author janko
+ * 
+ * @deprecated replaced by {@link ActiveMQBroker}
  */
+@Deprecated
 public class BrokerValues {
 
 	public static final String PROTOCOL_IP_SEPARATOR = "://";

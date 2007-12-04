@@ -22,7 +22,10 @@ import de.dailab.jiactng.agentcore.management.Manager;
  * 
  * @todo add configuration support for e.g. multicast
  * @author Joachim Fuchs, Janko Dimitroff
+ * 
+ * @deprecated replaced by {@link ActiveMQBroker}
  */
+@Deprecated
 public class JmsBrokerAMQ extends AbstractLifecycle implements Manageable, JmsBrokerAMQMBean {
     /** The logger we use, if it is not set by DI, we create our own */
     protected Log log = LogFactory.getLog(getClass());

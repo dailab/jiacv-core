@@ -8,7 +8,12 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml"/>
 
 	<bean name="CommunicationPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
-		<property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties"></property>
+		<property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties"/>
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="TestBroker"/>
+			</list>
+		</property>
 		<property name="agents">
 			<list>
 				<ref bean="Communicator" />
@@ -16,6 +21,7 @@
 		</property>
 	</bean>
 
+	<bean name="TestBroker" parent="activeMQBroker" singleton="true"/>
 
 	<bean name="Communicator" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
 		<property name="memory">

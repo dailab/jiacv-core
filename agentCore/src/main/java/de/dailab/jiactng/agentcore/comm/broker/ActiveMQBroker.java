@@ -94,6 +94,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
     
     // FACTORY METHODS FOR CONNECTOR CREATION
     public ConnectionFactory createConnectionFactory() {
-        return new ActiveMQConnectionFactory("vm://" + getBeanName());
+        ActiveMQConnectionFactory factory=  new ActiveMQConnectionFactory("vm://" + getBeanName());
+//        factory.setUseAsyncSend(true);
+//        factory.setDispatchAsync(true);
+        return factory;
     }
 }

@@ -11,13 +11,14 @@ import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements IAgentNodeBean {
     protected IAgentNode agentNode;
-    protected String beanName;
     protected Manager manager = null;
     protected Log log;
+    
+    private String _beanName;
 
     public final void setAgentNode(IAgentNode agentNode) {
         this.agentNode = agentNode;
@@ -25,17 +26,15 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
     }
     
     public final String getBeanName() {
-        return beanName;
+        return _beanName;
     }
 
     public final void setBeanName(String beanName) {
-        this.beanName = beanName;
+        _beanName = beanName;
     }
 
     /**
      * Deregisters the node bean and all its resources from management
-     * 
-     * @param manager
      */
     public void disableManagement() {
         // do nothing if management already disabled
@@ -47,7 +46,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
         try {
             manager.unregisterAgentNodeResource(agentNode.getName(), "agentNodeBean", getBeanName());
         } catch (Exception e) {
-            System.err.println("WARNING: Unable to deregister node bean " + beanName + " of node "
+            System.err.println("WARNING: Unable to deregister node bean " + _beanName + " of node "
                     + agentNode.getName() + " as JMX resource.");
             System.err.println(e.getMessage());
         }
@@ -71,7 +70,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
         try {
             manager.registerAgentNodeResource(agentNode.getName(), "agentNodeBean", getBeanName(), this);
         } catch (Exception e) {
-            System.err.println("WARNING: Unable to register node bean " + beanName + " of node " + agentNode.getName()
+            System.err.println("WARNING: Unable to register node bean " + _beanName + " of node " + agentNode.getName()
                     + " as JMX resource.");
             System.err.println(e.getMessage());
         }

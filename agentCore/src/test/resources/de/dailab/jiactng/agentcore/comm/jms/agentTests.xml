@@ -5,9 +5,14 @@
 	- Application context definition for "example" DispatcherServlet.
 -->
 <beans>
-
-	<bean name="PingPongPlatform"
-		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+	<import resource="classpath:de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml" />
+	
+	<bean name="PingPongPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="PingPongBroker"/>
+			</list>
+		</property>
 		<property name="agents">
 			<list>
 				<ref bean="Pinger" />
@@ -15,10 +20,10 @@
 			</list>
 		</property>
 	</bean>
+	
+	<bean name="PingPongBroker" parent="activeMQBroker" singleton="true"/>
 
-
-	<bean name="Pinger" class="de.dailab.jiactng.agentcore.Agent"
-		singleton="false">
+	<bean name="Pinger" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
 		<property name="memory">
 			<ref bean="memory" />
 		</property>
@@ -33,8 +38,7 @@
 		</property>
 	</bean>
 
-	<bean name="Ponger" class="de.dailab.jiactng.agentcore.Agent"
-		singleton="false">
+	<bean name="Ponger" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
 		<property name="memory">
 			<ref bean="memory" />
 		</property>
@@ -49,22 +53,14 @@
 		</property>
 	</bean>
 
-	<bean name="memory"
-		class="de.dailab.jiactng.agentcore.knowledge.Memory"
-		singleton="false">
+	<bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
 		<!--property name="timeOut" value="-1"/-->
 	</bean>
 
-	<bean name="pongerBean"
-		class="de.dailab.jiactng.agentcore.comm.jms.PongerBean"
-		singleton="false" />
-	<bean name="pingerBean"
-		class="de.dailab.jiactng.agentcore.comm.jms.PingerBean"
-		singleton="false" />
+	<bean name="pongerBean" class="de.dailab.jiactng.agentcore.comm.jms.PongerBean" singleton="false" />
+	<bean name="pingerBean" class="de.dailab.jiactng.agentcore.comm.jms.PingerBean" singleton="false" />
 
-	<bean name="communicationBean"
-		class="de.dailab.jiactng.agentcore.comm.CommunicationBean"
-		singleton="false">
+	<bean name="communicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false">
 		<property name="transports">
 			<set>
 				<ref bean="jmsTransport" />
@@ -72,24 +68,14 @@
 		</property>
 	</bean>
 
-	<bean name="jmsTransport"
-		class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
+	<bean name="jmsTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
 		singleton="false">
 		<constructor-arg type="java.lang.String" value="jms" />
 		<property name="connectionFactory">
-			<ref bean="amqConnectionFactory" />
+			<ref bean="connectionFactory" />
 		</property>
 	</bean>
 
-	<bean name="simpleExecCycle"
-		class="de.dailab.jiactng.agentcore.SimpleExecutionCycle"
-		singleton="false">
-	</bean>
-
-	<bean name="amqConnectionFactory"
-		class="org.apache.activemq.spring.ActiveMQConnectionFactory"
-		singleton="false">
-		<property name="brokerURL" value="vm://localhost:61616"></property>
-	</bean>
-
+	<bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false"></bean>
+	<bean name="connectionFactory" factory-bean="PingPongBroker" factory-method="createConnectionFactory" singleton="false"/>
 </beans>

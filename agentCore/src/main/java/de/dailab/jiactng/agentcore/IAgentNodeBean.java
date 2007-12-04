@@ -14,7 +14,7 @@ import de.dailab.jiactng.agentcore.management.Manageable;
  * ILifecycle and Manageable interfaces.
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public interface IAgentNodeBean extends ILifecycle, BeanNameAware, Manageable {
     /**
@@ -36,9 +36,9 @@ public interface IAgentNodeBean extends ILifecycle, BeanNameAware, Manageable {
     public void setBeanName(String name);
 
     /**
-     * Getter for the name of the agentbean
+     * Getter for the name of this node bean
      * 
-     * @return a string representing the name of the agentbean.
+     * @return a string representing the name of this node bean.
      */
     public String getBeanName();
 }

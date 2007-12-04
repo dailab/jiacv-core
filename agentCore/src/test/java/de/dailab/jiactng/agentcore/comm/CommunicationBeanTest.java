@@ -41,7 +41,6 @@ public class CommunicationBeanTest extends TestCase {
 			_log = LogFactory.getLog("CommunicationBeanTestLog");
 			super.setUp();
 			
-//			ClassPathXmlApplicationContext brokerContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml");
 			ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/communicationTestContext.xml");
 			_communicationPlatform = (IAgentNode) xmlContext.getBean("CommunicationPlatform");
 			

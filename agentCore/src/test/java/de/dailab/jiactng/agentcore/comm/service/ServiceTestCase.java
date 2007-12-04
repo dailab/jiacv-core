@@ -5,7 +5,6 @@ package de.dailab.jiactng.agentcore.comm.service;
 
 import junit.framework.TestCase;
 
-import org.apache.activemq.broker.BrokerService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.IAgent;
@@ -21,22 +20,12 @@ public class ServiceTestCase extends TestCase {
     public static String DUMMY_ADDRESS= "dummyAddress";
     public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.CommunicationBean#send";
 
-    private BrokerService _broker;
     private IAgentNode _node;
     private ClientBean _clientBean;
     
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        _broker= new BrokerService();
-        String destination= "localhost:61616";
-        System.out.println("setup Broker on " + destination);
-        _broker.setPersistent(false);
-        _broker.setUseJmx(true);
-        _broker.addConnector("tcp://" + destination);
-        _broker.start();
-        System.out.println("broker started");
-        
         ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/service/agentTests.xml");
         _node = (IAgentNode) newContext.getBean("ServiceTestPlatform");
         
@@ -62,7 +51,6 @@ public class ServiceTestCase extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         ((SimpleAgentNode)_node).shutdown();
-        _broker.stop();
         super.tearDown();
     }
 }

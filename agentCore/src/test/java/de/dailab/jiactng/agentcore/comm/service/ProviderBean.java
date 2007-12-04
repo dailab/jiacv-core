@@ -9,7 +9,7 @@ import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class OpenBean extends AbstractMethodExposingBean {
+public class ProviderBean extends AbstractMethodExposingBean {
     @Expose(name = "log")
     public void log(String message) {
         log.debug("I was forced to log something:: '" + message + "'");

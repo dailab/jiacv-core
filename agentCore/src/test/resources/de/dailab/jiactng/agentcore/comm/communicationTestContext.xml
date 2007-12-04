@@ -54,11 +54,10 @@
 		singleton="false">
 		<constructor-arg type="java.lang.String" value="jms" />
 		<property name="connectionFactory">
-			<ref bean="amqConnectionFactory" />
+			<ref bean="connectionFactory" />
 		</property>
 	</bean>
 
+	<bean name="connectionFactory" factory-bean="TestBroker" factory-method="createConnectionFactory" singleton="false"/>
 	<bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false"></bean>
-
-
 </beans>

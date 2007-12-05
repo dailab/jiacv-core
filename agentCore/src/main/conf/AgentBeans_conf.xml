@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!-- Generic application context definition. -->
+<beans>
+
+
+<!-- ------------- --
+  -- The Memory of an Agent --
+  -- maybe think about initial facts to be put here
+  -- ------------- -->
+  <bean name="Memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" scope="prototype">
+  </bean>
+
+
+<!-- ------------- --
+  -- The Bean handling the execution of all Agent Threads --
+  -- maybe put timer option in here
+  -- ------------- -->
+  <bean name="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" scope="prototype">
+<!--
+    <property name="timer" value="9999"/>
+-->
+  </bean>
+
+
+<!-- ------------- --
+  -- The Bean handling the communication between this Agent and other agents--
+  -- ------------- -->
+  <bean name="Communication" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" scope="prototype">
+   <property name="transports">
+     <set>
+        <ref bean="JMSMessageTransport"/>
+     </set>
+   </property>
+  </bean>
+
+    
+</beans>
+

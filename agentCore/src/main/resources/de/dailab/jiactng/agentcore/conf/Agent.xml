@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!-- Generic application context definition. -->
+<beans>
+	<!--
+		###########
+		# Imports #
+		###########
+		
+		1. get the abstract agent bean definitions
+	-->
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml" />
+
+	<!--
+		###################################
+		# Template for a Simple TNG-Agent #
+		###################################
+		
+		contains defaults properties for memory and lifecycle beans
+		this template should be inherited when declaring other agents
+		possible properties are
+		AgentBeans: a list of AgentBeans this agwnt will contain (components of the Agent)
+		AgentName: sets the name of the Agent (what will be the Agentname of this is not set???)
+		owner: sets the owner of this Agent, e.g. the platform provider. needed for usermanagement
+		BeanExecutionTimeout: sets the timeout for the execution of this Agent. only relevant for certain execution types (needs more documentation here about the proper context)
+	-->
+	<bean name="SimpleAgent" class="de.dailab.jiactng.agentcore.Agent" abstract="true">
+		<property name="memory" ref="Memory" />
+		<property name="execution" ref="SimpleExecutionCycle" />
+	</bean>
+
+	<bean name="SimpleAgentWithCommunication" parent="SimpleAgent" abstract="true">
+		<property name="agentBeans">
+			<list>
+				<ref bean="Communication" />
+			</list>
+		</property>
+	</bean>
+</beans>
+

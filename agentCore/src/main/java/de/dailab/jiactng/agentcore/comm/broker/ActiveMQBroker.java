@@ -35,6 +35,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
             context.setJmxDomainName("de.dailab.jiactng");
             context.setCreateConnector(false);
             _broker.setManagementContext(context);
+        } else {
+            _broker.setUseJmx(false);
         }
         
         _broker.setPersistent(_persistent);

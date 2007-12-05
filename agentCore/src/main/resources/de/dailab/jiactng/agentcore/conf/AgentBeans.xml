@@ -43,7 +43,7 @@
 		This standard communication component uses a JMSMessageTransport to exchange messages.
 		See the documentation of the referenced bean to ensure the functionality!
 	-->
-	<bean name="Communication" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false">
+	<bean name="CommunicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false">
 		<property name="transports">
 			<set>
 				<ref bean="StandardJMSMessageTransport" />

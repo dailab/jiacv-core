@@ -5,13 +5,15 @@
 	- Application context definition for usage within CommunicationBean related tests and examples 
 -->
 <beans>
-	<import resource="classpath:de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml"/>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml"/>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
 
-	<bean name="CommunicationPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+	<bean name="CommunicationPlatform" parent="Platform">
 		<property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties"/>
 		<property name="agentNodeBeans">
 			<list>
-				<ref bean="TestBroker"/>
+				<ref bean="StandardJMSBroker"/>
 			</list>
 		</property>
 		<property name="agents">
@@ -21,43 +23,11 @@
 		</property>
 	</bean>
 
-	<bean name="TestBroker" parent="activeMQBroker" singleton="true"/>
-
-	<bean name="Communicator" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
-		<property name="memory">
-			<ref bean="memory" />
-		</property>
-		<property name="execution">
-			<ref bean="simpleExecCycle" />
-		</property>
+	<bean name="Communicator" parent="SimpleAgent" singleton="false">
 		<property name="agentBeans">
 			<list>
-				<ref bean="communicationBean" />
+				<ref bean="CommunicationBean" />
 			</list>
 		</property>
 	</bean>
-
-
-	<bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
-		<!--property name="timeOut" value="-1"/-->
-	</bean>
-
-	<bean name="communicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false">
-		<property name="transports">
-			<set>
-				<ref bean="jmsTransport" />
-			</set>
-		</property>
-	</bean>
-
-	<bean name="jmsTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
-		singleton="false">
-		<constructor-arg type="java.lang.String" value="jms" />
-		<property name="connectionFactory">
-			<ref bean="connectionFactory" />
-		</property>
-	</bean>
-
-	<bean name="connectionFactory" factory-bean="TestBroker" factory-method="createConnectionFactory" singleton="false"/>
-	<bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false"></bean>
 </beans>

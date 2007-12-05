@@ -6,7 +6,7 @@ package de.dailab.jiactng.agentcore.comm.broker;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class ActiveMQTransportConnector {
     private String _transportURI= null;
@@ -48,6 +48,6 @@ public class ActiveMQTransportConnector {
 
     @Override
     public String toString() {
-        return "transportURI: " + getTransportURI() + "; discoverURI: " + getDiscoveryURI();
+        return "transportURI='" + getTransportURI() + "'; discoverURI='" + getDiscoveryURI() + "'";
     }
 }

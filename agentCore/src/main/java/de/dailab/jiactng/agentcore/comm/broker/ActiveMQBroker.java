@@ -41,7 +41,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
 
         try {
             for (ActiveMQTransportConnector amtc : _connectors) {
-                log.debug("embedded broker initializing url = " + amtc.toString());
+                log.debug("embedded broker initializing transport:: " + amtc.toString());
                 TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
                 if (amtc.getDiscoveryURI() != null) {
 //                    URI uri = new URI(amtc.getDiscoveryURI());

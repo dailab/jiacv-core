@@ -5,15 +5,14 @@
 	- Application context definition for usage within CommunicationBean related tests and examples 
 -->
 <beans>
-	<import resource="classpath:de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
 
-	<bean name="CommunicationPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+	<bean name="CommunicationPlatform" parent="Platform">
 		<property name="agentNodeBeans">
 			<list>
-				<ref bean="ChatBroker"/>
+				<ref bean="StandardJMSBroker"/>
 			</list>
 		</property>
 	</bean>
-
-	<bean name="ChatBroker" parent="activeMQBroker" singleton="true"/>
 </beans>

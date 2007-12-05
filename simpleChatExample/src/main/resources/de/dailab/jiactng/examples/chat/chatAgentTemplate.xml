@@ -5,45 +5,16 @@
 	- Application context definition for usage within CommunicationBean related tests and examples 
 -->
 <beans>
-	<import resource="classpath:de/dailab/jiactng/agentcore/comm/broker/activeMQBrokerContext.xml"/>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
 	
-	<bean name="chatAgentTemplate" class="de.dailab.jiactng.agentcore.Agent" abstract="true">
-		<property name="memory">
-			<ref bean="memory" />
-		</property>
-		<property name="execution">
-			<ref bean="simpleExecCycle" />
-		</property>
+	<bean name="chatAgentTemplate" parent="SimpleAgent" abstract="true">
 		<property name="agentBeans">
 			<list>
-				<ref bean="communicationBean" />
+				<ref bean="CommunicationBean" />
 				<ref bean="chatGUIBean" />
 			</list>
 		</property>
 	</bean>
-
-	<bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
-		<!--property name="timeOut" value="-1"/-->
-	</bean>
-
-	<bean name="communicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false">
-		<property name="transports">
-			<set>
-				<ref bean="jmsTransport" />
-			</set>
-		</property>
-	</bean>
-
-	<bean name="jmsTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
-		singleton="false">
-		<constructor-arg type="java.lang.String" value="jms" />
-		<property name="connectionFactory">
-			<ref bean="connectionFactory" />
-		</property>
-	</bean>
 	
-	<bean name="connectionFactory" factory-bean="ChatBroker" factory-method="createConnectionFactory" singleton="false"/>
-
-	<bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false" />
 	<bean name="chatGUIBean" class="de.dailab.jiactng.examples.chat.ChatGuiBean" singleton="false" />
 </beans>

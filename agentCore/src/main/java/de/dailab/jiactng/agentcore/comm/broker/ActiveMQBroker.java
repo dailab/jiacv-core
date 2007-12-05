@@ -52,9 +52,11 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
                 TransportConnector connector = _broker.addConnector(url);
                 if (_discoveryMethod != null && _discoveryAddress != null) {
                     URI uri = new URI(_discoveryMethod + "://" + _discoveryAddress);
+            		log.debug("adding discoveryAgent on address: " + uri);
                     connector.setDiscoveryUri(uri);
                     connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
                     _broker.addNetworkConnector(uri);
+                    connector.start();
                 }
             }
 

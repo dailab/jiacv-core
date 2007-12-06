@@ -8,6 +8,7 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
 	
 	<bean name="chatAgentTemplate" parent="SimpleAgent" abstract="true">
+		<!-- property name="execution" ref="FakeExecutionCycle" / -->
 		<property name="agentBeans">
 			<list>
 				<ref bean="CommunicationBean" />
@@ -17,4 +18,5 @@
 	</bean>
 	
 	<bean name="chatGUIBean" class="de.dailab.jiactng.examples.chat.ChatGuiBean" singleton="false" />
+	<bean name="FakeExecutionCycle" class="de.dailab.jiactng.examples.chat.FakeExecutionCycle" singleton="false"/>
 </beans>

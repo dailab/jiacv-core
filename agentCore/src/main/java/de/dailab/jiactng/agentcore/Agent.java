@@ -158,6 +158,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	public void run() {
 		while (true) {
 			try {
+                Thread.sleep(50);
 				synchronized (this) {
 					if (active) {
 						executionFuture = agentNode.getThreadPool().submit(

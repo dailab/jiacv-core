@@ -52,4 +52,29 @@ public interface IAgentBean extends ILifecycle, BeanNameAware, Manageable {
 	 */
 	public String getBeanName();
 
+	/**
+	 * Getter for Intervall by wich the execute()-method of the bean is called.
+	 * If negative, the execute-method is never called.
+	 * 
+	 * @return the timeintervall between two calls of the execute()-method.
+	 */
+	public int getExecuteIntervall();
+
+	/**
+	 * Setter for Intervall by wich the execute()-method of the bean is called.
+	 * If negative, the execute-method is never called.
+	 * 
+	 * @param executeIntervall
+	 *            the timeintervall between two calls of the execute()-method.
+	 *            If negative, the method is never called.
+	 */
+	public void setExecuteIntervall(int executeIntervall);
+
+	/**
+	 * The stub for the execute method, that should be implemented by all beans.
+	 * Note: this stub is likely to change, when the Sensor/Effector structure
+	 * is implemented.
+	 */
+	public void execute();
+
 }

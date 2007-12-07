@@ -6,6 +6,8 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import java.util.ArrayList;
+
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
@@ -24,6 +26,12 @@ import de.dailab.jiactng.agentcore.management.Manager;
  */
 public class SimpleExecutionCycle extends AbstractAgentBean implements
 		IExecutionCycle {
+
+	/** List of times at which execute-methods should be called */
+	private ArrayList<Long> executeTimes = null;
+
+	/** List of beans which have execute-methods that should be called. */
+	private ArrayList<IAgentBean> executeList = null;
 
 	/**
 	 * time to sleep to be nice to other threads/processes, in milliseconds
@@ -71,15 +79,32 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 */
 	public void run() {
 		// call execute-methods of beans
-		for (IAgentBean a : agent.getAgentBeans()) {
-			if (a instanceof IActiveAgentBean) {
+		long currentTime = System.currentTimeMillis();
+		if (executeTimes.size() > 0 && (executeTimes.get(0) <= currentTime)) {
+			IAgentBean a = executeList.remove(0);
+			executeTimes.remove(0);
+			if (a.getExecuteIntervall() > -1) {
 				synchronized (this) {
 					if (active) {
-						callBeanExecute((IActiveAgentBean)a);
+						callBeanExecute(a);
+						scheduleNextExecute(currentTime, a);
 					}
 				}
+
 			}
 		}
+
+		// for (IAgentBean a : agent.getAgentBeans()) {
+		// if (a.getExecuteIntervall()>-1) {
+		// synchronized (this) {
+		// if (active) {
+		// callBeanExecute(a);
+		// long nextCall = System.currentTimeMillis()+a.getExecuteIntervall();
+		// executeMap.put();
+		// }
+		// }
+		// }
+		// }
 
 		// process one doAction
 		// TODO: check if read can be used
@@ -105,6 +130,33 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			}
 		}
 
+	}
+
+	/**
+	 * Utility-Method for inserting the next call-time for an agentbeans
+	 * execute-method into the list.
+	 * 
+	 * @param currentTime
+	 *            the time at which the execute-method should be called (best
+	 *            effort).
+	 * @param a
+	 *            the bean for which the execute-method should be called.
+	 */
+	private void scheduleNextExecute(long currentTime, IAgentBean a) {
+		if (a.getExecuteIntervall() > -1) {
+			long nextCall = currentTime + a.getExecuteIntervall();
+			int index = 0;
+			for (Long l : executeTimes) {
+				if (l > nextCall) {
+					index++;
+				} else {
+					break;
+				}
+			}
+			executeTimes.add(index, nextCall);
+			executeList.add(index, a);
+			// TODO: removed beans should be taken out.
+		}
 	}
 
 	private void processResult(ActionResult actionResult) {
@@ -137,7 +189,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		}
 	}
 
-	private void callBeanExecute(IActiveAgentBean a) {
+	private void callBeanExecute(IAgentBean a) {
 		if (LifecycleStates.STARTED.equals(a.getState())) {
 			try {
 				Thread.sleep(BE_NICE_TIMER);
@@ -168,6 +220,8 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 */
 	@Override
 	public void doCleanup() {
+		executeTimes = null;
+		executeList = null;
 	}
 
 	/**
@@ -177,6 +231,12 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 */
 	@Override
 	public void doInit() {
+		executeList = new ArrayList<IAgentBean>();
+		executeTimes = new ArrayList<Long>();
+		long currentTime = System.currentTimeMillis();
+		for (IAgentBean a : agent.getAgentBeans()) {
+			scheduleNextExecute(currentTime, a);
+		}
 	}
 
 	/**

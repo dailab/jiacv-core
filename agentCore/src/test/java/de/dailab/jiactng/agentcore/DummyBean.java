@@ -9,7 +9,7 @@ package de.dailab.jiactng.agentcore;
  * 
  * @author Thomas Konnerth
  */
-public class DummyBean extends AbstractAgentBean implements IActiveAgentBean {
+public class DummyBean extends AbstractAgentBean {
 
   public enum Modes {
     Hello, Failure, Endless, Nothing

@@ -104,7 +104,7 @@ public class IAgentBeanTest extends TestCase {
 
   public void testExecute() {
     assertEquals("", ((DummyBean) bean).getTest());
-    ((IActiveAgentBean)bean).execute();
+    bean.execute();
     assertEquals("Hello World", ((DummyBean) bean).getTest());
   }
 

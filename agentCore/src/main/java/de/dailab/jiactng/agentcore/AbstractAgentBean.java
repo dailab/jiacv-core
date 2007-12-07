@@ -30,6 +30,12 @@ import de.dailab.jiactng.agentcore.management.Manager;
 public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		IAgentBean, AbstractAgentBeanMBean {
 
+	/**
+	 * Intervall by wich the execute()-method of the bean is called. If
+	 * negative, the execute-method is never called.
+	 */
+	private int executeIntervall = -1;
+
 	protected Log log = null;
 
 	/** The manager of the agent node */
@@ -71,9 +77,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 */
 	protected String beanName = null;
 
-    /**
-     * {@inheritDoc}
-     */	
+	/**
+	 * {@inheritDoc}
+	 */
 	public final void setThisAgent(IAgent agent) {
 		// update management
 		if (isManagementEnabled()) {
@@ -89,16 +95,16 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		this.log = thisAgent.getLog(this);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	public final void setMemory(IMemory mem) {
 		this.memory = mem;
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	public final void setBeanName(String name) {
 		// update management
 		if (isManagementEnabled()) {
@@ -116,9 +122,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		}
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	public final String getBeanName() {
 		return beanName;
 		// return new StringBuffer(thisAgent.getAgentName()).append(".").append(
@@ -152,9 +158,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		}
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void doInit() throws Exception {
 		if (log == null) {
@@ -162,23 +168,23 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		}
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void doStart() throws Exception {
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void doStop() throws Exception {
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void doCleanup() throws Exception {
 	}
@@ -186,7 +192,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	/**
 	 * Registers the agent bean and all its resources for management
 	 * 
-	 * @param manager the manager responsible for this agentbean.
+	 * @param manager
+	 *            the manager responsible for this agentbean.
 	 */
 	public void enableManagement(Manager manager) {
 		// do nothing if management already enabled
@@ -240,6 +247,27 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 */
 	public boolean isManagementEnabled() {
 		return _manager != null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getExecuteIntervall() {
+		return executeIntervall;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setExecuteIntervall(int executeIntervall) {
+		this.executeIntervall = executeIntervall;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void execute() {
+
 	}
 
 }

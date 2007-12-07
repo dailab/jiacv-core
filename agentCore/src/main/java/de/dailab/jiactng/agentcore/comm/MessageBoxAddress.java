@@ -23,12 +23,10 @@ class MessageBoxAddress extends CommunicationAddress implements IMessageBoxAddre
         super(unboundAddress, transportIdentifier);
     }
     
-	@SuppressWarnings("unchecked")
-    public IMessageBoxAddress toUnboundAddress() {
-        return super.toUnboundAddress();
+    public MessageBoxAddress toUnboundAddress() {
+        return (MessageBoxAddress) super.toUnboundAddress();
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     MessageBoxAddress bind(String transportId) throws URISyntaxException {
         return new MessageBoxAddress(this, transportId);

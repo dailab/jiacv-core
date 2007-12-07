@@ -29,12 +29,10 @@ final class GroupAddress extends CommunicationAddress implements IGroupAddress {
 		return false;
 	}
 
-    @SuppressWarnings("unchecked")
-    public IGroupAddress toUnboundAddress() {
-        return super.toUnboundAddress();
+    public GroupAddress toUnboundAddress() {
+        return (GroupAddress) super.toUnboundAddress();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     GroupAddress bind(String transportId) throws URISyntaxException {
         return new GroupAddress(this, transportId);

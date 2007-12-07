@@ -15,7 +15,7 @@ import org.sercho.masp.space.event.WriteCallEvent;
  * should be consumed and processed exclusively.
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class ConsumingKnowledgeProcessor<P extends IFact> implements IKnowledgeHandler<P> {
     protected class ConsumingSpaceObserver implements SpaceObserver<IFact> {
@@ -35,7 +35,9 @@ public class ConsumingKnowledgeProcessor<P extends IFact> implements IKnowledgeH
                     }
                 }
                 
-                handler.handle(knowledge);
+                if(knowledge != null) {
+                    handler.handle(knowledge);
+                }
             }
         }
     }
@@ -77,7 +79,7 @@ public class ConsumingKnowledgeProcessor<P extends IFact> implements IKnowledgeH
      * @param memory        the memory to attach to
      * @param template      the template which triggers this processor
      */
-    public void attachTo(IMemory memory, P template) {
+    public final void attachTo(IMemory memory, P template) {
         synchronized(associatedMemories) {
             memory.attach(_observer, template);
             associatedMemories.put(memory.getID(), memory);
@@ -89,7 +91,7 @@ public class ConsumingKnowledgeProcessor<P extends IFact> implements IKnowledgeH
      * 
      * @param memory        the memory to detach from
      */
-    public void detachFrom(IMemory memory) {
+    public final void detachFrom(IMemory memory) {
         synchronized(associatedMemories) {
             IMemory foundMemory= associatedMemories.remove(memory.getID());
             if(foundMemory != null) {

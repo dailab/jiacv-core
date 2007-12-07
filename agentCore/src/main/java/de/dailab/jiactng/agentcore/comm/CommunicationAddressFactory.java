@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
  * @version $Revision$
  */
 public final class CommunicationAddressFactory {
-    static final String SCHEME= "jiactransport";
     public static IGroupAddress createGroupAddress(String groupName) {
         try {
             return new GroupAddress(groupName);

@@ -22,6 +22,5 @@ public interface IMessageBoxAddress extends ICommunicationAddress {
      */
     boolean isLocal();
     
-    @SuppressWarnings("unchecked")
     IMessageBoxAddress toUnboundAddress();
 }

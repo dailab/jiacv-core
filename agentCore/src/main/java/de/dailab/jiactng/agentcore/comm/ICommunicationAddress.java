@@ -54,12 +54,10 @@ public interface ICommunicationAddress extends IFact {
      * returns the generic unbound address. Otherwise it returns a reference to
      * itself.
      * 
-     * @param <T>   the type of the address. It can be one of {@link ICommunicationAddress},
-     *              {@link IMessageBoxAddress} or {@link IGroupAddress}.
      * @return      the generic unbound address for this address
      * 
      * @see         IMessageBoxAddress#toUnboundAddress()
      * @see         IGroupAddress#toUnboundAddress()
      */
-    <T extends ICommunicationAddress> T toUnboundAddress();
+    ICommunicationAddress toUnboundAddress();
 }

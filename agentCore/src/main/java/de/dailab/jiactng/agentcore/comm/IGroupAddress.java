@@ -23,6 +23,5 @@ public interface IGroupAddress extends ICommunicationAddress {
      */
     boolean isClosed();
     
-    @SuppressWarnings("unchecked")
     IGroupAddress toUnboundAddress();
 }

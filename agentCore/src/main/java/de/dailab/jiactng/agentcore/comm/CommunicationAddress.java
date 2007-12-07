@@ -46,9 +46,8 @@ abstract class CommunicationAddress implements ICommunicationAddress {
         return _transportId != null;
     }
     
-    @SuppressWarnings("unchecked")
-    public <T extends ICommunicationAddress> T toUnboundAddress() {
-        return (T)_unboundAddress;
+    public CommunicationAddress toUnboundAddress() {
+        return _unboundAddress;
     }
 
     public final String getName() {
@@ -83,5 +82,5 @@ abstract class CommunicationAddress implements ICommunicationAddress {
         return toURI().toString();
     }
     
-    abstract <T extends CommunicationAddress> T bind(String transportId) throws URISyntaxException;
+    abstract CommunicationAddress bind(String transportId) throws URISyntaxException;
 }

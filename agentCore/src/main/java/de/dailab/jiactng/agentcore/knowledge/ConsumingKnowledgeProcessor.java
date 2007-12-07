@@ -3,6 +3,7 @@
  */
 package de.dailab.jiactng.agentcore.knowledge;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,12 @@ public class ConsumingKnowledgeProcessor<P extends IFact> implements IKnowledgeH
                 WriteCallEvent<? extends IFact> writeEvent= (WriteCallEvent<? extends IFact>) event;
                 
                 P template= (P)writeEvent.getObject();
+                
+                if(!factClass.isAssignableFrom(template.getClass())) {
+                    // ignore matches which does not fit to the specific fact type
+                    return;
+                }
+                
                 P knowledge;
                 synchronized(associatedMemories) {
                     IMemory currentMemory= associatedMemories.get(writeEvent.getSource());
@@ -46,8 +53,19 @@ public class ConsumingKnowledgeProcessor<P extends IFact> implements IKnowledgeH
      * Field which contains all memories the observer is associated to.
      * It is accessed from within the observer implementation.
      */
-    protected Map<String, IMemory> associatedMemories;
-    protected final IKnowledgeHandler<P> handler;
+    Map<String, IMemory> associatedMemories;
+    
+    /**
+     * Field which contains the reference to the handler.
+     * It is accessed from within the observer implementation.
+     */
+    final IKnowledgeHandler<P> handler;
+    
+    /**
+     * Field which contains the guessed fact type of the handler.
+     * It is accessed from within the observer implementation.
+     */
+    final Class<P> factClass;
     
     private final ConsumingSpaceObserver _observer;
     
@@ -68,6 +86,7 @@ public class ConsumingKnowledgeProcessor<P extends IFact> implements IKnowledgeH
      */
     public ConsumingKnowledgeProcessor(IKnowledgeHandler<P> handler) {
         this.handler= handler != null ? handler : this;
+        this.factClass= guessFactType(this.handler.getClass());
         this.associatedMemories= new HashMap<String, IMemory>();
         _observer= new ConsumingSpaceObserver();
     }
@@ -109,4 +128,26 @@ public class ConsumingKnowledgeProcessor<P extends IFact> implements IKnowledgeH
      * @param knowledge     the new knowledge from the memory
      */
     public void handle(P knowledge) {}
+    
+    /**
+     * Search for the handle method in the given handler class and returns the
+     * parameter type of it.
+     * 
+     * @param handlerClass
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private Class<P> guessFactType(Class<? extends IKnowledgeHandler> handlerClass) {
+        for(Method method : handlerClass.getMethods()) {
+            if(method.getName().equals("handle") && method.getParameterTypes().length == 1) {
+                Class<?> paramType= method.getParameterTypes()[0];
+                
+                if(IFact.class.isAssignableFrom(paramType)) {
+                    return (Class<P>)paramType;
+                }
+            }
+        }
+        
+        throw new IllegalStateException("could not find 'handle' method in handler"); 
+    }
 }

@@ -54,7 +54,7 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    protected static @interface Expose {
+    public static @interface Expose {
         String name() default "";
         Class[] returnTypes() default {};
     }

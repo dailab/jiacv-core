@@ -14,7 +14,7 @@
 	<description>
 		JIAC TNG is a framework to fast and efficiently develop agent-based applications and services. 
 	</description>
-	<url>http://bewaehrung.dai-lab.de/dai-repository/jiactng/site/</url>
+	<url>http://bewaehrung.aot.cs.tu-berlin.de/dai-repository/jiactng/site/</url>
 	<inceptionYear>2006</inceptionYear>
 	<organization>
 		<name>DAI-Labor</name>
@@ -364,7 +364,7 @@
 		<repository>
 			<id>dai-repository</id>
 			<name>DAI Maven 2 Repository</name>
-			<url>http://bewaehrung.dai-lab.de/dai-repository/</url>
+			<url>http://bewaehrung.aot.cs.tu-berlin.de/dai-repository/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -375,7 +375,7 @@
 		<repository>
 			<id>dai-snapshot-repository</id>
 			<name>DAI Maven 2 Snapshot Repository</name>
-			<url>http://bewaehrung.dai-lab.de/dai-snapshot-repository/</url>
+			<url>http://bewaehrung.aot.cs.tu-berlin.de/dai-snapshot-repository/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -394,7 +394,7 @@
 		<pluginRepository>
 			<id>dai-repository</id>
 			<name>DAI Maven 2 Repository</name>
-			<url>http://bewaehrung.dai-lab.de/dai-repository/</url>
+			<url>http://bewaehrung.aot.cs.tu-berlin.de/dai-repository/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -405,7 +405,7 @@
 		<pluginRepository>
 			<id>dai-snapshot-repository</id>
 			<name>DAI Maven 2 Snapshot Repository</name>
-			<url>http://bewaehrung.dai-lab.de/dai-snapshot-repository/</url>
+			<url>http://bewaehrung.aot.cs.tu-berlin.de/dai-snapshot-repository/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -428,17 +428,17 @@
 	<distributionManagement>
 		<site>
 			<id>dai-repository</id>
-			<url>scp://bewaehrung.dai-lab.de/home/maven/dai-repository/jiactng/site/</url>
+			<url>scp://bewaehrung.aot.cs.tu-berlin.de/home/maven/dai-repository/jiactng/site/</url>
 		</site>
 		<repository>
 			<id>dai-repository</id>
 			<name>DAI Repository</name>
-			<url>scp://bewaehrung.dai-lab.de/home/maven/dai-repository</url>
+			<url>scp://bewaehrung.aot.cs.tu-berlin.de/home/maven/dai-repository</url>
 		</repository>
 		<snapshotRepository>
 			<id>dai-snapshot-repository</id>
 			<name>DAI Snapshot Repository</name>
-			<url>scp://bewaehrung.dai-lab.de/home/maven/dai-snapshot-repository</url>
+			<url>scp://bewaehrung.aot.cs.tu-berlin.de/home/maven/dai-snapshot-repository</url>
 		</snapshotRepository>
 	</distributionManagement>
 

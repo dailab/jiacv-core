@@ -83,7 +83,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		if (executeTimes.size() > 0 && (executeTimes.get(0) <= currentTime)) {
 			IAgentBean a = executeList.remove(0);
 			executeTimes.remove(0);
-			if (a.getExecuteIntervall() > -1) {
+			if (a.getExecuteInterval() > -1) {
 				synchronized (this) {
 					if (active) {
 						callBeanExecute(a);
@@ -143,8 +143,8 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 *            the bean for which the execute-method should be called.
 	 */
 	private void scheduleNextExecute(long currentTime, IAgentBean a) {
-		if (a.getExecuteIntervall() > -1) {
-			long nextCall = currentTime + a.getExecuteIntervall();
+		if (a.getExecuteInterval() > -1) {
+			long nextCall = currentTime + a.getExecuteInterval();
 			int index = 0;
 			for (Long l : executeTimes) {
 				if (l > nextCall) {

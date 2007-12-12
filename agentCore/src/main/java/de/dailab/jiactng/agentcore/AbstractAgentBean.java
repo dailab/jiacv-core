@@ -31,10 +31,10 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		IAgentBean, AbstractAgentBeanMBean {
 
 	/**
-	 * Intervall by wich the execute()-method of the bean is called. If
+	 * Interval by which the execute()-method of the bean is called. If
 	 * negative, the execute-method is never called.
 	 */
-	private int executeIntervall = -1;
+	private int executeInterval = -1;
 
 	protected Log log = null;
 
@@ -252,15 +252,15 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getExecuteIntervall() {
-		return executeIntervall;
+	public int getExecuteInterval() {
+		return executeInterval;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setExecuteIntervall(int executeIntervall) {
-		this.executeIntervall = executeIntervall;
+	public void setExecuteInterval(int executeInterval) {
+		this.executeInterval = executeInterval;
 	}
 
 	/**

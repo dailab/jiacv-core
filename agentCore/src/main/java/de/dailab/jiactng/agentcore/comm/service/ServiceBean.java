@@ -140,12 +140,13 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     @Override
     public void doCleanup() throws Exception {
         log.debug("cleanup ServiceBean...");
-        _communicationBean.unregister(
-            _executionListener,
-            _communicationBean.getDefaultMessageBoxAddress(),
-            new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL)
-        );
-        _communicationBean.unregister(_managementListener, _serviceBroadcastGroup, null);
+        // TODO an neue CommunicationBean anpassen
+//        _communicationBean.unregister(
+//            _executionListener,
+//            _communicationBean.getDefaultMessageBoxAddress(),
+//            new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL)
+//        );
+//        _communicationBean.unregister(_managementListener, _serviceBroadcastGroup, null);
         _serviceBroadcastGroup= null;
         _managementListener= null;
         _executionListener= null;
@@ -180,12 +181,13 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         _executionListener= new ServiceExecutionListener();
         _managementListener= new ServiceManagementListener();
         _serviceBroadcastGroup= CommunicationAddressFactory.createGroupAddress(SERVICE_BROADCAST_ADDRESS);
-        _communicationBean.register(_managementListener, _serviceBroadcastGroup, null);
-        _communicationBean.register(
-            _executionListener,
-            _communicationBean.getDefaultMessageBoxAddress(),
-            new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL)
-        );
+        // TODO an neue CommunicationBean anpassen
+//        _communicationBean.register(_managementListener, _serviceBroadcastGroup, null);
+//        _communicationBean.register(
+//            _executionListener,
+//            _communicationBean.getDefaultMessageBoxAddress(),
+//            new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL)
+//        );
     }
 
     @Override

@@ -363,7 +363,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
             throw new IllegalArgumentException("address must not be null");
         }
 
-        internalRegister(_defaultListener, saveCast(address, CommunicationAddress.class), null);
+        internalRegister(saveCast(address, CommunicationAddress.class), null);
     }
 
     /**
@@ -381,7 +381,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
             throw new IllegalArgumentException("address must not be null");
         }
 
-        internalUnregister(_defaultListener, saveCast(address, CommunicationAddress.class), null);
+        internalUnregister(saveCast(address, CommunicationAddress.class), null);
     }
 
     // ~ END OF ACTIONS ~ //
@@ -392,19 +392,16 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
      * registers a given listener to an address if all messages shall be received selector == null Notes: Listener and
      * either address or selector must not be null
      */
-    public synchronized void register(IJiacMessageListener listener, ICommunicationAddress address, Selector selector) throws CommunicationException {
+    public synchronized void register(ICommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         if (log.isInfoEnabled()) {
-            log.info("Listener '" + listener + "' begins to listen at address '" + address + "' with Selector '" + selector + "'");
-        }
-        if (listener == null) {
-            throw new IllegalArgumentException("listener must not be null");
+            log.info("CommunicationBean begins to listen at address '" + address + "' with Selector '" + selectorTemplate + "'");
         }
 
         if (address == null) {
             throw new IllegalArgumentException("address must not be null");
         }
 
-        internalRegister(listener, saveCast(address, CommunicationAddress.class), selector);
+        internalRegister(saveCast(address, CommunicationAddress.class), selectorTemplate);
     }
 
     /**
@@ -419,19 +416,15 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
      *            The selector given while the listener was registered (null if none was given)
      * @throws CommunicationException
      */
-    public synchronized void unregister(IJiacMessageListener listener, ICommunicationAddress address, Selector selector) throws CommunicationException {
+    public synchronized void unregister(ICommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         if (log.isInfoEnabled()) {
-            log.info("Listener '" + listener + "' stops to listen at address '" + address + "' with selector '" + selector + "'");
+            log.info("CommunicationBean stops to listen at address '" + address + "' with selector '" + selectorTemplate + "'");
         }
-        if (listener == null) {
-            throw new IllegalArgumentException("listener must not be null");
-        }
-
         if (address == null) {
             throw new IllegalArgumentException("address must not be null");
         }
 
-        internalUnregister(listener, saveCast(address, CommunicationAddress.class), selector);
+        internalUnregister(saveCast(address, CommunicationAddress.class), selectorTemplate);
     }
 
     // ~ END OF METHODS FOR LISTENER ADMINISTRATION ~ //
@@ -443,56 +436,11 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
     protected void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
         if (log.isDebugEnabled()) {
             log.debug("CommunicationBean is receiving Message over transport '" + source.getTransportIdentifier() + "' from '" + at + "'");
-        }
-
-        if (log.isDebugEnabled()) {
             log.debug("received message ' " + message + "' at '" + at + "'");
         }
-        Set<IJiacMessageListener> notified = new ReferenceEqualityCheckSet<IJiacMessageListener>();
-        CommunicationAddress boundAddress = null;
-        try {
-            boundAddress = at.bind(source.getTransportIdentifier());
-        } catch (URISyntaxException use) {
-            if (log.isWarnEnabled()) {
-                log.warn("could not bound address '" + at + "' to transport '" + source.getTransportIdentifier() + "'", use);
-            }
-            boundAddress = at;
-        }
+        
+        memory.write(message);
 
-        synchronized (addressToListenerMap) {
-            for (ListenerContext context : addressToListenerMap.get(at)) {
-                boolean notify = false;
-
-                if (context.selector != null) {
-                    String header = message.getHeader(context.selector.getKey());
-
-                    if (header != null && header.equals(context.selector.getValue())) {
-                        notify = true;
-                    }
-                } else {
-                    // we have a generic listener with no selector...
-                    notify = true;
-                }
-                if (notify) {
-                    for (IJiacMessageListener current : context.listeners) {
-                        if (current != _defaultListener && notified.add(current)) {
-                            try {
-                                current.receive(message, boundAddress);
-                            } catch (RuntimeException re) {
-                                if (log.isWarnEnabled()) {
-                                    log.warn("listener threw a runtime exception", re);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // if no appropriate listener was found
-        if (notified.size() <= 0) {
-            _defaultListener.receive(message, boundAddress);
-        }
     }
 
     /**
@@ -560,66 +508,60 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
     /**
      * Assumes that the listener and the address are non-null.
      */
-    private synchronized void internalRegister(IJiacMessageListener listener, CommunicationAddress address, Selector selector) throws CommunicationException {
+    private synchronized void internalRegister(CommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         CommunicationAddress unboundAddress = address.toUnboundAddress();
-        ListenerContext context = new ListenerContext(selector);
+        ListenerContext context = new ListenerContext(selectorTemplate);
         List<ListenerContext> registeredContexts = addressToListenerMap.get(unboundAddress);
 
+        // Now there are three cases:
+        // 1. The address is allready registered and someone is listening with the same selectorTemplate
+        // 2. The address is allready registered but there are only listeners with other selectorTemplates
+        // 3. The address isn't registered and nobody is listening to it.
         if (registeredContexts != null) {
             // we have already some listener registered for this communication address
             int index = registeredContexts.indexOf(context);
 
             if (index >= 0) {
-                // there is already another listener with same address and selector registered
+                // (1.) there is already another listener with same address and selector registered
                 context = registeredContexts.get(index);
 
-                // check whether the listener is new, otherwise ignore this registration
-                if(context.listeners.contains(listener)) {
-                    if (log.isWarnEnabled()) {
-                        log.warn("listener is already registered for '" + unboundAddress + "' : '" + selector + "'");
-                    }
-                    return;
-                }
-
-                if (log.isDebugEnabled()) {
-                    log.debug("added further listener for '" + unboundAddress + "' : '" + selector + "'");
+                if (log.isInfoEnabled()) {
+                	log.info("Another Listener registeres for address '" + address + "' with selectortemplate '" + selectorTemplate + "'");
                 }
                 
-                // transports are already notified so we just add the new listener into the list
-                context.listeners.add(listener);
+                // check whether the listener is new, otherwise ignore this registration
+                context.listeners++; 
+
+
+                if (log.isDebugEnabled()) {
+                    log.debug("added further listener for '" + unboundAddress + "' : '" + selectorTemplate + "'");
+                }
                 return;
             }
-        }
-        
-        /*
-         * here we have two cases:
-         * 1) there are listeners for the address but non with the specified selector
-         * 2) there are no listeners for the address
-         */
-        if(registeredContexts == null) {
-            // currently there are no listeners registered for this address - selector combination
+        }else {
+            // (3.) currently there are no listeners registered for this address
             if (log.isDebugEnabled()) {
                 log.debug("first listener for '" + unboundAddress + "'");
             }
             registeredContexts= new LinkedList<ListenerContext>();
             addressToListenerMap.put(unboundAddress, registeredContexts);
         }
-        
+        // (2.) or (3. (continued))
+        context.listeners = 1;
         registeredContexts.add(context);
-        context.listeners.add(listener);
+       
 
         if (log.isDebugEnabled()) {
-            log.debug("registering new address and listeners on transports");
+        	log.debug("registering new address and listeners on transports");
         }
 
-        // first give our new listener something to listen to
         if (isActive()) {
-            if (log.isDebugEnabled()) {
-                log.debug("isActive -> registering listeners for new address '" + unboundAddress + "'");
-            }
-            for (MessageTransport transport : _transports.values()) {
-                transport.listen(address, context.selector);
-            }
+        	if (log.isDebugEnabled()) {
+        		log.debug("isActive -> registering listeners for new address '" + unboundAddress + "'");
+        	}
+        	for (MessageTransport transport : _transports.values()) {
+        		transport.listen(address, context.selector);
+        	}
         }
     }
 
@@ -646,12 +588,12 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
     /**
      * Assumes that the listener and the address are non-null.
      */
-    private synchronized void internalUnregister(IJiacMessageListener listener, CommunicationAddress address, Selector selector) throws CommunicationException {
+    private synchronized void internalUnregister(CommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         CommunicationAddress unboundAddress = address.toUnboundAddress();
         List<ListenerContext> registeredContexts = addressToListenerMap.remove(unboundAddress);
 
         if (log.isDebugEnabled()) {
-            log.debug("Removing nonWildcardListener with address '" + address + "' and selector '" + selector + "'");
+            log.debug("Removing nonWildcardListener with address '" + address + "' and selector '" + selectorTemplate + "'");
         }
 
         if (registeredContexts == null) {
@@ -661,40 +603,33 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
             return;
         }
         
-        ListenerContext context = new ListenerContext(selector); // template to find it fast
+        ListenerContext context = new ListenerContext(selectorTemplate); // template to find it fast
         int index = registeredContexts.indexOf(context);
 
         if(index >= 0) {
+        	// this address-selectorTemplate combination is actually registered
             context= registeredContexts.remove(index);
-            // remove listener from list
-            if(!context.listeners.remove(listener)) {
-                if(log.isWarnEnabled()) {
-                    log.warn("Aborted Unregister: Listener was not registered for '" + unboundAddress + "' : '" + selector + "'");
+            // decrease the number of listeners
+            context.listeners--;
+            if (context.listeners <= 0){
+            	// this was the last one listening to this address with this selectorTemplate
+            	if(isActive()) {
+                    // remove registration
+                    for(MessageTransport transport : _transports.values()) {
+                        transport.stopListen(unboundAddress, context.selector);
+                    }
                 }
-                return;
+            } else {
+            	// there is indeed someone still listening with this address-selectorTemplate combination
+            	registeredContexts.add(context);
+                addressToListenerMap.put(unboundAddress, registeredContexts);
             }
+            
         } else {
+        	// there doesn't exist a registstration for this combination 
             if(log.isWarnEnabled()) {
-                log.warn("Aborted Unregister: There is no listener registered for this address '" + address + "' and selector '" + selector + "'");
+                log.warn("Aborted Unregister: There is no listener registered for this address '" + address + "' and selector '" + selectorTemplate + "'");
             }
-            return;
-        }
-        
-        if(context.listeners.size() <= 0) {
-            if(isActive()) {
-                // remove registration
-                for(MessageTransport transport : _transports.values()) {
-                    transport.stopListen(unboundAddress, context.selector);
-                }
-            }
-        } else {
-            // re-add context because it is still not empty
-            registeredContexts.add(context);
-        }
-        
-        if(registeredContexts.size() > 0) {
-            // re-add context list because it is still not empty
-            addressToListenerMap.put(unboundAddress, registeredContexts);
         }
     }
 
@@ -827,7 +762,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
                 Iterator<ListenerContext> it = values.iterator();
                 int j = 0;
                 while (it.hasNext()) {
-                    Selector selector = it.next().selector;
+                    String selector = it.next().selector.toString();
                     if (selector == null) {
                         value[j] = "null";
                     } else {
@@ -848,13 +783,13 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
 }
 
 class ListenerContext {
-    protected final ReferenceEqualityCheckSet<IJiacMessageListener> listeners;
+    protected int listeners;
 
-    protected final Selector selector;
-
-    ListenerContext(Selector selector) {
-        this.selector = selector;
-        listeners = new ReferenceEqualityCheckSet<IJiacMessageListener>();
+    protected final IJiacMessage selector;
+    
+    ListenerContext(IJiacMessage selectorTemplate){
+    	this.selector = selectorTemplate;
+    	this.listeners = 0;
     }
 
     @Override

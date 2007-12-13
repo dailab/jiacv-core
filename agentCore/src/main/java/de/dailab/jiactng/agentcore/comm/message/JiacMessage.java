@@ -67,7 +67,7 @@ public class JiacMessage implements IJiacMessage {
                 builder.append(";");
             }
         }
-        
+      
         builder.append("}");
         builder.append(", Payload: ").append(getPayload()).append(", Sender: ").append(getSender());
         builder.append("]");

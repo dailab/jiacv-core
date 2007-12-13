@@ -79,8 +79,8 @@ public abstract class MessageTransport implements MessageTransportMBean {
      * Providing a selector enables the transport to optimise the inter-transport communication.
      * But it is <strong>not</strong> a criterion to delegate messages more then once!
      */
-    public abstract void listen(ICommunicationAddress address, Selector selector) throws CommunicationException;
-    public abstract void stopListen(ICommunicationAddress address, Selector selector) throws CommunicationException;
+    public abstract void listen(ICommunicationAddress address, IJiacMessage selector) throws CommunicationException;
+    public abstract void stopListen(ICommunicationAddress address, IJiacMessage selector) throws CommunicationException;
     
     public final void delegateException(Exception exception) {
         _delegate.onAsynchronousException(this, exception);

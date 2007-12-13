@@ -189,7 +189,7 @@ public class JMSMessageTransport extends MessageTransport {
 	 * @param address 	the address to listen to
 	 * @param selector	if you want to get only special messages use this to select them
 	 */
-	public void listen(ICommunicationAddress address, Selector selector) throws CommunicationException {
+	public void listen(ICommunicationAddress address, IJiacMessage selector) throws CommunicationException {
         if (log.isDebugEnabled()){
         	log.debug("JMSMessageTransports starts to listen at '" + address.toUnboundAddress() 
         			+ "' with selector'" + selector + "'");
@@ -213,7 +213,7 @@ public class JMSMessageTransport extends MessageTransport {
 	 * @param selector	the selector given with the address when you started to
 	 * 					listen to it
 	 */
-	public void stopListen(ICommunicationAddress address, Selector selector) { 
+	public void stopListen(ICommunicationAddress address, IJiacMessage selector) { 
 		_receiver.stopListen(address, selector);
 	}
     

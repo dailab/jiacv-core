@@ -10,13 +10,18 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
+import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.apache.commons.logging.Log;
 
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.Selector;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 
 /**
  * 
@@ -28,18 +33,19 @@ import de.dailab.jiactng.agentcore.comm.Selector;
  * @author Loeffelholz
  * 
  */
-class JMSReceiver {
+class JMSReceiver implements MessageListener{
     /**
      * @param address
      * @param selector
      * @return a standardized String Expression for address and selector
      */
-    protected static String getStringRepresentation(ICommunicationAddress address, Selector selector) {
+    protected static String getStringRepresentation(ICommunicationAddress address, IJiacMessage selector) {
         StringBuilder result = new StringBuilder();
         result.append(address.toString());
 
         if (selector != null) {
-            result.append('?').append(selector.getKey()).append('=').append(selector.getValue());
+//            result.append('?').append(selector.getKey()).append('=').append(selector.getValue());
+        	  result.append(selector.toString());
         }
 
         return result.toString();
@@ -50,88 +56,7 @@ class JMSReceiver {
      * _listeners list, where it is mapped with a key depending on address and selector if selector != null.
      * 
      */
-    protected class JMSMessageListener implements MessageListener {
-        private final ICommunicationAddress _address;
-
-        private final Selector _selector;
-
-        private MessageConsumer _consumer;
-
-        protected JMSMessageListener(ICommunicationAddress address, Selector selector) {
-            _address = address;
-            _selector = selector;
-        }
-
-        /**
-         * if a message arrives it is handed over the the delegate in the superior MessageTransport.
-         */
-        public void onMessage(Message message) {
-            try {
-                /*
-                 * By default JMS only delivers a message once per session. So it doesn't matter for which selector we
-                 * received it, we won't get it through another consumer!
-                 */
-
-                if (log.isDebugEnabled()) {
-                    log.debug("JMSReceiver receiving message... delegating message");
-                }
-
-                _parent.delegateMessage(JMSMessageTransport.unpack(message), _address);
-            } catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error("An error receiving a message occured. Cause is '" + e.getCause() + "'");
-                }
-                _parent.delegateException(e);
-            }
-        }
-
-        /**
-         * setting up consumer. This will be the listener to all consumers created here. if something goes wrong
-         * creating the consumer, the consumer is destroyed and and an exception is thrown.
-         * 
-         * @param session
-         *            the JMSSession used for creating the consumers
-         * @throws JMSException
-         */
-        void initialise(Session session) throws JMSException {
-
-            try {
-                if (log.isDebugEnabled()) {
-                    log.debug("Listener initializing for '" + _address.toString() + "' with '" + _selector + "'");
-                }
-                String add = _address.getName();
-                Destination dest = _address instanceof IGroupAddress ? session.createTopic(add) : session
-                        .createQueue(add);
-                _consumer = session.createConsumer(dest, _selector == null ? null : (_selector.getKey() + " = '"
-                        + _selector.getValue() + "'"));
-                _consumer.setMessageListener(this);
-            } catch (JMSException e) {
-                if (log.isErrorEnabled()) {
-                    log.error("Listener couldn't be initialized cause of '" + e.getCause() + "'");
-                    log.error("Listener will be destroyed");
-                }
-                destroy();
-                throw e;
-            }
-
-        }
-
-        /**
-         * cleans up the consumer.
-         */
-        void destroy() {
-            if (_consumer != null) {
-                try {
-                    _consumer.close();
-                } catch (JMSException e) {
-                    if (log.isErrorEnabled()) {
-                        log.error("Couldn't destroy consumer cause of '" + e.getCause() + "'");
-                    }
-                }
-            }
-        }
-    }
-
+   
     protected final Log log;
 
     private ConnectionFactory _connectionFactory;
@@ -142,13 +67,13 @@ class JMSReceiver {
 
     private JMSMessageTransport _parent;
 
-    private Map<String, JMSMessageListener> _listeners;
+    private Map<String, MessageConsumer> _consumers;
 
     public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent, Log log) throws JMSException {
         _connectionFactory = (ConnectionFactory) connectionFactory;
         _parent = parent;
         this.log = log;
-        _listeners = new HashMap<String, JMSMessageListener>();
+        _consumers = new HashMap<String, MessageConsumer>();
         doInit();
     }
 
@@ -188,22 +113,22 @@ class JMSReceiver {
      * 
      * @param address
      *            the address that should be listen to.
-     * @param selector
+     * @param selectorTemplate
      *            if you just want these special messages.
      */
-    public synchronized void listen(ICommunicationAddress address, Selector selector) throws JMSException {
+    public synchronized void listen(ICommunicationAddress address, IJiacMessage selectorTemplate) throws JMSException {
         // first check if we already have a listener like that
-        String key = getStringRepresentation(address, selector);
-        if (_listeners.containsKey(key)) {
+        String key = getStringRepresentation(address, selectorTemplate);
+        if (_consumers.containsKey(key)) {
             if (log.isWarnEnabled()) {
                 log.warn("there is already a listener for '" + key + "' registered");
             }
             return;
         }
         // then creating a listener if needed and map it with the others.
-        JMSMessageListener listener = new JMSMessageListener(address, selector);
-        listener.initialise(_session);
-        _listeners.put(key, listener);
+        String selector = this.templateToSelector((JiacMessage) selectorTemplate);
+        MessageConsumer consumer = initialiseConsumer(address, selector);
+        _consumers.put(key, consumer);
         if (log.isDebugEnabled()) {
             log.debug("Now listening to '" + key + "'");
         }
@@ -218,12 +143,12 @@ class JMSReceiver {
      * @param selector
      *            the selector given while the listener was created in the first place
      */
-    public synchronized void stopListen(ICommunicationAddress address, Selector selector) {
+    public synchronized void stopListen(ICommunicationAddress address, IJiacMessage selector) {
         String key = getStringRepresentation(address, selector);
-        JMSMessageListener listener = _listeners.remove(key);
+        MessageConsumer consumer = _consumers.remove(key);
 
-        if (listener != null) {
-            listener.destroy();
+        if (consumer != null) {
+            destroyConsumer(consumer);
         }
         if (log.isDebugEnabled()) {
             log.debug("stopped listening to address '" + address + "' with selector '" + selector + "'");
@@ -234,15 +159,102 @@ class JMSReceiver {
      * stops receiving Messages from all enlisted Destinations.
      */
     public synchronized void stopListenAll() {
-        for (JMSMessageListener listener : _listeners.values()) {
-            listener.destroy();
+        for (MessageConsumer consumer : _consumers.values()) {
+            destroyConsumer(consumer);
         }
 
-        _listeners.clear();
+        _consumers.clear();
 
         if (log.isDebugEnabled()) {
             log.debug("Stopped Listening to all JMS Addresses");
         }
+    }
+    
+    /**
+     * if a message arrives it is handed over the the delegate in the superior MessageTransport.
+     */
+    public void onMessage(Message message) {
+        try {
+            /*
+             * By default JMS only delivers a message once per session. So it doesn't matter for which selector we
+             * received it, we won't get it through another consumer!
+             */
+
+            if (log.isDebugEnabled()) {
+                log.debug("JMSReceiver receiving message... delegating message");
+            }
+
+            Destination receivedAt = message.getJMSDestination();
+            ICommunicationAddress at = null;
+            if (receivedAt instanceof Topic){
+            	Topic topic = (Topic) receivedAt;
+            	at = CommunicationAddressFactory.createGroupAddress(topic.getTopicName());
+            } else {
+            	Queue queue = (Queue) receivedAt;
+            	at = CommunicationAddressFactory.createMessageBoxAddress(queue.getQueueName());
+            }
+            
+            _parent.delegateMessage(JMSMessageTransport.unpack(message), at);
+        } catch (Exception e) {
+            if (log.isErrorEnabled()) {
+                log.error("An error receiving a message occured. Cause is '" + e.getCause() + "'");
+            }
+            _parent.delegateException(e);
+        }
+    }
+    
+    /**
+     * setting up consumer. This will be the listener to all consumers created here. if something goes wrong
+     * creating the consumer, the consumer is destroyed and and an exception is thrown.
+     * 
+     * @param _session
+     *            the JMSSession used for creating the consumers
+     * @throws JMSException
+     */
+    private MessageConsumer initialiseConsumer(ICommunicationAddress address, String selector) throws JMSException {
+
+    	MessageConsumer consumer;
+    	
+        try {
+            if (log.isDebugEnabled()) {
+                log.debug("Listener initializing for '" + address.toString() + "' with '" + selector + "'");
+            }
+            String add = address.getName();
+            Destination dest = address instanceof IGroupAddress ? _session.createTopic(add) : _session
+                    .createQueue(add);
+            consumer = _session.createConsumer(dest, selector == null ? null : selector);
+            consumer.setMessageListener(this);
+        } catch (JMSException e) {
+            if (log.isErrorEnabled()) {
+                log.error("Listener couldn't be initialized cause of '" + e.getCause() + "'");
+                log.error("Listener will be destroyed");
+            }
+            consumer = null;
+            destroyConsumer(consumer);
+            throw e;
+        }
+        return consumer;
+    }
+    
+    /**
+     * cleans up the consumer.
+     */
+    void destroyConsumer(MessageConsumer consumer) {
+        if (consumer != null) {
+            try {
+                consumer.close();
+            } catch (JMSException e) {
+                if (log.isErrorEnabled()) {
+                    log.error("Couldn't destroy consumer cause of '" + e.getCause() + "'");
+                }
+            }
+        }
+    }
+
+    
+    public String templateToSelector (JiacMessage jiacMessage){
+    	//TODO write a method that really creates a selectorstring
+    	return null;
     }
 
 }

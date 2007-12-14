@@ -17,8 +17,6 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
  * @author janko, loeffelholz
  */
 public class JiacMessage implements IJiacMessage {
-	public static final String PLATFORM_ENDPOINT_EXTENSION = "TNG";
-
 	private IJiacContent _payload;
     private Map<String, String> _headers;
     
@@ -137,6 +135,10 @@ public class JiacMessage implements IJiacMessage {
         
 		return _sender;
 	}
+    
+    public void setProtocol(String protocol) {
+        setHeader(Header.PROTOCOL, protocol);
+    }
     
     public String getProtocol() {
         return getHeader(Header.PROTOCOL);

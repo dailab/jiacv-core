@@ -8,6 +8,10 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
+import org.sercho.masp.space.event.SpaceEvent;
+import org.sercho.masp.space.event.SpaceObserver;
+import org.sercho.masp.space.event.WriteCallEvent;
+
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.action.Action;
@@ -21,12 +25,12 @@ import de.dailab.jiactng.agentcore.comm.CommunicationBean;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
-import de.dailab.jiactng.agentcore.comm.IJiacMessageListener;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
  * @author Marcel Patzlaff
@@ -34,49 +38,70 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  */
 public class ServiceBean extends AbstractMethodExposingBean implements IEffector, ResultReceiver, Runnable {
     private static final String SERVICE_BROADCAST_ADDRESS= "JiacTNG/service/broadcast";
-    private static final String SERVICE_PROTOCOL= "JiacTNG-service-protocol";
+    private static final String SERVICE_EXECUTION_PROTOCOL= "JiacTNG-service-exec-protocol";
+    private static final String SERVICE_MANAGEMENT_PROTOCOL= "JiacTNG-service-mgmt-protocol";
     private static final String SERVICE_OFFER_KEY= "JiacTNGServiceOffer";
+    
+    private static final JiacMessage EXECUTION_MESSAGE_TEMPLATE;
+    private static final JiacMessage MANAGEMENT_MESSAGE_TEMPLATE;
     
     private static final String ADD_OFFER= "add";
     private static final String REMOVE_OFFER= "remove";
     
-    /**
-     * This listener is used for processing incoming service requests and results.
-     */
-    private class ServiceExecutionListener implements IJiacMessageListener {
-        public void receive(IJiacMessage message, ICommunicationAddress at) {
-            log.debug("execution listener received something");
-            IJiacContent content= message.getPayload();
-            if(content instanceof RemoteActionResult) {
-                processActionResult((RemoteActionResult) content);
-            } else if (content instanceof DoRemoteAction) {
-                processAction((DoRemoteAction) content, message.getSender().toUnboundAddress());
-            } else {
-                log.warn("unexpected content for this protocol '" + content + "'");
+    static {
+        EXECUTION_MESSAGE_TEMPLATE= new JiacMessage();
+        EXECUTION_MESSAGE_TEMPLATE.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_EXECUTION_PROTOCOL);
+        
+        MANAGEMENT_MESSAGE_TEMPLATE= new JiacMessage();
+        MANAGEMENT_MESSAGE_TEMPLATE.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_MANAGEMENT_PROTOCOL);
+    }
+    
+    @SuppressWarnings("serial")
+    private class ServiceExecutionProtocol implements SpaceObserver<IFact> {
+        @SuppressWarnings("unchecked")
+        public void notify(SpaceEvent<? extends IFact> event) {
+            if(event instanceof WriteCallEvent) {
+                WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;
+                IJiacMessage message= memory.remove(wce.getObject());
+//                IJiacMessage message= wce.getObject();
+                
+                IJiacContent content= message.getPayload();
+                
+                if(content instanceof RemoteActionResult) {
+                    processActionResult((RemoteActionResult) content);
+                } else if (content instanceof DoRemoteAction) {
+                    processAction((DoRemoteAction) content, message.getSender().toUnboundAddress());
+                } else {
+                    log.warn("unexpected content for this protocol '" + content + "'");
+                }
             }
         }
     }
     
-    /**
-     * This listener is used for collecting remote actions other agents offer.
-     */
-    private class ServiceManagementListener implements IJiacMessageListener {
-        public void receive(IJiacMessage message, ICommunicationAddress at) {
-            log.debug("management listener received something");
-            IJiacContent content= message.getPayload();
-            
-            if(content instanceof RemoteAction) {
-                String task= message.getHeader(SERVICE_OFFER_KEY).toString();
+    @SuppressWarnings("serial")
+    private class ServiceManagementProtocol implements SpaceObserver<IFact> {
+        @SuppressWarnings("unchecked")
+        public void notify(SpaceEvent<? extends IFact> event) {
+            if(event instanceof WriteCallEvent) {
+                WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;
+                IJiacMessage message= memory.remove(wce.getObject());
+//                IJiacMessage message= wce.getObject();
                 
-                if(task.equals(ADD_OFFER)) {
-                    insertAction((RemoteAction) content, message.getSender().toUnboundAddress());
-                } else if(task.equals(REMOVE_OFFER)) {
-                    removeAction((RemoteAction) content);
+                IJiacContent content= message.getPayload();
+                
+                if(content instanceof RemoteAction) {
+                    String task= message.getHeader(SERVICE_OFFER_KEY).toString();
+                    
+                    if(task.equals(ADD_OFFER)) {
+                        insertAction((RemoteAction) content, message.getSender().toUnboundAddress());
+                    } else if(task.equals(REMOVE_OFFER)) {
+                        removeAction((RemoteAction) content);
+                    } else {
+                        log.warn("unexpected task '" + task + "' for offer");
+                    }
                 } else {
-                    log.warn("unexpected task '" + task + "' for offer");
+                    log.warn("unexpected content for this protocol '" + content + "'");
                 }
-            } else {
-                log.warn("unexpected content for this protocol '" + content + "'");
             }
         }
     }
@@ -91,16 +116,16 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     private IGroupAddress _serviceBroadcastGroup;
     
     /**
-     * This listener is responsible to forward the action request
+     * This protocol is responsible to forward the action request
      * to the specific provider <strong>in this</strong> agent.
      */
-    private IJiacMessageListener _executionListener;
+    private ServiceExecutionProtocol _executionProtocol;
     
     /**
-     * The listener that is responsible to update the memory when
+     * The protocol that is responsible to update the memory when
      * remote actions are offered or withdrawn.
      */
-    private IJiacMessageListener _managementListener;
+    private ServiceManagementProtocol _managementProtocol;
     
     /**
      * This map provides information of which communication
@@ -139,16 +164,13 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     @Override
     public void doCleanup() throws Exception {
         log.debug("cleanup ServiceBean...");
-        // TODO an neue CommunicationBean anpassen
-//        _communicationBean.unregister(
-//            _executionListener,
-//            _communicationBean.getDefaultMessageBoxAddress(),
-//            new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL)
-//        );
-//        _communicationBean.unregister(_managementListener, _serviceBroadcastGroup, null);
+        _communicationBean.unregister(_communicationBean.getDefaultMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
+        _communicationBean.unregister(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
         _serviceBroadcastGroup= null;
-        _managementListener= null;
-        _executionListener= null;
+        memory.detach(_executionProtocol);
+        memory.detach(_executionProtocol);
+        _managementProtocol= null;
+        _executionProtocol= null;
         _communicationBean= null;
         
         for(Action action : _actionToContext.keySet()) {
@@ -177,16 +199,15 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         _actionToContext= new Hashtable<Action, RemoteActionContext>();
         _sessionsFromExternalClients= new Hashtable<String, ICommunicationAddress>();
         _sessionsToExternalProviders= new Hashtable<String, DoAction>();
-        _executionListener= new ServiceExecutionListener();
-        _managementListener= new ServiceManagementListener();
+        
+        _executionProtocol= new ServiceExecutionProtocol();
+        _managementProtocol= new ServiceManagementProtocol();
+        memory.attach(_executionProtocol, EXECUTION_MESSAGE_TEMPLATE);
+        memory.attach(_managementProtocol, MANAGEMENT_MESSAGE_TEMPLATE);
+        
         _serviceBroadcastGroup= CommunicationAddressFactory.createGroupAddress(SERVICE_BROADCAST_ADDRESS);
-        // TODO an neue CommunicationBean anpassen
-//        _communicationBean.register(_managementListener, _serviceBroadcastGroup, null);
-//        _communicationBean.register(
-//            _executionListener,
-//            _communicationBean.getDefaultMessageBoxAddress(),
-//            new Selector(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL)
-//        );
+        _communicationBean.register(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
+        _communicationBean.register(_communicationBean.getDefaultMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
     }
 
     @Override
@@ -298,7 +319,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                 _sessionsToExternalProviders.put(doAction.getSessionId(), doAction);
             }
             
-            request.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_PROTOCOL);
+            request.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_EXECUTION_PROTOCOL);
             try {
                 log.debug("send request for remote action to '" + context.providerAddress + "'");
                 _communicationBean.send(request, context.providerAddress);
@@ -317,7 +338,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         
         if(recipient != null) {
             IJiacMessage response= new JiacMessage(new RemoteActionResult(result));
-            response.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_PROTOCOL);
+            response.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_EXECUTION_PROTOCOL);
             try {
                 log.debug("send result for session '" + sessionId + "' to '" + recipient + "'");
                 _communicationBean.send(response, recipient);
@@ -403,6 +424,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     private void updateActionOffer(Action action, String task) throws CommunicationException {
         // TODO where to get the agentDescription from???
         IJiacMessage message= new JiacMessage(new RemoteAction(action, null));
+        message.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_MANAGEMENT_PROTOCOL);
         message.setHeader(SERVICE_OFFER_KEY, task);
         _communicationBean.send(message, _serviceBroadcastGroup);
     }

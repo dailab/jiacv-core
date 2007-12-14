@@ -276,12 +276,13 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 				address = CommunicationAddressFactory.createMessageBoxAddress(addressName);
 			}
 
-			try {
-				_cBean.register(this, address, null);
-				addressList.add(address);
-			} catch (CommunicationException e) {
-				e.printStackTrace();
-			}
+// TODO: change it for new communication bean
+//			try {
+//				_cBean.register(this, address, null);
+//				addressList.add(address);
+//			} catch (CommunicationException e) {
+//				e.printStackTrace();
+//			}
 		} else {
 			System.err.println("Tried to listen to: " + targetAddress + " but no CommunicationBean was installed");
 		}
@@ -306,12 +307,13 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 				address = CommunicationAddressFactory.createMessageBoxAddress(addressName);
 			}
 
-			try {
-				_cBean.unregister(this, address, null);
-				addressList.remove(address);
-			} catch (CommunicationException e) {
-				e.printStackTrace();
-			}
+// TODO: change it for new communication bean
+//			try {
+//				_cBean.unregister(this, address, null);
+//				addressList.remove(address);
+//			} catch (CommunicationException e) {
+//				e.printStackTrace();
+//			}
 		}
 	}
 	
@@ -323,12 +325,13 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	private void stopListenToAll(){
 		if ((_cBean != null) && (!addressList.isEmpty())){
 			for (ICommunicationAddress address : addressList){
-				try {
-					_cBean.unregister(this, address, null);
-					log.debug("ChatGuiBean of " + _beanName + "stops listen to " + address);
-				} catch (CommunicationException e) {
-					e.printStackTrace();
-				}
+// TODO: change it for new communication bean
+//				try {
+//					_cBean.unregister(this, address, null);
+//					log.debug("ChatGuiBean of " + _beanName + "stops listen to " + address);
+//				} catch (CommunicationException e) {
+//					e.printStackTrace();
+//				}
 			}
 		} 
 		addressList.clear();
@@ -365,24 +368,25 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 	 * @author Martin Loeffelholz
 	 */
 	private void changeAddress(String address){
-		try {
-			if (_cBean != null){
-				ICommunicationAddress oldAddress = _messageBoxAddress.toUnboundAddress();
-				_cBean.unregister(this, _messageBoxAddress, null);
-				_messageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress(address);
-				_cBean.register(this, _messageBoxAddress, null);
-				_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
-				_addressLine.validate();
-				ICommunicationAddress unbound = _messageBoxAddress.toUnboundAddress();
-				sendStatusMessage(oldAddress + " is now known as " + unbound.toString());
-				_f.repaint();
-				log.debug("Address of Chatting Agent changed " + oldAddress + " is now known as " + unbound.toString());
-			} else {
-				System.err.println("Tried to change address, but no CommunicationBean was installed");
-			}
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
+// TODO: change it for new communication bean
+//		try {
+//			if (_cBean != null){
+//				ICommunicationAddress oldAddress = _messageBoxAddress.toUnboundAddress();
+//				_cBean.unregister(this, _messageBoxAddress, null);
+//				_messageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress(address);
+//				_cBean.register(this, _messageBoxAddress, null);
+//				_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
+//				_addressLine.validate();
+//				ICommunicationAddress unbound = _messageBoxAddress.toUnboundAddress();
+//				sendStatusMessage(oldAddress + " is now known as " + unbound.toString());
+//				_f.repaint();
+//				log.debug("Address of Chatting Agent changed " + oldAddress + " is now known as " + unbound.toString());
+//			} else {
+//				System.err.println("Tried to change address, but no CommunicationBean was installed");
+//			}
+//		} catch (CommunicationException e) {
+//			e.printStackTrace();
+//		}
 		
 	}
 	
@@ -576,7 +580,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		if (_cBean != null){
 			
 			_messageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress(_beanName);
-			_cBean.register(this, _messageBoxAddress, null);
+// TODO: change it for new communication bean
+//			_cBean.register(this, _messageBoxAddress, null);
 			
 			listenTo("g.all");
 			
@@ -645,7 +650,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		log.debug("ChatGuiBean is cleaning up");
 		log.debug("... disposing beanaddress");
 		if (_messageBoxAddress != null){
-			_cBean.unregister(this, _messageBoxAddress, null);
+// TODO: change it for new communication bean
+//			_cBean.unregister(this, _messageBoxAddress, null);
 		}
 		log.debug("... disposing other addresses");
 		stopListenToAll();

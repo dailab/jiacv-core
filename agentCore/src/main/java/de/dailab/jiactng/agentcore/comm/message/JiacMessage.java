@@ -28,12 +28,17 @@ public class JiacMessage implements IJiacMessage {
      * Constructor for a template message with no content.
      */
     public JiacMessage() {
-        this(null);
+        this(null, null);
     }
 
     public JiacMessage(IJiacContent payload) {
+        this(payload, null);
+    }
+    
+    public JiacMessage(IJiacContent payload, ICommunicationAddress senderAddress) {
         _payload= payload;
         _headers= new Hashtable<String, String>();
+        _sender= senderAddress;
     }
 
 	public IJiacContent getPayload() {

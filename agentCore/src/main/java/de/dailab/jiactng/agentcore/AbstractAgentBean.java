@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
@@ -270,4 +271,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public void handleLifecycleException(LifecycleException e, LifecycleStates state) {
+		throw new RuntimeException(e);
+	}
+	
 }

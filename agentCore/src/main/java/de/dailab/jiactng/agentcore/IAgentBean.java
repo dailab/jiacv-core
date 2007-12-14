@@ -7,6 +7,7 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manageable;
 
 /**
@@ -76,5 +77,19 @@ public interface IAgentBean extends ILifecycle, BeanNameAware, Manageable {
 	 * is implemented.
 	 */
 	public void execute();
+
+	/**
+	 * Recovery method for handling LifecycleExceptions. If a statechange for an
+	 * agentbean has failed, this method is called. It may fix the problem.
+	 * Afterwards the statechange is called one more time. If it fails again,
+	 * the bean is supposed to be defective.
+	 * 
+	 * @param e
+	 *            the exception that occured during the first statechange.
+	 * @param state
+	 *            the state to which the bean should change.
+	 */
+	public void handleLifecycleException(LifecycleException e,
+			LifecycleStates state);
 
 }

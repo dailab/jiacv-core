@@ -158,7 +158,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	public void run() {
 		while (true) {
 			try {
-                Thread.sleep(50);
+				Thread.sleep(50);
 				synchronized (this) {
 					if (active) {
 						executionFuture = agentNode.getThreadPool().submit(
@@ -241,10 +241,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		// call cleanup for all agentbeans
 		for (IAgentBean a : this.agentBeans) {
 			try {
-				a.cleanup();
-				setBeanState(a.getBeanName(), LifecycleStates.CLEANED_UP);
+				setBeanState(a, LifecycleStates.CLEANED_UP);
 			} catch (LifecycleException e) {
-				handleBeanException(a, e, LifecycleStates.CLEANING_UP);
+				handleBeanException(a, e, LifecycleStates.CLEANED_UP);
 			}
 		}
 		this.memory.removeAll(new Action(null, null, null, null));
@@ -275,14 +274,13 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		for (IAgentBean ab : this.agentBeans) {
 			try {
 				ab.setMemory(memory);
-				ab.init();
 				ab.addLifecycleListener(this);
 
-				memory.write(new AgentBeanDescription(ab.getBeanName(),
-						LifecycleStates.INITIALIZED.name()));
-				setBeanState(ab.getBeanName(), LifecycleStates.INITIALIZED);
+				// memory.write(new AgentBeanDescription(ab.getBeanName(),
+				// LifecycleStates.INITIALIZED.name()));
+				setBeanState(ab, LifecycleStates.INITIALIZED);
 			} catch (LifecycleException e) {
-				handleBeanException(ab, e, LifecycleStates.INITIALIZING);
+				handleBeanException(ab, e, LifecycleStates.INITIALIZED);
 			}
 
 			// if bean is effector, add all actions to memory
@@ -313,10 +311,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		// call start for all agentbeans
 		for (IAgentBean a : this.agentBeans) {
 			try {
-				a.start();
-				setBeanState(a.getBeanName(), LifecycleStates.STARTED);
+				setBeanState(a, LifecycleStates.STARTED);
 			} catch (LifecycleException e) {
-				handleBeanException(a, e, LifecycleStates.STARTING);
+				handleBeanException(a, e, LifecycleStates.STARTED);
 			}
 		}
 
@@ -338,10 +335,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		// call stop for all agentbeans
 		for (IAgentBean a : this.agentBeans) {
 			try {
-				a.stop();
-				setBeanState(a.getBeanName(), LifecycleStates.STOPPED);
+				setBeanState(a, LifecycleStates.STOPPED);
 			} catch (LifecycleException e) {
-				handleBeanException(a, e, LifecycleStates.STOPPING);
+				handleBeanException(a, e, LifecycleStates.STOPPED);
 			}
 		}
 		synchronized (this) {
@@ -367,7 +363,42 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	private void handleBeanException(IAgentBean a, LifecycleException e,
 			LifecycleStates state) {
-		e.printStackTrace();
+
+		printCriticalMessage("Agentbean: \'" + a.getBeanName()
+				+ "\' could not switch to state: \'" + state
+				+ "\'! \n  Exception was: ", e);
+		try {
+			a.handleLifecycleException(e, state);
+			setBeanState(a, state);
+			printCriticalMessage("Recovery for Agentbean: \'" + a.getBeanName()
+					+ "\' successful.", null);
+		} catch (Exception newEx) {
+			printCriticalMessage("Recovery for Agentbean: \'" + a.getBeanName()
+					+ "\' failed, removing Bean.", newEx);
+			// TODO: probably remove bean
+		}
+
+	}
+
+	/**
+	 * Delivers a message to the logging system or to the console, if the
+	 * logging-system is not yet initiated. An optional exception can be
+	 * submitted.
+	 * 
+	 * @param message
+	 *            the message to print
+	 * @param e
+	 *            an optional exception
+	 */
+	private void printCriticalMessage(String message, Exception e) {
+		if (agentLog != null) {
+			agentLog.error(message, e);
+		} else {
+			System.err.println(message);
+			if (e != null) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -391,8 +422,29 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @throws LifecycleException
 	 */
-	public void setBeanState(String beanName, LifecycleStates newState) {
+	public void setBeanState(IAgentBean bean, LifecycleStates newState)
+			throws LifecycleException {
+		String beanName = bean.getBeanName();
+
+		switch (newState) {
+		case CLEANED_UP:
+			bean.cleanup();
+			break;
+		case INITIALIZED:
+			bean.init();
+			break;
+		case STOPPED:
+			bean.stop();
+			break;
+		case STARTED:
+			bean.start();
+			break;
+		default:
+			break;
+		}
 		this.memory.update(new AgentBeanDescription(beanName, null),
 				new AgentBeanDescription(null, newState.name()));
 	}

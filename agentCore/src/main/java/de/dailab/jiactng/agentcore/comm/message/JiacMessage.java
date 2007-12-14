@@ -11,10 +11,9 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 
 
 /**
- * Ein Objekt, dass Nachrichten, die innerhalb Jiacs verschickt werden, kapselt. Der Recipient bestimmt, wer diese
- * Message bekommen soll. EIne Message ist typisiert, durch das operation-attribut
+ * The implementation of {@link IJiacMessage}.
  * 
- * @author janko, loeffelholz
+ * @author Marcel Patzlaff
  */
 public class JiacMessage implements IJiacMessage {
 	private IJiacContent _payload;

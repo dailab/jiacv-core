@@ -45,10 +45,14 @@
 	</bean>
 
 	<bean name="ClientBean" class="de.dailab.jiactng.agentcore.comm.service.ClientBean" singleton="false" />
-	<bean name="ClientServiceBean" class="de.dailab.jiactng.agentcore.comm.service.ServiceBean" singleton="false" />
+	<bean name="ClientServiceBean" parent="AbstractServiceBean"/>
+
+	<bean name="AbstractServiceBean" class="de.dailab.jiactng.agentcore.comm.service.ServiceBean" abstract="true">
+		<property name="executeInterval" value="1000"/>
+	</bean>
 
 	<bean name="ProviderBean" class="de.dailab.jiactng.agentcore.comm.service.ProviderBean" singleton="false" />
-	<bean name="ProviderServiceBean" class="de.dailab.jiactng.agentcore.comm.service.ServiceBean" singleton="false">
+	<bean name="ProviderServiceBean" parent="AbstractServiceBean">
 		<property name="actionTemplates">
 			<set>
 				<bean class="de.dailab.jiactng.agentcore.action.Action" singleton="false">

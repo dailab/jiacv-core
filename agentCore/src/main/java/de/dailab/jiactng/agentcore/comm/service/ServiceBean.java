@@ -36,7 +36,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class ServiceBean extends AbstractMethodExposingBean implements IEffector, ResultReceiver, Runnable {
+public class ServiceBean extends AbstractMethodExposingBean implements IEffector, ResultReceiver {
     private static final String SERVICE_BROADCAST_ADDRESS= "JiacTNG/service/broadcast";
     private static final String SERVICE_EXECUTION_PROTOCOL= "JiacTNG-service-exec-protocol";
     private static final String SERVICE_MANAGEMENT_PROTOCOL= "JiacTNG-service-mgmt-protocol";
@@ -63,8 +63,6 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             if(event instanceof WriteCallEvent) {
                 WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;
                 IJiacMessage message= memory.remove(wce.getObject());
-//                IJiacMessage message= wce.getObject();
-                
                 IJiacContent content= message.getPayload();
                 
                 if(content instanceof RemoteActionResult) {
@@ -85,8 +83,6 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             if(event instanceof WriteCallEvent) {
                 WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;
                 IJiacMessage message= memory.remove(wce.getObject());
-//                IJiacMessage message= wce.getObject();
-                
                 IJiacContent content= message.getPayload();
                 
                 if(content instanceof RemoteAction) {
@@ -219,8 +215,8 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                 updateActionOffer(action, ADD_OFFER);
             }
         }
-        
-        thisAgent.getThreadPool().submit(this);
+//        
+//        thisAgent.getThreadPool().submit(this);
     }
 
     @Override
@@ -236,52 +232,92 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     }
 
     
-    public void run() {
-        while(isActive()) {
-            Set<Action> toProcess= new HashSet<Action>();
-            synchronized(_actionTemplates) {
-                log.debug("walk through templates...");
-                for(Action template : _actionTemplates) {
-                    for(Action concrete : memory.readAll(template)) {
-                        toProcess.add(concrete);
-                    }
+    @Override
+    public void execute() {
+        Set<Action> toProcess= new HashSet<Action>();
+        synchronized(_actionTemplates) {
+            log.debug("walk through templates...");
+            for(Action template : _actionTemplates) {
+                for(Action concrete : memory.readAll(template)) {
+                    toProcess.add(concrete);
                 }
             }
-            
-            synchronized(_offeredActions) {
-                if(isActive()) {
-                    log.debug("update offers...");
-                    for(Action toAdd : toProcess) {
-                        if(_offeredActions.add(toAdd)) {
-                            // templates matched action which is currently withdrawn
-                            try {
-                                updateActionOffer(toAdd, ADD_OFFER);
-                            } catch (Exception e) {
-                                log.debug("could not offer action '" + toAdd + "'", e);
-                            }
-                        }
-                    }
-                    
-                    for(Action toRemove : _offeredActions) {
-                        if(!toProcess.remove(toRemove)) {
-                            // no template matched the currently offered action
-                            try {
-                                updateActionOffer(toRemove, REMOVE_OFFER);
-                            } catch (Exception e) {
-                                log.debug("could not withdraw action '" + toRemove + "'", e);
-                            }
+        }
+        
+        synchronized(_offeredActions) {
+            if(isActive()) {
+                log.debug("update offers...");
+                for(Action toAdd : toProcess) {
+                    if(_offeredActions.add(toAdd)) {
+                        // templates matched action which is currently withdrawn
+                        try {
+                            updateActionOffer(toAdd, ADD_OFFER);
+                        } catch (Exception e) {
+                            log.debug("could not offer action '" + toAdd + "'", e);
                         }
                     }
                 }
-            }
-            
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ie) {
-                log.warn("could not sleep", ie);
+                
+                for(Action toRemove : _offeredActions) {
+                    if(!toProcess.remove(toRemove)) {
+                        // no template matched the currently offered action
+                        try {
+                            updateActionOffer(toRemove, REMOVE_OFFER);
+                        } catch (Exception e) {
+                            log.debug("could not withdraw action '" + toRemove + "'", e);
+                        }
+                    }
+                }
             }
         }
     }
+//
+//    public void run() {
+//        while(isActive()) {
+//            Set<Action> toProcess= new HashSet<Action>();
+//            synchronized(_actionTemplates) {
+//                log.debug("walk through templates...");
+//                for(Action template : _actionTemplates) {
+//                    for(Action concrete : memory.readAll(template)) {
+//                        toProcess.add(concrete);
+//                    }
+//                }
+//            }
+//            
+//            synchronized(_offeredActions) {
+//                if(isActive()) {
+//                    log.debug("update offers...");
+//                    for(Action toAdd : toProcess) {
+//                        if(_offeredActions.add(toAdd)) {
+//                            // templates matched action which is currently withdrawn
+//                            try {
+//                                updateActionOffer(toAdd, ADD_OFFER);
+//                            } catch (Exception e) {
+//                                log.debug("could not offer action '" + toAdd + "'", e);
+//                            }
+//                        }
+//                    }
+//                    
+//                    for(Action toRemove : _offeredActions) {
+//                        if(!toProcess.remove(toRemove)) {
+//                            // no template matched the currently offered action
+//                            try {
+//                                updateActionOffer(toRemove, REMOVE_OFFER);
+//                            } catch (Exception e) {
+//                                log.debug("could not withdraw action '" + toRemove + "'", e);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException ie) {
+//                log.warn("could not sleep", ie);
+//            }
+//        }
+//    }
     
     /**
      * Offers an action to other agents.

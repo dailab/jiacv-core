@@ -121,7 +121,9 @@ public class Action implements IFact {
 	 */
 	public ActionResult createActionResult(Session resultOf, Object[] results,
 			DoAction source) {
-		return new ActionResult(this, resultOf, results, source);
+		ActionResult ret = new ActionResult(this, resultOf, results, source);
+		ret.setMetaData(source.getMetaData());
+		return ret;
 	}
 
 	/**

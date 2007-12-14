@@ -22,7 +22,6 @@ import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.IJiacMessageListener;
-import de.dailab.jiactng.agentcore.comm.Selector;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
@@ -67,7 +66,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             IJiacContent content= message.getPayload();
             
             if(content instanceof RemoteAction) {
-                String task= message.getHeader(SERVICE_OFFER_KEY);
+                String task= message.getHeader(SERVICE_OFFER_KEY).toString();
                 
                 if(task.equals(ADD_OFFER)) {
                     insertAction((RemoteAction) content, message.getSender().toUnboundAddress());
@@ -299,7 +298,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                 _sessionsToExternalProviders.put(doAction.getSessionId(), doAction);
             }
             
-            request.setHeader(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL);
+            request.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_PROTOCOL);
             try {
                 log.debug("send request for remote action to '" + context.providerAddress + "'");
                 _communicationBean.send(request, context.providerAddress);
@@ -318,7 +317,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         
         if(recipient != null) {
             IJiacMessage response= new JiacMessage(new RemoteActionResult(result));
-            response.setHeader(IJiacMessage.PROTOCOL_KEY, SERVICE_PROTOCOL);
+            response.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_PROTOCOL);
             try {
                 log.debug("send result for session '" + sessionId + "' to '" + recipient + "'");
                 _communicationBean.send(response, recipient);

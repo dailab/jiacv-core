@@ -9,10 +9,8 @@ import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
-import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
-import de.dailab.jiactng.agentcore.comm.Selector;
 import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
@@ -100,13 +98,7 @@ public class JMSMessageTransport extends MessageTransport {
             payload= (IJiacContent) ((ObjectMessage)message).getObject();
         }
         
-        String senderKey= message.getStringProperty(IJiacMessage.SENDER_KEY);
-        ICommunicationAddress sender= null;
-        if (senderKey != null) {
-            sender= CommunicationAddressFactory.createFromURI(senderKey);
-        }
-
-        IJiacMessage result= new JiacMessage(payload, sender);
+        IJiacMessage result= new JiacMessage(payload);
         for(Enumeration keys= message.getPropertyNames(); keys.hasMoreElements(); ) {
             Object keyObj= keys.nextElement();
             
@@ -141,8 +133,6 @@ public class JMSMessageTransport extends MessageTransport {
             result= session.createObjectMessage();
             ((ObjectMessage)result).setObject(payload);
         }
-        
-        result.setStringProperty(IJiacMessage.SENDER_KEY, message.getSender().toURI().toString());
         
         for(String key : message.getHeaderKeys()) {
             result.setStringProperty(key, message.getHeader(key));

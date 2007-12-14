@@ -3,7 +3,6 @@
  */
 package de.dailab.jiactng.agentcore.comm;
 
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +29,6 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.management.Manager;
-import de.dailab.jiactng.agentcore.util.ReferenceEqualityCheckSet;
 
 /**
  * This bean specifies the way an agent communicates. It implements a message-based approach for information exchange
@@ -84,7 +82,6 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         }
     }
 
-    private final IJiacMessageListener _defaultListener;
     private final IMessageTransportDelegate _defaultDelegate;
 
     private IMessageBoxAddress _defaultMessageBox;
@@ -93,7 +90,6 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
     protected final Map<ICommunicationAddress, List<ListenerContext>> addressToListenerMap;
 
     public CommunicationBean() {
-        _defaultListener = new MemoryDelegationMessageListener();
         _defaultDelegate = new MessageTransportDelegate();
         _transports = new HashMap<String, MessageTransport>();
         addressToListenerMap = new Hashtable<ICommunicationAddress, List<ListenerContext>>();
@@ -471,7 +467,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         CommunicationAddress unboundAddress = address.toUnboundAddress();
 
         // first check whether the sender is correct
-        if (message.getSender() == null || !addressToListenerMap.containsKey(unboundAddress)) {
+        if (message.getSender() == null || !addressToListenerMap.containsKey(message.getSender().toUnboundAddress())) {
             message.setSender(_defaultMessageBox);
         }
 
@@ -514,8 +510,8 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         List<ListenerContext> registeredContexts = addressToListenerMap.get(unboundAddress);
 
         // Now there are three cases:
-        // 1. The address is allready registered and someone is listening with the same selectorTemplate
-        // 2. The address is allready registered but there are only listeners with other selectorTemplates
+        // 1. The address is already registered and someone is listening with the same selectorTemplate
+        // 2. The address is already registered but there are only listeners with other selectorTemplates
         // 3. The address isn't registered and nobody is listening to it.
         if (registeredContexts != null) {
             // we have already some listener registered for this communication address

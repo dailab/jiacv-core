@@ -14,8 +14,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
-import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 public class CommunicationBeanTest extends TestCase {
@@ -29,7 +29,7 @@ public class CommunicationBeanTest extends TestCase {
 	private static CommunicationBean _cBean;
 	private static List<ICommunicationAddress> _addressList = new ArrayList<ICommunicationAddress>();
 	private static List<Listener> _listeners = new ArrayList<Listener>();
-	private static List<Selector> _selectors = new ArrayList<Selector>();
+	private static List<IJiacMessage> _selectors = new ArrayList<IJiacMessage>();
 
 	private static Map<ICommunicationAddress, List<ListenerContext>> _addressToListenerMap;
 	private static Log _log = null;
@@ -70,7 +70,9 @@ public class CommunicationBeanTest extends TestCase {
 					_addressList.add(i, CommunicationAddressFactory.createGroupAddress(String.valueOf(i)));
 				}
 				_listeners.add(i, new Listener(String.valueOf(i)));
-                _selectors.add(i, new Selector("key", String.valueOf(i)));
+                JiacMessage selectorTemplate= new JiacMessage();
+                selectorTemplate.setHeader("key", String.valueOf(i));
+                _selectors.add(i, selectorTemplate);
 			}
 		}
 	}

@@ -1,7 +1,9 @@
 package de.dailab.jiactng.agentcore.comm.transport.jms;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -19,9 +21,7 @@ import org.apache.commons.logging.Log;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
-import de.dailab.jiactng.agentcore.comm.Selector;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
-import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 
 /**
  * 
@@ -33,22 +33,42 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
  * @author Loeffelholz
  * 
  */
-class JMSReceiver implements MessageListener{
+class JMSReceiver implements MessageListener {
     /**
      * @param address
      * @param selector
      * @return a standardized String Expression for address and selector
      */
-    protected static String getStringRepresentation(ICommunicationAddress address, IJiacMessage selector) {
+    protected static String getStringRepresentation(ICommunicationAddress address, String selector) {
         StringBuilder result = new StringBuilder();
         result.append(address.toString());
 
         if (selector != null) {
-//            result.append('?').append(selector.getKey()).append('=').append(selector.getValue());
-        	  result.append(selector.toString());
+        	  result.append('?').append(selector);
         }
 
         return result.toString();
+    }
+    
+    protected static String templateToSelector (IJiacMessage jiacMessage) {
+        if(jiacMessage == null) {
+            return null;
+        }
+        
+        StringBuilder selector= new StringBuilder();
+        Set<String> keys= jiacMessage.getHeaderKeys();
+        String[] sortedKeys= keys.toArray(new String[keys.size()]);
+        Arrays.sort(sortedKeys);
+        
+        for(String key : sortedKeys) {
+            if(selector.length() > 0) {
+                selector.append(" AND ");
+            }
+            
+            selector.append(key).append(" = '").append(jiacMessage.getHeader(key)).append("'");
+        }
+        
+        return selector.toString();
     }
 
     /**
@@ -60,13 +80,9 @@ class JMSReceiver implements MessageListener{
     protected final Log log;
 
     private ConnectionFactory _connectionFactory;
-
     private Connection _connection;
-
     private Session _session;
-
     private JMSMessageTransport _parent;
-
     private Map<String, MessageConsumer> _consumers;
 
     public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent, Log log) throws JMSException {
@@ -118,7 +134,8 @@ class JMSReceiver implements MessageListener{
      */
     public synchronized void listen(ICommunicationAddress address, IJiacMessage selectorTemplate) throws JMSException {
         // first check if we already have a listener like that
-        String key = getStringRepresentation(address, selectorTemplate);
+        String selector= templateToSelector(selectorTemplate);
+        String key = getStringRepresentation(address, selector);
         if (_consumers.containsKey(key)) {
             if (log.isWarnEnabled()) {
                 log.warn("there is already a listener for '" + key + "' registered");
@@ -126,7 +143,6 @@ class JMSReceiver implements MessageListener{
             return;
         }
         // then creating a listener if needed and map it with the others.
-        String selector = this.templateToSelector((JiacMessage) selectorTemplate);
         MessageConsumer consumer = initialiseConsumer(address, selector);
         _consumers.put(key, consumer);
         if (log.isDebugEnabled()) {
@@ -143,7 +159,8 @@ class JMSReceiver implements MessageListener{
      * @param selector
      *            the selector given while the listener was created in the first place
      */
-    public synchronized void stopListen(ICommunicationAddress address, IJiacMessage selector) {
+    public synchronized void stopListen(ICommunicationAddress address, IJiacMessage selectorTemplate) {
+        String selector= templateToSelector(selectorTemplate);
         String key = getStringRepresentation(address, selector);
         MessageConsumer consumer = _consumers.remove(key);
 
@@ -250,11 +267,4 @@ class JMSReceiver implements MessageListener{
             }
         }
     }
-
-    
-    public String templateToSelector (JiacMessage jiacMessage){
-    	//TODO write a method that really creates a selectorstring
-    	return null;
-    }
-
 }

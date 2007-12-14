@@ -163,7 +163,8 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	private JiacMessage createJiacMessage(IServiceDescription serviceDesc) {
 		IJiacContent content = new ObjectContent(serviceDesc);
 		
-		JiacMessage msg = new JiacMessage(content, _serviceTopic);
+		JiacMessage msg = new JiacMessage(content);
+        msg.setSender(_serviceTopic);
 		return msg;
 	}
 

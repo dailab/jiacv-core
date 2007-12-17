@@ -73,15 +73,6 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         }
     }
 
-    private final class MemoryDelegationMessageListener implements IJiacMessageListener {
-        public void receive(IJiacMessage message, ICommunicationAddress from) {
-            if (log.isDebugEnabled()) {
-                log.debug("writing message '" + message.toString() + "' at '" + from + "' into memory");
-            }
-            memory.write(message);
-        }
-    }
-
     private final IMessageTransportDelegate _defaultDelegate;
 
     private IMessageBoxAddress _defaultMessageBox;
@@ -746,6 +737,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         }
     }
 
+    @SuppressWarnings("unchecked")
     public CompositeData getSelectorsOfAddresses() {
         CompositeData data = null;
         int size = addressToListenerMap.size();

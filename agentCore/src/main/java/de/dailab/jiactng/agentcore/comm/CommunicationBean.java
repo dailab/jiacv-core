@@ -627,6 +627,11 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
                 log.warn("Aborted Unregister: There is no listener registered for this address '" + address + "' and selector '" + selectorTemplate + "'");
             }
         }
+        
+        if (registeredContexts.size() > 0){
+        	// Still someone listening on this address
+        	addressToListenerMap.put(unboundAddress, registeredContexts);
+        }
     }
 
     private boolean isActive() {

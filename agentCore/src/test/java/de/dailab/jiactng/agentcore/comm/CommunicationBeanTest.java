@@ -359,10 +359,8 @@ public class CommunicationBeanTest extends TestCase {
         assertEquals("Listener count for Address 1 Selector Other", 0, listenerCountForAddress1SelectorOther);
         assertEquals("Listener count for Address 1 Selector Null", 1, listenerCountForAddress1SelectorNull);
         
-        System.err.println("Now it comes...");
         // Now let's unregister it completely
         _cBean.unregister(_addressList.get(1), null);
-        System.err.println("Now it came...");
         
         // quick test the order given
         assertEquals("One Order given", 1, _registration._orders.size());

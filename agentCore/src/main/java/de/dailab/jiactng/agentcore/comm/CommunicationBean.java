@@ -524,7 +524,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
                     log.debug("added further listener for '" + unboundAddress + "' : '" + selectorTemplate + "'");
                 }
                 return;
-            }
+            } 
         }else {
             // (3.) currently there are no listeners registered for this address
             if (log.isDebugEnabled()) {
@@ -596,6 +596,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         if(index >= 0) {
         	// this address-selectorTemplate combination is actually registered
             context= registeredContexts.remove(index);
+            
             // decrease the number of listeners
             context.listeners--;
             if (context.listeners <= 0){

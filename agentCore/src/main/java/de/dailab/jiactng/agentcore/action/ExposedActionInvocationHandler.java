@@ -50,13 +50,12 @@ public abstract class ExposedActionInvocationHandler implements IActionInvocatio
         private ResultReceiver _resultReceiver;
         
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if(IActionInvocationPreparer.class.isAssignableFrom(method.getDeclaringClass())) {
+            if(IActionInvocationPreparer.class == method.getDeclaringClass()) {
+                // its a method from the preparer interface -> I can handle it
                 return method.invoke(this, args);
             }
             
-            Expose expAnno= method.getAnnotation(Expose.class);
-
-            if(expAnno == null) {
+            if(!method.isAnnotationPresent(Expose.class)) {
                 throw new UnsupportedOperationException("this method is not exposed as an action");
             }
             
@@ -66,8 +65,10 @@ public abstract class ExposedActionInvocationHandler implements IActionInvocatio
             Set<Action> actions= getMemory().readAll(new Action(name, null, method.getParameterTypes(), returnTypes));
             Action action= null;
             
-            
-            // check the parameters by myself
+            /*
+             * Tuple space matcher does not check the equality of array dimensions and elements.
+             * So I have to check the action signature for myself...
+             */
             Class[] methodParams= method.getParameterTypes();
             outerloop: for(Action a : actions) {
                 Class[] actionParams= a.getParameters();

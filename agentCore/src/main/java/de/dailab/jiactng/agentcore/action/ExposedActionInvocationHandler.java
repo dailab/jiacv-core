@@ -18,9 +18,9 @@ import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
-public abstract class ExposedActionInvocator implements IActionInvocationHandler {
+public abstract class ExposedActionInvocationHandler implements IActionInvocationHandler {
     static final Class[] EMPTY_CLASSES= new Class[0];
     
     static final ResultReceiver DUMMY_RECEIVER= new ResultReceiver() {

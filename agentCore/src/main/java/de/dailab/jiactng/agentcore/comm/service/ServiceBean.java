@@ -189,7 +189,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
 //            }
 //        }
         
-        _communicationBean= thisAgent.getActionInvocator().getInvocatorInstance(ICommunicationBean.class);
+        _communicationBean= thisAgent.getActionInvocationHandler().getInvocatorInstance(ICommunicationBean.class);
 //        
 //        if(_communicationBean == null) {
 //            throw new IllegalStateException("could not find communication bean");

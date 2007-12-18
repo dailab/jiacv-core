@@ -23,7 +23,8 @@ import javax.management.openmbean.SimpleType;
 import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.action.Action;
-import de.dailab.jiactng.agentcore.action.ExposedActionInvocator;
+import de.dailab.jiactng.agentcore.action.ExposedActionInvocationHandler;
+import de.dailab.jiactng.agentcore.action.IActionInvocationHandler;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
@@ -106,7 +107,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	private long beanExecutionTimeout = 5 * 60 * 1000;
 
-    private ExposedActionInvocator _exposedActionInvocator;
+    private ExposedActionInvocationHandler _exposedActionInvocator;
     
 	private ArrayList<Action> actionList = null;
 
@@ -621,9 +622,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	}
 
 	@SuppressWarnings("unchecked")
-    public ExposedActionInvocator getActionInvocator() {
+    public IActionInvocationHandler getActionInvocationHandler() {
         if(_exposedActionInvocator == null) {
-            _exposedActionInvocator=  new ExposedActionInvocator() {
+            _exposedActionInvocator=  new ExposedActionInvocationHandler() {
                 @Override
                 protected IMemory getMemory() {
                     return memory;

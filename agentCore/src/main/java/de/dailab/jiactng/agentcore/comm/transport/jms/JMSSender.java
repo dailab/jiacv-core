@@ -31,7 +31,7 @@ class JMSSender {
 	private int _defaultTimeOut = 1000;
 
 	public JMSSender(ConnectionFactory connectionFactory, Log log) throws JMSException {
-		_connectionFactory = (ConnectionFactory)connectionFactory;
+		_connectionFactory = connectionFactory;
         _log= log;
 		doInit();
 	}

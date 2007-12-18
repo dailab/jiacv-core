@@ -86,7 +86,7 @@ class JMSReceiver implements MessageListener {
     private Map<String, MessageConsumer> _consumers;
 
     public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent, Log log) throws JMSException {
-        _connectionFactory = (ConnectionFactory) connectionFactory;
+        _connectionFactory = connectionFactory;
         _parent = parent;
         this.log = log;
         _consumers = new HashMap<String, MessageConsumer>();

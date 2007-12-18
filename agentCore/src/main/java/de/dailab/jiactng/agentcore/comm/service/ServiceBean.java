@@ -5,6 +5,7 @@ package de.dailab.jiactng.agentcore.comm.service;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -210,13 +211,6 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     public void doStart() throws Exception {
         super.doStart();
         log.debug("starting ServiceBean...");
-        synchronized (_offeredActions) {
-            for(Action action : _offeredActions) {
-                updateActionOffer(action, ADD_OFFER);
-            }
-        }
-//        
-//        thisAgent.getThreadPool().submit(this);
     }
 
     @Override
@@ -226,6 +220,8 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             for(Action action : _offeredActions) {
                 updateActionOffer(action, REMOVE_OFFER);
             }
+            
+            _offeredActions.clear();
         }
         
         super.doStop();
@@ -238,9 +234,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         synchronized(_actionTemplates) {
             log.debug("walk through templates...");
             for(Action template : _actionTemplates) {
-                for(Action concrete : memory.readAll(template)) {
-                    toProcess.add(concrete);
-                }
+                toProcess.addAll(memory.readAll(template));
             }
         }
         
@@ -248,76 +242,31 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             if(isActive()) {
                 log.debug("update offers...");
                 for(Action toAdd : toProcess) {
-                    if(_offeredActions.add(toAdd)) {
-                        // templates matched action which is currently withdrawn
                         try {
                             updateActionOffer(toAdd, ADD_OFFER);
                         } catch (Exception e) {
                             log.debug("could not offer action '" + toAdd + "'", e);
                         }
-                    }
                 }
                 
-                for(Action toRemove : _offeredActions) {
+                for(Iterator<Action> iter= _offeredActions.iterator(); iter.hasNext();) {
+                    Action toRemove= iter.next();
                     if(!toProcess.remove(toRemove)) {
                         // no template matched the currently offered action
                         try {
                             updateActionOffer(toRemove, REMOVE_OFFER);
+                            iter.remove();
                         } catch (Exception e) {
                             log.debug("could not withdraw action '" + toRemove + "'", e);
                         }
                     }
                 }
+                
+                // save newly offered actions for next run
+                _offeredActions.addAll(toProcess);
             }
         }
     }
-//
-//    public void run() {
-//        while(isActive()) {
-//            Set<Action> toProcess= new HashSet<Action>();
-//            synchronized(_actionTemplates) {
-//                log.debug("walk through templates...");
-//                for(Action template : _actionTemplates) {
-//                    for(Action concrete : memory.readAll(template)) {
-//                        toProcess.add(concrete);
-//                    }
-//                }
-//            }
-//            
-//            synchronized(_offeredActions) {
-//                if(isActive()) {
-//                    log.debug("update offers...");
-//                    for(Action toAdd : toProcess) {
-//                        if(_offeredActions.add(toAdd)) {
-//                            // templates matched action which is currently withdrawn
-//                            try {
-//                                updateActionOffer(toAdd, ADD_OFFER);
-//                            } catch (Exception e) {
-//                                log.debug("could not offer action '" + toAdd + "'", e);
-//                            }
-//                        }
-//                    }
-//                    
-//                    for(Action toRemove : _offeredActions) {
-//                        if(!toProcess.remove(toRemove)) {
-//                            // no template matched the currently offered action
-//                            try {
-//                                updateActionOffer(toRemove, REMOVE_OFFER);
-//                            } catch (Exception e) {
-//                                log.debug("could not withdraw action '" + toRemove + "'", e);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException ie) {
-//                log.warn("could not sleep", ie);
-//            }
-//        }
-//    }
     
     /**
      * Offers an action to other agents.

@@ -21,7 +21,7 @@ import de.dailab.jiactng.agentcore.comm.IGroupAddress;
  */
 public class PingPongTestCase extends TestCase {
     public static String DUMMY_ADDRESS= "dummyAddress";
-    public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.CommunicationBean#send";
+    public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#send";
 
     private IAgentNode _node;
     private PingerBean _pingerBean;

@@ -59,6 +59,29 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
         Class[] returnTypes() default {};
     }
     
+    static String getName(Method method) {
+        String name= method.getAnnotation(Expose.class).name();
+        
+        if(name.length() == 0) {
+            name= method.getDeclaringClass().getName() + METHOD_SEPARATING_CHAR + method.getName();
+        }
+        
+        return name;
+    }
+    
+    static Class[] getReturnTypes(Method method) {
+        Expose expAnno= method.getAnnotation(Expose.class);
+        Class returnType= method.getReturnType();
+        Class[] returnTypes;
+        if(returnType.isArray()) {
+            returnTypes= expAnno.returnTypes().length > 0 ? expAnno.returnTypes() : new Class[]{returnType};
+        } else {
+            returnTypes= returnType == void.class ? EMPTY_CLASSES : new Class[]{returnType};
+        }
+        
+        return returnTypes;
+    }
+    
     /**
      * Utility method which collects all exposed methods along the given hierarchy.
      * Methods which are annotated in more specialised classes will have precedence. 
@@ -151,7 +174,6 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
 log.debug("typechecking is '" + doAction.typeCheck() + "'");
         
         Action action= doAction.getAction();
-//        String name= doAction.getAction().getName();
         Method method= searchMethod(action.getName(), action.getParameters());
         if(method != null) {
             try {
@@ -191,20 +213,8 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         
         for(Method method : getExposedPublicMethods(getClass())) {
             // check for Expose annotation
-            Expose expAnno= method.getAnnotation(Expose.class);
-            Class returnType= method.getReturnType();
-            Class[] returnTypes;
-            if(returnType.isArray()) {
-                returnTypes= expAnno.returnTypes().length > 0 ? expAnno.returnTypes() : new Class[]{returnType};
-            } else {
-                returnTypes= returnType == void.class ? EMPTY_CLASSES : new Class[]{returnType};
-            }
-            
-            String name= expAnno.name();
-            
-            if(name.length() == 0) {
-                name= method.getDeclaringClass().getName() + METHOD_SEPARATING_CHAR + method.getName();
-            }
+            Class[] returnTypes= getReturnTypes(method);
+            String name= getName(method);
             
             // build the action object
             actions.add(

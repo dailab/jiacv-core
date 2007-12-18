@@ -38,7 +38,7 @@ import de.dailab.jiactng.agentcore.management.Manager;
  * @author Martin Loeffelholz
  * @version $Revision$
  */
-public class CommunicationBean extends AbstractMethodExposingBean implements CommunicationBeanMBean {
+public class CommunicationBean extends AbstractMethodExposingBean implements ICommunicationBean, CommunicationBeanMBean {
     /**
      * a save way to cast from object to targetType
      * 
@@ -181,8 +181,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         }
 
         // create the default message box for this agent
-        establishMessageBox((_defaultMessageBox = CommunicationAddressFactory.createMessageBoxAddress(thisAgent
-                .getAgentName())));
+        register((_defaultMessageBox = CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName())));
 
         if (_transports.size() <= 0) {
             log.warn("no transports available yet!");
@@ -270,59 +269,26 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
     // ~ END OF CONFIGURATION AND INITIALISATION STUFF ~ //
 
     // ~ START OF ACTIONS ~ //
-    @Expose
     public synchronized IMessageBoxAddress getDefaultMessageBoxAddress() {
         return _defaultMessageBox;
     }
 
-    /**
-     * An invocation of this action will associate this agent with a group (a logical destination)
-     * 
-     * @param group         the group to join
-     */
-    @Expose
     public synchronized void joinGroup(IGroupAddress group) throws CommunicationException {
         register(group);
     }
 
-    /**
-     * An invocation of this action will remove this agent from the specified group.
-     * 
-     * @param group         the group to leave
-     */
-    @Expose
     public synchronized void leaveGroup(IGroupAddress group) throws CommunicationException {
         unregister(group);
     }
 
-    /**
-     * This action will create a new message box for this agent. Messages that are sent to it will be received by this
-     * agent exclusivly.
-     * 
-     * @param messageBox    the address of the new message box
-     */
-    @Expose
     public synchronized void establishMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
         register(messageBox);
     }
 
-    /**
-     * This action destroys the message box with the specified address.
-     * 
-     * @param messageBox    the address to the message box which should be destroyed
-     */
-    @Expose
     public synchronized void destroyMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
         unregister(messageBox);
     }
 
-    /**
-     * This method sends a message to the given destination.
-     * 
-     * @param message       the message to send
-     * @param address       the address to send to
-     */
-    @Expose
     public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
         if (message == null) {
             throw new IllegalArgumentException("message must not be null");
@@ -335,13 +301,6 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         internalSend(saveCast(message, JiacMessage.class), saveCast(address, CommunicationAddress.class));
     }
 
-    /**
-     * registers to a given Address and starts to listen to it.
-     * 
-     * @param address
-     * @throws CommunicationException
-     */
-    @Expose
     public synchronized void register(ICommunicationAddress address) throws CommunicationException {
         if (log.isInfoEnabled()) {
             log.info("CommunicationBean begins to listen at address '" + address + "'");
@@ -353,13 +312,6 @@ public class CommunicationBean extends AbstractMethodExposingBean implements Com
         internalRegister(saveCast(address, CommunicationAddress.class), null);
     }
 
-    /**
-     * stops to listen to communication on a given Address
-     * 
-     * @param address
-     * @throws CommunicationException
-     */
-    @Expose
     public synchronized void unregister(ICommunicationAddress address) throws CommunicationException {
         if (log.isInfoEnabled()) {
             log.info("CommunicationBean stops to listen at address '" + address + "'");

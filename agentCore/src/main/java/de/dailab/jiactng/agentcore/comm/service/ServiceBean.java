@@ -13,7 +13,6 @@ import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
 
-import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
@@ -22,9 +21,9 @@ import de.dailab.jiactng.agentcore.action.DoRemoteAction;
 import de.dailab.jiactng.agentcore.action.RemoteAction;
 import de.dailab.jiactng.agentcore.action.RemoteActionResult;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
-import de.dailab.jiactng.agentcore.comm.CommunicationBean;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
@@ -105,7 +104,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     
     private final Object _workLock= new Object();
     
-    private CommunicationBean _communicationBean;
+    private ICommunicationBean _communicationBean;
     
     /**
      * The group to broadcast offering and withdrawing information.
@@ -161,7 +160,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     @Override
     public void doCleanup() throws Exception {
         log.debug("cleanup ServiceBean...");
-        _communicationBean.unregister(_communicationBean.getDefaultMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
+        _communicationBean.unregister(CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName()), EXECUTION_MESSAGE_TEMPLATE);
         _communicationBean.unregister(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
         _serviceBroadcastGroup= null;
         memory.detach(_executionProtocol);
@@ -183,16 +182,18 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     public void doInit() throws Exception {
         super.doInit();
         log.debug("initialise ServiceBean...");
-        for(IAgentBean bean : thisAgent.getAgentBeans()) {
-            if(bean instanceof CommunicationBean) {
-                _communicationBean= (CommunicationBean) bean;
-                break;
-            }
-        }
+//        for(IAgentBean bean : thisAgent.getAgentBeans()) {
+//            if(bean instanceof CommunicationBean) {
+//                _communicationBean= (CommunicationBean) bean;
+//                break;
+//            }
+//        }
         
-        if(_communicationBean == null) {
-            throw new IllegalStateException("could not find communication bean");
-        }
+        _communicationBean= thisAgent.getActionInvocator().getInvocatorInstance(ICommunicationBean.class);
+//        
+//        if(_communicationBean == null) {
+//            throw new IllegalStateException("could not find communication bean");
+//        }
         _actionToContext= new Hashtable<Action, RemoteActionContext>();
         _sessionsFromExternalClients= new Hashtable<String, ICommunicationAddress>();
         _sessionsToExternalProviders= new Hashtable<String, DoAction>();
@@ -204,7 +205,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         
         _serviceBroadcastGroup= CommunicationAddressFactory.createGroupAddress(SERVICE_BROADCAST_ADDRESS);
         _communicationBean.register(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
-        _communicationBean.register(_communicationBean.getDefaultMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
+        _communicationBean.register(CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName()), EXECUTION_MESSAGE_TEMPLATE);
     }
 
     @Override

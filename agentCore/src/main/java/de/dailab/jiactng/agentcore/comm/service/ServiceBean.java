@@ -25,7 +25,6 @@ import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
-import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.environment.IEffector;
@@ -63,7 +62,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             if(event instanceof WriteCallEvent) {
                 WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;
                 IJiacMessage message= memory.remove(wce.getObject());
-                IJiacContent content= message.getPayload();
+                IFact content= message.getPayload();
                 
                 if(content instanceof RemoteActionResult) {
                     processActionResult((RemoteActionResult) content);
@@ -83,7 +82,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             if(event instanceof WriteCallEvent) {
                 WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;
                 IJiacMessage message= memory.remove(wce.getObject());
-                IJiacContent content= message.getPayload();
+                IFact content= message.getPayload();
                 
                 if(content instanceof RemoteAction) {
                     String task= message.getHeader(SERVICE_OFFER_KEY).toString();

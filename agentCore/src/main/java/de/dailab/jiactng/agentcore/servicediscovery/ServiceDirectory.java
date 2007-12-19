@@ -24,7 +24,6 @@ import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
-import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
@@ -161,7 +160,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 * @return die Nachricht die per JMS verschickt wird.
 	 */
 	private JiacMessage createJiacMessage(IServiceDescription serviceDesc) {
-		IJiacContent content = new ObjectContent(serviceDesc);
+		IFact content = new ObjectContent(serviceDesc);
 		
 		JiacMessage msg = new JiacMessage(content);
         msg.setSender(_serviceTopic);

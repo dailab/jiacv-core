@@ -12,10 +12,10 @@ import javax.jms.Session;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
-import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
  * The JMSMessageTransports holds a JMSReceiver and a JMSSender.
@@ -88,14 +88,14 @@ public class JMSMessageTransport extends MessageTransport {
      * @throws JMSException
      */
     static IJiacMessage unpack(Message message) throws JMSException {
-        IJiacContent payload;
+        IFact payload;
         if(message instanceof BytesMessage) {
             int length= (int)((BytesMessage) message).getBodyLength();
             byte[] data= new byte[length];
             ((BytesMessage) message).readBytes(data);
             payload= new BinaryContent(data);
         } else {
-            payload= (IJiacContent) ((ObjectMessage)message).getObject();
+            payload= (IFact) ((ObjectMessage)message).getObject();
         }
         
         IJiacMessage result= new JiacMessage(payload);
@@ -124,7 +124,7 @@ public class JMSMessageTransport extends MessageTransport {
      * @throws JMSException
      */
     static Message pack(IJiacMessage message, Session session) throws JMSException {
-        IJiacContent payload= message.getPayload();
+        IFact payload= message.getPayload();
         Message result;
         if(payload instanceof BinaryContent) {
             result= session.createBytesMessage();

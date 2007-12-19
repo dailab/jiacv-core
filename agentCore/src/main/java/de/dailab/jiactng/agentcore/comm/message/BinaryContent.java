@@ -5,6 +5,8 @@ package de.dailab.jiactng.agentcore.comm.message;
 
 import java.util.Arrays;
 
+import de.dailab.jiactng.agentcore.knowledge.IFact;
+
 /**
  * This content type can be used for non-serialisable 
  * payloads.
@@ -15,7 +17,7 @@ import java.util.Arrays;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class BinaryContent implements IJiacContent {
+public class BinaryContent implements IFact {
     private static final byte[] NO_DATA= new byte[0];
     
     private byte[] _data;

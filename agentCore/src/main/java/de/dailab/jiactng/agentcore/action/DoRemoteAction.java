@@ -1,13 +1,13 @@
 package de.dailab.jiactng.agentcore.action;
 
-import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
  * This is a wrapper for a <code>DoAction</code>.
  * 
  * @author axle
  */
-public class DoRemoteAction implements IJiacContent {
+public class DoRemoteAction implements IFact {
 	private DoAction action;
 	
 	public DoRemoteAction (DoAction action) {

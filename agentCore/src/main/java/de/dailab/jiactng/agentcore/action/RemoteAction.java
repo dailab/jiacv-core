@@ -1,6 +1,6 @@
 package de.dailab.jiactng.agentcore.action;
 
-import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 /**
@@ -9,7 +9,7 @@ import de.dailab.jiactng.agentcore.ontology.AgentDescription;
  * @author axle
 
  */
-public class RemoteAction implements IJiacContent {
+public class RemoteAction implements IFact {
 	/** The action that will be offered remotely.*/
 	private Action action;
 	

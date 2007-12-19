@@ -1,8 +1,8 @@
 package de.dailab.jiactng.agentcore.comm.helpclasses;
 
-import de.dailab.jiactng.agentcore.comm.message.IJiacContent;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
-public class TestContent implements IJiacContent {
+public class TestContent implements IFact {
 	String _content;
 
 	public TestContent() {

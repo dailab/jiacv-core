@@ -51,7 +51,7 @@ public abstract class ExposedActionInvocationHandler implements IActionInvocatio
         
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if(IActionInvocationPreparer.class == method.getDeclaringClass()) {
-                // its a method from the preparer interface -> I can handle it
+                // it's a method from the preparer interface -> I can handle it
                 return method.invoke(this, args);
             }
             
@@ -67,7 +67,7 @@ public abstract class ExposedActionInvocationHandler implements IActionInvocatio
             
             /*
              * Tuple space matcher does not check the equality of array dimensions and elements.
-             * So I have to check the action signature for myself...
+             * So I have to check the action signature by myself...
              */
             Class[] methodParams= method.getParameterTypes();
             outerloop: for(Action a : actions) {

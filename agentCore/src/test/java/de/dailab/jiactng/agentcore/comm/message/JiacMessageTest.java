@@ -4,6 +4,7 @@ import javax.jms.Destination;
 
 import junit.framework.TestCase;
 import de.dailab.jiactng.agentcore.comm.helpclasses.FakeDestination;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
  * tests for different construction and getting the jiacDestination
@@ -15,7 +16,7 @@ import de.dailab.jiactng.agentcore.comm.helpclasses.FakeDestination;
 public class JiacMessageTest extends TestCase {
 	private static String operation = "testOperation";
 	private static Destination replyTo = new FakeDestination("replyTo");
-	private static IJiacContent payload = null;
+	private static IFact payload = null;
 	
 	protected void setUp() throws Exception {
 		super.setUp();

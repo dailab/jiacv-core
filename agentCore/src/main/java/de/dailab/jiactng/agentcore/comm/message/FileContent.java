@@ -1,12 +1,14 @@
 package de.dailab.jiactng.agentcore.comm.message;
 
+import de.dailab.jiactng.agentcore.knowledge.IFact;
+
 
 /**
  * Klasse, die ein zu verschickendes File kapselt.
  * @author janko
  *
  */
-public class FileContent implements IJiacContent {
+public class FileContent implements IFact {
 
 	String _filename;
 	char[] _content;

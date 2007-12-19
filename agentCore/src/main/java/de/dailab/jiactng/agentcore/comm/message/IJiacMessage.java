@@ -39,7 +39,7 @@ public interface IJiacMessage extends IFact {
 	 * 
 	 * @return
 	 */
-	IJiacContent getPayload();
+	IFact getPayload();
 
 	/**
 	 * Who did sent me this Message?

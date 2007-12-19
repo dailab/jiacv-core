@@ -2,13 +2,15 @@ package de.dailab.jiactng.agentcore.comm.message;
 
 import java.io.Serializable;
 
+import de.dailab.jiactng.agentcore.knowledge.IFact;
+
 
 /**
  * Der Content ist ein serialisierbares Object.
  * @author janko
  *
  */
-public class ObjectContent implements IJiacContent {
+public class ObjectContent implements IFact {
 	Serializable _object;
 
 	public ObjectContent(Serializable object) {

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 
 /**
@@ -16,7 +17,7 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
  * @author Marcel Patzlaff
  */
 public class JiacMessage implements IJiacMessage {
-	private IJiacContent _payload;
+	private IFact _payload;
     private Map<String, String> _headers;
     
     /**
@@ -31,17 +32,17 @@ public class JiacMessage implements IJiacMessage {
         this(null, null);
     }
 
-    public JiacMessage(IJiacContent payload) {
+    public JiacMessage(IFact payload) {
         this(payload, null);
     }
     
-    public JiacMessage(IJiacContent payload, ICommunicationAddress senderAddress) {
+    public JiacMessage(IFact payload, ICommunicationAddress senderAddress) {
         _payload= payload;
         _headers= new Hashtable<String, String>();
         _sender= senderAddress;
     }
 
-	public IJiacContent getPayload() {
+	public IFact getPayload() {
 		return _payload;
 	}
     
@@ -88,7 +89,7 @@ public class JiacMessage implements IJiacMessage {
             }
         }
         
-        IJiacContent otherPayload= other.getPayload();
+        IFact otherPayload= other.getPayload();
         return otherPayload != null ? otherPayload.equals(_payload) : _payload == null;
     }
 

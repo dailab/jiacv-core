@@ -27,10 +27,8 @@ import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationBean;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
-import de.dailab.jiactng.agentcore.comm.IJiacMessageListener;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
-import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 
 
@@ -43,7 +41,7 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
  *
  */
 
-public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMessageListener{
+public class ChatGuiBean extends AbstractMethodExposingBean {
 
 	private String _beanName = "CommunicationBean";
 	private IMessageBoxAddress _messageBoxAddress = null;
@@ -138,50 +136,51 @@ public class ChatGuiBean extends AbstractMethodExposingBean implements IJiacMess
 		setBeanName("CommunicationGuiBean");
 	}
 	
-	/**
-	 * Entrypoint for messages coming from the CommunicationBean.
-	 * Here all messages will get processed.
-	 * 
-	 *  @param message an IJiacMessage received from the communicationAddress
-	 *  @param at the ICommunicationAddress the messages was sent to
-	 *  
-	 *  @author Martin Loeffelholz
-	 */
-	public void receive(IJiacMessage message, ICommunicationAddress at){
-		ICommunicationAddress atUnbound = at.toUnboundAddress();
-		log.debug("message received from: " + message.getSender() + " at " + atUnbound);
-		
-		BinaryContent binaryPayload = null;
-		// Check if the payload within the message is of a supported type
-		if (message.getPayload() instanceof BinaryContent){
-			binaryPayload = (BinaryContent) message.getPayload();
-			log.debug("Payload is instanceof BinaryContent");
-		} 
-		
-		if (binaryPayload != null){
-			// payload was binary
-			// create ListElement to print some text into the _messagesReceived(output)field
-			ListElement le = new ListElement("Received Mesage from " + message.getSender() + " at " + at);
-			le.from = message.getSender();
-			le.at = at;
-			le.fontColor = Color.red;
-			le.fontStyle = Font.ITALIC;
-			printLine(le);
-			
-			le = new ListElement (binaryPayload.getData());
-			le.at = at;
-			le.from = message.getSender();
-			printLine(le);
-			
-		} else {
-			// if payload within Message was of unsupported type..
-			ListElement le = new ListElement("Received Message from " + message.getSender() + " at " + at);
-			le.fontColor = Color.red;
-			le.fontStyle = Font.ITALIC;
-			printLine(le);
-			printLine("Content could not be decyphered!");
-		}
-	}
+// TODO: adjust this component to the new communication bean
+//	/**
+//	 * Entrypoint for messages coming from the CommunicationBean.
+//	 * Here all messages will get processed.
+//	 * 
+//	 *  @param message an IJiacMessage received from the communicationAddress
+//	 *  @param at the ICommunicationAddress the messages was sent to
+//	 *  
+//	 *  @author Martin Loeffelholz
+//	 */
+//	public void receive(IJiacMessage message, ICommunicationAddress at){
+//		ICommunicationAddress atUnbound = at.toUnboundAddress();
+//		log.debug("message received from: " + message.getSender() + " at " + atUnbound);
+//		
+//		BinaryContent binaryPayload = null;
+//		// Check if the payload within the message is of a supported type
+//		if (message.getPayload() instanceof BinaryContent){
+//			binaryPayload = (BinaryContent) message.getPayload();
+//			log.debug("Payload is instanceof BinaryContent");
+//		} 
+//		
+//		if (binaryPayload != null){
+//			// payload was binary
+//			// create ListElement to print some text into the _messagesReceived(output)field
+//			ListElement le = new ListElement("Received Mesage from " + message.getSender() + " at " + at);
+//			le.from = message.getSender();
+//			le.at = at;
+//			le.fontColor = Color.red;
+//			le.fontStyle = Font.ITALIC;
+//			printLine(le);
+//			
+//			le = new ListElement (binaryPayload.getData());
+//			le.at = at;
+//			le.from = message.getSender();
+//			printLine(le);
+//			
+//		} else {
+//			// if payload within Message was of unsupported type..
+//			ListElement le = new ListElement("Received Message from " + message.getSender() + " at " + at);
+//			le.fontColor = Color.red;
+//			le.fontStyle = Font.ITALIC;
+//			printLine(le);
+//			printLine("Content could not be decyphered!");
+//		}
+//	}
 	
 	/**
 	 * prints the given line into the JList

@@ -20,10 +20,25 @@ public interface ResultReceiver { // extends IAgentBean {
 
 	
 	/**
-	 * This method is called when a result for an action is delivered 
+	 * This method is called when a result for an action is delivered .
 	 * 
 	 * @param result the result of an action
 	 */
 	public void receiveResult(ActionResult result);
 
+	/**
+	 * Setter for the beanName. This method is called by Spring during
+	 * initialization.
+	 * 
+	 * @param name the unqualified name of the bean.
+	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+	 */
+	public void setBeanName(String name);
+
+	/**
+	 * Getter for the name of the agentbean.
+	 * 
+	 * @return a string representing the name of the agentbean.
+	 */
+	public String getBeanName();
 }

@@ -36,6 +36,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 * negative, the execute-method is never called.
 	 */
 	private int executeInterval = -1;
+	
+	/** Used by the execution cycle to determine the next execution time when 
+	 * <code>executeInterval</code> is greater than 0.
+	 */
+	private long nextExecutionTime = 0;
 
 	protected Log log = null;
 
@@ -261,9 +266,38 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 * {@inheritDoc}
 	 */
 	public void setExecuteInterval(int executeInterval) {
-		this.executeInterval = executeInterval;
+		try {
+			if (executeInterval <= 0) {
+				nextExecutionTime = 0;
+				return;
+			}
+			//execute Interval > 0, schedule/reschedule bean
+			if(nextExecutionTime > 0) {
+				nextExecutionTime= nextExecutionTime - this.executeInterval + executeInterval;
+			} else {
+				nextExecutionTime = System.currentTimeMillis() + executeInterval;
+			}
+		} finally {
+			this.executeInterval = executeInterval;
+		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getNextExecutionTime() {
+		return nextExecutionTime;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setNextExecutionTime(long nextExecutionTime) {
+		this.nextExecutionTime = nextExecutionTime;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -277,5 +311,4 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	public void handleLifecycleException(LifecycleException e, LifecycleStates state) {
 		throw new RuntimeException(e);
 	}
-	
 }

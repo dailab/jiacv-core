@@ -79,6 +79,7 @@ public class IAgentTest extends TestCase {
           .getState());
 
     } catch (LifecycleException e) {
+    	e.printStackTrace();
       fail("Statechange failed.");
     }
   }

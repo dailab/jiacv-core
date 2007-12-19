@@ -6,65 +6,31 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import java.util.ArrayList;
-
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
-import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
- * A simple ExecutionCycle implementation. This class implements a round robin
- * cycle for the agentbeans.
+ * A simple ExecutionCycle implementation. This class executes active agentbeans
+ * (those agentbeans where the <code>executionInterval</code> is set to a
+ * value greater than 0) and takes care of action requests (<code>DoAction</code>)
+ * and their results (<code>ActionResult</code>).
  * 
  * @author Thomas Konnerth
- */
-/**
- * @author moekon
+ * @author axle
  * 
+ * @see IExecutionCycle
+ * @see DoAction
+ * @see ActionResult
  */
 public class SimpleExecutionCycle extends AbstractAgentBean implements
 		IExecutionCycle {
-
-	/** List of times at which execute-methods should be called */
-	private ArrayList<Long> executeTimes = null;
-
-	/** List of beans which have execute-methods that should be called. */
-	private ArrayList<IAgentBean> executeList = null;
-
-	/**
-	 * time to sleep to be nice to other threads/processes, in milliseconds
-	 */
-	private int BE_NICE_TIMER = 20;
-
-	/**
-	 * Reference to the agent. Used to retrieve the list of agentbeans. Note
-	 * that the list is actualized only after each agentbean has been called
-	 * once in a cycle.
-	 */
-	private IAgent agent = null;
 
 	/**
 	 * Activity flag. Used by statechanges
 	 */
 	private boolean active = false;
-
-	/**
-	 * Constructor for the class. For creation the reference to the agent is
-	 * needed, as the list of adators is taken from that reference.
-	 */
-	public SimpleExecutionCycle() {
-		// this.agent = agent;
-	}
-
-	/*
-	 * This method triggers the execution of the next agentbean in the list. The
-	 * syncFlag is used to notify the Thread.
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStep() public void
-	 *      doStep() { synchronized (syncFlag) { syncFlag.notify(); } }
-	 */
 
 	/**
 	 * Run-method for the execution cycle. The method iterates over the list of
@@ -78,33 +44,48 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#run()
 	 */
 	public void run() {
-		// call execute-methods of beans
-		long currentTime = System.currentTimeMillis();
-		if (executeTimes.size() > 0 && (executeTimes.get(0) <= currentTime)) {
-			IAgentBean a = executeList.remove(0);
-			executeTimes.remove(0);
-			if (a.getExecuteInterval() > -1) {
-				synchronized (this) {
-					if (active) {
-						callBeanExecute(a);
-						scheduleNextExecute(currentTime, a);
-					}
-				}
+		// execute the ripest bean
+		IAgentBean minBean = null;
+		long minExecutionTime = Long.MAX_VALUE;
+		long now = System.currentTimeMillis();
 
+		for (IAgentBean bean : thisAgent.getAgentBeans()) {
+			// check bean's state, if not started --> reject
+			if (bean.getState() != LifecycleStates.STARTED) {
+				continue;
 			}
+
+			// check if bean has cyclic behavior, if not --> reject
+			if (bean.getExecuteInterval() <= 0) {
+				continue;
+			}
+
+			// execution time not reached yet --> reject
+			if (bean.getNextExecutionTime() > now) {
+				continue;
+			}
+
+			// execution time is not minimum --> reject
+			if (bean.getNextExecutionTime() > minExecutionTime) {
+				continue;
+			}
+
+			minBean = bean;
+			minExecutionTime = bean.getNextExecutionTime();
 		}
 
-		// for (IAgentBean a : agent.getAgentBeans()) {
-		// if (a.getExecuteIntervall()>-1) {
-		// synchronized (this) {
-		// if (active) {
-		// callBeanExecute(a);
-		// long nextCall = System.currentTimeMillis()+a.getExecuteIntervall();
-		// executeMap.put();
-		// }
-		// }
-		// }
-		// }
+		// if there is a minBean then execute
+		if (minBean != null) {
+			try {
+				minBean.execute();
+			} catch (Exception ex) {
+				log.error("Error when executing bean \'"
+						+ minBean.getBeanName() + "\'", ex);
+			}
+
+			// reschedule bean
+			minBean.setNextExecutionTime(now + minBean.getExecuteInterval());
+		}
 
 		// process one doAction
 		// TODO: check if read can be used
@@ -130,33 +111,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			}
 		}
 
-	}
-
-	/**
-	 * Utility-Method for inserting the next call-time for an agentbeans
-	 * execute-method into the list.
-	 * 
-	 * @param currentTime
-	 *            the time at which the execute-method should be called (best
-	 *            effort).
-	 * @param a
-	 *            the bean for which the execute-method should be called.
-	 */
-	private void scheduleNextExecute(long currentTime, IAgentBean a) {
-		if (a.getExecuteInterval() > -1) {
-			long nextCall = currentTime + a.getExecuteInterval();
-			int index = 0;
-			for (Long l : executeTimes) {
-				if (l > nextCall) {
-					index++;
-				} else {
-					break;
-				}
-			}
-			executeTimes.add(index, nextCall);
-			executeList.add(index, a);
-			// TODO: removed beans should be taken out.
-		}
 	}
 
 	private void processResult(ActionResult actionResult) {
@@ -189,56 +143,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		}
 	}
 
-	private void callBeanExecute(IAgentBean a) {
-		if (LifecycleStates.STARTED.equals(a.getState())) {
-			try {
-				Thread.sleep(BE_NICE_TIMER);
-				a.execute();
-			} catch (Exception ex) {
-				log.error("Error when executing bean \'" + a.getBeanName()
-						+ "\'", ex);
-				try {
-					a.stop();
-				} catch (LifecycleException e) {
-					// TODO Auto-generated catch block
-					log.error(
-							"Could not stop Bean \'" + a.getBeanName() + "\'",
-							e);
-				}
-				// Agent.setBeanState(a.beanName,
-				// LifecycleStates.STOPPED);
-			}
-			// throw new RuntimeException(((DummyBean)a).getTest());
-		}
-	}
-
-	/**
-	 * Cleanup-method for the lifecycle. The active-flag is set to false an the
-	 * thread is set to null.
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doCleanup()
-	 */
-	@Override
-	public void doCleanup() {
-		executeTimes = null;
-		executeList = null;
-	}
-
-	/**
-	 * Init-method for the lifecycle. The thread is created if no thread exists.
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doInit()
-	 */
-	@Override
-	public void doInit() {
-		executeList = new ArrayList<IAgentBean>();
-		executeTimes = new ArrayList<Long>();
-		long currentTime = System.currentTimeMillis();
-		for (IAgentBean a : agent.getAgentBeans()) {
-			scheduleNextExecute(currentTime, a);
-		}
-	}
-
 	/**
 	 * Start-method for the lifecycle. The active-flag is set to true and the
 	 * thread is started.
@@ -261,13 +165,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	public void setAgent(IAgent agent) {
-		this.agent = agent;
-	}
-
-	/**
 	 * Registers the execution cycle for management
 	 * 
 	 * @param manager
@@ -281,13 +178,13 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 		// register execution cycle for management
 		try {
-			manager.registerAgentResource(agent, "ExecutionCycle", this);
+			manager.registerAgentResource(thisAgent, "ExecutionCycle", this);
 		} catch (Exception e) {
 			System.err
 					.println("WARNING: Unable to register execution cycle of agent "
-							+ agent.getAgentName()
+							+ thisAgent.getAgentName()
 							+ " of agent node "
-							+ agent.getAgentNode().getName()
+							+ thisAgent.getAgentNode().getName()
 							+ " as JMX resource.");
 			System.err.println(e.getMessage());
 		}
@@ -308,13 +205,13 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 		// deregister execution cycle from management
 		try {
-			_manager.unregisterAgentResource(agent, "ExecutionCycle");
+			_manager.unregisterAgentResource(thisAgent, "ExecutionCycle");
 		} catch (Exception e) {
 			System.err
 					.println("WARNING: Unable to deregister execution cycle of agent "
-							+ agent.getAgentName()
+							+ thisAgent.getAgentName()
 							+ " of agent node "
-							+ agent.getAgentNode().getName()
+							+ thisAgent.getAgentNode().getName()
 							+ " as JMX resource.");
 			System.err.println(e.getMessage());
 		}

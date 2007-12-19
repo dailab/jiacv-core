@@ -6,6 +6,7 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.management.Manageable;
 
@@ -27,5 +28,6 @@ public interface IExecutionCycle extends ILifecycle, Runnable, Manageable {
    */
 //  public void doStep();
 
-  public void setAgent(IAgent agent);
+  public void setThisAgent(IAgent agent);
+  public void setMemory(IMemory memory);
 }

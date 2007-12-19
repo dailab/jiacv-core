@@ -902,6 +902,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		try {
 			manager.registerAgentNode(this);
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.err.println("WARNING: Unable to register agent node " + this.getName() + " as JMX resource.");
 			System.err.println(e.getMessage());
 		}

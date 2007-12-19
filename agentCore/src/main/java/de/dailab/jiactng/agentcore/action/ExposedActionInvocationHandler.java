@@ -21,6 +21,10 @@ public abstract class ExposedActionInvocationHandler implements IActionInvocatio
     
     static final ResultReceiver DUMMY_RECEIVER= new ResultReceiver() {
         public void receiveResult(ActionResult result) {}
+		public long getNextExecutionTime() {return 0;}
+		public void setNextExecutionTime(long nextExecutionTime) {}
+		public String getBeanName() {return null;}
+		public void setBeanName(String name) {}
     };
     
     class Invocator implements InvocationHandler, IActionInvocationPreparer {

@@ -275,8 +275,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
                 LifecycleStates.INITIALIZING.name())
             );
 
+		this.execution.setMemory(memory);
 		this.execution.init();
-		((AbstractAgentBean) this.execution).setMemory(memory);
 
 		// call init for all agentbeans
 		for (IAgentBean ab : this.agentBeans) {
@@ -513,7 +513,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	public void setExecution(IExecutionCycle execution) {
 		this.execution = execution;
-		this.execution.setAgent(this);
+		this.execution.setThisAgent(this);
 	}
 
 	/**

@@ -55,7 +55,7 @@ public interface IAgentBean extends ILifecycle, BeanNameAware, Manageable {
 
 	/**
 	 * Getter for Interval by which the execute()-method of the bean is called.
-	 * If negative, the execute-method is never called.
+	 * If non-positive, the execute-method is never called.
 	 * 
 	 * @return the time interval between two calls of the execute()-method.
 	 */
@@ -63,7 +63,7 @@ public interface IAgentBean extends ILifecycle, BeanNameAware, Manageable {
 
 	/**
 	 * Setter for Interval by which the execute()-method of the bean is called.
-	 * If negative, the execute-method is never called.
+	 * If non-positive, the execute-method is never called.
 	 * 
 	 * @param executeInterval
 	 *            the time interval between two calls of the execute()-method.
@@ -78,6 +78,27 @@ public interface IAgentBean extends ILifecycle, BeanNameAware, Manageable {
 	 */
 	public void execute();
 
+	/**
+	 * This method will be used by the execution cycle. If <code>getExecuteInterval</code>
+	 * is greater than 0 this method returns the next scheduled time. The return value is
+	 * undefined else. 
+	 * 
+	 * Do not use it except you are implementing the scheduler or execution cycle.
+	 * 
+	 * @return the next time this bean must be executed
+	 */
+	long getNextExecutionTime();
+	
+	/**
+	 * This method will be used by the scheduler. If <code>getExecuteInterval</code>
+	 * is greater than 0 the execution cycle will store the next scheduled time here. 
+	 * 
+	 * Do not use it except you are implementing the scheduler or execution cycle.
+	 * 
+	 * @param nextExecutionTime the next time to execute this IAgentBean
+	 */ 
+	void setNextExecutionTime(long nextExecutionTime);
+	
 	/**
 	 * Recovery method for handling LifecycleExceptions. If a statechange for an
 	 * agentbean has failed, this method is called. It may fix the problem.

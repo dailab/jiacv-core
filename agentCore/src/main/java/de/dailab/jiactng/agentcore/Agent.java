@@ -268,8 +268,12 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		// initialize agent elements
 		this.actionList = new ArrayList<Action>();
 		this.memory.init();
-		this.memory.write(new ThisAgentDescription(this.agentId,
-				this.agentName, LifecycleStates.INITIALIZING.name(), null));
+		this.memory.write(
+            new ThisAgentDescription(
+                this.agentId,
+				this.agentName,
+                LifecycleStates.INITIALIZING.name())
+            );
 
 		this.execution.init();
 		((AbstractAgentBean) this.execution).setMemory(memory);
@@ -412,16 +416,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 *            the new state
 	 */
 	private void updateState(ILifecycle.LifecycleStates newState) {
-		memory.update(new ThisAgentDescription(null, null, null, null),
-				new ThisAgentDescription(null, null, newState.name(), null));
+		memory.update(new ThisAgentDescription(null, null, null), new ThisAgentDescription(null, null, newState.name()));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public LifecycleStates getAgentState() {
-		return LifecycleStates.valueOf(memory.read(
-				new ThisAgentDescription(null, null, null, null)).getState());
+		return LifecycleStates.valueOf(memory.read(new ThisAgentDescription(null, null, null)).getState());
 	}
 
 	/**
@@ -607,7 +609,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * @return the agent description of this agent
 	 */
 	public AgentDescription getAgentDescription() {
-		return memory.read(new ThisAgentDescription(null, null, null, null));
+		return memory.read(new ThisAgentDescription(null, null, null));
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.ontology;
 
-import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
+import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
@@ -22,14 +23,18 @@ public class AgentDescription implements IFact {
 	private String state;
 	
 	/** Kommunikation Identifier. */
-	private IEndPoint endpoint;
+	private IMessageBoxAddress messageBoxAddress;
 	
-	public AgentDescription(String aid, String name, String state, IEndPoint endpoint) {
-		this.aid=aid;
-		this.name=name;
-		this.state=state;
-		this.endpoint=endpoint;
+	public AgentDescription(String aid, String name, String state) {
+        this(aid, name, state, name != null ? CommunicationAddressFactory.createMessageBoxAddress(name) : null);
 	}
+    
+    public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress) {
+        this.aid=aid;
+        this.name=name;
+        this.state=state;
+        this.messageBoxAddress= messageBoxAddress;
+    }
 
 	/**
 	 * @return the aid
@@ -78,15 +83,15 @@ public class AgentDescription implements IFact {
      * 
      * TODO: vielleicht geht das hier noch schicker
 	 */
-	public IEndPoint getEndpoint() {
-		return endpoint;
+	public IMessageBoxAddress getMessageBoxAddress() {
+		return messageBoxAddress;
 	}
 
 	/**
-	 * @param endpoint the endpoint to set
+	 * @param messageBoxAddress the endpoint to set
 	 */
-	public void setEndpoint(IEndPoint endpoint) {
-		this.endpoint = endpoint;
+	public void setMessageBoxAddress(IMessageBoxAddress messageBoxAddress) {
+		this.messageBoxAddress = messageBoxAddress;
 	}
 
     @Override
@@ -118,23 +123,11 @@ public class AgentDescription implements IFact {
         }
 
         // endpoint
-        if (endpoint != null) {
+        if (messageBoxAddress != null) {
         	// local
-        	builder.append("\n endpoint(local)=");
-        	if (endpoint.getLocalId() != null) {
-        		builder.append("'").append(endpoint.getLocalId()).append("'");
-        	} else {
-            	builder.append("null");        		
-        	}
-        	// universal
-        	builder.append("\n endpoint(global)=");
-        	if (endpoint.getUniversalId() != null) {
-        		builder.append("'").append(endpoint.getUniversalId()).append("'");
-        	} else {
-            	builder.append("null");
-        	}
+        	builder.append("\n messageBoxAddress=").append(messageBoxAddress.toString());
         } else {
-        	builder.append("\n endpoint=null");
+        	builder.append("\n messageBoxAddress=null");
         }
 
         builder.append('\n');

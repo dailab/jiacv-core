@@ -75,8 +75,6 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
 
     private final IMessageTransportDelegate _defaultDelegate;
 
-    private IMessageBoxAddress _defaultMessageBox;
-
     private Map<String, MessageTransport> _transports;
     protected final Map<ICommunicationAddress, List<ListenerContext>> addressToListenerMap;
 
@@ -181,7 +179,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         }
 
         // create the default message box for this agent
-        register((_defaultMessageBox = CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName())));
+        register(thisAgent.getAgentDescription().getMessageBoxAddress());
 
         if (_transports.size() <= 0) {
             log.warn("no transports available yet!");
@@ -269,10 +267,6 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
     // ~ END OF CONFIGURATION AND INITIALISATION STUFF ~ //
 
     // ~ START OF ACTIONS ~ //
-    public synchronized IMessageBoxAddress getDefaultMessageBoxAddress() {
-        return _defaultMessageBox;
-    }
-
     public synchronized void joinGroup(IGroupAddress group) throws CommunicationException {
         register(group);
     }
@@ -411,7 +405,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
 
         // first check whether the sender is correct
         if (message.getSender() == null || !addressToListenerMap.containsKey(message.getSender().toUnboundAddress())) {
-            message.setSender(_defaultMessageBox);
+            message.setSender(thisAgent.getAgentDescription().getMessageBoxAddress());
         }
 
         if (address instanceof MessageBoxAddress) {

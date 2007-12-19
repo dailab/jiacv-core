@@ -1,6 +1,6 @@
 package de.dailab.jiactng.agentcore.ontology;
 
-import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
+
 
 public class ThisAgentDescription extends AgentDescription {
 
@@ -17,7 +17,7 @@ public class ThisAgentDescription extends AgentDescription {
 	 * @param state the agents current state.
 	 * @param endpoint the address of the agent.
 	 */
-	public ThisAgentDescription(String aid, String name, String state, IEndPoint endpoint) {
-		super(aid, name, state, endpoint);
+	public ThisAgentDescription(String aid, String name, String state) {
+		super(aid, name, state);
 	}
 }

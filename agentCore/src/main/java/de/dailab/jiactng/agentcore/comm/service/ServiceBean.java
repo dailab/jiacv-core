@@ -159,7 +159,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     @Override
     public void doCleanup() throws Exception {
         log.debug("cleanup ServiceBean...");
-        _communicationBean.unregister(CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName()), EXECUTION_MESSAGE_TEMPLATE);
+        _communicationBean.unregister(thisAgent.getAgentDescription().getMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
         _communicationBean.unregister(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
         _serviceBroadcastGroup= null;
         memory.detach(_executionProtocol);
@@ -204,7 +204,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         
         _serviceBroadcastGroup= CommunicationAddressFactory.createGroupAddress(SERVICE_BROADCAST_ADDRESS);
         _communicationBean.register(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
-        _communicationBean.register(CommunicationAddressFactory.createMessageBoxAddress(thisAgent.getAgentName()), EXECUTION_MESSAGE_TEMPLATE);
+        _communicationBean.register(thisAgent.getAgentDescription().getMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
     }
 
     @Override

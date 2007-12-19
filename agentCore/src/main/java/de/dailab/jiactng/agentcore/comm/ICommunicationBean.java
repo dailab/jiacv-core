@@ -12,18 +12,9 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * All method declared herein
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public interface ICommunicationBean {
-    /**
-     * This method returns the standard agent identifier which is used for the
-     * message bus.
-     * 
-     * @return              the unique message box address for the associated agent
-     */
-    @Expose
-    IMessageBoxAddress getDefaultMessageBoxAddress();
-    
     /**
      * Joins a group with the given address
      * 

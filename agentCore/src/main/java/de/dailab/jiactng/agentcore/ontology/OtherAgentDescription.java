@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore.ontology;
 
-import de.dailab.jiactng.agentcore.comm.message.IEndPoint;
 
 /**
  * Holds information about other agents.
@@ -18,8 +17,8 @@ public class OtherAgentDescription extends AgentDescription {
 	 * @param state the state of the other agent
 	 * @param endpoint the address under which the other agent can be reached
 	 */
-	public OtherAgentDescription(String aid, String name, String state, IEndPoint endpoint) {
-		super(aid, name, state, endpoint);
+	public OtherAgentDescription(String aid, String name, String state) {
+		super(aid, name, state);
 	}
 
 	/**
@@ -27,6 +26,6 @@ public class OtherAgentDescription extends AgentDescription {
 	 * @param descr the agent description to create a description of an other agent
 	 */
 	public OtherAgentDescription(AgentDescription descr) {
-		super(descr.getAid(), descr.getName(), descr.getState(), descr.getEndpoint());
+		super(descr.getAid(), descr.getName(), descr.getState(), descr.getMessageBoxAddress());
 	}
 }

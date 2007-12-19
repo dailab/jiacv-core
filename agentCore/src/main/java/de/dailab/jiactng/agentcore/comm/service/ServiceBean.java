@@ -119,8 +119,10 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                 if(content instanceof Action) {
                     ICommunicationAddress address= message.getSender();
                     if(!thisAgent.getAgentDescription().getMessageBoxAddress().equals(address)) {
-                        searchAction((Action) content, address);
+                        processActionSearch((Action) content, address);
                     }
+                } else if (content instanceof RemoteAction) {
+                    insertAction((RemoteAction) content);
                 } else {
                     log.warn("unexpected content for '" + SERVICE_SEARCH_PROTOCOL + "': '" + content + "'");
                 }
@@ -193,6 +195,8 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     public void doCleanup() throws Exception {
         log.debug("cleanup ServiceBean...");
         _communicationBean.unregister(thisAgent.getAgentDescription().getMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
+        _communicationBean.unregister(thisAgent.getAgentDescription().getMessageBoxAddress(), SEARCH_MESSAGE_TEMPLATE);
+        _communicationBean.unregister(_serviceBroadcastGroup, SEARCH_MESSAGE_TEMPLATE);
         _communicationBean.unregister(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
         _serviceBroadcastGroup= null;
         memory.detach(_executionProtocol);
@@ -240,7 +244,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         _serviceBroadcastGroup= CommunicationAddressFactory.createGroupAddress(SERVICE_BROADCAST_ADDRESS);
         _communicationBean.register(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
         _communicationBean.register(_serviceBroadcastGroup, SEARCH_MESSAGE_TEMPLATE);
-        _communicationBean.register(thisAgent.getAgentDescription().getMessageBoxAddress(), MANAGEMENT_MESSAGE_TEMPLATE);
+        _communicationBean.register(thisAgent.getAgentDescription().getMessageBoxAddress(), SEARCH_MESSAGE_TEMPLATE);
         _communicationBean.register(thisAgent.getAgentDescription().getMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
     }
 
@@ -433,7 +437,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         }
     }
     
-    void searchAction(Action action, ICommunicationAddress address) {
+    void processActionSearch(Action action, ICommunicationAddress address) {
         log.debug("received action search request from '" + address + "'");
         synchronized (_workLock) {
             Action concreteAction= memory.read(action);
@@ -449,10 +453,10 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                     log.debug("rejected it");
                 } else {
                     log.debug("answer it");
+                    _offeredActions.add(concreteAction);
                     try {
                         IJiacMessage message= new JiacMessage(new RemoteAction(concreteAction, new OtherAgentDescription(thisAgent.getAgentDescription())));
-                        message.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_MANAGEMENT_PROTOCOL);
-                        message.setHeader(SERVICE_OFFER_KEY, ADD_OFFER);
+                        message.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_SEARCH_PROTOCOL);
                         _communicationBean.send(message, address);
                     } catch (CommunicationException ce) {
                         log.error("could not answer action search request", ce);

@@ -6,7 +6,6 @@
  */
 package de.dailab.jiactng.agentcore.environment;
 
-import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 
 /**
@@ -17,7 +16,7 @@ import de.dailab.jiactng.agentcore.action.ActionResult;
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.action.Action
  */
-public interface ResultReceiver extends IAgentBean {
+public interface ResultReceiver { // extends IAgentBean {
 
 	
 	/**

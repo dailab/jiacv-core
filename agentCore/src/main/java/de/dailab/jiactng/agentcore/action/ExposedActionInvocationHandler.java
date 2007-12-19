@@ -8,13 +8,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Set;
 
-import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean.Expose;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
-import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
-import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
-import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * @author Marcel Patzlaff
@@ -25,25 +21,6 @@ public abstract class ExposedActionInvocationHandler implements IActionInvocatio
     
     static final ResultReceiver DUMMY_RECEIVER= new ResultReceiver() {
         public void receiveResult(ActionResult result) {}
-        public void execute() {}
-        public String getBeanName() {return "dummy";}
-        public int getExecuteInterval() {return 0;}
-        public void handleLifecycleException(LifecycleException e, LifecycleStates state) {}
-        public void setBeanName(String name) {}
-        public void setExecuteInterval(int executeInterval) {}
-        public void setMemory(IMemory mem) {}
-        public void setThisAgent(IAgent agent) {}
-        public void disableManagement() {}
-        public void enableManagement(Manager manager) {}
-        public boolean isManagementEnabled() {return false;}
-        public void addLifecycleListener(ILifecycleListener listener) {}
-        public void cleanup() {}
-        public LifecycleStates getState() {return LifecycleStates.STARTED;}
-        public void init(){}
-        public void removeLifecycleListener(ILifecycleListener listener) {}
-        public void start(){}
-        public void stateChanged(LifecycleStates oldState, LifecycleStates newState) {}
-        public void stop(){}
     };
     
     class Invocator implements InvocationHandler, IActionInvocationPreparer {

@@ -211,7 +211,7 @@ public class Session implements IFact {
 		// source
 		builder.append("\n source=");
 		if (source != null) {
-			builder.append("'").append(source.getBeanName()).append("'");
+			builder.append("'").append(source.toString()).append("'");
 		} else {
 			builder.append("null");
 		}

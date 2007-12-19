@@ -50,6 +50,27 @@ public class RemoteAction implements IFact {
 	}
 
     @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+        
+        if(obj == null || !(obj instanceof RemoteAction)) {
+            return false;
+        }
+        
+        RemoteAction other= (RemoteAction) obj;
+        return  action != null && other.action != null && action.equals(other.action) &&
+                agentDescription != null && other.agentDescription != null && agentDescription.equals(other.agentDescription);
+    }
+
+    @Override
+    public int hashCode() {
+        // TODO Auto-generated method stub
+        return super.hashCode();
+    }
+
+    @Override
     public String toString() {
         return "RemoteAction for " + action.toString();
     }

@@ -6,6 +6,8 @@
  */
 package de.dailab.jiactng.agentcore.action;
 
+import java.util.Arrays;
+
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
@@ -224,36 +226,9 @@ public class Action implements IFact {
         }
         
         Action other= (Action) obj;
-
-        if((name == null || other.name == null)) {
-            return false;
-        }
-        
-        if(!name.equals(other.name)) {
-            return false;
-        }
-        
-        if(parameters.length != other.parameters.length) {
-            return false;
-        }
-        
-        if(results.length != other.results.length) {
-            return false;
-        }
-        
-        for(int i= 0; i < parameters.length; ++i) {
-            if(!parameters[i].equals(other.parameters[i])) {
-                return false;
-            }
-        }
-        
-        for(int i= 0; i < results.length; ++i) {
-            if(!results[i].equals(other.results[i])) {
-                return false;
-            }
-        }
-        
-        return true;
+        return  name != null && other.name != null && name.equals(other.name) &&
+                Arrays.equals(parameters, other.parameters) &&
+                Arrays.equals(results, other.results);
     }
 
     /**

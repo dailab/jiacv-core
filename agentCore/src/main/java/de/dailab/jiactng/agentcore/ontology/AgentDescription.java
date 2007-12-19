@@ -20,7 +20,7 @@ public class AgentDescription implements IFact {
 	private String name;
 	
 	/** Agent's state. */
-	private String state;
+	private transient String state;
 	
 	/** Kommunikation Identifier. */
 	private IMessageBoxAddress messageBoxAddress;
@@ -77,11 +77,10 @@ public class AgentDescription implements IFact {
 	public void setState(String state) {
 		this.state = state;
 	}
-
+    
 	/**
 	 * @return the endpoint
      * 
-     * TODO: vielleicht geht das hier noch schicker
 	 */
 	public IMessageBoxAddress getMessageBoxAddress() {
 		return messageBoxAddress;
@@ -93,6 +92,25 @@ public class AgentDescription implements IFact {
 	public void setMessageBoxAddress(IMessageBoxAddress messageBoxAddress) {
 		this.messageBoxAddress = messageBoxAddress;
 	}
+    
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+        
+        if(obj == null || !(obj instanceof AgentDescription)) {
+            return false;
+        }
+        
+        AgentDescription other= (AgentDescription) obj;
+        return aid != null && other.aid != null && aid.equals(other.aid);
+    }
+    
+    @Override
+    public int hashCode() {
+        return aid != null ? aid.hashCode() : super.hashCode();
+    }
 
     @Override
     public String toString() {

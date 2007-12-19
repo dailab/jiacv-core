@@ -41,19 +41,7 @@ public class BinaryContent implements IFact {
         }
         
         BinaryContent other= (BinaryContent) obj;
-        byte[] otherData= other.getData();
-        
-        if(otherData.length != _data.length) {
-            return false;
-        }
-        
-        for(int i= 0; i < _data.length; ++i) {
-            if(_data[i] != otherData[i]) {
-                return false;
-            }
-        }
-        
-        return true;
+        return Arrays.equals(_data, other.getData());
     }
 
     @Override

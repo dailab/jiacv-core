@@ -11,7 +11,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  *
  */
 public class ObjectContent implements IFact {
-	Serializable _object;
+	private Serializable _object;
 
 	public ObjectContent(Serializable object) {
 		setObject(object);

@@ -66,12 +66,14 @@ public class RemoteAction implements IFact {
 
     @Override
     public int hashCode() {
-        // TODO Auto-generated method stub
-        return super.hashCode();
+        int hashCode= 0;
+        hashCode ^= action != null ? action.hashCode() : 0;
+        hashCode ^= agentDescription != null ? agentDescription.hashCode() : 0;
+        return hashCode;
     }
 
     @Override
     public String toString() {
-        return "RemoteAction for " + action.toString();
+        return "RemoteAction for " + action.toString() + " by " + agentDescription.toString();
     }
 }

@@ -204,15 +204,8 @@ public class Action implements IFact {
 	@Override
     public int hashCode() {
         int hash= name == null ? 0 : name.hashCode();
-        
-        for(int i= 0; i < parameters.length; ++i) {
-            hash ^= parameters[i].hashCode();
-        }
-        
-        for(int i= 0; i < results.length; ++i) {
-            hash ^= results[i].hashCode();
-        }
-        
+        hash ^= Arrays.hashCode(parameters);
+        hash ^= Arrays.hashCode(results);
         return hash;
     }
 

@@ -40,10 +40,12 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     private static final String SERVICE_BROADCAST_ADDRESS= "JiacTNG/service/broadcast";
     private static final String SERVICE_EXECUTION_PROTOCOL= "JiacTNG-service-exec-protocol";
     private static final String SERVICE_MANAGEMENT_PROTOCOL= "JiacTNG-service-mgmt-protocol";
+    private static final String SERVICE_SEARCH_PROTOCOL= "JiacTNG-service-search-protocol";
     private static final String SERVICE_OFFER_KEY= "JiacTNGServiceOffer";
     
     private static final JiacMessage EXECUTION_MESSAGE_TEMPLATE;
     private static final JiacMessage MANAGEMENT_MESSAGE_TEMPLATE;
+    private static final JiacMessage SEARCH_MESSAGE_TEMPLATE;
     
     private static final String ADD_OFFER= "add";
     private static final String REMOVE_OFFER= "remove";
@@ -54,6 +56,9 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         
         MANAGEMENT_MESSAGE_TEMPLATE= new JiacMessage();
         MANAGEMENT_MESSAGE_TEMPLATE.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_MANAGEMENT_PROTOCOL);
+        
+        SEARCH_MESSAGE_TEMPLATE= new JiacMessage();
+        SEARCH_MESSAGE_TEMPLATE.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_SEARCH_PROTOCOL);
     }
     
     @SuppressWarnings("serial")
@@ -70,7 +75,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                 } else if (content instanceof DoRemoteAction) {
                     processAction((DoRemoteAction) content, message.getSender().toUnboundAddress());
                 } else {
-                    log.warn("unexpected content for this protocol '" + content + "'");
+                    log.warn("unexpected content for '" + SERVICE_EXECUTION_PROTOCOL + "': '" + content + "'");
                 }
             }
         }
@@ -89,14 +94,35 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
                     String task= message.getHeader(SERVICE_OFFER_KEY).toString();
                     
                     if(task.equals(ADD_OFFER)) {
-                        insertAction((RemoteAction) content, message.getSender().toUnboundAddress());
+                        insertAction((RemoteAction) content);
                     } else if(task.equals(REMOVE_OFFER)) {
                         removeAction((RemoteAction) content);
                     } else {
                         log.warn("unexpected task '" + task + "' for offer");
                     }
                 } else {
-                    log.warn("unexpected content for this protocol '" + content + "'");
+                    log.warn("unexpected content for '" + SERVICE_MANAGEMENT_PROTOCOL + "': '" + content + "'");
+                }
+            }
+        }
+    }
+    
+    @SuppressWarnings("serial")
+    private class ServiceSearchProtocol implements SpaceObserver<IFact> {
+        @SuppressWarnings("unchecked")
+        public void notify(SpaceEvent<? extends IFact> event) {
+            if(event instanceof WriteCallEvent) {
+                WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;
+                IJiacMessage message= memory.remove(wce.getObject());
+                IFact content= message.getPayload();
+                
+                if(content instanceof Action) {
+                    ICommunicationAddress address= message.getSender();
+                    if(!thisAgent.getAgentDescription().getMessageBoxAddress().equals(address)) {
+                        searchAction((Action) content, address);
+                    }
+                } else {
+                    log.warn("unexpected content for '" + SERVICE_SEARCH_PROTOCOL + "': '" + content + "'");
                 }
             }
         }
@@ -124,10 +150,16 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     private ServiceManagementProtocol _managementProtocol;
     
     /**
+     * This protocol is responsible to answer requests for
+     * remote actions.
+     */
+    private ServiceSearchProtocol _searchProtocol;
+    
+    /**
      * This map provides information of which communication
      * address has to be used for a given action.
      */
-    private Map<Action, RemoteAction> _actionToRemoteAction;
+    private Map<Action, Set<RemoteAction>> _actionToRemoteAction;
     
     /**
      * This map contains all sessions from external clients that are currently open.
@@ -194,17 +226,21 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
 //        if(_communicationBean == null) {
 //            throw new IllegalStateException("could not find communication bean");
 //        }
-        _actionToRemoteAction= new Hashtable<Action, RemoteAction>();
+        _actionToRemoteAction= new Hashtable<Action, Set<RemoteAction>>();
         _sessionsFromExternalClients= new Hashtable<String, ICommunicationAddress>();
         _sessionsToExternalProviders= new Hashtable<String, DoAction>();
         
         _executionProtocol= new ServiceExecutionProtocol();
         _managementProtocol= new ServiceManagementProtocol();
+        _searchProtocol= new ServiceSearchProtocol();
         memory.attach(_executionProtocol, EXECUTION_MESSAGE_TEMPLATE);
         memory.attach(_managementProtocol, MANAGEMENT_MESSAGE_TEMPLATE);
+        memory.attach(_searchProtocol, SEARCH_MESSAGE_TEMPLATE);
         
         _serviceBroadcastGroup= CommunicationAddressFactory.createGroupAddress(SERVICE_BROADCAST_ADDRESS);
         _communicationBean.register(_serviceBroadcastGroup, MANAGEMENT_MESSAGE_TEMPLATE);
+        _communicationBean.register(_serviceBroadcastGroup, SEARCH_MESSAGE_TEMPLATE);
+        _communicationBean.register(thisAgent.getAgentDescription().getMessageBoxAddress(), MANAGEMENT_MESSAGE_TEMPLATE);
         _communicationBean.register(thisAgent.getAgentDescription().getMessageBoxAddress(), EXECUTION_MESSAGE_TEMPLATE);
     }
 
@@ -272,7 +308,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     /**
      * Offers an action to other agents.
      * 
-     * @param action    the action template to expose to other agents
+     * @param template      the action template to expose to other agents
      */
     @Expose
     public boolean offerAction(Action template) {
@@ -284,7 +320,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     /**
      * Withdraws a previously offered action.
      * 
-     * @param action    the action template to withdraw
+     * @param template      the action template to withdraw
      */
     @Expose
     public boolean withdrawAction(Action template) {
@@ -292,28 +328,44 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
             return _actionTemplates.remove(template);
         }
     }
+    
+    /**
+     * Request the search of a remote action for the
+     * specified action template.
+     * 
+     * @param template      the action template for the search
+     */
+    @Expose
+    public void searchRemoteAction(Action template) throws CommunicationException {
+        IJiacMessage request= new JiacMessage(template);
+        request.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_SEARCH_PROTOCOL);
+        _communicationBean.send(request, _serviceBroadcastGroup);
+    }
 
     protected void overrideDoAction(DoAction doAction) {
         Action action= doAction.getAction();
-        RemoteAction remoteAction= _actionToRemoteAction.get(action);
-        
-        if(remoteAction != null) {
-            IJiacMessage request= new JiacMessage(new DoRemoteAction(doAction));
-            ResultReceiver receiver= (ResultReceiver) doAction.getSource();
+        synchronized(_workLock) {
+            Set<RemoteAction> remoteActions= _actionToRemoteAction.get(action);
             
-            if(receiver != null) {
-                _sessionsToExternalProviders.put(doAction.getSessionId(), doAction);
+            if(remoteActions != null && remoteActions.size() > 0) {
+                RemoteAction remoteAction= remoteActions.iterator().next();
+                IJiacMessage request= new JiacMessage(new DoRemoteAction(doAction));
+                ResultReceiver receiver= (ResultReceiver) doAction.getSource();
+                
+                if(receiver != null) {
+                    _sessionsToExternalProviders.put(doAction.getSessionId(), doAction);
+                }
+                
+                request.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_EXECUTION_PROTOCOL);
+                try {
+                    log.debug("send request for remote action to '" + remoteAction.getAgentDescription().getMessageBoxAddress() + "'");
+                    _communicationBean.send(request, remoteAction.getAgentDescription().getMessageBoxAddress());
+                } catch (CommunicationException ce) {
+                    log.error("could not send DoRemoteAction to '" + remoteAction.getAgentDescription().getMessageBoxAddress() + "'", ce);
+                }
+            } else {
+                log.debug("could not find action: '" + action.getName() + "'");
             }
-            
-            request.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_EXECUTION_PROTOCOL);
-            try {
-                log.debug("send request for remote action to '" + remoteAction.getAgentDescription().getMessageBoxAddress() + "'");
-                _communicationBean.send(request, remoteAction.getAgentDescription().getMessageBoxAddress());
-            } catch (CommunicationException ce) {
-                log.error("could not send DoRemoteAction to '" + remoteAction.getAgentDescription().getMessageBoxAddress() + "'", ce);
-            }
-        } else {
-            log.debug("could not find action: '" + action.getName() + "'");
         }
     }
 
@@ -336,33 +388,78 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         }
     }
     
-    void insertAction(RemoteAction remoteAction, ICommunicationAddress provider) {
+    void insertAction(RemoteAction remoteAction) {
+        if(remoteAction.getAgentDescription().equals(thisAgent.getAgentDescription())) {
+            return;
+        }
+        
         synchronized(_workLock) {
             Action action= remoteAction.getAction();
             
-            if(memory.read(new Action(action.getName(), null, action.getParameters(), action.getResults())) == null) {
-                _actionToRemoteAction.put(action, remoteAction);
+            Set<RemoteAction> remoteActions= _actionToRemoteAction.get(action);
+            
+            if(remoteActions == null) {
+                remoteActions= new HashSet<RemoteAction>();
+                _actionToRemoteAction.put(action, remoteActions);
                 action.setProviderBean(this);
                 memory.write(action);
-                log.debug("new remote action available: '" + action + "'");
-            } else {
-                log.debug("action '" + action + "' already exists");
+                log.debug("new remote action for '" + action + "' available ");
+            }
+            
+            if(remoteActions.add(remoteAction)) {
+                log.debug("new provider for '" + remoteAction + "' available");
             }
         }
     }
     
     void removeAction(RemoteAction remoteAction) {
+        if(remoteAction.getAgentDescription().equals(thisAgent.getAgentDescription())) {
+            return;
+        }
+
         synchronized (_workLock) {
             Action action= remoteAction.getAction();
-            _actionToRemoteAction.remove(action);
-            Action current= memory.read(new Action(action.getName(), null, action.getParameters(), action.getResults()));
-            if(current == null) {
-                log.debug("action '" + action + "' is already removed");
-            } else if(current.getProviderBean() == this) {
-                log.debug("removed action '" + action + "' from memory");
-                memory.remove(current);
+            Set<RemoteAction> remoteActions= _actionToRemoteAction.remove(action);
+            remoteActions.remove(remoteAction);
+            
+            if(remoteActions.isEmpty()) {
+                action.setProviderBean(this);
+                memory.remove(action);
+                log.debug("remote action for '" + action + "' is no longer available");
             } else {
-                log.debug("this bean is not the provider of action '" + action + "'");
+                _actionToRemoteAction.put(action, remoteActions);
+                log.debug("removed provider of '" + remoteAction + "'");
+            }
+        }
+    }
+    
+    void searchAction(Action action, ICommunicationAddress address) {
+        log.debug("received action search request from '" + address + "'");
+        synchronized (_workLock) {
+            Action concreteAction= memory.read(action);
+            
+            if(concreteAction != null) {
+                // check whether we are allowed to offer this action
+                Set<Action> allowedAction= new HashSet<Action>();
+                for(Action template : _actionTemplates) {
+                    allowedAction.addAll(memory.readAll(template));
+                }
+                
+                if(!allowedAction.contains(concreteAction)) {
+                    log.debug("rejected it");
+                } else {
+                    log.debug("answer it");
+                    try {
+                        IJiacMessage message= new JiacMessage(new RemoteAction(concreteAction, new OtherAgentDescription(thisAgent.getAgentDescription())));
+                        message.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_MANAGEMENT_PROTOCOL);
+                        message.setHeader(SERVICE_OFFER_KEY, ADD_OFFER);
+                        _communicationBean.send(message, address);
+                    } catch (CommunicationException ce) {
+                        log.error("could not answer action search request", ce);
+                    }
+                }
+            } else {
+                log.debug("do not have the requested action");
             }
         }
     }

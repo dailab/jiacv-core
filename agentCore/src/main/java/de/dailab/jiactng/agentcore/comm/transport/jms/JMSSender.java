@@ -73,10 +73,7 @@ class JMSSender {
 	
 	private void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {
 		if (_log.isDebugEnabled()){
-			if (message.getSender() == null)
-				_log.debug("JMSSender start sending message to '" + destination + "' with Sender = null");
-			else
-				_log.debug("JMSSender start sending message to '" + destination + "' with Sender = " + message.getSender());
+			_log.debug("JMSSender start sending message to '" + destination + "'");
 		}
 		MessageProducer producer = null;
 

@@ -79,13 +79,14 @@ public class JiacMessage implements IJiacMessage {
         }
 
         for (String key : otherKeys) {
-            if (other.getHeader(key).equals(_headers.get(key))) {
+            String myValue= _headers.get(key);
+            if (myValue == null || !other.getHeader(key).equals(myValue)) {
                 return false;
             }
         }
 
         IFact otherPayload = other.getPayload();
-        return otherPayload != null ? otherPayload.equals(_payload) : _payload == null;
+        return otherPayload != null && _payload != null ? otherPayload.equals(_payload) : otherPayload == _payload;
     }
 
     @Override

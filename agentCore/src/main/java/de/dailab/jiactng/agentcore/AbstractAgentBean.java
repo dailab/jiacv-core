@@ -285,7 +285,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public long getNextExecutionTime() {
 		return nextExecutionTime;
 	}
@@ -293,7 +292,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setNextExecutionTime(long nextExecutionTime) {
 		this.nextExecutionTime = nextExecutionTime;
 	}

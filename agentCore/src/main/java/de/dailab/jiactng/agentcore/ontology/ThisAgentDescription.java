@@ -3,13 +3,9 @@ package de.dailab.jiactng.agentcore.ontology;
 
 
 public class ThisAgentDescription extends AgentDescription {
+    private static final long serialVersionUID = -4734957489524953244L;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	private static final long serialVersionUID = 3319772309911503648L;
-
-	/**
+    /**
 	 * Constructor for a new agent description.
 	 * 
 	 * @param aid the agents uid.

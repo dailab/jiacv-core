@@ -11,9 +11,9 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author axle
  */
 public class AgentDescription implements IFact {
-	private static final long serialVersionUID = -6931826359293880734L;
+    private static final long serialVersionUID = -3419096336200496875L;
 
-	/** Agent IDentifier.*/
+    /** Agent IDentifier.*/
 	private String aid;
 	
 	/** Agent name. */

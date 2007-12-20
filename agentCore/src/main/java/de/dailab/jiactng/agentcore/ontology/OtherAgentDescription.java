@@ -7,10 +7,9 @@ package de.dailab.jiactng.agentcore.ontology;
  *
  */
 public class OtherAgentDescription extends AgentDescription {
+    private static final long serialVersionUID = 1997986788487354440L;
 
-	private static final long serialVersionUID = -6296106391008839370L;
-
-	/**
+    /**
 	 * Creates a new description of another agent.
 	 * @param aid the agent id
 	 * @param name the name of the other agent

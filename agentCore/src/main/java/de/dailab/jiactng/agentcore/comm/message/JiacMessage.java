@@ -26,7 +26,7 @@ public class JiacMessage implements IJiacMessage {
     public JiacMessage() {
         this(null, null);
     }
-
+    
     public JiacMessage(IFact payload) {
         this(payload, null);
     }

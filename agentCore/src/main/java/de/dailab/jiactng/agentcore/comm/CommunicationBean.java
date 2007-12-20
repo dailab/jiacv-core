@@ -54,6 +54,21 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
 
         return targetType.cast(object);
     }
+    
+    private static IJiacMessage cloneTemplate(IJiacMessage template) {
+        if(template == null) {
+            return null;
+        }
+        
+        JiacMessage result= new JiacMessage();
+        
+        // only header fields are cloned...
+        for(String key : template.getHeaderKeys()) {
+            result.setHeader(key, template.getHeader(key));
+        }
+        
+        return result;
+    }
 
     /**
      * Helpclass used to manage incoming messages and exceptions, routing them to processError or processMessage
@@ -403,10 +418,8 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         }
         CommunicationAddress unboundAddress = address.toUnboundAddress();
 
-        // first check whether the sender is correct
-        if (message.getSender() == null || !addressToListenerMap.containsKey(message.getSender().toUnboundAddress())) {
-            message.setSender(thisAgent.getAgentDescription().getMessageBoxAddress());
-        }
+        // set the sender of the message
+        message.setSender(thisAgent.getAgentDescription().getMessageBoxAddress());
 
         if (address instanceof MessageBoxAddress) {
             if (log.isDebugEnabled()) {
@@ -443,6 +456,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
      */
     private synchronized void internalRegister(CommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         CommunicationAddress unboundAddress = address.toUnboundAddress();
+        selectorTemplate= cloneTemplate(selectorTemplate);
         ListenerContext context = new ListenerContext(selectorTemplate);
         List<ListenerContext> registeredContexts = addressToListenerMap.get(unboundAddress);
 

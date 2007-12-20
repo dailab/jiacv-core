@@ -84,9 +84,10 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	
 				// reschedule bean
 				minBean.setNextExecutionTime(now + minBean.getExecuteInterval());
-			} else {
-				log.debug("No active beans to execute");
-			}
+			} 
+//			else {
+//				log.debug("No active beans to execute");
+//			}
 	
 			// process one doAction
 			// TODO: check if read can be used

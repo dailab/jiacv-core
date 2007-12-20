@@ -82,7 +82,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * The list of agentbeans of this agent.
 	 */
-	private ArrayList<IAgentBean> agentBeans = null;
+	private ArrayList<IAgentBean> agentBeans = new ArrayList<IAgentBean>();
 
 	/**
 	 * activity Flag (could be replaced by statecheck
@@ -827,4 +827,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		return _manager != null;
 	}
 
+	/////////////////////////////////////
+	// TODO
+	/////////////////////////////////////
+	//
+	// - addAgentBean method
+	// - removeAgentBean method
 }

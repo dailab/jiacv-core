@@ -32,6 +32,18 @@
 		</property>
 	</bean>
 
+	<!--
+		The standard JMS Broker with fixed port number.
+		It has a standard TCP connector which maintains a multicast discovery mechanism.
+	-->
+	<bean name="StandardJMSBrokerFixedPort" parent="ActiveMQBroker" singleton="true">
+		<property name="connectors">
+			<set>
+				<ref bean="StandardTCPConnectorFixedPort" />
+			</set>
+		</property>
+	</bean>
+
 	<!-- 
 		Abstract configuration for a transport connector.
 	-->
@@ -44,6 +56,15 @@
 		It specifies the transport address and the default multicast address for discovery.
 	-->
 	<bean name="StandardTCPConnector" parent="ActiveMQTransportConnector" singleton="true">
+		<property name="transportURI" value="tcp://localhost:0" />
+		<property name="discoveryURI" value="multicast://239.255.2.45:5555" />
+	</bean>
+
+	<!-- 
+		Definition of the standard TCP connector with fixed port for ActiveMQ.
+		It specifies the transport address and the default multicast address for discovery.
+	-->
+	<bean name="StandardTCPConnectorFixedPort" parent="ActiveMQTransportConnector" singleton="true">
 		<property name="transportURI" value="tcp://localhost:61616" />
 		<property name="discoveryURI" value="multicast://239.255.2.45:5555" />
 	</bean>

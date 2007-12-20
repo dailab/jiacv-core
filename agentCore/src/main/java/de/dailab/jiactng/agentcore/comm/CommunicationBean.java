@@ -537,6 +537,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
      */
     private synchronized void internalUnregister(CommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         CommunicationAddress unboundAddress = address.toUnboundAddress();
+        selectorTemplate= cloneTemplate(selectorTemplate);
         List<ListenerContext> registeredContexts = addressToListenerMap.remove(unboundAddress);
 
         if (log.isDebugEnabled()) {

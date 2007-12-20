@@ -31,11 +31,12 @@ public class JiacMessage implements IJiacMessage {
         this(payload, null);
     }
 
-    public JiacMessage(IFact payload, ICommunicationAddress senderAddress) {
+    public JiacMessage(IFact payload, ICommunicationAddress replyToAddress) {
         _payload = payload;
         _headers = new Hashtable<String, String>();
-        setSender(senderAddress);
-        setHeader(Header.SENDER, senderAddress.toString());
+        if(replyToAddress != null) {
+            setHeader(Header.REPLY_TO, replyToAddress.toString());
+        }
     }
 
     public IFact getPayload() {
@@ -125,6 +126,16 @@ public class JiacMessage implements IJiacMessage {
 
     public ICommunicationAddress getSender() {
         String uri = getHeader(Header.SENDER);
+
+        if (uri != null) {
+            return CommunicationAddressFactory.createFromURI(uri);
+        }
+
+        return null;
+    }
+    
+    public ICommunicationAddress getReplyToAddress() {
+        String uri = getHeader(Header.REPLY_TO);
 
         if (uri != null) {
             return CommunicationAddressFactory.createFromURI(uri);

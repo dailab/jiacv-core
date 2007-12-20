@@ -21,6 +21,7 @@ public interface IJiacMessage extends IFact {
     public interface Header {
         String SENDER= "JiacTNGSenderAddress";
         String PROTOCOL= "JiacTNGProtocolID";
+        String REPLY_TO= "JiacTNGReplyToAddress";
     }
     
 	/**
@@ -37,6 +38,8 @@ public interface IJiacMessage extends IFact {
 	 * @return ICommunicationAddress	the address from where the Message is sent.
 	 */
 	ICommunicationAddress getSender();
+    
+    ICommunicationAddress getReplyToAddress();
     
     String getProtocol();
     

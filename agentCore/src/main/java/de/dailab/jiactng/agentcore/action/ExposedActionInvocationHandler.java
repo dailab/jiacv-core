@@ -6,6 +6,7 @@ package de.dailab.jiactng.agentcore.action;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.Set;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean.Expose;
@@ -51,21 +52,13 @@ public abstract class ExposedActionInvocationHandler implements IActionInvocatio
              * So I have to check the action signature by myself...
              */
             Class[] methodParams= method.getParameterTypes();
-            outerloop: for(Action a : actions) {
+            for(Action a : actions) {
                 Class[] actionParams= a.getParameters();
                 
-                if(actionParams.length != methodParams.length) {
-                    continue;
+                if(Arrays.equals(actionParams, methodParams)) {
+                    action= a;
+                    break;
                 }
-                
-                for(int i= 0; i < actionParams.length; ++i) {
-                    if(actionParams[i] != methodParams[i]) {
-                        continue outerloop;
-                    }
-                }
-                
-                action= a;
-                break;
             }
             
             if(action == null) {

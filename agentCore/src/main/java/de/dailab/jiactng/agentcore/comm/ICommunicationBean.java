@@ -3,13 +3,15 @@
  */
 package de.dailab.jiactng.agentcore.comm;
 
+import de.dailab.jiactng.agentcore.action.IActionInvocationHandler;
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean.Expose;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
  * This interface describes a standard communication component of an agent.
  * <p>
- * All method declared herein
+ * All method declared herein are exposed as actions and can thus be used
+ * via {@link IActionInvocationHandler}.
  * 
  * @author Marcel Patzlaff
  * @version $Revision$

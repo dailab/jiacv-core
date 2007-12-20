@@ -36,7 +36,7 @@ import de.dailab.jiactng.agentcore.ontology.OtherAgentDescription;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class ServiceBean extends AbstractMethodExposingBean implements IEffector, ResultReceiver {
+public class ServiceBean extends AbstractMethodExposingBean implements IEffector, IServiceBean, ResultReceiver {
     private static final String SERVICE_BROADCAST_ADDRESS= "JiacTNG/service/broadcast";
     private static final String SERVICE_EXECUTION_PROTOCOL= "JiacTNG-service-exec-protocol";
     private static final String SERVICE_MANAGEMENT_PROTOCOL= "JiacTNG-service-mgmt-protocol";
@@ -309,37 +309,18 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         }
     }
     
-    /**
-     * Offers an action to other agents.
-     * 
-     * @param template      the action template to expose to other agents
-     */
-    @Expose
     public boolean offerAction(Action template) {
         synchronized(_actionTemplates) {
             return _actionTemplates.add(template);
         }
     }
     
-    /**
-     * Withdraws a previously offered action.
-     * 
-     * @param template      the action template to withdraw
-     */
-    @Expose
     public boolean withdrawAction(Action template) {
         synchronized(_actionTemplates) {
             return _actionTemplates.remove(template);
         }
     }
     
-    /**
-     * Request the search of a remote action for the
-     * specified action template.
-     * 
-     * @param template      the action template for the search
-     */
-    @Expose
     public void searchRemoteAction(Action template) throws CommunicationException {
         IJiacMessage request= new JiacMessage(template);
         request.setHeader(IJiacMessage.Header.PROTOCOL, SERVICE_SEARCH_PROTOCOL);

@@ -18,19 +18,9 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author Marcel Patzlaff
  */
 public interface IJiacMessage extends IFact {
-    enum Header {
-        SENDER("JiacTNGSenderAddress"),
-        PROTOCOL("JiacTNGProtocolID");
-        
-        private final String _value;
-        
-        private Header(String value) {
-            _value= value;
-        }
-        
-        public String toString() {
-            return _value;
-        }
+    public interface Header {
+        String SENDER= "JiacTNGSenderAddress";
+        String PROTOCOL= "JiacTNGProtocolID";
     }
     
 	/**
@@ -55,14 +45,14 @@ public interface IJiacMessage extends IFact {
      * @param key       the key for the header
      * @param value     the value for the header
      */
-    void setHeader(Object key, String value);
+    void setHeader(String key, String value);
     
     /**
      * Returns the header of this message
      * @param key       the key of the header
      * @return          the value if the header is set or <code>null</code> otherwise
      */
-    String getHeader(Object key);
+    String getHeader(String key);
     
     /**
      * Returns all header keys for this message.

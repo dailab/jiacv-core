@@ -28,89 +28,102 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		IExecutionCycle {
 
 	/**
-	 * Activity flag. Used by statechanges
-	 */
-	private boolean active = false;
-
-	/**
 	 * Run-method for the execution cycle. The method iterates over the list of
-	 * adators and calls the execute method of each agentbean. The call is only
-	 * performed when the syncFlag-object is notified via the doStep-method.
-	 * Note that the list of adators is updated every cycle, i.e. whenever all
-	 * agentbeans have been executed a new list is retrieved from the
-	 * agent-reference. The run method stays active only as long as the
-	 * active-flag is set to true.
+	 * agentbeans and calls the execute method of each <i>active</i> agentbean.
+	 * 
+	 * This method also takes care of new <code>DoAction</code>s and 
+	 * <code>ActionResult</code>s.
+	 * 
+	 * The <code>SimpleExecutionCycle</code> only executes agentbeans and
+	 * handles DoActions and ActionResults when it has reached 
+	 * <code>LifecycleStates.STARTED</code>.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#run()
+	 * @see LifecycleStates
 	 */
 	public void run() {
-		// execute the ripest bean
-		IAgentBean minBean = null;
-		long minExecutionTime = Long.MAX_VALUE;
-		long now = System.currentTimeMillis();
-
-		for (IAgentBean bean : thisAgent.getAgentBeans()) {
-			// check bean's state, if not started --> reject
-			if (bean.getState() != LifecycleStates.STARTED) {
-				continue;
+		//check if lifecycle has been started --> execute if STARTED
+		if (getState() == LifecycleStates.STARTED) {
+			// execute the ripest bean
+			IAgentBean minBean = null;
+			long minExecutionTime = Long.MAX_VALUE;
+			long now = System.currentTimeMillis();
+			for (IAgentBean bean : thisAgent.getAgentBeans()) {
+				// check bean's state, if not started --> reject
+				if (bean.getState() != LifecycleStates.STARTED) {
+					continue;
+				}
+	
+				// check if bean has cyclic behavior, if not --> reject
+				if (bean.getExecuteInterval() <= 0) {
+					continue;
+				}
+	
+				// execution time not reached yet --> reject
+				if (bean.getNextExecutionTime() > now) {
+					continue;
+				}
+	
+				// execution time is not minimum --> reject
+				if (bean.getNextExecutionTime() > minExecutionTime) {
+					continue;
+				}
+	
+				minBean = bean;
+				minExecutionTime = bean.getNextExecutionTime();
 			}
-
-			// check if bean has cyclic behavior, if not --> reject
-			if (bean.getExecuteInterval() <= 0) {
-				continue;
+	
+			// if there is a minBean then execute
+			if (minBean != null) {
+				try {
+					minBean.execute();
+				} catch (Exception ex) {
+					log.error("Error when executing bean \'"
+							+ minBean.getBeanName() + "\'", ex);
+				}
+	
+				// reschedule bean
+				minBean.setNextExecutionTime(now + minBean.getExecuteInterval());
+			} else {
+				log.debug("No active beans to execute");
 			}
-
-			// execution time not reached yet --> reject
-			if (bean.getNextExecutionTime() > now) {
-				continue;
-			}
-
-			// execution time is not minimum --> reject
-			if (bean.getNextExecutionTime() > minExecutionTime) {
-				continue;
-			}
-
-			minBean = bean;
-			minExecutionTime = bean.getNextExecutionTime();
-		}
-
-		// if there is a minBean then execute
-		if (minBean != null) {
-			try {
-				minBean.execute();
-			} catch (Exception ex) {
-				log.error("Error when executing bean \'"
-						+ minBean.getBeanName() + "\'", ex);
-			}
-
-			// reschedule bean
-			minBean.setNextExecutionTime(now + minBean.getExecuteInterval());
-		}
-
-		// process one doAction
-		// TODO: check if read can be used
-		DoAction act = memory.remove(new DoAction(null, null, null, null));
-
-		if (act != null) {
-			synchronized (this) {
-				if (active) {
+	
+			// process one doAction
+			// TODO: check if read can be used
+			DoAction act = memory.remove(new DoAction(null, null, null, null));
+	
+			if (act != null) {
+				synchronized (this) {
 					performDoAction(act);
 				}
 			}
-		}
-
-		// process one actionResult
-		// TODO: check if read can be used
-		ActionResult actionResult = memory.remove(new ActionResult(null, null,
-				null, null));
-		if (actionResult != null) {
-			synchronized (this) {
-				if (active) {
+	
+			// process one actionResult
+			// TODO: check if read can be used
+			ActionResult actionResult = memory.remove(new ActionResult(null, null,
+					null, null));
+			if (actionResult != null) {
+				synchronized (this) {
 					processResult(actionResult);
 				}
 			}
-		}
+		} 
 
+		//reject execution if SimpleExecutionCycle hasn't been started
+		else {
+			log.error("Trying to run SimpleExecutionCycle in state "
+					+ getState());
+		}
+	}
+
+	private void performDoAction(DoAction act) {
+		if (act.getAction().getProviderBean() != null) {
+			memory.write(act.getSession());
+			act.getAction().getProviderBean().doAction(act);
+		} else {
+			log.error("--- found action without bean: "
+					+ act.getAction().getName());
+		}
 	}
 
 	private void processResult(ActionResult actionResult) {
@@ -131,37 +144,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		// break;
 		// }
 		// }
-	}
-
-	private void performDoAction(DoAction act) {
-		if (act.getAction().getProviderBean() != null) {
-			memory.write(act.getSession());
-			act.getAction().getProviderBean().doAction(act);
-		} else {
-			log.error("--- found action without bean: "
-					+ act.getAction().getName());
-		}
-	}
-
-	/**
-	 * Start-method for the lifecycle. The active-flag is set to true and the
-	 * thread is started.
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStart()
-	 */
-	@Override
-	public synchronized void doStart() {
-		active = true;
-	}
-
-	/**
-	 * Stop-method for the lifecycle. The active-flag is set to false.
-	 * 
-	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#doStop()
-	 */
-	@Override
-	public synchronized void doStop() {
-		active = false;
 	}
 
 	/**

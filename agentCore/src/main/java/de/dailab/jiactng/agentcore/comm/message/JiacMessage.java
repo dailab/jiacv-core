@@ -35,6 +35,7 @@ public class JiacMessage implements IJiacMessage {
         _payload = payload;
         _headers = new Hashtable<String, String>();
         setSender(senderAddress);
+        setHeader(Header.SENDER, senderAddress.toString());
     }
 
     public IFact getPayload() {

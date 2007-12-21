@@ -11,6 +11,7 @@ import java.util.Arrays;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /**
  * Describes an action that can be used within an agent. This is only the
@@ -203,7 +204,8 @@ public class Action implements IFact {
      */
 	@Override
     public int hashCode() {
-        int hash= name == null ? 0 : name.hashCode();
+        int hash= Action.class.hashCode();
+        hash ^= name != null ? name.hashCode() : 0;
         hash ^= Arrays.hashCode(parameters);
         hash ^= Arrays.hashCode(results);
         return hash;
@@ -219,7 +221,7 @@ public class Action implements IFact {
         }
         
         Action other= (Action) obj;
-        return  name != null && other.name != null && name.equals(other.name) &&
+        return  EqualityChecker.equals(name, other.name) &&
                 Arrays.equals(parameters, other.parameters) &&
                 Arrays.equals(results, other.results);
     }

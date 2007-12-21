@@ -20,6 +20,8 @@ public class JiacMessage implements IJiacMessage {
 
     private Map<String, String> _headers;
 
+    private transient boolean _recursionDetected= false;
+    
     /**
      * Constructor for a template message with no content.
      */
@@ -62,67 +64,94 @@ public class JiacMessage implements IJiacMessage {
     }
 
     @Override
-    public final boolean equals(Object obj) {
-        if (obj == this) {
+    public synchronized final boolean equals(Object obj) {
+        if(_recursionDetected) {
             return true;
         }
-
-        if (obj == null || !(obj instanceof JiacMessage)) {
-            return false;
-        }
-
-        JiacMessage other = (JiacMessage) obj;
-        Set<String> otherKeys = other.getHeaderKeys();
-
-        if (otherKeys.size() != _headers.size()) {
-            return false;
-        }
-
-        for (String key : otherKeys) {
-            String myValue= _headers.get(key);
-            if (myValue == null || !other.getHeader(key).equals(myValue)) {
+        
+        try {
+            _recursionDetected= true;
+            if (obj == this) {
+                return true;
+            }
+        
+            if (obj == null || !(obj instanceof JiacMessage)) {
                 return false;
             }
+        
+            JiacMessage other = (JiacMessage) obj;
+            Set<String> otherKeys = other.getHeaderKeys();
+        
+            if (otherKeys.size() != _headers.size()) {
+                return false;
+            }
+        
+            for (String key : otherKeys) {
+                String myValue= _headers.get(key);
+                if (myValue == null || !other.getHeader(key).equals(myValue)) {
+                    return false;
+                }
+            }
+        
+            IFact otherPayload = other.getPayload();
+            return otherPayload != null && _payload != null ? otherPayload.equals(_payload) : otherPayload == _payload;
+        } finally {
+            _recursionDetected= false;
         }
-
-        IFact otherPayload = other.getPayload();
-        return otherPayload != null && _payload != null ? otherPayload.equals(_payload) : otherPayload == _payload;
     }
 
     @Override
-    public final int hashCode() {
-        int hashCode = 0;
-
-        for (String key : getHeaderKeys()) {
-            hashCode ^= key.hashCode() << 7;
-            hashCode ^= getHeader(key).hashCode();
+    public synchronized final int hashCode() {
+        if(_recursionDetected) {
+            return 0;
         }
-
-        if (_payload != null) {
-            hashCode ^= _payload.hashCode();
+        
+        try {
+            _recursionDetected= true;
+            int hashCode = JiacMessage.class.hashCode();
+        
+            for (String key : getHeaderKeys()) {
+                hashCode ^= key.hashCode() << 7;
+                hashCode ^= getHeader(key).hashCode();
+            }
+        
+            if (_payload != null) {
+                hashCode ^= _payload.hashCode();
+            }
+        
+            return hashCode;
+        } finally {
+            _recursionDetected= false;
         }
-
-        return hashCode;
     }
 
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[Headers: {");
-        int counter = _headers.size() - 1;
-
-        for (Iterator<String> keys = _headers.keySet().iterator(); keys.hasNext(); --counter) {
-            String key = keys.next();
-            builder.append(key).append("=>").append(_headers.get(key));
-
-            if (counter > 0) {
-                builder.append(";");
-            }
+    public synchronized String toString() {
+        if(_recursionDetected) {
+            return "<recursion>";
         }
-
-        builder.append("}");
-        builder.append(", Payload: ").append(getPayload()).append(", Sender: ").append(getSender());
-        builder.append("]");
-        return builder.toString();
+        
+        try {
+            _recursionDetected= true;
+            StringBuilder builder = new StringBuilder();
+            builder.append("[Headers: {");
+            int counter = _headers.size() - 1;
+    
+            for (Iterator<String> keys = _headers.keySet().iterator(); keys.hasNext(); --counter) {
+                String key = keys.next();
+                builder.append(key).append("=>").append(_headers.get(key));
+    
+                if (counter > 0) {
+                    builder.append(";");
+                }
+            }
+    
+            builder.append("}");
+            builder.append(", Payload: ").append(getPayload()).append(", Sender: ").append(getSender());
+            builder.append("]");
+            return builder.toString();
+        } finally {
+            _recursionDetected= false;
+        }
     }
 
     public ICommunicationAddress getSender() {

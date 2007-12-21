@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.action;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /**
  * Wrapper for advertising actions to other agents.
@@ -60,13 +61,13 @@ public class RemoteAction implements IFact {
         }
         
         RemoteAction other= (RemoteAction) obj;
-        return  action != null && other.action != null && action.equals(other.action) &&
-                agentDescription != null && other.agentDescription != null && agentDescription.equals(other.agentDescription);
+        return  EqualityChecker.equals(action, other.action) &&
+                EqualityChecker.equals(agentDescription, other.agentDescription);
     }
 
     @Override
     public int hashCode() {
-        int hashCode= 0;
+        int hashCode= RemoteAction.class.hashCode();
         hashCode ^= action != null ? action.hashCode() : 0;
         hashCode ^= agentDescription != null ? agentDescription.hashCode() : 0;
         return hashCode;

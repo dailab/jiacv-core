@@ -46,6 +46,6 @@ public class BinaryContent implements IFact {
 
     @Override
     public final int hashCode() {
-        return Arrays.hashCode(_data);
+        return BinaryContent.class.hashCode() ^ Arrays.hashCode(_data);
     }
 }

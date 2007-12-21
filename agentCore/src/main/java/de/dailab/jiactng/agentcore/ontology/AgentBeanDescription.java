@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.ontology;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /**
  * Klasse zum Beschreiben einer AgentBean. Sie enthaelt die 
@@ -14,7 +15,7 @@ public class AgentBeanDescription implements IFact {
 	private String name;
 	
 	/** The current state of the agentbean. */
-	private String state;
+	private transient String state;
 
 	public AgentBeanDescription(String name, String state) {
 		this.name = name;
@@ -49,6 +50,25 @@ public class AgentBeanDescription implements IFact {
 		this.state = state;
 	}
 	
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+        
+        if(obj == null || !(obj instanceof AgentBeanDescription)) {
+            return false;
+        }
+
+        AgentBeanDescription other= (AgentBeanDescription) obj;
+        return EqualityChecker.equals(name, other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return AgentBeanDescription.class.hashCode() ^ (name != null ? name.hashCode() : 0);
+    }
+
     @Override
     public String toString() {
         StringBuilder builder= new StringBuilder();

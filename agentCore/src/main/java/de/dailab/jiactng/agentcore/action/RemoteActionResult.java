@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.action;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /** 
  * This class is a wrapper for <code>ActionResult</code>.
@@ -28,4 +29,25 @@ public class RemoteActionResult implements IFact {
 	public void setResult(ActionResult result) {
 		this.result = result;
 	}
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) {
+            return true;
+        }
+        
+        if(obj == null || !(obj instanceof RemoteActionResult)) {
+            return false;
+        }
+        
+        RemoteActionResult other= (RemoteActionResult) obj;
+        return EqualityChecker.equals(result, other.result);
+    }
+
+    @Override
+    public int hashCode() {
+        return RemoteActionResult.class.hashCode() ^ (result != null ? result.hashCode() : 0);
+    }
+    
+    
 }

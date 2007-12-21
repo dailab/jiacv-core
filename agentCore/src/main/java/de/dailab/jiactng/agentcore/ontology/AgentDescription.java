@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.ontology;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /**
  * Klasse zum Beschreiben eines Agenten. Sie enthuelt also META-Infos ueber den Agenten.
@@ -104,12 +105,12 @@ public class AgentDescription implements IFact {
         }
         
         AgentDescription other= (AgentDescription) obj;
-        return aid != null && other.aid != null && aid.equals(other.aid);
+        return EqualityChecker.equals(aid, other.aid);
     }
     
     @Override
     public int hashCode() {
-        return aid != null ? aid.hashCode() : super.hashCode();
+        return AgentDescription.class.hashCode() ^ (aid != null ? aid.hashCode() : 0);
     }
 
     @Override

@@ -21,15 +21,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 
+import org.sercho.masp.space.event.SpaceEvent;
+import org.sercho.masp.space.event.SpaceObserver;
+import org.sercho.masp.space.event.WriteCallEvent;
+
+import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.IAgentBean;
-import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationBean;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 
 /**
@@ -41,8 +47,12 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
  *
  */
 
-public class ChatGuiBean extends AbstractMethodExposingBean {
+@SuppressWarnings("serial")
+public class ChatGuiBean extends AbstractAgentBean implements SpaceObserver<IFact> {
 
+	private static final JiacMessage MESSAGE_TEMPLATE;
+	private static final String MESSAGE_HEADER = "SimpleChatExample";
+	
 	private String _beanName = "CommunicationBean";
 	private IMessageBoxAddress _messageBoxAddress = null;
 	private JFrame _f;
@@ -59,12 +69,15 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	private CommunicationBean _cBean;
 	private ArrayList<ICommunicationAddress> addressList = new ArrayList<ICommunicationAddress>();
 	
+	static {
+		MESSAGE_TEMPLATE = new JiacMessage();
+		MESSAGE_TEMPLATE.setHeader(IJiacMessage.Header.PROTOCOL, MESSAGE_HEADER);
+	}
+	
 	/**
 	 * A class that encapsulates a textline for the list. e.g. a messagetext of a
 	 * message received during runtime. It may contain informations about an address
 	 * of such a message.
-	 * 
-	 * @author Martin Loeffelholz
 	 *
 	 */
 	private class ListElement {
@@ -102,8 +115,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	
 	/**
 	 * This CellRenderer is responsible for formating and printing listelements within the used JList
-	 * 
-	 * @author Martin Loeffelholz
 	 *
 	 */
 	class MessageCellRenderer implements ListCellRenderer {
@@ -130,63 +141,74 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	/**
 	 * Constructor for this class
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	public ChatGuiBean() {
-		setBeanName("CommunicationGuiBean");
+		setBeanName("ChatGuiBean");
 	}
 	
-// TODO: adjust this component to the new communication bean
-//	/**
-//	 * Entrypoint for messages coming from the CommunicationBean.
-//	 * Here all messages will get processed.
-//	 * 
-//	 *  @param message an IJiacMessage received from the communicationAddress
-//	 *  @param at the ICommunicationAddress the messages was sent to
-//	 *  
-//	 *  @author Martin Loeffelholz
-//	 */
-//	public void receive(IJiacMessage message, ICommunicationAddress at){
-//		ICommunicationAddress atUnbound = at.toUnboundAddress();
-//		log.debug("message received from: " + message.getSender() + " at " + atUnbound);
-//		
-//		BinaryContent binaryPayload = null;
-//		// Check if the payload within the message is of a supported type
-//		if (message.getPayload() instanceof BinaryContent){
-//			binaryPayload = (BinaryContent) message.getPayload();
-//			log.debug("Payload is instanceof BinaryContent");
-//		} 
-//		
-//		if (binaryPayload != null){
-//			// payload was binary
-//			// create ListElement to print some text into the _messagesReceived(output)field
-//			ListElement le = new ListElement("Received Mesage from " + message.getSender() + " at " + at);
-//			le.from = message.getSender();
-//			le.at = at;
-//			le.fontColor = Color.red;
-//			le.fontStyle = Font.ITALIC;
-//			printLine(le);
-//			
-//			le = new ListElement (binaryPayload.getData());
-//			le.at = at;
-//			le.from = message.getSender();
-//			printLine(le);
-//			
-//		} else {
-//			// if payload within Message was of unsupported type..
-//			ListElement le = new ListElement("Received Message from " + message.getSender() + " at " + at);
-//			le.fontColor = Color.red;
-//			le.fontStyle = Font.ITALIC;
-//			printLine(le);
-//			printLine("Content could not be decyphered!");
-//		}
-//	}
+	/**
+	 * Entrypoint for messages coming from the CommunicationBean through the tuplespace.
+	 * Here all messages will get processed.
+	 * 
+	 *  @param message an IJiacMessage received from the communicationAddress
+	 *  @param at the ICommunicationAddress the messages was sent to
+	 *  
+	 */
+	@SuppressWarnings("unchecked")
+	public void notify(SpaceEvent<? extends IFact> event) {
+		IJiacMessage message = null;
+		ICommunicationAddress at = null;
+		ICommunicationAddress from = null;
+		
+		if(event instanceof WriteCallEvent) {
+			WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;
+			message= memory.remove(wce.getObject());
+			String sender = message.getHeader("SimpleChatExampleSender");
+			String receiver = message.getHeader("SimpleChatExampleReceiver");
+			from = CommunicationAddressFactory.createFromURI(sender);
+			at = CommunicationAddressFactory.createFromURI(receiver);
+
+			at = at.toUnboundAddress();
+			from = from.toUnboundAddress();
+			log.debug("message received from: " + from + " at " + at);
+
+			BinaryContent binaryPayload = null;
+			// Check if the payload within the message is of a supported type
+			if (message.getPayload() instanceof BinaryContent){
+				binaryPayload = (BinaryContent) message.getPayload();
+				log.debug("Payload is instanceof BinaryContent");
+			} 
+
+			if (binaryPayload != null){
+				// payload was binary
+				// create ListElement to print some text into the _messagesReceived(output)field
+				ListElement le = new ListElement("Received Mesage from " + from + " at " + at);
+				le.from = message.getSender();
+				le.at = at;
+				le.fontColor = Color.red;
+				le.fontStyle = Font.ITALIC;
+				printLine(le);
+
+				le = new ListElement (binaryPayload.getData());
+				le.at = at;
+				le.from = message.getSender();
+				printLine(le);
+
+			} else {
+				// if payload within Message was of unsupported type..
+				ListElement le = new ListElement("Received Message from " + from + " at " + at);
+				le.fontColor = Color.red;
+				le.fontStyle = Font.ITALIC;
+				printLine(le);
+				printLine("Content could not be decyphered!");
+			}
+		}
+	}
 	
 	/**
 	 * prints the given line into the JList
 	 * @param line the line to print into the JList
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void printLine(String line){
 		ListElement le = new ListElement(line);
@@ -200,7 +222,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	 * @param fontStyle	the Style for the font as defined in constants of the class Font
 	 * @param fontColor	a color as defined in the class Color, if set to null the default color is used
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void printLine(String line, int fontStyle, Color fontColor){
 		ListElement le = new ListElement(line);
@@ -218,7 +239,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	 * 
 	 * @param le the Listelement to display in the list
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void printLine(ListElement le){
 		_messageListModel.add(_newMessageIndex++, le);
@@ -227,7 +247,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	/**
 	 * prints a list of all commands to the chatwindow
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void printHelp(){
 		final Color helpColor = Color.YELLOW;
@@ -241,12 +260,12 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 		printLine("To stop listen to a Address, type \"stopListen.[g|m].<AddressName>\"", Font.ITALIC, helpColor);
 		printLine("To stop listen to all but your very own address, type \"stopListenAll\"", Font.ITALIC, helpColor);
 		printLine("To get a List of all used Addresses, type \"ListAddresses\" ", Font.ITALIC, helpColor);
+		printLine("To change the Color Theme of this chatclient, type \"ChangeColor\" ");
 	}
 	
 	/**
 	 * prints the list of all addresses the agent is listening to.
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void printAddressList(){
 		printLine("List of Addresses Listening To:");
@@ -262,7 +281,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	 * targetaddress has to start with "g." or "m." this is checked before running this method.
 	 * @param targetAddress
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void listenTo(String targetAddress){
 		if (_cBean != null){
@@ -274,7 +292,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 			} else {
 				address = CommunicationAddressFactory.createMessageBoxAddress(addressName);
 			}
-
 			try {
 				_cBean.register(address);
 				addressList.add(address);
@@ -282,16 +299,14 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Tried to listen to: " + targetAddress + " but no CommunicationBean was installed");
+			log.error("Tried to listen to: " + targetAddress + " but no CommunicationBean was installed");
 		}
-		
 	}
 	
 	/**
 	 * stops to listen to the given targetAddress. 
 	 * @param targetAddress No messages sent to this address will get received from this address anymore
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void stopListenTo(String targetAddress){
 		if (_cBean != null){
@@ -306,7 +321,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 			}
 
 			try {
-				_cBean.unregister(address);
+				_cBean.unregister(address, MESSAGE_TEMPLATE);
 				addressList.remove(address);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
@@ -317,13 +332,12 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	/**
 	 * Stops to listen to all addresses except your main-mailbox
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void stopListenToAll(){
 		if ((_cBean != null) && (!addressList.isEmpty())){
 			for (ICommunicationAddress address : addressList){
 				try {
-					_cBean.unregister(address);
+					_cBean.unregister(address, MESSAGE_TEMPLATE);
 					log.debug("ChatGuiBean of " + _beanName + "stops listen to " + address);
 				} catch (CommunicationException e) {
 					e.printStackTrace();
@@ -338,38 +352,85 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	 * using this bean will receive them
 	 * @param line the messageText for all other agents listening
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void sendStatusMessage(String line){
 		if (_cBean != null){
+			ICommunicationAddress to = CommunicationAddressFactory.createGroupAddress("all");
 			BinaryContent payload = new BinaryContent(line.getBytes());
-			JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
+			JiacMessage jMessage = createMessage(payload, to);
 			try {
 				_cBean.send(
 						jMessage,
-						CommunicationAddressFactory.createGroupAddress("all")
+						to
 				); 
 			} catch (CommunicationException e) {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Tried to send Message " + line + " but no CommunicationBean installed");
+			log.error("Tried to send Message " + line + " but no CommunicationBean installed");
 		}
+	}
+	
+	/**
+	 * Sends a message out to another agent
+	 * @param line	The actual message
+	 * @param to	The address to send it to
+	 * @param isGroup	, true if <code> to </code> is a group address
+	 */
+	private void sendMessage(String line, String to, boolean isGroup){
+		if (_cBean != null){
+			
+			ICommunicationAddress toAddress = null;
+			if (isGroup)
+				toAddress = CommunicationAddressFactory.createGroupAddress(to);
+			else
+				toAddress = CommunicationAddressFactory.createMessageBoxAddress(to);
+			
+			BinaryContent payload = new BinaryContent(line.getBytes());
+			JiacMessage jMessage = createMessage(payload, toAddress);
+			try {
+				_cBean.send(
+						jMessage,
+						toAddress
+				); 
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			}
+			log.debug("Message sent to: " + toAddress + " reads: " + line);
+		} else {
+			log.error("Tried to send Message " + line + " but no CommunicationBean installed");
+		}
+	}
+	
+	/**
+	 * Creates a JiacMessage and sets the headers to make it possible to identify
+	 * the sender of this message and the address it was originally sent to.
+	 * @param payload	The actual message we want someone other to read
+	 * @param to		The address the message is going to be send to
+	 * @return			the message with all neccessary headers set
+	 */
+	private JiacMessage createMessage(IFact payload, ICommunicationAddress to){
+		JiacMessage jMessage = new JiacMessage(payload);
+		// This header part is neccessary to filter the message from the memory
+		jMessage.setHeader(IJiacMessage.Header.PROTOCOL, MESSAGE_HEADER);
+		// The headers following are for actual chatintern informations 
+		jMessage.setHeader("SimpleChatExampleSender", _messageBoxAddress.toString());
+		jMessage.setHeader("SimpleChatExampleReceiver", to.toString());
+		return jMessage;
 	}
 	
 	/**
 	 * method to change "my own address" meaning the mailbox of this agentbean
 	 * @param address the mailbox of this agentbean
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	private void changeAddress(String address){
 		try {
 			if (_cBean != null){
 				ICommunicationAddress oldAddress = _messageBoxAddress.toUnboundAddress();
-				_cBean.unregister(_messageBoxAddress);
+				_cBean.unregister(_messageBoxAddress, MESSAGE_TEMPLATE);
 				_messageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress(address);
-				_cBean.register(_messageBoxAddress);
+				_cBean.register(_messageBoxAddress, MESSAGE_TEMPLATE);
 				_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
 				_addressLine.validate();
 				ICommunicationAddress unbound = _messageBoxAddress.toUnboundAddress();
@@ -377,7 +438,7 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 				_f.repaint();
 				log.debug("Address of Chatting Agent changed " + oldAddress + " is now known as " + unbound.toString());
 			} else {
-				System.err.println("Tried to change address, but no CommunicationBean was installed");
+				log.error("Tried to change address, but no CommunicationBean was installed");
 			}
 		} catch (CommunicationException e) {
 			e.printStackTrace();
@@ -389,17 +450,31 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	 * setter for the CommunicationBean to use for sending messages
 	 * @param cBean the CommunicationBean to use for sending messages
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	public void setCommunicationBean(CommunicationBean cBean){
 		_cBean = cBean;
+	}
+	
+	/**
+	 * Changes the ColorTheme between two possible versions
+	 */
+	public void switchColorTheme(){
+		
+		if (_messagesReceived.getBackground() == Color.BLUE){
+			_messagesReceived.setBackground(Color.BLACK);
+			_messagesReceived.setForeground(Color.GREEN);
+			printLine("Color Theme changed to Smith");
+		} else {
+			_messagesReceived.setBackground(Color.BLUE);
+			_messagesReceived.setForeground(Color.LIGHT_GRAY);
+			printLine("Color Theme changed to Old Man");
+		}
 	}
 	
 	@Override
 	/**
 	 * Initializationmethod used by the LifeCycle class
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	public void doInit() throws Exception {
 		super.doInit();
@@ -407,6 +482,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 		if (this.thisAgent != null){
 			_beanName = this.thisAgent.getAgentName();
 		}
+		
+		memory.attach(this, MESSAGE_TEMPLATE);
 		
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 		
@@ -428,8 +505,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 		_addressLine.setForeground(Color.BLACK);
 			   
 		_messagesReceived = new JList( _messageListModel);
-		_messagesReceived.setBackground(Color.BLUE);
-		_messagesReceived.setForeground(Color.LIGHT_GRAY);
+		_messagesReceived.setBackground(Color.BLACK);
+		_messagesReceived.setForeground(Color.GREEN);
 		_messagesReceived.setFixedCellHeight(14);
 		_messagesReceived.setCellRenderer(_renderer);
 		_messagesReceived.validate();
@@ -459,6 +536,8 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 					
 				} else if (command.equalsIgnoreCase("ListAddresses")){
 					printAddressList();
+				} else if (command.equalsIgnoreCase("changeColor")){
+					switchColorTheme();
 					
 				}else if (command.equalsIgnoreCase("clear")){
 					_messagesReceived.clearSelection();
@@ -492,16 +571,9 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 						targetName = text.substring(0, text.indexOf("."));
 						text = text.substring(text.indexOf(".") + 1);
 						payload = new BinaryContent(text.getBytes());
-						JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
-						try {
-							_cBean.send(
-									jMessage,
-									isGroup ? CommunicationAddressFactory.createGroupAddress(targetName) 
-											: CommunicationAddressFactory.createMessageBoxAddress(targetName));
-						} catch (CommunicationException e) {
-							e.printStackTrace();
-						}
-						log.debug("Message sent to: " + targetName + " reads: " + text);
+						
+						log.debug("Sending message to: " + targetName + " reads: " + text);
+						sendMessage(text, targetName, isGroup);
 					}
 				}
 				_inputField.setText("");
@@ -557,7 +629,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	/**
 	 * Starting method used by the LifeCycle class
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	public void doStart() throws Exception {
 		super.doStart();
@@ -573,26 +644,17 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 		}
 				
 		if (_cBean != null){
-			
+			log.debug("ChatGuiBean has found CommunicationBean");
 			_messageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress(_beanName);
-			_cBean.register(_messageBoxAddress);
+			_cBean.register(_messageBoxAddress, MESSAGE_TEMPLATE);
 			
-			listenTo("g.all");
+			this.listenTo("g.all");
 			
 			_addressLine.setText("Your Address: m." + _messageBoxAddress.toString().substring(7));
 			_addressLine.validate();
 			
 			String messageText = "m." + _messageBoxAddress.toString().substring(7) + " is ready to chat";
-			BinaryContent payload = new BinaryContent(messageText.getBytes());
-			JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
-			try {
-				_cBean.send(
-						jMessage,
-						CommunicationAddressFactory.createGroupAddress("all")
-						); 
-			} catch (CommunicationException e) {
-				e.printStackTrace();
-			}
+			sendStatusMessage(messageText);
 			
 			printLine("CommunicationBean installed, ready to chat");
 		} else {
@@ -610,24 +672,14 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	/**
 	 * Stopping method used by the LifeCycle class
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	public void doStop() throws Exception {
 		super.doStop();
 		log.debug("ChatGuiBean is stopping");
 		
 		String messageText = "m." + _messageBoxAddress.toString().substring(7) + " has left the chat";
-		BinaryContent payload = new BinaryContent(messageText.getBytes());
-		JiacMessage jMessage = new JiacMessage(payload, _messageBoxAddress);
-		try {
-			_cBean.send(
-					jMessage,
-					CommunicationAddressFactory.createGroupAddress("all")
-					); 
-			log.debug("Statusmessage sent");
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
+		sendStatusMessage(messageText);
+		
 		log.debug("ChatGuiBean has stopped");
 		_f.setVisible(false);
 		_f.dispose();
@@ -637,7 +689,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 	/**
 	 * Cleanup method used by the LifeCycle class
 	 * 
-	 * @author Martin Loeffelholz
 	 */
 	public void doCleanup() throws Exception {
 		super.doCleanup();
@@ -653,7 +704,6 @@ public class ChatGuiBean extends AbstractMethodExposingBean {
 		_cBean = null;
 		log.debug("Cleanup was finished");
 	}
-	
 
 	
 }

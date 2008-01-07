@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.management.MBeanNotificationInfo;
+import javax.management.Notification;
 import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
@@ -29,6 +31,8 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.management.Manager;
+import de.dailab.jiactng.agentcore.management.jmx.MessageExchangeNotification;
+import de.dailab.jiactng.agentcore.management.jmx.MessageExchangeNotification.MessageExchangeAction;
 
 /**
  * This bean specifies the way an agent communicates. It implements a message-based approach for information exchange
@@ -382,7 +386,10 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
      * delegates received messages to the default listener
      */
     protected void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
-        if (log.isDebugEnabled()) {
+    	// notification about receiving message
+        messageExchanged(MessageExchangeAction.RECEIVE, at, message, source.getTransportIdentifier());
+    	
+    	if (log.isDebugEnabled()) {
             log.debug("CommunicationBean is receiving Message over transport '" + source.getTransportIdentifier() + "' from '" + at + "'");
             log.debug("received message ' " + message + "' at '" + at + "'");
         }
@@ -437,6 +444,8 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
 
             if (transport != null) {
                 transport.send(message, unboundAddress);
+                // notification about sending message
+                messageExchanged(MessageExchangeAction.SEND, unboundAddress, message, transport.getTransportIdentifier());
             } else {
                 throw new CommunicationException("does not have transport for '" + address + "'");
             }
@@ -447,6 +456,8 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
             // 1:n communication
             for (MessageTransport transport : _transports.values()) {
                 transport.send(message, unboundAddress);
+                // notification about sending message
+                messageExchanged(MessageExchangeAction.SEND, unboundAddress, message, transport.getTransportIdentifier());
             }
         }
     }
@@ -735,6 +746,47 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         }
         return data;
     }
+
+    /**
+     * Uses JMX to send notifications that a message was exchanged with another agent.
+     *
+     * @param action
+     * @param receiver
+     * @param jiacMessage
+     * @param transport
+     */
+    public void messageExchanged(MessageExchangeAction action, 
+			ICommunicationAddress receiver, IJiacMessage jiacMessage,
+			String transport) {
+        Notification n =
+                new MessageExchangeNotification(this,
+                sequenceNumber++,
+                System.currentTimeMillis(),
+                "Message exchanged",
+                action, receiver, jiacMessage, transport);
+        
+        sendNotification(n);
+    }
+    
+    @Override
+    public MBeanNotificationInfo[] getNotificationInfo() {
+    	MBeanNotificationInfo[] parent = super.getNotificationInfo();
+    	int size = parent.length;
+    	MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
+    	for (int i=0; i<size; i++) {
+    		result[i] = parent[i];
+    	}
+    	
+        String[] types = new String[] {
+            MessageExchangeNotification.MESSAGE_EXCHANGE
+        };
+        String name = MessageExchangeNotification.class.getName();
+        String description = "A message with another agent was exchanged";
+        MBeanNotificationInfo info =
+                new MBeanNotificationInfo(types, name, description);
+        result[size] = info;
+        return result;
+    }    
 }
 
 class ListenerContext {

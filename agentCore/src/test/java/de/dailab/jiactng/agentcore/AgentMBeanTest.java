@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 public class AgentMBeanTest extends TestCase implements NotificationListener {
 
 	private final String nodeName = "myPlatform";
-	private final String agentName = "TestAgent";
+	private final String agentName = "testagent";
 	private ObjectName node = null;
 	private ObjectName agent = null;
 	private MBeanServer mbs = null;
@@ -62,9 +62,9 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		// start application
 		context = new ClassPathXmlApplicationContext(
 			"de/dailab/jiactng/agentcore/agentTests.xml");
-		nodeRef = (SimpleAgentNode) context.getBean("myPlatform");
+		nodeRef = (SimpleAgentNode) context.getBean(nodeName);
 		ArrayList<String> agentList = new ArrayList<String>();
-		agentList.add("TestAgent");
+		agentList.add(agentName);
 		agentListNotification = agentList;
 
 		// add listener for change of agent's lifecycle state
@@ -155,7 +155,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		} catch (Exception e) {
 			fail("Error while getting agent's name");
 		}
-		assertEquals("AgentMBean.getAgentName is wrong", "TestAgent", name);
+		assertEquals("AgentMBean.getAgentName is wrong", agentName, name);
 	}
 	
 	/**

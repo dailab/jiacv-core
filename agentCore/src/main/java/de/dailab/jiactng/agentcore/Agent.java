@@ -482,10 +482,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		if (isManagementEnabled()) {
 			Manager manager = _manager;
 			disableManagement();
-			this.agentName = agentname;
+			this.agentName = agentname.toLowerCase();
 			enableManagement(manager);
 		} else {
-			this.agentName = agentname;
+			this.agentName = agentname.toLowerCase();
 		}
 
 		// update logger

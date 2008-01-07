@@ -40,7 +40,7 @@ public class IAgentTest extends TestCase {
   }
 
   public void testGetAgentName() {
-    assertEquals("Agent.getName is wrong", "TestAgent", agent.getAgentName());
+    assertEquals("Agent.getName is wrong", "testagent", agent.getAgentName());
   }
 
   public void testGetAgentNode() {

@@ -23,8 +23,8 @@ import junit.framework.TestCase;
 public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationListener {
 
 	private final String nodeName = "myPlatform";
-	private final String agentName = "TestAgent";
-	private final String newAgentName = "NewAgent";
+	private final String agentName = "testagent";
+	private final String newAgentName = "newagent";
 	private MBeanServer mbs = null;
 	private ObjectName node = null;
 	private ObjectName agent = null;
@@ -61,9 +61,9 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		// start application
 		context = new ClassPathXmlApplicationContext(
 			"de/dailab/jiactng/agentcore/agentTests.xml");
-		nodeRef = (SimpleAgentNode) context.getBean("myPlatform");
+		nodeRef = (SimpleAgentNode) context.getBean(nodeName);
 		ArrayList<String> agentList = new ArrayList<String>();
-		agentList.add("TestAgent");
+		agentList.add(agentName);
 		agentListNotification = agentList;
 
 		// add listener for change of agent node's lifecycle state and agent list
@@ -135,7 +135,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		} catch (Exception e) {
 			fail("Error while getting agent node's name");
 		}
-		assertEquals("SimpleAgentNodeMBean.getName is wrong", "myPlatform", name);
+		assertEquals("SimpleAgentNodeMBean.getName is wrong", nodeName, name);
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 			fail("Error while getting agent node's agents");
 		}
 		ArrayList<String> intendedAgents = new ArrayList<String>();
-		intendedAgents.add("TestAgent");
+		intendedAgents.add(agentName);
 		assertEquals("SimpleAgentNodeMBean.getAgents is wrong", intendedAgents, agents);
 	}
 
@@ -211,8 +211,8 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 		
 		// check notification
 		ArrayList<String> agentList = new ArrayList<String>();
-		agentList.add("TestAgent");
-		agentList.add("NewAgent");
+		agentList.add(agentName);
+		agentList.add(newAgentName);
 		checkAgentListNotification(agentList);
 	}
 

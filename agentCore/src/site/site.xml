@@ -21,7 +21,9 @@
       <item name="JIAC TNG Community" href="http://www.jiac.de:81/forum/phpBB2/"/>
     </links>
     <menu name="agentCore">
-      <item name="Overview" href="index.html"/>
+      <item name="Overview" href="overview.html"/>
+      <item name="Management Interface" href="management.html"/>
+      <item name="Communication" href="communication.html"/>
       <item name="FAQ" href="faq.html"/>
     </menu>
     <menu name="JIAC TNG">

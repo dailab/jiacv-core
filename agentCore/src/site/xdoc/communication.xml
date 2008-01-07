@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+	<properties>
+		<title>agentCore Documentation</title>
+		<author email="marcel.patzlaff@dai-labor.de">Marcel Patzlaff</author>
+		<author email="martin.loeffelholz@dai-labor.de">Martin Loeffelholz</author>
+	</properties>
+	<body>
+		<section name="Agent Communication">
+			<subsection name="Agent Lifecycle">
+				<p>
+					The following graph shows the possible lifecycle states and state transitions of agent nodes, agents
+					and agent beans. Each transition is triggered by the corresponding method of interface
+					<a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/ILifecycle.html">
+						<code>ILifecycle</code>
+					</a>
+					, which optional checks the current state, switches to the intermediate state, invokes the
+					corresponding method of the abstract class
+					<a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
+						<code>AbstractLifecycle</code>
+					</a>
+					and switches to the final state.
+				</p>
+
+				<a href="images/Lifecycle.png">
+					<img src="images/Lifecycle.png" />
+				</a>
+
+				<p>
+					During each state transition of an agent node, the same transition is automatically executed by all
+					agents and other resources of this agent node. The state transition of an agent in turn executes the
+					same transition on all agent beans and other resources of this agent.
+				</p>
+			</subsection>
+
+			<subsection name="Measurement data">
+				<p>
+					The data below are measured by using the test class
+					<code>SetupMeasurement</code>
+					with the following environment:
+					<ul>
+						<li>Processor: Intel Centrino Duo 2.00GHz</li>
+						<li>Memory: 1.00GB RAM</li>
+						<li>Operating system: Windows XP Professional 2002 SP2</li>
+						<li>Java version: JRE 1.6.0_03</li>
+					</ul>
+				</p>
+				<table>
+					<tr>
+						<td>Scenario</td>
+						<td>Setup time (ms)</td>
+						<td>Heap memory usage (kB)</td>
+						<td>Non-heap memory usage (kB)</td>
+						<td>Number of live threads</td>
+						<td>Number of loaded classes</td>
+					</tr>
+					<tr>
+						<td>JVM without any application</td>
+						<td>-</td>
+						<td>243</td>
+						<td>2198</td>
+						<td>5</td>
+						<td>319</td>
+					</tr>
+					<tr>
+						<td>Agent node without any features</td>
+						<td>785</td>
+						<td>1325</td>
+						<td>6978</td>
+						<td>5</td>
+						<td>1312</td>
+					</tr>
+					<tr>
+						<td>Agent node only with one small agent</td>
+						<td>892</td>
+						<td>1195</td>
+						<td>7270</td>
+						<td>8</td>
+						<td>1376</td>
+					</tr>
+					<tr>
+						<td>Agent node only with RMI connector</td>
+						<td>1036</td>
+						<td>1178</td>
+						<td>8418</td>
+						<td>10</td>
+						<td>1652</td>
+					</tr>
+					<tr>
+						<td>Agent node only with communication</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</table>
+			</subsection>
+		</section>
+	</body>
+</document>

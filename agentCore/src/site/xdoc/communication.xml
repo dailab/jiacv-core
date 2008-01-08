@@ -8,94 +8,67 @@
 	</properties>
 	<body>
 		<section name="Agent Communication">
-			<subsection name="Agent Lifecycle">
-				<p>
-					The following graph shows the possible lifecycle states and state transitions of agent nodes, agents
-					and agent beans. Each transition is triggered by the corresponding method of interface
-					<a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/ILifecycle.html">
-						<code>ILifecycle</code>
-					</a>
-					, which optional checks the current state, switches to the intermediate state, invokes the
-					corresponding method of the abstract class
-					<a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
-						<code>AbstractLifecycle</code>
-					</a>
-					and switches to the final state.
-				</p>
-
-				<a href="images/Lifecycle.png">
-					<img src="images/Lifecycle.png" />
+			<p>
+				AgentCore defines a generic layer for message-based communication. This layer is available in the
+				<a href="apidocs/de/dailab/jiactng/agentcore/comm/package-summary.html">
+					<code>de.dailab.jiactng.agentcore.comm</code>
 				</a>
-
-				<p>
-					During each state transition of an agent node, the same transition is automatically executed by all
-					agents and other resources of this agent node. The state transition of an agent in turn executes the
-					same transition on all agent beans and other resources of this agent.
-				</p>
+				and
+				<a href="apidocs/de/dailab/jiactng/agentcore/comm/transport/package-summary.html">
+					<code>de.dailab.jiactng.agentcore.comm.transport</code>
+				</a>
+				packages. The following list describes the most essential classes and their functions:
+				<ul>
+					<li>
+						<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationBean.html">
+							<code>CommunicationBean</code>
+						</a>
+						<br />
+						The CommunicationBean is an agent component which provides access to the message bus. It can be
+						configured with one or more message transports. If no transports are available, then this bean
+						cannot do anything.
+					</li>
+					<li>
+						<a href="apidocs/de/dailab/jiactng/agentcore/comm/transport/MessageTransport.html">
+							<code>MessageTransport</code>
+						</a>
+						<br />
+						The MessageTransport is an abstract class which defines send and un-/registering primitives for
+						the various message busses.
+					</li>
+					<li>
+						<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationAddressFactory.html">
+							<code>CommunicationAddressFactory</code>
+						</a>
+						<br />
+						This factory class is the only way to create communication addresses. There are two different
+						types of addresses which covers 1:1 (message box) and 1:n (group) communication.
+					</li>
+				</ul>
+			</p>
+			<p>
+				Currently the message bus in AgentCore, which connects agents (on the same or on remote hosts), is a JMS
+				implementation.
+			</p>
+			<subsection name="Using the CommunicationBean">
+				
 			</subsection>
 
-			<subsection name="Measurement data">
+			<subsection name="Configuring the Communication">
 				<p>
-					The data below are measured by using the test class
-					<code>SetupMeasurement</code>
-					with the following environment:
-					<ul>
-						<li>Processor: Intel Centrino Duo 2.00GHz</li>
-						<li>Memory: 1.00GB RAM</li>
-						<li>Operating system: Windows XP Professional 2002 SP2</li>
-						<li>Java version: JRE 1.6.0_03</li>
-					</ul>
+					AgentCore defines some beans for the communication in configuration files. The default setup uses
+					the
+					<code>StandardJMSBroker</code>
+					as bean for the node. It encapsulates the ActiveMQBroker which is in fact our message bus. Client
+					access for the agents is granted through the
+					<code>CommunicationBean</code>
+					definition. The associated <code>StandardJMSMessageTransport</code> 
 				</p>
-				<table>
-					<tr>
-						<td>Scenario</td>
-						<td>Setup time (ms)</td>
-						<td>Heap memory usage (kB)</td>
-						<td>Non-heap memory usage (kB)</td>
-						<td>Number of live threads</td>
-						<td>Number of loaded classes</td>
-					</tr>
-					<tr>
-						<td>JVM without any application</td>
-						<td>-</td>
-						<td>243</td>
-						<td>2198</td>
-						<td>5</td>
-						<td>319</td>
-					</tr>
-					<tr>
-						<td>Agent node without any features</td>
-						<td>785</td>
-						<td>1325</td>
-						<td>6978</td>
-						<td>5</td>
-						<td>1312</td>
-					</tr>
-					<tr>
-						<td>Agent node only with one small agent</td>
-						<td>892</td>
-						<td>1195</td>
-						<td>7270</td>
-						<td>8</td>
-						<td>1376</td>
-					</tr>
-					<tr>
-						<td>Agent node only with RMI connector</td>
-						<td>1036</td>
-						<td>1178</td>
-						<td>8418</td>
-						<td>10</td>
-						<td>1652</td>
-					</tr>
-					<tr>
-						<td>Agent node only with communication</td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-					</tr>
-				</table>
+				<p>
+					Please take a look in the
+					<code>de.dailab.jiactng.agentcore.conf</code>
+					folder where the default configuration files are located.
+				</p>
 			</subsection>
 		</section>
 	</body>

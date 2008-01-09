@@ -51,23 +51,83 @@
 				implementation.
 			</p>
 			<subsection name="Using the CommunicationBean">
-				
+				<p>
+					There are two ways to use the functionalities of the communication bean. First you can iterate
+					through the agent's beans list to find an instance of
+					<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationBean.html">
+						<code>CommunicationBean</code>
+					</a>
+					and use this reference. This is considered to be the dirty way.
+				</p>
+				<p>
+					The second and better possibility is to use the actions the <code>CommunicationBean</code>
+					offers. Just take a look at the <b>TODO: insert link to action description here</b> for instructions
+					how to use the standard action invocation mechanism.
+				</p>
 			</subsection>
 
 			<subsection name="Configuring the Communication">
 				<p>
-					AgentCore defines some beans for the communication in configuration files. The default setup uses
-					the
-					<code>StandardJMSBroker</code>
-					as bean for the node. It encapsulates the ActiveMQBroker which is in fact our message bus. Client
-					access for the agents is granted through the
-					<code>CommunicationBean</code>
-					definition. The associated <code>StandardJMSMessageTransport</code> 
+					AgentCore defines some beans for the communication in configuration files. There are beans for the
+					node which configure an ActiveMQ-Broker which is in fact our message bus. Client access for the
+					agents is granted through the <code>CommunicationBean</code> definition. The associated
+					<code>StandardJMSMessageTransport</code> connects to the broker through a VM-
+					<code>ConnectionFactory</code>.
 				</p>
 				<p>
-					Please take a look in the
-					<code>de.dailab.jiactng.agentcore.conf</code>
-					folder where the default configuration files are located.
+					An example configuration for two agents which can communicate is given:
+					<source>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd"&gt;
+
+&lt;!--
+	- Application context definition for "example" Ping-Pong Scenario.
+--&gt;
+&lt;beans&gt;
+	&lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml"/&gt;
+	&lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/&gt;
+	&lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/&gt;
+	
+	&lt;bean name="PingPongPlatform" parent="Platform"&gt;
+		&lt;property name="agentNodeBeans"&gt;
+			&lt;list&gt;
+				&lt;ref bean="StandardJMSBroker"/&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+		&lt;property name="agents"&gt;
+			&lt;list&gt;
+				&lt;ref bean="Pinger" /&gt;
+				&lt;ref bean="Ponger" /&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
+	
+	&lt;bean name="Pinger" parent="SimpleAgent" singleton="false"&gt;
+		&lt;property name="agentBeans"&gt;
+			&lt;list&gt;
+				&lt;ref bean="CommunicationBean" /&gt;
+				&lt;ref bean="PingerBean" /&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
+
+	&lt;bean name="Ponger" parent="SimpleAgent" singleton="false"&gt;
+		&lt;property name="agentBeans"&gt;
+			&lt;list&gt;
+				&lt;ref bean="CommunicationBean" /&gt;
+				&lt;ref bean="PongerBean" /&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
+
+	&lt;bean name="PongerBean" class="de.dailab.jiactng.agentcore.comm.jms.PongerBean" singleton="false" /&gt;
+	&lt;bean name="PingerBean" class="de.dailab.jiactng.agentcore.comm.jms.PingerBean" singleton="false" /&gt;
+&lt;/beans&gt;
+					</source>
+				</p>
+				<p>
+					Please take a look in the <code>de.dailab.jiactng.agentcore.conf</code> package where the default
+					configuration files are located.
 				</p>
 			</subsection>
 		</section>

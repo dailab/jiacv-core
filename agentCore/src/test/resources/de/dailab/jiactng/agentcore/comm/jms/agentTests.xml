@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
-	- Application context definition for "example" DispatcherServlet.
+	- Application context definition for "example" Ping-Pong Scenario
 -->
 <beans>
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml"/>

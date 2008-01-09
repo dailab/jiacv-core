@@ -25,6 +25,7 @@
 			<item name="Implementation">
 				<item name="Management Interface" href="management.html" />
 				<item name="Communication" href="communication.html" />
+				<item name="Action Handling in Agents" href="actions.html" />
 			</item>
 			<item name="FAQ" href="faq.html" />
 		</menu>

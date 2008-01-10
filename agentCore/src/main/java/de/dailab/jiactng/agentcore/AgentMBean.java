@@ -84,7 +84,7 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	/**
 	 * Undeploys this agent from its agent node.
      *
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * @throws LifecycleException if an error occurs during stop or cleanup of this agent.
 	 */
 	public void remove() throws LifecycleException;
 

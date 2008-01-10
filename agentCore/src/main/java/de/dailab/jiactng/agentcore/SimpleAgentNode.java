@@ -207,6 +207,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	
 	public Log getLog(IAgent agent, IAgentBean bean, String extension) {
 		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName() + "." + extension);
 	}
@@ -249,6 +253,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * Returns the name of localhost.
 	 * 
 	 * @return name of localhost
+	 * @throws UnknownHostException if no IP address for the local host could be found.
 	 * @see InetAddress#toString()
 	 */
 	public String getHost() throws UnknownHostException {
@@ -284,8 +289,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * Deploys and starts new agents on this agent node.
 	 * 
-	 * @param name
-	 *            of the XML file which contains the spring configuration of the
+	 * @param configFile
+	 *            name of the XML file which contains the spring configuration of the
 	 *            agents
 	 */
 	public void addAgents(String configFile) {
@@ -384,6 +389,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * resource and calls the init() and start()-methods from ILifefycle for
 	 * this.
 	 * 
+	 * @throws Exception if the agent node can not be initialized and started.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
@@ -424,7 +430,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * deregistration as JMX resource) before stopping all JMX connector
 	 * servers.
 	 * 
-	 * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException
+	 * @throws LifecycleException if an error occurs during stop and cleanup of this agent node.
 	 */
 	public void shutdown() throws LifecycleException {
 		// remove shutdown hook
@@ -681,10 +687,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		this._agentNodeBeans = agentnodebeans;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public ServiceDirectory getServiceDirectory() {
 		return _serviceDirectory;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void setServiceDirectory(ServiceDirectory serviceDirectory) {
 		_serviceDirectory = serviceDirectory;
 		_serviceDirectory.setAgentNode(this);
@@ -935,8 +947,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/**
 	 * Deregisters the agent node and all its resources from management
-	 * 
-	 * @param manager
 	 */
 	public void disableManagement() {
 		// do nothing if management already disabled

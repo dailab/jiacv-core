@@ -29,6 +29,7 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Getter for attribute "Host" of the managed agent node.
+	 * @throws UnknownHostException if no IP address for the host could be found.
 	 * @return the host where this agent node is running
 	 */
 	public String getHost() throws UnknownHostException;
@@ -41,7 +42,7 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Deploys new agents on this agent node.
-	 * @param name of the XML file which contains the spring configuration of the agents
+	 * @param configFile name of the XML file which contains the spring configuration of the agents
 	 */
 	public void addAgents(String configFile);
 
@@ -99,7 +100,7 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Shuts down the managed agent node.
-     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException
+     * @throws LifecycleException if an error occurs during stop and cleanup of this agent node.
 	 */
 	public void shutdown() throws Exception;
 

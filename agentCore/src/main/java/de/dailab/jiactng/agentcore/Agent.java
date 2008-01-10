@@ -219,7 +219,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * Stops and undeploys this agent from its agent node (incl. deregistration
 	 * as JMX resource).
 	 * 
-	 * @throws LifecycleException
+	 * @throws LifecycleException if an error occurs during stop or cleanup of this agent.
 	 */
 	public void remove() throws LifecycleException {
 		// clean up agent

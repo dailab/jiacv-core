@@ -112,6 +112,23 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    */
   public Log getLog(IAgent agent, IAgentBean bean);
   
+  /**
+   * Getter for a log-instance that heeds the hierarchie of the agentnode,
+   * the agent and the agent bean, i.e the name of the logger consists of the agentnode-name,
+   * the name of the agent-parameter, the beanname and the extension.
+   * 
+   * 
+   * @param agent
+   *          the agent that contains the bean for which the logger shall be
+   *          instantiated.
+   * @param bean
+   *          the bean for which the logger shall be instantiated.
+   * @param extension
+   *          the bean part for which the logger shall be instantiated.
+   * @return a log-object that contains the agentnodes name, the agents name,
+   *         the beanname and the extension.
+   * @see org.apache.commons.logging.Log;
+   */
   public Log getLog(IAgent agent, IAgentBean bean, String extension);
 
   /**
@@ -140,10 +157,15 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
   public ArrayList<IAgentNodeBean> getAgentNodeBeans();
   
   /**
-   * Liefert das platformweite ServiceDirectory 
+   * Gets the service directory used by this agent node.
+   * @return the service directory 
    */
   public ServiceDirectory getServiceDirectory();
-  
+
+  /**
+   * Sets the service directory to be used by this agent node.
+   * @param serviceDirectory the service directory
+   */
   public void setServiceDirectory(ServiceDirectory serviceDirectory);
   
 }

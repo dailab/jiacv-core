@@ -655,19 +655,19 @@ public class JmxManager implements Manager {
 	 * @see JMXConnectorServerFactory#newJMXConnectorServer(JMXServiceURL, Map, MBeanServer)
 	 * @see javax.management.remote.JMXConnectorServerMBean#start()
 	 */
-	public void enableRemoteManagement(String nodeName, Set<Map> jmxConnectors) {
+	public void enableRemoteManagement(String nodeName, Set<Map<String,String>> jmxConnectors) {
 		if (!jmxConnectors.isEmpty()) {
 			System.setProperty("com.sun.management.jmxremote", "");
 		}
 		// Create and register all specified JMX connector servers
-		for (Map conf : jmxConnectors) {
+		for (Map<String,String> conf : jmxConnectors) {
 			// get parameters of connector server
-			String protocol = (String) conf.get("protocol");
+			String protocol = conf.get("protocol");
 			if (protocol == null) {
 				System.out.println("WARNING: No protocol specified for a JMX connector server");
 				continue;
 			}
-			String portStr = (String) conf.get("port");
+			String portStr = conf.get("port");
 			int port = 0;
 			if (portStr != null) {
 				try {
@@ -677,13 +677,13 @@ public class JmxManager implements Manager {
 					System.err.println(e.getMessage());
 				}
 			}
-			String path = (String) conf.get("path");
-			String authenticator = (String) conf.get("authenticator");
+			String path = conf.get("path");
+			String authenticator = conf.get("authenticator");
 
 			if (protocol.equals("rmi")) {
 				// check use of RMI registry
-				String registryPort = (String) conf.get("registryPort");
-				String registryHost = (String) conf.get("registryHost");
+				String registryPort = conf.get("registryPort");
+				String registryHost = conf.get("registryHost");
 				if ((registryPort != null) || (registryHost != null)) {
 					path = "/jndi/rmi://" + ((registryHost == null) ? "localhost" : registryHost)
 																									+ ((registryPort == null) ? "" : ":" + registryPort) + "/" + nodeName;

@@ -488,5 +488,6 @@
 		<module>jiacSecurity</module>
 		<module>util/ui</module>
 		<module>WebserviceInterface</module>
+		<module>tools</module>
 	</modules>
 </project>

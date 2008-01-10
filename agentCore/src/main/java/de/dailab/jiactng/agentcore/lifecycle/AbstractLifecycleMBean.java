@@ -20,7 +20,9 @@ public interface AbstractLifecycleMBean {
 	
 	/**
 	 * Initializes the managed resource.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * @throws Exception if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      * 
      * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle#init()
 	 */
@@ -28,7 +30,9 @@ public interface AbstractLifecycleMBean {
 
 	/**
 	 * Starts the managed resource.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * @throws Exception if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
 	 *
      * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle#start()
 	 */
@@ -36,7 +40,9 @@ public interface AbstractLifecycleMBean {
 
 	/**
 	 * Stops the managed resource.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * @throws Exception if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      * 
      * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle#stop()
 	 */
@@ -44,7 +50,9 @@ public interface AbstractLifecycleMBean {
 
 	/**
 	 * Cleanes up the managed resource.
-     * @throws de.dailab.jiangtng.agentcore.lifecycle.LifecycleException
+     * @throws Exception if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      * 
      * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle#cleanup()
 	 */

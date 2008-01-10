@@ -15,6 +15,11 @@ public interface CommunicationBeanMBean extends AbstractMethodExposingBeanMBean 
 	 * @param transportIdentifier of the transport to remove
 	 */
 	public void removeTransport(String transportIdentifier);
-	
+
+	/**
+	 * Gets information about the selectors of all listeners for each address.
+	 * @return composite data where the items are the addresses and the values are the
+	 * lists of the selectors of the corresponding listeners.
+	 */
 	public CompositeData getSelectorsOfAddresses();
 }

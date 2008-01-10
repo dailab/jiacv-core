@@ -60,28 +60,36 @@ public interface ILifecycle {
      * Initialize your object, prepare to grab all resources you need for work.
      * To avoid any lenghty processing at object creation time put all your
      * initialization code here.
-     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException 
+     * @throws LifecycleException if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      */
     public void init() throws LifecycleException;
 
     /**
      * Start your object, get ready for business. Acquire any resources.
      * 
-     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException 
+     * @throws LifecycleException if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      */
     public void start() throws LifecycleException;
 
     /**
      * Stop your object. Release resources.
      * 
-     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException 
+     * @throws LifecycleException if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      */
     public void stop() throws LifecycleException;
 
     /**
      * Prepare for the object's removal.
      * 
-     * @throws de.dailab.jiactng.agentcore.lifecycle.LifecycleException 
+     * @throws LifecycleException if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      */
     public void cleanup() throws LifecycleException;
 

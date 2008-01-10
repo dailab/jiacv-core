@@ -710,6 +710,9 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         }
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     @SuppressWarnings("unchecked")
     public CompositeData getSelectorsOfAddresses() {
         CompositeData data = null;

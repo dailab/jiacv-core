@@ -19,13 +19,20 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * The lifecycle handler that is used internally.
      */
     protected DefaultLifecycleHandler lifecycle = null;
-    
+
+    /**
+     * Default constructor that creates an internally used lifecycle handler for the default mode.
+     */
     public AbstractLifecycle() {
         
         lifecycle = new DefaultLifecycleHandler(this);
         
     }
-    
+
+    /**
+     * Constructor that creates an internally used lifecycle handler for the given mode.
+     * @param strict <code>true</code> for strict mode and <code>false</code> for loose mode
+     */
     public AbstractLifecycle(boolean strict) {
         
         lifecycle = new DefaultLifecycleHandler(this, strict);
@@ -44,6 +51,9 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     
     /**
      * You may override this method to change the lifecycle event propagation behavior.
+     * @throws LifecycleException if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      */
     public void init() throws LifecycleException {
         try {
@@ -85,6 +95,9 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     
     /**
      * You may override this method to change the lifecycle event propagation behavior.
+     * @throws LifecycleException if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      */
     public void start() throws LifecycleException {
         try {
@@ -124,6 +137,9 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     
     /**
      * You may override this method to change the lifecycle event propagation behavior.
+     * @throws LifecycleException if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      */
     public void stop() throws LifecycleException {
         try {
@@ -166,6 +182,9 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     
     /**
      * You may override this method to change the lifecycle event propagation behavior.
+     * @throws LifecycleException if the object is not in one of the expected
+     * previous states (depending on mode) or an error occurs during change of 
+     * the state.
      */
     public void cleanup() throws LifecycleException {
         try {
@@ -206,6 +225,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     
     /**
      * Registers the supplied <code>ILifecycleListener</code>.
+     * @param listener the lifecycle listener.
      */
     public void addLifecycleListener(ILifecycleListener listener) {
         
@@ -215,6 +235,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     
     /**
      * Unregisters the supplied <code>ILifecycleListener</code>.
+     * @param listener the lifecycle listener.
      */
     public void removeLifecycleListener(ILifecycleListener listener) {
         
@@ -225,7 +246,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     /**
      * Returns the current lifecycle state of this <code>ILifecycle</code>.
      *
-     * @return the current lifecycle state
+     * @return the current lifecycle state.
      */
     public LifecycleStates getState() {
         
@@ -234,8 +255,8 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     }
     
     /**
-     * @see de.dailab.jiactng.agentcore.AgentMBean#getLifecycleState()
-     */
+	 * {@inheritDoc}
+	 */
     public String getLifecycleState() {
         return getState().toString();
     }
@@ -268,7 +289,11 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
         
         sendNotification(n);
     }
-    
+
+    /**
+     * Returns information about the <code>AttributeChangeNotification</code> 
+     * this lifecycle instance may send to notify about the changed state.
+     */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
         String[] types = new String[] {
@@ -283,21 +308,25 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     
     /**
      * Put your initialization code here.
+     * @throws Exception if this lifecycle instance can not be initialized.
      */
     public abstract void doInit() throws Exception ;
     
     /**
      * Put your start code here.
+     * @throws Exception if this lifecycle instance can not be started.
      */
     public abstract void doStart() throws Exception ;
     
     /**
      * Put your stop code here.
+     * @throws Exception if this lifecycle instance can not be stopped.
      */
     public abstract void doStop() throws Exception ;
     
     /**
      * Put your clean up code here.
+     * @throws Exception if this lifecycle instance can not be cleaned up.
      */
     public abstract void doCleanup() throws Exception ;
     

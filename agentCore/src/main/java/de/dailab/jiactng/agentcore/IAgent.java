@@ -37,7 +37,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * Setter for the agent's memory-component. Used for dependency injection by
    * Spring.
    * 
-   * @param memory
+   * @param memory the memory-component of this agent.
    */
   public void setMemory(IMemory memory);
 
@@ -45,7 +45,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * Setter for the agent's execution-cycle-component. Used for dependency
    * injection by Spring.
    * 
-   * @param execution
+   * @param execution the execution-cycle-component of this agent.
    */
   public void setExecution(IExecutionCycle execution);
 
@@ -53,7 +53,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * Setter for the agent's agentbeans. Used for dependency injection by
    * Spring.
    * 
-   * @param agentbeans
+   * @param agentbeans the agentbeans of this agent.
    */
   public void setAgentBeans(ArrayList<IAgentBean> agentbeans);
 
@@ -128,7 +128,19 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @see org.apache.commons.logging.Log;
    */
   public Log getLog(IAgentBean bean);
-  
+
+  /**
+   * Getter for a log-instance that heeds the hierarchie of the agentnode,
+   * the agent and the agentbean, i.e the name of the logger consists of the agentnode-name,
+   * the name of the agent-parameter, the beanname and the extension. Note that the
+   * implementation this method should call the approriate method of the
+   * agentnode to retrieve the log-instance to insure consistency.
+   * 
+   * @param owner the bean for which the logger shall be retrieved.
+   * @param extension the part of the bean for which the logger shall be retrieved.
+   * @return a log-object that contains the agentnodes name, the agents name,
+   *         the beanname and the extension or <code>null</code> if the agent node is unknown.
+   */
   public Log getLog(IAgentBean owner, String extension);
   
   /**
@@ -136,11 +148,23 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @return the agent description of this agent
    */
   public AgentDescription getAgentDescription();
-  
+
+  /**
+   * Gets the action invocation handler exposed by this agent.
+   * @return the action invocation handler.
+   */
   public IActionInvocationHandler getActionInvocationHandler();
-  
+
+  /**
+   * Gets the list of actions exposed by this agent.
+   * @return list of actions.
+   */
   public ArrayList<Action> getActionList();
-  
+
+  /**
+   * Sets the list of actions to be exposed by this agent.
+   * @param actionList the list of actions.
+   */
   public void setActionList(ArrayList<Action> actionList);
 
 }

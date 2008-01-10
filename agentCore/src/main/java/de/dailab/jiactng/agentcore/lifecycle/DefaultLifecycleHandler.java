@@ -170,7 +170,7 @@ public class DefaultLifecycleHandler {
          */
     	if (isStrict()) {
     		if (!(state.equals(UNDEFINED) || state.equals(CLEANED_UP))) {
-    			throw new IllegalStateException();
+    			throw new IllegalStateException("Lifecycle is not in state UNDEFINED or CLEANED_UP.");
     		}
     	}
             
@@ -227,8 +227,10 @@ public class DefaultLifecycleHandler {
     				try {
     					lifecycle.init();
     					break;
-    				} catch (Exception e) {}
-    			default: throw new IllegalStateException();
+    				} catch (Exception e) {
+						// do nothing, because prepare start also if a previous init failed 
+    				}
+    			default: throw new IllegalStateException("Lifecycle is already in state STARTED.");
     		}
     	}
 
@@ -275,7 +277,7 @@ public class DefaultLifecycleHandler {
          */
     	if (isStrict()) {
     		if (!state.equals(STARTED)) {
-    			throw new IllegalStateException();
+    			throw new IllegalStateException("Lifecycle is not in state STARTED.");
     		}
     	}
             
@@ -331,8 +333,10 @@ public class DefaultLifecycleHandler {
 					try {
 						lifecycle.stop();
 						break;
-					} catch (Exception e) {}
-				default: throw new IllegalStateException();
+					} catch (Exception e) {
+						// do nothing, because prepare cleanup also if a previous stop failed 
+					}
+				default: throw new IllegalStateException("Lifecycle is already in state CLEANED_UP or UNDEFINED.");
     		}
     	}
         
@@ -417,7 +421,11 @@ public class DefaultLifecycleHandler {
         }
         
     }
-        
+
+    /**
+     * Checks if the lifecycle mode is strict.
+     * @return <code>true</code>, if the mode is strict.
+     */
     public boolean isStrict() {
         
         return strict;

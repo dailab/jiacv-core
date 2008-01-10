@@ -623,6 +623,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		return ret;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
     public IActionInvocationHandler getActionInvocationHandler() {
         if(_exposedActionInvocator == null) {

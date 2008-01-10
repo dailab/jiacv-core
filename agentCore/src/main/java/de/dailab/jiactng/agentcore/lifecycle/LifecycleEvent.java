@@ -22,7 +22,7 @@ public class LifecycleEvent extends EventObject {
      * 
      * Creates a new instance of LifecycleEvent 
      * 
-     * @param state 
+     * @param state the new state of the lifecycle instance
      * @param source the <code>Lifecycle</code> instance that this event 
      *               originates from
      */

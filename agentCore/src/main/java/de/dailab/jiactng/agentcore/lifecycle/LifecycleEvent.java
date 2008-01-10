@@ -12,8 +12,9 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
  * @author Joachim Fuchs
  */
 public class LifecycleEvent extends EventObject {
-            
-    /**
+	private static final long serialVersionUID = -8699363037558845703L;
+
+	/**
      * The source object's lifecycle state represented by this event.
      */
     private LifecycleStates state = UNDEFINED;            

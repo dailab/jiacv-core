@@ -6,10 +6,14 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import javax.management.MBeanNotificationInfo;
+import javax.management.Notification;
+
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
+import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
 
 /**
  * A simple ExecutionCycle implementation. This class executes active agentbeans
@@ -120,7 +124,10 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	private void performDoAction(DoAction act) {
 		if (act.getAction().getProviderBean() != null) {
 			memory.write(act.getSession());
+			long start = System.nanoTime();
 			act.getAction().getProviderBean().doAction(act);
+			long end = System.nanoTime();
+			actionPerformed(act, end-start);
 		} else {
 			log.error("--- found action without bean: "
 					+ act.getAction().getName());
@@ -147,6 +154,50 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		// }
 	}
 
+    /**
+     * Uses JMX to send notifications that an action was performed
+     * by the managed execution cycle of an agent.
+     *
+     * @param action the performed action.
+     * @param duration the duration of the execution.
+     */
+    public void actionPerformed(DoAction action, long duration) {
+        Notification n =
+                new ActionPerformedNotification(this,
+                sequenceNumber++,
+                System.currentTimeMillis(),
+                "Action performed",
+                action, duration);
+        
+        sendNotification(n);
+    }
+
+    /**
+     * Gets information about all notifications this execution cycle instance may send.
+     * This contains also information about the <code>ActionPerformedNotification</code> 
+     * to notify about performed actions.
+     * @return list of notification information.
+     */
+    @Override
+    public MBeanNotificationInfo[] getNotificationInfo() {
+    	MBeanNotificationInfo[] parent = super.getNotificationInfo();
+    	int size = parent.length;
+    	MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
+    	for (int i=0; i<size; i++) {
+    		result[i] = parent[i];
+    	}
+    	
+        String[] types = new String[] {
+        		ActionPerformedNotification.ACTION_PERFORMED
+        };
+        String name = ActionPerformedNotification.class.getName();
+        String description = "An action was performed";
+        MBeanNotificationInfo info =
+                new MBeanNotificationInfo(types, name, description);
+        result[size] = info;
+        return result;
+    }
+    
 	/**
 	 * Registers the execution cycle for management
 	 * 

@@ -293,6 +293,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     /**
      * Returns information about the <code>AttributeChangeNotification</code> 
      * this lifecycle instance may send to notify about the changed state.
+     * @return list with only one notification information.
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {

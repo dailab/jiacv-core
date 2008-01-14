@@ -753,10 +753,10 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
     /**
      * Uses JMX to send notifications that a message was exchanged with another agent.
      *
-     * @param action
-     * @param receiver
-     * @param jiacMessage
-     * @param transport
+     * @param action indicates if the message was sent or received.
+     * @param receiver the address of the message receiver.
+     * @param jiacMessage the exchanged message.
+     * @param transport the used message transport mechanism
      */
     public void messageExchanged(MessageExchangeAction action, 
 			ICommunicationAddress receiver, IJiacMessage jiacMessage,
@@ -771,6 +771,12 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         sendNotification(n);
     }
     
+    /**
+     * Gets information about all notifications this communication bean instance may send.
+     * This contains also information about the <code>MessageExchangeNotification</code> 
+     * to notify about exchanged messages.
+     * @return list of notification information.
+     */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
     	MBeanNotificationInfo[] parent = super.getNotificationInfo();

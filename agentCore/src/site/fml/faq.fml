@@ -278,12 +278,12 @@
         <faq id="management-tools">
             <question>Which management tools are available?</question>
             <answer><p>
-                A special management tool for JIAC TNG applications does not yet exist, but you can 
-                use the generic JMX clients 
-                <a href="http://java.sun.com/j2se/1.5.0/docs/guide/management/jconsole.html">"jConsole"</a> 
-                or <a href="http://www.jmanage.org/">"jManage"</a>. The first one is a desktop 
-                application of JDK1.5+ (Java Development Kit, version 1.5 or higher) where the second
-                one is a web application which is exemplarily installed on a 
+                With the user-friendly <a href="../tools/nodemonitor/index.html">agent node monitor</a> only an 
+                incomplete graphical management tool for JIAC TNG applications exists, but you can use the generic 
+                JMX clients <a href="http://java.sun.com/j2se/1.5.0/docs/guide/management/jconsole.html">"jConsole"</a> 
+                or <a href="http://www.jmanage.org/">"jManage"</a> to completely manage a JIAC TNG application. 
+                The first one is a desktop application of JDK1.5+ (Java Development Kit, version 1.5 or higher) 
+                where the second one is a web application which is exemplarily installed on a 
                 <a href="http://130.149.154.198:9090">DAI-Labor server</a>. Please read the 
                 <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.pdf">tutorial</a>
                 for a short description on how to use these tools.</p>

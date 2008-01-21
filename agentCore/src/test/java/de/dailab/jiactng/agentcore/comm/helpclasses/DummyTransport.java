@@ -8,6 +8,16 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 
+
+/**
+ * A Dummy Class to make it possible for a Testcase to determine which orders are
+ * actually given by the CommunicationBean to it's transports. So it is possible
+ * to check if an address is registered or unregistered and depending on the
+ * frequency of requests to this DummyTransport when this happens.
+ *  
+ * @author Martin Loeffelholz
+ *
+ */
 public class DummyTransport extends MessageTransport {
 
 	public List<RegistrationOrder> _orders = new ArrayList<RegistrationOrder>();
@@ -57,6 +67,13 @@ public class DummyTransport extends MessageTransport {
         }
 	}
 
+	/**
+	 * Class to store Orders which are given, 
+	 * from the communicationBean to the Transports.
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	public class RegistrationOrder{
 		public ICommunicationAddress _address = null;
 		public IJiacMessage _selector = null;

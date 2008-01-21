@@ -38,22 +38,38 @@ public class CommunicationBeanTest extends TestCase {
 	private static Map<ICommunicationAddress, List<ListenerContext>> _addressToListenerMap;
 	private static Log _log = null;
 
+	/**
+	 * Welcome to our CommunicationBeanTestCase.
+	 * Here we are setting up the "environment" for our tests to come.
+	 * This is happening exactly one time before the first test.
+	 * 
+	 * Spring will set up an Active-MQ broker, and create an agentplatform with an agent,
+	 * that includes a communicationBean.
+	 */
 	@Override
 	protected void setUp() throws Exception {
 		if (testCount < 0){
+			// if this is before the first test...
 			testCount= 0;
+
+			// init log
 			_log = LogFactory.getLog("CommunicationBeanTestLog");
 			super.setUp();
 			
+			// agentplatformcreation
 			ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/communicationTestContext.xml");
 			_communicationPlatform = (IAgentNode) xmlContext.getBean("CommunicationPlatform");
 			
+			// get a list of all agents on the platform. There should be exactly one...
 			List<IAgent> beanlist = _communicationPlatform.findAgents(); 
 			
+			// get this one and only agent from the platform
 			_communicator =  beanlist.get(0);
 			
+			// get the beans of the agent
 			_beans = _communicator.getAgentBeans(); 
 
+			// find the communicationBean within the beans of that agent
 			Iterator<IAgentBean> it = _beans.iterator();
 			while (it.hasNext()){
 				ILifecycle lc = it.next();
@@ -62,16 +78,19 @@ public class CommunicationBeanTest extends TestCase {
 				}
 			}
 
+			// init DummyTransport for testing purposes and add it to the Communicationbean
 			_registration.doInit();
 			_cBean.addTransport(_registration);
 			
-			// now clear orderbuffer to clear it from all orders that aren't associated with this testsuite
+			// now clear orderbuffer of Dummytransport, to clear it from the
+			// initialisation orders given by default from the communicationBean
 			_registration._orders.clear();
 			
 			_log.info("Setting up Test Environment");
 
+			// create n addresses and selectors for testregistrations etc.
 			int n = 10;
-
+			
 			for (int i = 0; i <= n; i++){
 				if (i % 2 == 0){
 					_addressList.add(i, CommunicationAddressFactory.createMessageBoxAddress(String.valueOf(i)));
@@ -85,17 +104,39 @@ public class CommunicationBeanTest extends TestCase {
 		}
 	}
 
+	/**
+	 * this will set up the address/selector combinations we are going to unregister
+	 * in the testcases to come. 
+	 * 
+	 * In the End the following address/selector combinations will be set up:
+	 * 
+	 * Address 0:
+	 * 	3x selector 0
+	 * 	1x selector null
+	 *  
+	 * Address 1:
+	 * 	1x selector null
+	 * 
+	 * Address 2:
+	 * 	1x selector null
+	 * 	2x selector 1
+	 * 
+	 * @throws Exception
+	 */
 	public void testRegister() throws Exception {
 		_log.info("Testing registering addresses");
         testCount++;
 		
         assertTrue("Check: No Orders yet", _registration._orders.isEmpty());
        
+        // Register one address with selector, two without. 
 		_cBean.register(_addressList.get(0), _selectors.get(0));
 		_cBean.register(_addressList.get(1), null);
         _cBean.register(_addressList.get(2), null);
 
         // double registration
+        // Let's put two other listeners on the addresses 0 and 2.
+        // Address 1 will be the only one that has only one listener
 		_cBean.register(_addressList.get(0), null);
 		_cBean.register(_addressList.get(0), _selectors.get(0));
 		_cBean.register(_addressList.get(0), _selectors.get(0));
@@ -104,7 +145,21 @@ public class CommunicationBeanTest extends TestCase {
 		_cBean.register(_addressList.get(2), _selectors.get(1));
 		
 		
-		// Now check if the registration went right
+		/*
+		 * Now check if the registration went right
+		 * 
+		 * First we will get the addressToListenerMap from the communicationBean,
+		 * that stores the informations regarding the registered listeners on each
+		 * address.
+		 * 
+		 * Then we will count all registered Listeners for the given addresses and
+		 * selectors, and will compare them with the expected number of listeners
+		 * 
+		 * On the way we will also check the structure of the Listenercontexts for
+		 * the addresses, as there should be one context for each Address/Selector
+		 * combination given to the CommunicationBean
+		 * 
+		 */
         _addressToListenerMap = _cBean.addressToListenerMap;
         
         int listenerCountForAddress0Selector0 = 0;
@@ -149,12 +204,19 @@ public class CommunicationBeanTest extends TestCase {
         assertEquals("Listener count for Address 2 Selector 1", 2, listenerCountForAddress2Selector1);
         assertEquals("Listener count for Address 2 Selector Null", 1, listenerCountForAddress2SelectorNull);
         
-        // now let's check the orders given by the Bean to the Transports
+        /*
+         * After we just checked if the CommunicationBean processed the registrations
+         * correctly and stored the right informations within itself, now we will 
+         * check if the CommunicationBean also gave the right orders of registration
+         * to it's Transports by checking the orders given to our DummyTransport
+         */
         assertEquals("Check quantity of Orders", 5, _registration._orders.size());
         
         int registrations = 0;
         int unregistrations = 0;
         
+        // As there should be five Orders given we will check each order given
+        // to be the order we expected it to be.
         for (int i = 0; i < 5; i++){
         	RegistrationOrder order = _registration._orders.get(i);
         	if (order.isRegister()){
@@ -164,26 +226,31 @@ public class CommunicationBeanTest extends TestCase {
         	}
         	
         	switch(i) {
+        	// first Order
         	case 0 : 
         		assertTrue("Registering", order.isRegister());
         		assertEquals("Address 0", order._address, _addressList.get(0));
         		assertEquals("Selector 0", order._selector, _selectors.get(0));
         		break;
+        	// second Order
         	case 1:
         		assertTrue("Registering", order.isRegister());
         		assertEquals("Address 1", order._address, _addressList.get(1));
         		assertNull("Check: Selector is Null", order._selector);
         		break;
+        	// third Order
         	case 2:
         		assertTrue("Registering", order.isRegister());
         		assertEquals("Address 2", order._address, _addressList.get(2));
         		assertNull("Check: Selector is Null", order._selector);
         		break;
+        	// fourth Order
         	case 3:
         		assertTrue("Registering", order.isRegister());
         		assertEquals("Address 0", order._address, _addressList.get(0));
         		assertNull("Check: Selector is Null", order._selector);
         		break;
+        	// fifth Order
         	case 4:
         		assertTrue("Registering", order.isRegister());
         		assertEquals("Address 2", order._address, _addressList.get(2));
@@ -192,6 +259,8 @@ public class CommunicationBeanTest extends TestCase {
         	}
         }
         
+        // now check that all 5 orders are registrationorders and there was no
+        // unregistration order given.
         assertEquals("Check quantity of registrationOrders", 5, registrations);
         assertEquals("Check quantity of unregistrationOrders", 0, unregistrations);
         
@@ -200,6 +269,28 @@ public class CommunicationBeanTest extends TestCase {
 		
 	}
 
+	/**
+	 * In this test we will unregister all listeners for Address 0
+	 * 
+	 * In the beginning the Listeners for Address 0 should be:
+	 * 	3x selector 0
+	 * 	1x selector null
+	 * 
+	 * First we will check if all is set up allright.
+	 * 
+	 * Then we will first unregister the single listener with the null selector and
+	 * check if the listener and context for that combination will correctly be gone.
+	 * We also will check if the correct order was given to the transport.
+	 *
+	 * After that we will unregister one of the three listeners that are listening
+	 * on address 0 with selector 0, and check that correctly no order is given
+	 * to the transport, because there are still two more listeners on that context.
+	 * 
+	 * Finally we will unregister the last two listeners and check if the address
+	 * was cleaned up and unregistered correctly on the transport.
+	 * 
+	 * @throws Exception
+	 */
 	public void testUnregisterAddress0() throws Exception {
 		_log.info("Checking unregistering of Addresses");
         testCount++;
@@ -245,13 +336,21 @@ public class CommunicationBeanTest extends TestCase {
         assertEquals("Order regards Address0", order._address, _addressList.get(0));
         assertNull("Order of unregistration for Address 0 has selector null", order._selector);
 		
-        // now check the unregistration
+        /* 
+         * now check the unregistration
+         * the context for Address 0, Selector null should be gone.
+         *  
+         */
 		listenerList = _addressToListenerMap.get(_addressList.get(0));
 		listenerCountForAddress0SelectorNull = 0;
 		listenerCountForAddress0Selector0 = 0;
 		selector0Context = null;
 		selectorNullContext = null;
 		
+		/*
+		 Nevertheless still there should be someone listening on that address
+         * with the selector 0, so there should be one context remaining
+		 */
 		assertNotNull("Check: Still listening on address 0", listenerList);
 		assertEquals("Contextcount for Address 0", 1, listenerList.size());
 		
@@ -276,9 +375,11 @@ public class CommunicationBeanTest extends TestCase {
         // Next Unregister
         _cBean.unregister(_addressList.get(0), _selectors.get(0));
         
-        // quick check that no order was given
+        // quick check that no order was given, as there are still some listeners
+        // listening with selector 0
         assertEquals("No further order given", 1, _registration._orders.size());
         
+        // now check if number of listeners was updated correctly
         listenerList = _addressToListenerMap.get(_addressList.get(0));
 		listenerCountForAddress0SelectorNull = 0;
 		listenerCountForAddress0Selector0 = 0;
@@ -322,6 +423,7 @@ public class CommunicationBeanTest extends TestCase {
         assertEquals("Order of unregistration for Address 0 has selector0", _selectors.get(0), order._selector);
         
         // now make the final check
+        // there should be no one left listening on this address
         listenerList = _addressToListenerMap.get(_addressList.get(0));
         assertNull("Check: Address 0 unregistered completely", listenerList);
         
@@ -330,6 +432,16 @@ public class CommunicationBeanTest extends TestCase {
         
 	}
 	
+	/**
+	 * This testcase will test correct unregistration of an address with only
+	 * one listener and so only one context for it. So it's quite plain and simple.
+	 * 
+	 * First the correct setup is checked. After that we simply unregister the
+	 * only listener for this address and check if the right order is given and
+	 * the address is cleaned up properly
+	 * 
+	 * @throws Exception
+	 */
 	public void testUnregisterAddress1() throws Exception {
 		_log.info("Checking unregistering of Addresses");
         testCount++;
@@ -379,6 +491,21 @@ public class CommunicationBeanTest extends TestCase {
 	}
 	
 
+	/**
+	 * our last unregistertest will unregister all listeners for address 2
+	 * 
+	 * The setup of listeners for this address should look like this:
+	 * 	1x selector null
+	 * 	2x selector 1
+	 * 
+	 * So this test is allmost like the testcase for address 0 but instead of
+	 * first unregistering an listener with no selector, we will unregister the
+	 * others first and finaly the only listener without selector. So it may be
+	 * checked if the CommunicationBean isn't making any difference between listeners
+	 * with and without selectors.
+	 * 
+	 * @throws Exception
+	 */
 	public void testUnregisterAddress2() throws Exception {
 		_log.info("Checking unregistering of Addresses");
         testCount++;
@@ -503,7 +630,11 @@ public class CommunicationBeanTest extends TestCase {
         
 	}
 
-	
+	/**
+	 * If all tests are been committed we now can tear down our testenvironment
+	 * which means shuting down the agentplatform and so all agents on it with
+	 * all beans included by them.
+	 */
 	@Override
 	protected void tearDown() throws Exception {
 		if(testCount >= 4){
@@ -515,7 +646,3 @@ public class CommunicationBeanTest extends TestCase {
 	}
 	
 }
-
-
-
-

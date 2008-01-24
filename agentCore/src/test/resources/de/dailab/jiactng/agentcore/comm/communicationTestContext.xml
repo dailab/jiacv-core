@@ -27,7 +27,12 @@
 		<property name="agentBeans">
 			<list>
 				<ref bean="CommunicationBean" />
+				<ref bean="MemoryExposingBean" />
 			</list>
 		</property>
 	</bean>
+	
+	<bean name="MemoryExposingBean" class="de.dailab.jiactng.agentcore.comm.helpclasses.MemoryExposingBean">
+	</bean>
+	
 </beans>

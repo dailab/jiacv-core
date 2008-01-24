@@ -19,6 +19,7 @@ import de.dailab.jiactng.agentcore.comm.helpclasses.DummyTransport;
 import de.dailab.jiactng.agentcore.comm.helpclasses.DummyTransport.RegistrationOrder;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 public class CommunicationBeanTest extends TestCase {
@@ -629,6 +630,7 @@ public class CommunicationBeanTest extends TestCase {
         
         
 	}
+	
 
 	/**
 	 * If all tests are been committed we now can tear down our testenvironment

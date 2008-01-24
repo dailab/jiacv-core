@@ -6,6 +6,7 @@ import java.util.List;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
+import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 
 
@@ -15,12 +16,17 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
  * to check if an address is registered or unregistered and depending on the
  * frequency of requests to this DummyTransport when this happens.
  *  
+ * Messages and their Destinations will be stored within the _sentTo and _messages lists
+ * and can be retrieved too.
+ *  
  * @author Martin Loeffelholz
  *
  */
 public class DummyTransport extends MessageTransport {
 
 	public List<RegistrationOrder> _orders = new ArrayList<RegistrationOrder>();
+	public ArrayList<ICommunicationAddress> _sentTo = new ArrayList<ICommunicationAddress>();
+	public ArrayList<IJiacMessage> _messages = new ArrayList<IJiacMessage>();
 	
 	public DummyTransport(){
 		super("DummyTransport");
@@ -29,13 +35,15 @@ public class DummyTransport extends MessageTransport {
 	@Override
 	public void doCleanup() throws Exception {
 		_orders.clear();
-		
+		_sentTo.clear();
+		_messages.clear();
 	}
 
 	@Override
 	public void doInit() throws Exception {
 		_orders.clear();
-		
+		_sentTo.clear();
+		_messages.clear();
 	}
 
 	@Override
@@ -48,8 +56,8 @@ public class DummyTransport extends MessageTransport {
 	@Override
 	public void send(IJiacMessage message, ICommunicationAddress address)
 			throws CommunicationException {
-		// Do Nothing
-
+		_sentTo.add(address);
+		_messages.add(message);
 	}
 
 	@Override

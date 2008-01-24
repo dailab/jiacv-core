@@ -25,7 +25,7 @@
                   architecture document</a> (in german) with more detailed information
                   for users, and a
                   <a href="https://wiki.dai-labor.de/ClusterFAC:JIACTNG-Overview">wiki</a> 
-                  and <a href="http://www.jiac.de:81/forum/phpBB2/">forum</a> (both
+                  and <a href="http://www.jiac.de/phpBB2/">forum</a> (both
                   in german) with information for developers.
                 </p>
             </answer>
@@ -43,7 +43,7 @@
                   ActiveMQ 4.1</a> or higher on your computer. You have to set
                   the <code>JAVA_HOME</code> environment-variable to the root-path
                   of your Java-installation. You will also need to supply a
-                  <a href="http://www.jiac.de:81/forum/phpBB2/download.php?id=8">
+                  <a href="http://www.jiac.de/phpBB2/download.php?id=8">
                   <code>settings.xml</code></a>-file in the <code>.m2</code>-directory
                   of your home directory to find all needed libraries.
                 </p>

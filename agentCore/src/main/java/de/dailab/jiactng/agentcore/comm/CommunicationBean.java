@@ -341,8 +341,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
     // ~ METHODS FOR LISTENER ADMINISTRATION ~ //
 
     /**
-     * registers a given listener to an address if all messages shall be received selector == null Notes: Listener and
-     * either address or selector must not be null
+     * registers a given listener to an address if all messages shall be received selector == null Notes: Listener, and Address must not be null
      */
     public synchronized void register(ICommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         if (log.isInfoEnabled()) {
@@ -357,8 +356,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
     }
 
     /**
-     * Unregisters a listener either from an address or from all messages associated with with a given selector Notes:
-     * either address or selector must not be null
+     * Unregisters a listener from an address with a given selector 
      * 
      * @param listener
      *            that wants to unregister
@@ -383,7 +381,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
 
     // ~ INTERNAL METHODS ~ //
     /**
-     * delegates received messages to the default listener
+     * delegates received messages to the Memory of the agent
      */
     protected void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
     	// notification about receiving message

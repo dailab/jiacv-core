@@ -558,21 +558,32 @@ public class ChatGuiBean extends AbstractAgentBean implements SpaceObserver<IFac
 					stopListenToAll();
 					
 				} else if ( (command.startsWith("g.")) || (command.startsWith("m.")) ){
+					// The user wants to sent a message either to a g(roup) or m(essagebox) address
+					// Syntax used: [g|m].[name of group or messagebox].[messagetext]
 					log.debug("got something to send");
 					boolean isGroup;
 					String text;
 					String targetName;
 					BinaryContent payload;
 
+					// check if it is a group. If it doesn't it's a messagebox.
 					isGroup = command.startsWith("g.");
+					// cut out of the string what we allready know.
 					text = command.substring(command.indexOf(".") + 1);
 					if (text.contains(".")){
+						// the substring uses the correct syntax
 						log.debug("seems to be a valid something");
+						// cut the name of the targetAddress out of the string
 						targetName = text.substring(0, text.indexOf("."));
+						// the rest of the string has to be the actual messagetext
 						text = text.substring(text.indexOf(".") + 1);
-						payload = new BinaryContent(text.getBytes());
 						
 						log.debug("Sending message to: " + targetName + " reads: " + text);
+						
+						// Let the user know what he/she just did and print the message that's going to be sent
+						printLine("-- Message sent to " + targetName, Font.ITALIC, Color.RED);
+						printLine("-- Message sent: " + text, Font.ITALIC, _messagesReceived.getForeground());
+						// now really send the message.
 						sendMessage(text, targetName, isGroup);
 					}
 				}

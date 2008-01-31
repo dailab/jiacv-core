@@ -293,7 +293,7 @@ public class ChatGuiBean extends AbstractAgentBean implements SpaceObserver<IFac
 				address = CommunicationAddressFactory.createMessageBoxAddress(addressName);
 			}
 			try {
-				_cBean.register(address);
+				_cBean.register(address, MESSAGE_TEMPLATE);
 				addressList.add(address);
 			} catch (CommunicationException e) {
 				e.printStackTrace();

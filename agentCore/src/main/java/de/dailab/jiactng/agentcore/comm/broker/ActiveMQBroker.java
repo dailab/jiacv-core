@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.broker;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.activemq.broker.BrokerService;
@@ -18,7 +19,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
     /** The embedded broker we use if no other broker is running on our host machine */
     private String _brokerName= null;
     private BrokerService _broker= null;
-    private Set<ActiveMQTransportConnector> _connectors= null;
+    private Set<ActiveMQTransportConnector> _connectors= new HashSet<ActiveMQTransportConnector>();
     private boolean _persistent = false;
 
     public ActiveMQBroker() {}

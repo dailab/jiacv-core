@@ -138,7 +138,7 @@
 					<p>
 						Addresses are necessary to send and receive
 						messages. There are two types of addresses which
-						are descriped further below. To receive messages
+						are described further below. To receive messages
 						it is necessary to register for an address.
 						Messages that are send to this address will then
 						be received by the agent registered for it.
@@ -149,10 +149,20 @@
 						will be described below in more detail. 
 					</p>
 					<p>
-						Notes: If you want to receive all messages from
+						It is of vital importance, that an agent that
+						doesn't want to receive any more messages from
+						an address is deregistering as often from it
+						as the agent has registered before. Doing so
+						the agent must use the same selector during
+						deregistration from the address as it used before
+						for registration.
+					</p>
+					<p>
+						<i><b>Notes:</b></i> If you want to receive all messages from
 						an address or just doesn't want to bother with
 						selectors, this parameter may be set to null
 					</p>
+					
 				</subsection>
 				
 				<subsection name = "Types of addresses">
@@ -160,15 +170,16 @@
 						Within the CommunicationBean two address
 						concepts are existing.
 					</p>
-					<p>The MessageBox (1:1)</p>
+					<p><b> The MessageBox (1:1)</b></p>
 					<p>
 						This type of Address works like a single mailbox
 						at your house. All messages are delivered to one
-						single point. Notes: The CommunicationBean
-						doesn't check how many times an agent registeres
-						for this kind of address.
+						single point. 
 					</p>
-					<p>The Group (1:n)</p>
+					<p>
+						
+					</p>
+					<p><b>The Group (1:n)</b></p>
 					<p>
 						A group is like a mailinglist for emails. When
 						an agent sends a message to a group it will be
@@ -180,20 +191,18 @@
 				<subsection name = "Using Selectors">
 					<p>
 						To receive messages an agent has to be
-						registered for it, but it may be, that an agent
-						doesn't have to get all messages send to this
-						address. In that case <b>Selectors are helping to
-						filter the messages</b>, by let the agent only
-						receive these messages, that are fulfilling
-						special criterias.
-					</p>
-					<p>
+						registered on an address, but it's possible, that an agent
+						doesn't want to get all messages send to this
+						address. In that case <i>Selectors are helping to
+						filter the messages</i>, by letting the agent only
+						receive messages, that are fulfilling
+						special criteria.
 					</p>
 					<p>
 						<b>How to create selectors?</b>
 					</p>
 					<p>
-						<b>Selectors used by the CommunicationBean are basically messagetemplates</b>
+						<i>Selectors used by the CommunicationBean are basically messagetemplates</i>
 					</p>
 					<p>
 						Example for creating a selector as used in the SimpleChatExample included in JiacTNG:
@@ -209,9 +218,11 @@ static {
 
 						</source>
 
-						This selector is being used to just get all
-						messages with the same Header set as the one
-						above.
+						<i>This selector is being used to just get all
+						messages with the same header set as the one
+						in the messagetemplate. In our example this would
+						be the header IJiacMessage.Header.PROTOCOL set to
+						"SimpleChatExample".</i>
 
 					</p>
 					
@@ -224,24 +235,32 @@ static {
 						selector, to the CommunicationBean while it
 						registeres
 						<b>and</b>
-						unregisteres for an address. 
-						<b>Caution:</b>
-						The agent has to use the same selector when
+						unregisteres for an address.
+					</p>
+					<p> 
+						<i><b>Caution:</b></i>
+						The agent must use the same selector when
 						unregistering an address, that it used for
 						registering for this address, or the
 						unregistering won't work.
 					</p>
 					<p>
-						So after using the Selector from our codeexample
-						above while registering for an address. Each
-						Message send to this address that is meant to be
-						received by this agent, has to be get this
-						header with it.
+						Let's assume, that we just used the selector from
+						our codeexample above, while registering for an address.
+						Each Message send to this address and is meant to
+						be received by our agent, then has to get the
+						right header. Without this header it wouldn't get
+						through the selecting process filtering the
+						messages.
 						<source>
-							JiacMessage jMessage = new JiacMessage(payload); 
-							// This header part is neccessary to filter the message from the memory
-							jMessage.setHeader(IJiacMessage.Header.PROTOCOL, MESSAGE_HEADER);
+JiacMessage jMessage = new JiacMessage(payload); 
+// This header part is neccessary to filter the message from the memory
+jMessage.setHeader(IJiacMessage.Header.PROTOCOL, MESSAGE_HEADER);
 						</source>
+
+						<i><b>Notes:</b></i> Every attribute of a messagetemplate that
+						is set when it is used as selector will be
+						checked.
 					</p>
 					
 				</subsection>
@@ -256,8 +275,8 @@ static {
 						MessageBox- or a Groupaddress and has to be done
 						with the CommunicationAddressFactory
 						<source>
-							ICommunicationAddress toMessageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress("MessageBoxName");
-							ICommunicationAddress toGroupAddress = CommunicationAddressFactory.createGroupAddress("GroupName");
+ICommunicationAddress toMessageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress("MessageBoxName");
+ICommunicationAddress toGroupAddress = CommunicationAddressFactory.createGroupAddress("GroupName");
 						</source>
 					</p>
 					
@@ -265,45 +284,75 @@ static {
 						<b>How to create a Message</b>
 					</p>
 					<p>
-						A JiacMessage is composed of (to be continued)
+						A JiacMessage can transport within itself nearly
+						every content. At this moment, predefined
+						contents are BinaryContent for non-serializable
+						payloads, which is used especially with
+						MicroJiac and ObjectContent which can include
+						every serializable object. However, every Object
+						inheriting <a href="apidocs/de/dailab/jiactng/agentcore/knowledge/IFact.html">
+							<code>IFact</code>
+						</a> is usable as payload, which is
+						the only parameter needed for creating a
+						standard JiacMessage
 					</p>
 					<p>
-						<b>How to send a Message</b>
+						<i><b>How to actually send a message</b></i>
 					</p>
+					<p><i>THIS HAS TO BE REWRITTEN</i></p>
 					<p>
-						Actually sending an Message is quite simple. If _cBean is the CommunicationBean of your agent the agent just has to hand the message and the address over to the CommunicationBean.
+						Actually sending a message is quite simple. If
+						_cBean is the CommunicationBean of your agent
+						the agent just has to hand the message and the
+						address over to the CommunicationBean.
 						<source>
-							_cBean.send( jMessage,	toAddress ); 
+_cBean.send( jMessage,	toAddress ); 
 						</source>
 					</p>
 					
 				</subsection>
 				
-				<!-- ToDO 16:34:51) Marcel Patzlaff: 
-					schau ma im code wo ein template in den selectorstring umgewandelt wird
-					(16:34:54) Marcel Patzlaff: 
-					for further details 
-					protected static String templateToSelector (IJiacMessage jiacMessage) {
-			        if(jiacMessage == null) {
-			            return null;
-			        }
-			        
-			        StringBuilder selector= new StringBuilder();
-			        Set<String> keys= jiacMessage.getHeaderKeys();
-			        String[] sortedKeys= keys.toArray(new String[keys.size()]);
-			        Arrays.sort(sortedKeys);
-			        
-			        for(String key : sortedKeys) {
-			            if(selector.length() > 0) {
-			                selector.append(" AND ");
-			            }
-			            
-			            selector.append(key).append(" = '").append(jiacMessage.getHeader(key)).append("'");
-			        }
-			        
-			        return selector.toString();
-			    }
-        -->
+				<subsection name = "How to receive Messages">
+					<p>
+						All messages that are received by the
+						CommunicationBean will be delegated to the
+						memory of the agent the CommunicationBean
+						belongs too. To get notified when this happens,
+						it is neccessary to create an SpaceObserver or
+						implement the SpaceObserver interface.
+					</p>
+					<p>
+						Done that, this SpaceObserver has to be attached
+						to the memory of that agent, so it can be notified
+						when messages are coming in. Doing that is quite simple
+						once access to the memory is achieved.
+					</p>
+						<source>
+memory.attach(ourSpaceObserver, ourMessageTemplate);
+						</source>
+					<p>
+						If a message was delegated to the agents memory,
+						the SpaceObservers notify method will be called.
+						Then it's up to the agent to retrieve the message
+						from the memory. 
+					</p>
+						
+					<p><i><b>Example:</b></i></p>
+					
+					<source>
+public void notify(SpaceEvent&lt;? extends IFact&gt; event) {
+	IJiacMessage message = null;
+	ICommunicationAddress at = null;
+	ICommunicationAddress from = null;
+
+	if(event instanceof WriteCallEvent) {
+		WriteCallEvent&lt;IJiacMessage&gt; wce= (WriteCallEvent&lt;IJiacMessage&gt;) event;
+		message= memory.remove(wce.getObject());
+	}
+}					
+					</source>
+					
+				</subsection>
 				
 		</section>
 		

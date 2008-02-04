@@ -3,6 +3,8 @@ package de.dailab.jiactng.agentcore.comm;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sercho.masp.space.event.SpaceEvent;
@@ -22,7 +24,6 @@ import de.dailab.jiactng.agentcore.comm.message.ObjectContent;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
-import junit.framework.TestCase;
 
 @SuppressWarnings("serial")
 public class CommunicationBeanMessagingTest extends TestCase implements SpaceObserver<IFact>{
@@ -107,6 +108,7 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 	 * @throws Exception
 	 */
 	public void testMessageSending() throws Exception {
+	    testCount++;
 		JiacMessage messageToSend = null;
 		
 		JiacMessage messageSent = null;
@@ -133,6 +135,7 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 	
 	
 	public void testMessageReceiving() throws Exception {
+	    testCount++;
 		_memory.attach(this, MESSAGE_TEMPLATE);
 		_cBean.register(_receiverAddress);
 		

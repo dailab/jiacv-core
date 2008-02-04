@@ -10,6 +10,7 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
 	
 	<bean name="PingPongPlatform" parent="Platform">
+		<property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/jms/pingpongLog4j.properties"/>
 		<property name="agentNodeBeans">
 			<list>
 				<ref bean="LocalJMSBroker"/>

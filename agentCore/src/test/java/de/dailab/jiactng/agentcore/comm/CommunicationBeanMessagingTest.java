@@ -27,7 +27,9 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 @SuppressWarnings("serial")
 public class CommunicationBeanMessagingTest extends TestCase implements SpaceObserver<IFact>{
-
+    
+    private static final long MAX_TIMEOUT= 2000;
+    
 	private static final JiacMessage MESSAGE_TEMPLATE;
 	private static final String MESSAGE_HEADER = "CommunicationBeanMessagingTest";
 	
@@ -64,7 +66,7 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 			super.setUp();
 			
 			// agentplatformcreation
-			ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/communicationTestContext.xml");
+			ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/communicationBeanMessagingTest.xml");
 			_communicationPlatform = (IAgentNode) xmlContext.getBean("CommunicationPlatform");
 			
 			// get a list of all agents on the platform. There should be exactly one...
@@ -90,8 +92,8 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 			
 			_memory = _meb.getMemory();
 			
-			// init DummyTransport for testing purposes and add it to the Communicationbean
-			_transport.doInit();
+//			// init DummyTransport for testing purposes and add it to the Communicationbean
+//			_transport.doInit();
 			_cBean.addTransport(_transport);
 			
 			// now clear orderbuffer of Dummytransport, to clear it from the
@@ -147,8 +149,9 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 		
 		_transport.delegateMessage(message, _receiverAddress);
 		synchronized(_lock){
-			_lock.wait();
+			_lock.wait(MAX_TIMEOUT);
 		}
+		assertNotNull("no message received", _lock.message);
 		JiacMessage messageReceived = (JiacMessage) _lock.message;
 		ObjectContent contentReceived = (ObjectContent) messageReceived.getPayload();
 		

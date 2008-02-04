@@ -22,7 +22,6 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
  *
  */
 public class DummyTransport extends MessageTransport {
-
 	public List<RegistrationOrder> orders = new ArrayList<RegistrationOrder>();
 	public ArrayList<ICommunicationAddress> sentTo = new ArrayList<ICommunicationAddress>();
 	public ArrayList<IJiacMessage> messages = new ArrayList<IJiacMessage>();

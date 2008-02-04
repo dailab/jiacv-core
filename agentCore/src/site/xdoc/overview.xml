@@ -19,21 +19,25 @@
          the colon. Input parameters are ignored in this view. The
          character before the name of attributes and methods describes
          their visibility (-private, #protected, +public).</p>
-         
+
+      <p>		         
          <a href="images/StaticStructure.png">
 	      <img src="images/StaticStructure.png"/>
 	     </a>
-	     
+	  </p>
+     
       <p>The next figure shows the startup procedure of a JIAC TNG
          application. Firstly the spring framework creates the agent node,
          agents and agent beans and sets the properties of these elements
          according to the application context. Afterwards it invokes the
          method afterPropertiesSet() of the agent node, which enables the
          management, and initializes and starts all elements.</p>
-         
+
+      <p>
          <a href="images/Startup.png">
 	      <img src="images/Startup.png"/>
 	     </a>
+      </p>
 
 	  <subsection name="Agent Lifecycle">
         <p>The following graph shows the possible lifecycle states and state
@@ -45,10 +49,12 @@
            the abstract class 
            <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
            <code>AbstractLifecycle</code></a> and switches to the final state.</p>
-         
+
+        <p>
           <a href="images/Lifecycle.png">
 	        <img src="images/Lifecycle.png"/>
 	      </a>
+        </p>
 
         <p>During each state transition of an agent node, the same transition is
            automatically executed by all agents and other resources of this agent

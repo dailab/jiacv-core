@@ -20,7 +20,7 @@
             <answer>
                 <p>Beside this FAQ and the <a href="apidocs/index.html">JavaDoc</a>
                   there are a <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/TNG-Tutorial.pdf">
-                  tutorial</a> for beginners, a <a href="index.html">website</a>
+                  tutorial</a> for beginners, a <a href="overview.html">website</a>
                   and an <a href="https://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/Architecture_JIAC-TNG.pdf">
                   architecture document</a> (in german) with more detailed information
                   for users, and a
@@ -94,7 +94,7 @@
                   Check out the lifecycle graph from page 15 of the
                   <a href="https://cvs.dai-labor.de/jiac/jiac-tng/trunk/documentation/Architecture_JIAC-TNG.pdf">
                   architecture document</a> or read the corresponding section of the
-                  <a href="index.html#Agent Lifecycle">website</a> to learn more about the lifecycle model.
+                  <a href="overview.html#Agent Lifecycle">website</a> to learn more about the lifecycle model.
                 </p>
             </answer>
           </faq>
@@ -203,7 +203,7 @@
           <faq id="faq4_Agent">
             <question>What kind of and how much ressources does one agent require? Is it advisable to keep the number of Agents for my application low?</question>
             <answer>
-              <p>The <a href="index.html#Measurement data">result of measurements</a>
+              <p>The <a href="overview.html#Measurement data">result of measurements</a>
                 is that a standard agent has three threads and uses approximately
                 120kB of heap memory and 200kB of non-heap memory. Thus it is advisable
                 to have only a maximum of thousands of agents running on one host.
@@ -271,7 +271,7 @@
                 <a href="http://cvs.dai-labor.de/jiac/jiac-tng/trunk/examples/HelloWorld/src/main/">"HelloWorld"</a> 
                 to learn more about the configuration of the remote management and the extensibility of 
                 the management interface. You can manage an application by using the 
-                <a href="index.html#Management interface">management API</a> directly or an existing
+                <a href="overview.html#Management interface">management API</a> directly or an existing
                 <a href="faq.html#management-tools">management tool</a> with a corresponding JMX connector.</p>
             </answer>
         </faq>

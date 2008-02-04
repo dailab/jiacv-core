@@ -85,7 +85,7 @@ public class CommunicationBeanTest extends TestCase {
 			
 			// now clear orderbuffer of Dummytransport, to clear it from the
 			// initialisation orders given by default from the communicationBean
-			_registration._orders.clear();
+			_registration.orders.clear();
 			
 			_log.info("Setting up Test Environment");
 
@@ -128,7 +128,7 @@ public class CommunicationBeanTest extends TestCase {
 		_log.info("Testing registering addresses");
         testCount++;
 		
-        assertTrue("Check: No Orders yet", _registration._orders.isEmpty());
+        assertTrue("Check: No Orders yet", _registration.orders.isEmpty());
        
         // Register one address with selector, two without. 
 		_cBean.register(_addressList.get(0), _selectors.get(0));
@@ -211,7 +211,7 @@ public class CommunicationBeanTest extends TestCase {
          * check if the CommunicationBean also gave the right orders of registration
          * to it's Transports by checking the orders given to our DummyTransport
          */
-        assertEquals("Check quantity of Orders", 5, _registration._orders.size());
+        assertEquals("Check quantity of Orders", 5, _registration.orders.size());
         
         int registrations = 0;
         int unregistrations = 0;
@@ -219,7 +219,7 @@ public class CommunicationBeanTest extends TestCase {
         // As there should be five Orders given we will check each order given
         // to be the order we expected it to be.
         for (int i = 0; i < 5; i++){
-        	RegistrationOrder order = _registration._orders.get(i);
+        	RegistrationOrder order = _registration.orders.get(i);
         	if (order.isRegister()){
         		registrations++;
         	} else {
@@ -266,7 +266,7 @@ public class CommunicationBeanTest extends TestCase {
         assertEquals("Check quantity of unregistrationOrders", 0, unregistrations);
         
         // now cleanup for the next test
-        _registration._orders.clear();
+        _registration.orders.clear();
 		
 	}
 
@@ -297,13 +297,13 @@ public class CommunicationBeanTest extends TestCase {
         testCount++;
 
         // just clear the orderbuffer to be sure
-        _registration._orders.clear();
+        _registration.orders.clear();
         
         // setting up unregistertest and checking correct testenvironment
 		List<ListenerContext> listenerList = _addressToListenerMap.get(_addressList.get(0));
 		assertNotNull("Check: Still listening on address 0", listenerList);
 		assertEquals("Contextcount for Address 0", 2, listenerList.size());
-		assertTrue("Check if Orderbuffer is empty", _registration._orders.isEmpty());
+		assertTrue("Check if Orderbuffer is empty", _registration.orders.isEmpty());
         
 		int listenerCountForAddress0SelectorNull = 0;
 		int listenerCountForAddress0Selector0 = 0;
@@ -330,8 +330,8 @@ public class CommunicationBeanTest extends TestCase {
         _cBean.unregister(_addressList.get(0), null);
         
         // quick test the order given
-        assertEquals("One Order given", 1, _registration._orders.size());
-        RegistrationOrder order = _registration._orders.get(0);
+        assertEquals("One Order given", 1, _registration.orders.size());
+        RegistrationOrder order = _registration.orders.get(0);
         
         assertFalse("Order is Unregister", order.isRegister());
         assertEquals("Order regards Address0", order._address, _addressList.get(0));
@@ -378,7 +378,7 @@ public class CommunicationBeanTest extends TestCase {
         
         // quick check that no order was given, as there are still some listeners
         // listening with selector 0
-        assertEquals("No further order given", 1, _registration._orders.size());
+        assertEquals("No further order given", 1, _registration.orders.size());
         
         // now check if number of listeners was updated correctly
         listenerList = _addressToListenerMap.get(_addressList.get(0));
@@ -410,14 +410,14 @@ public class CommunicationBeanTest extends TestCase {
         
         _cBean.unregister(_addressList.get(0), _selectors.get(0));
         // quick check that no order was given
-        assertEquals("No further order given", 1, _registration._orders.size());
+        assertEquals("No further order given", 1, _registration.orders.size());
         assertNotNull("QuickCheck, if address is still registered", _addressToListenerMap.get(_addressList.get(0)));
 
         _cBean.unregister(_addressList.get(0), _selectors.get(0));
         
         // quick test the order given
-        assertEquals("Another Order given", 2, _registration._orders.size());
-        order = _registration._orders.get(1);
+        assertEquals("Another Order given", 2, _registration.orders.size());
+        order = _registration.orders.get(1);
         
         assertFalse("Order is Unregister", order.isRegister());
         assertEquals("Order regards Address0", order._address, _addressList.get(0));
@@ -429,7 +429,7 @@ public class CommunicationBeanTest extends TestCase {
         assertNull("Check: Address 0 unregistered completely", listenerList);
         
         // now cleanup for next test
-        _registration._orders.clear();
+        _registration.orders.clear();
         
 	}
 	
@@ -448,7 +448,7 @@ public class CommunicationBeanTest extends TestCase {
         testCount++;
         
         // clear orderlist just to be sure
-        _registration._orders.clear();
+        _registration.orders.clear();
 
         // setting up unregistertest and checking correct testenvironment
 		List<ListenerContext> listenerList = _addressToListenerMap.get(_addressList.get(1));
@@ -476,8 +476,8 @@ public class CommunicationBeanTest extends TestCase {
         _cBean.unregister(_addressList.get(1), null);
         
         // quick test the order given
-        assertEquals("One Order given", 1, _registration._orders.size());
-        RegistrationOrder order = _registration._orders.get(0);
+        assertEquals("One Order given", 1, _registration.orders.size());
+        RegistrationOrder order = _registration.orders.get(0);
         
         assertFalse("Order is Unregister", order.isRegister());
         assertEquals("Order regards Address1", order._address, _addressList.get(1));
@@ -488,7 +488,7 @@ public class CommunicationBeanTest extends TestCase {
 		assertNull("Check: Unregistered from address 1", listenerList);        
         
 		//cleanup orderbuffer for next test
-		_registration._orders.clear();
+		_registration.orders.clear();
 	}
 	
 
@@ -512,7 +512,7 @@ public class CommunicationBeanTest extends TestCase {
         testCount++;
         
         // clear the orderbuffer just to be sure
-        _registration._orders.clear();
+        _registration.orders.clear();
         
         // setting up unregistertest and checking correct testenvironment
 		List<ListenerContext> listenerList = _addressToListenerMap.get(_addressList.get(2));
@@ -547,7 +547,7 @@ public class CommunicationBeanTest extends TestCase {
         _cBean.unregister(_addressList.get(2), _selectors.get(1));
         
         // quick test the order given
-        assertEquals("No Order given", 0, _registration._orders.size());
+        assertEquals("No Order given", 0, _registration.orders.size());
         
         // now some other checks
 		
@@ -582,8 +582,8 @@ public class CommunicationBeanTest extends TestCase {
         _cBean.unregister(_addressList.get(2), _selectors.get(1));
 
         // quick test the order given
-        assertEquals("One Order given", 1, _registration._orders.size());
-        RegistrationOrder order = _registration._orders.get(0);
+        assertEquals("One Order given", 1, _registration.orders.size());
+        RegistrationOrder order = _registration.orders.get(0);
         
         assertFalse("Order is Unregister", order.isRegister());
         assertEquals("Order regards Address2", order._address, _addressList.get(2));
@@ -618,8 +618,8 @@ public class CommunicationBeanTest extends TestCase {
         _cBean.unregister(_addressList.get(2)); // should work as (_addressList.get(2), null)
         
         // 	quick test the order given
-        assertEquals("Further Order given", 2, _registration._orders.size());
-        order = _registration._orders.get(1);
+        assertEquals("Further Order given", 2, _registration.orders.size());
+        order = _registration.orders.get(1);
         
         assertFalse("Order is Unregister", order.isRegister());
         assertEquals("Order regards Address2", order._address, _addressList.get(2));

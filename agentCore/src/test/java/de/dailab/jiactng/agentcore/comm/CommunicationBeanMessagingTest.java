@@ -95,7 +95,7 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 			
 			// now clear orderbuffer of Dummytransport, to clear it from the
 			// initialisation orders given by default from the communicationBean
-			_transport._orders.clear();
+			_transport.orders.clear();
 			
 		}
 	}
@@ -118,8 +118,8 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 		messageToSend = new JiacMessage(content);
 		
 		_cBean.send(messageToSend, _receiverAddress);
-		messageSent = (JiacMessage) _transport._messages.remove(0);
-		sentToAddress = (CommunicationAddress) _transport._sentTo.remove(0);
+		messageSent = (JiacMessage) _transport.messages.remove(0);
+		sentToAddress = (CommunicationAddress) _transport.sentTo.remove(0);
 		
 		ObjectContent sentContent = (ObjectContent) messageSent.getPayload();
 		String messageContentSent = (String) sentContent.getObject();

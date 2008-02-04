@@ -13,7 +13,7 @@
 		<property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties"/>
 		<property name="agentNodeBeans">
 			<list>
-				<ref bean="StandardJMSBroker"/>
+				<ref bean="LocalJMSBroker"/>
 			</list>
 		</property>
 		<property name="agents">
@@ -22,6 +22,8 @@
 			</list>
 		</property>
 	</bean>
+
+	<bean name="LocalJMSBroker" parent="ActiveMQBroker" singleton="true"/>
 
 	<bean name="Communicator" parent="SimpleAgent" singleton="false">
 		<property name="agentBeans">

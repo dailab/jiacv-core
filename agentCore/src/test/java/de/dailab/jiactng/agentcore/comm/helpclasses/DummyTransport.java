@@ -6,7 +6,6 @@ import java.util.List;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
-import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 
 
@@ -24,9 +23,9 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
  */
 public class DummyTransport extends MessageTransport {
 
-	public List<RegistrationOrder> _orders = new ArrayList<RegistrationOrder>();
-	public ArrayList<ICommunicationAddress> _sentTo = new ArrayList<ICommunicationAddress>();
-	public ArrayList<IJiacMessage> _messages = new ArrayList<IJiacMessage>();
+	public List<RegistrationOrder> orders = new ArrayList<RegistrationOrder>();
+	public ArrayList<ICommunicationAddress> sentTo = new ArrayList<ICommunicationAddress>();
+	public ArrayList<IJiacMessage> messages = new ArrayList<IJiacMessage>();
 	
 	public DummyTransport(){
 		super("DummyTransport");
@@ -34,30 +33,30 @@ public class DummyTransport extends MessageTransport {
 	
 	@Override
 	public void doCleanup() throws Exception {
-		_orders.clear();
-		_sentTo.clear();
-		_messages.clear();
+		orders.clear();
+		sentTo.clear();
+		messages.clear();
 	}
 
 	@Override
 	public void doInit() throws Exception {
-		_orders.clear();
-		_sentTo.clear();
-		_messages.clear();
+		orders.clear();
+		sentTo.clear();
+		messages.clear();
 	}
 
 	@Override
 	public void listen(ICommunicationAddress address, IJiacMessage selector)
 			throws CommunicationException {
 		RegistrationOrder order = new RegistrationOrder(address, selector);
-		_orders.add(order);
+		orders.add(order);
 	}
 
 	@Override
 	public void send(IJiacMessage message, ICommunicationAddress address)
 			throws CommunicationException {
-		_sentTo.add(address);
-		_messages.add(message);
+		sentTo.add(address);
+		messages.add(message);
 	}
 
 	@Override
@@ -65,12 +64,12 @@ public class DummyTransport extends MessageTransport {
 			throws CommunicationException {
 		RegistrationOrder order = new RegistrationOrder(address, selector);
 		order.setRegister(false);
-		_orders.add(order);
+		orders.add(order);
 
 	}
 	
 	public void printOrders(){
-		for (RegistrationOrder order : _orders){
+		for (RegistrationOrder order : orders){
         	System.out.println(order);
         }
 	}

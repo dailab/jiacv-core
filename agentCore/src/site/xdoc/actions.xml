@@ -8,9 +8,173 @@
 	</properties>
 	<body>
 		<section name="Action Handling in Agents">
+		  <p>
+		    The primary concept for the implementation of an agents abilites are 
+		    <a href="apidocs/de/dailab/jiactng/agentcore/action/Action.html">Actions</a>. 
+		    The idea behind actions is, that each agentbean, that provides some functionality
+		    within the agent or for other agents, publishes its functionalities in the form 
+		    of a list of actions. These actions can be accessed by other agentbeans, or in case
+		    of services by other agents, and then a client can create a DoAction to invoke the action.
+		  </p>
 			<subsection name="Loose Coupling of Agent Beans">
+			  <p>
+			    As JIAC TNG is designed to support loose coupling and runtime exchange 
+			    of agentbeans and whole agents, the invocation of functionality needs to
+			    be decoupled in order to ensure a stable behaviour. Therefore JIAC TNG 
+			    has a concept of action invocation, that allows the asychronous 
+			    invocation of actions, without any direct reference to the provider of 
+			    an action.
+			  </p>
 			</subsection>
-			<subsection name="Usage">
+			<subsection name="Providing Actions">
+        If an agentbean wants to provide on or more actions, it has to implement the 
+        <a href="apidocs/de/dailab/jiactng/agentcore/environment/IEffector.html">
+        <code>IEffector</code></a>-Interface. This interface specifies two methods:
+        <ul>
+          <li><code>public ArrayList&lt;? extends Action&gt; getActions()</code>
+            <p>
+              This method is used to publish the beans actions. It is called by the 
+              architecture right after the the bean has changed its state to 
+              INITIALIZED. It should simply be a list of 
+              <a href="apidocs/de/dailab/jiactng/agentcore/action/Action.html">
+              Action</a>-objects, in which the bean is set as providerbean.
+              The actions should all have unique names, and parameters and results are simply
+              arrays of the classes that should be used for the parameters. For no parameters/results use Class-arrays of length 0.
+            </p>
+            <p><b>Example-Code</b><br/>
+<pre>
+    public ArrayList&lt;Action&gt; getActions() {
+      ArrayList myActions = new ArrayList();
+      Action helloAction = new Action("helloWorld", this, new Class[0], new Class[0]);
+      myActions.add(helloAction);
+      return myActions;
+    }
+</pre>
+            </p>
+          </li>
+          <li><code>public void doAction(DoAction doAction)</code>
+            <p>
+              This method is called when an action is executed. It is called by the 
+              architecture with the 
+              <a href="apidocs/de/dailab/jiactng/agentcore/action/DoAction.html">
+              DoAction</a>-object that contains the parameters and the session-data.
+              Please note that there is only one single method which is called for all 
+              actions that are provided by the agentbean, so you need to check the action that 
+              is referenced by the doAction object in order to do the right thing. 
+            </p>
+            <p>
+              Once the Action is finished, you should write an 
+              <a href="apidocs/de/dailab/jiactng/agentcore/action/ActionResult.html">
+              ActionResult</a>-object to the memory, in order to return the results. 
+              This can be created by calling the <b>createActionResult</b>-method 
+              on the action-object.
+            </p>
+            <p><b>Example-Code</b><br/>
+<pre>
+    public void doAction(DoAction arg0) {
+      if (helloAction.equals(arg0.getAction())) {
+        System.out.println("Hello World");
+  
+        ActionResult result = helloAction.createActionResult(arg0, new Object[0]);
+        memory.write(result);
+      } else {
+        System.out.println("Unknown Action: " + arg0);
+      }
+    }
+</pre>
+            </p>          
+          </li>
+        </ul>
+			</subsection>
+			<subsection name="A simple Method for Actions">
+			  <p>
+			    If you simply want to publish one or more methods from your agentbean as Actions,
+			    you can use the 
+			    <a href="apidocs/de/dailab/jiactng/agentcore/action/AbstractMethodExposingBean.html">
+			    AbstractMethodExposingBean</a>. This bean provides a Java-Annotation, that can be used to
+			    mark a method that you want to publish. Everything else is done by the bean. Your agentbean
+			    has to extend the <code>AbstractMethodExposingBean</code>.
+			  </p>
+        <p><b>Example-Code</b><br/>
+<pre>
+  public class ExampleExposingBean extends AbstractMethodExposingBean {
+    
+    public ExampleExposingBean() {
+        [...]
+    }
+    
+    
+    @Expose
+    public void helloWorld() {
+        return true;
+    }
+
+    @Expose(name = "OderDochAnders")
+    public void ichHeisseSo(Object foo) {
+        
+    }
+  }
+</pre>
+            </p>			  
+            <p>
+              In the second method in this example, the name-field in the annotation is used to 
+              change the name of the action, if you want to give it another name than the method.
+            </p>
+			</subsection>			
+			<subsection name="Calling Actions">
+			  <p>
+			    <a href="apidocs/de/dailab/jiactng/agentcore/action/DoAction.html">
+              DoAction</a>-object that contains the parameters and a reference to the 
+              client-bean in order to return the results. The simples way to do 
+              this is to use the <code>createDoAction</code>-method from the Action 
+              object. This of course requires, that you get the Action-object first.
+              As all Actions are written to the agents memory during initialization,
+              the easiest way to retrieve an Action is this:
+			  </p>
+        <p>
+<pre>
+		Action a = memory.read(new Action("helloWorld", null, null, null));
+</pre>
+        </p>
+        <p>
+          With this action you can then create the DoAction, which is executed by 
+          writing it to the agents memory:
+        </p>
+<pre>
+    DoAction doHelloWorld = a.createDoAction(new Class[0], null);
+    memory.write(doHelloWorld);
+</pre>
+        <p>
+          Note that the createDoAction-method automatically creates a session-id 
+          for the DoAction. So if you create mupltiple DoActions and need to keep
+          the sessions intact, you should probably save these session-ids in order
+          to compare them, when the result returns.
+        </p>
+        <p>
+          The above example assumes, that you are not interessted in any 
+          results from the action. However, if you want to receive the results,
+          your agentbean needs to implement the 
+          <a href="apidocs/de/dailab/jiactng/agentcore/environment/ResultReceiver.html">
+          <code>ResultReceiver</code></a>-Interface. This changes the examplecode as 
+          follows:
+        </p>
+<pre>
+  public void foo() {
+    DoAction doHelloWorld = a.createDoAction(new Class[0], this);
+    memory.write(doHelloWorld);
+    
+    [...]
+  }
+   
+  public void receiveResult(ActionResult result) {
+    [...]
+  }
+</pre>
+        <p>
+          Please note, that the second parameter of the createDoAction-call is 
+          now <code>this</code> instead of <code>null</code>, as the architecture 
+          needs to know which agentbean should get the result of the action.
+        </p>
 			</subsection>
 		</section>
 	</body>

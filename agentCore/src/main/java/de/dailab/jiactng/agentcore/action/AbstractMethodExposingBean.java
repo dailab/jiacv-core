@@ -179,7 +179,7 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
             try {
                 Object result= method.invoke(this, doAction.getParams());
     			memory.write(doAction.getAction().createActionResult(
-    					doAction.getSession(), new Object[] { result }, doAction));
+    					doAction, new Object[] { result }));
                 log.debug("action processed and result written...");
                 return;
             }  catch (IllegalAccessException iae) {
@@ -190,7 +190,7 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
                 // should not happen -> type checking have to be implemented in the DoAction constructor!
                 log.debug("error while invoking action", ite);
                 Throwable cause= ite.getCause();
-                memory.write(action.createActionResult(doAction.getSession(), new Object[]{cause != null ? cause : ite}, doAction));
+                memory.write(action.createActionResult(doAction, new Object[]{cause != null ? cause : ite}));
                 return;
 //                // delegate runtime exceptions
 //                if(cause != null && cause instanceof RuntimeException) {

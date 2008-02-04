@@ -25,8 +25,8 @@ public class Action implements IFact {
 	/** SerialVersionUID for Serialization */
 	private static final long serialVersionUID = 6644586804009024924L;
 
-	private final static Class[] EMPTY_CLASSES= new Class[0];
-    
+	private final static Class[] EMPTY_CLASSES = new Class[0];
+
 	/** the name of the action */
 	private String name;
 
@@ -39,13 +39,13 @@ public class Action implements IFact {
 	/** The classes of the results of this action */
 	private Class[] results;
 
-    /**
-     * This constructor is used to create an action template
-     */
-    public Action() {
-        this(null, null, null, null);
-    }
-    
+	/**
+	 * This constructor is used to create an action template
+	 */
+	public Action() {
+		this(null, null, null, null);
+	}
+
 	/**
 	 * Constructor. Creates a new action-declaration.
 	 * 
@@ -63,7 +63,7 @@ public class Action implements IFact {
 		super();
 		this.name = name;
 		this.providerBean = providerBean;
-        setParameters(parameters);
+		setParameters(parameters);
 		setResults(results);
 	}
 
@@ -110,21 +110,18 @@ public class Action implements IFact {
 	/**
 	 * Creates a new Result-object for this action. The resulting object can be
 	 * written to the memory to return the results of the action. *
-	 * 
-	 * @see de.dailab.jiactng.agentcore.action.ActionResult
-	 * @param resultOf
-	 *            the DoAction-object that triggered the action.
-	 * @param results
-	 *            the results that come from executing the action.
 	 * @param source
 	 *            the entity that created the results of the action (usually the
 	 *            providing component)
+	 * @param results
+	 *            the results that come from executing the action.
+	 * 
+	 * @see de.dailab.jiactng.agentcore.action.ActionResult
 	 * @return a new ActionResult-object that can be used (by writing it to the
 	 *         memory) to return the results of the action.
 	 */
-	public ActionResult createActionResult(Session resultOf, Object[] results,
-			DoAction source) {
-		ActionResult ret = new ActionResult(this, resultOf, results, source);
+	public ActionResult createActionResult(DoAction source, Object[] results) {
+		ActionResult ret = new ActionResult(source, results);
 		ret.setMetaData(source.getMetaData());
 		return ret;
 	}
@@ -199,62 +196,62 @@ public class Action implements IFact {
 		this.results = results == null ? EMPTY_CLASSES : results;
 	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-    public int hashCode() {
-        int hash= Action.class.hashCode();
-        hash ^= name != null ? name.hashCode() : 0;
-        hash ^= Arrays.hashCode(parameters);
-        hash ^= Arrays.hashCode(results);
-        return hash;
-    }
+	public int hashCode() {
+		int hash = Action.class.hashCode();
+		hash ^= name != null ? name.hashCode() : 0;
+		hash ^= Arrays.hashCode(parameters);
+		hash ^= Arrays.hashCode(results);
+		return hash;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-    public boolean equals(Object obj) {
-        if(obj == null || !(obj instanceof Action)) {
-            return false;
-        }
-        
-        Action other= (Action) obj;
-        return  EqualityChecker.equals(name, other.name) &&
-                Arrays.equals(parameters, other.parameters) &&
-                Arrays.equals(results, other.results);
-    }
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Action)) {
+			return false;
+		}
 
-    /**
-     * {@inheritDoc}
-     */
+		Action other = (Action) obj;
+		return EqualityChecker.equals(name, other.name)
+				&& Arrays.equals(parameters, other.parameters)
+				&& Arrays.equals(results, other.results);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-    public String toString() {
-        StringBuilder builder= new StringBuilder();
-        builder.append("Action:\n name='").append(name).append("'");
-        builder.append("\n parameters=");
-        prettyPrintArray(builder, parameters);
-        builder.append("\n results=");
-        prettyPrintArray(builder, results);
-        builder.append('\n');
-        return builder.toString();
-    }
-    
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Action:\n name='").append(name).append("'");
+		builder.append("\n parameters=");
+		prettyPrintArray(builder, parameters);
+		builder.append("\n results=");
+		prettyPrintArray(builder, results);
+		builder.append('\n');
+		return builder.toString();
+	}
+
 	/*
 	 * Utility-method for a nicely formatted output
 	 */
-    private void prettyPrintArray(StringBuilder builder, Class[] array) {
-        builder.append('[');
-        int last= array.length - 1;
-        for(int i= 0; i <= last; ++i) {
-            builder.append(array[i].getName());
-            
-            if(i < last) {
-                builder.append("; ");
-            }
-        }
-        
-        builder.append(']');
-    }
+	private void prettyPrintArray(StringBuilder builder, Class[] array) {
+		builder.append('[');
+		int last = array.length - 1;
+		for (int i = 0; i <= last; ++i) {
+			builder.append(array[i].getName());
+
+			if (i < last) {
+				builder.append("; ");
+			}
+		}
+
+		builder.append(']');
+	}
 }

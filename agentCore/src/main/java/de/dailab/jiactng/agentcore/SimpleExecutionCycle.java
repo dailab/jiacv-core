@@ -105,8 +105,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	
 			// process one actionResult
 			// TODO: check if read can be used
-			ActionResult actionResult = memory.remove(new ActionResult(null, null,
-					null, null));
+			ActionResult actionResult = memory.remove(new ActionResult(null, null));
 			if (actionResult != null) {
 				synchronized (this) {
 					processResult(actionResult);

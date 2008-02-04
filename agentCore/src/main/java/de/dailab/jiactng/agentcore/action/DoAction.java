@@ -15,6 +15,12 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * 
  */
 public class DoAction extends SessionEvent {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8741204284564770003L;
+
 	private final static Object[] EMPTY_OBJECTS = new Object[0];
 
 	/** The input-parameters for the action-call */

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+	- Application context for the messaging test 
+-->
+<beans>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+	<bean name="CommunicationPlatform" parent="Platform">
+		<property name="loggingConfig"
+			value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties" />
+		<property name="agents">
+			<list>
+				<ref bean="Communicator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean name="Communicator" parent="SimpleAgent" singleton="false">
+		<property name="agentBeans">
+			<list>
+				<ref bean="SpecificCommunicationBean" />
+				<ref bean="MemoryExposingBean" />
+			</list>
+		</property>
+	</bean>
+
+	<bean name="SpecificCommunicationBean" parent="CommunicationBean">
+		<property name="transports">
+			<set/>
+		</property>
+	</bean>
+
+	<bean name="MemoryExposingBean" class="de.dailab.jiactng.agentcore.comm.helpclasses.MemoryExposingBean" />
+</beans>

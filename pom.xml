@@ -1,9 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0        http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab</groupId>
 	<artifactId>jiactng</artifactId>
-	<version>5.0.2</version>
+	<version>5.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Java-based Intelligent Agent Componentware TNG</name>
@@ -469,10 +469,9 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/tags/jiactng-5.0.2</connection>
-		<developerConnection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/tags/jiactng-5.0.2</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://cvs.dai-labor.de/jiac/jiac-tng/tags/jiactng-5.0.2</url>
+		<connection>scm:svn:http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</connection>
+		<developerConnection>scm:svn:http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</developerConnection>
+		<url>http://cvs.dai-labor.de/jiac/jiac-tng/trunk/</url>
 	</scm>
 
 	<modules>

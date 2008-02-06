@@ -29,7 +29,7 @@ public class ActionResult extends SessionEvent {
 		this.results = results;
 		if (getSession() != null)
 			getSession().addToSessionHistory(this);
-		if (source.getMetaData() != null)
+		if ((source!=null) && (source.getMetaData() != null))
 			super.setMetaData(source.getMetaData());
 	}
 
@@ -38,7 +38,7 @@ public class ActionResult extends SessionEvent {
 		this.results = results;
 		if (getSession() != null)
 			getSession().addToSessionHistory(this);
-		if (source != null && source.getMetaData() != null)
+		if ((source != null) && (source.getMetaData() != null))
 			super.setMetaData(source.getMetaData());
 	}
 

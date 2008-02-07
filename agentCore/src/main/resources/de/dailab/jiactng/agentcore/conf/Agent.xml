@@ -32,7 +32,7 @@
    <bean name="SimpleAgentWithCommunication" parent="SimpleAgent" abstract="true">
       <property name="agentBeans">
          <list>
-            <ref bean="Communication" />
+            <ref bean="CommunicationBean" />
          </list>
       </property>
    </bean>

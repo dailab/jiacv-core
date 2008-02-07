@@ -1,58 +1,58 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                      	
-	<modelVersion>4.0.0</modelVersion>
-	
-	<parent>
-		<groupId>de.dailab.jiactng</groupId>
-		<artifactId>examples</artifactId>
-		<version>5.0.3-SNAPSHOT</version>
-	</parent>
-	
-	<groupId>de.dailab.jiactng.examples</groupId>
-	<artifactId>SimpleChatExample</artifactId>
-	<name>${project.groupId} - ${project.artifactId}</name>
-	
-	<description>A simple example for a gui-driven chat using the communicationbean for jiac-tng</description>
+                         
+   <modelVersion>4.0.0</modelVersion>
+   
+   <parent>
+      <groupId>de.dailab.jiactng</groupId>
+      <artifactId>examples</artifactId>
+      <version>5.0.3-SNAPSHOT</version>
+   </parent>
+   
+   <groupId>de.dailab.jiactng.examples</groupId>
+   <artifactId>SimpleChatExample</artifactId>
+   <name>${project.artifactId}</name>
+   
+   <description>A simple example for a gui-driven chat using the communicationbean for jiac-tng</description>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.jgoodies</groupId>
-			<artifactId>forms</artifactId>
-			<version>1.0.7</version>
-		</dependency>
-		<dependency>
-			<groupId>de.dailab.jiactng</groupId>
-			<artifactId>agentCore</artifactId>
-			<version>${project.version}</version>
-		</dependency>		
-	</dependencies>
-	
-	<build>
-  		<plugins>
-  			<plugin>
-  				<artifactId>maven-assembly-plugin</artifactId>
-  				<executions>
-  					<execution>
-  						<phase>package</phase>
-  						<goals>
-  							<goal>attached</goal>
-  						</goals>
-  					</execution>
-  				</executions>
-  				<configuration>
-  					<descriptors>
-  						<descriptor>
-  							${basedir}/standalone.assembly
-  						</descriptor>
-  					</descriptors>
-  					<outputDirectory>
-  						${project.build.directory}
-  					</outputDirectory>
-  					<workDirectory>
-  						${project.build.directory}/assembly/work
-  					</workDirectory>
-  				</configuration>
-  			</plugin>
-  		</plugins>
-  	</build>
+   <dependencies>
+      <dependency>
+         <groupId>com.jgoodies</groupId>
+         <artifactId>forms</artifactId>
+         <version>1.0.7</version>
+      </dependency>
+      <dependency>
+         <groupId>de.dailab.jiactng</groupId>
+         <artifactId>agentCore</artifactId>
+         <version>${project.version}</version>
+      </dependency>      
+   </dependencies>
+   
+   <build>
+        <plugins>
+           <plugin>
+              <artifactId>maven-assembly-plugin</artifactId>
+              <executions>
+                 <execution>
+                    <phase>package</phase>
+                    <goals>
+                       <goal>attached</goal>
+                    </goals>
+                 </execution>
+              </executions>
+              <configuration>
+                 <descriptors>
+                    <descriptor>
+                       ${basedir}/standalone.assembly
+                    </descriptor>
+                 </descriptors>
+                 <outputDirectory>
+                    ${project.build.directory}
+                 </outputDirectory>
+                 <workDirectory>
+                    ${project.build.directory}/assembly/work
+                 </workDirectory>
+              </configuration>
+           </plugin>
+        </plugins>
+     </build>
 </project>

@@ -31,8 +31,4 @@ class MessageBoxAddress extends CommunicationAddress implements IMessageBoxAddre
     MessageBoxAddress bind(String transportId) throws URISyntaxException {
         return new MessageBoxAddress(this, transportId);
     }
-
-    public boolean isLocal() {
-		return false;
-	}
 }

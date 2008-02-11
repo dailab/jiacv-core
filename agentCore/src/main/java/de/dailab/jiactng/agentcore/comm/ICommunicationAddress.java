@@ -25,13 +25,6 @@ public interface ICommunicationAddress extends IFact {
     String getName();
     
     /**
-     * Checks whether the destination this address references exists.
-     * 
-     * @return
-     */
-    boolean exists();
-    
-    /**
      * Checks whether this address is bound to a specific transport type.
      * Currently this information is only evaluated when addressing a
      * message box.

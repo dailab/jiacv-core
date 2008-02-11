@@ -38,10 +38,6 @@ abstract class CommunicationAddress implements ICommunicationAddress {
         _uri= new URI(_transportId + ':' + unboundAddress.toURI());
     }
 
-	public final boolean exists() {
-		return false;
-	}
-    
 	public final boolean isBoundToTransport() {
         return _transportId != null;
     }

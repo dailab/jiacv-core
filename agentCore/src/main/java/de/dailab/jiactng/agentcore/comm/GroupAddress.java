@@ -23,11 +23,6 @@ final class GroupAddress extends CommunicationAddress implements IGroupAddress {
     private GroupAddress(GroupAddress copy, String transportId) throws URISyntaxException {
         super(copy, transportId);
     }
-    
-    public boolean isClosed() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
     public GroupAddress toUnboundAddress() {
         return (GroupAddress) super.toUnboundAddress();

@@ -484,5 +484,6 @@
 		<module>util/ui</module>
 		<module>WebserviceInterface</module>
 		<module>tools</module>
+		<module>ruleEngine</module>
 	</modules>
 </project>

@@ -14,7 +14,15 @@ import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.S
 import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STOPPED;
 import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.UNDEFINED;
 
+import java.lang.management.ManagementFactory;
+
+import javax.management.AttributeChangeNotification;
+import javax.management.AttributeChangeNotificationFilter;
 import javax.management.MBeanNotificationInfo;
+import javax.management.MBeanServer;
+import javax.management.Notification;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
 
 import junit.framework.TestCase;
 
@@ -23,10 +31,11 @@ import org.springframework.context.ApplicationContext;
  *
  * @author joachim
  */
-public class AbstractLifecycleTest extends TestCase implements ILifecycleListener {
+public class AbstractLifecycleTest extends TestCase implements ILifecycleListener, NotificationListener {
     
     LifecycleEvent lastEvent = null;
     LifecycleEvent eventBeforeLastEvent = null;
+    Notification lastNotification = null;
     
     AbstractLifecycle mock = null;
     
@@ -192,16 +201,39 @@ public class AbstractLifecycleTest extends TestCase implements ILifecycleListene
      * Test of stateChanged method, of class de.dailab.jiactng.agentcore.lifecycle.MockLifecycle.
      */
     public void testStateChanged() {
-        System.out.println("stateChanged");
+    	System.out.println("stateChanged");
         
-        ILifecycle.LifecycleStates oldState = null;
-        ILifecycle.LifecycleStates newState = null;
-        MockLifecycle instance = new MockLifecycle();
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = null;
+        try {
+            // register mock lifecycle
+        	name = new ObjectName("test:type=MockLifecycle");
+        	mbs.registerMBean(mock, name);
+            
+    		// add listener for change of agent's lifecycle state
+    		AttributeChangeNotificationFilter acnf = new AttributeChangeNotificationFilter();
+    		acnf.enableAttribute("LifecycleState");
+    		mbs.addNotificationListener(name, this, acnf, null);
+        } catch (Exception e) {
+        	fail("Registration of lifecycle or adding notification listener failed.");
+        }
+
+        ILifecycle.LifecycleStates oldState = ILifecycle.LifecycleStates.INITIALIZING;
+        ILifecycle.LifecycleStates newState = ILifecycle.LifecycleStates.INITIALIZED;
+
+        mock.stateChanged(oldState, newState);
+
+        assertEquals("LifecycleState", ((AttributeChangeNotification)lastNotification).getAttributeName());
+        assertEquals("java.lang.String", ((AttributeChangeNotification)lastNotification).getAttributeType());
+        assertEquals(newState.toString(), ((AttributeChangeNotification)lastNotification).getNewValue());
+        assertEquals(oldState.toString(), ((AttributeChangeNotification)lastNotification).getOldValue());
         
-        instance.stateChanged(oldState, newState);
-        
-        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
+        try {
+        	mbs.removeNotificationListener(name, this);
+        	mbs.unregisterMBean(name);
+        } catch (Exception e) {
+        	fail("Deregistration of lifecycle or removing notification listener failed.");
+        }
     }
     
     /**
@@ -210,30 +242,15 @@ public class AbstractLifecycleTest extends TestCase implements ILifecycleListene
     public void testGetNotificationInfo() {
         System.out.println("getNotificationInfo");
         
-        MockLifecycle instance = new MockLifecycle();
-        
-        MBeanNotificationInfo[] expResult = null;
-        MBeanNotificationInfo[] result = instance.getNotificationInfo();
-        assertEquals(expResult, result);
-        
-        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-    }
-    
-    /**
-     * Test of setApplicationContext method, of class de.dailab.jiactng.agentcore.lifecycle.MockLifecycle.
-     */
-    public void testSetApplicationContext() {
-        System.out.println("setApplicationContext");
-        
-        ApplicationContext applicationContext = null;
-        MockLifecycle instance = new MockLifecycle();
-        
-        // TODO check what this shalls! Das Ding ist keine Bean!
-        //instance.setApplicationContext(applicationContext);
-        
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        MBeanNotificationInfo[] result = mock.getNotificationInfo();
+        for (int i=0; i<result.length; i++) {
+        	MBeanNotificationInfo info = result[i];
+        	if (info.getName().equals("javax.management.AttributeChangeNotification") && 
+        			info.getNotifTypes()[0].equals("jmx.attribute.change")) {
+        		return;
+        	}
+        }
+        fail("Missing attribute change notification.");
     }
     
     /**
@@ -286,5 +303,10 @@ public class AbstractLifecycleTest extends TestCase implements ILifecycleListene
         lastEvent = evt;
         
     }
+
+	@Override
+	public void handleNotification(Notification notification, Object handle) {
+		lastNotification = notification;
+	}
     
 }

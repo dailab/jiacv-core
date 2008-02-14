@@ -478,12 +478,12 @@
 		<!--module>ModuleTemplate</module--><!-- This is a template for new modules and testing; usually not required -->		
 		<module>agentCore</module>
 		<module>agentInterpreter</module>
+		<module>ruleEngine</module>
 		<module>basicServices</module>
 		<module>examples</module>
 		<module>jiacSecurity</module>
 		<module>util/ui</module>
 		<module>WebserviceInterface</module>
 		<module>tools</module>
-		<module>ruleEngine</module>
 	</modules>
 </project>

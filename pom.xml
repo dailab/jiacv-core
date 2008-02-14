@@ -10,7 +10,7 @@
 	<description>
 		JIAC TNG is a framework to fast and efficiently develop agent-based applications and services. 
 	</description>
-	<url>http://130.149.154.117/dai-repository/jiactng/site/</url>
+	<url>http://repositories.dai-labor.de/sites/${project.artifactId}/${version}/</url>
 	<inceptionYear>2006</inceptionYear>
 	<organization>
 		<name>DAI-Labor</name>
@@ -360,7 +360,7 @@
 		<repository>
 			<id>dai-repository</id>
 			<name>DAI Maven 2 Repository</name>
-			<url>http://130.149.154.117/dai-repository/</url>
+			<url>http://repositories.dai-labor.de/dai-repository/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -371,7 +371,7 @@
 		<repository>
 			<id>dai-snapshot-repository</id>
 			<name>DAI Maven 2 Snapshot Repository</name>
-			<url>http://130.149.154.117/dai-snapshot-repository/</url>
+			<url>http://repositories.dai-labor.de/dai-snapshot-repository/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -390,7 +390,7 @@
 		<pluginRepository>
 			<id>dai-repository</id>
 			<name>DAI Maven 2 Repository</name>
-			<url>http://130.149.154.117/dai-repository/</url>
+			<url>http://repositories.dai-labor.de/dai-repository/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -401,7 +401,7 @@
 		<pluginRepository>
 			<id>dai-snapshot-repository</id>
 			<name>DAI Maven 2 Snapshot Repository</name>
-			<url>http://130.149.154.117/dai-snapshot-repository/</url>
+			<url>http://repositories.dai-labor.de/dai-snapshot-repository/</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
@@ -424,17 +424,17 @@
 	<distributionManagement>
 		<site>
 			<id>dai-repository</id>
-			<url>scp://130.149.154.117/home/maven/dai-repository/jiactng/site/</url>
+			<url>scp://repositories.dai-labor.de/export/home/local/maven/sites/${project.artifactId}/${version}</url>
 		</site>
 		<repository>
 			<id>dai-repository</id>
 			<name>DAI Repository</name>
-			<url>scp://130.149.154.117/home/maven/dai-repository</url>
+			<url>scp://repositories.dai-labor.de/export/home/local/maven/dai-repository</url>
 		</repository>
 		<snapshotRepository>
 			<id>dai-snapshot-repository</id>
 			<name>DAI Snapshot Repository</name>
-			<url>scp://130.149.154.117/home/maven/dai-snapshot-repository</url>
+			<url>scp://repositories.dai-labor.de/export/home/local/maven/dai-snapshot-repository</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -478,10 +478,10 @@
 		<!--module>ModuleTemplate</module--><!-- This is a template for new modules and testing; usually not required -->		
 		<module>agentCore</module>
 		<module>agentInterpreter</module>
+		<module>jiacSecurity</module>
 		<module>ruleEngine</module>
 		<module>basicServices</module>
 		<module>examples</module>
-		<module>jiacSecurity</module>
 		<module>util/ui</module>
 		<module>WebserviceInterface</module>
 		<module>tools</module>

@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -15,7 +14,6 @@ import java.util.concurrent.Future;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
-import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -30,15 +28,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
-import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
-import de.dailab.jiactng.agentcore.servicediscovery.IServiceDescription;
-import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**
@@ -78,12 +73,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** Configuration of a set of JMX connector server. */
 	private Set<Map<String,String>> _jmxConnectors = null;
-
-//	/** Der eingebettete JMSBroker zur Inter-AgentNode-Kommunikation */
-//	ActiveMQBroker _embeddedBroker = null;
-
-	/** Das ServiceDirectory des AgentNodes */
-	private ServiceDirectory _serviceDirectory = null;
 
 	/** The manager of the agent node */
 	private Manager _manager = null;
@@ -358,27 +347,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				}
 			}
 		}
-		if (source == _serviceDirectory) {
-			switch (evt.getState()) {
-			case STARTED:
-				Future f1 = _threadPool.submit(_serviceDirectory);
-				agentFutures.put(_serviceDirectory.getFutureName(getName()), f1);
-				break;
-			case STOPPED:
-				Future f2 = agentFutures.get(_serviceDirectory.getFutureName(getName()));
-				if (f2 == null) {
-					(new LifecycleException("ServiceDirectory future not found")).printStackTrace();
-				} else {
-					// if soft-cancel fails, do a force-cancel.
-					if (!f2.cancel(false) && !f2.isDone()) {
-						log.warn("ServiceDirectory " + _serviceDirectory.getFutureName(getName())
-								+ " did not respond to stopping. Thread is forcecanceled.");
-						f2.cancel(true);
-					}
-				}
-				break;
-			}
-		}
 	}
 
 	/**
@@ -411,13 +379,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
                 nodeBean.addLifecycleListener(this.lifecycle.createLifecycleListener());
             }
         }
-        
-		// listener am servicedrirectory setzen
-		if (_serviceDirectory != null) {
-			_serviceDirectory.addLifecycleListener(this.lifecycle.createLifecycleListener());
-		}
 
-		// enable management of agent node and all its resources
+        // enable management of agent node and all its resources
 		enableManagement(new JmxManager());
 
 		// start agent node
@@ -457,16 +420,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	
 	public void doInit() {
-		// init service directory
-		try {
-			if (_serviceDirectory != null) {
-				_serviceDirectory.init();
-			}
-		} catch (LifecycleException e) {
-			// TODO:
-			e.printStackTrace();
-		}
-
 		_threadPool = Executors.newCachedThreadPool();
 		agentFutures = new HashMap<String, Future>();
 
@@ -504,16 +457,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	
 	public void doStart() {
-		// start service directory
-		try {
-			if (_serviceDirectory != null) {
-				_serviceDirectory.start();
-			}
-		} catch (LifecycleException e) {
-			// TODO:
-			e.printStackTrace();
-		}
-
 		// call start on all beans of the agentnode
 		// TODO testing
 		if (_agentNodeBeans != null) {
@@ -571,16 +514,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				}
 			}
 		}
-
-		// stop service directory
-		try {
-			if (_serviceDirectory != null) {
-				_serviceDirectory.stop();
-			}
-		} catch (LifecycleException e) {
-			// TODO:
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -614,16 +547,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 		if (_threadPool != null) {
 			_threadPool.shutdown();
-		}
-
-		// cleanup service directory
-		try {
-			if (_serviceDirectory != null) {
-				_serviceDirectory.stop();
-			}
-		} catch (LifecycleException e) {
-			// TODO:
-			e.printStackTrace();
 		}
 	}
 
@@ -685,21 +608,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void setAgentNodeBeans(ArrayList<IAgentNodeBean> agentnodebeans) {
 		this._agentNodeBeans = agentnodebeans;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public ServiceDirectory getServiceDirectory() {
-		return _serviceDirectory;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setServiceDirectory(ServiceDirectory serviceDirectory) {
-		_serviceDirectory = serviceDirectory;
-		_serviceDirectory.setAgentNode(this);
 	}
 
 	/**
@@ -780,112 +688,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
-	 * Getter for attribute "ServiceDirectoryData" of the managed agent node.
-	 * 
-	 * @return information about the service directory of this agent node
-	 */
-	public CompositeData getServiceDirectoryData() {
-		if (_serviceDirectory == null) {
-			return null;
-		}
-
-		// create commBean data
-		// String[] commBeanItemNames = new String[] {"UniversalId", "LocalId",
-		// "QueueReceiverQueueName", "QueueSenderDestinationName",
-		// "TopicReceiverTopicName", "TopicSenderTopicName", "DefaultQueueName",
-		// "DefaultTopicName", "ProtocolType"};
-		String[] commBeanItemNames = new String[] { "ConnectorURI", "TransportIdentifier" };
-		CompositeDataSupport commBeanData = null;
-		CompositeType commBeanType = null;
-		try {
-			// commBeanType = new
-			// CompositeType("javax.management.openmbean.CompositeDataSupport",
-			// "Communication bean data", commBeanItemNames, new String[]
-			// {"UniversalId", "LocalId", "QueueReceiverQueueName",
-			// "QueueSenderDestinationName", "TopicReceiverTopicName",
-			// "TopicSenderTopicName", "DefaultQueueName", "DefaultTopicName",
-			// "ProtocolType"}, new OpenType[] {SimpleType.STRING,
-			// SimpleType.STRING, SimpleType.STRING, SimpleType.STRING,
-			// SimpleType.STRING, SimpleType.STRING, SimpleType.STRING,
-			// SimpleType.STRING, SimpleType.STRING});
-			commBeanType = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Message transport data",
-					commBeanItemNames, new String[] { "ConnectorURI", "TransportIdentifier" }, new OpenType[] {
-							SimpleType.STRING, SimpleType.STRING });
-			// CommBean commBean = _serviceDirectory.getCommBean();
-			MessageTransport commBean = _serviceDirectory.getCommBean();
-			if (commBean != null) {
-				// Object[] commBeanValues = new Object[] {null, null, null,
-				// null, null, null, commBean.getDefaultQueueName(),
-				// commBean.getDefaultTopicName(), commBean.getProtocolType()};
-				Object[] commBeanValues = new Object[] { null, commBean.getTransportIdentifier() };
-				if (commBean.getConnectorURI() != null) {
-					commBeanValues[0] = commBean.getConnectorURI().toString();
-				}
-				// if (commBean.getAddress() != null) {
-				// commBeanValues[0] = commBean.getAddress().getUniversalId();
-				// commBeanValues[1] = commBean.getAddress().getLocalId();
-				// }
-				// if (commBean.getCommunicator() != null) {
-				// if (commBean.getCommunicator().getReceiver() != null) {
-				// commBeanValues[2] =
-				// commBean.getCommunicator().getReceiver().getQueueName();
-				// }
-				// if (commBean.getCommunicator().getSender() != null) {
-				// commBeanValues[3] =
-				// commBean.getCommunicator().getSender().getDestinationName();
-				// }
-				// }
-				// if (commBean.getTopicCommunicator() != null) {
-				// if (commBean.getTopicCommunicator().getReceiver() != null) {
-				// commBeanValues[4] =
-				// commBean.getTopicCommunicator().getReceiver().getTopicName();
-				// }
-				// if (commBean.getTopicCommunicator().getSender() != null) {
-				// commBeanValues[5] =
-				// commBean.getTopicCommunicator().getSender().getTopicName();
-				// }
-				// }
-				// commBeanData = new CompositeDataSupport(commBeanType,
-				// commBeanItemNames, commBeanValues);
-				commBeanData = new CompositeDataSupport(commBeanType, commBeanItemNames, commBeanValues);
-			}
-		} catch (OpenDataException e) {
-			e.printStackTrace();
-		}
-
-		// get name of all services
-		List<IServiceDescription> allServices = _serviceDirectory.getAllServices();
-		int size = allServices.size();
-		String[] allServiceNames = new String[size];
-		for (int i = 0; i < size; i++) {
-			allServiceNames[i] = allServices.get(i).getName();
-		}
-
-		// get name of all web services
-		List<IServiceDescription> allWebServices = _serviceDirectory.getAllWebServices();
-		size = allWebServices.size();
-		String[] allWebServiceNames = new String[size];
-		for (int i = 0; i < size; i++) {
-			allWebServiceNames[i] = allWebServices.get(i).getName();
-		}
-
-		// create service directory data
-		String[] itemNames = new String[] { "PublishTimer", "ServiceNumber", "AllWebServiceNames", "AllServiceNames",
-				"MessageTransport" };
-		try {
-			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport",
-					"Service directory data", itemNames, new String[] { "PublishTimer", "ServiceNumber", "AllWebServiceNames",
-							"AllServiceNames", "MessageTransport" }, new OpenType[] { SimpleType.INTEGER, SimpleType.INTEGER,
-							new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), commBeanType });
-			return new CompositeDataSupport(type, itemNames, new Object[] { _serviceDirectory.getPublishTimer(),
-					_serviceDirectory.getServiceNumber(), allWebServiceNames, allServiceNames, commBeanData });
-		} catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
 	 * Activates the java security policy defined in the given policy file by
 	 * setting the system property <code>java.security.policy</code> and
 	 * activating the default security manager.
@@ -926,17 +728,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		// register service directory for management
-		if (_serviceDirectory != null) {
-			_serviceDirectory.enableManagement(manager);
-		}
-
-//		// register message broker for management
-//		if (_embeddedBroker != null) {
-//			/* TODO Managment implementation for revised ActiveMQBroker */
-//			// _embeddedBroker.enableManagement(manager);
-//		}
-
 		// enable remote management
 		if (_jmxConnectors != null) {
 			manager.enableRemoteManagement(_name, _jmxConnectors);
@@ -956,17 +747,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// disable remote management
 		_manager.disableRemoteManagement(getName());
-
-//		// deregister message broker from management
-//		if (_embeddedBroker != null) {
-//			/* TODO Managment implementation for revised ActiveMQBroker */
-//			// _embeddedBroker.disableManagement();
-//		}
-
-		// deregister service directory from management
-		if (_serviceDirectory != null) {
-			_serviceDirectory.disableManagement();
-		}
 
 		// deregister agents from management
 		if (_agents != null) {

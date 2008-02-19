@@ -197,7 +197,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 */
 	public Set<ServiceDescription> findServiceByName(String name) {
 		Set<ServiceDescription> serviceDescriptionList = memory.readAll(new ServiceDescription(null, null, name, null,
-																						null, null, null, null, null, null, null, null));
+																						null, null, null, null, null, null));
 		return serviceDescriptionList;
 	}
 
@@ -210,24 +210,24 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 		return memory.readAllOfType(IServiceDescription.class).size();
 	}
 
-	/**
-	 * threadsafe ??
-	 * 
-	 * @return all webservices, stored in this servicedirectory
-	 */
-	public List<IServiceDescription> getAllWebServices() {
-		List<IServiceDescription> webServices = new ArrayList<IServiceDescription>();
-		Set<ServiceDescription> serviceDescriptionList = memory.readAll(new ServiceDescription(null, null, null, null,
-																						null, null, null, null, null, null, null, null));
-		for (Iterator iter = serviceDescriptionList.iterator(); iter.hasNext();) {
-			IServiceDescription serviceDesc = (IServiceDescription) iter.next();
-			if (serviceDesc.isWebService()) {
-				webServices.add(serviceDesc);
-			}
-		}
-		return webServices;
-	}
-
+//	/**
+//	 * threadsafe ??
+//	 * 
+//	 * @return all webservices, stored in this servicedirectory
+//	 */
+//	public List<IServiceDescription> getAllWebServices() {
+//		List<IServiceDescription> webServices = new ArrayList<IServiceDescription>();
+//		Set<ServiceDescription> serviceDescriptionList = memory.readAll(new ServiceDescription(null, null, null, null,
+//																						null, null, null, null, null, null));
+//		for (Iterator iter = serviceDescriptionList.iterator(); iter.hasNext();) {
+//			IServiceDescription serviceDesc = (IServiceDescription) iter.next();
+//			if (serviceDesc.isWebService()) {
+//				webServices.add(serviceDesc);
+//			}
+//		}
+//		return webServices;
+//	}
+//
 	/**
 	 * threadsafe ??
 	 * 
@@ -236,7 +236,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	public List<IServiceDescription> getAllServices() {
 		List<IServiceDescription> services = new ArrayList<IServiceDescription>();
 		Set<ServiceDescription> serviceDescriptionList = memory.readAll(new ServiceDescription(null, null, null, null,
-																						null, null, null, null, null, null, null, null));
+																						null, null, null, null, null, null));
 		// gefundene services in ne Liste kopieren
 		for (Iterator iter = serviceDescriptionList.iterator(); iter.hasNext();) {
 			IServiceDescription serviceDesc = (IServiceDescription) iter.next();

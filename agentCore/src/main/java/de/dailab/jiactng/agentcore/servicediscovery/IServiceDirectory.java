@@ -36,20 +36,10 @@ public interface IServiceDirectory extends IFact {
 	 * @return a List of IServiceDescriptions as search result. 
 	 */	
 	public List<IServiceDescription> searchService(IServiceSearchRequest request) ;
-	
-	
-	/**
-	 * Returns all web services registered in the jiac tng service directory.
-	 * @return a List of IServiceDescriptions
-	 */
-	public List<IServiceDescription> getAllWebServices();
-	
 
 	/**
 	 * Returns all services registered in the jiac tng service directory.
 	 * @return a List of IServiceDescriptions
 	 */
 	public List<IServiceDescription> getAllServices();
-
-	
 }

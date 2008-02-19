@@ -46,10 +46,6 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 */
 	public void addAgents(String configFile);
 
-	//public long getInitTime();
-	
-	//public long getStartTime();
-
 	/**
 	 * Getter for attribute "Owner" of the managed agent node.
 	 * @return the owner of this agent node
@@ -93,17 +89,8 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	public CompositeData getAmqBrokerValues();
 
 	/**
-	 * Getter for attribute "ServiceDirectoryData" of the managed agent node.
-	 * @return information about the service directory of this agent node
-	 */
-	public CompositeData getServiceDirectoryData();
-
-	/**
 	 * Shuts down the managed agent node.
      * @throws LifecycleException if an error occurs during stop and cleanup of this agent node.
 	 */
 	public void shutdown() throws Exception;
-
-	//public void undeployAgent(Agent agent);
-	
 }

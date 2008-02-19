@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore;
 
-//import de.dailab.jiactng.agentcore.comm.protocolenabler.AbstractProtocolEnabler;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.BeanNameAware;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
 import de.dailab.jiactng.agentcore.management.Manageable;
-import de.dailab.jiactng.agentcore.servicediscovery.ServiceDirectory;
 
 /**
  * Interface for agentnodes. This interfaces defines functionalities, that are
@@ -155,17 +153,4 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    * @return the beans of the agent node
    */
   public ArrayList<IAgentNodeBean> getAgentNodeBeans();
-  
-  /**
-   * Gets the service directory used by this agent node.
-   * @return the service directory 
-   */
-  public ServiceDirectory getServiceDirectory();
-
-  /**
-   * Sets the service directory to be used by this agent node.
-   * @param serviceDirectory the service directory
-   */
-  public void setServiceDirectory(ServiceDirectory serviceDirectory);
-  
 }

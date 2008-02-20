@@ -12,7 +12,7 @@ import javax.jms.JMSException;
  * factory.
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public final class ConnectionFactoryProxy implements ConnectionFactory {
     protected ConnectionFactory connectionFactory= null;
@@ -32,7 +32,9 @@ public final class ConnectionFactoryProxy implements ConnectionFactory {
     private void checkConnectionFactory() {
         if(connectionFactory == null) {
             synchronized(this) {
-                ActiveMQBroker.initialiseProxy(this);
+                if(connectionFactory == null) {
+                    ActiveMQBroker.initialiseProxy(this);
+                }
             }
         }
     }

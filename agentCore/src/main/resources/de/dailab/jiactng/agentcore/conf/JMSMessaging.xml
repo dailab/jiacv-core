@@ -2,97 +2,96 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
-   - This file specifies all JMS-relevant entities for the JIAC-TNG agentCore
+	- This file specifies all JMS-relevant entities for the JIAC-TNG agentCore
 -->
 <beans>
-   <!--
-      Abstract configuration of an ActiveMQ broker.
-      It has the following properties:
-      * brokerName: the name of the broker (it should be unique) - if it is not set
-        the bean name in the configuration is used instead (here: StandardJMSBroker)
-      * persistent: indicates whether messages should be stored in a data base or not. ActiveMQ
-        uses Derby to store message. You must include this dependency explicitly in your project!
-      * connectors: The set of connectors. Each broker automatically has a VMConnector which allows
-        VM-internal connections. For identification of this VMConnector you have to use the brokerName.
-   -->
-   <bean name="ActiveMQBroker" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker" abstract="true">
-      <property name="brokerName" value="ActiveMQBroker" />
-      <property name="persistent" value="false" />
-   </bean>
+	<!--
+		Abstract configuration of an ActiveMQ broker.
+		It has the following properties:
+		* persistent: indicates whether messages should be stored in a data base or not. ActiveMQ
+		uses Derby to store message. You must include this dependency explicitly in your project!
+		* connectors: The set of connectors. Each broker automatically has a VMConnector which allows
+		VM-internal connections. For identification of this VMConnector you have to use the brokerName.
+	-->
+	<bean name="ActiveMQBroker" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker" factory-method="getInstance" singleton="true">
+		<property name="persistent" value="false" />
+	</bean>
 
-   <!--
-      The standard JMS Broker.
-      It has a standard TCP connector which maintains a multicast discovery mechanism.
-   -->
-   <bean name="StandardJMSBroker" parent="ActiveMQBroker" singleton="true">
-      <property name="connectors">
-         <set>
-            <ref bean="StandardTCPConnector" />
-         </set>
-      </property>
-   </bean>
+<!--	<bean name="ActiveMQBroker" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker" singleton="true">-->
+<!--		<property name="persistent" value="false" />-->
+<!--	</bean>-->
 
-   <!--
-      The standard JMS Broker with fixed port number.
-      It has a standard TCP connector which maintains a multicast discovery mechanism.
-   -->
-   <bean name="StandardJMSBrokerFixedPort" parent="ActiveMQBroker" singleton="true">
-      <property name="connectors">
-         <set>
-            <ref bean="StandardTCPConnectorFixedPort" />
-         </set>
-      </property>
-   </bean>
+	<!--
+		The standard JMS Broker.
+		It has a standard TCP connector which maintains a multicast discovery mechanism.
+	-->
+	<bean name="StandardJMSBroker" parent="ActiveMQBroker" singleton="true">
+		<property name="connectors">
+			<set>
+				<ref bean="StandardTCPConnector" />
+			</set>
+		</property>
+	</bean>
 
-   <!-- 
-      Abstract configuration for a transport connector.
-   -->
-   <bean name="ActiveMQTransportConnector" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQTransportConnector"
-      abstract="true">
-   </bean>
+	<!--
+		The standard JMS Broker with fixed port number.
+		It has a standard TCP connector which maintains a multicast discovery mechanism.
+	-->
+	<bean name="StandardJMSBrokerFixedPort" parent="ActiveMQBroker" singleton="true">
+		<property name="connectors">
+			<set>
+				<ref bean="StandardTCPConnectorFixedPort" />
+			</set>
+		</property>
+	</bean>
 
-   <!-- 
-      Definition of the standard TCP connector for ActiveMQ.
-      It specifies the transport address and the default multicast address for discovery.
-   -->
-   <bean name="StandardTCPConnector" parent="ActiveMQTransportConnector" singleton="true">
-      <property name="transportURI" value="tcp://localhost:0" />
-      <property name="discoveryURI" value="multicast://239.255.2.45:5555" />
-   </bean>
+	<!-- 
+		Abstract configuration for a transport connector.
+	-->
+	<bean name="ActiveMQTransportConnector" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQTransportConnector"
+		abstract="true">
+	</bean>
 
-   <!-- 
-      Definition of the standard TCP connector with fixed port for ActiveMQ.
-      It specifies the transport address and the default multicast address for discovery.
-   -->
-   <bean name="StandardTCPConnectorFixedPort" parent="ActiveMQTransportConnector" singleton="true">
-      <property name="transportURI" value="tcp://localhost:61616" />
-      <property name="discoveryURI" value="multicast://239.255.2.45:5555" />
-   </bean>
+	<!-- 
+		Definition of the standard TCP connector for ActiveMQ.
+		It specifies the transport address and the default multicast address for discovery.
+	-->
+	<bean name="StandardTCPConnector" parent="ActiveMQTransportConnector" singleton="true">
+		<property name="transportURI" value="tcp://localhost:0" />
+		<property name="discoveryURI" value="multicast://239.255.2.45:5555" />
+	</bean>
 
-   <!-- 
-      The standard JMS connection factory connects to the broker via VM-connector.
-      Thus you have to ensure that the brokerURL is the unique name of the broker associated
-      with the node.
-      
-      See the de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker documentation for more details.
-   -->
-   <bean name="StandardJMSConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory"
-      singleton="false">
-      <property name="brokerURL" value="vm://ActiveMQBroker" />
-   </bean>
+	<!-- 
+		Definition of the standard TCP connector with fixed port for ActiveMQ.
+		It specifies the transport address and the default multicast address for discovery.
+	-->
+	<bean name="StandardTCPConnectorFixedPort" parent="ActiveMQTransportConnector" singleton="true">
+		<property name="transportURI" value="tcp://localhost:61616" />
+		<property name="discoveryURI" value="multicast://239.255.2.45:5555" />
+	</bean>
 
-   <!-- 
-      The standard JMS message transport for the communication bean (an agent bean).
-      By default, it maintains a VM-connection the node's broker.
-      
-      If you want to use this message transport, you have to ensure that your agent node
-      has the StandardJMSBroker agent node bean installed. Otherwise this transport cannot access
-      the broker!
-   -->
-   <bean name="StandardJMSMessageTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
-      singleton="false">
-      <property name="connectionFactory" ref="StandardJMSConnectionFactory" />
-   </bean>
+	<!-- 
+		The standard JMS connection factory connects to the broker via VM-connector.
+		Thus you have to ensure that the brokerURL is the unique name of the broker associated
+		with the node.
+		
+		See the de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker documentation for more details.
+	-->
+	<bean name="StandardJMSConnectionFactory" class="de.dailab.jiactng.agentcore.comm.broker.ConnectionFactoryProxy"
+		singleton="false" />
+
+	<!-- 
+		The standard JMS message transport for the communication bean (an agent bean).
+		By default, it maintains a VM-connection the node's broker.
+		
+		If you want to use this message transport, you have to ensure that your agent node
+		has the StandardJMSBroker agent node bean installed. Otherwise this transport cannot access
+		the broker!
+	-->
+	<bean name="StandardJMSMessageTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
+		singleton="false">
+		<property name="connectionFactory" ref="StandardJMSConnectionFactory" />
+	</bean>
 </beans>
 
 

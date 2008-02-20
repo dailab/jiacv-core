@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
@@ -15,18 +16,56 @@ import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
  * @author Marcel Patzlaff
  * 
  */
-public class ActiveMQBroker extends AbstractAgentNodeBean {
-    /** The embedded broker we use if no other broker is running on our host machine */
+public final class ActiveMQBroker extends AbstractAgentNodeBean {
+    private static ActiveMQBroker INSTANCE= null;
+    
+    /**
+     * TODO: Spring versteht zur Zeit nicht was Singleton bedeutet. Der Konstruktor
+     *       wuerde ohne diese Methode mehrmals aufgerufen werden!
+     *       Sowie diese Problem geloest ist, sollte getInstance entfernt werden!
+     */
+    private synchronized static ActiveMQBroker getInstance() {
+        if(INSTANCE == null) {
+            INSTANCE= new ActiveMQBroker();
+        }
+        
+        return INSTANCE;
+    }
+
+    /*package*/ static void initialiseProxy(ConnectionFactoryProxy proxy) {
+        if(INSTANCE == null) {
+            throw new IllegalStateException("no broker is running");
+        }
+        
+        proxy.connectionFactory= new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName());
+    }
+    
     private String _brokerName= null;
     private BrokerService _broker= null;
     private Set<ActiveMQTransportConnector> _connectors= new HashSet<ActiveMQTransportConnector>();
     private boolean _persistent = false;
 
-    public ActiveMQBroker() {}
+    public ActiveMQBroker() {
+//try {
+//    throw new NullPointerException();
+//} catch (RuntimeException re) {
+//    re.printStackTrace(System.out);
+//}
+//        synchronized (ActiveMQBroker.class) {
+//            if(INSTANCE != null) {
+//                throw new IllegalStateException("only on instance per VM is allowed");
+//            }
+//            
+//            INSTANCE= this;
+//        }
+    }
 
     // Lifecyclemethods:
     public void doInit() throws Exception {
         log.debug("initializing embedded broker");
+        
+        // TODO: ensure that there are no dots, underscores and so on!
+        _brokerName= agentNode.getName() + getBeanName() + hashCode();
         _broker = new BrokerService();
         _broker.setBrokerName(getBrokerName());
         
@@ -95,24 +134,11 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
         _connectors = connectors;
     }
 
-    /**
-     * Setter for the broker name. The name is only changed when this node bean is not
-     * yet initialised. Otherwise the call of this method is ignored.
-     * <p>
-     * You have to ensure, that the broker name is unique. If the broker name is not set
-     * the name of this bean will be taken instead!
-     * </p>
-     * 
-     * @param brokerName    the new name for the broker or <code>null</code> to default it
-     *                      to the bean name. 
-     */
-    public void setBrokerName(String brokerName) {
-        if(_broker == null) {
-            _brokerName= brokerName;
+    private String getBrokerName() {
+        if(_brokerName == null) {
+            throw new IllegalStateException("broker is not initialised");
         }
-    }
-    
-    public String getBrokerName() {
-        return _brokerName == null ? getBeanName() : _brokerName;
+
+        return _brokerName;
     }
 }

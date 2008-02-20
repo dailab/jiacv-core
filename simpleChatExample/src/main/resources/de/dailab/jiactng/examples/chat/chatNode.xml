@@ -8,7 +8,7 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/>
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
 
-	<bean name="CommunicationPlatform" parent="PlatformWithJMX">
+	<bean name="CommunicationPlatform" parent="Platform">
 		<property name="agentNodeBeans">
 			<list>
 				<ref bean="FanzyBroker"/>

@@ -19,19 +19,6 @@ import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 public final class ActiveMQBroker extends AbstractAgentNodeBean {
     private static ActiveMQBroker INSTANCE= null;
     
-    /**
-     * TODO: Spring versteht zur Zeit nicht was Singleton bedeutet. Der Konstruktor
-     *       wuerde ohne diese Methode mehrmals aufgerufen werden!
-     *       Sowie diese Problem geloest ist, sollte getInstance entfernt werden!
-     */
-    private synchronized static ActiveMQBroker getInstance() {
-        if(INSTANCE == null) {
-            INSTANCE= new ActiveMQBroker();
-        }
-        
-        return INSTANCE;
-    }
-
     /*package*/ static void initialiseProxy(ConnectionFactoryProxy proxy) {
         if(INSTANCE == null) {
             throw new IllegalStateException("no broker is running");
@@ -46,18 +33,13 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
     private boolean _persistent = false;
 
     public ActiveMQBroker() {
-//try {
-//    throw new NullPointerException();
-//} catch (RuntimeException re) {
-//    re.printStackTrace(System.out);
-//}
-//        synchronized (ActiveMQBroker.class) {
-//            if(INSTANCE != null) {
-//                throw new IllegalStateException("only on instance per VM is allowed");
-//            }
-//            
-//            INSTANCE= this;
-//        }
+        synchronized (ActiveMQBroker.class) {
+            if(INSTANCE != null) {
+                throw new IllegalStateException("only on instance per VM is allowed");
+            }
+            
+            INSTANCE= this;
+        }
     }
 
     // Lifecyclemethods:

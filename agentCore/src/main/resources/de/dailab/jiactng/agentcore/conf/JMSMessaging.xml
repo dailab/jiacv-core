@@ -12,20 +12,23 @@
 		uses Derby to store message. You must include this dependency explicitly in your project!
 		* connectors: The set of connectors. Each broker automatically has a VMConnector which allows
 		VM-internal connections. For identification of this VMConnector you have to use the brokerName.
+		
+		You can instantiate the ActiveMQBroker class only once. So if you define several broker configurations
+		you have to ensure the following:
+		1. declare them as singletons
+		2. set lazy-init to true
+		The second point is the most crucial one because Spring usually instantiate _all_ singletons it can find!
+		Singleton is here used in terms of "one-bean-reference-at-a-time" and not on class-level!
 	-->
-	<bean name="ActiveMQBroker" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker" factory-method="getInstance" singleton="true">
+	<bean name="ActiveMQBroker" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker" abstract="true">
 		<property name="persistent" value="false" />
 	</bean>
-
-<!--	<bean name="ActiveMQBroker" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker" singleton="true">-->
-<!--		<property name="persistent" value="false" />-->
-<!--	</bean>-->
 
 	<!--
 		The standard JMS Broker.
 		It has a standard TCP connector which maintains a multicast discovery mechanism.
 	-->
-	<bean name="StandardJMSBroker" parent="ActiveMQBroker" singleton="true">
+	<bean name="StandardJMSBroker" parent="ActiveMQBroker" singleton="true" lazy-init="true">
 		<property name="connectors">
 			<set>
 				<ref bean="StandardTCPConnector" />
@@ -37,7 +40,7 @@
 		The standard JMS Broker with fixed port number.
 		It has a standard TCP connector which maintains a multicast discovery mechanism.
 	-->
-	<bean name="StandardJMSBrokerFixedPort" parent="ActiveMQBroker" singleton="true">
+	<bean name="StandardJMSBrokerFixedPort" parent="ActiveMQBroker" singleton="true" lazy-init="true">
 		<property name="connectors">
 			<set>
 				<ref bean="StandardTCPConnectorFixedPort" />

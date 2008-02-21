@@ -20,6 +20,14 @@ public final class CommunicationAddressFactory {
         }
     }
     
+    /**
+     * @deprecated
+     * This method will be removed as soon as the white and yellow pages discovery functionalities are
+     * available.
+     * 
+     * MessageBoxAddress will be generated and assigned from the node/system to ensure the uniqueness.
+     */
+    @Deprecated
     public static IMessageBoxAddress createMessageBoxAddress(String boxName) {
         try {
             return new MessageBoxAddress(boxName);

@@ -7,9 +7,10 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 /**
  * Used for invocation of a TNG-service via the generic web service interface.
  * @author schenk
- *
+ * 
+ * @deprecated This class should be removed as specific webservice handling is not part of agentCore.
  */
-
+@Deprecated
 public interface IWsToPe extends IFact {
 
 	/**

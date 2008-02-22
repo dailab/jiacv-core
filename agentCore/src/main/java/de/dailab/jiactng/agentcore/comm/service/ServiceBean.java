@@ -13,6 +13,7 @@ import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
 
+import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
@@ -21,6 +22,7 @@ import de.dailab.jiactng.agentcore.action.DoRemoteAction;
 import de.dailab.jiactng.agentcore.action.RemoteAction;
 import de.dailab.jiactng.agentcore.action.RemoteActionResult;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
+import de.dailab.jiactng.agentcore.comm.CommunicationBean;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
@@ -218,18 +220,17 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     public void doInit() throws Exception {
         super.doInit();
         log.debug("initialise ServiceBean...");
-//        for(IAgentBean bean : thisAgent.getAgentBeans()) {
-//            if(bean instanceof CommunicationBean) {
-//                _communicationBean= (CommunicationBean) bean;
-//                break;
-//            }
-//        }
+        for(IAgentBean bean : thisAgent.getAgentBeans()) {
+            if(bean instanceof CommunicationBean) {
+                _communicationBean= (CommunicationBean) bean;
+                break;
+            }
+        }
         
-        _communicationBean= thisAgent.getActionInvocationHandler().getInvocatorInstance(ICommunicationBean.class);
-//        
-//        if(_communicationBean == null) {
-//            throw new IllegalStateException("could not find communication bean");
-//        }
+        if(_communicationBean == null) {
+            throw new IllegalStateException("could not find communication bean");
+        }
+        
         _actionToRemoteAction= new Hashtable<Action, Set<RemoteAction>>();
         _sessionsFromExternalClients= new Hashtable<String, ICommunicationAddress>();
         _sessionsToExternalProviders= new Hashtable<String, DoAction>();

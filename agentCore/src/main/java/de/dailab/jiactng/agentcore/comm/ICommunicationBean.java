@@ -3,15 +3,11 @@
  */
 package de.dailab.jiactng.agentcore.comm;
 
-import de.dailab.jiactng.agentcore.action.IActionInvocationHandler;
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean.Expose;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
  * This interface describes a standard communication component of an agent.
- * <p>
- * All method declared herein are exposed as actions and can thus be used
- * via {@link IActionInvocationHandler}.
  * 
  * @author Marcel Patzlaff
  * @version $Revision$
@@ -44,7 +40,12 @@ public interface ICommunicationBean {
      * @param messageBox    the address of the message box
      * @throws CommunicationException
      *                      if an error occurs on the message bus
+     * 
+     * @deprecated
+     *      This method will be removed as soon as there is a white pages service
+     *      available!
      */
+    @Deprecated
     @Expose
     void establishMessageBox(IMessageBoxAddress messageBox) throws CommunicationException;
     
@@ -54,7 +55,12 @@ public interface ICommunicationBean {
      * @param messageBox    the address of the message box
      * @throws CommunicationException
      *                      if an error occurs on the message bus
+     *                      
+     * @deprecated
+     *      This method will be removed as soon as there is a white pages service
+     *      available!
      */
+    @Deprecated
     @Expose
     void destroyMessageBox(IMessageBoxAddress messageBox) throws CommunicationException;
     
@@ -76,8 +82,13 @@ public interface ICommunicationBean {
      * @param address       the address to associate with
      * @throws CommunicationException
      *                      if an error occurs on the message bus
+     *                      
+     * @deprecated 
+     *      This method will be removed soon as it collides with
+     *      {@link #register(ICommunicationAddress, IJiacMessage)}!
      */
     @Expose
+    @Deprecated
     void register(ICommunicationAddress address) throws CommunicationException;
     
     /**
@@ -99,8 +110,13 @@ public interface ICommunicationBean {
      * @param address           the address to disassociate from
      * @throws CommunicationException
      *                          if an error occurs on the message bus
+     * 
+     * @deprecated 
+     *      This method will be removed soon as it collides with
+     *      {@link #unregister(ICommunicationAddress, IJiacMessage)}! 
      */
     @Expose
+    @Deprecated
     void unregister(ICommunicationAddress address) throws CommunicationException;
     
     /**

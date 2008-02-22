@@ -198,7 +198,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         }
 
         // create the default message box for this agent
-        register(thisAgent.getAgentDescription().getMessageBoxAddress());
+        establishMessageBox(thisAgent.getAgentDescription().getMessageBoxAddress());
 
         if (_transports.size() <= 0) {
             log.warn("no transports available yet!");
@@ -287,19 +287,21 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
 
     // ~ START OF ACTIONS ~ //
     public synchronized void joinGroup(IGroupAddress group) throws CommunicationException {
-        register(group);
+        register(group, null);
     }
 
     public synchronized void leaveGroup(IGroupAddress group) throws CommunicationException {
-        unregister(group);
+        unregister(group, null);
     }
 
+    // TODO: make this private
     public synchronized void establishMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
-        register(messageBox);
+        register(messageBox, null);
     }
 
+    // TODO: make this private
     public synchronized void destroyMessageBox(IMessageBoxAddress messageBox) throws CommunicationException {
-        unregister(messageBox);
+        unregister(messageBox, null);
     }
 
     public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
@@ -314,6 +316,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         internalSend(saveCast(message, JiacMessage.class), saveCast(address, CommunicationAddress.class));
     }
 
+    @Deprecated
     public synchronized void register(ICommunicationAddress address) throws CommunicationException {
         if (log.isInfoEnabled()) {
             log.info("CommunicationBean begins to listen at address '" + address + "'");
@@ -325,6 +328,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         internalRegister(saveCast(address, CommunicationAddress.class), null);
     }
 
+    @Deprecated
     public synchronized void unregister(ICommunicationAddress address) throws CommunicationException {
         if (log.isInfoEnabled()) {
             log.info("CommunicationBean stops to listen at address '" + address + "'");
@@ -340,9 +344,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
 
     // ~ METHODS FOR LISTENER ADMINISTRATION ~ //
 
-    /**
-     * registers a given listener to an address if all messages shall be received selector == null Notes: Listener, and Address must not be null
-     */
+    // TODO: change the type of the address to IGroupAddress
     public synchronized void register(ICommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         if (log.isInfoEnabled()) {
             log.info("CommunicationBean begins to listen at address '" + address + "' with Selector '" + selectorTemplate + "'");
@@ -355,17 +357,7 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
         internalRegister(saveCast(address, CommunicationAddress.class), selectorTemplate);
     }
 
-    /**
-     * Unregisters a listener from an address with a given selector 
-     * 
-     * @param listener
-     *            that wants to unregister
-     * @param address
-     *            The address the listener should stop listen to
-     * @param selector
-     *            The selector given while the listener was registered (null if none was given)
-     * @throws CommunicationException
-     */
+    // TODO: change the type of the address to IGroupAddress
     public synchronized void unregister(ICommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
         if (log.isInfoEnabled()) {
             log.info("CommunicationBean stops to listen at address '" + address + "' with selector '" + selectorTemplate + "'");

@@ -4,18 +4,14 @@
 package de.dailab.jiactng.agentcore.comm.service;
 
 import de.dailab.jiactng.agentcore.action.Action;
-import de.dailab.jiactng.agentcore.action.IActionInvocationHandler;
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean.Expose;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 
 /**
  * This interface describes the capabilities of a simple service bean.
- * <p>
- * All method declared herein are exposed as actions and can thus be used
- * via {@link IActionInvocationHandler}.
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public interface IServiceBean {
     /**

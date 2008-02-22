@@ -12,8 +12,9 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * 
  * @author schenk
  *
+ * @deprecated This class should be removed as specific webservice handling is not part of agentCore.
  */
-
+@Deprecated
 public interface IWSClient extends IFact {
 	
 	/**

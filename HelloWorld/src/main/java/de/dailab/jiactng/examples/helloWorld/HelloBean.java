@@ -19,7 +19,7 @@ public class HelloBean extends AbstractAgentBean implements IEffector {
 
 	public void doStart() throws Exception {
 		super.doStart();
-		Action a = memory.read(new Action("helloWorld", null, null, null));
+		Action a = memory.read(new Action("helloWorld", null, new Class[0], null));
 		memory.write(a.createDoAction(new Class[0], null));
 	}
 
@@ -55,7 +55,7 @@ public class HelloBean extends AbstractAgentBean implements IEffector {
 	}
 
 	public ArrayList<Action> getActions() {
-		ArrayList myActions = new ArrayList();
+		ArrayList<Action> myActions = new ArrayList<Action>();
 		myActions
 				.add(new Action("helloWorld", this, new Class[0], new Class[0]));
 		return myActions;

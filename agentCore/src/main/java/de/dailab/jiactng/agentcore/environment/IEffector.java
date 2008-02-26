@@ -6,7 +6,7 @@
  */
 package de.dailab.jiactng.agentcore.environment;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
@@ -29,9 +29,9 @@ public interface IEffector extends IAgentBean {
 	 * components.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.action.Action
-	 * @return An ArrayList containing all actions from this component.
+	 * @return A List containing all actions from this component.
 	 */
-	public ArrayList<? extends Action> getActions();
+	public List<? extends Action> getActions();
 
 	/**
 	 * Executes a selected action. This method should be implemented by the

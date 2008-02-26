@@ -6,11 +6,16 @@
  */
 package de.dailab.jiactng.agentcore.action;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
-import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /**
@@ -21,31 +26,39 @@ import de.dailab.jiactng.agentcore.util.EqualityChecker;
  * @see de.dailab.jiactng.agentcore.action.DoAction
  * @author moekon
  */
-public class Action implements IFact {
+public class Action implements IActionDescription {
 	/** SerialVersionUID for Serialization */
-	private static final long serialVersionUID = 6644586804009024924L;
+    private static final long serialVersionUID = 2416102010976263587L;
 
-	private final static Class[] EMPTY_CLASSES = new Class[0];
-
-	/** the name of the action */
-	private String name;
+    /** the name of the action */
+	private String _name;
 
 	/** The component that holds the funtionality for this action */
 	private transient IEffector providerBean;
 
 	/** The classes of the input-parameters of this action */
-	private Class[] parameters;
+	private List<Class<?>> _inputTypes;
 
 	/** The classes of the results of this action */
-	private Class[] results;
+	private List<Class<?>> _resultTypes;
 
+	private IAgentDescription _providerDescription;
+	
 	/**
 	 * This constructor is used to create an action template
 	 */
 	public Action() {
-		this(null, null, null, null);
+		this(null, null, (List<Class<?>>)null, (List<Class<?>>)null);
 	}
 
+	/**
+	 * This constructor is used to create an action template with only
+	 * the name specified.
+	 */
+	public Action(String name) {
+	    this(name, null, (List<Class<?>>)null, (List<Class<?>>)null);
+	}
+	
 	/**
 	 * Constructor. Creates a new action-declaration.
 	 * 
@@ -53,18 +66,25 @@ public class Action implements IFact {
 	 *            the name of the action
 	 * @param providerBean
 	 *            the component that holds the functionality of this action
-	 * @param parameters
+	 * @param inputTypes
 	 *            the classes of the input-parameters of this action
-	 * @param results
+	 * @param resultTypes
 	 *            the classes of the results of this action
 	 */
-	public Action(String name, IEffector providerBean, Class[] parameters,
-			Class[] results) {
-		super();
-		this.name = name;
-		this.providerBean = providerBean;
-		setParameters(parameters);
-		setResults(results);
+	public Action(String name, IEffector providerBean, Class<?>[] inputTypes, Class<?>[] resultTypes) {
+		this(
+	        name,
+	        providerBean,
+	        inputTypes != null ? Arrays.asList(inputTypes) : null,
+	        resultTypes != null ? Arrays.asList(resultTypes) : null
+        );
+	}
+	
+	public Action(String name, IEffector providerBean, List<Class<?>> inputTypes, List<Class<?>> resultTypes) {
+	    setName(name);
+	    setProviderBean(providerBean);
+	    setInputTypes(inputTypes);
+	    setResultTypes(resultTypes);
 	}
 
 	/**
@@ -74,20 +94,12 @@ public class Action implements IFact {
 	 *            the action to create an action from
 	 */
 	public Action(Action action) {
-		this.name = action.getName();
-		this.providerBean = action.getProviderBean();
-		if (action.parameters != null) {
-			this.parameters = new Class[action.getParameters().length];
-			for (int i = 0; i < action.getParameters().length; i++) {
-				this.parameters[i] = action.getParameters()[i];
-			}
-		}
-		if (action.getResults() != null) {
-			this.results = new Class[action.getResults().length];
-			for (int i = 0; i < action.getResults().length; i++) {
-				this.results[i] = action.getResults()[i];
-			}
-		}
+		_name = action.getName();
+		providerBean = action.getProviderBean();
+		
+		// we can exchange references here, because the lists are immutable
+		_inputTypes= action.getInputTypes();
+		_resultTypes= action.getResultTypes();
 	}
 
 	/**
@@ -131,8 +143,8 @@ public class Action implements IFact {
 	 * 
 	 * @return a string representing the name of this action.
 	 */
-	public String getName() {
-		return name;
+	public final String getName() {
+		return _name;
 	}
 
 	/**
@@ -141,8 +153,8 @@ public class Action implements IFact {
 	 * @return an array containing the classes of the parameters in correct
 	 *         order.
 	 */
-	public Class[] getParameters() {
-		return parameters;
+	public final List<Class<?>> getInputTypes() {
+		return _inputTypes;
 	}
 
 	/**
@@ -150,50 +162,70 @@ public class Action implements IFact {
 	 * 
 	 * @return a life-reference to the component.
 	 */
-	public IEffector getProviderBean() {
+	public final IEffector getProviderBean() {
 		return providerBean;
 	}
+	
+	public final IAgentDescription getProviderDescription() {
+        return _providerDescription;
+    }
 
-	/**
+    /**
 	 * Getter for the result classes.
 	 * 
 	 * @return an array containing the classes of the return-values in correct
 	 *         order.
 	 */
-	public Class[] getResults() {
-		return results;
+	public final List<Class<?>> getResultTypes() {
+		return _resultTypes;
 	}
 
 	/**
 	 * @param name
 	 *            the name to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public final void setName(String name) {
+		this._name = name;
 	}
 
 	/**
 	 * @param parameters
 	 *            the parameters to set
 	 */
-	public void setParameters(Class[] parameters) {
-		this.parameters = parameters == null ? EMPTY_CLASSES : parameters;
+	public final void setInputTypes(List<Class<?>> inputTypes) {
+		if(inputTypes != null) {
+		    List<Class<?>> copy= new ArrayList<Class<?>>();
+		    copy.addAll(inputTypes);
+		    _inputTypes= Collections.unmodifiableList(copy);
+		} else {
+		    _inputTypes= Collections.emptyList();
+		}
 	}
 
 	/**
 	 * @param providerBean
 	 *            the providerBean to set
 	 */
-	public void setProviderBean(IEffector providerBean) {
+	public final void setProviderBean(IEffector providerBean) {
 		this.providerBean = providerBean;
 	}
 
-	/**
+	public final void setProviderDescription(IAgentDescription providerDescription) {
+        _providerDescription = providerDescription;
+    }
+
+    /**
 	 * @param results
 	 *            the results to set
 	 */
-	public void setResults(Class[] results) {
-		this.results = results == null ? EMPTY_CLASSES : results;
+	public final void setResultTypes(List<Class<?>> resultTypes) {
+	    if(resultTypes != null) {
+	        List<Class<?>> copy= new ArrayList<Class<?>>();
+	        copy.addAll(resultTypes);
+	        _resultTypes= Collections.unmodifiableList(copy);
+	    } else {
+	        _resultTypes= Collections.emptyList();
+	    }
 	}
 
 	/**
@@ -202,9 +234,9 @@ public class Action implements IFact {
 	@Override
 	public int hashCode() {
 		int hash = Action.class.hashCode();
-		hash ^= name != null ? name.hashCode() : 0;
-		hash ^= Arrays.hashCode(parameters);
-		hash ^= Arrays.hashCode(results);
+		hash ^= _name != null ? _name.hashCode() : 0;
+		hash ^= _inputTypes.hashCode();
+		hash ^= _resultTypes.hashCode();
 		return hash;
 	}
 
@@ -218,9 +250,9 @@ public class Action implements IFact {
 		}
 
 		Action other = (Action) obj;
-		return EqualityChecker.equals(name, other.name)
-				&& Arrays.equals(parameters, other.parameters)
-				&& Arrays.equals(results, other.results);
+		return EqualityChecker.equals(_name, other.getName())
+				&& _inputTypes.equals(other.getInputTypes())
+				&& _resultTypes.equals(other.getResultTypes());
 	}
 
 	/**
@@ -229,11 +261,11 @@ public class Action implements IFact {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Action:\n name='").append(name).append("'");
+		builder.append("Action:\n name='").append(_name).append("'");
 		builder.append("\n parameters=");
-		prettyPrintArray(builder, parameters);
+		prettyPrintArray(builder, _inputTypes);
 		builder.append("\n results=");
-		prettyPrintArray(builder, results);
+		prettyPrintArray(builder, _resultTypes);
 		builder.append('\n');
 		return builder.toString();
 	}
@@ -241,13 +273,12 @@ public class Action implements IFact {
 	/*
 	 * Utility-method for a nicely formatted output
 	 */
-	private void prettyPrintArray(StringBuilder builder, Class[] array) {
+	private void prettyPrintArray(StringBuilder builder, List<Class<?>> list) {
 		builder.append('[');
-		int last = array.length - 1;
-		for (int i = 0; i <= last; ++i) {
-			builder.append(array[i].getName());
+		for(Iterator<Class<?>> iter= list.iterator(); iter.hasNext();) {
+			builder.append(iter.next().getName());
 
-			if (i < last) {
+			if (iter.hasNext()) {
 				builder.append("; ");
 			}
 		}

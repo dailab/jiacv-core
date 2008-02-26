@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.action;
 
+import java.util.List;
+
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 
 /**
@@ -121,17 +123,17 @@ public class DoAction extends SessionEvent {
 	 *         the mismatch otherwise.
 	 */
 	public String typeCheck() {
-		Class[] types = getAction().getParameters();
+		List<Class<?>> types = getAction().getInputTypes();
 
-		if (types.length != params.length) {
-			return "type length is '" + types.length
+		if (types.size() != params.length) {
+			return "type length is '" + types.size()
 					+ "' but param length is '" + params.length + "'";
 		}
 
-		for (int i = 0; i < types.length; ++i) {
-			if (!types[i].isInstance(params[i])) {
+		for (int i = 0; i < types.size(); ++i) {
+			if (!types.get(i).isInstance(params[i])) {
 				return "param" + i + " '" + params[i] + "' mismatch the type '"
-						+ types[i] + "'";
+						+ types.get(i) + "'";
 			}
 		}
 

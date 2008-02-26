@@ -458,7 +458,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         doAction.getSession().setSource(this);
         
         Action action= doAction.getAction();
-        Action current= memory.read(new Action(action.getName(), null, action.getParameters(), action.getResults()));
+        Action current= memory.read(new Action(action.getName(), null, action.getInputTypes(), action.getResultTypes()));
         
         if(current != null) {
             _sessionsFromExternalClients.put(doAction.getSessionId(), requestSource);

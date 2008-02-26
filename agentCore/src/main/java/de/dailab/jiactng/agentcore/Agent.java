@@ -7,6 +7,7 @@
 package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -246,7 +247,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 				handleBeanException(a, e, LifecycleStates.CLEANED_UP);
 			}
 		}
-		this.memory.removeAll(new Action(null, null, null, null));
+		this.memory.removeAll(new Action());
 
 		// update state information in agent's memory
 		updateState(LifecycleStates.CLEANED_UP);
@@ -289,7 +290,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
 			// if bean is effector, add all actions to memory
 			if (ab instanceof IEffector) {
-				ArrayList<? extends Action> acts = ((IEffector) ab)
+				List<? extends Action> acts = ((IEffector) ab)
 						.getActions();
 				if (acts != null) {
 					for (Action item : acts) {

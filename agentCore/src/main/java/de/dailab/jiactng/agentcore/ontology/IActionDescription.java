@@ -46,7 +46,7 @@ public interface IActionDescription extends IFact {
      * </p>
      * 
      * @see Collections#unmodifiableList(List)
-     * @return      the unmodifiable list of return types or
+     * @return      the unmodifiable list of result types or
      *              <code>null</code> if not set
      */
     List<Class<?>> getResultTypes();

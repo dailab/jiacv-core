@@ -53,7 +53,7 @@ public class PingerBean extends AbstractAgentBean implements ResultReceiver {
     public void startPingProcess() {
         System.out.println("start the ping process...");
         
-        Action action= memory.read(new Action(PingPongTestCase.ACTION_NAME, null, null, null));
+        Action action= memory.read(new Action(PingPongTestCase.ACTION_NAME));
         IJiacMessage  message= new JiacMessage(new ObjectContent("Ping"));
             DoAction doAction= action.createDoAction(new Object[]{
                 message,

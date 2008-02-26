@@ -46,7 +46,7 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
         log.debug("use remote action to print hello world");
         synchronized (_logLock) {
             
-            Action action= memory.read(new Action(LOG_ACTION, null, null, null));
+            Action action= memory.read(new Action(LOG_ACTION));
             if(action == null) {
                 return "action '" + LOG_ACTION + "' not found";
             }
@@ -75,7 +75,7 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
         synchronized (_timeLock) {
             long start= System.currentTimeMillis();
             
-            Action action= memory.read(new Action(TIME_ACTION, null, null, null));
+            Action action= memory.read(new Action(TIME_ACTION));
             if(action == null) {
                 return "action '" + TIME_ACTION + "' not found";
             }

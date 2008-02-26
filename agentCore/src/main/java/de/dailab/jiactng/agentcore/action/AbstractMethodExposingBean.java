@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -56,7 +57,7 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
     @Target(ElementType.METHOD)
     public static @interface Expose {
         String name() default "";
-        Class[] returnTypes() default {};
+        Class<?>[] returnTypes() default {};
     }
     
     static String getName(Method method) {
@@ -69,10 +70,10 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
         return name;
     }
     
-    static Class[] getReturnTypes(Method method) {
+    static Class<?>[] getReturnTypes(Method method) {
         Expose expAnno= method.getAnnotation(Expose.class);
-        Class returnType= method.getReturnType();
-        Class[] returnTypes;
+        Class<?> returnType= method.getReturnType();
+        Class<?>[] returnTypes;
         if(returnType.isArray()) {
             returnTypes= expAnno.returnTypes().length > 0 ? expAnno.returnTypes() : new Class[]{returnType};
         } else {
@@ -90,11 +91,11 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
      * @return
      */
     static ArrayList<Method> getExposedPublicMethods(Class<? extends AbstractMethodExposingBean> clazz) {
-        Set<Class> processed= new HashSet<Class>();
-        Queue<Class> nextStep= new LinkedList<Class>();
+        Set<Class<?>> processed= new HashSet<Class<?>>();
+        Queue<Class<?>> nextStep= new LinkedList<Class<?>>();
         ArrayList<Method> methods= new ArrayList<Method>();
         nextStep.offer(clazz);
-        Class current;
+        Class<?> current;
         
         do {
             current= nextStep.poll();
@@ -130,7 +131,7 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
                         nextStep.offer(current.getSuperclass());
                     }
                     
-                    for(Class superIntfc : current.getInterfaces()) {
+                    for(Class<?> superIntfc : current.getInterfaces()) {
                         nextStep.offer(superIntfc);
                     }
                 }
@@ -153,8 +154,8 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
         if(!a.getName().equals(b.getName()))
             return false;
         
-        Class[] aParams;
-        Class[] bParams;
+        Class<?>[] aParams;
+        Class<?>[] bParams;
         
         if((aParams= a.getParameterTypes()).length != (bParams= b.getParameterTypes()).length)
             return false;
@@ -167,14 +168,14 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
         return true;
     }
     
-    private static final Class[] EMPTY_CLASSES= new Class[0];
+    private static final Class<?>[] EMPTY_CLASSES= new Class[0];
     protected static final char METHOD_SEPARATING_CHAR= '#';
     
     public final void doAction(DoAction doAction) {
 log.debug("typechecking is '" + doAction.typeCheck() + "'");
         
         Action action= doAction.getAction();
-        Method method= searchMethod(action.getName(), action.getParameters());
+        Method method= searchMethod(action.getName(), action.getInputTypes());
         if(method != null) {
             try {
                 Object result= method.invoke(this, doAction.getParams());
@@ -208,12 +209,12 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         overrideDoAction(doAction);
     }
 
-    public final ArrayList<? extends Action> getActions() {
+    public final List<? extends Action> getActions() {
         ArrayList<Action> actions= new ArrayList<Action>();
         
         for(Method method : getExposedPublicMethods(getClass())) {
             // check for Expose annotation
-            Class[] returnTypes= getReturnTypes(method);
+            Class<?>[] returnTypes= getReturnTypes(method);
             String name= getName(method);
             
             // build the action object
@@ -232,10 +233,10 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         return actions;
     }
     
-    protected void overrideDoAction(DoAction doAction) {}
+    protected void overrideDoAction(@SuppressWarnings("unused") DoAction doAction) {}
     protected List<? extends Action> overrideGetActions() {return Collections.emptyList();}
     
-    private Method searchMethod(String name, Class[] parameters) {
+    private Method searchMethod(String name, List<Class<?>> parameters) {
         String originalName= name;
         String assumedMethodName= null;
         // check for hashmark
@@ -247,22 +248,31 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         
         for(Method method : getExposedPublicMethods(getClass())) {
             Expose exposeAnno= method.getAnnotation(Expose.class);
-            Class[] mpar= method.getParameterTypes();
-            if(mpar.length == parameters.length) {
+            List<Class<?>> mpar= Arrays.asList(method.getParameterTypes());
+            
+            if(mpar.size() == parameters.size()) {
                 if(exposeAnno.name().equals(originalName) || (assumedMethodName != null && method.getName().equals(assumedMethodName))) {
-                    boolean found= true;
-                    for(int i= 0; i < mpar.length; ++i) {
-                        if(!mpar[i].equals(parameters[i])) {
-                            found= false;
-                            break;
-                        }
-                    }
-                    
-                    if(found) {
+                    if(mpar.equals(parameters)) {
                         return method;
                     }
                 }
             }
+//            
+//            if(mpar.length == parameters.length) {
+//                if(exposeAnno.name().equals(originalName) || (assumedMethodName != null && method.getName().equals(assumedMethodName))) {
+//                    boolean found= true;
+//                    for(int i= 0; i < mpar.length; ++i) {
+//                        if(!mpar[i].equals(parameters[i])) {
+//                            found= false;
+//                            break;
+//                        }
+//                    }
+//                    
+//                    if(found) {
+//                        return method;
+//                    }
+//                }
+//            }
         }
         
         return null;
@@ -272,15 +282,16 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
 	 * Creates management information about the provided actions.
 	 * @return list of action descriptions
 	 */
-	public TabularData getActionList() {
-        ArrayList<? extends Action> actions = getActions();
+	@SuppressWarnings("unchecked")
+    public TabularData getActionList() {
+        List<? extends Action> actions = getActions();
         if (actions.isEmpty()) {
         	return null;
         }
 
         try {
         	// create empty table
-        	String[] itemNames = new String[] {"Name", "Parameters", "Results", "ProviderBean"};
+        	String[] itemNames = new String[] {"Name", "InputTypes", "ResultTypes", "ProviderBean"};
         	OpenType[] itemTypes = new OpenType[] {SimpleType.STRING, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), SimpleType.STRING};
         	CompositeType rowType = new CompositeType(actions.get(0).getClass().getName(), "provided action", itemNames, itemNames, itemTypes);
         	TabularType tabularType = new TabularType(actions.getClass().getName(), "list of provided actions", rowType, new String[] {"Name"});
@@ -289,21 +300,21 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         	// fill table
         	for (Action action : actions) {
         		// get parameter classes
-        		Class[] parameters = action.getParameters();
-        		int size = parameters.length;
-        		String[] parameterList = new String[size];
+        	    List<Class<?>> inputTypes = action.getInputTypes();
+        		int size = inputTypes.size();
+        		String[] inputTypeList = new String[size];
         		for (int i=0; i<size; i++) {
-        			parameterList[i] = parameters[i].getName();
+        			inputTypeList[i] = inputTypes.get(i).getName();
         		}
         		// get result classes
-        		Class[] results = action.getResults();
-        		size = results.length;
-        		String[] resultList = new String[size];
+        		List<Class<?>> resultTypes = action.getResultTypes();
+        		size = resultTypes.size();
+        		String[] resultTypeList = new String[size];
         		for (int i=0; i<size; i++) {
-        			resultList[i] = results[i].getName();
+        			resultTypeList[i] = resultTypes.get(i).getName();
         		}
         		// create and add action description
-        		Object[] itemValues = new Object[] {action.getName(), parameterList, resultList, action.getProviderBean().getBeanName()};
+        		Object[] itemValues = new Object[] {action.getName(), inputTypeList, resultTypeList, action.getProviderBean().getBeanName()};
         		CompositeData value = new CompositeDataSupport(rowType, itemNames, itemValues);
         		actionList.put(value);
         	}

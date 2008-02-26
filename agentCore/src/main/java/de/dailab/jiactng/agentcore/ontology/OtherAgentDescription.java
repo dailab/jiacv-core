@@ -5,9 +5,11 @@ package de.dailab.jiactng.agentcore.ontology;
  * Holds information about other agents.
  * @author axle
  *
+ *
+ * TODO: remove inheritance from {@link AgentDescription}.
  */
-public class OtherAgentDescription extends AgentDescription {
-    private static final long serialVersionUID = 1997986788487354440L;
+public class OtherAgentDescription extends AgentDescription implements IAgentDescription {
+    private static final long serialVersionUID = -7568071559906302487L;
 
     /**
 	 * Creates a new description of another agent.
@@ -26,5 +28,9 @@ public class OtherAgentDescription extends AgentDescription {
 	 */
 	public OtherAgentDescription(AgentDescription descr) {
 		super(descr.getAid(), descr.getName(), descr.getState(), descr.getMessageBoxAddress());
+	}
+	
+	public OtherAgentDescription(IAgentDescription descr) {
+	    super(descr.getAid(), descr.getName(), null, descr.getMessageBoxAddress());
 	}
 }

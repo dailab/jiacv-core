@@ -3,56 +3,35 @@
  */
 package de.dailab.jiactng.agentcore.comm.yp;
 
-import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import java.util.List;
+
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class ActionDescription implements IActionDescription {
     protected String name;
-    protected Class<?>[] inputTypes;
-    protected Class<?>[] resultTypes;
-    protected AgentDescription providerDescription;
+    protected List<Class<?>> inputTypes;
+    protected List<Class<?>> resultTypes;
+    protected IAgentDescription providerDescription;
     
     @Override
-    public Class<?>[] getInputTypes() {
+    public List<Class<?>> getInputTypes() {
         return inputTypes;
     }
-
     @Override
     public String getName() {
         return name;
     }
-
     @Override
-    public AgentDescription getProviderDescription() {
+    public IAgentDescription getProviderDescription() {
         return providerDescription;
     }
-
     @Override
-    public Class<?>[] getResultTypes() {
+    public List<Class<?>> getResultTypes() {
         return resultTypes;
-    }
-
-    @Override
-    public void setInputTypes(Class<?>[] inputTypes) {
-        this.inputTypes= inputTypes;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name= name;
-    }
-
-    @Override
-    public void setProviderDescription(AgentDescription description) {
-        this.providerDescription= description;
-    }
-
-    @Override
-    public void setResultTypes(Class<?>[] resultTypes) {
-        this.resultTypes= resultTypes;
     }
 }

@@ -2,7 +2,6 @@ package de.dailab.jiactng.agentcore.ontology;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
-import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /**
@@ -11,8 +10,8 @@ import de.dailab.jiactng.agentcore.util.EqualityChecker;
  * @author janko
  * @author axle
  */
-public class AgentDescription implements IFact {
-    private static final long serialVersionUID = -3419096336200496875L;
+public class AgentDescription implements IAgentDescription {
+    private static final long serialVersionUID = -5364612545330522105L;
 
     /** Agent IDentifier.*/
 	private String aid;

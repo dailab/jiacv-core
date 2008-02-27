@@ -3,6 +3,7 @@
 
 <!-- Generic application context definition. -->
 <beans>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
    <!--
       # The default AgentNode configuration
       # provides an empty platform definition with JMX support
@@ -33,6 +34,18 @@
       
    -->
    <bean name="Platform" class="de.dailab.jiactng.agentcore.SimpleAgentNode" abstract="true"></bean>
+
+	<!-- 
+		##############################################################################################
+		# Bean providing white pages directory functionality for agents with the DirectoryAccessBean #
+		##############################################################################################
+	 -->
+
+	<bean name="DirectoryAgentNodeBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean" singleton="false"> 
+		<property name="messageTransport">
+			<ref bean="StandardJMSMessageTransport" />
+		</property>
+	</bean>
 
 </beans>
 

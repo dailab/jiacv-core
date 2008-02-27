@@ -11,7 +11,11 @@ package de.dailab.jiactng.agentcore.knowledge;
  * memory. This class can only hold tuples with two arguments.
  * 
  * @author Thomas Konnerth
+ * 
+ * 
+ * TODO: check whether we need this or a more generic tuple class
  */
+@SuppressWarnings("serial")
 public class Tuple implements IFact {
 
   /**

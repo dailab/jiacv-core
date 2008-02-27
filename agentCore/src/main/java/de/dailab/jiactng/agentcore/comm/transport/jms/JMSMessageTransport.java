@@ -99,7 +99,7 @@ public class JMSMessageTransport extends MessageTransport {
         }
         
         IJiacMessage result= new JiacMessage(payload);
-        for(Enumeration keys= message.getPropertyNames(); keys.hasMoreElements(); ) {
+        for(Enumeration<?> keys= message.getPropertyNames(); keys.hasMoreElements(); ) {
             Object keyObj= keys.nextElement();
             
             if(keyObj instanceof String) {

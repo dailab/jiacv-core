@@ -32,7 +32,6 @@ import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
-import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
@@ -62,7 +61,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * @see org.sercho.masp.space.TupleSpace
      */
 	@Override
-	public void doInit() throws LifecycleException {
+	public void doInit() {
 		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("FactBase"));
 		space = destroyer.destroybleSpace;
 	}
@@ -71,7 +70,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	@Override
-	public void doStart() throws LifecycleException {
+	public void doStart() {
 		// nothing to do yet
 	}
 
@@ -79,7 +78,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void doStop() throws LifecycleException {
+	public void doStop() {
 		// nothing to do yet
 		// persistency may go here
 	}
@@ -88,7 +87,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	@Override
-	public void doCleanup() throws LifecycleException {
+	public void doCleanup() {
 		try {
 			destroyer.destroy();
 		} catch (DestroyFailedException e) {
@@ -222,7 +221,8 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	 * Information about the facts stored in the memory.
 	 * @return information about facts stored in memory
 	 */
-	public CompositeData getSpace() {
+	@SuppressWarnings("unchecked")
+    public CompositeData getSpace() {
 	    Set<IFact> facts = readAllOfType(IFact.class);
 	    if (facts.isEmpty()) {
 	    	return null;
@@ -244,7 +244,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	    CompositeData data = null;
 	    int size = map.size();
 	    String[] itemNames = new String[size];
-	    OpenType[] itemTypes = new OpenType[size];
+	    OpenType<?>[] itemTypes = new OpenType[size];
 	    Object[] itemValues = new Object[size];
 	    Object[] classes = map.keySet().toArray();
 	    try {

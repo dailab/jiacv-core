@@ -11,6 +11,7 @@ import de.dailab.jiactng.agentcore.util.EqualityChecker;
  * @author janko
  *
  */
+@SuppressWarnings("serial")
 public class ObjectContent implements IFact {
 	private Serializable _object;
     private transient boolean _recursionDetected= false;

@@ -17,6 +17,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
+@SuppressWarnings("serial")
 public class BinaryContent implements IFact {
     private static final byte[] NO_DATA= new byte[0];
     

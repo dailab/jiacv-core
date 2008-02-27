@@ -4,7 +4,8 @@ package de.dailab.jiactng.agentcore.lifecycle;
  * @author Joachim Fuchs
  */
 public class LifecycleException extends Exception {
-    
+    private static final long serialVersionUID = 1675899104547457451L;
+
     /** 
      * Creates a new instance of LifecycleException 
      *

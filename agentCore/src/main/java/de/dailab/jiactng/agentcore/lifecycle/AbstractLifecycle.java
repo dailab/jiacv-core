@@ -76,17 +76,11 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
             doInit();
             
         } catch (Throwable t) {
-            
             if (t instanceof LifecycleException) {
-                
                 throw (LifecycleException)t;
-                
-            } else {
-                
-                throw new LifecycleException("Failed to initialize", t);
-                
             }
             
+            throw new LifecycleException("Failed to initialize", t);
         }
         
         lifecycle.afterInit();
@@ -118,17 +112,11 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
             doStart();
             
         } catch (Throwable t) {
-            
             if (t instanceof LifecycleException) {
-                
                 throw (LifecycleException)t;
-                
-            } else {
-                
-                throw new LifecycleException("Failed to start", t);
-                
             }
             
+            throw new LifecycleException("Failed to start", t);
         }
         
         lifecycle.afterStart();
@@ -163,17 +151,11 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
             doStop();
             
         } catch (Throwable t) {
-            
             if (t instanceof LifecycleException) {
-                
                 throw (LifecycleException)t;
-                
-            } else {
-                
-                throw new LifecycleException("Failed to stop", t);
-                
             }
-            
+
+            throw new LifecycleException("Failed to stop", t);
         }
         
         lifecycle.afterStop();
@@ -206,17 +188,11 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
             doCleanup();
             
         } catch (Throwable t) {
-            
             if (t instanceof LifecycleException) {
-                
                 throw (LifecycleException)t;
-                
-            } else {
-                
-                throw new LifecycleException("Failed to clean up", t);
-                
             }
             
+            throw new LifecycleException("Failed to clean up", t);
         }
         
         lifecycle.afterCleanup();

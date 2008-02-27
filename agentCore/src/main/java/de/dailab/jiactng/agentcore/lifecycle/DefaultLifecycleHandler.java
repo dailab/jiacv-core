@@ -368,10 +368,8 @@ public class DefaultLifecycleHandler {
         
     }
     
-    protected void setState(LifecycleStates targetState) {
-        
+    protected void setState(@SuppressWarnings("unused") LifecycleStates targetState) {
         throw new UnsupportedOperationException("Not yet implemented");
-        
     }
         
     /**

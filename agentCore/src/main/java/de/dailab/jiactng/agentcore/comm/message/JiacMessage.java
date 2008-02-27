@@ -15,6 +15,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * 
  * @author Marcel Patzlaff
  */
+@SuppressWarnings("serial")
 public class JiacMessage implements IJiacMessage {
     private IFact _payload;
 

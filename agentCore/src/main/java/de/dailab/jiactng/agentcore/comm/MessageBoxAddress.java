@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
  * @author loeffelholz
  *
  */
+@SuppressWarnings("serial")
 class MessageBoxAddress extends CommunicationAddress implements IMessageBoxAddress {
     static final String PREFIX= "msgbox";
 	

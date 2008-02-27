@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
  * @author Marcel Patzlaff
  *
  */
+@SuppressWarnings("serial")
 final class GroupAddress extends CommunicationAddress implements IGroupAddress {
     static final String PREFIX= "group";
     

@@ -22,14 +22,15 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		IAgentNodeBean {
 	
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
 	
-	private SpaceDestroyer<IFact> destroyer = null;
-	private EventedTupleSpace<IFact> space = null;
+	private SpaceDestroyer<IAgentDescription> destroyer = null;
+	private EventedTupleSpace<IAgentDescription> space = null;
 	private MessageTransport messageBus = null;
 	private ICommunicationAddress myAddress = null; 
 
@@ -43,7 +44,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * This method is meant to give the AgentNode the option to directly
 	 * add an AgentDescription object when an agent is added to the node.
 	 */
-	public void addAgentDescription(IFact agentDescription){
+	public void addAgentDescription(IAgentDescription agentDescription){
 		space.write(agentDescription);
 	}
 	
@@ -52,18 +53,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * remove an AgentDescription object from the directory when an agent
 	 * is removed from the node.
 	 */
-	public void removeAgentDescription(IFact agentDescription){
+	public void removeAgentDescription(IAgentDescription agentDescription){
 		space.remove(agentDescription);
-	}
-	
-	public <E extends IFact> Set<E> processSearchRequest(E template){
-		return space.readAll(template);
 	}
 	
 	
 	public void onInit(){
 		_searchRequestHandler = new SearchRequestHandler();
-		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("FactBase"));
+		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IAgentDescription>("WhitePages"));
 		space = destroyer.destroybleSpace;
 		messageBus.setDefaultDelegate(_searchRequestHandler);
 		
@@ -116,26 +113,27 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		@Override
 		public void onMessage(MessageTransport source, IJiacMessage message,
 				ICommunicationAddress at) {
-			
+
 			if (message.getPayload() instanceof SearchRequest){
 				SearchRequest request = (SearchRequest) message.getPayload();
-				
-				Set<IFact> agents = space.readAll(request.getSearchTemplate());
-				Set<AgentDescription> result = new HashSet<AgentDescription>();
-				
-				for (IFact agent : agents){
-					if (agent instanceof AgentDescription) {
-						result.add((AgentDescription) agent);
+
+				if (request.getSearchTemplate() instanceof IAgentDescription){
+
+					IAgentDescription template = (IAgentDescription) request.getSearchTemplate();
+
+					Set<IAgentDescription> descriptions = space.readAll(template);
+					
+					Set<IFact> result = new HashSet<IFact>();
+					result.addAll(descriptions);
+					
+					request.setResult(result);
+
+					IJiacMessage resultMessage = new JiacMessage(request);
+					try {
+						messageBus.send(resultMessage, message.getReplyToAddress());
+					} catch (CommunicationException e) {
+						e.printStackTrace();
 					}
-				}
-				
-				request.setResult(result);
-				
-				IJiacMessage resultMessage = new JiacMessage(request);
-				try {
-					messageBus.send(resultMessage, message.getReplyToAddress());
-				} catch (CommunicationException e) {
-					e.printStackTrace();
 				}
 			}
 			

@@ -5,11 +5,12 @@ import java.util.Set;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 public class SearchRequest implements IFact{
 
 	private IFact _searchTemplate = null;
-	private Set<AgentDescription> _result = null;
+	private Set<IFact> _result = null;
 	private ICommunicationAddress _requestingAgent = null;
 	
 	public SearchRequest(IFact template, ICommunicationAddress requestingAgent) {
@@ -25,11 +26,11 @@ public class SearchRequest implements IFact{
 		return _searchTemplate;
 	}
 	
-	public Set<AgentDescription> getResult(){
+	public Set<IFact> getResult(){
 		return _result;
 	}
 	
-	public void setResult(Set<AgentDescription> agentDescriptions){
+	public void setResult(Set<IFact> agentDescriptions){
 		_result = agentDescriptions;
 	}
 	

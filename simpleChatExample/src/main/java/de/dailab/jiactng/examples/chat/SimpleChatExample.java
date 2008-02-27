@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -108,7 +108,7 @@ public class SimpleChatExample {
 				System.out.println();
 				System.out.println("Agents enlisted onto this Node:");
 				System.out.println("===============================");
-				ArrayList<String> agentList =_communicationPlatform.getAgents();
+				List<String> agentList =_communicationPlatform.getAgents();
 				
 				if (agentList != null){
 					for (String agentName : agentList){
@@ -130,7 +130,7 @@ public class SimpleChatExample {
 				}
 
 				if (input != null){
-					ArrayList<IAgent> agentList = _communicationPlatform.findAgents();
+					List<IAgent> agentList = _communicationPlatform.findAgents();
 					
 					if (agentList == null){
 						System.out.println("There are currently no Agents on the Node!");

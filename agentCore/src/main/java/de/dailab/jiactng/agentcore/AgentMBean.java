@@ -1,6 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.management.openmbean.CompositeData;
 
@@ -61,7 +61,7 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	 * Getter for attribute "ActionNames" of the managed agent.
 	 * @return name of actions provided by this agent
 	 */
-	public ArrayList<String> getActionNames();
+	public List<String> getActionNames();
 
 	/**
 	 * Getter for attribute "Logger" of the managed agent.
@@ -92,6 +92,6 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	 * Getter for attribute "AgentBeanNames" of the managed agent.
 	 * @return name of agent beans contained in this agent
 	 */
-	public ArrayList<String> getAgentBeanNames();
+	public List<String> getAgentBeanNames();
 
 }

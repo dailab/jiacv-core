@@ -5,7 +5,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -69,7 +71,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	private ArrayList<IAgent> _agents = null;
 
 	/** Storage for the agentFutures. Used to stop/cancel agentthreads. */
-	private HashMap<String, Future> agentFutures = null;
+	private HashMap<String, Future<?>> agentFutures = null;
 
 	/** Configuration of a set of JMX connector server. */
 	private Set<Map<String,String>> _jmxConnectors = null;
@@ -113,8 +115,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgents(ArrayList<IAgent> agents) {
-		_agents = agents;
+	public void setAgents(List<IAgent> agents) {
+	    _agents= new ArrayList<IAgent>();
+	    _agents.addAll(agents);
 	}
 
 	/**
@@ -125,7 +128,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		agent.setAgentNode(this);
 
 		// TODO: statechanges?
-		ArrayList<String> oldAgentList = getAgents();
+		List<String> oldAgentList = getAgents();
 		if (_agents == null) {
 			_agents = new ArrayList<IAgent>();
 		}
@@ -149,7 +152,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// remove agent
 		if (_agents != null) {
-			ArrayList<String> oldAgentList = getAgents();
+			List<String> oldAgentList = getAgents();
 			_agents.remove(agent);
 			agentListChanged(oldAgentList, getAgents());
 		}
@@ -164,7 +167,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @param newAgentList
 	 *            the new list of agent names
 	 */
-	private void agentListChanged(ArrayList<String> oldAgentList, ArrayList<String> newAgentList) {
+	private void agentListChanged(List<String> oldAgentList, List<String> newAgentList) {
 		Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
 				"Agents changed", "Agents", "java.util.ArrayList<java.lang.String>", oldAgentList, newAgentList);
 		sendNotification(n);
@@ -174,10 +177,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 	
-	public ArrayList<IAgent> findAgents() {
-		// TODO: Security must decide whether the lifelist should be returned or
-		// not.
-		return _agents;
+	public List<IAgent> findAgents() {
+		return Collections.unmodifiableList(_agents);
 	}
 
 	/**
@@ -264,7 +265,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * 
 	 * @return list of agent names
 	 */
-	public ArrayList<String> getAgents() {
+	public List<String> getAgents() {
 		if (_agents == null) {
 			return new ArrayList<String>();
 		}
@@ -284,7 +285,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void addAgents(String configFile) {
 		ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(new String[] { configFile + ".xml" });
-		Collection newAgents = appContext.getBeansOfType(IAgent.class).values();
+		Collection<?> newAgents = appContext.getBeansOfType(IAgent.class).values();
 		for (Object a : newAgents) {
 			IAgent agent = (IAgent) a;
 			addAgent(agent);
@@ -329,11 +330,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				IAgent agent = (IAgent) source;
 				switch (evt.getState()) {
 				case STARTED:
-					Future f1 = _threadPool.submit(agent);
+					Future<?> f1 = _threadPool.submit(agent);
 					agentFutures.put(agent.getAgentName(), f1);
 					break;
 				case STOPPED:
-					Future f2 = agentFutures.get(agent.getAgentName());
+					Future<?> f2 = agentFutures.get(agent.getAgentName());
 					if (f2 == null) {
 						(new LifecycleException("Agentfuture not found")).printStackTrace();
 					} else {
@@ -421,7 +422,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	
 	public void doInit() {
 		_threadPool = Executors.newCachedThreadPool();
-		agentFutures = new HashMap<String, Future>();
+		agentFutures = new HashMap<String, Future<?>>();
 
 		// call init on all beans of the agentnodes
 		// TODO testing
@@ -583,8 +584,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public ArrayList<IAgentNodeBean> getAgentNodeBeans() {
-		return this._agentNodeBeans;
+	public List<IAgentNodeBean> getAgentNodeBeans() {
+		return Collections.unmodifiableList(_agentNodeBeans);
 	}
 
 	/**
@@ -592,7 +593,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * 
 	 * @return the class of agent beans running in this agent node
 	 */
-	public ArrayList<String> getAgentNodeBeanClasses() {
+	public List<String> getAgentNodeBeanClasses() {
 		if (getAgentNodeBeans() == null) {
 			return null;
 		}
@@ -606,8 +607,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgentNodeBeans(ArrayList<IAgentNodeBean> agentnodebeans) {
-		this._agentNodeBeans = agentnodebeans;
+	public void setAgentNodeBeans(List<IAgentNodeBean> agentnodebeans) {
+	    _agentNodeBeans= new ArrayList<IAgentNodeBean>();
+	    _agentNodeBeans.addAll(agentnodebeans);
 	}
 
 	/**

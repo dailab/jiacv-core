@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.logging.Log;
@@ -54,7 +55,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * 
    * @param agentbeans the agentbeans of this agent.
    */
-  public void setAgentBeans(ArrayList<IAgentBean> agentbeans);
+  public void setAgentBeans(List<IAgentBean> agentbeans);
 
   /**
    * Setter for the name of this agent. Used by Spring during initialisation.
@@ -94,11 +95,13 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
   public void setOwner(String owner);
 
   /**
-   * Getter for the list of agentbeans of this agent.
+   * Getter for a list of agentbeans of this agent.
    * 
-   * @return the lifelist of the agentbeans.
+   * @return the unmodifiable list of the agentbeans.
+   * 
+   * @see Collections#unmodifiableList(List)
    */
-  public ArrayList<IAgentBean> getAgentBeans();
+  public List<IAgentBean> getAgentBeans();
 
   /**
    * Getter for the global threadpool responsivle for this agent. All threads
@@ -150,14 +153,17 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
 
   /**
    * Gets the list of actions exposed by this agent.
-   * @return list of actions.
+   * 
+   * @return unmodifiable list of actions.
+   * 
+   * @see Collections#unmodifiableList(List)
    */
-  public ArrayList<Action> getActionList();
+  public List<Action> getActionList();
 
   /**
    * Sets the list of actions to be exposed by this agent.
    * @param actionList the list of actions.
    */
-  public void setActionList(ArrayList<Action> actionList);
+  public void setActionList(List<Action> actionList);
 
 }

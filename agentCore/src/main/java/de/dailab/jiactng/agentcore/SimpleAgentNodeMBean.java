@@ -1,7 +1,7 @@
 package de.dailab.jiactng.agentcore;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.management.openmbean.CompositeData;
 
@@ -38,7 +38,7 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * Getter for attribute "Agents" of the managed agent node.
 	 * @return the name of agents running on this agent node
 	 */
-	public ArrayList<String> getAgents();
+	public List<String> getAgents();
 
 	/**
 	 * Deploys new agents on this agent node.
@@ -80,7 +80,7 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * Getter for attribute "AgentNodeBeanClasses" of the managed agent node.
 	 * @return the class of agent beans running in this agent node
 	 */
-	public ArrayList<String> getAgentNodeBeanClasses();
+	public List<String> getAgentNodeBeanClasses();
 
 	/**
 	 * Getter for attribute "AmqBroker" of the managed agent node.

@@ -7,6 +7,7 @@
 package de.dailab.jiactng.agentcore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -97,7 +98,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * Future for the executionCycle of this agent. Used to store and cancel the
 	 * executionThread.
 	 */
-	private Future executionFuture = null;
+	private Future<?> executionFuture = null;
 
 	/**
 	 * Timeout after which the execution of a bean will be stopped and the agent
@@ -137,15 +138,16 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	public ArrayList<IAgentBean> getAgentBeans() {
-		return agentBeans;
+	public List<IAgentBean> getAgentBeans() {
+		return Collections.unmodifiableList(agentBeans);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgentBeans(ArrayList<IAgentBean> agentbeans) {
-		this.agentBeans = agentbeans;
+	public void setAgentBeans(List<IAgentBean> agentbeans) {
+	    this.agentBeans= new ArrayList<IAgentBean>();
+		this.agentBeans.addAll(agentbeans);
 
 		// set references for all agent beans
 		for (IAgentBean ab : this.agentBeans) {
@@ -164,7 +166,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 					if (active) {
 						executionFuture = agentNode.getThreadPool().submit(
 								execution);
-						FutureTask t = ((FutureTask) executionFuture);
+						FutureTask<?> t = ((FutureTask<?>) executionFuture);
 						try {
 							t.get(beanExecutionTimeout, TimeUnit.MILLISECONDS);
 						} catch (TimeoutException to) {
@@ -196,18 +198,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * Setter for the agentname. Called by Spring via the BeanNameAware
 	 * interface.
 	 * 
-	 * @param arg0
+	 * @param name
 	 *            the name of the agent.
 	 * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
 	 */
-	public void setBeanName(String arg0) {
-		setAgentName(arg0);
+	public void setBeanName(String name) {
+		setAgentName(name);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void onEvent(LifecycleEvent evt) {
+	public void onEvent(@SuppressWarnings("unused") LifecycleEvent evt) {
 		// TODO Auto-generated method stub
 
 	}
@@ -612,7 +614,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	public ArrayList<String> getAgentBeanNames() {
+	public List<String> getAgentBeanNames() {
 		ArrayList<String> ret = new ArrayList<String>();
 		for (IAgentBean bean : getAgentBeans()) {
 			ret.add(bean.getBeanName());
@@ -623,15 +625,16 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
     /**
 	 * {@inheritDoc}
 	 */
-	public ArrayList<Action> getActionList() {
-		return actionList;
+	public List<Action> getActionList() {
+		return Collections.unmodifiableList(actionList);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setActionList(ArrayList<Action> actionList) {
-		this.actionList = actionList;
+	public void setActionList(List<Action> actionList) {
+	    this.actionList= new ArrayList<Action>();
+	    this.actionList.addAll(actionList);
 	}
 
 	/**
@@ -639,7 +642,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * 
 	 * @return name of actions provided by this agent
 	 */
-	public ArrayList<String> getActionNames() {
+	public List<String> getActionNames() {
 		ArrayList<String> ret = new ArrayList<String>();
 		for (Action action : getActionList()) {
 			ret.add(action.getName());

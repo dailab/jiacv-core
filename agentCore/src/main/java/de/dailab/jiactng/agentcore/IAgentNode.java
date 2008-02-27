@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.logging.Log;
@@ -52,7 +53,7 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    * @param agents
    *          the list of agents that should be started with the agendnodes.
    */
-  public void setAgents(ArrayList<IAgent> agents);
+  public void setAgents(List<IAgent> agents);
 
   /**
    * Adds an agent to the agentnode during runtime.
@@ -74,12 +75,14 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
   public void removeAgent(IAgent agent);
 
   /**
-   * Getter for the current list of agents on the agentnode.
+   * Getter for a list of agents on the agentnode
    * 
-   * @return a list of IAgent-instances that are currently residing on this
+   * @return an unmodifiable list of IAgent-instances that are currently residing on this
    *         agentnode.
+   * 
+   * @see Collections#unmodifiableList(List)
    */
-  public ArrayList<IAgent> findAgents();
+  public List<IAgent> findAgents();
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode, i.e
@@ -145,12 +148,14 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    * 
    * @param agentnodebeans the beans to set 
    */
-  public void setAgentNodeBeans(ArrayList<IAgentNodeBean> agentnodebeans);
+  public void setAgentNodeBeans(List<IAgentNodeBean> agentnodebeans);
   
   /**
    * Getter for beans of the agentnode.
    * 
-   * @return the beans of the agent node
+   * @return an unmodifiable list of agentnode beans
+   * 
+   * @see Collections#unmodifiableList(List)
    */
-  public ArrayList<IAgentNodeBean> getAgentNodeBeans();
+  public List<IAgentNodeBean> getAgentNodeBeans();
 }

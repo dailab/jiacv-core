@@ -17,12 +17,24 @@ import javax.jms.JMSException;
 public final class ConnectionFactoryProxy implements ConnectionFactory {
     protected ConnectionFactory connectionFactory= null;
     
+    /**
+     * @throws IllegalStateException    if no broker is available or the broker is
+     *                                  not yet initialised
+     * 
+     * @see ConnectionFactory#createConnection()
+     */
     @Override
     public Connection createConnection() throws JMSException {
         checkConnectionFactory();
         return connectionFactory.createConnection();
     }
 
+    /**
+     * @throws IllegalStateException    if no broker is available or the broker is
+     *                                  not yet initialised
+     * 
+     * @see ConnectionFactory#createConnection(String, String)
+     */
     @Override
     public Connection createConnection(String userName, String password) throws JMSException {
         checkConnectionFactory();

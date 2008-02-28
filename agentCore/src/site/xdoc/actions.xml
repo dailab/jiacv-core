@@ -27,14 +27,14 @@
 			  </p>
 			</subsection>
 			<subsection name="Providing Actions">
-        If an agentbean wants to provide on or more actions, it has to implement the 
+        If an agentbean wants to provide one or more actions, it has to implement the 
         <a href="apidocs/de/dailab/jiactng/agentcore/environment/IEffector.html">
         <code>IEffector</code></a>-Interface. This interface specifies two methods:
         <ul>
           <li><code>public ArrayList&lt;? extends Action&gt; getActions()</code>
             <p>
               This method is used to publish the beans actions. It is called by the 
-              architecture right after the the bean has changed its state to 
+              architecture right after the bean has changed its state to 
               INITIALIZED. It should simply be a list of 
               <a href="apidocs/de/dailab/jiactng/agentcore/action/Action.html">
               Action</a>-objects, in which the bean is set as providerbean.

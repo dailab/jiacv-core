@@ -69,10 +69,12 @@ IAgentBean, IEffector {
 	}
 
 	public void doStart(){
+			memory.attach(_searchRequestHandler);
 			_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 	}
 
 	public void doStop(){
+		memory.detach(_searchRequestHandler);
 		// nothing to do yet
 	}
 

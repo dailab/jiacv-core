@@ -11,7 +11,6 @@ public class ThisAgentDescription extends AgentDescription {
 	 * @param aid the agents uid.
 	 * @param name the name of the agent.
 	 * @param state the agents current state.
-	 * @param endpoint the address of the agent.
 	 */
 	public ThisAgentDescription(String aid, String name, String state) {
 		super(aid, name, state);

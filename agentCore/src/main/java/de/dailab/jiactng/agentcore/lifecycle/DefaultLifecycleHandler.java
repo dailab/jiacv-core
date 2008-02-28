@@ -159,7 +159,7 @@ public class DefaultLifecycleHandler {
      * Call this method when entering <code>init()</code>. It sets the state to
      * INITIALIZING and informs all listener.
      * @throws IllegalStateException if strict mode and the current state is not VOID
-     * @see {@link LifecycleStates#INITIALIZING}
+     * @see LifecycleStates#INITIALIZING
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
@@ -187,7 +187,7 @@ public class DefaultLifecycleHandler {
      * Call this method when leaving <CODE>init()</CODE>. It sets the state to
      * INITIALIZED and informs all listener.
      * @throws IllegalStateException never
-     * @see {@link LifecycleStates#INITIALIZED}
+     * @see LifecycleStates#INITIALIZED
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
@@ -207,7 +207,7 @@ public class DefaultLifecycleHandler {
      * STARTING and informs all listener. In strict mode the transition 
      * <CODE>init()<CODE> will be done before if the current state is VOID.
      * @throws IllegalStateException if strict mode and the current state is not READY or VOID
-     * @see {@link LifecycleStates#STARTING}
+     * @see LifecycleStates#STARTING
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
@@ -247,7 +247,7 @@ public class DefaultLifecycleHandler {
      * Call this method when leaving <CODE>start()</CODE>. It sets the state to
      * STARTED and informs all listener.
      * @throws IllegalStateException never
-     * @see {@link LifecycleStates#STARTED}
+     * @see LifecycleStates#STARTED
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
@@ -266,7 +266,7 @@ public class DefaultLifecycleHandler {
      * Call this method when entering <CODE>stop()</CODE>. It sets the state to
      * STOPPING and informs all listener.
      * @throws IllegalStateException if strict mode and the current state is not STARTED
-     * @see {@link LifecycleStates#STOPPING}
+     * @see LifecycleStates#STOPPING
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
@@ -294,7 +294,7 @@ public class DefaultLifecycleHandler {
      * Call this method when leaving <CODE>stop()</CODE>. It sets the state to
      * STOPPED and informs all listener.
      * @throws IllegalStateException never
-     * @see {@link LifecycleStates#STOPPED}
+     * @see LifecycleStates#STOPPED
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
@@ -314,7 +314,7 @@ public class DefaultLifecycleHandler {
      * CLEANING_UP and informs all listener. In strict mode the transition 
      * <CODE>stop()<CODE> will be done before if the current state is STARTED.
      * @throws IllegalStateException if strict mode and the current state is not READY or STARTED
-     * @see {@link LifecycleStates#CLEANING_UP}
+     * @see LifecycleStates#CLEANING_UP
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
@@ -353,7 +353,7 @@ public class DefaultLifecycleHandler {
      * Call this method when leaving <CODE>cleanup()</CODE>. It sets the state to
      * CLEANED_UP and informs all listener. 
      * @throws IllegalStateException never
-     * @see {@link LifecycleStates#CLEANED_UP}
+     * @see LifecycleStates#CLEANED_UP
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */

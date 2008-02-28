@@ -419,16 +419,21 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Gets the lifecycle state of this agent by reading the agent description within the agent's memory.
+	 * @return the current lifecycle state of this agent
 	 */
 	public LifecycleStates getAgentState() {
 		return LifecycleStates.valueOf(memory.read(new ThisAgentDescription(null, null, null)).getState());
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 * @throws LifecycleException
+	 * Sets the lifecycle state of an agent bean by invoking the corresponding method of
+	 * interface <code>ILifecycle</code>. It also updates the bean description within the
+	 * agent's memory.
+	 * @param bean the agent bean
+	 * @param newState the intended state of the agent bean (must be one of CLEANED_UP, INITIALIZED, STOPPED or STARTED).
+	 * @throws LifecycleException if the corresponding lifecycle method throws an exception.
+	 * @see ILifecycle
 	 */
 	public void setBeanState(IAgentBean bean, LifecycleStates newState)
 			throws LifecycleException {
@@ -448,14 +453,16 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			bean.start();
 			break;
 		default:
-			break;
+			return;
 		}
 		this.memory.update(new AgentBeanDescription(beanName, null),
 				new AgentBeanDescription(null, newState.name()));
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Gets the lifecycle state of an agent bean by reading the bean description within the agent's memory.
+	 * @param beanName the name of the agent bean
+	 * @return the current lifecycle state of the agent bean
 	 */
 	public LifecycleStates getBeanState(String beanName) {
 		return LifecycleStates.valueOf(this.memory.read(
@@ -501,7 +508,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Gets the execution cycle of this agent.
+	 * @return the execution cycle of this agent
 	 */
 	public IExecutionCycle getExecution() {
 		return execution;
@@ -766,9 +774,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	}
 
 	/**
-	 * Deregisters the agent and all its resources from management
-	 * 
-	 * @param manager
+	 * Deregisters the agent and all its resources from management.
 	 */
 	public void disableManagement() {
 		// do nothing if management already disabled

@@ -16,7 +16,6 @@ public class OtherAgentDescription extends AgentDescription implements IAgentDes
 	 * @param aid the agent id
 	 * @param name the name of the other agent
 	 * @param state the state of the other agent
-	 * @param endpoint the address under which the other agent can be reached
 	 */
 	public OtherAgentDescription(String aid, String name, String state) {
 		super(aid, name, state);

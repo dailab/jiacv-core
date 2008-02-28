@@ -189,7 +189,7 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * @param parameters
+	 * @param inputTypes
 	 *            the parameters to set
 	 */
 	public final void setInputTypes(List<Class<?>> inputTypes) {
@@ -215,7 +215,7 @@ public class Action implements IActionDescription {
     }
 
     /**
-	 * @param results
+	 * @param resultTypes
 	 *            the results to set
 	 */
 	public final void setResultTypes(List<Class<?>> resultTypes) {

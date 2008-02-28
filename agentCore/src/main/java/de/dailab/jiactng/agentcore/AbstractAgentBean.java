@@ -222,9 +222,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	}
 
 	/**
-	 * Deregisters the agent bean and all its resources from management
-	 * 
-	 * @param manager
+	 * Deregisters the agent bean and all its resources from management.
 	 */
 	public void disableManagement() {
 		// do nothing if management already disabled

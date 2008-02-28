@@ -16,12 +16,14 @@ public class ActionResult extends SessionEvent {
 	 * An <code>ActionResult</code> will be used as return object for a
 	 * <code>DoAction</code> request.
 	 * 
-	 * @param source
-	 *            the object that created the results
+	 * @param action
+	 *            the requested action
+	 * @param session
+	 *            the session of the action request
 	 * @param results
 	 *            the result values if any
-	 * @param success
-	 *            whether or not this result is success or failure
+	 * @param source
+	 *            the object that created the results
 	 */
 	public ActionResult(Action action, Session session, Object[] results,
 			DoAction source) {

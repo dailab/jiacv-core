@@ -43,7 +43,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * <code>LifecycleStates.STARTED</code>.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#run()
-	 * @see LifecycleStates
+	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
 	public void run() {
 		//check if lifecycle has been started --> execute if STARTED
@@ -227,8 +227,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 	/**
 	 * Deregisters the execution cycle from management
-	 * 
-	 * @param manager
 	 */
 	public void disableManagement() {
 		// do nothing if management already disabled

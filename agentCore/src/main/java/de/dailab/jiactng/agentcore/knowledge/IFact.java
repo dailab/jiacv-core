@@ -10,7 +10,7 @@ public interface IFact extends Serializable {
      * This method have to be implemented to enable the
      * template matching of the memory.
      * 
-     * @see {@link Object#equals(Object)}
+     * @see Object#equals(Object)
      */
     boolean equals(Object obj);
     
@@ -18,7 +18,7 @@ public interface IFact extends Serializable {
      * This method must be implemented to 
      * remain consistent with {@link #equals(Object)}.
      * 
-     * @see {@link Object#hashCode()}
+     * @see Object#hashCode()
      */
     int hashCode();
 }

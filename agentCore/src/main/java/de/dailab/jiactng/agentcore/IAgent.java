@@ -127,7 +127,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    *          the bean for which the logger shall be retrieved.
    * @return a log-object that contains the agentnodes name, the agents name and
    *         the beanname.
-   * @see org.apache.commons.logging.Log;
+   * @see org.apache.commons.logging.Log
    */
   public Log getLog(IAgentBean bean);
 

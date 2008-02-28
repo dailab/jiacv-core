@@ -92,7 +92,7 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    * @param agent
    *          the agent for which the logger shall be instantiated.
    * @return a log-object that contains the agentnodes name and the agents name.
-   * @see org.apache.commons.logging.Log;
+   * @see org.apache.commons.logging.Log
    */
   public Log getLog(IAgent agent);
 
@@ -109,7 +109,7 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    *          the bean for which the logger shall be instantiated.
    * @return a log-object that contains the agentnodes name, the agents name and
    *         the beanname.
-   * @see org.apache.commons.logging.Log;
+   * @see org.apache.commons.logging.Log
    */
   public Log getLog(IAgent agent, IAgentBean bean);
   
@@ -128,7 +128,7 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    *          the bean part for which the logger shall be instantiated.
    * @return a log-object that contains the agentnodes name, the agents name,
    *         the beanname and the extension.
-   * @see org.apache.commons.logging.Log;
+   * @see org.apache.commons.logging.Log
    */
   public Log getLog(IAgent agent, IAgentBean bean, String extension);
 

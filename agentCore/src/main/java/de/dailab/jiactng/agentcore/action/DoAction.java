@@ -32,7 +32,7 @@ public class DoAction extends SessionEvent {
 	 * The owner of this action/invocation / simple implementation of a
 	 * user/tracking
 	 * 
-	 * @TODO: needs real concept and implementation
+	 * TODO: needs real concept and implementation
 	 */
 	private String owner;
 

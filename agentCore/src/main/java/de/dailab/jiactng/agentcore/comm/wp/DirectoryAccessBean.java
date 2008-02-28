@@ -32,14 +32,16 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 public class DirectoryAccessBean extends AbstractAgentBean implements
 IAgentBean, IEffector {
 
+	private long _timeoutMillis = 2500;
+	
 	private MessageTransport messageTransport = null;
 	private ICommunicationAddress directoryAddress = null;
 //	private ICommunicationAddress myAddress = null; 
 	private SearchRequestHandler _searchRequestHandler = null;
 	
-	Action _sendAction = null;
+	private Action _sendAction = null;
 	private Map<IFact, DoAction> _request2ActionMap = new HashMap<IFact, DoAction>();
-
+	
 	public DirectoryAccessBean() {
 		setBeanName("DirectoryAccessBean");
 		String name = thisAgent.getAgentName() + getBeanName();
@@ -64,6 +66,25 @@ IAgentBean, IEffector {
 		_searchRequestHandler.requestSearch(template);
 	}
 
+	/**
+	 * Check if one of the pending requests is over timeout
+	 */
+	@Override
+	public void execute() {
+		super.execute();
+		for (IFact key : _request2ActionMap.keySet()){
+			DoAction action = _request2ActionMap.get(key);
+			Session session = action.getSession();
+			long creation = session.getCreationTime();
+			long now = System.currentTimeMillis();
+			
+			if ((now - creation) > _timeoutMillis){
+				_request2ActionMap.remove(key);
+				//TODO ActionFailure zurückliefern!
+			}
+		}
+	}
+	
 	public void doInit(){
 		_searchRequestHandler = new SearchRequestHandler();
 	}
@@ -71,10 +92,12 @@ IAgentBean, IEffector {
 	public void doStart(){
 			memory.attach(_searchRequestHandler);
 			_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
+			this.setExecuteInterval(100);
 	}
 
 	public void doStop(){
 		memory.detach(_searchRequestHandler);
+		this.setExecuteInterval(-100);
 		// nothing to do yet
 	}
 
@@ -98,19 +121,7 @@ IAgentBean, IEffector {
 		return actions;
 	}
 
-	/**
-	 * Executes a selected action. This method should be implemented by the
-	 * component and be able to deal with each of the registered Actions. Note
-	 * that this action is called automatically by the agents kernel, whenever
-	 * an action registered by this component should be executed.
-	 * 
-	 * @see de.dailab.jiactng.agentcore.action.DoAction
-	 * @param doAction
-	 *            the action-invocation that describes the action to be executed
-	 *            as well as its parameters.
-	 */
 	public void doAction(DoAction doAction){
-		// TODO Timeoutmanagment for Actions
 		
 		Object[] params = doAction.getParams();
 		if (params[0] instanceof SearchRequest){
@@ -121,6 +132,14 @@ IAgentBean, IEffector {
 		}
 		
 		
+	}
+
+	public void setTimeoutMillis(long timeoutMillis){
+		_timeoutMillis = timeoutMillis;
+	}
+	
+	public long getTimeoutMillis(){
+		return _timeoutMillis;
 	}
 	
 	private class SearchRequestHandler implements SpaceObserver<IFact> {
@@ -147,13 +166,16 @@ IAgentBean, IEffector {
 				IJiacMessage message = (IJiacMessage) event;
 				if (message.getPayload() instanceof SearchRequest){
 					SearchRequest request = (SearchRequest) message.getPayload();
-					
+
 					IFact template = request.getSearchTemplate();
 					DoAction sourceAction = _request2ActionMap.remove(template);
-					Object[] results = request.getResult().toArray();
-					ActionResult result = sourceAction.getAction().createActionResult(sourceAction, results);
+					if (sourceAction != null){
+						// if request exists and hasn't timed out yet
+						Object[] results = request.getResult().toArray();
+						ActionResult result = sourceAction.getAction().createActionResult(sourceAction, results);
 
-					memory.write(result);
+						memory.write(result);
+					}
 				}
 			}
 			

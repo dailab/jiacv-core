@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore;
+package de.dailab.jiactng.agentcore.management.jmx;
 
 import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;

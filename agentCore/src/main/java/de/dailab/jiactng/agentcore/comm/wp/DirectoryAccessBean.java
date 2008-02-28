@@ -1,8 +1,5 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
@@ -15,21 +12,27 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
-import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 public class DirectoryAccessBean extends AbstractAgentBean implements
 IAgentBean {
 
-	private MessageTransport messageBus = null;
+	private MessageTransport messageTransport = null;
 	private ICommunicationAddress directoryAddress = null;
-	private ICommunicationAddress myAddress = null; 
+//	private ICommunicationAddress myAddress = null; 
 	private SearchRequestHandler _searchRequestHandler = null;
 
 	public DirectoryAccessBean() {
 		setBeanName("DirectoryAccessBean");
 		String name = thisAgent.getAgentName() + getBeanName();
-		myAddress = CommunicationAddressFactory.createMessageBoxAddress(name);
+
+//      Die Addresse des Agenten steht ab der Initialisierungsphase im Memory!
+//      siehe CommunicationBean
+//		myAddress = CommunicationAddressFactory.createMessageBoxAddress(name);
 		String boxName = thisAgent.getAgentNode().getName() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
+		
+		// TODO: wir muessen einen Weg finden, die Addresse des Verzeichnisses zu dieser
+		//       Bean zu kommunizieren. MessageBoxAddressen sollten allerdings nicht auf
+		//       Agentenebene erzeugt werden!
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(boxName);
 	}
 
@@ -44,31 +47,31 @@ IAgentBean {
 
 	public void onInit(){
 		_searchRequestHandler = new SearchRequestHandler();
-		messageBus.setDefaultDelegate(_searchRequestHandler);
+		messageTransport.setDefaultDelegate(_searchRequestHandler);
 	}
 
-	public void onStart(){
-		try {
-			messageBus.listen(myAddress, null);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void onStop(){
-		try {
-			messageBus.stopListen(myAddress, null);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
-	}
+//	public void onStart(){
+//		try {
+//			messageBus.listen(myAddress, null);
+//		} catch (CommunicationException e) {
+//			e.printStackTrace();
+//		}
+//	}
+//
+//	public void onStop(){
+//		try {
+//			messageBus.stopListen(myAddress, null);
+//		} catch (CommunicationException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	public void onCleanup(){
 		
 	}
 
 	public void setMessageTransport(MessageTransport mt){
-		messageBus = mt;
+		messageTransport = mt;
 	}
 
 	private class SearchRequestHandler implements IMessageTransportDelegate {
@@ -84,10 +87,11 @@ IAgentBean {
 		}
 
 		public <E extends IFact> void requestSearch(E template){
-			IJiacMessage message = new JiacMessage(template, myAddress);
-
+//			IJiacMessage message = new JiacMessage(template, myAddress);
+//          Absender wird von der CommunicationBean selber gesetzt
+		    IJiacMessage message = new JiacMessage(template);
 			try {
-				messageBus.send(message, directoryAddress);
+				messageTransport.send(message, directoryAddress);
 			} catch (CommunicationException e) {
 				e.printStackTrace();
 			}

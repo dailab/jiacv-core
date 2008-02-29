@@ -42,7 +42,7 @@ import de.dailab.jiactng.agentcore.management.jmx.MessageExchangeNotification.Me
  * @author Martin Loeffelholz
  * @version $Revision$
  */
-public class CommunicationBean extends AbstractMethodExposingBean implements ICommunicationBean, CommunicationBeanMBean {
+public final class CommunicationBean extends AbstractMethodExposingBean implements ICommunicationBean, CommunicationBeanMBean {
     /**
      * a save way to cast from object to targetType
      * 
@@ -292,6 +292,11 @@ public class CommunicationBean extends AbstractMethodExposingBean implements ICo
 
     public synchronized void leaveGroup(IGroupAddress group) throws CommunicationException {
         unregister(group, null);
+    }
+    
+    public boolean isLocal(IMessageBoxAddress messageBox) {
+        String name= messageBox.getName();
+        return name.startsWith(thisAgent.getAgentNode().getName().toLowerCase());
     }
 
     // TODO: make this private

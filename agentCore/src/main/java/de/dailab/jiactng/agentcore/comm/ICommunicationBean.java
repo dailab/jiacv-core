@@ -34,6 +34,17 @@ public interface ICommunicationBean {
     void leaveGroup(IGroupAddress group) throws CommunicationException;
     
     /**
+     * Checks whether the provided address references an agent that is
+     * local to the agent this bean belongs to.
+     * 
+     * @param messageBox    the address to check
+     * @return              <code>true</code> if the address references a local
+     *                      agent and <code>false/<code> otherwise.
+     */
+    @Expose
+    boolean isLocal(IMessageBoxAddress messageBox);
+    
+    /**
      * Creates a new message box at the given address and associate the requesting
      * agent with it.
      * 

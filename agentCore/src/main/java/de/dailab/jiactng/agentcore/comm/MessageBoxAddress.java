@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
  *
  */
 @SuppressWarnings("serial")
-class MessageBoxAddress extends CommunicationAddress implements IMessageBoxAddress {
+final class MessageBoxAddress extends CommunicationAddress implements IMessageBoxAddress {
     static final String PREFIX= "msgbox";
 	
     MessageBoxAddress(String name) throws URISyntaxException {

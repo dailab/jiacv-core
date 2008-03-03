@@ -30,6 +30,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
+import de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
@@ -449,6 +450,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					// e.printStackTrace();
 					System.out.println(e.getMessage());
 				}
+				// Check if White Pages bean is present
+				for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()){
+					if (agentNodeBean instanceof DirectoryAgentNodeBean){
+						// directory is present so add agentdescription to it.
+						DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
+						directory.addAgentDescription(a.getAgentDescription());
+					}
+				}
 			}
 		}
 	}
@@ -525,6 +534,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// call cleanup for all agents if any
 		if (_agents != null) {
 			for (IAgent a : _agents) {
+				
+				// Check if White Pages bean is present
+				for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()){
+					if (agentNodeBean instanceof DirectoryAgentNodeBean){
+						// directory is present so remove agentdescription from it before cleaning up the agent
+						DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
+						directory.removeAgentDescription(a.getAgentDescription());
+					}
+				}
 				try {
 					a.cleanup();
 				} catch (LifecycleException e) {

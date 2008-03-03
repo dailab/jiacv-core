@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.action;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 public class ActionResult extends SessionEvent {
@@ -10,7 +11,12 @@ public class ActionResult extends SessionEvent {
 	private static final long serialVersionUID = 7941825814785637285L;
 
 	/** The return values of the action. */
-	private Object[] results;
+	private Object[] _results;
+	
+	/**
+	 * A field for exceptions, strings or other kinds of failureresults
+	 */
+	private Serializable _failure = null;
 
 	/**
 	 * An <code>ActionResult</code> will be used as return object for a
@@ -28,7 +34,7 @@ public class ActionResult extends SessionEvent {
 	public ActionResult(Action action, Session session, Object[] results,
 			DoAction source) {
 		super(session, action, source);
-		this.results = results;
+		this._results = results;
 		if (getSession() != null)
 			getSession().addToSessionHistory(this);
 		if ((source!=null) && (source.getMetaData() != null))
@@ -37,13 +43,22 @@ public class ActionResult extends SessionEvent {
 
 	public ActionResult(DoAction source, Object[] results) {
 		super(source);
-		this.results = results;
+		this._results = results;
 		if (getSession() != null)
 			getSession().addToSessionHistory(this);
 		if ((source != null) && (source.getMetaData() != null))
 			super.setMetaData(source.getMetaData());
 	}
 
+	public ActionResult(DoAction source, Serializable failure) {
+		super(source);
+		if (getSession() != null)
+			getSession().addToSessionHistory(this);
+		if ((source != null) && (source.getMetaData() != null))
+			super.setMetaData(source.getMetaData());
+		_failure = failure;
+	}
+	
 	// /**
 	// * @return the <code>DoAction</code> that triggered the action
 	// */
@@ -62,7 +77,7 @@ public class ActionResult extends SessionEvent {
 	 * @return the results
 	 */
 	public Object[] getResults() {
-		return results;
+		return _results;
 	}
 
 	/**
@@ -70,9 +85,13 @@ public class ActionResult extends SessionEvent {
 	 *            the results to set
 	 */
 	public void setResults(Object[] results) {
-		this.results = results;
+		this._results = results;
 	}
 
+	public Serializable getFailure(){
+		return this._failure;
+	}
+	
 	// /**
 	// * @return true if action succeeded, false otherwise
 	// */
@@ -91,8 +110,8 @@ public class ActionResult extends SessionEvent {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ActionResult:\n results=");
-		if (results != null) {
-			builder.append(Arrays.asList(results).toString());
+		if (_results != null) {
+			builder.append(Arrays.asList(_results).toString());
 		} else {
 			builder.append("null");
 		}

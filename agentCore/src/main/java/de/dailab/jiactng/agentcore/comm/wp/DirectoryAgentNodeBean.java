@@ -21,7 +21,6 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
-import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
@@ -127,11 +126,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 					Set<IFact> result = new HashSet<IFact>();
 					result.addAll(descriptions);
 					
-					request.setResult(result);
+					SearchResponse response = new SearchResponse(request, result);
 
-					IJiacMessage resultMessage = new JiacMessage(request);
+					IJiacMessage resultMessage = new JiacMessage(response);
 					try {
-						messageBus.send(resultMessage, message.getReplyToAddress());
+						messageBus.send(resultMessage, message.getSender());
 					} catch (CommunicationException e) {
 						e.printStackTrace();
 					}

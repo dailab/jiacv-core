@@ -1,43 +1,27 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
-import java.util.Set;
-
-import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
-import de.dailab.jiactng.agentcore.ontology.AgentDescription;
-import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 public class SearchRequest implements IFact{
 
 	private IFact _searchTemplate = null;
-	private Set<IFact> _result = null;
-	private ICommunicationAddress _requestingAgent = null;
+	private long _creationTime = -1;
 	
-	public SearchRequest(IFact template, ICommunicationAddress requestingAgent) {
+	public SearchRequest(IFact template) {
 		_searchTemplate = null;
-		_requestingAgent = requestingAgent;
+		_creationTime = System.currentTimeMillis();
 	}
 
-	public ICommunicationAddress getRequestingAgent(){
-		return _requestingAgent;
-	}
-	
 	public IFact getSearchTemplate(){
 		return _searchTemplate;
 	}
 	
-	public Set<IFact> getResult(){
-		return _result;
+	public long getCreationTime(){
+		return _creationTime;
 	}
 	
-	public void setResult(Set<IFact> agentDescriptions){
-		_result = agentDescriptions;
+	synchronized public long getAge(){
+		return (System.currentTimeMillis()-_creationTime);
 	}
-	
-	public void addResult(AgentDescription agentDescription){
-		_result.add(agentDescription);
-	}
-	
-	
 	
 }

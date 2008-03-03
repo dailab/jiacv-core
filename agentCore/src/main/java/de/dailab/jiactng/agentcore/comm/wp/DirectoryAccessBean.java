@@ -2,13 +2,9 @@ package de.dailab.jiactng.agentcore.comm.wp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
 
-import org.apache.commons.logging.Log;
 import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 
@@ -17,26 +13,20 @@ import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
-import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
-import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
-import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
-import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.environment.IEffector;
-import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 public class DirectoryAccessBean extends AbstractAgentBean implements
 IAgentBean, IEffector {
 
 	private long _timeoutMillis = 2500;
+	private int _stdExecutionIntervall = 100;
 	
-	private MessageTransport messageTransport = null;
 	private ICommunicationAddress directoryAddress = null;
-//	private ICommunicationAddress myAddress = null; 
 	private SearchRequestHandler _searchRequestHandler = null;
 	
 	private Action _sendAction = null;
@@ -44,11 +34,7 @@ IAgentBean, IEffector {
 	
 	public DirectoryAccessBean() {
 		setBeanName("DirectoryAccessBean");
-		String name = thisAgent.getAgentName() + getBeanName();
 
-//      Die Addresse des Agenten steht ab der Initialisierungsphase im Memory!
-//      siehe CommunicationBean
-//		myAddress = CommunicationAddressFactory.createMessageBoxAddress(name);
 		String boxName = thisAgent.getAgentNode().getName() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
 		
 		// TODO: wir muessen einen Weg finden, die Addresse des Verzeichnisses zu dieser
@@ -72,16 +58,23 @@ IAgentBean, IEffector {
 	@Override
 	public void execute() {
 		super.execute();
-		for (IFact key : _request2ActionMap.keySet()){
-			DoAction action = _request2ActionMap.get(key);
-			Session session = action.getSession();
-			long creation = session.getCreationTime();
-			long now = System.currentTimeMillis();
-			
-			if ((now - creation) > _timeoutMillis){
-				_request2ActionMap.remove(key);
-				//TODO ActionFailure zurückliefern!
+		if (_request2ActionMap.keySet().size() > 0){
+			synchronized(_request2ActionMap){
+				for (IFact key : _request2ActionMap.keySet()){
+					SearchRequest request = (SearchRequest) key;
+
+					long creation = request.getCreationTime();
+					long now = System.currentTimeMillis();
+
+					if ((now - creation) > _timeoutMillis){
+						DoAction action = _request2ActionMap.remove(key);
+						ActionResult result = new ActionResult(action, new TimeoutException("Failure due to Timeout for action " + action));
+						memory.write(result);
+					}
+				}
 			}
+		} else {
+			this.setExecuteInterval(-1);
 		}
 	}
 	
@@ -92,21 +85,17 @@ IAgentBean, IEffector {
 	public void doStart(){
 			memory.attach(_searchRequestHandler);
 			_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
-			this.setExecuteInterval(100);
+			this.setExecuteInterval(_stdExecutionIntervall);
 	}
 
 	public void doStop(){
 		memory.detach(_searchRequestHandler);
-		this.setExecuteInterval(-100);
+		this.setExecuteInterval(-_stdExecutionIntervall);
 		// nothing to do yet
 	}
 
 	public void doCleanup(){
 		// nothing to do yet
-	}
-
-	public void setMessageTransport(MessageTransport mt){
-		messageTransport = mt;
 	}
 
 	
@@ -128,6 +117,9 @@ IAgentBean, IEffector {
 			SearchRequest request = (SearchRequest) params[0];
 			IFact template = request.getSearchTemplate();
 			_request2ActionMap.put(template, doAction);
+			if (this.getExecuteInterval() < 0){
+				this.setExecuteInterval(_stdExecutionIntervall);
+			}
 			_searchRequestHandler.requestSearch(request);
 		}
 		
@@ -149,37 +141,38 @@ IAgentBean, IEffector {
 //          Absender wird von der CommunicationBean selber gesetzt
 		    IJiacMessage message = new JiacMessage(template);
 		    
-		    Object[] params = {};
+		    Object[] params = {message, directoryAddress};
 			DoAction send = _sendAction.createDoAction(params, null);
 		    
-		    try {
-				
-				messageTransport.send(message, directoryAddress);
-			} catch (CommunicationException e) {
-				e.printStackTrace();
-			}
+		    memory.write(send);
 		}
 
 		@Override
 		public void notify(SpaceEvent<? extends IFact> event) {
 			if (event instanceof IJiacMessage){
 				IJiacMessage message = (IJiacMessage) event;
-				if (message.getPayload() instanceof SearchRequest){
-					SearchRequest request = (SearchRequest) message.getPayload();
-
+				if (message.getPayload() instanceof SearchResponse){
+					SearchResponse response = (SearchResponse) message.getPayload();
+					SearchRequest request = response.getSearchRequest();
+					
 					IFact template = request.getSearchTemplate();
 					DoAction sourceAction = _request2ActionMap.remove(template);
 					if (sourceAction != null){
 						// if request exists and hasn't timed out yet
-						Object[] results = request.getResult().toArray();
+						
+						Object[] results = response.getResult().toArray();
 						ActionResult result = sourceAction.getAction().createActionResult(sourceAction, results);
 
 						memory.write(result);
-					}
+					} // Falls doch sA == null müsste hier ein Fehlschlag bekannt gegeben werden. Doch das geschieht bereits weiter oben
 				}
 			}
-			
 		}
 	}
 	
+	public class TimeoutException extends RuntimeException{
+		public TimeoutException(String s){
+			super(s);
+		}
+	}
 }

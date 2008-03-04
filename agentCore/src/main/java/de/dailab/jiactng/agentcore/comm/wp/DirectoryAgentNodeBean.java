@@ -65,7 +65,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 	
 	public void doStart(){
-	    // TODO: the address of this bean must contain the agentNode ID (for uniqueness)
 		myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getName() + SEARCHREQUESTSUFFIX);
 		try {
 			messageBus.listen(myAddress, null);

@@ -33,10 +33,6 @@ IAgentBean, IEffector {
 	private Map<IFact, DoAction> _request2ActionMap = new HashMap<IFact, DoAction>();
 	
 	public DirectoryAccessBean() {
-		setBeanName("DirectoryAccessBean");
-
-		String boxName = thisAgent.getAgentNode().getName() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
-		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(boxName);
 	}
 
 	public DirectoryAccessBean(boolean strict) {
@@ -75,6 +71,8 @@ IAgentBean, IEffector {
 	
 	public void doInit(){
 		_searchRequestHandler = new SearchRequestHandler();
+		String messageboxName = thisAgent.getAgentNode().getName() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
+		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
 	}
 
 	public void doStart(){

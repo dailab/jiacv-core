@@ -164,7 +164,7 @@ IAgentBean, IEffector {
 						ActionResult result = sourceAction.getAction().createActionResult(sourceAction, results);
 
 						memory.write(result);
-					} // Falls doch sA == null müsste hier ein Fehlschlag bekannt gegeben werden. Doch das geschieht bereits weiter oben
+					} // Falls doch sA == null muesste hier ein Fehlschlag bekannt gegeben werden. Doch das geschieht bereits weiter oben
 				}
 			}
 		}

@@ -45,7 +45,6 @@ IAgentBean, IEffector {
 
 	public DirectoryAccessBean(boolean strict) {
 		super(strict);
-		// TODO Auto-generated constructor stub
 	}
 
 	public <E extends IFact> void requestSearch(E template){
@@ -159,8 +158,10 @@ IAgentBean, IEffector {
 					DoAction sourceAction = _request2ActionMap.remove(template);
 					if (sourceAction != null){
 						// if request exists and hasn't timed out yet
-						
-						Object[] results = response.getResult().toArray();
+						Object[] results = null;
+						if (response.getResult() != null){
+							results = response.getResult().toArray();
+						}
 						ActionResult result = sourceAction.getAction().createActionResult(sourceAction, results);
 
 						memory.write(result);

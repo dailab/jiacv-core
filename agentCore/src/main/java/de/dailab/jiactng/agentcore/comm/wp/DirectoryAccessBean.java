@@ -36,10 +36,6 @@ IAgentBean, IEffector {
 		setBeanName("DirectoryAccessBean");
 
 		String boxName = thisAgent.getAgentNode().getName() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
-		
-		// TODO: wir muessen einen Weg finden, die Addresse des Verzeichnisses zu dieser
-		//       Bean zu kommunizieren. MessageBoxAddressen sollten allerdings nicht auf
-		//       Agentenebene erzeugt werden!
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(boxName);
 	}
 
@@ -90,7 +86,6 @@ IAgentBean, IEffector {
 	public void doStop(){
 		memory.detach(_searchRequestHandler);
 		this.setExecuteInterval(-_stdExecutionIntervall);
-		// nothing to do yet
 	}
 
 	public void doCleanup(){
@@ -102,8 +97,8 @@ IAgentBean, IEffector {
 		List<Action> actions = new ArrayList<Action>();
 		
 		Class<?>[] input = {IFact.class};
-		Class<?>[] output = {IFact.class};
-		Action action = new Action("requestSearch", this, input, output);
+		Class<?>[] result = {List.class};
+		Action action = new Action("requestSearch", this, input, result);
 		actions.add(action);
 		
 		return actions;
@@ -136,8 +131,6 @@ IAgentBean, IEffector {
 	private class SearchRequestHandler implements SpaceObserver<IFact> {
 
 		public <E extends IFact> void requestSearch(E template){
-//			IJiacMessage message = new JiacMessage(template, myAddress);
-//          Absender wird von der CommunicationBean selber gesetzt
 		    IJiacMessage message = new JiacMessage(template);
 		    
 		    Object[] params = {message, directoryAddress};
@@ -158,14 +151,16 @@ IAgentBean, IEffector {
 					DoAction sourceAction = _request2ActionMap.remove(template);
 					if (sourceAction != null){
 						// if request exists and hasn't timed out yet
-						Object[] results = null;
+						List<IFact> result = new ArrayList<IFact>();
 						if (response.getResult() != null){
-							results = response.getResult().toArray();
+							result.addAll(response.getResult());
 						}
-						ActionResult result = sourceAction.getAction().createActionResult(sourceAction, results);
+						
+						Object[] results = {result};
+						ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, results);
 
-						memory.write(result);
-					} // Falls doch sA == null muesste hier ein Fehlschlag bekannt gegeben werden. Doch das geschieht bereits weiter oben
+						memory.write(actionResult);
+					}
 				}
 			}
 		}

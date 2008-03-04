@@ -36,7 +36,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	private SearchRequestHandler _searchRequestHandler = null;
 	
 	public DirectoryAgentNodeBean() {
-		setBeanName(agentNode.getName() + SEARCHREQUESTSUFFIX);
 	}
 
 	/**
@@ -67,7 +66,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	
 	public void doStart(){
 	    // TODO: the address of this bean must contain the agentNode ID (for uniqueness)
-		myAddress = CommunicationAddressFactory.createMessageBoxAddress(getBeanName());
+		myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getName() + SEARCHREQUESTSUFFIX);
 		try {
 			messageBus.listen(myAddress, null);
 		} catch (CommunicationException e) {

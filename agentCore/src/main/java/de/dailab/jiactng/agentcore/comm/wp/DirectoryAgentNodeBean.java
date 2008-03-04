@@ -30,7 +30,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	
 	private SpaceDestroyer<IAgentDescription> destroyer = null;
 	private EventedTupleSpace<IAgentDescription> space = null;
-	private MessageTransport messageBus = null;
+	private MessageTransport messageTransport = null;
 	private ICommunicationAddress myAddress = null; 
 
 	private SearchRequestHandler _searchRequestHandler = null;
@@ -60,14 +60,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		_searchRequestHandler = new SearchRequestHandler();
 		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IAgentDescription>("WhitePages"));
 		space = destroyer.destroybleSpace;
-		messageBus.setDefaultDelegate(_searchRequestHandler);
+		messageTransport.setDefaultDelegate(_searchRequestHandler);
 		
 	}
 	
 	public void doStart(){
 		myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getName() + SEARCHREQUESTSUFFIX);
 		try {
-			messageBus.listen(myAddress, null);
+			messageTransport.listen(myAddress, null);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -75,7 +75,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	
 	public void doStop(){
 		try {
-			messageBus.stopListen(myAddress, null);
+			messageTransport.stopListen(myAddress, null);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -92,7 +92,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	public void setMessageTransport(MessageTransport mt){
-		messageBus = mt;
+		messageTransport = mt;
 	}
 	
 	
@@ -128,7 +128,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 					IJiacMessage resultMessage = new JiacMessage(response);
 					try {
-						messageBus.send(resultMessage, message.getSender());
+						messageTransport.send(resultMessage, message.getSender());
 					} catch (CommunicationException e) {
 						e.printStackTrace();
 					}

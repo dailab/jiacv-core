@@ -23,8 +23,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 public class DirectoryAccessBean extends AbstractAgentBean implements
 IAgentBean, IEffector {
 
-	private long _timeoutMillis = 2500;
-	private int _stdExecutionIntervall = 100;
+	private int _timeoutMillis = 2500;
 	
 	private ICommunicationAddress directoryAddress = null;
 	private SearchRequestHandler _searchRequestHandler = null;
@@ -33,10 +32,6 @@ IAgentBean, IEffector {
 	private Map<IFact, DoAction> _request2ActionMap = new HashMap<IFact, DoAction>();
 	
 	public DirectoryAccessBean() {
-	}
-
-	public DirectoryAccessBean(boolean strict) {
-		super(strict);
 	}
 
 	public <E extends IFact> void requestSearch(E template){
@@ -78,12 +73,12 @@ IAgentBean, IEffector {
 	public void doStart(){
 			memory.attach(_searchRequestHandler);
 			_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
-			this.setExecuteInterval(_stdExecutionIntervall);
+			this.setExecuteInterval( _timeoutMillis /2);
 	}
 
 	public void doStop(){
 		memory.detach(_searchRequestHandler);
-		this.setExecuteInterval(-_stdExecutionIntervall);
+		this.setExecuteInterval(- (_timeoutMillis/2));
 	}
 
 	public void doCleanup(){
@@ -110,7 +105,7 @@ IAgentBean, IEffector {
 			IFact template = request.getSearchTemplate();
 			_request2ActionMap.put(template, doAction);
 			if (this.getExecuteInterval() < 0){
-				this.setExecuteInterval(_stdExecutionIntervall);
+				this.setExecuteInterval(_timeoutMillis/2);
 			}
 			_searchRequestHandler.requestSearch(request);
 		}
@@ -118,7 +113,7 @@ IAgentBean, IEffector {
 		
 	}
 
-	public void setTimeoutMillis(long timeoutMillis){
+	public void setTimeoutMillis(int timeoutMillis){
 		_timeoutMillis = timeoutMillis;
 	}
 	

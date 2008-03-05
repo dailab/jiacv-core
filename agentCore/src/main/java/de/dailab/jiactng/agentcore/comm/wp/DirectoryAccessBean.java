@@ -149,7 +149,7 @@ IAgentBean, IEffector {
 							result.addAll(response.getResult());
 						}
 						
-						Object[] results = {result};
+						Object[] results = {result.toArray()};
 						ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, results);
 
 						memory.write(actionResult);

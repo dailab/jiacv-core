@@ -60,11 +60,6 @@
 
  	-->
 	
-	<bean name="DirectoryAccessBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean" singleton="false"> 
-		<property name="messageTransport">
-			<ref bean="StandardJMSMessageTransport" />
-		</property>
-	</bean>
-	
+	<bean name="DirectoryAccessBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean" singleton="false"/> 
 </beans>
 

@@ -83,7 +83,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
 		public void run() {
-			System.out.println("\nShutting down agent node ...");
+			System.out.println("\nShutting down agent node '" + SimpleAgentNode.this.getName() + "'...");
 			try {
 				shutdown();
 			} catch (Exception e) {
@@ -442,6 +442,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					// directory is present so add agentdescription to it.
 					DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
 					directory.addAgentDescription(a.getAgentDescription());
+					break;
 				}
 			}
 		}
@@ -516,6 +517,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					// directory is present so remove agentdescription from it before cleaning up the agent
 					DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
 					directory.removeAgentDescription(a.getAgentDescription());
+					break;
 				}
 			}
 			

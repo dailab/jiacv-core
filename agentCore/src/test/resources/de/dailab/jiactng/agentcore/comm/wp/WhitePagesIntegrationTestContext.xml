@@ -20,7 +20,7 @@
 		</property>
 		<property name="agentNodeBeans">
 			<list>
-				<ref bean="WhitePagesAgentNodeBean"/>
+				<ref bean="DirectoryAgentNodeBean"/>
 			</list>
 		</property>
 	</bean>
@@ -29,7 +29,7 @@
 		<property name="agentBeans">
 			<list>
 				<ref bean="CommunicationBean" />
-				<ref bean="WhitePagesAccessbean" />
+				<ref bean="DirectoryAccessBean" />
 			</list>
 		</property>
 	</bean>
@@ -41,11 +41,4 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean name = "WhitePagesAgentNodeBean" class = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean.class" >
-	</bean>
-	
-	<bean name = "WhitePagesAccessBean" class = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean.class">
-	</bean>
-	
 </beans>

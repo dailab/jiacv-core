@@ -41,7 +41,7 @@
 		##############################################################################################
 	 -->
 
-	<bean name="DirectoryAgentNodeBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean" singleton="false"> 
+	 <bean name="DirectoryAgentNodeBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean" singleton="false"> 
 		<property name="messageTransport">
 			<ref bean="StandardJMSMessageTransport" />
 		</property>

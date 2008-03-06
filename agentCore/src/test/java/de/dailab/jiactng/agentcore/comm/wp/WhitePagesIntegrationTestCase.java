@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 
 public class WhitePagesIntegrationTestCase extends TestCase {
 
-	ClassPathXmlApplicationContext _xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/wp/WhitePagesIntegrationTestContext.xml");
+	ClassPathXmlApplicationContext _xmlContext;
 	private boolean _setup = true;
 	
 	IAgentNode _agentNode;
@@ -20,26 +20,26 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		super.setUp();
-		if (_setup){
-			_setup = false;
-			
-			_agentNode = (IAgentNode) _xmlContext.getBean("WhitePagePlatform");
-			List<IAgent> agents = _agentNode.findAgents();
-			
-			for (IAgent agent : agents){
-				if (agent.getAgentName().equalsIgnoreCase("WhitePageAgent")){
-					_whitePageAgent = agent;
-				}
-			}
-			List<IAgentBean> beans = _whitePageAgent.getAgentBeans();
-			
-			for (IAgentBean bean : beans){
-				if (bean.getBeanName().equalsIgnoreCase("WhitePagesTestbean")){
-					_whitePagesTestBean = (WhitePagesTestBean) bean;
-				}
-			}	
-		}
+//	    ClassPathXmlApplicationContext _xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/wp/WhitePagesIntegrationTestContext.xml");
+//		if (_setup){
+//			_setup = false;
+//			
+//			_agentNode = (IAgentNode) _xmlContext.getBean("WhitePagePlatform");
+//			List<IAgent> agents = _agentNode.findAgents();
+//			
+//			for (IAgent agent : agents){
+//				if (agent.getAgentName().equalsIgnoreCase("WhitePageAgent")){
+//					_whitePageAgent = agent;
+//				}
+//			}
+//			List<IAgentBean> beans = _whitePageAgent.getAgentBeans();
+//			
+//			for (IAgentBean bean : beans){
+//				if (bean.getBeanName().equalsIgnoreCase("WhitePagesTestbean")){
+//					_whitePagesTestBean = (WhitePagesTestBean) bean;
+//				}
+//			}	
+//		}
 	}
 	
 	@Override

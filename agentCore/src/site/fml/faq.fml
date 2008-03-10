@@ -289,5 +289,34 @@
                 for a short description on how to use these tools.</p>
             </answer>
         </faq>
+        <faq id="mbean-connection">
+            <question>My management client is not able to connect to the running agent node. What is the 
+                reason?</question>
+            <answer><p>
+                The specified JMX connector server was not successfully created by the agent node, the client
+                uses the wrong URL for this connector server or a firewall inhibits the specified port for a
+                connection to the remote host. In the first case there is an error message on the console of
+                the started agent node describing the problem. To exclude the second case you should ensure
+                that the client uses the same URL which was printed on the console of the successfully started 
+                agent node.</p>
+            </answer>
+        </faq>
+        <faq id="interface-name">
+            <question>Within the management interface of my agentbean only the inherited methods (e.g. "init") and
+                attributes (e.g. "LifecycleState") but not the self-defined methods and attributes are known by the
+                MBean server. What is the reason?</question>
+            <answer><p>
+                The agentbean must implement the self-defined MBean interface with the same name except the suffix
+                "MBean" (e.g. "<code>class HelloBean implements HelloBeanMBean</code>").</p>
+            </answer>
+        </faq>
+        <faq id="method-name">
+            <question>Within the management interface of my agentbean only the attributes and/or some methods but
+                not all self-defined methods are known by the MBean server. What is the reason?</question>
+            <answer><p>
+                Methods with prefix "is", "get" or "set" are exposed as attributes of the agentbean and not
+                contained in the list of operations.</p>
+            </answer>
+        </faq>
     </part>
 </faqs>

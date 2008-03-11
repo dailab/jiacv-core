@@ -296,7 +296,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
     
     public boolean isLocal(IMessageBoxAddress messageBox) {
         String name= messageBox.getName();
-        return name.startsWith(thisAgent.getAgentNode().getName().toLowerCase());
+        return name.startsWith(thisAgent.getAgentNode().getUUID());
     }
 
     // TODO: make this private

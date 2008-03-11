@@ -2,11 +2,14 @@ package de.dailab.jiactng.agentcore.comm.wp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
+import org.sercho.masp.space.event.WriteCallEvent;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.IAgentBean;
@@ -24,17 +27,27 @@ public class DirectoryAccessBean extends AbstractAgentBean implements
 IAgentBean, IEffector {
 
 	private int _timeoutMillis = 2500;
-	
+	private static final IJiacMessage WHITEPAGESMESSAGETEMPLATE;
+
 	private ICommunicationAddress directoryAddress = null;
 	private SearchRequestHandler _searchRequestHandler = null;
-	
+
 	private Action _sendAction = null;
-	private Map<IFact, DoAction> _request2ActionMap = new HashMap<IFact, DoAction>();
-	
+	private Map<String, DoAction> _requestID2ActionMap = new HashMap<String, DoAction>();
+
+	static {
+		JiacMessage template = new JiacMessage();
+		template.setProtocol(DirectoryAgentNodeBean.PROTOCOL_ID);
+		WHITEPAGESMESSAGETEMPLATE = template;
+	}
+
+
 	public DirectoryAccessBean() {
 	}
 
+	
 	public <E extends IFact> void requestSearch(E template){
+		log.debug("Received SearchRequest via direct invocation. Searching for Agents with template: " + template);
 		_searchRequestHandler.requestSearch(template);
 	}
 
@@ -44,26 +57,47 @@ IAgentBean, IEffector {
 	@Override
 	public void execute() {
 		super.execute();
-		if (_request2ActionMap.keySet().size() > 0){
-			synchronized(_request2ActionMap){
-				for (IFact key : _request2ActionMap.keySet()){
-					SearchRequest request = (SearchRequest) key;
+		log.debug("Collecting timed out SearchRequests, current check-interval is " + this.getExecuteInterval());
+		Set<String> toRemove = new HashSet<String>();
+		if (_requestID2ActionMap.keySet().size() > 0){
+			synchronized(_requestID2ActionMap){
+				// make sure that the Map isn't changed during maintenance
+				for (String key : _requestID2ActionMap.keySet()){
+					if (key != null){
+						DoAction action = _requestID2ActionMap.get(key);
+						if (action.getParams()[0] instanceof SearchRequest){
+							SearchRequest request =  (SearchRequest) action.getParams()[0];
 
-					long creation = request.getCreationTime();
-					long now = System.currentTimeMillis();
+							long creation = request.getCreationTime();
+							long now = System.currentTimeMillis();
 
-					if ((now - creation) > _timeoutMillis){
-						DoAction action = _request2ActionMap.remove(key);
-						ActionResult result = new ActionResult(action, new TimeoutException("Failure due to Timeout for action " + action));
-						memory.write(result);
+							if ((now - creation) > _timeoutMillis){
+								String owner = action.getOwner();
+								
+								log.warn("SearchRequest from owner " + owner + " has timeout");
+								// request is timed out, mark for removal
+								toRemove.add(key);
+								// not "throw" exception and let the requester know that his request has timed out
+								ActionResult result = new ActionResult(action, new TimeoutException("Failure due to Timeout for action " + action));
+								memory.write(result);
+							}
+						}
+					} else {
+						log.debug("No more Requests pending, timeout-checks are deactivated");
+						this.setExecuteInterval(-1);
 					}
+				}
+				// actually remove found timeouts
+				for (String key : toRemove) {
+					_requestID2ActionMap.remove(key);
 				}
 			}
 		} else {
+			log.debug("No more Requests pending, timeout-checks are deactivated");
 			this.setExecuteInterval(-1);
 		}
 	}
-	
+
 	public void doInit(){
 		_searchRequestHandler = new SearchRequestHandler();
 		String messageboxName = thisAgent.getAgentNode().getName() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
@@ -71,12 +105,14 @@ IAgentBean, IEffector {
 	}
 
 	public void doStart(){
-			memory.attach(_searchRequestHandler);
-			_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
-			this.setExecuteInterval( _timeoutMillis /2);
+		log.debug("starting DirectoryAccessBean");
+		memory.attach(_searchRequestHandler, WHITEPAGESMESSAGETEMPLATE);
+		_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
+		this.setExecuteInterval( _timeoutMillis /2);
 	}
 
 	public void doStop(){
+		log.debug("stopping DirectoryAccessBean");
 		memory.detach(_searchRequestHandler);
 		this.setExecuteInterval(- (_timeoutMillis/2));
 	}
@@ -85,80 +121,95 @@ IAgentBean, IEffector {
 		// nothing to do yet
 	}
 
-	
+
 	public List<? extends Action> getActions(){
 		List<Action> actions = new ArrayList<Action>();
-		
+
 		Class<?>[] input = {IFact.class};
 		Class<?>[] result = {List.class};
-		Action action = new Action("requestSearch", this, input, result);
+		Action action = new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch", this, input, result);
 		actions.add(action);
-		
 		return actions;
 	}
 
 	public void doAction(DoAction doAction){
-		
+
+		log.debug("Received SearchRequest through Action");
 		Object[] params = doAction.getParams();
 		if (params[0] instanceof SearchRequest){
+			log.debug("parameter is actual SearchRequest");
 			SearchRequest request = (SearchRequest) params[0];
-			IFact template = request.getSearchTemplate();
-			_request2ActionMap.put(template, doAction);
+			request.setID(doAction.getSessionId());
+			_requestID2ActionMap.put(request.getID(), doAction);
 			if (this.getExecuteInterval() < 0){
+				log.debug("activating timeoutchecking. Next Check will commence in " + _timeoutMillis/2 + " intervalls");
 				this.setExecuteInterval(_timeoutMillis/2);
 			}
 			_searchRequestHandler.requestSearch(request);
 		}
-		
-		
+
+
 	}
 
 	public void setTimeoutMillis(int timeoutMillis){
 		_timeoutMillis = timeoutMillis;
 	}
-	
+
 	public long getTimeoutMillis(){
 		return _timeoutMillis;
 	}
-	
+
+	@SuppressWarnings("serial")
 	private class SearchRequestHandler implements SpaceObserver<IFact> {
 
 		public <E extends IFact> void requestSearch(E template){
-		    IJiacMessage message = new JiacMessage(template);
-		    
-		    Object[] params = {message, directoryAddress};
+			JiacMessage message = new JiacMessage(template);
+			message.setProtocol(DirectoryAgentNodeBean.PROTOCOL_ID);
+
+			Object[] params = {message, directoryAddress};
 			DoAction send = _sendAction.createDoAction(params, null);
-		    
-		    memory.write(send);
+
+			log.debug("DirectoryAccessBean sends message to directory: " + message);
+			memory.write(send);
 		}
 
 		@Override
 		public void notify(SpaceEvent<? extends IFact> event) {
-			if (event instanceof IJiacMessage){
-				IJiacMessage message = (IJiacMessage) event;
-				if (message.getPayload() instanceof SearchResponse){
-					SearchResponse response = (SearchResponse) message.getPayload();
-					SearchRequest request = response.getSearchRequest();
+			if(event instanceof WriteCallEvent) {
+				WriteCallEvent wceTemp = (WriteCallEvent) event;
+				if (wceTemp.getObject() instanceof IJiacMessage){
+					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
 					
-					IFact template = request.getSearchTemplate();
-					DoAction sourceAction = _request2ActionMap.remove(template);
-					if (sourceAction != null){
-						// if request exists and hasn't timed out yet
-						List<IFact> result = new ArrayList<IFact>();
-						if (response.getResult() != null){
-							result.addAll(response.getResult());
-						}
+					
+					if (message.getPayload() instanceof SearchResponse){
+						log.debug("DirectoryAccessBean: Got reply to SearchRequest");
 						
-						Object[] results = {result.toArray()};
-						ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, results);
+						SearchResponse response = (SearchResponse) message.getPayload();
+						SearchRequest request = response.getSearchRequest();
+						
+						log.debug("processing reply on SearchRequest with ID " + request.getID());
+						
+						DoAction sourceAction = _requestID2ActionMap.remove(request.getID());
+						
+						if (sourceAction != null){
+							// if request exists and hasn't timed out yet
+							List<IFact> result = new ArrayList<IFact>();
+							if (response.getResult() != null){
+								result.addAll(response.getResult());
+							}
 
-						memory.write(actionResult);
+							Object[] results = {result.toArray()};
+							ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, results);
+							log.debug("DirectoryAccessBean is writing actionResult");
+							memory.write(actionResult);
+						}
 					}
 				}
 			}
 		}
 	}
-	
+
+	@SuppressWarnings("serial")
 	public class TimeoutException extends RuntimeException{
 		public TimeoutException(String s){
 			super(s);

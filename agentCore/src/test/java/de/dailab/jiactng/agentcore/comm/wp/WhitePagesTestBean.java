@@ -26,33 +26,50 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	 * 
 	 */
 	public WhitePagesTestBean() {
-		Class<?>[] input = {IFact.class};
-		Class<?>[] result = {List.class};
-		_requestAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch",null,input ,result));
+	}
+	
+	@Override
+	public void doInit() throws Exception {
+		super.doInit();
+		//nothing to do yet
+	}
+	
+	@Override
+	public void doStart() throws Exception {
+		super.doStart();
+		_requestAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch"));
 	}
 	
 	public void searchForAgentDesc(String agentName){
+		log.debug("Searching for Agent " + agentName);
 		AgentDescription desc = new AgentDescription(null, agentName, null, null);
-		Object[] params = {desc};
+		SearchRequest request = new SearchRequest(desc);
+		Object[] params = {request};
 		DoAction action = _requestAction.createDoAction(params, this);
 		memory.write(action);
 	}
 
 	@Override
 	public void receiveResult(ActionResult result) {
+		log.debug("Receiving Result");
+		if (result != null) log.debug("Result reads: " + result);
 		Object[] actionResults = result.getResults();
-		if (actionResults[0] instanceof IFact[]){
-			IFact[] facts = (IFact[]) actionResults[0];
-			_results = new ArrayList<AgentDescription>();
-			for (IFact fact : facts){
-				if (fact instanceof AgentDescription){
-					_results.add((AgentDescription) fact);
+		if (actionResults != null){
+			if (actionResults instanceof IFact[]){
+				IFact[] facts = (IFact[]) actionResults;
+				_results = new ArrayList<AgentDescription>();
+				for (IFact fact : facts){
+					if (fact instanceof AgentDescription){
+						_results.add((AgentDescription) fact);
+					}
 				}
 			}
-		} else {
-			// result == null or no result
-			_results = null;
 		}
+		
+//		} else {
+//			// result == null or no result
+//			_results = null;
+//		}
 	}
 	
 	public List<AgentDescription> getLastResult(){

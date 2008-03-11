@@ -6,57 +6,61 @@ import java.util.List;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
+import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import junit.framework.TestCase;
 
 public class WhitePagesIntegrationTestCase extends TestCase {
 
-	ClassPathXmlApplicationContext _xmlContext;
+	private ClassPathXmlApplicationContext _xmlContext;
 	private boolean _setup = true;
+	private Boolean _lastTestDone = false;
 	
-	IAgentNode _agentNode;
-	IAgent _whitePageAgent;
-	WhitePagesTestBean _whitePagesTestBean;
+	private IAgentNode _agentNode;
+	private IAgent _whitePagesAgent;
+	private WhitePagesTestBean _whitePagesTestBean;
+	
 	
 	@Override
 	protected void setUp() throws Exception {
 //	    ClassPathXmlApplicationContext _xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/wp/WhitePagesIntegrationTestContext.xml");
 //		if (_setup){
 //			_setup = false;
-//			
+//						
 //			_agentNode = (IAgentNode) _xmlContext.getBean("WhitePagePlatform");
 //			List<IAgent> agents = _agentNode.findAgents();
 //			
 //			for (IAgent agent : agents){
-//				if (agent.getAgentName().equalsIgnoreCase("WhitePageAgent")){
-//					_whitePageAgent = agent;
+//				if (agent.getAgentName().equalsIgnoreCase("WhitePagesAgent")){
+//					_whitePagesAgent = agent;
 //				}
 //			}
-//			List<IAgentBean> beans = _whitePageAgent.getAgentBeans();
+//			List<IAgentBean> beans = _whitePagesAgent.getAgentBeans();
 //			
 //			for (IAgentBean bean : beans){
 //				if (bean.getBeanName().equalsIgnoreCase("WhitePagesTestbean")){
 //					_whitePagesTestBean = (WhitePagesTestBean) bean;
 //				}
-//			}	
+//			}
 //		}
 	}
 	
 	@Override
 	protected void tearDown() throws Exception {
-		super.tearDown();
-		
+		if(_lastTestDone){
+			super.tearDown();
+		}
 	}
 	
 	public void testFindAgent(){
-//		_whitePagesTestBean.searchForAgentDesc("FindMeAgent");
+//		_whitePagesTestBean.searchForAgentDesc("findmeagent");
 //		try {
 //			Thread.sleep(2500);
 //		} catch (InterruptedException e) {
 //			e.printStackTrace();
 //		}
 //		List<AgentDescription> results = _whitePagesTestBean.getLastResult();
-//		
+//		System.err.println(results);
 //		assertNotNull(results);
 //		assertEquals(results.size(), 1);
 //		assertTrue(results.get(1).getName().equalsIgnoreCase("FindMeAgent"));
@@ -73,6 +77,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 //		
 //		assertNull(results);
 //		assertEquals(results.size(), 0);
+		_lastTestDone = true;
 	}
 	
 }

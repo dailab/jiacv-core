@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.security.auth.DestroyFailedException;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.sercho.masp.space.SimpleObjectSpace;
 import org.sercho.masp.space.event.EventedSpaceWrapper;
 import org.sercho.masp.space.event.EventedTupleSpace;
@@ -27,6 +28,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		IAgentNodeBean {
 	
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
+	public final static String PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp#DirectoryAgentNodeBean";
 	
 	private SpaceDestroyer<IAgentDescription> destroyer = null;
 	private EventedTupleSpace<IAgentDescription> space = null;
@@ -36,6 +38,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	private SearchRequestHandler _searchRequestHandler = null;
 	
 	public DirectoryAgentNodeBean() {
+		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IAgentDescription>("WhitePages"));
+		space = destroyer.destroybleSpace;
 	}
 
 	/**
@@ -43,7 +47,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * add an AgentDescription object when an agent is added to the node.
 	 */
 	public void addAgentDescription(IAgentDescription agentDescription){
-		space.write(agentDescription);
+		if (agentDescription != null) {
+			space.write(agentDescription);
+		}
 	}
 	
 	/**
@@ -52,15 +58,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * is removed from the node.
 	 */
 	public void removeAgentDescription(IAgentDescription agentDescription){
-		space.remove(agentDescription);
+		if (agentDescription != null) {
+			space.remove(agentDescription);
+		}
 	}
 	
 	
-	public void onInit(){
+	public void doInit(){
 		_searchRequestHandler = new SearchRequestHandler();
-		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IAgentDescription>("WhitePages"));
-		space = destroyer.destroybleSpace;
 		messageTransport.setDefaultDelegate(_searchRequestHandler);
+		try {
+			messageTransport.doInit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -100,7 +111,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	private class SearchRequestHandler implements IMessageTransportDelegate {
 		
 		public Log getLog(String extension){
-			return null;
+			//TODO Creating a method within the AgentNode to get a log for AgentNodeBeans and use it here
+			return LogFactory.getLog(getClass().getName() + "." + extension);
 		}
 		
 		@Override
@@ -112,32 +124,34 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		public void onMessage(MessageTransport source, IJiacMessage message,
 				ICommunicationAddress at) {
 
+			log.debug("got message " + message);
 			if (message.getPayload() instanceof SearchRequest){
 				SearchRequest request = (SearchRequest) message.getPayload();
 
+				log.debug("Message is holding SearchRequest");
 				if (request.getSearchTemplate() instanceof IAgentDescription){
-
+					log.debug("SearchRequest hold SearchTemplate of type IAgentDescription");
 					IAgentDescription template = (IAgentDescription) request.getSearchTemplate();
 
+					log.debug("SearchRequest holds template " + template);
 					Set<IAgentDescription> descriptions = space.readAll(template);
-					
 					Set<IFact> result = new HashSet<IFact>();
 					result.addAll(descriptions);
+					log.debug("Result to send reads " + result);
 					
 					SearchResponse response = new SearchResponse(request, result);
 
-					IJiacMessage resultMessage = new JiacMessage(response);
+					JiacMessage resultMessage = new JiacMessage(response);
+					resultMessage.setProtocol(DirectoryAgentNodeBean.PROTOCOL_ID);
 					try {
+						log.debug("AgentNode: sending Message " + resultMessage);
+						log.debug("sending it to " + message.getSender());
 						messageTransport.send(resultMessage, message.getSender());
 					} catch (CommunicationException e) {
 						e.printStackTrace();
 					}
 				}
 			}
-			
 		}
-		
-		
 	}
-	
 }

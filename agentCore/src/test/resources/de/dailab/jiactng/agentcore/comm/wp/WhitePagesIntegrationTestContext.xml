@@ -5,9 +5,10 @@
 	- Application context for the white pages integration testcase
 -->
 <beans>
-	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
 
 	<bean name="WhitePagePlatform" parent="Platform">
 		<property name="loggingConfig"
@@ -20,6 +21,7 @@
 		</property>
 		<property name="agentNodeBeans">
 			<list>
+				<ref bean="StandardJMSBroker" />
 				<ref bean="DirectoryAgentNodeBean"/>
 			</list>
 		</property>
@@ -30,6 +32,7 @@
 			<list>
 				<ref bean="CommunicationBean" />
 				<ref bean="DirectoryAccessBean" />
+				<ref bean="WhitePagesTestBean" />
 			</list>
 		</property>
 	</bean>
@@ -40,5 +43,8 @@
 				<ref bean="CommunicationBean" />
 			</list>
 		</property>
+	</bean>
+	
+	<bean name="WhitePagesTestBean" class="de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean">
 	</bean>
 </beans>

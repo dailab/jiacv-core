@@ -33,7 +33,7 @@ public final class IdFactory {
 	 * @return the id of the agent platform
 	 */
 	public static String createPlatformId(int hashcode) {
-		return new StringBuffer("p:")
+		return new StringBuilder("p/")
 			.append(Long.toHexString(System.currentTimeMillis() + hashcode))
 			.toString();
 	}
@@ -46,7 +46,7 @@ public final class IdFactory {
 	 * @return the id of the agent node
 	 */
 	public static String createAgentNodeId(int hashcode) {
-		return new StringBuffer("n:")
+		return new StringBuilder("n/")
 			.append(Long.toHexString(System.currentTimeMillis() + hashcode))
 			.toString();
 	}
@@ -58,7 +58,7 @@ public final class IdFactory {
 	 * @return the id of the agent
 	 */
 	public static String createAgentId(int hashcode) {
-		return new StringBuffer("a:")
+		return new StringBuilder("a/")
 			.append(Long.toHexString(System.currentTimeMillis() + hashcode))
 			.toString();
 	}
@@ -70,7 +70,7 @@ public final class IdFactory {
 	 * @return the session id
 	 */
 	public static String createSessionId(int hashcode) {
-		return new StringBuffer("s:")
+		return new StringBuilder("s/")
 			.append(Long.toHexString(System.currentTimeMillis() + hashcode))
 			.toString();
 	}

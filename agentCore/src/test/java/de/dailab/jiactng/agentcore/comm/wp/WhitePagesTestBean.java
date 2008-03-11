@@ -32,7 +32,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	}
 	
 	public void searchForAgentDesc(String agentName){
-		AgentDescription desc = new AgentDescription(null, agentName, null);
+		AgentDescription desc = new AgentDescription(null, agentName, null, null);
 		Object[] params = {desc};
 		DoAction action = _requestAction.createDoAction(params, this);
 		memory.write(action);

@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.ontology;
 
+import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
+
 
 /**
  * Holds information about other agents.
@@ -17,8 +19,8 @@ public class OtherAgentDescription extends AgentDescription implements IAgentDes
 	 * @param name the name of the other agent
 	 * @param state the state of the other agent
 	 */
-	public OtherAgentDescription(String aid, String name, String state) {
-		super(aid, name, state);
+	public OtherAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress) {
+		super(aid, name, state, messageBoxAddress);
 	}
 
 	/**

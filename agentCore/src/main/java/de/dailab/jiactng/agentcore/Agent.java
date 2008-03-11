@@ -25,6 +25,7 @@ import javax.management.openmbean.SimpleType;
 import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
@@ -271,8 +272,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
             new ThisAgentDescription(
                 this.agentId,
 				this.agentName,
-                LifecycleStates.INITIALIZING.name())
-            );
+                LifecycleStates.INITIALIZING.name(),
+                CommunicationAddressFactory.createMessageBoxAddress(this.agentNode.getUUID() + '/' + this.agentId)
+            )
+        );
 
 		this.execution.setMemory(memory);
 		this.execution.init();
@@ -415,7 +418,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 *            the new state
 	 */
 	private void updateState(ILifecycle.LifecycleStates newState) {
-		memory.update(new ThisAgentDescription(null, null, null), new ThisAgentDescription(null, null, newState.name()));
+		memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, null, newState.name(), null));
 	}
 
 	/**
@@ -423,7 +426,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * @return the current lifecycle state of this agent
 	 */
 	public LifecycleStates getAgentState() {
-		return LifecycleStates.valueOf(memory.read(new ThisAgentDescription(null, null, null)).getState());
+		return LifecycleStates.valueOf(memory.read(new ThisAgentDescription()).getState());
 	}
 
 	/**
@@ -616,7 +619,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * @return the agent description of this agent
 	 */
 	public AgentDescription getAgentDescription() {
-		return memory.read(new ThisAgentDescription(null, null, null));
+		return memory.read(new ThisAgentDescription());
 	}
 
 	/**

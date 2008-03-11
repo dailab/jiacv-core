@@ -54,8 +54,8 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 		String agentbeanName;
 		try {
 			ActionPerformedNotification n = (ActionPerformedNotification) notification;
-			actionName = n.getAction().getAction().getName();
-			agentbeanName = n.getAction().getAction().getProviderBean().getBeanName();
+			actionName = n.getActionName();
+			agentbeanName = n.getAgentbeanName();
 		}
 		catch (Exception e) {
 			return false;

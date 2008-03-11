@@ -20,11 +20,14 @@ public class MessageExchangeNotification extends Notification {
 	/** Indicates if the message was sent or received. */
 	private MessageExchangeAction _action;
 
+	/** The address of the message sender. */
+	private ICommunicationAddress _sender;
+
 	/** The address of the message receiver. */
 	private ICommunicationAddress _receiver;
 
-	/** The exchanged message. */
-	private IJiacMessage _message;
+	/** The description of the exchanged message. */
+	private Object _message;
 
 	/** The used message transport mechanism. */
 	private String _transport;
@@ -61,8 +64,13 @@ public class MessageExchangeNotification extends Notification {
 			IJiacMessage jiacMessage, String transport) {
 		super(MESSAGE_EXCHANGE, source, sequenceNumber, timeStamp, msg);
 		_action = action;
+		_sender = jiacMessage.getSender();
 		_receiver = receiver;
-		_message = jiacMessage;
+		try {
+			_message = ((JmxDescriptionSupport)jiacMessage).getDescription();
+		} catch (Exception e) {
+			_message = jiacMessage.toString();
+		}
 		_transport = transport;
 	}
 
@@ -75,6 +83,14 @@ public class MessageExchangeNotification extends Notification {
 	}
 
 	/**
+	 * Gets the address of the message sender.
+	 * @return The address of the message sender.
+	 */
+	public ICommunicationAddress getSender() {
+		return _sender;
+	}
+
+	/**
 	 * Gets the address of the message receiver.
 	 * @return The address of the message receiver.
 	 */
@@ -83,10 +99,13 @@ public class MessageExchangeNotification extends Notification {
 	}
 
 	/**
-	 * Gets the exchanged message.
-	 * @return The exchanged message.
+	 * Gets the description of the exchanged message.
+	 * @return The description of the exchanged message. The representation is either a string 
+	 * or based on JMX open types.
+	 * @see Object#toString()
+	 * @see JmxDescriptionSupport#getDescription()
 	 */
-	public IJiacMessage getJiacMessage() {
+	public Object getJiacMessage() {
 		return _message;
 	}
 

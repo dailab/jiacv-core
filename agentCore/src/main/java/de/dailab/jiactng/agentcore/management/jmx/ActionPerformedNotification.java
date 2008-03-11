@@ -16,8 +16,14 @@ public class ActionPerformedNotification extends Notification {
 	/** Notification type which indicates that an action was performed. */
 	public static String ACTION_PERFORMED = "jiactng.action.perform";
 
-	/** The performed action. */
-	private DoAction _action;
+	/** The name of the performed action. */
+	private String _actionName;
+
+	/** The name of the agent bean which has performed the action. */
+	private String _agentbeanName;
+
+	/** The description of the performed action. */
+	private String _action;
 
 	/** The duration of action execution in nanoseconds. */
 	private long _duration;
@@ -34,15 +40,34 @@ public class ActionPerformedNotification extends Notification {
 	public ActionPerformedNotification(Object source, long sequenceNumber,
 			long timeStamp, String msg, DoAction action, long duration) {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
-		_action = action;
+		_actionName = action.getAction().getName();
+		_agentbeanName = action.getAction().getProviderBean().getBeanName();
+		_action = action.toString();
 		_duration = duration;
 	}
 
 	/**
-	 * Gets the performed action.
-	 * @return The performed action.
+	 * Gets the name of the performed action.
+	 * @return The name of the performed action.
 	 */
-	public DoAction getAction() {
+	public String getActionName() {
+		return _actionName;
+	}
+
+	/**
+	 * Gets the name of the agent bean which has performed the action.
+	 * @return The name of the agent bean.
+	 */
+	public String getAgentbeanName() {
+		return _agentbeanName;
+	}
+
+	/**
+	 * Gets the description of the performed action.
+	 * @return The description of the performed action.
+	 * @see Object#toString()
+	 */
+	public String getAction() {
 		return _action;
 	}
 

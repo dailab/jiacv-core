@@ -25,7 +25,6 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	protected void setUp() throws Exception {
 		if (_setup){
 			super.setUp();
-			System.err.println("SETUP! SETUP! SETUP! WARRRRNNNIINNNGGGGG ! ! ! SETUP! SETUP! SETUP!");
 			_setup = false;
 			
 			_xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/wp/WhitePagesIntegrationTestContext.xml");
@@ -69,14 +68,12 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 				findme = (AgentDescription) results.get(0);
 		}
 		
-		System.err.println("TestCase got: " + results);
 		assertNotNull(results);
 		assertEquals(1, results.size());
 		assertTrue(findme.getName().equalsIgnoreCase("FindMeAgent"));
 	}
 	
 	public void testNothingToFind(){
-		System.err.println("Testbean: " + _whitePagesTestBean);
 		_whitePagesTestBean.searchForAgentDesc("NixaAgentos");
 		try {
 			Thread.sleep(2500);
@@ -85,7 +82,6 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 		List<IFact> results = _whitePagesTestBean.getLastResult();
 		
-		System.err.println(results);
 		assertNotNull(results);
 		assertEquals(0, results.size());
 		_lastTestDone = true;

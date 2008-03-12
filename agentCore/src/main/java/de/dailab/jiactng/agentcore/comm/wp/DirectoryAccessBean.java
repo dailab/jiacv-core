@@ -23,6 +23,17 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
+/**
+ * This Class is meant to work on the side of the agent that is searching
+ * for entrys in the directory. E.g. other Agents. It processes actions
+ * from the memory and delivers actionresults to the memory.
+ * 
+ * Note: For this Bean to be able to work properly there has to be a CommunicationBean
+ * present on this Agent and a DirectoryAgentNodeBean on the AgentNode.
+ * 
+ * @author Martin Loeffelholz
+ *
+ */
 public class DirectoryAccessBean extends AbstractAgentBean implements
 IAgentBean, IEffector {
 
@@ -46,6 +57,11 @@ IAgentBean, IEffector {
 	}
 
 	
+	/**
+	 * Starts a search for DirectoryEntrys that are conform to the template given
+	 * @param <E> extends IFact
+	 * @param template the template to search for
+	 */
 	public <E extends IFact> void requestSearch(E template){
 		log.debug("Received SearchRequest via direct invocation. Searching for Agents with template: " + template);
 		_searchRequestHandler.requestSearch(template);
@@ -98,27 +114,31 @@ IAgentBean, IEffector {
 		}
 	}
 
-	public void doInit(){
+	public void doInit() throws Exception{
+		super.doInit();
 		_searchRequestHandler = new SearchRequestHandler();
 		String messageboxName = thisAgent.getAgentNode().getName() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
 	}
 
-	public void doStart(){
+	public void doStart() throws Exception{
+		super.doStart();
 		log.debug("starting DirectoryAccessBean");
 		memory.attach(_searchRequestHandler, WHITEPAGESMESSAGETEMPLATE);
 		_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 		this.setExecuteInterval( _timeoutMillis /2);
 	}
 
-	public void doStop(){
+	public void doStop() throws Exception{
+		super.doStop();
 		log.debug("stopping DirectoryAccessBean");
 		memory.detach(_searchRequestHandler);
 		this.setExecuteInterval(- (_timeoutMillis/2));
 	}
 
-	public void doCleanup(){
+	public void doCleanup() throws Exception{
 		// nothing to do yet
+		super.doCleanup();
 	}
 
 
@@ -133,7 +153,6 @@ IAgentBean, IEffector {
 	}
 
 	public void doAction(DoAction doAction){
-
 		log.debug("Received SearchRequest through Action");
 		Object[] params = doAction.getParams();
 		if (params[0] instanceof SearchRequest){
@@ -159,9 +178,21 @@ IAgentBean, IEffector {
 		return _timeoutMillis;
 	}
 
+	/**
+	 * Inner Class for handling searchRequests 
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	@SuppressWarnings("serial")
 	private class SearchRequestHandler implements SpaceObserver<IFact> {
 
+		/**
+		 * just gets the SearchRequest to the directory
+		 * 
+		 * @param <E> extends IFact
+		 * @param template of the entrys to look for
+		 */
 		public <E extends IFact> void requestSearch(E template){
 			JiacMessage message = new JiacMessage(template);
 			message.setProtocol(DirectoryAgentNodeBean.PROTOCOL_ID);
@@ -173,6 +204,10 @@ IAgentBean, IEffector {
 			memory.write(send);
 		}
 
+		/**
+		 * receives the answers from the directory and processes them. 
+		 * Then puts an actionresult into the agents memory
+		 */
 		@Override
 		public void notify(SpaceEvent<? extends IFact> event) {
 			if(event instanceof WriteCallEvent) {
@@ -197,10 +232,10 @@ IAgentBean, IEffector {
 							if (response.getResult() != null){
 								result.addAll(response.getResult());
 							}
-
-							Object[] results = {result.toArray()};
-							ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, results);
+							
+							ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, result.toArray());
 							log.debug("DirectoryAccessBean is writing actionResult");
+							
 							memory.write(actionResult);
 						}
 					}

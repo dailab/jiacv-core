@@ -21,7 +21,7 @@ import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 public class WhitePagesTestBean extends AbstractAgentBean implements ResultReceiver{
 
 	Action _requestAction;
-	List<AgentDescription> _results = null;
+	List<IFact> _results = new ArrayList<IFact>();
 	/**
 	 * 
 	 */
@@ -40,6 +40,11 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		_requestAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch"));
 	}
 	
+	/**
+	 * Creates an action and starts a search for an Agent with the name of agentname
+	 * 
+	 * @param agentName name of the agent to search for
+	 */
 	public void searchForAgentDesc(String agentName){
 		log.debug("Searching for Agent " + agentName);
 		AgentDescription desc = new AgentDescription(null, agentName, null, null);
@@ -49,32 +54,34 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		memory.write(action);
 	}
 
+	/**
+	 * Receives the result for the action created in searchForAgentDesc and stores it for later withdrawl
+	 */
 	@Override
 	public void receiveResult(ActionResult result) {
-		log.debug("Receiving Result");
+		log.debug("WhitePagesTestBean Receiving Result");
 		if (result != null) log.debug("Result reads: " + result);
+		
 		Object[] actionResults = result.getResults();
-		if (actionResults != null){
-			if (actionResults instanceof IFact[]){
-				IFact[] facts = (IFact[]) actionResults;
-				_results = new ArrayList<AgentDescription>();
-				for (IFact fact : facts){
-					if (fact instanceof AgentDescription){
-						_results.add((AgentDescription) fact);
-					}
+		if (actionResults != null) {
+			synchronized(_results){
+				_results = new ArrayList<IFact>();
+				for (Object obj : actionResults){
+					if (obj instanceof IFact)
+						_results.add((IFact) obj);
 				}
 			}
 		}
-		
-//		} else {
-//			// result == null or no result
-//			_results = null;
-//		}
 	}
 	
-	public List<AgentDescription> getLastResult(){
-		List<AgentDescription> output = _results;
-		_results = null;
+	/**
+	 * returns the last result(s) of a searchrequest and deletes the resultstorage
+	 * 
+	 * @return
+	 */
+	public List<IFact> getLastResult(){
+		List<IFact> output = _results;
+		_results = new ArrayList<IFact>();
 		return output;
 	}
 }

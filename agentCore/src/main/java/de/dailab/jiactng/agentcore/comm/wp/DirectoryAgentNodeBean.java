@@ -24,21 +24,31 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTrans
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
+/**
+ * This class is meant to work on the side of the agentnode. It stores a
+ * directory based on IFacts so although its meant to store AgentDescriptions
+ * it could theoretically also be used for other subclasses of IFact
+ * 
+ * Note: To look for entries within this directory the DirectoryAccessBean should be used.
+ * 
+ * @author Martin Loeffelholz
+ *
+ */
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		IAgentNodeBean {
 	
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
 	public final static String PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp#DirectoryAgentNodeBean";
 	
-	private SpaceDestroyer<IAgentDescription> destroyer = null;
-	private EventedTupleSpace<IAgentDescription> space = null;
+	private SpaceDestroyer<IFact> destroyer = null;
+	private EventedTupleSpace<IFact> space = null;
 	private MessageTransport messageTransport = null;
 	private ICommunicationAddress myAddress = null; 
 
 	private SearchRequestHandler _searchRequestHandler = null;
 	
 	public DirectoryAgentNodeBean() {
-		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IAgentDescription>("WhitePages"));
+		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("WhitePages"));
 		space = destroyer.destroybleSpace;
 	}
 
@@ -107,7 +117,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 	
 	
-	
+	/*
+	 * inner Class to handle the incoming and outgoing searchRequests
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	private class SearchRequestHandler implements IMessageTransportDelegate {
 		
 		public Log getLog(String extension){

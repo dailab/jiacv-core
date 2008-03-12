@@ -6,43 +6,46 @@ import java.util.List;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
-import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import junit.framework.TestCase;
 
 public class WhitePagesIntegrationTestCase extends TestCase {
 
-	private ClassPathXmlApplicationContext _xmlContext;
-	private boolean _setup = true;
-	private Boolean _lastTestDone = false;
+	private static ClassPathXmlApplicationContext _xmlContext;
+	private static boolean _setup = true;
+	private static boolean _lastTestDone = false;
 	
-	private IAgentNode _agentNode;
-	private IAgent _whitePagesAgent;
-	private WhitePagesTestBean _whitePagesTestBean;
+	private static IAgentNode _agentNode;
+	private static IAgent _whitePagesAgent;
+	private static WhitePagesTestBean _whitePagesTestBean;
 	
 	
 	@Override
 	protected void setUp() throws Exception {
-//	    ClassPathXmlApplicationContext _xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/wp/WhitePagesIntegrationTestContext.xml");
-//		if (_setup){
-//			_setup = false;
-//						
-//			_agentNode = (IAgentNode) _xmlContext.getBean("WhitePagePlatform");
-//			List<IAgent> agents = _agentNode.findAgents();
-//			
-//			for (IAgent agent : agents){
-//				if (agent.getAgentName().equalsIgnoreCase("WhitePagesAgent")){
-//					_whitePagesAgent = agent;
-//				}
-//			}
-//			List<IAgentBean> beans = _whitePagesAgent.getAgentBeans();
-//			
-//			for (IAgentBean bean : beans){
-//				if (bean.getBeanName().equalsIgnoreCase("WhitePagesTestbean")){
-//					_whitePagesTestBean = (WhitePagesTestBean) bean;
-//				}
-//			}
-//		}
+		if (_setup){
+			super.setUp();
+			System.err.println("SETUP! SETUP! SETUP! WARRRRNNNIINNNGGGGG ! ! ! SETUP! SETUP! SETUP!");
+			_setup = false;
+			
+			_xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/wp/WhitePagesIntegrationTestContext.xml");
+			
+			_agentNode = (IAgentNode) _xmlContext.getBean("WhitePagePlatform");
+			List<IAgent> agents = _agentNode.findAgents();
+			
+			for (IAgent agent : agents){
+				if (agent.getAgentName().equalsIgnoreCase("WhitePagesAgent")){
+					_whitePagesAgent = agent;
+				}
+			}
+			List<IAgentBean> beans = _whitePagesAgent.getAgentBeans();
+			
+			for (IAgentBean bean : beans){
+				if (bean.getBeanName().equalsIgnoreCase("WhitePagesTestbean")){
+					_whitePagesTestBean = (WhitePagesTestBean) bean;
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -53,30 +56,38 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testFindAgent(){
-//		_whitePagesTestBean.searchForAgentDesc("findmeagent");
-//		try {
-//			Thread.sleep(2500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		List<AgentDescription> results = _whitePagesTestBean.getLastResult();
-//		System.err.println(results);
-//		assertNotNull(results);
-//		assertEquals(results.size(), 1);
-//		assertTrue(results.get(1).getName().equalsIgnoreCase("FindMeAgent"));
+		_whitePagesTestBean.searchForAgentDesc("findmeagent");
+		try {
+			Thread.sleep(2500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		List<IFact> results = _whitePagesTestBean.getLastResult();
+		AgentDescription findme = null;
+		if (results.size() > 0){
+			if (results.get(0) instanceof AgentDescription)
+				findme = (AgentDescription) results.get(0);
+		}
+		
+		System.err.println("TestCase got: " + results);
+		assertNotNull(results);
+		assertEquals(1, results.size());
+		assertTrue(findme.getName().equalsIgnoreCase("FindMeAgent"));
 	}
 	
 	public void testNothingToFind(){
-//		_whitePagesTestBean.searchForAgentDesc("NixaAgentos");
-//		try {
-//			Thread.sleep(2500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		List<AgentDescription> results = _whitePagesTestBean.getLastResult();
-//		
-//		assertNull(results);
-//		assertEquals(results.size(), 0);
+		System.err.println("Testbean: " + _whitePagesTestBean);
+		_whitePagesTestBean.searchForAgentDesc("NixaAgentos");
+		try {
+			Thread.sleep(2500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		List<IFact> results = _whitePagesTestBean.getLastResult();
+		
+		System.err.println(results);
+		assertNotNull(results);
+		assertEquals(0, results.size());
 		_lastTestDone = true;
 	}
 	

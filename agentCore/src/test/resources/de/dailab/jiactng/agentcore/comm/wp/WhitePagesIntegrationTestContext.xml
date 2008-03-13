@@ -47,16 +47,7 @@
 		The special JMS Broker.
 		It has a standard TCP connector
 	-->
-	<bean name="WhitePagesTestJMSBroker" parent="ActiveMQBroker" singleton="true" lazy-init="true">
-		<property name="connectors">
-			<set>
-				<ref bean="WhitePagesTestTCPConnector" />
-			</set>
-		</property>
-	</bean>
-	
-	<bean name="WhitePagesTestTCPConnector" parent="ActiveMQTransportConnector" singleton="true">
-		<property name="transportURI" value="tcp://localhost:0" />
+	<bean name="WhitePagesTestJMSBroker" parent="ActiveMQBroker" singleton="true" lazy-init="true">	
 	</bean>
 	
 </beans>

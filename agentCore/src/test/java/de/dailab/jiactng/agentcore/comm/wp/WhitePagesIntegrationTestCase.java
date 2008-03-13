@@ -57,7 +57,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	public void testFindAgent(){
 		_whitePagesTestBean.searchForAgentDesc("findmeagent");
 		try {
-			Thread.sleep(2500);
+			Thread.sleep(3500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

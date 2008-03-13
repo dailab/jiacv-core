@@ -272,23 +272,23 @@ public interface Manager {
 	/**
 	 * Gets the value of an attribute of an agent.
 	 * @param nodeName the name of the agent node where the agent is residing on
-	 * @param agentName the name of the agent
+	 * @param agentId the unique identifier of the agent
 	 * @param attributeName the name of the attribute
 	 * @return the value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getAttributeOfAgent(String nodeName, String agentName, String attributeName) throws Exception;
+	public Object getAttributeOfAgent(String nodeName, String agentId, String attributeName) throws Exception;
 
 	/**
 	 * Gets the value of an attribute of an agent bean.
 	 * @param nodeName the name of the agent node where the agent is residing on which contains the agent bean
-	 * @param agentName the name of the agent which contains the agent bean
+	 * @param agentId the unique identifier of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @param attributeName the name of the attribute
 	 * @return the value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getAttributeOfAgentBean(String nodeName, String agentName, String beanName, String attributeName) throws Exception;
+	public Object getAttributeOfAgentBean(String nodeName, String agentId, String beanName, String attributeName) throws Exception;
 
 	/**
 	 * Sets the value of an attribute of an agent node.
@@ -302,23 +302,23 @@ public interface Manager {
 	/**
 	 * Sets the value of an attribute of an agent.
 	 * @param nodeName the name of the agent node where the agent is residing on
-	 * @param agentName the name of the agent
+	 * @param agentId the unique identifier of the agent
 	 * @param attributeName the name of the attribute
 	 * @param attributeValue the new value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public void setAttributeOfAgent(String nodeName, String agentName, String attributeName, Object attributeValue) throws Exception;
+	public void setAttributeOfAgent(String nodeName, String agentId, String attributeName, Object attributeValue) throws Exception;
 
 	/**
 	 * Sets the value of an attribute of an agent bean.
 	 * @param nodeName the name of the agent node where the agent is residing on which contains the agent bean
-	 * @param agentName the name of the agent which contains the agent bean
+	 * @param agentId the unique identifier of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @param attributeName the name of the attribute
 	 * @param attributeValue the new value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public void setAttributeOfAgentBean(String nodeName, String agentName, String beanName, String attributeName, Object attributeValue) throws Exception;
+	public void setAttributeOfAgentBean(String nodeName, String agentId, String beanName, String attributeName, Object attributeValue) throws Exception;
 
 	/**
 	 * Invokes an operation on an agent node.
@@ -334,19 +334,19 @@ public interface Manager {
 	/**
 	 * Invokes an operation on an agent.
 	 * @param nodeName The name of the agent node where the agent is residing on.
-	 * @param agentName The name of the agent.
+	 * @param agentId The unique identifier of the agent.
 	 * @param operationName The name of the operation to be invoked.
 	 * @param params An array containing the parameters to be set when the operation is invoked.
 	 * @param signature An array containing the signature of the operation.
 	 * @return The object returned by the operation.
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object invokeAgent(String nodeName, String agentName, String operationName, Object[] params, String[] signature) throws Exception;
+	public Object invokeAgent(String nodeName, String agentId, String operationName, Object[] params, String[] signature) throws Exception;
 
 	/**
 	 * Invokes an operation on an agent bean.
 	 * @param nodeName The name of the agent node where the agent is residing on which contains the agent bean.
-	 * @param agentName The name of the agent which contains the agent bean.
+	 * @param agentId The unique identifier of the agent which contains the agent bean.
 	 * @param beanName The name of the agent bean.
 	 * @param operationName The name of the operation to be invoked.
 	 * @param params An array containing the parameters to be set when the operation is invoked.
@@ -354,7 +354,7 @@ public interface Manager {
 	 * @return The object returned by the operation.
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object invokeAgentBean(String nodeName, String agentName, String beanName, String operationName, Object[] params, String[] signature) throws Exception;
+	public Object invokeAgentBean(String nodeName, String agentId, String beanName, String operationName, Object[] params, String[] signature) throws Exception;
 
 	/**
 	 * Creates all specified connector server for remote management.

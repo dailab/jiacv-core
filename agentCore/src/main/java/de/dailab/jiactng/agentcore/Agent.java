@@ -15,6 +15,8 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.management.AttributeChangeNotification;
+import javax.management.Notification;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -480,27 +482,27 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	}
 
 	/**
-	 * Setter for the agentname.
+	 * Setter for attribute <code>AgentName</code>. It also sends a notification to JMX listeners.
 	 * 
 	 * @param agentname
 	 *            the new name of the agent
 	 * @see #setBeanName(java.lang.String)
 	 */
 	public void setAgentName(String agentname) {
-		// update management
-		if (isManagementEnabled()) {
-			Manager manager = _manager;
-			disableManagement();
-			this.agentName = agentname.toLowerCase();
-			enableManagement(manager);
-		} else {
-			this.agentName = agentname.toLowerCase();
-		}
-
-		// update logger
-		if (agentNode != null) {
-			this.agentLog = agentNode.getLog(this);
-		}
+		String oldName = this.agentName;
+		this.agentName = agentname;
+		
+		// send notification
+        Notification n =
+            new AttributeChangeNotification(this,
+            sequenceNumber++,
+            System.currentTimeMillis(),
+            "Name of agent changed",
+            "AgentName",
+            "java.lang.String",
+            oldName,
+            agentname);
+        sendNotification(n);
 	}
 
 	/**
@@ -605,9 +607,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	}
 
 	/**
-	 * Returns the agent identifier.
-	 * 
-	 * @return the agent identifier of this agent
+	 * {@inheritDoc}
 	 */
 	public String getAgentId() {
 		return agentId;

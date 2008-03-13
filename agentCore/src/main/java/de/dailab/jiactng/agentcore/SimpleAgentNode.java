@@ -259,14 +259,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
-	 * Returns the names of agents which reside on this agent node.
+	 * Returns the unique identifiers of agents which reside on this agent node.
 	 * 
-	 * @return list of agent names
+	 * @return list of unique agent identifiers
 	 */
 	public List<String> getAgents() {
 		ArrayList<String> result = new ArrayList<String>();
 		for (IAgent a : _agents) {
-			result.add(a.getAgentName());
+			result.add(a.getAgentId());
 		}
 		return result;
 	}

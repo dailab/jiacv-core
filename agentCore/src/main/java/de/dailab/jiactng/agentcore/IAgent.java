@@ -67,11 +67,18 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
   public void setBeanName(String name);
 
   /**
-   * Getter for the name of this agent, as set by Spring
+   * Getter for the name of this agent, as set by Spring.
    * 
    * @return the name of this agent.
    */
   public String getAgentName();
+
+  /**
+   * Getter for the agent identifier.
+   * 
+   * @return the agent identifier of this agent.
+   */
+  public String getAgentId();
 
   /**
    * Getter for the agentnode that hosts this agent.

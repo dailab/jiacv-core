@@ -36,7 +36,7 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Getter for attribute "Agents" of the managed agent node.
-	 * @return the name of agents running on this agent node
+	 * @return the unique identifier of agents running on this agent node
 	 */
 	public List<String> getAgents();
 

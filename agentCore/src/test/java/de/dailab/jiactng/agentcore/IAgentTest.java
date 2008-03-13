@@ -8,7 +8,6 @@ package de.dailab.jiactng.agentcore;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -40,7 +39,7 @@ public class IAgentTest extends TestCase {
   }
 
   public void testGetAgentName() {
-    assertEquals("Agent.getName is wrong", "testagent", agent.getAgentName());
+    assertEquals("Agent.getName is wrong", "TestAgent", agent.getAgentName());
   }
 
   public void testGetAgentNode() {

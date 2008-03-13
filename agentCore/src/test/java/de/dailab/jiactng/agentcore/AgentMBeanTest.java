@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 public class AgentMBeanTest extends TestCase implements NotificationListener {
 
 	private final String nodeName = "myPlatform";
-	private final String agentName = "testagent";
+	private final String agentName = "TestAgent";
 	private ObjectName node = null;
 	private ObjectName agent = null;
 	private MBeanServer mbs = null;
@@ -35,8 +35,9 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	private String currentLifecycleState = "";
 	private String previousLifecycleState = "";
 	private String registrationNotification = "";
-	private ArrayList agentListNotification = null;
+	private ArrayList<String> agentListNotification = null;
 	private SimpleAgentNode nodeRef = null;
+	private String agentId = null;
 	private JmxManager manager = null;
 
 	/**
@@ -50,21 +51,21 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		System.setProperty("jmx.invoke.getters", "");
 		manager = new JmxManager();
 		node = manager.getMgmtNameOfAgentNode(nodeName);
-		agent = manager.getMgmtNameOfAgent(nodeName, agentName);
 		mbs = ManagementFactory.getPlatformMBeanServer();
 
 		// add listener for (de)registration of the agent
 		MBeanServerNotificationFilter msnf = new MBeanServerNotificationFilter();
-		msnf.disableAllObjectNames();
-		msnf.enableObjectName(agent);
+		msnf.enableAllObjectNames();
 		mbs.addNotificationListener(new ObjectName("JMImplementation:type=MBeanServerDelegate"), this, msnf, null);
 
 		// start application
 		context = new ClassPathXmlApplicationContext(
 			"de/dailab/jiactng/agentcore/agentTests.xml");
 		nodeRef = (SimpleAgentNode) context.getBean(nodeName);
+		agentId = ((IAgent) context.getBean(agentName)).getAgentId();
+		agent = manager.getMgmtNameOfAgent(nodeName, agentId);
 		ArrayList<String> agentList = new ArrayList<String>();
-		agentList.add(agentName);
+		agentList.add(agentId);
 		agentListNotification = agentList;
 
 		// add listener for change of agent's lifecycle state
@@ -100,6 +101,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		previousLifecycleState = null;
 		registrationNotification = null;
 		agentListNotification = null;
+		agentId = null;
 		nodeRef = null;
 		manager = null;
 	}
@@ -116,10 +118,16 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 				previousLifecycleState = currentLifecycleState;
 				currentLifecycleState = (String) ((AttributeChangeNotification) notification).getNewValue();
 			} else if (((AttributeChangeNotification)notification).getAttributeName().equals("Agents")) {
-				agentListNotification = (ArrayList) ((AttributeChangeNotification) notification).getNewValue();
+				agentListNotification = (ArrayList<String>) ((AttributeChangeNotification) notification).getNewValue();
 			}
 		} else if (notification instanceof MBeanServerNotification) {
-			registrationNotification = notification.getType();
+			ObjectName bean = ((MBeanServerNotification)notification).getMBeanName();
+			if (bean.getDomain().equals("de.dailab.jiactng") && 
+					(bean.getKeyPropertyList().size()==4) &&
+					bean.getKeyPropertyList().containsKey("agent")) {
+				// an agent was (de)registered
+				registrationNotification = notification.getType();
+			}
 		}
 	}
 
@@ -142,7 +150,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		checkRegistrationNotification("JMX.mbean.unregistered");
 		
 		// check notification
-		checkAgentListNotification(new ArrayList());
+		checkAgentListNotification(new ArrayList<String>());
 	}
 	
 	/**
@@ -151,7 +159,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	public void testGetName() {
 		String name = "";
 		try {
-			name = (String) manager.getAttributeOfAgent(nodeName, agentName, "AgentName");
+			name = (String) manager.getAttributeOfAgent(nodeName, agentId, "AgentName");
 		} catch (Exception e) {
 			fail("Error while getting agent's name");
 		}
@@ -198,7 +206,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	protected void doAction(String action) {
 		try {
-			manager.invokeAgent(nodeName, agentName, action, new Object[] {}, new String[] {});
+			manager.invokeAgent(nodeName, agentId, action, new Object[] {}, new String[] {});
 		} catch (Exception e) {
 			fail("Error while " + action + " agent");
 		}
@@ -216,7 +224,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		// check JMX interface
 		state = "";
 		try {
-			state = (String) manager.getAttributeOfAgent(nodeName, agentName, "LifecycleState");
+			state = (String) manager.getAttributeOfAgent(nodeName, agentId, "LifecycleState");
 		} catch (Exception e) {
 			fail("Error while getting agent's state");
 		}
@@ -238,14 +246,14 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 * @param intendedType the intended type of the registration notification
 	 */
 	protected void checkRegistrationNotification(String intendedType) {
-		assertEquals("Missing notification about agent " + intendedType, intendedType, registrationNotification);
+		assertEquals("Missing notification about agent registration", intendedType, registrationNotification);
 	}
 
 	/**
 	 * Checks the last notification about changed agent list of the agent node.
 	 * @param intendedList the intended agent list of the notification
 	 */
-	protected void checkAgentListNotification(ArrayList intendedList) {
+	protected void checkAgentListNotification(ArrayList<String> intendedList) {
 		assertEquals("Missing notification about changed agent list", intendedList, agentListNotification);
 	}
 

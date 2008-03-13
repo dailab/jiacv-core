@@ -58,7 +58,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	 * Receives the result for the action created in searchForAgentDesc and stores it for later withdrawl
 	 */
 	@Override
-	public void receiveResult(ActionResult result) {
+	synchronized public void receiveResult(ActionResult result) {
 		log.debug("WhitePagesTestBean Receiving Result");
 		if (result != null) log.debug("Result reads: " + result);
 		
@@ -80,8 +80,10 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	 * @return
 	 */
 	public List<IFact> getLastResult(){
-		List<IFact> output = _results;
-		_results = new ArrayList<IFact>();
-		return output;
+		synchronized(_results){
+			List<IFact> output = _results;
+			_results = new ArrayList<IFact>();
+			return output;
+		}
 	}
 }

@@ -21,7 +21,7 @@
 		</property>
 		<property name="agentNodeBeans">
 			<list>
-				<ref bean="StandardJMSBroker" />
+				<ref bean="WhitePagesTestJMSBroker" />
 				<ref bean="DirectoryAgentNodeBean"/>
 			</list>
 		</property>
@@ -42,4 +42,21 @@
 	
 	<bean name="WhitePagesTestBean" class="de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean">
 	</bean>
+	
+	<!-- 
+		The special JMS Broker.
+		It has a standard TCP connector
+	-->
+	<bean name="WhitePagesTestJMSBroker" parent="ActiveMQBroker" singleton="true" lazy-init="true">
+		<property name="connectors">
+			<set>
+				<ref bean="WhitePagesTestTCPConnector" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean name="WhitePagesTestTCPConnector" parent="ActiveMQTransportConnector" singleton="true">
+		<property name="transportURI" value="tcp://localhost:0" />
+	</bean>
+	
 </beans>

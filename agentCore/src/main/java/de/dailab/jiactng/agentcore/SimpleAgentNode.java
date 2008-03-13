@@ -722,7 +722,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// enable remote management
 		if (_jmxConnectors != null) {
-			manager.enableRemoteManagement(_name, _jmxConnectors);
+			manager.enableRemoteManagement(_uuid, _jmxConnectors);
 		}
 
 		_manager = manager;
@@ -738,7 +738,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// disable remote management
-		_manager.disableRemoteManagement(getName());
+		_manager.disableRemoteManagement(_uuid);
 
 		// deregister agents from management
 		for (IAgent a : this._agents) {

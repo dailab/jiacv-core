@@ -358,10 +358,11 @@ public interface Manager {
 
 	/**
 	 * Creates all specified connector server for remote management.
+	 * @param nodeId the unique identifier of the agent node
 	 * @param nodeName the name of the agent node
 	 * @param connectors a set of connector configurations
 	 */
-	public void enableRemoteManagement(String nodeName, Set<Map<String,String>> connectors);
+	public void enableRemoteManagement(String nodeId, String nodeName, Set<Map<String,String>> connectors);
 
 	/**
 	 * Stops all connector servers.

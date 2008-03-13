@@ -650,12 +650,13 @@ public class JmxManager implements Manager {
 	 * Creates all specified connector server for remote management and registers
 	 * them in the MBean server.
 	 * @param nodeId the unique identifier of the agent node
+	 * @param nodeName the unique identifier of the agent node
 	 * @param jmxConnectors a set of connector configurations
 	 * @see JMXServiceURL#JMXServiceURL(String, String, int, String)
 	 * @see JMXConnectorServerFactory#newJMXConnectorServer(JMXServiceURL, Map, MBeanServer)
 	 * @see javax.management.remote.JMXConnectorServerMBean#start()
 	 */
-	public void enableRemoteManagement(String nodeId, Set<Map<String,String>> jmxConnectors) {
+	public void enableRemoteManagement(String nodeId, String nodeName, Set<Map<String,String>> jmxConnectors) {
 		if (!jmxConnectors.isEmpty()) {
 			System.setProperty("com.sun.management.jmxremote", "");
 		}
@@ -751,7 +752,7 @@ public class JmxManager implements Manager {
 
 			// register connector server as JMX resource
 			try {
-				this.registerAgentNodeResource(nodeId, "JMXConnectorServer", "\"" + cs.getAddress() + "\"", cs);
+				this.registerAgentNodeResource(nodeName, "JMXConnectorServer", "\"" + cs.getAddress() + "\"", cs);
 			}
 			catch (Exception e) {
 				System.err.println("WARNING: Unable to register JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");
@@ -765,10 +766,10 @@ public class JmxManager implements Manager {
 
 	/**
 	 * Deregisters and stops all connector servers.
-	 * @param nodeId the unique identifier of the agent node
+	 * @param nodeName the name of the agent node
 	 * @see javax.management.remote.JMXConnectorServerMBean#stop()
 	 */
-	public void disableRemoteManagement(String nodeId) {
+	public void disableRemoteManagement(String nodeName) {
 		// Deregister and stop all connector servers
 		Iterator<JMXConnectorServer> i = this._connectorServer.iterator();
 		while (i.hasNext()) {
@@ -779,7 +780,7 @@ public class JmxManager implements Manager {
 
 			// deregister connector server as JMX resource
 			try {
-				this.unregisterAgentNodeResource(nodeId, "JMXConnectorServer", "\"" + cs.getAddress() + "\"");
+				this.unregisterAgentNodeResource(nodeName, "JMXConnectorServer", "\"" + cs.getAddress() + "\"");
 			}
 			catch (Exception e) {
 				System.err.println("WARNING: Unable to deregister JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");

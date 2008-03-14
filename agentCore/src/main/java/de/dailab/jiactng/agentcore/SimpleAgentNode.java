@@ -416,35 +416,48 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// call init on all beans of the agentnodes
 		// TODO testing
-		for (IAgentNodeBean anb : _agentNodeBeans) {
-			log.info("Initializing agentnode bean: " + anb.getClass());
-			try {
-				anb.init();
-			} catch (LifecycleException lce) {
-				// TODO
-				lce.printStackTrace();
-			}
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
+				try {
+					if(log != null && log.isInfoEnabled()) {
+						log.info("Trying to initialize agentnodebean: "+anb.getBeanName());
+					}										
+					anb.init();
+				} catch (LifecycleException lce) {
+					// TODO
+					lce.printStackTrace();
+				}
+			}			
 		}
 
 		// call init and set references for all agents if any
-		for (IAgent a : _agents) {
-			log.info("Initializing agent: " + a.getAgentName());
-			try {
-				a.init();
-			} catch (LifecycleException e) {
-				// TODO:
-				// e.printStackTrace();
-				System.out.println(e.getMessage());
-			}
-			// Check if White Pages bean is present
-			for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()){
-				if (agentNodeBean instanceof DirectoryAgentNodeBean){
-					// directory is present so add agentdescription to it.
-					DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
-					directory.addAgentDescription(a.getAgentDescription());
-					break;
-				}
-			}
+		if (_agents != null) {
+  		for (IAgent a : _agents) {
+  			log.info("Initializing agent: " + a.getAgentName());
+  			try {
+    			if(log != null && log.isInfoEnabled()) {
+    				log.info("Trying to initialize agent: "+a.getAgentName());
+    			}															
+    			a.init();
+    			if(log != null && log.isInfoEnabled()) {
+    				log.info("Trying to initialize agent: "+a.getAgentName());
+    			}															
+  			} catch (LifecycleException e) {
+  				// TODO:
+  				// e.printStackTrace();
+  				System.out.println(e.getMessage());
+  			}
+  		
+			  // Check if White Pages bean is present
+			  for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()){
+			  	if (agentNodeBean instanceof DirectoryAgentNodeBean){
+			  		// directory is present so add agentdescription to it.
+			  		DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
+			  		directory.addAgentDescription(a.getAgentDescription());
+			  		break;
+			  	}
+			  }
+  		}
 		}
 	}
 
@@ -455,22 +468,32 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public void doStart() {
 		// call start on all beans of the agentnode
 		// TODO testing
-		for (IAgentNodeBean anb : _agentNodeBeans) {
-			try {
-				anb.start();
-			} catch (LifecycleException lce) {
-				// TODO
-				lce.printStackTrace();
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
+				try {
+					if(log != null) {
+						log.info("Trying to start agentnodebean: "+anb.getBeanName());
+					}					
+					anb.start();
+				} catch (LifecycleException lce) {
+					// TODO
+					lce.printStackTrace();
+				}
 			}
 		}
 
 		// call start() and instantiate Threads for all agents if any
-		for (IAgent a : _agents) {
-			try {
-				a.start();
-			} catch (Exception ex) {
-				// TODO
-				ex.printStackTrace();
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				try {
+					if(log != null) {
+						log.info("Trying to start agent: "+a.getAgentName());
+					}										
+					a.start();
+				} catch (Exception ex) {
+					// TODO
+					ex.printStackTrace();
+				}
 			}
 		}
 
@@ -483,62 +506,83 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	
 	public void doStop() {
 		// call stop() for all agents if any
-		for (IAgent a : _agents) {
-			try {
-				a.stop();
-			} catch (LifecycleException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				try {
+					if(log != null) {
+						log.info("Trying to stop agent: "+a.getAgentName());
+					}
+					a.stop();
+				} catch (LifecycleException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 
 		// call stop on all beans of the agentnode
 		// TODO testing
-		for (IAgentNodeBean anb : _agentNodeBeans) {
-			try {
-				anb.stop();
-			} catch (LifecycleException lce) {
-				// TODO
-				lce.printStackTrace();
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
+				try {
+					if(log != null) {
+						log.info("Trying to stop agentnodebean: "+anb.getBeanName());
+					}					
+					anb.stop();
+				} catch (LifecycleException lce) {
+					// TODO
+					lce.printStackTrace();
+				}
 			}
 		}
 	}
 
+
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	public void doCleanup() {
 		// call cleanup for all agents if any
-		for (IAgent a : _agents) {
-			// Check if White Pages bean is present
-			for (IAgentNodeBean agentNodeBean : _agentNodeBeans){
-				if (agentNodeBean instanceof DirectoryAgentNodeBean){
-					// directory is present so remove agentdescription from it before cleaning up the agent
-					DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
-					directory.removeAgentDescription(a.getAgentDescription());
-					break;
-				}
-			}
-			
-			try {
-				a.cleanup();
-			} catch (LifecycleException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+			  // Check if White Pages bean is present
+			  for (IAgentNodeBean agentNodeBean : _agentNodeBeans) {
+			  	if (agentNodeBean instanceof DirectoryAgentNodeBean){
+			  		// directory is present so remove agentdescription from it before cleaning up the agent
+			  		DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
+			  		directory.removeAgentDescription(a.getAgentDescription());
+			  		break;
+			  	}
+			  }
+
+				try {
+					if(log != null) {
+						log.info("Trying to cleanup agent: "+a.getAgentName());
+					}					
+					a.cleanup();
+				} catch (LifecycleException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+		    }
+		 }
+    }
 
 		// call cleanup on all beans of the agentnode
 		// TODO testing
-		for (IAgentNodeBean anb : _agentNodeBeans) {
-			try {
-				anb.cleanup();
-			} catch (LifecycleException lce) {
-				// TODO
-				lce.printStackTrace();
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
+				try {
+					if(log != null) {
+						log.info("Trying to cleanup agentnodebean: "+anb.getBeanName());
+					}										
+					anb.cleanup();
+				} catch (LifecycleException lce) {
+					// TODO
+					lce.printStackTrace();
+				}
 			}
 		}
+		
 		if (_threadPool != null) {
 			_threadPool.shutdown();
 		}

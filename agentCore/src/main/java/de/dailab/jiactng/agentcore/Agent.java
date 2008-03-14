@@ -252,6 +252,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 				handleBeanException(a, e, LifecycleStates.CLEANED_UP);
 			}
 		}
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Trying to cleanup memory and executioncycle");
+		}
 		this.memory.removeAll(new Action());
 
 		// update state information in agent's memory
@@ -260,6 +263,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		this.actionList = null;
 		this.execution.cleanup();
 		this.memory.cleanup();
+		
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Memory and executioncycle switched to state "+LifecycleStates.CLEANED_UP);
+		}
 	}
 
 	/**
@@ -269,6 +276,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	public void doInit() throws LifecycleException {
 		// initialize agent elements
 		this.actionList = new ArrayList<Action>();
+
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Trying to initalize memory and executioncycle");
+		}
+		
 		this.memory.init();
 		this.memory.write(
             new ThisAgentDescription(
@@ -282,6 +294,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		this.execution.setMemory(memory);
 		this.execution.init();
 
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Memory and executioncycle switched to state "+LifecycleStates.INITIALIZED);
+		}
+		
 		// call init for all agentbeans
 		for (IAgentBean ab : this.agentBeans) {
 			try {
@@ -317,9 +333,17 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	@Override
 	public void doStart() throws LifecycleException {
 
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Trying to start memory and executioncycle");
+		}
+		
 		this.memory.start();
 		this.execution.start();
 
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Memory and executioncycle switched to state "+LifecycleStates.STARTED);
+		}
+		
 		// call start for all agentbeans
 		for (IAgentBean a : this.agentBeans) {
 			try {
@@ -341,9 +365,25 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	@Override
 	public void doStop() throws LifecycleException {
 
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Trying to stop memory and executioncycle");
+		}
+		
+		synchronized (this) {
+			active = false;
+			if (executionFuture != null) {
+				executionFuture.cancel(false);
+			}
+
+		}
+
 		this.memory.stop();
 		this.execution.stop();
-
+		
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Memory and executioncycle switched to state "+LifecycleStates.STOPPED);
+		}		
+		
 		// call stop for all agentbeans
 		for (IAgentBean a : this.agentBeans) {
 			try {
@@ -351,13 +391,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			} catch (LifecycleException e) {
 				handleBeanException(a, e, LifecycleStates.STOPPED);
 			}
-		}
-		synchronized (this) {
-			active = false;
-			if (executionFuture != null) {
-				executionFuture.cancel(false);
-			}
-
 		}
 
 		updateState(LifecycleStates.STOPPED);
@@ -444,6 +477,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			throws LifecycleException {
 		String beanName = bean.getBeanName();
 
+		if(agentLog != null && agentLog.isInfoEnabled()) {
+			agentLog.info("Trying to switch bean: "+bean.getBeanName()+ " to "+newState.toString());
+		}
+		
 		switch (newState) {
 		case CLEANED_UP:
 			bean.cleanup();
@@ -460,6 +497,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		default:
 			return;
 		}
+		if(agentLog!=null && agentLog.isInfoEnabled())
+			agentLog.info("Bean "+bean.getBeanName()+" switched to state: "+newState.toString());
 		this.memory.update(new AgentBeanDescription(beanName, null),
 				new AgentBeanDescription(null, newState.name()));
 	}

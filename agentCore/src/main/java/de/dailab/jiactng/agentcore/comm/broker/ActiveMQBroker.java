@@ -84,8 +84,9 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
     }
 
     public void doCleanup() throws Exception {
-        _broker.stop();
-        log.debug("stopping broker");
+    	log.debug("stopping broker");
+    	_broker.stop();
+    	log.debug("stopping broker done");
     }
 
     /**

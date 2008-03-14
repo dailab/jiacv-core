@@ -15,6 +15,10 @@ import javax.management.openmbean.SimpleType;
 
 import org.apache.commons.logging.Log;
 
+import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.Session;
+import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -36,8 +40,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 * negative, the execute-method is never called.
 	 */
 	private int executeInterval = -1;
-	
-	/** Used by the execution cycle to determine the next execution time when 
+
+	/**
+	 * Used by the execution cycle to determine the next execution time when
 	 * <code>executeInterval</code> is greater than 0.
 	 */
 	private long nextExecutionTime = 0;
@@ -269,11 +274,13 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 				nextExecutionTime = 0;
 				return;
 			}
-			//execute Interval > 0, schedule/reschedule bean
-			if(nextExecutionTime > 0) {
-				nextExecutionTime= nextExecutionTime - this.executeInterval + executeInterval;
+			// execute Interval > 0, schedule/reschedule bean
+			if (nextExecutionTime > 0) {
+				nextExecutionTime = nextExecutionTime - this.executeInterval
+						+ executeInterval;
 			} else {
-				nextExecutionTime = System.currentTimeMillis() + executeInterval;
+				nextExecutionTime = System.currentTimeMillis()
+						+ executeInterval;
 			}
 		} finally {
 			this.executeInterval = executeInterval;
@@ -293,7 +300,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	public void setNextExecutionTime(long nextExecutionTime) {
 		this.nextExecutionTime = nextExecutionTime;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -306,5 +313,16 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 */
 	public void handleLifecycleException(LifecycleException e, @SuppressWarnings("unused") LifecycleStates state) {
 		throw new RuntimeException(e);
+	}
+
+	protected Session invoke(Action a, Object[] inputParams) {
+		return invoke(a, inputParams, null);
+	}
+
+	protected Session invoke(Action a, Object[] inputParams,
+			ResultReceiver receiver) {
+		DoAction doAct = a.createDoAction(inputParams, receiver);
+		memory.write(doAct);
+		return doAct.getSession();
 	}
 }

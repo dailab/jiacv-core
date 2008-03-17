@@ -55,22 +55,22 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testFindAgent(){
-//		_whitePagesTestBean.searchForAgentDesc("findmeagent");
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		List<IFact> results = _whitePagesTestBean.getLastResult();
-//		AgentDescription findme = null;
-//		if (results.size() > 0){
-//			if (results.get(0) instanceof AgentDescription)
-//				findme = (AgentDescription) results.get(0);
-//		}
-//		
-//		assertNotNull(results);
-//		assertEquals(1, results.size());
-//		assertTrue(findme.getName().equalsIgnoreCase("FindMeAgent"));
+		_whitePagesTestBean.searchForAgentDesc("FindMeAgent");
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		List<IFact> results = _whitePagesTestBean.getLastResult();
+		AgentDescription findme = null;
+		if (results.size() > 0){
+			if (results.get(0) instanceof AgentDescription)
+				findme = (AgentDescription) results.get(0);
+		}
+		
+		assertNotNull(results);
+		assertEquals(1, results.size());
+		assertTrue(findme.getName().equalsIgnoreCase("FindMeAgent"));
 	}
 	
 	public void testNothingToFind(){

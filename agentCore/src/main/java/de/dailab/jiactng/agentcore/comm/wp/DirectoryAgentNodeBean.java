@@ -1,7 +1,11 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.security.auth.DestroyFailedException;
 
@@ -13,7 +17,9 @@ import org.sercho.masp.space.event.EventedTupleSpace;
 import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
+import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentNodeBean;
+import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -29,6 +35,10 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * directory based on IFacts so although its meant to store AgentDescriptions
  * it could theoretically also be used for other subclasses of IFact
  * 
+ * If an Agent descides to expose any actions within this bean it is assumed that
+ * this agent wants to expose all actions contained within the getActions() method,
+ * so doing regular updates on actions these will be pulled and exposed too.
+ * 
  * Note: To look for entries within this directory the DirectoryAccessBean should be used.
  * 
  * @author Martin Loeffelholz
@@ -39,6 +49,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
 	public final static String PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp#DirectoryAgentNodeBean";
+	private long _refreshingIntervall = 4000;
+	private long _firstRefresh = 5000;
+	// if this bean should get the actions from all present agents itself on startphase
+	// if false agents have to expose their actions themselves in order for their actions to be found in the directory
+	private boolean _pullModeActive = false;
 	
 	private SpaceDestroyer<IFact> destroyer = null;
 	private EventedTupleSpace<IFact> space = null;
@@ -46,6 +61,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	private ICommunicationAddress myAddress = null; 
 
 	private SearchRequestHandler _searchRequestHandler = null;
+	
+	private Timer _timer;
+	private SpaceRefresher _refresher; 
+	private long _currentLogicTime = 0;
 	
 	public DirectoryAgentNodeBean() {
 		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("WhitePages"));
@@ -57,6 +76,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * add an AgentDescription object when an agent is added to the node.
 	 */
 	public void addAgentDescription(IAgentDescription agentDescription){
+		System.err.println("AgentDesc added: " + agentDescription);
 		if (agentDescription != null) {
 			space.write(agentDescription);
 		}
@@ -70,6 +90,37 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	public void removeAgentDescription(IAgentDescription agentDescription){
 		if (agentDescription != null) {
 			space.remove(agentDescription);
+		}
+	}
+	
+	/**
+	 * This method is meant to give the AgentNode the option to directly
+	 * add an Action object when an agent is added to the node.
+	 * 
+	 * @param <T>
+	 * @param action
+	 */
+	public <T extends Action> void addAction(T action){
+		if (action != null){
+			ActionData actionData = new ActionData(_currentLogicTime);
+			actionData.setAction(action);
+			space.write(actionData);
+		}
+	}
+	
+	/**
+	 * This method is meant to give the AgentNode the option to directly
+	 * remove an Action object from the directory when an agent
+	 * is removed from the node.
+	 * 
+	 * @param <T>
+	 * @param action
+	 */
+	public <T extends Action> void removeAction(T action){
+		if (action != null) {
+			ActionData actionData = new ActionData();
+			actionData.setAction(action);
+			space.remove(actionData);
 		}
 	}
 	
@@ -92,6 +143,24 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
+		
+		if (_pullModeActive){
+			List<IAgent> agents = this.agentNode.findAgents();
+
+			for (IAgent agent : agents){
+				List<Action> actions = agent.getActionList();
+				for (Action action : actions){
+					ActionData actionData = new ActionData(_currentLogicTime);
+					actionData.setAction(action);
+					space.write(actionData);
+				}
+			}
+		}
+		
+		_timer = new Timer();
+		_refresher = new SpaceRefresher();
+		_timer.schedule(_refresher, _firstRefresh, _refreshingIntervall);
+		
 	}
 	
 	public void doStop(){
@@ -100,6 +169,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
+		_timer.cancel();
 	}
 	
 	public void doCleanup(){
@@ -110,12 +180,28 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 		space = null;
 		destroyer = null;
+		_timer.purge();
 	}
 
 	public void setMessageTransport(MessageTransport mt){
 		messageTransport = mt;
 	}
 	
+	public void setRefreshingIntervall(long intervall){
+		_refreshingIntervall = intervall;
+	}
+	
+	public long getRefrehsingIntervall(){
+		return _refreshingIntervall;
+	}
+	
+	public void setFirstRefresh(long firstRefresh){
+		_firstRefresh = firstRefresh;
+	}
+	
+	public long getFirstRefresh(){
+		return _firstRefresh;
+	}
 	
 	/*
 	 * inner Class to handle the incoming and outgoing searchRequests
@@ -133,8 +219,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		@Override
 		public void onAsynchronousException(MessageTransport source, Exception e) {
 			e.printStackTrace();
-			
 		}
+		
 		@Override
 		public void onMessage(MessageTransport source, IJiacMessage message,
 				ICommunicationAddress at) {
@@ -152,6 +238,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 					Set<IAgentDescription> descriptions = space.readAll(template);
 					Set<IFact> result = new HashSet<IFact>();
 					result.addAll(descriptions);
+					System.err.println("Space reads as follows: " + space.readAll());
 					log.debug("Result to send reads " + result);
 					
 					SearchResponse response = new SearchResponse(request, result);
@@ -166,7 +253,95 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 						e.printStackTrace();
 					}
 				}
+			} else if (message.getPayload() instanceof Action){
+				//TODO ActionDescriptionhandling.... vielleicht auch Actions unten auf IAgentDescription umstellen.
 			}
 		}
 	}
+	
+	private class SpaceRefresher extends TimerTask{
+		
+		/**
+		 * Method to keep the actions stored within the space up to date.
+		 * within a regular intervall this method is called. It checks which actiondata
+		 * tends to be obsolete and get's updated informations from each agent that actions
+		 * might be 
+		 */
+		@Override
+		public void run() {
+			ActionData actionTemplate = new ActionData(_currentLogicTime);
+			
+			// Check the Space for timeouts by using the current and now obsolet logical time
+			Set<ActionData> timeouts = space.removeAll(actionTemplate);
+			
+			// as long as timeouts are existing...
+			while (!timeouts.isEmpty()){
+				//get the first of them and the action stored within it
+				ActionData actionData = timeouts.iterator().next();
+				Action timeoutAction = actionData.getAction();
+				
+				// now let's see if the agent still provides any actions
+				List<Action> actions = new ArrayList<Action>();
+				actions = (List<Action>) timeoutAction.getProviderBean().getActions();
+				
+				/*
+				 * It would be quite inefficient to not check the other actions of this agent also
+				 * to possibly be outdated since all actions of an agent are usually stored at the
+				 * same time
+				 */
+				for (Action action: actions){
+					
+					ActionData refreshAction = new ActionData(_currentLogicTime);
+					refreshAction.setAction(action);
+					// remove this action from the timeouts if it is within them so it hasn't to be looked up twice
+					timeouts.remove(refreshAction);
+					
+					/*  now nevertheless if the action is allready within the space or not, the directory is updated
+					 *  with what the agent has to offer which kind of is the purpose of this directory
+					 */
+					refreshAction.setCreationTime(_currentLogicTime + 1);
+					space.write(refreshAction);
+				}
+			}
+
+			// finally after processing all timeouts let's give the clock a little nudge
+			_currentLogicTime++;
+		}
+		
+		
+	}
+	
+	private class ActionData implements IFact{
+		private Action _action;
+		private Long _creationTime = new Long(0);
+		
+		public ActionData(long creationtime){
+			_creationTime = new Long(creationtime);
+		}
+		
+		/**
+		 * This Constructor is only meant to be used for Templatecreation
+		 */
+		public ActionData(){
+			_creationTime = null;
+		}
+		
+		public void setCreationTime(long creationTime){
+			_creationTime = new Long(creationTime);
+		}
+		
+		public long getCreationTime(){
+			return _creationTime.longValue();
+		}
+		
+		public void setAction(Action action){
+			_action = action;
+		}
+		
+		public Action getAction(){
+			return _action;
+		}
+		
+	}
+	
 }

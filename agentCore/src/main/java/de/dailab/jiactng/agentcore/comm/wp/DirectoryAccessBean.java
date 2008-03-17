@@ -204,6 +204,8 @@ IAgentBean, IEffector {
 			log.debug("DirectoryAccessBean sends message to directory: " + message);
 			memory.write(send);
 		}
+		
+		
 
 		/**
 		 * receives the answers from the directory and processes them. 

@@ -56,7 +56,7 @@ IAgentBean, IEffector {
 	public DirectoryAccessBean() {
 	}
 
-	
+
 	/**
 	 * Starts a search for DirectoryEntrys that are conform to the template given
 	 * @param <E> extends IFact
@@ -75,8 +75,8 @@ IAgentBean, IEffector {
 		super.execute();
 		log.debug("Collecting timed out SearchRequests, current check-interval is " + this.getExecuteInterval());
 		Set<String> toRemove = new HashSet<String>();
-		if (_requestID2ActionMap.keySet().size() > 0){
-			synchronized(_requestID2ActionMap){
+		synchronized(_requestID2ActionMap){
+			if (_requestID2ActionMap.keySet().size() > 0){	
 				// make sure that the Map isn't changed during maintenance
 				for (String key : _requestID2ActionMap.keySet()){
 					if (key != null){
@@ -89,7 +89,7 @@ IAgentBean, IEffector {
 
 							if ((now - creation) > _timeoutMillis){
 								String owner = action.getOwner();
-								
+
 								log.warn("SearchRequest from owner " + owner + " has timeout");
 								// request is timed out, mark for removal
 								toRemove.add(key);
@@ -107,10 +107,11 @@ IAgentBean, IEffector {
 				for (String key : toRemove) {
 					_requestID2ActionMap.remove(key);
 				}
+
+			} else {
+				log.debug("No more Requests pending, timeout-checks are deactivated");
+				this.setExecuteInterval(-1);
 			}
-		} else {
-			log.debug("No more Requests pending, timeout-checks are deactivated");
-			this.setExecuteInterval(-1);
 		}
 	}
 
@@ -214,28 +215,28 @@ IAgentBean, IEffector {
 				WriteCallEvent wceTemp = (WriteCallEvent) event;
 				if (wceTemp.getObject() instanceof IJiacMessage){
 					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
-					
-					
+
+
 					if (message.getPayload() instanceof SearchResponse){
 						log.debug("DirectoryAccessBean: Got reply to SearchRequest");
-						
+
 						SearchResponse response = (SearchResponse) message.getPayload();
 						SearchRequest request = response.getSearchRequest();
-						
+
 						log.debug("processing reply on SearchRequest with ID " + request.getID());
-						
+
 						DoAction sourceAction = _requestID2ActionMap.remove(request.getID());
-						
+
 						if (sourceAction != null){
 							// if request exists and hasn't timed out yet
 							List<IFact> result = new ArrayList<IFact>();
 							if (response.getResult() != null){
 								result.addAll(response.getResult());
 							}
-							
+
 							ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, result.toArray());
 							log.debug("DirectoryAccessBean is writing actionResult");
-							
+
 							memory.write(actionResult);
 						}
 					}

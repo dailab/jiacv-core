@@ -153,6 +153,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 *   
 	 */
 	public void setGenericAgents(List<GenericAgentProperties> agentProps) {
+		//long start  = System.currentTimeMillis();
 		//System.out.println("invoking setgenericAgents...");
 		if (agentProps != null && agentProps.size() > 0) {
 			// contains the agents to be added
@@ -163,12 +164,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				ClassPathXmlApplicationContext cpxac = new ClassPathXmlApplicationContext(gap.getAgentConfig());
 				if (cpxac != null && cpxac.containsBeanDefinition(gap.getAgentBeanName())) {
 					//System.out.println("application context is valid - creating agents...");
-					for (int i = 0; i < gap.getCount(); i++) {
+					for (int i = 1; i <= gap.getCount(); i++) {
 						// get the new Agent from Spring
 						IAgent newAgent = (IAgent) cpxac.getBean(gap.getAgentBeanName());
-						newAgent.setAgentName(gap.createAgentName(i + 1));//don't start at 0
+						newAgent.setAgentName(gap.createAgentName(i));
 						//log does not work in this context: using system instead
-						System.out.println("adding agent: " + newAgent.getAgentName() + " with ID: " + newAgent.getAgentId());
+						//System.out.println("adding agent: " + newAgent.getAgentName() + " with ID: " + newAgent.getAgentId());
 						agents.add(newAgent);
 					}
 				} else System.out.println(new StringBuffer("could not create xmlapplicationcontext from ")
@@ -180,6 +181,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		} else {
 			System.out.println("nothing to do - list is null or empty");
 		}
+		//System.out.println("creation took " + (System.currentTimeMillis() - start) + " milliseconds");
 	}
 
 	/**

@@ -105,7 +105,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
 	/**
 	 * Timeout after which the execution of a bean will be stopped and the agent
-	 * as well. TODO do something more intelligent, possibly recover the bean
+	 * as well. 
+	 * TODO do something more intelligent, possibly recover the bean
 	 * without stopping the agent.
 	 */
 	private long beanExecutionTimeout = 5 * 60 * 1000;
@@ -114,14 +115,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
 	/** The manager of the agent node */
 	protected Manager _manager = null;
-
-	/**
-	 * Getter for the memory-component
-	 * 
-	 * @return a reference to the IMemory implementation of this agent.
-	 * 
-	 * public IMemory getMemory() { return memory; }
-	 */
+	
 
 	/**
 	 * Public default constructor, creating the agent identifier.
@@ -860,6 +854,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	public boolean isManagementEnabled() {
 		return _manager != null;
 	}
+	
 
 	/////////////////////////////////////
 	// TODO

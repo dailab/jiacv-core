@@ -40,7 +40,8 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @param memory the memory-component of this agent.
    */
   public void setMemory(IMemory memory);
-
+  
+  
   /**
    * Setter for the agent's execution-cycle-component. Used for dependency
    * injection by Spring.
@@ -48,6 +49,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @param execution the execution-cycle-component of this agent.
    */
   public void setExecution(IExecutionCycle execution);
+    
 
   /**
    * Setter for the agent's agentbeans. Used for dependency injection by
@@ -57,7 +59,7 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    */
   public void setAgentBeans(List<IAgentBean> agentbeans);
 
-  /**
+  /** TODO rename to setAgentName
    * Setter for the name of this agent. Used by Spring during initialisation.
    * 
    * @param name

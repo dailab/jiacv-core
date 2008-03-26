@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+	- Application context definition for "example" DispatcherServlet.
+-->
+<beans>
+
+	<bean name="TestAgent" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
+		<property name="memory">
+			<ref bean="memory" />
+		</property>
+		<property name="execution">
+			<ref bean="simpleExecCycle" />
+		</property>
+	</bean>
+
+	<bean name="memory"	class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
+		<!--property name="timeOut" value="-1"/-->
+	</bean>
+
+	<bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false">
+	</bean>
+
+</beans>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+	- Application context definition for "example" DispatcherServlet.
+-->
+<beans>
+
+	<bean name="myPlatform"
+		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+		<property name="genericAgents">
+			<list>
+				<ref bean="generics" />
+			</list>
+		</property>
+	</bean>	
+
+	<bean name="generics" class="de.dailab.jiactng.agentcore.conf.GenericAgentProperties" singleton="false">
+		<property name="count" value="10" />
+		<property name="agentNamePattern" value="agent_#{count}" />
+		<property name="agentBeanName" value="TestAgent" />
+		<property name="agentConfig" value="de/dailab/jiactng/agentcore/conf/genericAgentDefinition.xml" />
+	</bean>
+
+</beans>

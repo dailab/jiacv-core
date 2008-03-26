@@ -166,7 +166,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					for (int i = 0; i < gap.getCount(); i++) {
 						// get the new Agent from Spring
 						IAgent newAgent = (IAgent) cpxac.getBean(gap.getAgentBeanName());
-						newAgent.setBeanName(gap.createAgentName(i + 1));//don't start at 0
+						newAgent.setAgentName(gap.createAgentName(i + 1));//don't start at 0
 						//log does not work in this context: using system instead
 						System.out.println("adding agent: " + newAgent.getAgentName() + " with ID: " + newAgent.getAgentId());
 						agents.add(newAgent);

@@ -35,7 +35,7 @@ public class GenericAgentProperties {
 	}
 	/**
 	 * @return agentNamePattern, returns the pattern used to create the name of an Agent
-	 * @see createAgentName for details
+	 * @see #createAgentName(int) for details
 	 */
 	public String getAgentNamePattern() {
 		return agentNamePattern;
@@ -57,7 +57,7 @@ public class GenericAgentProperties {
 	/**
 	 * @param agentConfig, sets the spring configuration file
 	 * This file is supposed to contain the bean definition of the agent including all referenced beans. 
-	 * The name of the bean definition is given with the AgentBeanName property.
+	 * The name of the bean definition is given via the AgentBeanName property.
 	 */
 	public void setAgentConfig(String agentConfig) {
 		this.agentConfig = agentConfig;

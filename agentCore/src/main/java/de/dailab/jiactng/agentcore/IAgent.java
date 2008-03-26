@@ -65,9 +65,17 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @param name
    *          the name of this agent
    * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+   * @deprecated use setAgentName instead
    */
   public void setBeanName(String name);
 
+  /**
+   * Setter for the name of this agent. Used by Spring during initialisation.
+   * 
+   * @param name, the name of this agent.
+   */
+  public void setAgentName(String name);
+  
   /**
    * Getter for the name of this agent, as set by Spring.
    * 

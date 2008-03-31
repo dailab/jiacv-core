@@ -16,7 +16,7 @@ import javax.management.NotificationListener;
 
 /**
  * @author Some Guy in the internet
- * @version $Revision:$
+ * @version $Revision$
  */
 public class MemoryDebugger {
     static class NotificationListenerImpl implements NotificationListener {
@@ -63,6 +63,7 @@ public class MemoryDebugger {
                 tenuredGenPool.setUsageThreshold((long) (fraction * maxMemory));
                 MemoryMXBean mxBean = ManagementFactory.getMemoryMXBean();
                 ((NotificationEmitter) mxBean).addNotificationListener(new NotificationListenerImpl(), null, null);
+                initialised= true;
             }
         }
     }

@@ -111,7 +111,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	
 			// process one actionResult
 			// TODO: check if read can be used
-			Set<ActionResult> resultSet = memory.readAll(new ActionResult(null, null));
+			Set<ActionResult> resultSet = memory.removeAll(new ActionResult(null, null));
 			int countNew = 0;
 			for(ActionResult ar : resultSet) {
 				if(ar.getSource()!= null && ((DoAction)ar.getSource()).getSource()!=null) {
@@ -126,6 +126,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 				synchronized(this) {
 					ActionResult actionResult = pendingResults.iterator().next(); 
 					processResult(actionResult);
+					pendingResults.remove(actionResult);
 				}
 			}
 			
@@ -146,7 +147,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 	private void performDoAction(DoAction act) {
 		if (act.getAction().getProviderBean() != null) {
-			memory.write(act.getSession());
+//			memory.write(act.getSession());
 			long start = System.nanoTime();
 			act.getAction().getProviderBean().doAction(act);
 			long end = System.nanoTime();
@@ -165,12 +166,13 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			//memory.write(actionResult);
 ;
 		} else {
-			//memory.remove(new ActionResult(null,actionResult.getSession(),null,null));
-			DoAction doAct = ((DoAction) actionResult.getSource());
+		    DoAction doAct = ((DoAction) actionResult.getSource());
+		    Session template= new Session(doAct.getSession().getId(),doAct.getSession().getCreationTime(),null,null);
+//			memory.remove(new ActionResult(null,template,null,null));
+//			DoAction doAct = ((DoAction) actionResult.getSource());
 			//memory.remove(doAct.getSession());
-			memory.remove(new Session(doAct.getSession().getId(),doAct.getSession().getCreationTime(),null,null));
-			((ResultReceiver) doAct.getSource())
-					.receiveResult(actionResult);
+			memory.remove(template);
+			((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
 			
 		}
 		// ArrayList history = actionResult.getSession().getHistory();

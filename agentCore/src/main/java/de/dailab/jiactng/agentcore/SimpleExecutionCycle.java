@@ -6,11 +6,15 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
@@ -31,6 +35,8 @@ import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
 public class SimpleExecutionCycle extends AbstractAgentBean implements
 		IExecutionCycle {
 
+	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
+	
 	/**
 	 * Run-method for the execution cycle. The method iterates over the list of
 	 * agentbeans and calls the execute method of each <i>active</i> agentbean.
@@ -105,12 +111,30 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	
 			// process one actionResult
 			// TODO: check if read can be used
-			ActionResult actionResult = memory.remove(new ActionResult(null, null));
-			if (actionResult != null) {
-				synchronized (this) {
+			Set<ActionResult> resultSet = memory.readAll(new ActionResult(null, null));
+			int countNew = 0;
+			for(ActionResult ar : resultSet) {
+				if(ar.getSource()!= null && ((DoAction)ar.getSource()).getSource()!=null) {
+					synchronized(this) {
+						pendingResults.add(ar);
+						countNew++;
+					}
+				}
+			}
+		
+			if(!pendingResults.isEmpty()) {
+				synchronized(this) {
+					ActionResult actionResult = pendingResults.iterator().next(); 
 					processResult(actionResult);
 				}
 			}
+			
+//			ActionResult actionResult = memory.remove(new ActionResult(null, null));
+//			if (actionResult != null) {
+//				synchronized (this) {
+//					processResult(actionResult);
+//				}
+//			}
 		} 
 
 		//reject execution if SimpleExecutionCycle hasn't been started
@@ -138,10 +162,16 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		// den Memory schreiben
 		if (((DoAction) actionResult.getSource()) == null
 				|| ((DoAction) actionResult.getSource()).getSource() == null) {
-			memory.write(actionResult);
+			//memory.write(actionResult);
+;
 		} else {
-			((ResultReceiver) ((DoAction) actionResult.getSource()).getSource())
+			//memory.remove(new ActionResult(null,actionResult.getSession(),null,null));
+			DoAction doAct = ((DoAction) actionResult.getSource());
+			//memory.remove(doAct.getSession());
+			memory.remove(new Session(doAct.getSession().getId(),doAct.getSession().getCreationTime(),null,null));
+			((ResultReceiver) doAct.getSource())
 					.receiveResult(actionResult);
+			
 		}
 		// ArrayList history = actionResult.getSession().getHistory();
 		// for (int i = history.size() - 1; i >= 0; i--) {

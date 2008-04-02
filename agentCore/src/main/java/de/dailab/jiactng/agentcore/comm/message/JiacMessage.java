@@ -25,8 +25,16 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
  * @author Marcel Patzlaff
  */
 @SuppressWarnings("serial")
-public class JiacMessage implements IJiacMessage, JmxDescriptionSupport {
-
+public final class JiacMessage implements IJiacMessage, JmxDescriptionSupport {
+    /*
+     * TODO: changed JiacMessage to final to avoid unexpected subclassing
+     *       We should consider the necessity for typed contents to force the
+     *       existence of specific content types (i.e. subclass of IFact as argument in
+     *       the constructor...)
+     */
+    
+    
+    
 	public static final String ITEMNAME_HEADERS = "headers";
 	public static final String ITEMNAME_PAYLOAD = "payload";
 

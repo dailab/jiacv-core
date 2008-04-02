@@ -8,6 +8,10 @@ import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
+import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean;
+
 import junit.framework.TestCase;
 
 public class WhitePagesIntegrationTestCase extends TestCase {
@@ -19,6 +23,8 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	private static IAgentNode _agentNode;
 	private static IAgent _whitePagesAgent;
 	private static WhitePagesTestBean _whitePagesTestBean;
+	
+	private static Action _sendAction = null;
 	
 	
 	@Override
@@ -55,22 +61,29 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testFindAgent(){
-//		_whitePagesTestBean.searchForAgentDesc("FindMeAgent");
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		List<IFact> results = _whitePagesTestBean.getLastResult();
-//		AgentDescription findme = null;
-//		if (results.size() > 0){
-//			if (results.get(0) instanceof AgentDescription)
-//				findme = (AgentDescription) results.get(0);
-//		}
-//		
-//		assertNotNull(results);
-//		assertEquals(1, results.size());
-//		assertTrue(findme.getName().equalsIgnoreCase("FindMeAgent"));
+		/* check if the setup is done properly */
+		assertNotNull("Setup Failure", _agentNode);
+		assertNotNull("Setup Failure", _whitePagesAgent);
+		assertNotNull("Setup Failure", _whitePagesTestBean);
+		
+		_whitePagesTestBean.searchForAgentDesc("FindMeAgent");
+		try {
+			System.err.println("Begin to sleep");
+			Thread.sleep(15000);
+			System.err.println("The Awakening!");
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		List<IFact> results = _whitePagesTestBean.getLastResult();
+		AgentDescription findme = null;
+		if (results.size() > 0){
+			if (results.get(0) instanceof AgentDescription)
+				findme = (AgentDescription) results.get(0);
+		}
+		
+		assertNotNull(results);
+		assertEquals(1, results.size());
+		assertTrue(findme.getName().equalsIgnoreCase("FindMeAgent"));
 	}
 	
 	public void testNothingToFind(){
@@ -85,6 +98,57 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		assertNotNull(results);
 		assertEquals(0, results.size());
 		_lastTestDone = true;
+	}
+	
+	public void testActionHandling(){
+		// Test for storing, searching for and removing actions
+//		_sendAction = _whitePagesTestBean.getSendAction();
+//		IActionDescription actualActionDesc = (IActionDescription) _sendAction;
+//		_whitePagesTestBean.addActionToDirectory(actualActionDesc);
+//		
+//		try {
+//			Thread.sleep(500);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		IActionDescription actionDesc = new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send");
+//		_whitePagesTestBean.searchForActionDesc(actionDesc);
+//		
+//		try {
+//			Thread.sleep(3500);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		List<IFact> results = _whitePagesTestBean.getLastResult();
+//		assertNotNull(results);
+//		
+//		if (results.size() > 0){
+//			IActionDescription resultDesc = (IActionDescription) results.get(0);
+//			assertEquals(actualActionDesc.hashCode(), resultDesc.hashCode());
+//		} else {
+//			// Let the world now that there was no result coming through.
+//			assertTrue("No Results were delivered", false);
+//		}
+//		
+//		
+//		_whitePagesTestBean.removeActionFromDirectory(actualActionDesc);
+//		
+//		try {
+//			Thread.sleep(500);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		_whitePagesTestBean.searchForActionDesc(actionDesc);
+//		
+//		try {
+//			Thread.sleep(3500);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+		
 	}
 	
 }

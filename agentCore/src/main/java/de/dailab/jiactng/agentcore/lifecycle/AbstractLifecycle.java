@@ -44,10 +44,10 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      */
     protected long sequenceNumber = 1;
     
-    /**
-     * Reference to the spring application context
-     */
-    protected ApplicationContext applicationContext = null;
+//    /**
+//     * Reference to the spring application context
+//     */
+//    protected ApplicationContext applicationContext = null;
     
     /**
      * You may override this method to change the lifecycle event propagation behavior.

@@ -153,22 +153,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 *   
 	 */
 	public void setGenericAgents(List<GenericAgentProperties> agentProps) {
-		//long start  = System.currentTimeMillis();
-		//System.out.println("invoking setgenericAgents...");
+		//long start  = System.currentTimeMillis();		
 		if (agentProps != null && agentProps.size() > 0) {
-			// contains the agents to be added
 			ArrayList<IAgent> agents = new ArrayList<IAgent>();
-			//System.out.println("size is: " + agentProps.size());
 			for (GenericAgentProperties gap : agentProps) {
-				//System.out.println("found new generic agent property");
 				ClassPathXmlApplicationContext cpxac = new ClassPathXmlApplicationContext(gap.getAgentConfig());
 				if (cpxac != null && cpxac.containsBeanDefinition(gap.getAgentBeanName())) {
-					//System.out.println("application context is valid - creating agents...");
 					for (int i = 1; i <= gap.getCount(); i++) {
-						// get the new Agent from Spring
 						IAgent newAgent = (IAgent) cpxac.getBean(gap.getAgentBeanName());
 						newAgent.setAgentName(gap.createAgentName(i));
-						//log does not work in this context: using system instead
+						//log does not work in this context somehow: using system instead
 						//System.out.println("adding agent: " + newAgent.getAgentName() + " with ID: " + newAgent.getAgentId());
 						agents.add(newAgent);
 					}
@@ -179,7 +173,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 			_agents.addAll(agents);
 		} else {
-			System.out.println("nothing to do - list is null or empty");
+			System.out.println("nothing to do - GenericAgentProperties list is null or empty");
 		}
 		//System.out.println("creation took " + (System.currentTimeMillis() - start) + " milliseconds");
 	}
@@ -502,10 +496,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					if (log != null && log.isInfoEnabled()) {
 						log.info("Trying to initialize agent: " + a.getAgentName());
 					}
-					a.init();
-					if (log != null && log.isInfoEnabled()) {
-						log.info("Trying to initialize agent: " + a.getAgentName());
-					}
+					a.init();				
 				} catch (LifecycleException e) {
 					// TODO:
 					// e.printStackTrace();
@@ -518,7 +509,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 						// directory is present so add agentdescription to it.
 						DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
 						directory.addAgentDescription(a.getAgentDescription());
-						break;
+						break;//????
 					}
 				}
 			}

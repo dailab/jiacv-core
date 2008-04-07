@@ -102,52 +102,62 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	public void testActionHandling(){
 		// Test for storing, searching for and removing actions
-//		_sendAction = _whitePagesTestBean.getSendAction();
-//		IActionDescription actualActionDesc = (IActionDescription) _sendAction;
-//		_whitePagesTestBean.addActionToDirectory(actualActionDesc);
-//		
-//		try {
-//			Thread.sleep(500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		IActionDescription actionDesc = new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send");
-//		_whitePagesTestBean.searchForActionDesc(actionDesc);
-//		
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		List<IFact> results = _whitePagesTestBean.getLastResult();
-//		assertNotNull(results);
-//		
-//		if (results.size() > 0){
-//			IActionDescription resultDesc = (IActionDescription) results.get(0);
-//			assertEquals(actualActionDesc.hashCode(), resultDesc.hashCode());
-//		} else {
-//			// Let the world now that there was no result coming through.
-//			assertTrue("No Results were delivered", false);
-//		}
-//		
-//		
-//		_whitePagesTestBean.removeActionFromDirectory(actualActionDesc);
-//		
-//		try {
-//			Thread.sleep(500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		_whitePagesTestBean.searchForActionDesc(actionDesc);
-//		
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
+		_sendAction = _whitePagesTestBean.getSendAction();
+		IActionDescription actualActionDesc = (IActionDescription) _sendAction;
+		
+		// first add a description to the directory
+		_whitePagesTestBean.addActionToDirectory(actualActionDesc);
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		// now let's search for it
+		IActionDescription actionDesc = new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send");
+		_whitePagesTestBean.searchForActionDesc(actionDesc);
+		
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		List<IFact> results = _whitePagesTestBean.getLastResult();
+		assertNotNull(results);
+		
+		if (results.size() > 0){
+			IActionDescription resultDesc = (IActionDescription) results.get(0);
+			assertEquals(actualActionDesc.hashCode(), resultDesc.hashCode());
+		} else {
+			// Let the world now that there was no result coming through.
+			assertTrue("No Results were delivered", false);
+		}
+		
+		
+		// given that the action was stored properly and found now let's remove it and check if it will be removed.
+		_whitePagesTestBean.removeActionFromDirectory(actualActionDesc);
+		
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		// no let's see if it was removed properly
+		_whitePagesTestBean.searchForActionDesc(actionDesc);
+		
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		results = _whitePagesTestBean.getLastResult();
+		assertNotNull(results);
+		
+		assertEquals("There shouldn't be any results", 0, results.size());
 		
 	}
 	

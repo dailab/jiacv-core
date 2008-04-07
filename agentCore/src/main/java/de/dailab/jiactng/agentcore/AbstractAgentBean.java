@@ -315,14 +315,14 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		throw new RuntimeException(e);
 	}
 
-	protected Session invoke(Action a, Object[] inputParams) {
+	protected String invoke(Action a, Object[] inputParams) {
 		return invoke(a, inputParams, null);
 	}
 
-	protected Session invoke(Action a, Object[] inputParams,
+	protected String invoke(Action a, Object[] inputParams,
 			ResultReceiver receiver) {
 		DoAction doAct = a.createDoAction(inputParams, receiver);
 		memory.write(doAct);
-		return doAct.getSession();
+		return doAct.getSessionId();
 	}
 }

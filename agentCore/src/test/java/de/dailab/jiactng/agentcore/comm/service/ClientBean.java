@@ -27,7 +27,7 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
     private final ResultObject _logLock= new ResultObject();
     
     public void receiveResult(ActionResult result) {
-        Action action= result.getAction();
+        Action action= (Action)result.getAction();
         log.debug("received result for '" + action + "'");
         if(action.getName().equals(TIME_ACTION)) {
             synchronized (_timeLock) {

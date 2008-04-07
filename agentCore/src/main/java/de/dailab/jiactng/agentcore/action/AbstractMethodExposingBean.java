@@ -174,12 +174,12 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
     public final void doAction(DoAction doAction) {
 log.debug("typechecking is '" + doAction.typeCheck() + "'");
         
-        Action action= doAction.getAction();
+        Action action= (Action)doAction.getAction();
         Method method= searchMethod(action.getName(), action.getInputTypes());
         if(method != null) {
             try {
                 Object result= method.invoke(this, doAction.getParams());
-    			memory.write(doAction.getAction().createActionResult(
+    			memory.write(action.createActionResult(
     					doAction, new Object[] { result }));
                 log.debug("action processed and result written...");
                 return;

@@ -293,7 +293,7 @@ IAgentBean, IEffector {
 								result.addAll(response.getResult());
 							}
 
-							ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, result.toArray());
+							ActionResult actionResult = ((Action)sourceAction.getAction()).createActionResult(sourceAction, result.toArray());
 							log.debug("DirectoryAccessBean is writing actionResult: " + actionResult);
 
 							memory.write(actionResult);
@@ -366,7 +366,7 @@ IAgentBean, IEffector {
 								result.addAll(response.getResult());
 							}
 
-							ActionResult actionResult = sourceAction.getAction().createActionResult(sourceAction, result.toArray());
+							ActionResult actionResult = ((Action)sourceAction.getAction()).createActionResult(sourceAction, result.toArray());
 							log.debug("DirectoryAccessBean is writing actionResult for ActionSearchRequest with ID" + request.getID());
 
 							memory.write(actionResult);

@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.management.jmx;
 
 import javax.management.Notification;
 
+import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
 
 /**
@@ -41,7 +42,7 @@ public class ActionPerformedNotification extends Notification {
 			long timeStamp, String msg, DoAction action, long duration) {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		_actionName = action.getAction().getName();
-		_agentbeanName = action.getAction().getProviderBean().getBeanName();
+		_agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();
 		_action = action.toString();
 		_duration = duration;
 	}

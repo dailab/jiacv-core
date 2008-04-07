@@ -329,7 +329,7 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
     }
 
     protected void overrideDoAction(DoAction doAction) {
-        Action action= doAction.getAction();
+        Action action= (Action)doAction.getAction();
         synchronized(_workLock) {
             Set<RemoteAction> remoteActions= _actionToRemoteAction.get(action);
             
@@ -455,9 +455,9 @@ public class ServiceBean extends AbstractMethodExposingBean implements IEffector
         DoAction doAction= doRemoteAction.getAction();
         // set this bean as result receiver
         doAction.setSource(this);
-        doAction.getSession().setSource(this);
+//        doAction.getSession().setSource(this);
         
-        Action action= doAction.getAction();
+        Action action= (Action)doAction.getAction();
         Action current= memory.read(new Action(action.getName(), null, action.getInputTypes(), action.getResultTypes()));
         
         if(current != null) {

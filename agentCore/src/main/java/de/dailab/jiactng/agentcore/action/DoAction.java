@@ -71,9 +71,6 @@ public class DoAction extends SessionEvent {
 	public DoAction(Session session, Action thisAction, ResultReceiver source,
 			Object[] params) {
 		super(session, thisAction, source);
-		if (session != null) {
-			session.addToSessionHistory(this);
-		}
 		setParams(params);
 	}
 

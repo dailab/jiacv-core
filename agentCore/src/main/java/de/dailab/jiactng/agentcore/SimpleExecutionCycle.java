@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 
+import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
@@ -146,10 +147,10 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	}
 
 	private void performDoAction(DoAction act) {
-		if (act.getAction().getProviderBean() != null) {
+		if (((Action)act.getAction()).getProviderBean() != null) {
 //			memory.write(act.getSession());
 			long start = System.nanoTime();
-			act.getAction().getProviderBean().doAction(act);
+			((Action)act.getAction()).getProviderBean().doAction(act);
 			long end = System.nanoTime();
 			actionPerformed(act, end-start);
 		} else {
@@ -167,11 +168,11 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 ;
 		} else {
 		    DoAction doAct = ((DoAction) actionResult.getSource());
-		    Session template= new Session(doAct.getSession().getId(),doAct.getSession().getCreationTime(),null,null);
+//		    Session template= new Session(doAct.getSessionId(),doAct.getSession().getCreationTime(),null,null);
 //			memory.remove(new ActionResult(null,template,null,null));
 //			DoAction doAct = ((DoAction) actionResult.getSource());
 			//memory.remove(doAct.getSession());
-			memory.remove(template);
+//			memory.remove(template);
 			((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
 			
 		}

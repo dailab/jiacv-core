@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.action;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * This class is thought to be super class of all session events. Every session
@@ -14,20 +15,21 @@ public class SessionEvent implements IFact {
 	/** SerialVersionUID for Serialization */
 	private static final long serialVersionUID = 2754758742968423185L;
 
-	/** The session of the session this session event belongs to. */
-	private Session session;
+//	/** The session of the session this session event belongs to. */
+//	private Session session;
 
 	/** Redundant for the sake of SimpleSpace. */
 	private String sessionId;
 
 	/** The action this session event will trigger or be result of. */
-	private Action action;
+	private IActionDescription action;
 
 	/** The object that created this event. */
 	private transient Object source;
 
 	private Object metaData;
 
+	
 	/**
 	 * Subclasses use this constructor to set the session and action of a
 	 * session event.
@@ -39,20 +41,41 @@ public class SessionEvent implements IFact {
 	 * @param source
 	 *            the originator of this event
 	 */
-	public SessionEvent(Session session, Action action, Object source) {
-		this.session = session;
-		if (session != null)
-			this.sessionId = session.getId();
+	public SessionEvent(Session session, IActionDescription action, Object source) {
+		if (session != null) {
+			session.addToSessionHistory(this);
+			this.sessionId = session.getSessionId();
+		}
+		
 		this.action = action;
 		this.source = source;
 	}
+	
+//	/**
+//	 * Subclasses use this constructor to set the session and action of a
+//	 * session event.
+//	 * 
+//	 * @param session
+//	 *            the session this event belongs to
+//	 * @param action
+//	 *            the action this event is trigger or result of
+//	 * @param source
+//	 *            the originator of this event
+//	 */
+//	public SessionEvent(String sessionId, IActionDescription action, Object source) {
+////		this.session = session;
+////		if (session != null)
+//		this.sessionId = sessionId;
+//		this.action = action;
+//		this.source = source;
+//	}
 
 	public SessionEvent(DoAction source) {
 		this(null, null, source);
 		if (source != null) {
-			this.session = source.getSession();
-			if (this.session != null)
-				this.sessionId = this.session.getId();
+			this.sessionId = source.getSessionId();
+//			if (this.session != null)
+//				this.sessionId = this.session.getId();
 			this.action = source.getAction();
 		}
 	}
@@ -60,7 +83,7 @@ public class SessionEvent implements IFact {
 	/**
 	 * @return the action
 	 */
-	public Action getAction() {
+	public IActionDescription getAction() {
 		return action;
 	}
 
@@ -68,7 +91,7 @@ public class SessionEvent implements IFact {
 	 * @param action
 	 *            the action to set
 	 */
-	public void setAction(Action action) {
+	public void setAction(IActionDescription action) {
 		this.action = action;
 	}
 
@@ -87,22 +110,22 @@ public class SessionEvent implements IFact {
 		this.source = source;
 	}
 
-	/**
-	 * @return the session
-	 */
-	public Session getSession() {
-		return session;
-	}
-
-	/**
-	 * @param session
-	 *            the session to set
-	 */
-	public void setSession(Session session) {
-		this.session = session;
-		if (session != null)
-			this.sessionId = session.getId();
-	}
+//	/**
+//	 * @return the session
+//	 */
+//	public Session getSession() {
+//		return session;
+//	}
+//
+//	/**
+//	 * @param session
+//	 *            the session to set
+//	 */
+//	public void setSession(Session session) {
+//		this.session = session;
+//		if (session != null)
+//			this.sessionId = session.getId();
+//	}
 
 	/**
 	 * @return the session id of the session this event belongs to

@@ -11,7 +11,7 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  * This class is used as a superclass for everything that is connected to the
  * execution of an action. The idea is, that all phases of action execution (an
  * consequently all objects associated with those phases) have a commen
- * superclass and thus can have the same session-id.
+ * superclass and thus can have the same session-sessionId.
  * 
  * @author moekon
  */
@@ -21,7 +21,7 @@ public class Session implements IFact {
 	private static final long serialVersionUID = 8699173523554827559L;
 
 	/** The actual ID of the session. */
-	private String id;
+	private String sessionId;
 
 	/** The creation time of the session object. */
 	private long creationTime;
@@ -39,7 +39,7 @@ public class Session implements IFact {
 	 * (i.E. of actions, results, etc.) in order of appearance. TODO should be
 	 * of type ArrayList<SessionEvent>
 	 */
-	private ArrayList<Object> history;
+	private ArrayList<SessionEvent> history;
 
 	/**
 	 * Constructor for a new session. Can be called with any kind of object as
@@ -51,14 +51,14 @@ public class Session implements IFact {
 	public Session(ResultReceiver source) {
 		this(IdFactory.createSessionId((source != null) ? source.hashCode()
 				: Session.class.hashCode()), System.currentTimeMillis(),
-				source, new ArrayList<Object>());
+				source, new ArrayList<SessionEvent>());
 	}
 
 	/**
 	 * Constructor to set all values of session by hand.
 	 * 
-	 * @param id
-	 *            the session id
+	 * @param sessionId
+	 *            the session sessionId
 	 * @param creationTime
 	 *            the time of creation of this session
 	 * @param source
@@ -67,8 +67,8 @@ public class Session implements IFact {
 	 *            the history of this session
 	 */
 	public Session(String id, long creationTime, ResultReceiver source,
-			ArrayList<Object> history) {
-		this.id = id;
+			ArrayList<SessionEvent> history) {
+		this.sessionId = id;
 		this.creationTime = creationTime;
 		this.source = source;
 		this.history = history;
@@ -82,27 +82,27 @@ public class Session implements IFact {
 	 *            the session to copy the values from
 	 */
 	public Session(Session session) {
-		this.id = session.getId();
+		this.sessionId = session.getSessionId();
 		this.creationTime = session.getCreationTime();
 		this.source = session.getSource();
 		this.history = session.getHistory();
 	}
 
 	/**
-	 * Getter for the id of this session object
+	 * Getter for the sessionId of this session object
 	 * 
-	 * @return a string representing the id of this session.
+	 * @return a string representing the sessionId of this session.
 	 */
-	public String getId() {
-		return id;
+	public String getSessionId() {
+		return sessionId;
 	}
 
 	/**
-	 * @param id
-	 *            the id to set
+	 * @param sessionId
+	 *            the sessionId to set
 	 */
-	public void setId(String id) {
-		this.id = id;
+	public void setSessionId(String id) {
+		this.sessionId = id;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class Session implements IFact {
 	 * 
 	 * @return an Arraylist containing the history.
 	 */
-	public ArrayList<Object> getHistory() {
+	public ArrayList<SessionEvent> getHistory() {
 		return history;
 	}
 
@@ -148,7 +148,7 @@ public class Session implements IFact {
 	 * @param history
 	 *            the history to set
 	 */
-	public void setHistory(ArrayList<Object> history) {
+	public void setHistory(ArrayList<SessionEvent> history) {
 		this.history = history;
 	}
 
@@ -158,9 +158,9 @@ public class Session implements IFact {
 	 * @param event
 	 *            the object to add to history
 	 */
-	public void addToSessionHistory(Object event) {
+	public void addToSessionHistory(SessionEvent event) {
 		if (history == null) {
-			history = new ArrayList<Object>();
+			history = new ArrayList<SessionEvent>();
 		}
 		history.add(event);
 	}
@@ -172,7 +172,7 @@ public class Session implements IFact {
 	 *            the index of the object to remove
 	 * @return the removed object
 	 */
-	public Object removeFromSessionHistory(int index) {
+	public SessionEvent removeFromSessionHistory(int index) {
 		return history.remove(index);
 	}
 
@@ -183,7 +183,7 @@ public class Session implements IFact {
 	 *            the object to remove
 	 * @return true, if history contained the given object
 	 */
-	public boolean removeFromSessionHistory(Object o) {
+	public boolean removeFromSessionHistory(SessionEvent o) {
 		return history.remove(o);
 	}
 
@@ -194,10 +194,10 @@ public class Session implements IFact {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 
-		// id
-		builder.append("Session:\n id=");
-		if (id != null) {
-			builder.append("'").append(id).append("'");
+		// sessionId
+		builder.append("Session:\n sessionId=");
+		if (sessionId != null) {
+			builder.append("'").append(sessionId).append("'");
 		} else {
 			builder.append("null");
 		}

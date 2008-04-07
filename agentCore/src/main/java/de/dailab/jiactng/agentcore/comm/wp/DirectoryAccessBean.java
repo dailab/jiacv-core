@@ -21,6 +21,7 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.environment.IEffector;
+import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
@@ -52,10 +53,12 @@ IAgentBean, IEffector {
 	private AgentRequestHandler _agentSearchRequestHandler = null;
 	private ActionRequestHandler _actionSearchRequestHandler = null;
 	private RemoteActionHandler _remoteActionHandler = null;
+	private RemoteActionWatcher _remoteActionWatcher = new RemoteActionWatcher();
 	private final ResultDump _resultDump = new ResultDump();
 
 	private Action _sendAction = null;
 	private Map<String, DoAction> _requestID2ActionMap = new HashMap<String, DoAction>();
+	
 
 	static {
 		JiacMessage agentSearchTemplate = new JiacMessage();
@@ -68,7 +71,7 @@ IAgentBean, IEffector {
 		
 		JiacMessage remoteActionTemplate = new JiacMessage();
 		remoteActionTemplate.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
-		WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE = remoteActionTemplate;
+		WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE = remoteActionTemplate;	
 	}
 
 
@@ -81,7 +84,7 @@ IAgentBean, IEffector {
 		_agentSearchRequestHandler = new AgentRequestHandler();
 		_actionSearchRequestHandler = new ActionRequestHandler();
 		_remoteActionHandler = new RemoteActionHandler();
-		String messageboxName = thisAgent.getAgentNode().getName() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
+		String messageboxName = thisAgent.getAgentNode().getUUID() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
 	}
 
@@ -91,6 +94,7 @@ IAgentBean, IEffector {
 		memory.attach(_agentSearchRequestHandler, WHITEPAGES_AGENTSEARCH_MESSAGETEMPLATE);
 		memory.attach(_actionSearchRequestHandler, WHITEPAGES_ACTIONSEARCH_MESSAGETEMPLATE);
 		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
+		memory.attach(_remoteActionWatcher, new DoAction(null, null, null));
 		_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 		this.setExecuteInterval( _timeoutMillis /2);
 	}
@@ -116,6 +120,8 @@ IAgentBean, IEffector {
 	@Override
 	public void execute() {
 		super.execute();
+		
+		// TODO TimeoutManagment for RemoteActions
 		log.debug("Collecting timed out SearchRequests, current check-interval is " + this.getExecuteInterval());
 		Set<String> toRemove = new HashSet<String>();
 		synchronized(_requestID2ActionMap){
@@ -213,6 +219,7 @@ IAgentBean, IEffector {
 			
 		} else if (doAction.getAction().getName().equalsIgnoreCase(_action_UseRemoteAction)){
 			log.debug("doAction is an Action that has to be invoked remotely");
+			
 			_remoteActionHandler.processRemoteAction(doAction);
 			
 		}
@@ -378,10 +385,49 @@ IAgentBean, IEffector {
 	}
 	
 	@SuppressWarnings("serial")
-	private class RemoteActionHandler implements SpaceObserver<IFact> {
+	private class RemoteActionHandler implements SpaceObserver<IFact>, ResultReceiver {
+		
+		private class RemoteRequest{
+			/**  The remoteAction to invoke */
+			private DoAction _request = null;
+			
+			/** Time of Creation of this SearchRequest in millis */
+			private long _creationTime = -1;
+			
+			/** optional ID used e.g. for tracking within the DirectoryAccessBean */
+			private String _ID;
+			
+			public RemoteRequest(DoAction doAction) {
+				_request = doAction;
+				_creationTime = System.currentTimeMillis();
+			}
+
+			public IFact getRequest(){
+				return _request;
+			}
+			
+			public long getCreationTime(){
+				return _creationTime;
+			}
+			
+			synchronized public long getAge(){
+				return (System.currentTimeMillis()-_creationTime);
+			}
+			
+			public void setID(String id){
+				_ID = id;
+			}
+			
+			public String getID(){
+				return _ID;
+			}
+			
+		}
+		
+		private Map<String, DoAction> remoteAction2DoActionMap = null;
 		
 		public RemoteActionHandler() {
-		
+			remoteAction2DoActionMap = new HashMap<String, DoAction>();
 		}
 		
 		public void processRemoteAction (DoAction doAction){
@@ -390,12 +436,109 @@ IAgentBean, IEffector {
 			
 			Object[] params = {message, directoryAddress};
 			DoAction send = _sendAction.createDoAction(params, _resultDump);
+			
+			RemoteRequest request = new RemoteRequest(doAction);
+			remoteAction2DoActionMap.put(doAction.getSessionId(), doAction);
+			
 			memory.write(send);
 		}
 		
 		@Override
-		public void notify(SpaceEvent<? extends IFact> arg0) {
+		@SuppressWarnings("unchecked")
+		public void notify(SpaceEvent<? extends IFact> event) {
+			if(event instanceof WriteCallEvent) {
+				WriteCallEvent wceTemp = (WriteCallEvent) event;
+				if (wceTemp.getObject() instanceof IJiacMessage){
+					log.debug("Got RemoteActionMessage...");
+					JiacMessage message = (JiacMessage) wceTemp.getObject();
+					DoAction action = (DoAction) message.getPayload();
+					IActionDescription actionDesc = (IActionDescription) action.getParams()[0];
+					Object[] params = (Object[]) action.getParams()[1];
+					
+					Action remoteAction = new Action(actionDesc.getName());
+					DoAction remoteDoAction = null;
+					
+					List<Action> actions = thisAgent.getActionList();
+					if (actions.contains(remoteAction)){
+						for (Action foundAction : actions){
+							if (actionsAreEqual(foundAction, actionDesc)){
+								remoteDoAction = foundAction.createDoAction(params, this);
+								break;
+							}
+						}
+						// TODO store DoAction to have a trace back to the place where the actionresult really should get to.
+						
+						memory.write(remoteDoAction);
+					} else {
+						ActionNotPresentException exception = new ActionNotPresentException(actionDesc);
+						
+//						ActionResult result = new ActionResult()
+						
+						//TODO return exception if Action isn't present
+					}
+					
+					
+//					Action remoteAction = new Action(actionDesc.getName(), thisAgent.get , actionDesc.getInputTypes(), actionDesc.getResultTypes());
+					
+				}
+			}
+			
+			
+			// TODO RemoteActionHandling from here on
+			
+			// Write Results that are received within an JiacMessage into the memory.
+			
+		}
+		
+		private boolean actionsAreEqual(IActionDescription action1, IActionDescription action2){
+			boolean equal = (action1 != null)&&(action2 != null); 
+			equal = action1.getName().equals(action2.getName()) && equal;
+			equal = action1.getInputTypes().equals(action2.getInputTypes()) && equal;
+			equal = action1.getResultTypes().equals(action2.getResultTypes()) && equal;
+			return equal;
+		}
+		
+		public Map<String, DoAction> getRemoteAction2DoActionMap(){
+			return remoteAction2DoActionMap;
+		}
+		
+		@Override
+		public void receiveResult(ActionResult result) {
+//			DoAction doAction = remoteAction2DoActionMap.get(result.getSessionId());
+//			doAction.getAction().getProviderDescription().getMessageBoxAddress();
+			
+		}
+		
+		@Override
+		public String getBeanName() {
 			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public void setBeanName(String name) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+
+	@SuppressWarnings("serial")
+	public class RemoteActionWatcher implements SpaceObserver<IFact>{
+		
+		@Override
+		public void notify(SpaceEvent<? extends IFact> event) {
+			
+			if(event instanceof WriteCallEvent) {
+				WriteCallEvent wce = (WriteCallEvent) event;
+				if (wce.getObject() instanceof DoAction){
+					DoAction doAction = (DoAction) wce.getObject();
+					System.err.println("DoAction " + doAction.getAction().getName());
+					System.err.println("DoAction provider = " + doAction.getAction());
+					
+					
+				}
+			}
 			
 		}
 	}
@@ -405,6 +548,16 @@ IAgentBean, IEffector {
 	public class TimeoutException extends RuntimeException{
 		public TimeoutException(String s){
 			super(s);
+		}
+	}
+	
+	@SuppressWarnings("serial")
+	public class ActionNotPresentException extends RuntimeException{
+		IActionDescription _actionDesc = null;
+		
+		public ActionNotPresentException(IActionDescription actionDesc) {
+			super("Action isn't present anymore");
+			_actionDesc = actionDesc;
 		}
 	}
 }

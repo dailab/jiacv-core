@@ -45,5 +45,8 @@ public interface IEffector extends IAgentBean {
 	 *            as well as its parameters.
 	 */
 	public void doAction(DoAction doAction);
+	
+	
+	public void cancelAction(DoAction doAction);
 
 }

@@ -124,6 +124,7 @@ IAgentNodeBean {
 	 */
 	public <T extends IActionDescription> void removeAction(T action){
 		if (action != null) {
+			Action bla;
 			ActionData actionData = new ActionData();
 			actionData.setActionDescription(action);
 			space.remove(actionData);
@@ -164,7 +165,7 @@ IAgentNodeBean {
 	}
 
 	public void doStart(){
-		myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getName() + SEARCHREQUESTSUFFIX);
+		myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getUUID() + SEARCHREQUESTSUFFIX);
 		try {
 			messageTransport.listen(myAddress, null);
 		} catch (CommunicationException e) {
@@ -283,11 +284,21 @@ IAgentNodeBean {
 				} else if (request.getSearchTemplate() instanceof IActionDescription){
 					log.debug("SearchRequest hold SearchTemplate of type Action");
 					IActionDescription template = (IActionDescription) request.getSearchTemplate();
-
+					
 					log.debug("SearchRequest holds template " + template);
-					Set<IActionDescription> descriptions = space.readAll(template);
+					
+					ActionData templateData = new ActionData();
+					templateData.setActionDescription(template);
+					
+					Set<ActionData> foundData = space.readAll(templateData);
+					Set<IActionDescription> resultDescriptions = new HashSet<IActionDescription>();
+					
+					for (ActionData data: foundData){
+						resultDescriptions.add(data.getActionDescription());
+					}
+					
 					Set<IFact> result = new HashSet<IFact>();
-					result.addAll(descriptions);
+					result.addAll(resultDescriptions);
 					log.debug("Result to send reads " + result);
 
 					SearchResponse response = new SearchResponse(request, result);
@@ -315,9 +326,10 @@ IAgentNodeBean {
 
 				actionData.setCreationTime(_currentLogicTime + 1);
 
+				System.err.println("Space before actionData " + space.read(new ActionData()));
 				log.debug("writing new action to tuplespace");
 				space.write(actionData);
-
+				System.err.println("space after ActionData" + space.read(new ActionData()));
 				
 			} else if (message.getProtocol().equalsIgnoreCase(REMOVE_ACTION_PROTOCOL_ID)){
 				log.debug("Message is holding Action for removal");
@@ -333,13 +345,14 @@ IAgentNodeBean {
 				log.debug("Message is holding Action for remote invocation");
 				DoAction doAction = (DoAction) message.getPayload();
 				IActionDescription action = (IActionDescription) doAction.getParams()[0];
-				Object[] params = (Object[]) doAction.getParams()[1];
 				
 				IActionDescription realAction = space.read(action);
 				ICommunicationAddress providerAddress = realAction.getProviderDescription().getMessageBoxAddress();
 				
-				// TODO RemoteActionHandling from here on
-				JiacMessage remoteActionmessage = null;
+				JiacMessage remoteActionmessage = new JiacMessage(doAction);
+				remoteActionmessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
+				remoteActionmessage.setHeader("RemoteClient", message.getSender().toString());
+				
 				
 				try {
 					messageTransport.send(remoteActionmessage, providerAddress);
@@ -428,7 +441,7 @@ IAgentNodeBean {
 	}
 
 	@SuppressWarnings("serial")
-	private class ActionData implements IFact{
+	public static class ActionData implements IFact{
 		private IActionDescription _action = null;
 		private Long _creationTime = null;
 
@@ -443,12 +456,12 @@ IAgentNodeBean {
 			_creationTime = null;
 		}
 
-		public void setCreationTime(long creationTime){
-			_creationTime = new Long(creationTime);
+		public void setCreationTime(Long creationTime){
+			_creationTime = creationTime;
 		}
 
-		public long getCreationTime(){
-			return _creationTime.longValue();
+		public Long getCreationTime(){
+			return _creationTime;
 		}
 
 		public void setActionDescription(IActionDescription action){

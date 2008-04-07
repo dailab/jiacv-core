@@ -6,6 +6,7 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
+import de.dailab.jiactng.agentcore.action.SessionEvent;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
@@ -137,6 +139,55 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 //					processResult(actionResult);
 //				}
 //			}
+			
+			/*
+			 * Session-Cleanup
+			 * 
+			 * If Session has a timeout 
+			 */
+			synchronized(memory){
+				Set<Session> sessions = memory.removeAll(new Session());
+				for (Session session : sessions){
+					long timeout = session.getCreationTime() + session.getTimeToLive();
+					if (timeout < System.currentTimeMillis()){
+						// session hasn't timeout yet
+						memory.write(session);
+					} else {
+						//session has timeout
+						ArrayList<SessionEvent> history = session.getHistory();
+						
+						// Does Session is related to DoAction?
+						boolean doActionFound = false;
+						for(SessionEvent event : history){
+							if (event instanceof DoAction){
+								//doAction found
+								doActionFound = true;
+								DoAction doAction = (DoAction) event;
+								if (doAction.getAction() instanceof Action){
+									// Got an Action, so let's cancel this doAction
+									
+									Action action = (Action) doAction.getAction();
+									action.getProviderBean().cancelAction(doAction);
+								} else if (session.getSource() != null){
+									// there isn't an Action, so let's send the failure to the source
+									
+									ResultReceiver receiver = session.getSource();
+									ActionResult result = new ActionResult(doAction, new RuntimeException("DoAction has timeout"));
+									receiver.receiveResult(result);
+								} else {
+									log.warn("DoAction has to be canceled due to sessiontimeout " + doAction);
+								}
+							}
+						}
+						
+						if (!doActionFound){
+							log.warn("Session with no DoAction was deleted due to timeout. Session: " + session);
+						}
+					}
+				}
+			}
+			
+			
 		} 
 
 		//reject execution if SimpleExecutionCycle hasn't been started
@@ -282,4 +333,12 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 		_manager = null;
 	}
+	
+	@SuppressWarnings("serial")
+	public class TimeoutException extends RuntimeException{
+		public TimeoutException(String s){
+			super(s);
+		}
+	}
+	
 }

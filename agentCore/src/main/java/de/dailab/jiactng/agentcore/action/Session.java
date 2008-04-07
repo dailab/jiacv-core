@@ -24,7 +24,12 @@ public class Session implements IFact {
 	private String sessionId;
 
 	/** The creation time of the session object. */
-	private long creationTime;
+	private Long creationTime;
+	
+	/** Optional attribute for timeout conditions, 
+	 * it only is relevant when the session is written into the memory
+	 * Default value is 60 seconds*/
+	private Long timeToLive = new Long(60000); 
 
 	/** Stores the reference to the creator of this session. */
 	/*
@@ -54,6 +59,14 @@ public class Session implements IFact {
 				source, new ArrayList<SessionEvent>());
 	}
 
+	public Session(){
+		this.sessionId = null;
+		this.creationTime = null;
+		this.history = null;
+		this.source = null;
+		this.timeToLive = null;
+	}
+	
 	/**
 	 * Constructor to set all values of session by hand.
 	 * 
@@ -96,6 +109,20 @@ public class Session implements IFact {
 	public String getSessionId() {
 		return sessionId;
 	}
+	
+	/**
+	 * Sets an optional timeout attribute. If not set the default value is 60.000 milliseconds
+	 * Used only when session is written into agents memory
+	 * 
+	 * @param timeout
+	 */
+	public void setTimeToLive(long timeout){
+		timeToLive = new Long(timeout);
+	}
+	
+	public Long getTimeToLive(){
+		return timeToLive;
+	}
 
 	/**
 	 * @param sessionId
@@ -123,7 +150,7 @@ public class Session implements IFact {
 	/**
 	 * @return the creationTime
 	 */
-	public long getCreationTime() {
+	public Long getCreationTime() {
 		return creationTime;
 	}
 
@@ -132,7 +159,7 @@ public class Session implements IFact {
 	 *            the creationTime to set
 	 */
 	public void setCreationTime(long creationTime) {
-		this.creationTime = creationTime;
+		this.creationTime = new Long(creationTime);
 	}
 
 	/**

@@ -199,6 +199,10 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	@Override
 	public void doCleanup() throws Exception {
 	}
+	
+	public void cancelAction(DoAction doAction){
+		
+	}
 
 	/**
 	 * Registers the agent bean and all its resources for management

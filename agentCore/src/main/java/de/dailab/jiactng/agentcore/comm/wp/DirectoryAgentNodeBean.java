@@ -54,7 +54,6 @@ IAgentNodeBean {
 	public final static String ACTION_SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionSearchRequest";
 	public final static String ADD_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AddAction";
 	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
-	public final static String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#UseRemoteAction";
 
 	private long _refreshingIntervall = 4000;
 	private long _firstRefresh = 5000;
@@ -337,26 +336,6 @@ IAgentNodeBean {
 
 				log.debug("removing action " + action + " from directory");
 				space.remove(actionData);
-				
-				
-			} else if (message.getProtocol().equalsIgnoreCase(REMOTEACTION_PROTOCOL_ID)){
-				log.debug("Message is holding Action for remote invocation");
-				DoAction doAction = (DoAction) message.getPayload();
-				IActionDescription action = (IActionDescription) doAction.getParams()[0];
-				
-				IActionDescription realAction = space.read(action);
-				ICommunicationAddress providerAddress = realAction.getProviderDescription().getMessageBoxAddress();
-				
-				JiacMessage remoteActionmessage = new JiacMessage(doAction);
-				remoteActionmessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
-				remoteActionmessage.setHeader("RemoteClient", message.getSender().toString());
-				
-				
-				try {
-					messageTransport.send(remoteActionmessage, providerAddress);
-				} catch (CommunicationException e) {
-					e.printStackTrace();
-				}
 			}
 		}
 	}

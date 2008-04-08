@@ -68,9 +68,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 		_whitePagesTestBean.searchForAgentDesc("FindMeAgent");
 		try {
-			System.err.println("Begin to sleep");
-			Thread.sleep(15000);
-			System.err.println("The Awakening!");
+			Thread.sleep(3500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

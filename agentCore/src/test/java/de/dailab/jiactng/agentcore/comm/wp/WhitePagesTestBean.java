@@ -60,8 +60,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	public void searchForAgentDesc(String agentName){
 		log.debug("Searching for Agent " + agentName);
 		AgentDescription desc = new AgentDescription(null, agentName, null, null);
-		SearchRequest request = new SearchRequest(desc);
-		Object[] params = {request};
+		Object[] params = {desc};
 		DoAction action = _requestAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
@@ -69,8 +68,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 
 	public void searchForActionDesc(IActionDescription actionDesc){
 		log.debug("Searching for Action " + actionDesc.toString());
-		SearchRequest request = new SearchRequest(actionDesc);
-		Object[] params = {request};
+		Object[] params = {actionDesc};
 		DoAction action = _requestAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
@@ -114,10 +112,11 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		if (result != null) log.debug("Result reads: " + result);
 		
 		Object[] actionResults = result.getResults();
-		if (actionResults != null) {
+		if (actionResults[0] != null) {
+			List<IFact> results = (List<IFact>) actionResults[0];
 			synchronized(_results){
 				_results = new ArrayList<IFact>();
-				for (Object obj : actionResults){
+				for (Object obj : results){
 					if (obj instanceof IFact)
 						_results.add((IFact) obj);
 				}

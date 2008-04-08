@@ -37,6 +37,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.ontology.AgentBeanDescription;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
@@ -310,10 +311,15 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			}
 
 			// if bean is effector, add all actions to memory
+			IAgentDescription myDescription= getAgentDescription();
 			if (ab instanceof IEffector) {
 				List<? extends Action> acts = ((IEffector) ab).getActions();
 				if (acts != null) {
 					for (Action item : acts) {
+						item.setProviderDescription(myDescription);
+						if(item.getProviderBean() == null) {
+							item.setProviderBean((IEffector) ab);
+						}
 						memory.write(item);
 						actionList.add(item);
 					}

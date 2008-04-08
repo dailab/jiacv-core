@@ -24,6 +24,7 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * This Class is meant to work on the side of the agent that is searching
@@ -39,10 +40,10 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 public class DirectoryAccessBean extends AbstractAgentBean implements
 IAgentBean, IEffector {
 
-	private String _action_RequestSearch = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch";
-	private String _action_AddActionToDirectory = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory";
-	private String _action_RemoveActionFromDirectory = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory";
-	private String _action_UseRemoteAction = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#useRemoteAction";
+	public static final String ACTION_REQUEST_SEARCH = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch";
+	public static final String ACTION_ADD_ACTION_TO_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory";
+	public static final String ACTION_REMOVE_ACTION_FROM_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory";
+	public static final String ACTION_USE_REMOTE_ACTION = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#useRemoteAction";
 
 	private int _timeoutMillis = 2500;
 	private static final IJiacMessage WHITEPAGES_AGENTSEARCH_MESSAGETEMPLATE;
@@ -50,8 +51,8 @@ IAgentBean, IEffector {
 	private static final IJiacMessage WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE;
 
 	private ICommunicationAddress directoryAddress = null;
-	private AgentRequestHandler _agentSearchRequestHandler = null;
-	private ActionRequestHandler _actionSearchRequestHandler = null;
+	private SearchRequestHandler _searchRequestHandler = null;
+	private ActionRequestHandler _actionRequestHandler = null;
 	private RemoteActionHandler _remoteActionHandler = null;
 	private RemoteActionWatcher _remoteActionWatcher = new RemoteActionWatcher();
 	private final ResultDump _resultDump = new ResultDump();
@@ -81,8 +82,8 @@ IAgentBean, IEffector {
 
 	public void doInit() throws Exception{
 		super.doInit();
-		_agentSearchRequestHandler = new AgentRequestHandler();
-		_actionSearchRequestHandler = new ActionRequestHandler();
+		_searchRequestHandler = new SearchRequestHandler();
+		_actionRequestHandler = new ActionRequestHandler();
 		_remoteActionHandler = new RemoteActionHandler();
 		String messageboxName = thisAgent.getAgentNode().getUUID() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
@@ -91,10 +92,10 @@ IAgentBean, IEffector {
 	public void doStart() throws Exception{
 		super.doStart();
 		log.debug("starting DirectoryAccessBean");
-		memory.attach(_agentSearchRequestHandler, WHITEPAGES_AGENTSEARCH_MESSAGETEMPLATE);
-		memory.attach(_actionSearchRequestHandler, WHITEPAGES_ACTIONSEARCH_MESSAGETEMPLATE);
+		memory.attach(_searchRequestHandler, WHITEPAGES_AGENTSEARCH_MESSAGETEMPLATE);
+		memory.attach(_actionRequestHandler, WHITEPAGES_ACTIONSEARCH_MESSAGETEMPLATE);
 		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
-		memory.attach(_remoteActionWatcher, new DoAction(null, null, null));
+		memory.attach(_remoteActionWatcher, new DoAction());
 		_sendAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 		this.setExecuteInterval( _timeoutMillis /2);
 	}
@@ -102,8 +103,8 @@ IAgentBean, IEffector {
 	public void doStop() throws Exception{
 		super.doStop();
 		log.debug("stopping DirectoryAccessBean");
-		memory.detach(_agentSearchRequestHandler);
-		memory.detach(_actionSearchRequestHandler);
+		memory.detach(_searchRequestHandler);
+		memory.detach(_actionRequestHandler);
 		memory.detach(_remoteActionHandler);
 		this.setExecuteInterval(- (_timeoutMillis/2));
 	}
@@ -169,22 +170,22 @@ IAgentBean, IEffector {
 
 		Class<?>[] input1 = {IFact.class};
 		Class<?>[] result = {List.class};
-		Action action = new Action(_action_RequestSearch, this, input1, result);
+		Action action = new Action(ACTION_REQUEST_SEARCH, this, input1, result);
 		actions.add(action);
 
 		input1[0] = IActionDescription.class;
 		result = null;
-		action = new Action(_action_AddActionToDirectory, this, input1, result);
+		action = new Action(ACTION_ADD_ACTION_TO_DIRECTORY, this, input1, result);
 		actions.add(action);
 
 		input1[0] = IActionDescription.class;
 		result = null;
-		action = new Action(_action_RemoveActionFromDirectory, this, input1, result);
+		action = new Action(ACTION_REMOVE_ACTION_FROM_DIRECTORY, this, input1, result);
 		actions.add(action);
 
 		Class<?>[] input2 = {Action.class, Object[].class};
 		Class<?>[] result2 = {ActionResult.class};
-		action = new Action(_action_UseRemoteAction, this, input2, result2);
+		action = new Action(ACTION_USE_REMOTE_ACTION, this, input2, result2);
 		actions.add(action);
 
 		return actions;
@@ -197,27 +198,30 @@ IAgentBean, IEffector {
 
 
 		Object[] params = doAction.getParams();
-		if (doAction.getAction().getName().equalsIgnoreCase(_action_RequestSearch)){
+		if (doAction.getAction().getName().equalsIgnoreCase(ACTION_REQUEST_SEARCH)){
 			log.debug("doAction is a SearchRequest");
-			SearchRequest request = (SearchRequest) params[0];
-			request.setID(doAction.getSessionId());
-			_requestID2ActionMap.put(request.getID(), doAction);
-			if (this.getExecuteInterval() < 0){
-				log.debug("activating timeoutchecking. Next Check will commence in " + _timeoutMillis/2 + " intervalls");
-				this.setExecuteInterval(_timeoutMillis/2);
-			}
-			_agentSearchRequestHandler.requestSearch(request);
+			if (params[0] instanceof IFact){
+				IFact template = (IFact) params[0];
+				SearchRequest request = new SearchRequest(template);
+				request.setID(doAction.getSessionId());
+				_requestID2ActionMap.put(request.getID(), doAction);
+				if (this.getExecuteInterval() < 0){
+					log.debug("activating timeoutchecking. Next Check will commence in " + _timeoutMillis/2 + " intervalls");
+					this.setExecuteInterval(_timeoutMillis/2);
+				}
+				_searchRequestHandler.requestSearch(request);
+			} 
 
-		} else if (doAction.getAction().getName().equalsIgnoreCase(_action_AddActionToDirectory)){
+		} else if (doAction.getAction().getName().equalsIgnoreCase(ACTION_ADD_ACTION_TO_DIRECTORY)){
 			log.debug("doAction is an Action to add to the Directory");	
-			_actionSearchRequestHandler.addActionToDirectory((Action) params[0]);
+			_actionRequestHandler.addActionToDirectory((Action) params[0]);
 
 
-		} else if (doAction.getAction().getName().equalsIgnoreCase(_action_RemoveActionFromDirectory)){
+		} else if (doAction.getAction().getName().equalsIgnoreCase(ACTION_REMOVE_ACTION_FROM_DIRECTORY)){
 			log.debug("doAction is an Action to remove to the Directory");
-			_actionSearchRequestHandler.removeActionFromDirectory((Action) params[0]);
+			_actionRequestHandler.removeActionFromDirectory((Action) params[0]);
 			
-		} else if (doAction.getAction().getName().equalsIgnoreCase(_action_UseRemoteAction)){
+		} else if (doAction.getAction().getName().equalsIgnoreCase(ACTION_USE_REMOTE_ACTION)){
 			log.debug("doAction is an Action that has to be invoked remotely");
 			
 			_remoteActionHandler.processRemoteAction(doAction);
@@ -232,7 +236,7 @@ IAgentBean, IEffector {
 	 */
 	public <E extends IFact> void requestSearch(E template){
 		log.debug("Received SearchRequest via direct invocation. Searching for Agents with template: " + template);
-		_agentSearchRequestHandler.requestSearch(template);
+		_searchRequestHandler.requestSearch(template);
 	}
 	
 
@@ -251,7 +255,7 @@ IAgentBean, IEffector {
 	 *
 	 */
 	@SuppressWarnings("serial")
-	private class AgentRequestHandler implements SpaceObserver<IFact> {
+	private class SearchRequestHandler implements SpaceObserver<IFact> {
 
 		/**
 		 * just gets the SearchRequest to the directory
@@ -300,7 +304,7 @@ IAgentBean, IEffector {
 								result.addAll(response.getResult());
 							}
 
-							ActionResult actionResult = ((Action)sourceAction.getAction()).createActionResult(sourceAction, result.toArray());
+							ActionResult actionResult = ((Action)sourceAction.getAction()).createActionResult(sourceAction, new Object[] {result});
 							log.debug("DirectoryAccessBean is writing actionResult: " + actionResult);
 
 							memory.write(actionResult);
@@ -528,14 +532,29 @@ IAgentBean, IEffector {
 		
 		@Override
 		public void notify(SpaceEvent<? extends IFact> event) {
-			
+			boolean isRemoteAction = true;
 			if(event instanceof WriteCallEvent) {
 				WriteCallEvent wce = (WriteCallEvent) event;
 				if (wce.getObject() instanceof DoAction){
 					DoAction doAction = (DoAction) wce.getObject();
 					System.err.println("DoAction " + doAction.getAction().getName());
-					System.err.println("DoAction provider = " + doAction.getAction());
+					System.err.println("DoAction provider = " + doAction.getAction().getProviderDescription());
 					
+					if (doAction.getAction() instanceof Action){
+						Action action = (Action) doAction.getAction();
+						if (action.getProviderBean() != null){
+							
+						}
+						String agentID = doAction.getAction().getProviderDescription().getAid();
+						isRemoteAction = !agentID.equals(thisAgent.getAgentId());
+					} 
+					String message = (isRemoteAction ? "Got Remote Action!" : "Didn't got RemoteAction");
+					System.err.println(message);
+					
+					if (isRemoteAction){
+						
+//						_remoteActionHandler.processRemoteAction(doAction);
+					}
 					
 				}
 			}

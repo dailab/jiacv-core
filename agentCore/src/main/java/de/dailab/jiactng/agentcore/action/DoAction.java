@@ -73,7 +73,16 @@ public class DoAction extends SessionEvent {
 		super(session, thisAction, source);
 		setParams(params);
 	}
-
+	
+	/**
+	 * Used to filter <code>DoAction</code>s out of tuplespaces
+	 */
+	public DoAction(){
+		super(null, null, null);
+		setParams(null);
+	}
+	
+	
 	/**
 	 * Getter for the input-parameters of the action-call.
 	 * 

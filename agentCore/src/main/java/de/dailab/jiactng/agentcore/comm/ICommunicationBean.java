@@ -13,6 +13,11 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @version $Revision$
  */
 public interface ICommunicationBean {
+    String ACTION_JOIN_GROUP= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#joinGroup";
+    String ACTION_LEAVE_GROUP= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#leaveGroup";
+    String ACTION_IS_LOCAL= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#isLocal";
+    String ACTION_SEND= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#send";
+    
     /**
      * Joins a group with the given address
      * 
@@ -20,7 +25,7 @@ public interface ICommunicationBean {
      * @throws CommunicationException
      *                      if an error occurs on the message bus
      */
-    @Expose
+    @Expose(name = ACTION_JOIN_GROUP)
     void joinGroup(IGroupAddress group) throws CommunicationException;
     
     /**
@@ -30,7 +35,7 @@ public interface ICommunicationBean {
      * @throws CommunicationException
      *                      if an error occurs on the message bus
      */
-    @Expose
+    @Expose(name = ACTION_LEAVE_GROUP)
     void leaveGroup(IGroupAddress group) throws CommunicationException;
     
     /**
@@ -41,7 +46,7 @@ public interface ICommunicationBean {
      * @return              <code>true</code> if the address references a local
      *                      agent and <code>false/<code> otherwise.
      */
-    @Expose
+    @Expose(name = ACTION_IS_LOCAL)
     boolean isLocal(IMessageBoxAddress messageBox);
     
     /**
@@ -84,7 +89,7 @@ public interface ICommunicationBean {
      * @throws CommunicationException
      *                      if an error occurs on the message bus
      */
-    @Expose
+    @Expose(name = ACTION_SEND)
     void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException;
     
     /**

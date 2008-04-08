@@ -126,7 +126,8 @@ public class JMSMessageTransport extends MessageTransport {
     static Message pack(IJiacMessage message, Session session) throws JMSException {
         IFact payload= message.getPayload();
         Message result;
-        if(payload instanceof BinaryContent) {
+        
+        if(payload != null && payload instanceof BinaryContent) {
             result= session.createBytesMessage();
             ((BytesMessage)result).writeBytes(((BinaryContent)payload).getData());
         } else {

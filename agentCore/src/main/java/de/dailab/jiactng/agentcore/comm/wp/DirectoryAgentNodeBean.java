@@ -326,10 +326,8 @@ IAgentNodeBean {
 
 				actionData.setCreationTime(_currentLogicTime + 1);
 
-				System.err.println("Space before actionData " + space.read(new ActionData()));
 				log.debug("writing new action to tuplespace");
 				space.write(actionData);
-				System.err.println("space after ActionData" + space.read(new ActionData()));
 				
 			} else if (message.getProtocol().equalsIgnoreCase(REMOVE_ACTION_PROTOCOL_ID)){
 				log.debug("Message is holding Action for removal");

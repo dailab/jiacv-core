@@ -537,8 +537,6 @@ IAgentBean, IEffector {
 				WriteCallEvent wce = (WriteCallEvent) event;
 				if (wce.getObject() instanceof DoAction){
 					DoAction doAction = (DoAction) wce.getObject();
-					System.err.println("DoAction " + doAction.getAction().getName());
-					System.err.println("DoAction provider = " + doAction.getAction().getProviderDescription());
 					
 					if (doAction.getAction() instanceof Action){
 						Action action = (Action) doAction.getAction();
@@ -549,7 +547,6 @@ IAgentBean, IEffector {
 						isRemoteAction = !agentID.equals(thisAgent.getAgentId());
 					} 
 					String message = (isRemoteAction ? "Got Remote Action!" : "Didn't got RemoteAction");
-					System.err.println(message);
 					
 					if (isRemoteAction){
 						

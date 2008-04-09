@@ -79,7 +79,7 @@ public class Session implements IFact {
 	 * @param history
 	 *            the history of this session
 	 */
-	public Session(String id, long creationTime, ResultReceiver source,
+	public Session(String id, Long creationTime, ResultReceiver source,
 			ArrayList<SessionEvent> history) {
 		this.sessionId = id;
 		this.creationTime = creationTime;

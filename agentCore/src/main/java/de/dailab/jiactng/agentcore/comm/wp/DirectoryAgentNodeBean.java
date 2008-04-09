@@ -18,9 +18,7 @@ import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.IAgent;
-import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.action.Action;
-import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -46,8 +44,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * @author Martin Loeffelholz
  *
  */
-public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
-IAgentNodeBean {
+public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
 	public final static String AGENT_SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentSearchRequest";

@@ -175,7 +175,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 							to.printStackTrace();
 							t.cancel(true);
 							this.stop();
-							agentLog.error("ExecutionCycle did not return");
+							agentLog.error("ExecutionCycle did not return: ", to);
 						}
 					} else {
 						break;
@@ -183,7 +183,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 				}
 			} catch (Exception e) {
 				agentLog.error("Critical error in controlcycle of agent: "
-						+ agentName + ". Stopping Agent.");
+						+ agentName + ". Stopping Agent. Exception was: ",e);
 				e.printStackTrace();
 				try {
 					this.stop();

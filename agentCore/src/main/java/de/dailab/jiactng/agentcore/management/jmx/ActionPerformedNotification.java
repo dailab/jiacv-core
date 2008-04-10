@@ -23,11 +23,20 @@ public class ActionPerformedNotification extends Notification {
 	/** The name of the agent bean which has performed the action. */
 	private String _agentbeanName;
 
+	/** The session id of the action execution. */
+	private String _sessionId;
+
+	/** The name of the owner which has invoked the action. */
+	private String _owner;
+
 	/** The description of the performed action. */
 	private String _action;
 
 	/** The duration of action execution in nanoseconds. */
 	private long _duration;
+
+	/** The success of action execution. */
+	private boolean _success;
 
 	/**
 	 * Constructs a notification about a performed action by an agent.
@@ -37,14 +46,18 @@ public class ActionPerformedNotification extends Notification {
 	 * @param msg A String containing the message of the notification.
 	 * @param action The performed action.
 	 * @param duration The duration of action execution in nanoseconds.
+	 * @param success The success of the action execution.
 	 */
 	public ActionPerformedNotification(Object source, long sequenceNumber,
-			long timeStamp, String msg, DoAction action, long duration) {
+			long timeStamp, String msg, DoAction action, long duration, boolean success) {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		_actionName = action.getAction().getName();
 		_agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();
+		_sessionId = action.getSessionId();
+		_owner = action.getOwner();
 		_action = action.toString();
 		_duration = duration;
+		_success = success;
 	}
 
 	/**
@@ -64,6 +77,22 @@ public class ActionPerformedNotification extends Notification {
 	}
 
 	/**
+	 * Gets the session id of the action execution.
+	 * @return The session id of the action execution.
+	 */
+	public String getSessionId() {
+		return _sessionId;
+	}
+
+	/**
+	 * Gets the owner of the action-invocation.
+	 * @return The name of the owner.
+	 */
+	public String getOwner() {
+		return _owner;
+	}
+
+	/**
 	 * Gets the description of the performed action.
 	 * @return The description of the performed action.
 	 * @see Object#toString()
@@ -78,6 +107,14 @@ public class ActionPerformedNotification extends Notification {
 	 */
 	public long getDuration() {
 		return _duration;
+	}
+
+	/**
+	 * Gets the success of the action execution.
+	 * @return The success of action execution.
+	 */
+	public boolean getSuccess() {
+		return _success;
 	}
 
 }

@@ -43,8 +43,9 @@ public interface IEffector extends IAgentBean {
 	 * @param doAction
 	 *            the action-invocation that describes the action to be executed
 	 *            as well as its parameters.
+	 * @throws Exception An exception during the execution of the action has been occurred.
 	 */
-	public void doAction(DoAction doAction);
+	public void doAction(DoAction doAction) throws Exception;
 	
 	
 	public void cancelAction(DoAction doAction);

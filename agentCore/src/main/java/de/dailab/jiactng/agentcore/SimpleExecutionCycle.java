@@ -198,16 +198,25 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	}
 
 	private void performDoAction(DoAction act) {
+		long start = System.nanoTime();
+		boolean success = false;
+
 		if (((Action)act.getAction()).getProviderBean() != null) {
-//			memory.write(act.getSession());
-			long start = System.nanoTime();
-			((Action)act.getAction()).getProviderBean().doAction(act);
-			long end = System.nanoTime();
-			actionPerformed(act, end-start);
+			try {
+//				memory.write(act.getSession());
+				((Action)act.getAction()).getProviderBean().doAction(act);
+				success = true;
+			} catch (Throwable t) {
+				log.error("--- action failed: "
+						+ act.getAction().getName());
+			}
 		} else {
 			log.error("--- found action without bean: "
 					+ act.getAction().getName());
 		}
+
+		long end = System.nanoTime();
+		actionPerformed(act, end-start, success);		
 	}
 
 	private void processResult(ActionResult actionResult) {
@@ -244,13 +253,13 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
      * @param action the performed action.
      * @param duration the duration of the execution.
      */
-    public void actionPerformed(DoAction action, long duration) {
+    public void actionPerformed(DoAction action, long duration, boolean success) {
         Notification n =
                 new ActionPerformedNotification(this,
                 sequenceNumber++,
                 System.currentTimeMillis(),
                 "Action performed",
-                action, duration);
+                action, duration, success);
         
         sendNotification(n);
     }

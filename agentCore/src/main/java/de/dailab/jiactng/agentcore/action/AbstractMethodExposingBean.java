@@ -171,7 +171,7 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
     private static final Class<?>[] EMPTY_CLASSES= new Class[0];
     protected static final char METHOD_SEPARATING_CHAR= '#';
     
-    public final void doAction(DoAction doAction) {
+    public final void doAction(DoAction doAction) throws Exception {
 log.debug("typechecking is '" + doAction.typeCheck() + "'");
         
         Action action= (Action)doAction.getAction();
@@ -192,7 +192,7 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
                 log.debug("error while invoking action", ite);
                 Throwable cause= ite.getCause();
                 memory.write(action.createActionResult(doAction, new Object[]{cause != null ? cause : ite}));
-                return;
+                throw new Exception("error while invoking action" + method.getName(), ite);
 //                // delegate runtime exceptions
 //                if(cause != null && cause instanceof RuntimeException) {
 //                    throw (RuntimeException) cause;
@@ -233,7 +233,10 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         return actions;
     }
     
-    protected void overrideDoAction(@SuppressWarnings("unused") DoAction doAction) {}
+    protected void overrideDoAction(@SuppressWarnings("unused") DoAction doAction) throws Exception {
+    	throw new Exception("No implementation of overrideDoAction in " + this.getClass().getName());
+    }
+
     protected List<? extends Action> overrideGetActions() {return Collections.emptyList();}
     
     private Method searchMethod(String name, List<Class<?>> parameters) {

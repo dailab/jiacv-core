@@ -20,6 +20,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.WindowConstants;
 
 import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
@@ -489,7 +490,7 @@ public class ChatGuiBean extends AbstractAgentBean implements SpaceObserver<IFac
 		
 		// setup Frame
 		_f = new JFrame( "Communicator of " + _beanName); 
-		_f.setDefaultCloseOperation( JFrame.HIDE_ON_CLOSE ); 
+		_f.setDefaultCloseOperation( WindowConstants.HIDE_ON_CLOSE ); 
 		_f.setLocation(d.width / 16, d.height / 32);
 		
 		// model gui on Frame

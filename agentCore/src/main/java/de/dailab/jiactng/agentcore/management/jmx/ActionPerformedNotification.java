@@ -29,6 +29,9 @@ public class ActionPerformedNotification extends Notification {
 	/** The name of the owner which has invoked the action. */
 	private String _owner;
 
+	/** The type of the performed action. */
+	private String _actionType;
+
 	/** The description of the performed action. */
 	private String _action;
 
@@ -55,6 +58,7 @@ public class ActionPerformedNotification extends Notification {
 		_agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();
 		_sessionId = action.getSessionId();
 		_owner = action.getOwner();
+		_actionType = action.getAction().getClass().getSimpleName();
 		_action = action.toString();
 		_duration = duration;
 		_success = success;
@@ -90,6 +94,15 @@ public class ActionPerformedNotification extends Notification {
 	 */
 	public String getOwner() {
 		return _owner;
+	}
+
+	/**
+	 * Gets the type of the performed action.
+	 * @return The simple class name of the action object.
+	 * @see Class#getSimpleName()
+	 */
+	public String getActionType() {
+		return _actionType;
 	}
 
 	/**

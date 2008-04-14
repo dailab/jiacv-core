@@ -77,6 +77,14 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	public CompositeData getLogger();
 
 	/**
+	 * Adds a socket appender to the logger of the agent node and all agents,
+	 * which connects to a remote server at specified address and port.
+	 * @param address The IP address of the logging server.
+	 * @param port The port of the logging port.
+	 */
+	public void addLog4JSocketAppender(String address, int port);
+
+	/**
 	 * Getter for attribute "AgentNodeBeanClasses" of the managed agent node.
 	 * @return the class of agent beans running in this agent node
 	 */

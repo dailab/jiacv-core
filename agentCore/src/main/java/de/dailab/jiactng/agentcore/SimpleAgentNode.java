@@ -25,6 +25,8 @@ import javax.management.openmbean.SimpleType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.impl.Log4JLogger;
+import org.apache.log4j.net.SocketAppender;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Log4jConfigurer;
@@ -772,6 +774,25 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public void setAuthorizationPolicyFilename(String filename) {
 		System.setProperty("java.security.policy", filename);
 		System.setSecurityManager(new SecurityManager());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addLog4JSocketAppender(String address, int port) {
+		// add appender for logger of the agent node
+		((Log4JLogger)log).getLogger().addAppender(new SocketAppender(address, port));
+
+		// add appender for logger of all agents
+		if (_agents != null) {
+			for (IAgent a : _agents) {
+				try {
+					((Agent)a).addLog4JSocketAppender(address, port);				
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		}
 	}
 
 	/**

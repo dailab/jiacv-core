@@ -783,6 +783,17 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// add appender for logger of the agent node
 		((Log4JLogger)log).getLogger().addAppender(new SocketAppender(address, port));
 
+		// add appender for logger of all agent node beans
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : _agentNodeBeans) {
+				try {
+					((AbstractAgentNodeBean)anb).addLog4JSocketAppender(address, port);				
+				} catch (Throwable t) {
+					t.printStackTrace();
+				}
+			}
+		}
+
 		// add appender for logger of all agents
 		if (_agents != null) {
 			for (IAgent a : _agents) {

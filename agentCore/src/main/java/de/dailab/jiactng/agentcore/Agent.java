@@ -803,6 +803,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		// add appender for logger of the agent
 		((Log4JLogger)agentLog).getLogger().addAppender(new SocketAppender(address, port));
 
+		// add appender for logger of the execution cycle
+		((SimpleExecutionCycle)this.execution).addLog4JSocketAppender(address, port);
+
 		// add appender for logger of all agent beans
 		if (agentBeans != null) {
 			for (IAgentBean ab : agentBeans) {

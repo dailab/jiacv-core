@@ -86,20 +86,33 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode, i.e
-   * the name of the logger consists of the agentnode-name and the name of the
-   * agent-parameter.
+   * the name of the logger consists of the UUID of the agentnode and the name
+   * of the nodebean.
+   * 
+   * @param nodeBean
+   *          the node bean for which the logger shall be instantiated.
+   * @return a log-object that contains the UUID of the agentnode and the name of the 
+   * 		 node bean.
+   * @see org.apache.commons.logging.Log
+   */
+  public Log getLog(IAgentNodeBean nodeBean);
+
+  /**
+   * Getter for a log-instance that heeds the hierarchie of the agentnode, i.e
+   * the name of the logger consists of the UUID of the agentnode and the name of the
+   * agent.
    * 
    * @param agent
    *          the agent for which the logger shall be instantiated.
-   * @return a log-object that contains the agentnodes name and the agents name.
+   * @return a log-object that contains the UUID of the agentnode and the name of the agent.
    * @see org.apache.commons.logging.Log
    */
   public Log getLog(IAgent agent);
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode and
-   * the agent, i.e the name of the logger consists of the agentnode-name and
-   * the name of the agent-parameter and the beanname.
+   * the agent, i.e the name of the logger consists of the UUID of the agentnode,
+   * the name of the agent and the name of the agent bean.
    * 
    * 
    * @param agent
@@ -107,27 +120,27 @@ public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListene
    *          instantiated.
    * @param bean
    *          the bean for which the logger shall be instantiated.
-   * @return a log-object that contains the agentnodes name, the agents name and
-   *         the beanname.
+   * @return a log-object that contains the UUID of the agentnode, the name of the agent
+   *         and the name of the agent bean.
    * @see org.apache.commons.logging.Log
    */
   public Log getLog(IAgent agent, IAgentBean bean);
   
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode,
-   * the agent and the agent bean, i.e the name of the logger consists of the agentnode-name,
-   * the name of the agent-parameter, the beanname and the extension.
+   * the agent and the agent bean, i.e the name of the logger consists of the UUID of 
+   * the agentnode, the name of the agent, the name of the agent bean and the extension.
    * 
    * 
    * @param agent
-   *          the agent that contains the bean for which the logger shall be
+   *          the agent that contains the bean part for which the logger shall be
    *          instantiated.
    * @param bean
-   *          the bean for which the logger shall be instantiated.
+   *          the bean that contains the bean part for which the logger shall be instantiated.
    * @param extension
    *          the bean part for which the logger shall be instantiated.
-   * @return a log-object that contains the agentnodes name, the agents name,
-   *         the beanname and the extension.
+   * @return a log-object that contains the UUID of the agentnode, the name of the agent,
+   *         the name of the agent bean and the extension.
    * @see org.apache.commons.logging.Log
    */
   public Log getLog(IAgent agent, IAgentBean bean, String extension);

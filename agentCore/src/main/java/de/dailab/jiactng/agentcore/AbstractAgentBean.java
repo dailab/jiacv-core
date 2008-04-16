@@ -14,8 +14,6 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.impl.Log4JLogger;
-import org.apache.log4j.net.SocketAppender;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
@@ -203,17 +201,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	
 	public void cancelAction(DoAction doAction){
 		
-	}
-
-	/**
-	 * Adds a socket appender to the logger of the agent bean,
-	 * which connects to a remote server at specified address and port.
-	 * @param address The IP address of the logging server.
-	 * @param port The port of the logging port.
-	 */
-	public void addLog4JSocketAppender(String address, int port) {
-		// add appender for logger of the agent bean
-		((Log4JLogger)log).getLogger().addAppender(new SocketAppender(address, port));
 	}
 
 	/**

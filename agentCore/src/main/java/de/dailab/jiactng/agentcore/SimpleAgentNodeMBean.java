@@ -77,6 +77,19 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	public CompositeData getLogger();
 
 	/**
+	 * Gets the log level of the agent node's log4j logger.
+	 * @return one of OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL.
+	 */
+	public String getLogLevel();
+
+	/**
+	 * Sets the log level of the agent node's log4j logger. The log level will
+	 * be set to DEBUG if the parameter has an illegal value.
+	 * @param level one of OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL.
+	 */
+	public void setLogLevel(String level);
+
+	/**
 	 * Adds a socket appender to the logger of the agent node, all agent
 	 * node beans and all agents, which connects to a remote server at 
 	 * specified address and port.
@@ -84,6 +97,15 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * @param port The port of the logging port.
 	 */
 	public void addLog4JSocketAppender(String address, int port);
+
+	/**
+	 * Removes a socket appender from the logger of the agent node, all agent
+	 * node beans and all agents, which connects to a remote server at 
+	 * specified address and port.
+	 * @param address The IP address of the logging server.
+	 * @param port The port of the logging port.
+	 */
+	public void removeLog4JSocketAppender(String address, int port);
 
 	/**
 	 * Getter for attribute "AgentNodeBeanClasses" of the managed agent node.

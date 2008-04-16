@@ -25,8 +25,6 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.impl.Log4JLogger;
-import org.apache.log4j.net.SocketAppender;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
@@ -791,31 +789,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			return null;
 		}
 		return execution.getClass().getName();
-	}
-
-	/**
-	 * Adds a socket appender to the logger of the agent and all agent beans,
-	 * which connects to a remote server at specified address and port.
-	 * @param address The IP address of the logging server.
-	 * @param port The port of the logging port.
-	 */
-	public void addLog4JSocketAppender(String address, int port) {
-		// add appender for logger of the agent
-		((Log4JLogger)agentLog).getLogger().addAppender(new SocketAppender(address, port));
-
-		// add appender for logger of the execution cycle
-		((SimpleExecutionCycle)this.execution).addLog4JSocketAppender(address, port);
-
-		// add appender for logger of all agent beans
-		if (agentBeans != null) {
-			for (IAgentBean ab : agentBeans) {
-				try {
-					((AbstractAgentBean)ab).addLog4JSocketAppender(address, port);				
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		}
 	}
 
 	/**

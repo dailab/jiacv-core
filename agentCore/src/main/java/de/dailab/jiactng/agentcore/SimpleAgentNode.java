@@ -26,6 +26,7 @@ import javax.management.openmbean.SimpleType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Log4JLogger;
+import org.apache.log4j.Level;
 import org.apache.log4j.net.SocketAppender;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -239,8 +240,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
+	public Log getLog(IAgentNodeBean nodeBean) {
+		return LogFactory.getLog(getUUID() + "." + nodeBean.getBeanName());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+
 	public Log getLog(IAgent agent) {
-		return LogFactory.getLog(getName() + "." + agent.getAgentName());
+		return LogFactory.getLog(getUUID() + "." + agent.getAgentName());
 	}
 
 	/**
@@ -248,7 +257,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 
 	public Log getLog(IAgent agent, IAgentBean bean) {
-		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName());
+		return LogFactory.getLog(getUUID() + "." + agent.getAgentName() + "." + bean.getBeanName());
 	}
 
 	/**
@@ -256,7 +265,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 
 	public Log getLog(IAgent agent, IAgentBean bean, String extension) {
-		return LogFactory.getLog(getName() + "." + agent.getAgentName() + "." + bean.getBeanName() + "." + extension);
+		return LogFactory.getLog(getUUID() + "." + agent.getAgentName() + "." + bean.getBeanName() + "." + extension);
 	}
 
 	/**
@@ -366,7 +375,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// update logger
-		log = LogFactory.getLog(_name);
+		log = LogFactory.getLog(getUUID());
 	}
 
 	/**
@@ -734,6 +743,20 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public String getLogLevel() {
+		return ((Log4JLogger)log).getLogger().getEffectiveLevel().toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setLogLevel(String level) {
+		((Log4JLogger)log).getLogger().setLevel(Level.toLevel(level));
+	}
+
+	/**
 	 * Getter for attribute "AmqBroker" of the managed agent node.
 	 * 
 	 * @return the configuration of the embedded ActiveMQ broker of this agent
@@ -780,30 +803,26 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 	public void addLog4JSocketAppender(String address, int port) {
+		System.out.println("Add socket appender for " + address + ":" + port + " ...");
+
 		// add appender for logger of the agent node
-		((Log4JLogger)log).getLogger().addAppender(new SocketAppender(address, port));
+		SocketAppender appender = new SocketAppender(address, port);
+		appender.setName(address+":"+port);
+		((Log4JLogger)log).getLogger().addAppender(appender);
 
-		// add appender for logger of all agent node beans
-		if (_agentNodeBeans != null) {
-			for (IAgentNodeBean anb : _agentNodeBeans) {
-				try {
-					((AbstractAgentNodeBean)anb).addLog4JSocketAppender(address, port);				
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		}
+		System.out.println("Socket appender added.");
+	}
 
-		// add appender for logger of all agents
-		if (_agents != null) {
-			for (IAgent a : _agents) {
-				try {
-					((Agent)a).addLog4JSocketAppender(address, port);				
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-			}
-		}
+	/**
+	 * {@inheritDoc}
+	 */
+	public void removeLog4JSocketAppender(String address, int port) {
+		System.out.println("Remove socket appender for " + address + ":" + port + " ...");
+
+		// remove appender from logger of the agent node
+		((Log4JLogger)log).getLogger().removeAppender(address+":"+port);
+
+		System.out.println("Socket appender removed.");
 	}
 
 	/**

@@ -328,7 +328,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 */
 	protected void setLog(Log log) {
 		this.log = log;
-		if (logLevel != null) {
+		if ((log != null) && (logLevel != null)) {
 			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
 		}
 	}

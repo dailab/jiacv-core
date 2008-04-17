@@ -41,7 +41,7 @@ public class HelloBean extends AbstractAgentBean implements IEffector {
 
 	public void doAction(DoAction arg0) {
 		if ("helloWorld".equals(arg0.getAction().getName())) {
-			System.out.println("Hello World (" + arg0.getSessionId() + ") from "
+			log.info("Hello World (" + arg0.getSessionId() + ") from "
 					+ getBeanName());
 			try {
 				Thread.sleep(1000);
@@ -50,7 +50,7 @@ public class HelloBean extends AbstractAgentBean implements IEffector {
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("Unknown Action: " + arg0);
+			log.error("Unknown Action: " + arg0);
 		}
 	}
 

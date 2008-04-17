@@ -78,6 +78,7 @@
   </bean>
 
   <bean name="helloBean" class="de.dailab.jiactng.examples.helloWorld.HelloBean" singleton="false">
+    <property name="logLevel" value="INFO"/>
   </bean>
 
   <bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false">

@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
+import javax.management.openmbean.CompositeData;
+
 /**
  * Common management interface of all lifecycle-aware resources.
  * @author Jan Keiser
@@ -57,5 +59,24 @@ public interface AbstractLifecycleMBean {
      * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle#cleanup()
 	 */
 	public void cleanup() throws Exception;
+
+	/**
+	 * Getter for attribute "Logger".
+	 * @return Information about class and levels of the current logger.
+	 */
+	public CompositeData getLogger();
+
+	/**
+	 * Gets the log level of the agent node's log4j logger.
+	 * @return one of OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL.
+	 */
+	public String getLogLevel();
+
+	/**
+	 * Sets the log level of the agent node's log4j logger. The log level will
+	 * be set to DEBUG if the parameter has an illegal value.
+	 * @param level one of OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL.
+	 */
+	public void setLogLevel(String level);
 
 }

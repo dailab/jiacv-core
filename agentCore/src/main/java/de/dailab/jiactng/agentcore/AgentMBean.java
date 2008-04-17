@@ -64,12 +64,6 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	public List<String> getActionNames();
 
 	/**
-	 * Getter for attribute "Logger" of the managed agent.
-	 * @return information about the logger of this agent
-	 */
-	public CompositeData getLogger();
-
-	/**
 	 * Getter for attribute "MemoryData" of the managed agent.
 	 * @return implementation of the memory of this agent
 	 */

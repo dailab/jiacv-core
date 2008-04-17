@@ -34,9 +34,4 @@ public interface ServiceDirectoryMBean extends AbstractLifecycleMBean {
 	 */
 	public CompositeData getMemory();
 
-	/**
-	 * Getter for attribute "Log" of the service directory.
-	 * @return information about the logger of the service directory
-	 */
-	public CompositeData getLog();
 }

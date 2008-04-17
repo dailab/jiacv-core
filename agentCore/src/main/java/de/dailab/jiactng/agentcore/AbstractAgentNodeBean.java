@@ -3,15 +3,6 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.CompositeDataSupport;
-import javax.management.openmbean.CompositeType;
-import javax.management.openmbean.OpenDataException;
-import javax.management.openmbean.OpenType;
-import javax.management.openmbean.SimpleType;
-
-import org.apache.commons.logging.Log;
-
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.management.Manager;
 
@@ -22,13 +13,12 @@ import de.dailab.jiactng.agentcore.management.Manager;
 public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements IAgentNodeBean, AbstractAgentNodeBeanMBean {
     protected IAgentNode agentNode;
     protected Manager manager = null;
-    protected Log log;
     
     private String _beanName;
 
     public final void setAgentNode(IAgentNode agentNode) {
         this.agentNode = agentNode;
-        log= agentNode.getLog(this);
+        setLog(agentNode.getLog(this));
     }
     
     public final String getBeanName() {
@@ -39,33 +29,6 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
         _beanName = beanName;
     }
 
-	/**
-	 * Gets information about the logger of this bean.
-	 * 
-	 * @return information about levels of the logger
-	 */
-	public CompositeData getLog() {
-		if (log == null) {
-			return null;
-		}
-		String[] itemNames = new String[] { "DebugEnabled", "ErrorEnabled",
-				"FatalEnabled", "InfoEnabled", "TraceEnabled", "WarnEnabled" };
-		try {
-			CompositeType type = new CompositeType(log.getClass().getName(),
-					"Logger information", itemNames, itemNames, new OpenType[] {
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN });
-			return new CompositeDataSupport(type, itemNames, new Object[] {
-					log.isDebugEnabled(), log.isErrorEnabled(),
-					log.isFatalEnabled(), log.isInfoEnabled(),
-					log.isTraceEnabled(), log.isWarnEnabled() });
-		} catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}    
-    
     /**
      * Deregisters the node bean and all its resources from management
      */

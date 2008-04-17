@@ -1,7 +1,5 @@
 package de.dailab.jiactng.agentcore;
 
-import javax.management.openmbean.CompositeData;
-
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
 
 /**
@@ -22,9 +20,4 @@ public interface AbstractAgentNodeBeanMBean extends AbstractLifecycleMBean {
 	 */
 	public void setBeanName(String name);
 
-	/**
-	 * Getter for attribute "Log" of the managed agent bean.
-	 * @return information about the logger of this agent bean
-	 */
-	public CompositeData getLog();
 }

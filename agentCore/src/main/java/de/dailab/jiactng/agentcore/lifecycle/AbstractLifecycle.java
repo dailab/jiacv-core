@@ -4,8 +4,16 @@ import javax.management.AttributeChangeNotification;
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
 
-import org.springframework.context.ApplicationContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.impl.Log4JLogger;
+import org.apache.log4j.Level;
 
 /**
  * Abstract base class for <code>ILifecycle</code> implementations.
@@ -19,6 +27,16 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * The lifecycle handler that is used internally.
      */
     protected DefaultLifecycleHandler lifecycle = null;
+
+	/** 
+	 * The logger to be used. 
+	 */
+	protected Log log = null;
+
+	/** 
+	 * The configured log level. 
+	 */
+	private String logLevel = null;
 
     /**
      * Default constructor that creates an internally used lifecycle handler for the default mode.
@@ -283,7 +301,59 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
         return new MBeanNotificationInfo[] {info};
     }
     
-    /**
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getLogLevel() {
+		if (log != null) {
+			logLevel = ((Log4JLogger)log).getLogger().getEffectiveLevel().toString();
+		}
+		return logLevel;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setLogLevel(String level) {
+		logLevel = level;
+		if (log != null) {
+			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
+		}
+	}
+
+	/**
+	 * Sets a logger to be used for logging purposes. It also sets the log level 
+	 * of this logger if it was preassigned with method <code>setLogLevel</code>.
+	 * @param log The logger instance.
+	 */
+	protected void setLog(Log log) {
+		this.log = log;
+		if (logLevel != null) {
+			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public CompositeData getLogger() {
+		if (log == null) {
+			return null;
+		}
+		String[] itemNames = new String[] { "class", "debug", "error", "fatal", "info", "trace", "warn" };
+		try {
+			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] { "Implementation of the logger instance", "debug",
+					"error", "fatal", "info", "trace", "warn" }, new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN,
+					SimpleType.BOOLEAN, SimpleType.BOOLEAN });
+			return new CompositeDataSupport(type, itemNames, new Object[] { log.getClass().getName(), log.isDebugEnabled(), log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(),
+					log.isTraceEnabled(), log.isWarnEnabled() });
+		} catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
      * Put your initialization code here.
      * @throws Exception if this lifecycle instance can not be initialized.
      */

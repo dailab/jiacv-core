@@ -26,7 +26,6 @@ import javax.management.openmbean.SimpleType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Log4JLogger;
-import org.apache.log4j.Level;
 import org.apache.log4j.net.SocketAppender;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -53,9 +52,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** The threadPool object */
 	private ExecutorService _threadPool = null;
-
-	/** Log-instance for the agentnode */
-	protected Log log = null;
 
 	/**
 	 * A customized logging configuration will be used instead of the default
@@ -117,9 +113,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** Constructor. Creates the uuid for the agentnode. */
 	public SimpleAgentNode() {
-		// _uuid = new String("p:" + Long.toHexString(System.currentTimeMillis()
-		// + this.hashCode()));
 		_uuid = IdFactory.createAgentNodeId(this.hashCode());
+		setLog(LogFactory.getLog(_uuid));
 		_agentNodeBeans = new ArrayList<IAgentNodeBean>();
 		_agents = new ArrayList<IAgent>();
 	}
@@ -249,7 +244,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 
 	public Log getLog(IAgent agent) {
-		return LogFactory.getLog(getUUID() + "." + agent.getAgentName());
+		return LogFactory.getLog(getUUID() + "." + agent.getAgentId());
 	}
 
 	/**
@@ -257,7 +252,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 
 	public Log getLog(IAgent agent, IAgentBean bean) {
-		return LogFactory.getLog(getUUID() + "." + agent.getAgentName() + "." + bean.getBeanName());
+		return LogFactory.getLog(getUUID() + "." + agent.getAgentId() + "." + bean.getBeanName());
 	}
 
 	/**
@@ -265,7 +260,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 
 	public Log getLog(IAgent agent, IAgentBean bean, String extension) {
-		return LogFactory.getLog(getUUID() + "." + agent.getAgentName() + "." + bean.getBeanName() + "." + extension);
+		return LogFactory.getLog(getUUID() + "." + agent.getAgentId() + "." + bean.getBeanName() + "." + extension);
 	}
 
 	/**
@@ -373,9 +368,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		} else {
 			_name = name;
 		}
-
-		// update logger
-		log = LogFactory.getLog(getUUID());
 	}
 
 	/**
@@ -717,43 +709,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		} catch (FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		}
-	}
-
-	/**
-	 * Getter for attribute "Logger" of the managed agent node.
-	 * 
-	 * @return information about class and levels of the logger of this agent
-	 *         node
-	 */
-	public CompositeData getLogger() {
-		if (log == null) {
-			return null;
-		}
-		String[] itemNames = new String[] { "class", "debug", "error", "fatal", "info", "trace", "warn" };
-		try {
-			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] { "Implementation of the logger instance", "debug",
-					"error", "fatal", "info", "trace", "warn" }, new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-					SimpleType.BOOLEAN, SimpleType.BOOLEAN });
-			return new CompositeDataSupport(type, itemNames, new Object[] { log.getClass().getName(), log.isDebugEnabled(), log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(),
-					log.isTraceEnabled(), log.isWarnEnabled() });
-		} catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getLogLevel() {
-		return ((Log4JLogger)log).getLogger().getEffectiveLevel().toString();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setLogLevel(String level) {
-		((Log4JLogger)log).getLogger().setLevel(Level.toLevel(level));
 	}
 
 	/**

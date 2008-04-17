@@ -71,25 +71,6 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	public String getLoggingConfig();
 
 	/**
-	 * Getter for attribute "Logger" of the managed agent node.
-	 * @return information about the logger of this agent node
-	 */
-	public CompositeData getLogger();
-
-	/**
-	 * Gets the log level of the agent node's log4j logger.
-	 * @return one of OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL.
-	 */
-	public String getLogLevel();
-
-	/**
-	 * Sets the log level of the agent node's log4j logger. The log level will
-	 * be set to DEBUG if the parameter has an illegal value.
-	 * @param level one of OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL.
-	 */
-	public void setLogLevel(String level);
-
-	/**
 	 * Adds a socket appender to the logger of the agent node, all agent
 	 * node beans and all agents, which connects to a remote server at 
 	 * specified address and port.

@@ -6,15 +6,6 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.CompositeDataSupport;
-import javax.management.openmbean.CompositeType;
-import javax.management.openmbean.OpenDataException;
-import javax.management.openmbean.OpenType;
-import javax.management.openmbean.SimpleType;
-
-import org.apache.commons.logging.Log;
-
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
@@ -45,8 +36,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	 * <code>executeInterval</code> is greater than 0.
 	 */
 	private long nextExecutionTime = 0;
-
-	protected Log log = null;
 
 	/** The manager of the agent node */
 	protected Manager _manager = null;
@@ -102,7 +91,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		}
 
 		// update logger
-		this.log = thisAgent.getLog(this);
+		setLog(thisAgent.getLog(this));
 	}
 
 	/**
@@ -128,7 +117,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 
 		// update logger
 		if (thisAgent != null) {
-			this.log = thisAgent.getLog(this);
+			setLog(thisAgent.getLog(this));
 		}
 	}
 
@@ -142,39 +131,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	}
 
 	/**
-	 * Gets information about the logger of this bean.
-	 * 
-	 * @return information about levels of the logger
-	 */
-	public CompositeData getLog() {
-		if (log == null) {
-			return null;
-		}
-		String[] itemNames = new String[] { "DebugEnabled", "ErrorEnabled",
-				"FatalEnabled", "InfoEnabled", "TraceEnabled", "WarnEnabled" };
-		try {
-			CompositeType type = new CompositeType(log.getClass().getName(),
-					"Logger information", itemNames, itemNames, new OpenType[] {
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN });
-			return new CompositeDataSupport(type, itemNames, new Object[] {
-					log.isDebugEnabled(), log.isErrorEnabled(),
-					log.isFatalEnabled(), log.isInfoEnabled(),
-					log.isTraceEnabled(), log.isWarnEnabled() });
-		} catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void doInit() throws Exception {
 		if (log == null) {
-			this.log = thisAgent.getLog(this);
+			setLog(thisAgent.getLog(this));
 		}
 	}
 

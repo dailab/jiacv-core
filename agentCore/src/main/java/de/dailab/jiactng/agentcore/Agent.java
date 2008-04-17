@@ -64,11 +64,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	private IAgentNode agentNode = null;
 
 	/**
-	 * The log-instance for this agent.
-	 */
-	private Log agentLog = null;
-
-	/**
 	 * The name of this agent.
 	 */
 	private String agentName = null;
@@ -175,14 +170,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 							to.printStackTrace();
 							t.cancel(true);
 							this.stop();
-							agentLog.error("ExecutionCycle did not return: ", to);
+							log.error("ExecutionCycle did not return: ", to);
 						}
 					} else {
 						break;
 					}
 				}
 			} catch (Exception e) {
-				agentLog.error("Critical error in controlcycle of agent: "
+				log.error("Critical error in controlcycle of agent: "
 						+ agentName + ". Stopping Agent. Exception was: ",e);
 				e.printStackTrace();
 				try {
@@ -252,8 +247,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 				handleBeanException(a, e, LifecycleStates.CLEANED_UP);
 			}
 		}
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Trying to cleanup memory and executioncycle");
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Trying to cleanup memory and executioncycle");
 		}
 		this.memory.removeAll(new Action());
 
@@ -264,8 +259,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		this.execution.cleanup();
 		this.memory.cleanup();
 
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Memory and executioncycle switched to state "
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Memory and executioncycle switched to state "
 					+ LifecycleStates.CLEANED_UP);
 		}
 	}
@@ -278,8 +273,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		// initialize agent elements
 		this.actionList = new ArrayList<Action>();
 
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Trying to initalize memory and executioncycle");
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Trying to initalize memory and executioncycle");
 		}
 
 		this.memory.init();
@@ -292,8 +287,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		this.execution.setMemory(memory);
 		this.execution.init();
 
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Memory and executioncycle switched to state "
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Memory and executioncycle switched to state "
 					+ LifecycleStates.INITIALIZED);
 		}
 
@@ -336,15 +331,15 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	@Override
 	public void doStart() throws LifecycleException {
 
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Trying to start memory and executioncycle");
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Trying to start memory and executioncycle");
 		}
 
 		this.memory.start();
 		this.execution.start();
 
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Memory and executioncycle switched to state "
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Memory and executioncycle switched to state "
 					+ LifecycleStates.STARTED);
 		}
 
@@ -369,8 +364,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	@Override
 	public void doStop() throws LifecycleException {
 
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Trying to stop memory and executioncycle");
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Trying to stop memory and executioncycle");
 		}
 
 		synchronized (this) {
@@ -384,8 +379,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		this.memory.stop();
 		this.execution.stop();
 
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Memory and executioncycle switched to state "
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Memory and executioncycle switched to state "
 					+ LifecycleStates.STOPPED);
 		}
 
@@ -441,8 +436,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 *            an optional exception
 	 */
 	private void printCriticalMessage(String message, Exception e) {
-		if (agentLog != null) {
-			agentLog.error(message, e);
+		if (log != null) {
+			log.error(message, e);
 		} else {
 			System.err.println(message);
 			if (e != null) {
@@ -491,8 +486,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			throws LifecycleException {
 		String beanName = bean.getBeanName();
 
-		if (agentLog != null && agentLog.isInfoEnabled()) {
-			agentLog.info("Trying to switch bean: " + bean.getBeanName()
+		if (log != null && log.isInfoEnabled()) {
+			log.info("Trying to switch bean: " + bean.getBeanName()
 					+ " to " + newState.toString());
 		}
 
@@ -512,8 +507,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		default:
 			return;
 		}
-		if (agentLog != null && agentLog.isInfoEnabled())
-			agentLog.info("Bean " + bean.getBeanName() + " switched to state: "
+		if (log != null && log.isInfoEnabled())
+			log.info("Bean " + bean.getBeanName() + " switched to state: "
 					+ newState.toString());
 		this.memory.update(new AgentBeanDescription(beanName, null),
 				new AgentBeanDescription(null, newState.name()));
@@ -605,7 +600,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 		}
 
 		// update logger
-		this.agentLog = this.agentNode.getLog(this);
+		setLog(this.agentNode.getLog(this));
 	}
 
 	/**
@@ -714,38 +709,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			ret.add(action.getName());
 		}
 		return ret;
-	}
-
-	/**
-	 * Getter for attribute "Logger" of the managed agent.
-	 * 
-	 * @return information about the logger of this agent
-	 */
-	public CompositeData getLogger() {
-		if (agentLog == null) {
-			return null;
-		}
-		String[] itemNames = new String[] { "class", "debug", "error", "fatal",
-				"info", "trace", "warn" };
-		try {
-			CompositeType type = new CompositeType(
-					"javax.management.openmbean.CompositeDataSupport",
-					"Logger information", itemNames, new String[] {
-							"Implementation of the logger instance", "debug",
-							"error", "fatal", "info", "trace", "warn" },
-					new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN, SimpleType.BOOLEAN,
-							SimpleType.BOOLEAN });
-			return new CompositeDataSupport(type, itemNames, new Object[] {
-					agentLog.getClass().getName(), agentLog.isDebugEnabled(),
-					agentLog.isErrorEnabled(), agentLog.isFatalEnabled(),
-					agentLog.isInfoEnabled(), agentLog.isTraceEnabled(),
-					agentLog.isWarnEnabled() });
-		} catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 
 	/**

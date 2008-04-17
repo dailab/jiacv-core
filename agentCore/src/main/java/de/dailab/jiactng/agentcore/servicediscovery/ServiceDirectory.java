@@ -44,7 +44,9 @@ import de.dailab.jiactng.agentcore.management.Manager;
  *        
  */
 public class ServiceDirectory extends AbstractLifecycle implements IServiceDirectory, Runnable, Manageable, ServiceDirectoryMBean {
-    private class ServiceDirectoryMessageDelegate implements IMessageTransportDelegate {
+	private static final long serialVersionUID = 1L;
+
+	private class ServiceDirectoryMessageDelegate implements IMessageTransportDelegate {
         public void onAsynchronousException(MessageTransport source, Exception e) {
             log.error("asynchronous error on message transport", e);
         }
@@ -137,8 +139,8 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 */
 	private void doPublishServices() {
 		List<IServiceDescription> serviceList = getAllServices();
-		for (Iterator iter = serviceList.iterator(); iter.hasNext();) {
-			IServiceDescription serviceDesc = (IServiceDescription) iter.next();
+		for (Iterator<IServiceDescription> iter = serviceList.iterator(); iter.hasNext();) {
+			IServiceDescription serviceDesc = iter.next();
 			// nur services publishen, deren verfallsdatum in zukunft liegt.
 			Date actualDate = new Date();
 			if (serviceDesc.getExpireDate().after(actualDate)) {
@@ -238,8 +240,8 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 		Set<ServiceDescription> serviceDescriptionList = memory.readAll(new ServiceDescription(null, null, null, null,
 																						null, null, null, null, null, null));
 		// gefundene services in ne Liste kopieren
-		for (Iterator iter = serviceDescriptionList.iterator(); iter.hasNext();) {
-			IServiceDescription serviceDesc = (IServiceDescription) iter.next();
+		for (Iterator<ServiceDescription> iter = serviceDescriptionList.iterator(); iter.hasNext();) {
+			IServiceDescription serviceDesc = iter.next();
 			services.add(serviceDesc);
 		}
 		return services;
@@ -333,25 +335,6 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	    }
 
 	    return data;		
-	}
-
-	/**
-	 * Gets information about the logger of service directory.
-	 * @return information about levels of the logger
-	 */
-	public CompositeData getLog() {
-		if (log == null) {
-			return null;
-		}
-		String[] itemNames = new String[] {"DebugEnabled", "ErrorEnabled", "FatalEnabled", "InfoEnabled", "TraceEnabled", "WarnEnabled"};
-		try {
-			CompositeType type = new CompositeType(log.getClass().getName(), "Logger information", itemNames, itemNames, new OpenType[] {SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN});
-			return new CompositeDataSupport(type, itemNames, new Object[] {log.isDebugEnabled(), log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(), log.isTraceEnabled(), log.isWarnEnabled()});
-		}
-		catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 
 	/**

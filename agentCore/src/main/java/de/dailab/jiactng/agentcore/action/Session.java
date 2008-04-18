@@ -70,7 +70,7 @@ public class Session implements IFact {
 	/**
 	 * Constructor to set all values of session by hand.
 	 * 
-	 * @param sessionId
+	 * @param id
 	 *            the session sessionId
 	 * @param creationTime
 	 *            the time of creation of this session
@@ -125,7 +125,7 @@ public class Session implements IFact {
 	}
 
 	/**
-	 * @param sessionId
+	 * @param id
 	 *            the sessionId to set
 	 */
 	public void setSessionId(String id) {

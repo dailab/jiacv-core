@@ -5,6 +5,8 @@ package de.dailab.jiactng.agentcore.comm.service;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.IAgent;
@@ -43,11 +45,12 @@ public class ServiceTestCase extends TestCase {
     }
     
     public void testServices() throws Exception {
-        System.out.println("wait 5 seconds for the agents to synchronise");
+    	Log log = LogFactory.getLog(getClass());
+        log.debug("wait 5 seconds for the agents to synchronise");
         Thread.sleep(5000);
         assertEquals("could not log", null, _clientBean.printHelloWorld());
         assertEquals("could not log", null, _clientBean.printTimes());
-        System.out.println("service test done");
+        log.debug("service test done");
     }
 
     @Override

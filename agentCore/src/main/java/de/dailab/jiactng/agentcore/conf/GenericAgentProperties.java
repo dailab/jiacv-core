@@ -22,40 +22,40 @@ public class GenericAgentProperties {
 	
 	
 	/**
-	 * @return count, returns the number of agents that will be created from this definition
+	 * @return the number of agents that will be created from this definition
 	 */
 	public int getCount() {
 		return count;
 	}
 	/**
-	 * @param count, sets the number of agents that will be created from this definition
+	 * @param count sets the number of agents that will be created from this definition
 	 */
 	public void setCount(int count) {
 		this.count = count;
 	}
 	/**
-	 * @return agentNamePattern, returns the pattern used to create the name of an Agent
+	 * @return the pattern used to create the name of an Agent
 	 * @see #createAgentName(int) for details
 	 */
 	public String getAgentNamePattern() {
 		return agentNamePattern;
 	}
 	/**
-	 * @param agentNamePattern, sets the pattern used to create the name of an Agent
+	 * @param agentNamePattern sets the pattern used to create the name of an Agent
 	 *  
 	 */
 	public void setAgentNamePattern(String agentNamePattern) {
 		this.agentNamePattern = agentNamePattern;
 	}
 	/**
-	 * @return agentConfig, returns the spring configuration file. 
+	 * @return the spring configuration file. 
 	 */
 	public String getAgentConfig() {
 		return agentConfig;
 	}
 	
 	/**
-	 * @param agentConfig, sets the spring configuration file
+	 * @param agentConfig Sets the spring configuration file.
 	 * This file is supposed to contain the bean definition of the agent including all referenced beans. 
 	 * The name of the bean definition is given via the AgentBeanName property.
 	 */
@@ -64,14 +64,14 @@ public class GenericAgentProperties {
 	}
 
 	/**
-	 * @return agentBeanName, returns the name of the agent bean.
+	 * @return the name of the agent bean.
 	 */
 	public String getAgentBeanName() {
 		return agentBeanName;
 	}
 	
 	/**
-	 * @param agentBeanName, sets the bean name which is supposed to contain the agent definition.
+	 * @param agentBeanName Sets the bean name which is supposed to contain the agent definition.
 	 * this definition will be used to create the instances of the agents, thus is can be seen as a template for all agents.
 	 */
 	public void setAgentBeanName(String agentBeanName) {
@@ -79,8 +79,8 @@ public class GenericAgentProperties {
 	}
 	
 	/**
-	 * @param number, the number of the current iteration cycle or any other number if wanted
-	 * @return agent name, returns a name that is created by replacing any occurrence of "#{count}" with the number.
+	 * @param number the number of the current iteration cycle or any other number if wanted
+	 * @return A name that is created by replacing any occurrence of "#{count}" with the number.
 	 * Currently the patter simple replaces the any occurrences of "#{count}" with the current iteration number, starting with 1.
 	 * Thus, given the pattern "name#{count}" the names of the agents would be name1, name2, ... name n.  
 	 */

@@ -51,7 +51,7 @@ public abstract class MessageTransport implements MessageTransportMBean {
          * {@link Log}
          * 
          * @param extension     the name extension for the logger
-         * @return
+         * @return the named logger
          */
         Log getLog(String extension);
     }
@@ -86,7 +86,7 @@ public abstract class MessageTransport implements MessageTransportMBean {
      * then the URI might look like <code>tcp://192.168.3.42:4321</code>
      * 
      * By default, this method returns <code>null</code>
-     * @return
+     * @return the connection entry point or <code>null</code>
      * 
      * @deprecated
      * TODO: check whether this method is still of use

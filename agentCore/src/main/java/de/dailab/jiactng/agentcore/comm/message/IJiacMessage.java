@@ -28,7 +28,7 @@ public interface IJiacMessage extends IFact {
 	 * Returns the payload of this message. There are several different payload
      * types available.
 	 * 
-	 * @return
+	 * @return the payload
 	 */
 	IFact getPayload();
 

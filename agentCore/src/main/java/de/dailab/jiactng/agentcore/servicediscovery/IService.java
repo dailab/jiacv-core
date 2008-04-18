@@ -19,7 +19,7 @@ public interface IService extends IEffector {
 	
 	/**
 	 * Liefert ne Liste mit ServiceDescriptions, den einzelnen operationen des Service
-	 * @return
+	 * @return all descriptions of the service
 	 */
 	public List<IServiceDescription> getServiceDescriptions();
 }

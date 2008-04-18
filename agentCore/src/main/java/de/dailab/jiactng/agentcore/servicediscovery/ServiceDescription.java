@@ -9,10 +9,10 @@ import java.util.Set;
 /**
  * Eine Implementation fuer die Servicebeschreibung Wenn wsdl-Beschreibung null
  * ist, wird davon ausgegangen, dass es kein WebService ist.
- * @TODO equals, hashCode nachziehen
  * @author janko
  */
 public class ServiceDescription implements IServiceDescription {
+	//TODO equals, hashCode nachziehen
 
 	private Date _expireDate;
 	private String _id;  // soll eigentlich ordinal sein, aber momentan bug in hibernate.. lieber string nehmen
@@ -40,8 +40,6 @@ public class ServiceDescription implements IServiceDescription {
 	 * @param postCondition
 	 * @param providerAddress
 	 * @param qoSRating
-	 * @param wsdl wsdl beschreibung
-	 * @param wsdlUrl 
 	 */
 	public ServiceDescription(Date expireDate, String id, String name, Set<String> keywords,
 			List<ServiceParameter> inputParams, List<ServiceParameter> outputParams, String preCondition,

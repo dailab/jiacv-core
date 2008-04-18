@@ -195,7 +195,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 	 * Sucht einen Service im Directory anhand des ServiceNamens
 	 * 
 	 * @param name
-	 * @return
+	 * @return description of all registered services with the given name
 	 */
 	public Set<ServiceDescription> findServiceByName(String name) {
 		Set<ServiceDescription> serviceDescriptionList = memory.readAll(new ServiceDescription(null, null, name, null,

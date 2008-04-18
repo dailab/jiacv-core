@@ -20,7 +20,7 @@ public interface ICommunicationAddress extends IFact {
      * Returns the <code>String</code> that was used to create
      * this communication address
      * 
-     * @return
+     * @return the name
      */
     String getName();
     

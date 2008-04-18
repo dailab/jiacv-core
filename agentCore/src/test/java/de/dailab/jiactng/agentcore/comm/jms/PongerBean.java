@@ -36,7 +36,7 @@ public class PongerBean extends AbstractAgentBean implements ResultReceiver {
                 
                 IJiacMessage message= (IJiacMessage) obj;
                 ObjectContent content= (ObjectContent) message.getPayload();
-                System.out.println("PongerBean:: received " + content.getObject());
+                log.info("PongerBean:: received " + content.getObject());
 
                 Action action= memory.read(new Action(PingPongTestCase.ACTION_NAME));
                 IJiacMessage  pongMessage= new JiacMessage(new ObjectContent("Pong"));

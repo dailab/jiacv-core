@@ -6,82 +6,29 @@
   -->
 <beans>
 
-  <bean name="myPlatform" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
-    <property name="jmxConnectors">
-      <set>
-        <map>
-          <entry key="protocol" value="rmi"/>
-          <!--entry key="registryHost" value=""/-->
-          <entry key="registryPort" value="9999"/>
-        </map>
-        <!--map>
-          <entry key="protocol" value="soap"/>
-          <entry key="port" value="8080"/>
-          <entry key="path" value="/jmxconnector"/>
-        </map-->
-        <!--map>
-          <entry key="protocol" value="ws"/>
-        </map-->
-      </set>
-    </property>
+  <import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+  <import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+  <bean name="myPlatform" parent="Platform">
     <property name="agents">
       <list>
-        <ref bean="HelloWorldAgent1"/>
-        <ref bean="HelloWorldAgent2"/>
-        <ref bean="HelloWorldAgent3"/>
+        <ref bean="HelloWorldAgent"/>
+        <ref bean="HelloWorldAgent"/>
+        <ref bean="HelloWorldAgent"/>
       </list>
     </property>
   </bean>
 
-
-  <bean name="HelloWorldAgent1" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
-    <property name="memory"><ref bean="memory"/></property>
-    <property name="execution"><ref bean="simpleExecCycle"/></property>
+  <bean name="HelloWorldAgent" parent="SimpleAgent" singleton="false">
     <property name="agentBeans">
       <list>
         <ref bean="helloBean"/>
       </list>
     </property>
-  </bean>
-  
-  <bean name="HelloWorldAgent2" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
-    <property name="memory"><ref bean="memory"/></property>
-    <property name="execution"><ref bean="simpleExecCycle"/></property>
-    <property name="agentBeans">
-      <list>
-        <ref bean="helloBean"/>
-      </list>
-    </property>
-  </bean>
-  
-  <bean name="HelloWorldAgent3" class="de.dailab.jiactng.agentcore.Agent" singleton="false">
-    <property name="memory"><ref bean="memory"/></property>
-    <property name="execution"><ref bean="simpleExecCycle"/></property>
-    <property name="agentBeans">
-      <list>
-        <ref bean="helloBean"/>
-      </list>
-    </property>
-  </bean>    
-
-  <!--bean name="Agent2" class="de.dailab.jiactng.agentcore.Agent">
-    <property name="memory"><ref bean="memory"/></property>
-    <property name="agentBeans">
-      <list>
-        <ref bean="pongPing"/>
-      </list>
-    </property>
-  </bean-->
-
-  <bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
-    <!--property name="timeOut" value="-1"/-->
   </bean>
 
   <bean name="helloBean" class="de.dailab.jiactng.examples.helloWorld.HelloBean" singleton="false">
     <property name="logLevel" value="INFO"/>
-  </bean>
-
-  <bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false">
   </bean>
 
 </beans>

@@ -10,7 +10,10 @@
   	<groupId>de.dailab.jiactng.examples</groupId>
   	<artifactId>HelloWorld</artifactId>  	
   	<packaging>jar</packaging>  	
-  	<name>${project.artifactId}</name>   	
+  	<name>Hello World</name>   	
+  	<description>
+  		A simple action invocation example.
+  	</description>
   	
 
   	<dependencies>

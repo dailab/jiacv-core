@@ -2,11 +2,11 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
   <properties>
-    <title>simpleChatExample Overview</title>
+    <title>Overview</title>
     <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
   </properties>
   <body>
-    <section name="simpleChatExample Overview"> 
+    <section name="Simple Chat - Overview"> 
       <p>
          This section provides an overview about simpleChatExample.
       </p>

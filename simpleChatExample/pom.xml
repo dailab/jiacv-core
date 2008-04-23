@@ -10,9 +10,9 @@
    
    <groupId>de.dailab.jiactng.examples</groupId>
    <artifactId>SimpleChatExample</artifactId>
-   <name>${project.artifactId}</name>
+   <name>Simple Chat</name>
    
-   <description>A simple example for a gui-driven chat using the communicationbean for jiac-tng</description>
+   <description>A simple example for a GUI-driven chat using the CommunicationBean for JIAC TNG.</description>
 
    <dependencies>
       <dependency>

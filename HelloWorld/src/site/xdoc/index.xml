@@ -2,11 +2,12 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
   <properties>
-    <title>HelloWorld Overview</title>
+    <title>Overview</title>
     <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
   </properties>
   <body>
-    <section name="Goals"> 
+  <section name="Hello World - Overview">
+    <subsection name="Goals"> 
        <p>
           This smallest example will introduce the following JIAC TNG components and concepts:
           <ul>
@@ -25,17 +26,17 @@
           AgentsNodes, in order to start the application.
        </p>
 
-    </section>
+    </subsection>
 
-    <section name="Scenario">
+    <subsection name="Scenario">
        <p>
           In this scenario, three agents print the log message "Hello World" during the
           change to the lifecycle state "STARTED" by using the generic action mechanism. 
           All agents reside on the same node.
        </p>
-    </section>
+    </subsection>
 
-    <section name="Implementation">
+    <subsection name="Implementation">
        <p>
           In the first step we have to implement an agent bean which provides the action
           and another agent bean which triggers this action.
@@ -107,6 +108,7 @@ public class HelloUserBean extends AbstractAgentBean {
    &lt;bean name="UserBean" class="de.dailab.jiactng.examples.helloWorld.HelloUserBean" singleton="false" /&gt;
 &lt;/beans&gt;</source>
 
-    </section>
+    </subsection>
+  </section>
   </body>
 </document>

@@ -47,16 +47,13 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
-	public final static String AGENT_SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentSearchRequest";
-	public final static String ACTION_SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionSearchRequest";
+	public final static String SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#SearchRequest";
 	public final static String ADD_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AddAction";
 	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
+	public final static String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#UseRemoteAction";
 
 	private long _refreshingIntervall = 4000;
 	private long _firstRefresh = 5000;
-	// if this bean should get the actions from all present agents itself on startphase
-	// if false agents have to expose their actions themselves in order for their actions to be found in the directory
-	private boolean _pullModeActive = false;
 
 	private SpaceDestroyer<IFact> destroyer = null;
 	private EventedTupleSpace<IFact> space = null;
@@ -120,34 +117,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	 */
 	public <T extends IActionDescription> void removeAction(T action){
 		if (action != null) {
-			Action bla;
 			ActionData actionData = new ActionData();
 			actionData.setActionDescription(action);
 			space.remove(actionData);
 		}
 	}
-
-	/**
-	 * This method allows to get all exposed Actions from all Agents on the Node
-	 * and write or refresh them in the tuplespace.
-	 */
-	public void getAllActions(){
-		log.debug("Direct call to get all Actions from the Agents on the Node " + agentNode.getName());
-		List<IAgent> agents = this.agentNode.findAgents();
-
-		for (IAgent agent : agents){
-			List<Action> actions = agent.getActionList();
-			for (Action action : actions){
-				ActionData actionData = new ActionData();
-				actionData.setActionDescription((IActionDescription) action);
-				space.remove(actionData);
-				actionData.setCreationTime(_currentLogicTime + 1);
-				space.write(actionData);
-			}
-		}
-	}
-
-
 
 	public void doInit(){
 		_searchRequestHandler = new RequestHandler();
@@ -166,19 +140,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			messageTransport.listen(myAddress, null);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
-		}
-
-		if (_pullModeActive){
-			List<IAgent> agents = this.agentNode.findAgents();
-
-			for (IAgent agent : agents){
-				List<Action> actions = agent.getActionList();
-				for (Action action : actions){
-					ActionData actionData = new ActionData(_currentLogicTime + 1);
-					actionData.setActionDescription(action);
-					space.write(actionData);
-				}
-			}
 		}
 
 		_timer = new Timer();
@@ -250,7 +211,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				ICommunicationAddress at) {
 
 			log.debug("got message " + message);
-			if (message.getProtocol().equalsIgnoreCase(AGENT_SEARCH_REQUEST_PROTOCOL_ID)){
+			if (message.getProtocol().equalsIgnoreCase(SEARCH_REQUEST_PROTOCOL_ID)){
 				SearchRequest request = (SearchRequest) message.getPayload();
 
 				log.debug("Message is holding SearchRequest");
@@ -267,7 +228,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					SearchResponse response = new SearchResponse(request, result);
 
 					JiacMessage resultMessage = new JiacMessage(response);
-					resultMessage.setProtocol(DirectoryAgentNodeBean.AGENT_SEARCH_REQUEST_PROTOCOL_ID);
+					resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
 					try {
 						log.debug("AgentNode: sending Message " + resultMessage);
 						log.debug("sending it to " + message.getSender());
@@ -276,7 +237,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 						e.printStackTrace();
 					}
 
-					// TODO research if this really is necessary
 				} else if (request.getSearchTemplate() instanceof IActionDescription){
 					log.debug("SearchRequest hold SearchTemplate of type Action");
 					IActionDescription template = (IActionDescription) request.getSearchTemplate();
@@ -300,7 +260,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					SearchResponse response = new SearchResponse(request, result);
 
 					JiacMessage resultMessage = new JiacMessage(response);
-					resultMessage.setProtocol(DirectoryAgentNodeBean.AGENT_SEARCH_REQUEST_PROTOCOL_ID);
+					resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
 					try {
 						log.debug("AgentNode: sending Message " + resultMessage);
 						log.debug("sending it to " + message.getSender());
@@ -333,6 +293,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 				log.debug("removing action " + action + " from directory");
 				space.remove(actionData);
+			} else if (message.getProtocol().equalsIgnoreCase(REMOTEACTION_PROTOCOL_ID)){
+				
 			}
 		}
 	}

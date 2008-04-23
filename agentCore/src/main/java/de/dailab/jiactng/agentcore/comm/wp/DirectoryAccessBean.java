@@ -2,7 +2,6 @@ package de.dailab.jiactng.agentcore.comm.wp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,24 +36,22 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * @author Martin Loeffelholz
  *
  */
+
+//TODO Get RemoteActionProcessing working.
+
 public class DirectoryAccessBean extends AbstractAgentBean implements IEffector {
 
 	public static final String ACTION_REQUEST_SEARCH = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch";
 	public static final String ACTION_ADD_ACTION_TO_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory";
 	public static final String ACTION_REMOVE_ACTION_FROM_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory";
 
-	private static final String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#UseRemoteAction";
-
-	private int _timeoutMillis = 2500;
-	private static final IJiacMessage WHITEPAGES_AGENTSEARCH_MESSAGETEMPLATE;
-	private static final IJiacMessage WHITEPAGES_ACTIONSEARCH_MESSAGETEMPLATE;
+	private static final IJiacMessage WHITEPAGES_SEARCH_MESSAGETEMPLATE;
 	private static final IJiacMessage WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE;
 
 	private ICommunicationAddress directoryAddress = null;
 	private SearchRequestHandler _searchRequestHandler = null;
 	private ActionRequestHandler _actionRequestHandler = null;
 	private RemoteActionHandler _remoteActionHandler = null;
-	private RemoteActionWatcher _remoteActionWatcher = new RemoteActionWatcher();
 	private final ResultDump _resultDump = new ResultDump();
 
 	private Action _sendAction = null;
@@ -63,15 +60,11 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	static {
 		JiacMessage agentSearchTemplate = new JiacMessage();
-		agentSearchTemplate.setProtocol(DirectoryAgentNodeBean.AGENT_SEARCH_REQUEST_PROTOCOL_ID);
-		WHITEPAGES_AGENTSEARCH_MESSAGETEMPLATE = agentSearchTemplate;
-
-		JiacMessage actionSearchTemplate = new JiacMessage();
-		actionSearchTemplate.setProtocol(DirectoryAgentNodeBean.ACTION_SEARCH_REQUEST_PROTOCOL_ID);
-		WHITEPAGES_ACTIONSEARCH_MESSAGETEMPLATE = actionSearchTemplate;
+		agentSearchTemplate.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
+		WHITEPAGES_SEARCH_MESSAGETEMPLATE = agentSearchTemplate;
 
 		JiacMessage remoteActionTemplate = new JiacMessage();
-		remoteActionTemplate.setProtocol(REMOTEACTION_PROTOCOL_ID);
+		remoteActionTemplate.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
 		WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE = remoteActionTemplate;	
 	}
 
@@ -82,7 +75,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	public void doInit() throws Exception{
 		super.doInit();
-		_searchRequestHandler = new SearchRequestHandler();
+		_searchRequestHandler = new SearchRequestHandler(this);
 		_actionRequestHandler = new ActionRequestHandler();
 		_remoteActionHandler = new RemoteActionHandler();
 		String messageboxName = thisAgent.getAgentNode().getUUID() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
@@ -92,77 +85,21 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	public void doStart() throws Exception{
 		super.doStart();
 		log.debug("starting DirectoryAccessBean");
-		memory.attach(_searchRequestHandler, WHITEPAGES_AGENTSEARCH_MESSAGETEMPLATE);
-		memory.attach(_actionRequestHandler, WHITEPAGES_ACTIONSEARCH_MESSAGETEMPLATE);
+		memory.attach(_searchRequestHandler, WHITEPAGES_SEARCH_MESSAGETEMPLATE);
 		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
-		memory.attach(_remoteActionWatcher, new DoAction());
 		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
-		setExecuteInterval( _timeoutMillis /2);
 	}
 
 	public void doStop() throws Exception{
 		super.doStop();
 		log.debug("stopping DirectoryAccessBean");
 		memory.detach(_searchRequestHandler);
-		memory.detach(_actionRequestHandler);
 		memory.detach(_remoteActionHandler);
-		setExecuteInterval(0);
 	}
 
 	public void doCleanup() throws Exception{
 		// nothing to do yet
 		super.doCleanup();
-	}
-
-
-	/**
-	 * Check if one of the pending requests is over timeout
-	 */
-	@Override
-	public void execute() {
-		super.execute();
-
-		// TODO TimeoutManagment for RemoteActions
-		log.debug("Collecting timed out SearchRequests, current check-interval is " + this.getExecuteInterval());
-		Set<String> toRemove = new HashSet<String>();
-		synchronized(_requestID2ActionMap){
-			if (_requestID2ActionMap.keySet().size() > 0){	
-				// make sure that the Map isn't changed during maintenance
-				for (String key : _requestID2ActionMap.keySet()){
-					if (key != null){
-						DoAction action = _requestID2ActionMap.get(key);
-						if (action.getParams()[0] instanceof SearchRequest){
-							SearchRequest request =  (SearchRequest) action.getParams()[0];
-
-							long creation = request.getCreationTime();
-							long now = System.currentTimeMillis();
-
-							if ((now - creation) > _timeoutMillis){
-								String owner = action.getOwner();
-
-								log.warn("SearchRequest from owner " + owner + " has timeout");
-								// request is timed out, mark for removal
-								toRemove.add(key);
-								// not "throw" exception and let the requester know that his request has timed out
-								ActionResult result = new ActionResult(action, new TimeoutException("Failure due to Timeout for action " + action));
-								memory.write(result);
-							}
-						}
-					} else {
-						log.debug("No more Requests pending, timeout-checks are deactivated");
-						this.setExecuteInterval(-1);
-					}
-				}
-				// actually remove found timeouts
-				for (String key : toRemove) {
-					_requestID2ActionMap.remove(key);
-				}
-
-			} else {
-				log.debug("No more Requests pending, timeout-checks are deactivated");
-				this.setExecuteInterval(-1);
-			}
-		}
 	}
 
 	public List<? extends Action> getActions(){
@@ -195,11 +132,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				SearchRequest request = new SearchRequest(template);
 				request.setID(doAction.getSessionId());
 				_requestID2ActionMap.put(request.getID(), doAction);
-				if (this.getExecuteInterval() < 0){
-				    // TODO: soon this will be done in SimpleExecutionCycle... -> should be removed
-					log.debug("activating timeoutchecking. Next Check will commence in " + _timeoutMillis/2 + " intervalls");
-					this.setExecuteInterval(_timeoutMillis/2);
-				}
 				_searchRequestHandler.requestSearch(request);
 			} 
 
@@ -209,12 +141,30 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_ACTION_FROM_DIRECTORY)){
 			log.debug("doAction is an Action to remove to the Directory");
 			_actionRequestHandler.removeActionFromDirectory((Action) params[0]);
-		} 
+		} else {
+			log.debug("doAction is an Action that has to be invoked remotely");
+			
+			//TODO REMOTE ACTION HANDLING HAS TO START NEW FROM HERE
+		}
 	}
 	
 	@Override
     public void cancelAction(DoAction doAction) {
-        // TODO: implement timeout management here (i.e. discard the response that is coming too late)
+		
+		synchronized(_requestID2ActionMap){
+		  DoAction sourceAction = _requestID2ActionMap.remove(doAction.getSessionId());
+		  
+		  if (sourceAction != null){
+			  String owner = sourceAction.getOwner();
+			  log.warn("SearchRequest from owner " + owner + " has timeout");
+			  
+			  ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
+			  memory.write(result);
+			  
+		  } else {
+			  log.warn("tried to cancel non existing doAction");
+		  } 
+		}
     }
 
 
@@ -228,18 +178,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_searchRequestHandler.requestSearch(template);
 	}
 
-	// TODO: should be removed... the timeout will be set by creating the DoAction
-	@Deprecated
-	public void setTimeoutMillis(int timeoutMillis){
-		_timeoutMillis = timeoutMillis;
-	}
-
-	// TODO: should be removed... the timeout will be set by creating the DoAction
-	@Deprecated
-	public long getTimeoutMillis(){
-		return _timeoutMillis;
-	}
-
 	/**
 	 * Inner Class for handling searchRequests 
 	 * 
@@ -251,7 +189,13 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	 */
 	@SuppressWarnings("serial")
 	private class SearchRequestHandler implements SpaceObserver<IFact> {
+		
+		public DirectoryAccessBean myAccessBean;
 
+		public SearchRequestHandler(DirectoryAccessBean accessBean) {
+			myAccessBean = accessBean;
+		}
+		
 		/**
 		 * just gets the SearchRequest to the directory
 		 * 
@@ -260,7 +204,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		 */
 		public <E extends IFact> void requestSearch(E template){
 			JiacMessage message = new JiacMessage(template);
-			message.setProtocol(DirectoryAgentNodeBean.AGENT_SEARCH_REQUEST_PROTOCOL_ID);
+			message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
 
 			Object[] params = {message, directoryAddress};
 			DoAction send = _sendAction.createDoAction(params, _resultDump);
@@ -295,14 +239,28 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 							// if request exists and hasn't timed out yet
 							List<IFact> result = new ArrayList<IFact>();
 							if (response.getResult() != null){
-								result.addAll(response.getResult());
-							}
+								// if there is an at least empty result
+								
+								Set<IFact> facts = response.getResult();
+								if (!facts.isEmpty()){
+									// and it is in fact not empty
+									if (facts.iterator().next() instanceof IActionDescription){
+										for (IFact fact : facts){
+											IActionDescription desc = (IActionDescription) fact;
+											IActionDescription newDesc = new Action(desc.getName(), myAccessBean, desc.getInputTypes(), desc.getResultTypes());
+											result.add(newDesc);
+										}
+									} else {
+										result.addAll(response.getResult());
+									}
+								}
+							} 
 
 							ActionResult actionResult = ((Action)sourceAction.getAction()).createActionResult(sourceAction, new Object[] {result});
 							log.debug("DirectoryAccessBean is writing actionResult: " + actionResult);
 
 							memory.write(actionResult);
-						}
+						} 
 					}
 				}
 			}
@@ -310,14 +268,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	}
 
-	/**
-	 * TODO: Check whether this observer is deprecated after the changes to SearchRequestHandler. At least it should not be
-	 *       a spaceobserver anymore -> code duplication
-	 *       
-	 * @deprecated
-	 */
+	
 	@SuppressWarnings("serial")
-	private class ActionRequestHandler implements SpaceObserver<IFact> {
+	private class ActionRequestHandler {
 
 		/**
 		 * just gets the SearchRequest to the directory
@@ -344,48 +297,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 			log.debug("sending Message to register action in directory " + message);
 			memory.write(send);
-		}
-
-
-		/**
-		 * receives the answers from the directory and processes them. 
-		 * Then puts an actionresult into the agents memory
-		 * 
-		 * TODO: Code duplication detected. Check {@link SearchRequestHandler#notify(SpaceEvent)}...
-		 */
-		@Override
-		@SuppressWarnings("unchecked")
-		public void notify(SpaceEvent<? extends IFact> event) {
-			if(event instanceof WriteCallEvent) {
-				WriteCallEvent wceTemp = (WriteCallEvent) event;
-				if (wceTemp.getObject() instanceof IJiacMessage){
-					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
-
-					if (message.getPayload() instanceof SearchResponse && ((message= memory.remove(message)) != null)){
-						log.debug("DirectoryAccessBean: Got reply to ActionSearchRequest");
-
-						SearchResponse response = (SearchResponse) message.getPayload();
-						SearchRequest request = response.getSearchRequest();
-
-						log.debug("processing reply on ActionSearchRequest with ID " + request.getID());
-
-						DoAction sourceAction = _requestID2ActionMap.remove(request.getID());
-
-						if (sourceAction != null){
-							// if request exists and hasn't timed out yet
-							List<IFact> result = new ArrayList<IFact>();
-							if (response.getResult() != null){
-								result.addAll(response.getResult());
-							}
-
-							ActionResult actionResult = ((Action)sourceAction.getAction()).createActionResult(sourceAction, new Object[]{result});
-							log.debug("DirectoryAccessBean is writing actionResult for ActionSearchRequest with ID" + request.getID());
-
-							memory.write(actionResult);
-						}
-					}
-				}
-			}
 		}
 	}
 
@@ -436,7 +347,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		
 		public RemoteActionHandler() {
 			openSessionsFromClients = new HashMap<String, ICommunicationAddress>();
-			openSessionsToProviders= new HashMap<String, DoAction>();
+			openSessionsToProviders = new HashMap<String, DoAction>();
 		}
 
 		public void invokeActionRemote (DoAction doAction){
@@ -446,7 +357,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					ICommunicationAddress providerAddress = provider.getMessageBoxAddress();
 
 					JiacMessage message = new JiacMessage(doAction);
-					message.setProtocol(REMOTEACTION_PROTOCOL_ID);
+					message.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
 
 					Object[] params = {message, providerAddress};
 					DoAction send = _sendAction.createDoAction(params, _resultDump);
@@ -514,7 +425,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		    
 		    if(recipient != null) {
     			JiacMessage resultMessage = new JiacMessage(result);
-    			resultMessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
+    			resultMessage.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
     			
     			Object[] params = {resultMessage, recipient};
     			DoAction send = _sendAction.createDoAction(params, _resultDump);

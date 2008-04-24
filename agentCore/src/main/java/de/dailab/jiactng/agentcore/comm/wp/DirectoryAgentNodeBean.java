@@ -268,6 +268,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					} catch (CommunicationException e) {
 						e.printStackTrace();
 					}
+				} else {
+					log.warn("SearchRequest hold SearchTemplate of unknown type "+request.getSearchTemplate().getClass().getName());
 				}
 
 				
@@ -293,8 +295,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 				log.debug("removing action " + action + " from directory");
 				space.remove(actionData);
+
 			} else if (message.getProtocol().equalsIgnoreCase(REMOTEACTION_PROTOCOL_ID)){
 				
+			} else {
+				log.warn("Message has unknown protocol " + message.getProtocol());
 			}
 		}
 	}

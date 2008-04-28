@@ -18,7 +18,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class NodePerformance {
     private static ByteArrayResource getAgentConfiguration(String agentName) {

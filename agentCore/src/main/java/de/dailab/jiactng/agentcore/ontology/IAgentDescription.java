@@ -10,7 +10,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * This interface represents a description of an agent.
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public interface IAgentDescription extends IFact {
     /**

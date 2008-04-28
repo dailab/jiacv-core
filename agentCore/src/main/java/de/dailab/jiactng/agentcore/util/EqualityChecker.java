@@ -12,7 +12,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class EqualityChecker {
     private EqualityChecker() {}

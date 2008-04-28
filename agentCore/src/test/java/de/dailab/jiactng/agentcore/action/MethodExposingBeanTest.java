@@ -16,7 +16,7 @@ import de.dailab.jiactng.agentcore.SimpleAgentNodeMBean;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class MethodExposingBeanTest extends TestCase {
     private IAgentNode _node;

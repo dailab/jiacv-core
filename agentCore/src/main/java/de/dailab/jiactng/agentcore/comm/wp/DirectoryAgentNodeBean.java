@@ -302,9 +302,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 				log.debug("removing action " + action + " from directory");
 				synchronized(space){
-					System.err.println("space before " + space.readAll(new ActionData()));
 					space.remove(actionData);
-					System.err.println("space after " + space.readAll(new ActionData()));
 				}
 
 			} else if (message.getProtocol().equalsIgnoreCase(REMOTEACTION_PROTOCOL_ID)){

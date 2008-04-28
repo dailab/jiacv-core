@@ -2,9 +2,12 @@ package de.dailab.jiactng.agentcore.comm.wp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
@@ -43,7 +46,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	public static final String ACTION_REQUEST_SEARCH = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch";
 	public static final String ACTION_ADD_ACTION_TO_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory";
 	public static final String ACTION_REMOVE_ACTION_FROM_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory";
-
+	public static final String ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addAutoenlistActionTemplate";
+	public static final String ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeAutoenlistActionTemplate";
+	
 	private static final IJiacMessage WHITEPAGES_SEARCH_MESSAGETEMPLATE;
 	private static final IJiacMessage WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE;
 
@@ -55,6 +60,15 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	private Action _sendAction = null;
 	private Map<String, DoAction> _requestID2ActionMap = new HashMap<String, DoAction>();
+	
+	private List<Action> _autoentlistActionTemplates = null;
+	private Set<Action> _offeredActions = new HashSet<Action>();
+	// the intervall the autoenlistener should check for new actions to enlist
+	private long _autoEnlisteningInterval = 2000;
+	private long _firstAutoEnlistening = 2000;
+	private AutoEnlister _autoEnlister = null;
+	
+	private Timer _timer;
 
 
 	static {
@@ -79,6 +93,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_remoteActionHandler = new RemoteActionHandler();
 		String messageboxName = thisAgent.getAgentNode().getUUID() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
+		_autoentlistActionTemplates = new ArrayList<Action>();
+		_autoEnlister = new AutoEnlister();
 	}
 
 	public void doStart() throws Exception{
@@ -87,6 +103,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		memory.attach(_searchRequestHandler, WHITEPAGES_SEARCH_MESSAGETEMPLATE);
 		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
 		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
+		_timer = new Timer();
+		_timer.schedule(_autoEnlister, _firstAutoEnlistening, _autoEnlisteningInterval);
+		
 	}
 
 	public void doStop() throws Exception{
@@ -112,12 +131,19 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 		action = new Action(ACTION_REMOVE_ACTION_FROM_DIRECTORY, this, new Class<?>[]{IActionDescription.class}, null);
 		actions.add(action);
-
+		
+		action = new Action(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE, this, new Class<?>[] {List.class}, null);
+		actions.add(action);
+		
+		action = new Action(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE, this, new Class<?>[] {List.class}, null);
+		actions.add(action);
+		
 		return actions;
 	}
 
 
 
+	@SuppressWarnings("unchecked")
 	public void doAction(DoAction doAction){
 		log.debug("Received DoAction... decoding begins");
 
@@ -140,7 +166,22 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_ACTION_FROM_DIRECTORY)){
 			log.debug("doAction is an Action to remove to the Directory");
 			_actionRequestHandler.removeActionFromDirectory((Action) params[0]);
-		} else {
+		}else if (actionName.equalsIgnoreCase(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE)){
+			_autoentlistActionTemplates.addAll((List<Action>) params[0]);
+		}else if (actionName.equalsIgnoreCase(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE)){
+			synchronized (_offeredActions) {
+				List<Action> templatesToRemove = (List<Action>) params[0];
+				_autoentlistActionTemplates.removeAll(templatesToRemove);
+				
+				for (Action removeTemplate: templatesToRemove){
+					Set<Action> actions = memory.readAll(removeTemplate);
+					for (Action action : actions){
+						if (_offeredActions.remove(action))
+							_actionRequestHandler.removeActionFromDirectory(action);
+					}
+				}
+			}
+		}else {
 			log.debug("doAction is an Action that has to be invoked remotely");
 			_remoteActionHandler.invokeActionRemote(doAction);
 		}
@@ -148,6 +189,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	
 	@Override
     public void cancelAction(DoAction doAction) {
+		System.err.println("GOT TIMEOUT! GOT TIMEOUT! GOT FRAGGING TIMEOUT WITHIN DIRECTORY_ACCESS_BEAN!!!");
 		log.debug("DoAction CANCELED!");
 		
 		synchronized(_requestID2ActionMap){
@@ -166,7 +208,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
     }
 
-
     /**
 	 * Starts a search for DirectoryEntrys that are conform to the template given
 	 * @param <E> extends IFact
@@ -175,6 +216,14 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	public <E extends IFact> void requestSearch(E template){
 		log.debug("Received SearchRequest via direct invocation. Searching for Agents with template: " + template);
 		_searchRequestHandler.requestSearch(template);
+	}
+	
+	public void setAutoEnlisteningInterval(long autoEnlisteningInterval){
+		_autoEnlisteningInterval = autoEnlisteningInterval;
+	}
+	
+	public void setFirstAutoEnlistening(long firstAutoEnlistening){
+		_firstAutoEnlistening = firstAutoEnlistening;
 	}
 
 	/**
@@ -449,6 +498,24 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 
 	}
+	
+	private class AutoEnlister extends TimerTask {
+	
+		public void run() {
+			synchronized (_offeredActions) {
+				for (Action actionTemplate : _autoentlistActionTemplates){
+					Set<Action> actions = memory.readAll(actionTemplate);
+					for (Action action : actions){
+						if(!_offeredActions.contains(action)){
+							_offeredActions.add(action);
+							_actionRequestHandler.addActionToDirectory(action);
+						}
+					}
+				}
+			}
+		}
+	}
+
 
 
 

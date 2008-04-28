@@ -33,14 +33,28 @@
 				<ref bean="CommunicationBean" />
 				<ref bean="DirectoryAccessBean" />
 				<ref bean="WhitePagesTestBean" />
+				<ref bean="RemoteActionTestBean"/>
 			</list>
 		</property>
 	</bean>
 	
 	<bean name="FindMeAgent" parent="SimpleAgent" singleton="false">
+	<property name="agentBeans">
+		<list>
+			<ref bean="CommunicationBean"/>
+			<ref bean="DirectoryAccessBean"/>
+			<ref bean="RemoteActionProviderBean"/>
+		</list>
+	</property>
 	</bean>
 	
 	<bean name="WhitePagesTestBean" class="de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean">
+	</bean>
+	
+	<bean name="RemoteActionTestBean" class="de.dailab.jiactng.agentcore.comm.wp.RemoteActionTestBean">
+	</bean>
+	
+	<bean name="RemoteActionProviderBean" class="de.dailab.jiactng.agentcore.comm.wp.RemoteActionProviderBean">
 	</bean>
 	
 	<!-- 

@@ -26,7 +26,6 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	private Action _requestAction;
 	private Action _addActionAction;
 	private Action _removeActionAction;
-	private Action _useRemoteActionAction;
 	
 	List<IFact> _results = new ArrayList<IFact>();
 	DoAction _lastDoAction = null;
@@ -49,7 +48,6 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		_requestAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch"));
 		_addActionAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory"));
 		_removeActionAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory"));
-		_useRemoteActionAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#useRemoteAction"));
 	}
 	
 	/**
@@ -65,7 +63,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		_lastDoAction = action;
 		memory.write(action);
 	}
-
+	
 	public void searchForActionDesc(IActionDescription actionDesc){
 		log.debug("Searching for Action " + actionDesc.toString());
 		Object[] params = {actionDesc};
@@ -90,14 +88,6 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		memory.write(action);
 	}
 	
-	public void useRemoteAction(IActionDescription actionDesc, Object[] params){
-		log.debug("using remote Action " + actionDesc.getName());
-		Object[] paramsToWorkOn = {actionDesc, params};
-		DoAction action = _useRemoteActionAction.createDoAction(paramsToWorkOn, this);
-		_lastDoAction = action;
-		memory.write(action);
-	}
-	
 	public Action getSendAction(){
 		return memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 	}
@@ -107,11 +97,13 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	 * Receives the result for the action created in searchForAgentDesc and stores it for later withdrawl
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	synchronized public void receiveResult(ActionResult result) {
 		log.debug("WhitePagesTestBean Receiving Result");
 		if (result != null) log.debug("Result reads: " + result);
 		
 		Object[] actionResults = result.getResults();
+
 		if (actionResults[0] != null) {
 			List<IFact> results = (List<IFact>) actionResults[0];
 			synchronized(_results){

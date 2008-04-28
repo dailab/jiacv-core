@@ -52,6 +52,25 @@ public class DoAction extends SessionEvent {
 	public DoAction(Action thisAction, ResultReceiver source, Object[] params) {
 		this(new Session(source), thisAction, source, params);
 	}
+	
+	/**
+	 * Constructor for a new action-call. The created object should be written
+	 * to the agents memory to trigger the action execution. Note that it may be
+	 * usefull to store the session object from this object after creation, as
+	 * it will be your only method of retrieving the results of the action-call.
+	 * 
+	 * @param thisAction
+	 *            the action that shall be called.
+	 * @param source
+	 *            the source of the action-call.
+	 * @param params
+	 *            the input-parameters for the call.
+	 * @param timeToLive
+	 * 			  time until timeout in milliseconds
+	 */
+	public DoAction(Action thisAction, ResultReceiver source, Object[] params, long timeToLive) {
+		this(new Session(source, timeToLive), thisAction, source, params);
+	}
 
 	/**
 	 * Constructor for a new action-call. The created object should be written
@@ -72,14 +91,6 @@ public class DoAction extends SessionEvent {
 			Object[] params) {
 		super(session, thisAction, source);
 		setParams(params);
-	}
-	
-	/**
-	 * Used to filter <code>DoAction</code>s out of tuplespaces
-	 */
-	public DoAction(){
-		super(null, null, null);
-		setParams(null);
 	}
 	
 	

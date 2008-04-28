@@ -10,6 +10,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean;
 
 import junit.framework.TestCase;
@@ -23,6 +24,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	private static IAgentNode _agentNode;
 	private static IAgent _whitePagesAgent;
 	private static WhitePagesTestBean _whitePagesTestBean;
+	private static RemoteActionTestBean _remoteActionTestBean;
 	
 	private static Action _sendAction = null;
 	
@@ -48,6 +50,8 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			for (IAgentBean bean : beans){
 				if (bean.getBeanName().equalsIgnoreCase("WhitePagesTestbean")){
 					_whitePagesTestBean = (WhitePagesTestBean) bean;
+				} else if (bean.getBeanName().equalsIgnoreCase("RemoteActionTestBean")){
+					_remoteActionTestBean = (RemoteActionTestBean) bean;
 				}
 			}
 		}
@@ -95,10 +99,9 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 		assertNotNull(results);
 		assertEquals(0, results.size());
-		_lastTestDone = true;
 	}
 	
-	public void testActionHandling(){
+	public void testActionStorage(){
 		// Test for storing, searching for and removing actions
 		_sendAction = _whitePagesTestBean.getSendAction();
 		IActionDescription actualActionDesc = (IActionDescription) _sendAction;
@@ -123,13 +126,14 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 		
 		List<IFact> results = _whitePagesTestBean.getLastResult();
+		
 		assertNotNull(results);
 		
 		if (results.size() > 0){
-			IActionDescription resultDesc = (IActionDescription) results.get(0);
-			assertEquals(actualActionDesc.hashCode(), resultDesc.hashCode());
+			Action resultAction = (Action) results.get(0);
+			assertEquals(actualActionDesc.hashCode(), resultAction.hashCode());
 		} else {
-			// Let the world now that there was no result coming through.
+			// Let the world know that there was no result coming through.
 			assertTrue("No Results were delivered", false);
 		}
 		
@@ -158,5 +162,96 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		assertEquals("There shouldn't be any results", 0, results.size());
 		
 	}
+	
+	public void testRemoteActionTimeoutHandling(){
+//		try {
+//			Thread.sleep(3500);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		Action action = new Action(RemoteActionProviderBean.ACTION_TIMEOUT_TEST);
+//		_whitePagesTestBean.searchForActionDesc(action);
+//		
+//		try {
+//			Thread.sleep(3500);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		List<IFact> results = _whitePagesTestBean.getLastResult();
+//		assertNotNull(results);
+//		
+//		if (results.get(0) instanceof Action){
+//			Action remoteAction = (Action) results.get(0);
+//			System.err.println("Starting Timeout RemoteAction ! ! !");
+//			_remoteActionTestBean.useRemoteAction(remoteAction, null, 1000);
+//		}
+//		
+//		try {
+//			Thread.sleep(13500);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		ActionResult actionResult = _remoteActionTestBean.getLastActionResult();
+//		assertNotNull(actionResult);
+//		
+//		Object[] remoteResults = actionResult.getResults();
+//		assertNotNull(remoteResults[0]);
+//		assertTrue(remoteResults[0] instanceof DirectoryAccessBean.TimeoutException);
+//		
+		
+	}
+	
+	public void testRemoteActionHandling(){
+		
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		final String REMOTE_RESULT = "Live long and prosper";
+		
+		Action action = new Action(RemoteActionProviderBean.ACTION_GET_SOME_RESULT);
+		_whitePagesTestBean.searchForActionDesc(action);
+		
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		List<IFact> remoteActions = _whitePagesTestBean.getLastResult();
+		assertNotNull(remoteActions);
+		assertTrue(remoteActions.get(0) instanceof Action);
+		
+		Action remoteAction = (Action) remoteActions.get(0);
+		Object[] params = {REMOTE_RESULT};
+		
+		_remoteActionTestBean.useRemoteAction(remoteAction, params);
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		
+		ActionResult result = _remoteActionTestBean.getLastActionResult();
+		assertNotNull(result);
+		
+		Object[] actionResults = result.getResults();
+		
+		assertTrue(actionResults[0] instanceof String);
+		String remoteResult = (String) actionResults[0];
+		
+		assertTrue(remoteResult.equalsIgnoreCase(REMOTE_RESULT));
+		
+		_lastTestDone = true;
+	}
+	
+	//TODO TESTS FOR: Missing Actions, Missing Agents, Actions not provided anymore
 	
 }

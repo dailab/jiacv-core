@@ -58,6 +58,23 @@ public class Session implements IFact {
 				: Session.class.hashCode()), System.currentTimeMillis(),
 				source, new ArrayList<SessionEvent>());
 	}
+	
+	/**
+	 * Constructor for a new session. Can be called with any kind of object as
+	 * source, usually the class, that initiated the session.
+	 * 
+	 * @param source
+	 *            the source that created the new session
+	 * @param timeToLive
+	 * 			  time to live in milliseconds
+	 */
+	public Session(ResultReceiver source, long timeToLive) {
+		this(IdFactory.createSessionId((source != null) ? source.hashCode()
+				: Session.class.hashCode()), System.currentTimeMillis(),
+				source, new ArrayList<SessionEvent>());
+		this.timeToLive = new Long(timeToLive);
+	}
+	
 
 	public Session(){
 		this.sessionId = null;
@@ -78,6 +95,37 @@ public class Session implements IFact {
 	 *            the creator object of this session
 	 * @param history
 	 *            the history of this session
+	 * @param timeToLive
+	 * 			  time until timeout if 0 it will be set to null           
+	 *            
+	 */
+	public Session(String id, Long creationTime, ResultReceiver source,
+			ArrayList<SessionEvent> history, long timeToLive) {
+		this.sessionId = id;
+		this.creationTime = creationTime;
+		this.source = source;
+		this.history = history;
+		if (timeToLive != 0){
+			this.timeToLive = new Long(timeToLive);
+		} else{
+			this.timeToLive = null;
+		}
+	}
+	
+	/**
+	 * Constructor to set all values of session by hand.
+	 * 
+	 * @param id
+	 *            the session sessionId
+	 * @param creationTime
+	 *            the time of creation of this session
+	 * @param source
+	 *            the creator object of this session
+	 * @param history
+	 *            the history of this session       
+	 *            
+	 * Note: TimeToLive will keep at default of 60 seconds
+	 *            
 	 */
 	public Session(String id, Long creationTime, ResultReceiver source,
 			ArrayList<SessionEvent> history) {

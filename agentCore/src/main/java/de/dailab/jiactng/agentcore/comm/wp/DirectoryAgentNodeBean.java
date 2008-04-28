@@ -19,6 +19,7 @@ import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -240,19 +241,19 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				} else if (request.getSearchTemplate() instanceof IActionDescription){
 					log.debug("SearchRequest hold SearchTemplate of type Action");
 					IActionDescription template = (IActionDescription) request.getSearchTemplate();
-					
+
 					log.debug("SearchRequest holds template " + template);
-					
+
 					ActionData templateData = new ActionData();
 					templateData.setActionDescription(template);
-					
+
 					Set<ActionData> foundData = space.readAll(templateData);
 					Set<IActionDescription> resultDescriptions = new HashSet<IActionDescription>();
-					
+
 					for (ActionData data: foundData){
 						resultDescriptions.add(data.getActionDescription());
 					}
-					
+
 					Set<IFact> result = new HashSet<IFact>();
 					result.addAll(resultDescriptions);
 					log.debug("Result to send reads " + result);
@@ -272,7 +273,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					log.warn("SearchRequest hold SearchTemplate of unknown type "+request.getSearchTemplate().getClass().getName());
 				}
 
-				
+
 			} else if (message.getProtocol().equalsIgnoreCase(ADD_ACTION_PROTOCOL_ID)){
 				log.debug("Message is holding Action for storage");
 				IActionDescription action = (IActionDescription) message.getPayload();
@@ -286,7 +287,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 				log.debug("writing new action to tuplespace");
 				space.write(actionData);
-				
+
 			} else if (message.getProtocol().equalsIgnoreCase(REMOVE_ACTION_PROTOCOL_ID)){
 				log.debug("Message is holding Action for removal");
 				IActionDescription action = (IActionDescription) message.getPayload();
@@ -297,7 +298,31 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				space.remove(actionData);
 
 			} else if (message.getProtocol().equalsIgnoreCase(REMOTEACTION_PROTOCOL_ID)){
-				
+				log.debug("Message is request for provideraddress of remote Action");
+
+				DoAction remoteAction = (DoAction) message.getPayload();
+				log.debug("Searching for provider of (remote)Action " + remoteAction);
+
+				ActionData templateData = new ActionData();
+				templateData.setActionDescription(remoteAction.getAction());
+
+				ActionData foundData = space.read(templateData);
+
+				if (foundData != null){
+					IActionDescription resultDescription = foundData.getActionDescription();
+					ICommunicationAddress providerAddress = resultDescription.getProviderDescription().getMessageBoxAddress();
+					JiacMessage resultMessage = new JiacMessage(providerAddress);
+					resultMessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
+					resultMessage.setHeader("SESSION_ID", remoteAction.getSessionId());
+					try {
+						messageTransport.send(resultMessage, message.getSender());
+					} catch (CommunicationException e) {
+						e.printStackTrace();
+					}
+				} else {
+					//TODO Send Exception if no Action like the searched is stored within the memory
+				}
+
 			} else {
 				log.warn("Message has unknown protocol " + message.getProtocol());
 			}
@@ -314,71 +339,73 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		 */
 		@Override
 		public void run() {
-			ActionData actionTemplate = new ActionData(_currentLogicTime);
-			
-			// During maintenance there must not be any other changes to the tupespace, so...
-			synchronized(space){
-				
-				// Check the Space for timeouts by using the current and now obsolete logical time
-				Set<ActionData> timeouts = space.removeAll(actionTemplate);
-
-				// as long as timeouts are existing...
-				while (!timeouts.isEmpty()){
-					//get the first of them and the action stored within it
-					ActionData actionData = timeouts.iterator().next();
-					IActionDescription timeoutActionDesc = actionData.getActionDescription();
-
-					// now let's see if the agent still provides any actions
-					List<Action> actions = new ArrayList<Action>();
-					IAgentDescription agentDesc = timeoutActionDesc.getProviderDescription();
-					String timeoutAgentID = agentDesc.getAid();
-
-					IAgent timeoutAgent = null;
-
-					List<IAgent> agents = agentNode.findAgents();
-					//TODO find an alternative solution for agents that are not on this agentnode
-					for (IAgent agent : agents){
-						if (agent.getAgentId().equals(timeoutAgentID)){
-							timeoutAgent = agent;
-							break;
-						}
-					}
-
-					if (timeoutAgent == null){
-						log.warn("Agent with ID " + timeoutAgentID + " hasn't removed it's actions from Directory and isn't present anymore");
-						timeouts.remove(actionData);
-						continue;
-					} else {
-
-						actions = timeoutAgent.getActionList();
-
-						/*
-						 * It would be quite inefficient to not check the other actions of this agent also
-						 * to possibly be outdated since all actions of an agent are usually stored at the
-						 * same time
-						 */
-						for (IActionDescription action: actions){
-
-							ActionData refreshAction = new ActionData();
-							refreshAction.setActionDescription((IActionDescription) action);
-							// remove this action from the timeouts if it is within them so it hasn't to be looked up twice
-							if (timeouts.remove(refreshAction)){
-
-								/*  if the action was within the timeouts and though shall be known to the outside world
-								 *  let's refresh it too since we're already refreshing
-								 */
-								refreshAction.setCreationTime(_currentLogicTime + 1);
-								space.write(refreshAction);
-							}
-						}
-					}
-				}
-			}
-			// finally after processing all timeouts let's give the clock a little nudge
-			_currentLogicTime++;
+//			ActionData actionTemplate = new ActionData(_currentLogicTime);
+//
+//			// During maintenance there must not be any other changes to the tupespace, so...
+//			synchronized(space){
+//
+//				// Check the Space for timeouts by using the current and now obsolete logical time
+//				Set<ActionData> timeouts = space.removeAll(actionTemplate);
+//
+//				// as long as timeouts are existing...
+//				while (!timeouts.isEmpty()){
+//					//get the first of them and the action stored within it
+//					ActionData actionData = timeouts.iterator().next();
+//					IActionDescription timeoutActionDesc = actionData.getActionDescription();
+//
+//					// now let's see if the agent still provides any actions
+//					List<Action> actions = new ArrayList<Action>();
+//					IAgentDescription agentDesc = timeoutActionDesc.getProviderDescription();
+//					String timeoutAgentID = agentDesc.getAid();
+//
+//					IAgent timeoutAgent = null;
+//
+//					List<IAgent> agents = agentNode.findAgents();
+//					//TODO find an alternative solution for agents that are not on this agentnode
+//					for (IAgent agent : agents){
+//						if (agent.getAgentId().equals(timeoutAgentID)){
+//							timeoutAgent = agent;
+//							break;
+//						}
+//					}
+//
+//					if (timeoutAgent == null){
+//						log.warn("Agent with ID " + timeoutAgentID + " hasn't removed it's actions from Directory and isn't present anymore");
+//						timeouts.remove(actionData);
+//						continue;
+//					} else {
+//
+//						actions = timeoutAgent.getActionList();
+//						if (actions != null){
+//							/*
+//							 * It would be quite inefficient to not check the other actions of this agent also
+//							 * to possibly be outdated since all actions of an agent are usually stored at the
+//							 * same time
+//							 */
+//							for (IActionDescription action: actions){
+//
+//								ActionData refreshAction = new ActionData();
+//								refreshAction.setActionDescription((IActionDescription) action);
+//								// remove this action from the timeouts if it is within them so it hasn't to be looked up twice
+//								if (timeouts.remove(refreshAction)){
+//
+//									/*  if the action was within the timeouts and though shall be known to the outside world
+//									 *  let's refresh it too since we're already refreshing
+//									 */
+//									refreshAction.setCreationTime(_currentLogicTime + 1);
+//									space.write(refreshAction);
+//								}
+//							}
+//						} else {
+//							// Action isn't present anymore on agent
+//							timeouts.remove(actionData);
+//						}
+//					}
+//				}
+//			}
+//			// finally after processing all timeouts let's give the clock a little nudge
+//			_currentLogicTime++;
 		}
-
-
 	}
 
 	@SuppressWarnings("serial")

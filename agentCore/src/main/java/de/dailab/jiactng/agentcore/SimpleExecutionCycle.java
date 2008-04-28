@@ -167,10 +167,12 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 									// Got an Action, so let's cancel this doAction
 									
 									Action action = (Action) doAction.getAction();
+									log.debug("canceling DoAction " + doAction);
 									action.getProviderBean().cancelAction(doAction);
 								} else if (session.getSource() != null){
 									// there isn't an Action, so let's send the failure to the source
 									
+									log.debug("Sending timeout Result to source of Session " + session);
 									ResultReceiver receiver = session.getSource();
 									ActionResult result = new ActionResult(doAction, new RuntimeException("DoAction has timeout"));
 									receiver.receiveResult(result);

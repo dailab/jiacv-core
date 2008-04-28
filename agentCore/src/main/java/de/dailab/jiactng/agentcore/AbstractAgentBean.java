@@ -47,18 +47,18 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		super();
 	}
 
-	/**
-	 * Creates an agent bean that may use lifecycle support in strict mode. This
-	 * means, that the lifecycle graph is enforced.
-	 * 
-	 * @param strict
-	 *            Flag, that determines, whether the lifecylce of this agentbean
-	 *            should run in strict mode or not.
-	 * @see ILifecycle
-	 */
-	public AbstractAgentBean(boolean strict) {
-		super(strict);
-	}
+//	/**
+//	 * Creates an agent bean that may use lifecycle support in strict mode. This
+//	 * means, that the lifecycle graph is enforced.
+//	 * 
+//	 * @param strict
+//	 *            Flag, that determines, whether the lifecylce of this agentbean
+//	 *            should run in strict mode or not.
+//	 * @see ILifecycle
+//	 */
+//	public AbstractAgentBean(boolean strict) {
+//		super(strict);
+//	}
 
 	/**
 	 * Reference to the agent that holds this bean.

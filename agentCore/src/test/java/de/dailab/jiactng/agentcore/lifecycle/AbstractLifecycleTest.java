@@ -45,7 +45,7 @@ public class AbstractLifecycleTest extends TestCase implements ILifecycleListene
     
     protected void setUp() throws Exception {
         
-        mock = new MockLifecycle(true);
+        mock = new MockLifecycle();
         
     }
     
@@ -150,7 +150,7 @@ public class AbstractLifecycleTest extends TestCase implements ILifecycleListene
      */
     public void testGetState() throws LifecycleException {
         
-        mock = new MockLifecycle(true);
+        mock = new MockLifecycle();
         mock.addLifecycleListener(this);
         
         assertEquals(UNDEFINED, mock.getState());
@@ -179,7 +179,7 @@ public class AbstractLifecycleTest extends TestCase implements ILifecycleListene
     public void testGetLifecycleState() throws LifecycleException {
         System.out.println("getLifecycleState");
         
-        MockLifecycle instance = new MockLifecycle(true);
+        MockLifecycle instance = new MockLifecycle();
         
         assertEquals("UNDEFINED", instance.getLifecycleState());
         instance.init();

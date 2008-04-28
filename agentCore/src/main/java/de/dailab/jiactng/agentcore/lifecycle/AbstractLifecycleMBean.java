@@ -14,11 +14,11 @@ public interface AbstractLifecycleMBean {
 	 */
 	public String getLifecycleState();
 	
-	/**
-	 * Getter for attribute "Strict" of the managed resource.
-	 * @return the lifecycle mode of this resource
-	 */
-	public boolean isStrict();
+//	/**
+//	 * Getter for attribute "Strict" of the managed resource.
+//	 * @return the lifecycle mode of this resource
+//	 */
+//	public boolean isStrict();
 	
 	/**
 	 * Initializes the managed resource.

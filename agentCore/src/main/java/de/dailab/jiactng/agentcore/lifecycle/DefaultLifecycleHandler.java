@@ -26,11 +26,11 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
  */
 public class DefaultLifecycleHandler {
     
-    /**
-     * Indicates wether this <code>Lifecycle</code> may accept only transitions
-     * following the state graph
-     */
-    protected boolean strict = true;
+//    /**
+//     * Indicates wether this <code>Lifecycle</code> may accept only transitions
+//     * following the state graph
+//     */
+//    protected boolean strict = true;
        
     /**
      * The <code>Lifecycle</code>'s current state
@@ -54,23 +54,24 @@ public class DefaultLifecycleHandler {
      */
     public DefaultLifecycleHandler(ILifecycle lifecycle) {
         
-        this(lifecycle, false);
+        // this(lifecycle, false);
+    	this.lifecycle = lifecycle;
         
     }
     
-    /**
-     * Creates a new instance of DefaultLifecycleHandler
-     *
-     * @param lifecycle the <code>Lifecycle</code> this handler takes care of
-     * @param strict    determines wether this handler is suppposed to enforce
-     *                  the lifecycle graph
-     */
-    public DefaultLifecycleHandler(ILifecycle lifecycle, boolean strict) {
-        
-        this.lifecycle = lifecycle;
-        this.strict = strict;
-        
-    }
+//    /**
+//     * Creates a new instance of DefaultLifecycleHandler
+//     *
+//     * @param lifecycle the <code>Lifecycle</code> this handler takes care of
+//     * @param strict    determines wether this handler is suppposed to enforce
+//     *                  the lifecycle graph
+//     */
+//    public DefaultLifecycleHandler(ILifecycle lifecycle, boolean strict) {
+//        
+//        this.lifecycle = lifecycle;
+//        this.strict = strict;
+//        
+//    }
     
     /**
      * Returns the current state of the managed <code>Lifecycle</code>
@@ -168,11 +169,11 @@ public class DefaultLifecycleHandler {
         /*
          * in strict mode the init transition is allowed only from VOID state
          */
-    	if (isStrict()) {
+//    	if (isStrict()) {
     		if (!(state.equals(UNDEFINED) || state.equals(CLEANED_UP))) {
     			throw new IllegalStateException("Lifecycle is not in state UNDEFINED or CLEANED_UP.");
     		}
-    	}
+//    	}
             
         LifecycleStates oldState = state;
         state = INITIALIZING;
@@ -217,7 +218,7 @@ public class DefaultLifecycleHandler {
          * In strict mode the start transition is allowed only from READY or VOID state
          * In case of VOID an init transition will be automatically done before. 
          */
-    	if (isStrict()) {
+//    	if (isStrict()) {
     		switch (state) {
     			case INITIALIZED:
     			case STOPPED:
@@ -232,7 +233,7 @@ public class DefaultLifecycleHandler {
     				}
     			default: throw new IllegalStateException("Lifecycle is already in state STARTED.");
     		}
-    	}
+//    	}
 
         LifecycleStates oldState = state;
         state = STARTING;
@@ -275,11 +276,11 @@ public class DefaultLifecycleHandler {
         /*
          * in strict mode the stop transition is allowed only from STARTED state
          */
-    	if (isStrict()) {
+//    	if (isStrict()) {
     		if (!state.equals(STARTED)) {
     			throw new IllegalStateException("Lifecycle is not in state STARTED.");
     		}
-    	}
+//    	}
             
         LifecycleStates oldState = state;
         state = STOPPING;
@@ -324,7 +325,7 @@ public class DefaultLifecycleHandler {
          * In strict mode the cleanup transition is allowed only from READY or STARTED state.
          * In case of STARTED a stop transition will be automatically done before. 
          */
-    	if (isStrict()) {
+//    	if (isStrict()) {
     		switch (state) {
 				case INITIALIZED:
 				case STOPPED:
@@ -338,7 +339,7 @@ public class DefaultLifecycleHandler {
 					}
 				default: throw new IllegalStateException("Lifecycle is already in state CLEANED_UP or UNDEFINED.");
     		}
-    	}
+//    	}
         
         LifecycleStates oldState = state;
         state = CLEANING_UP;
@@ -420,14 +421,14 @@ public class DefaultLifecycleHandler {
         
     }
 
-    /**
-     * Checks if the lifecycle mode is strict.
-     * @return <code>true</code>, if the mode is strict.
-     */
-    public boolean isStrict() {
-        
-        return strict;
-        
-    }
+//    /**
+//     * Checks if the lifecycle mode is strict.
+//     * @return <code>true</code>, if the mode is strict.
+//     */
+//    public boolean isStrict() {
+//        
+//        return strict;
+//        
+//    }
     
 }

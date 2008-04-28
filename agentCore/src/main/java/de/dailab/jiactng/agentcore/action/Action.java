@@ -28,9 +28,9 @@ import de.dailab.jiactng.agentcore.util.EqualityChecker;
  */
 public class Action implements IActionDescription {
 	/** SerialVersionUID for Serialization */
-    private static final long serialVersionUID = 2416102010976263587L;
+	private static final long serialVersionUID = 2416102010976263587L;
 
-    /** the name of the action */
+	/** the name of the action */
 	private String _name;
 
 	/** The component that holds the funtionality for this action */
@@ -43,22 +43,22 @@ public class Action implements IActionDescription {
 	private List<Class<?>> _resultTypes;
 
 	private IAgentDescription _providerDescription;
-	
+
 	/**
 	 * This constructor is used to create an action template
 	 */
 	public Action() {
-		this(null, null, (List<Class<?>>)null, (List<Class<?>>)null);
+		this(null, null, (List<Class<?>>) null, (List<Class<?>>) null);
 	}
 
 	/**
-	 * This constructor is used to create an action template with only
-	 * the name specified.
+	 * This constructor is used to create an action template with only the name
+	 * specified.
 	 */
 	public Action(String name) {
-	    this(name, null, (List<Class<?>>)null, (List<Class<?>>)null);
+		this(name, null, (List<Class<?>>) null, (List<Class<?>>) null);
 	}
-	
+
 	/**
 	 * Constructor. Creates a new action-declaration.
 	 * 
@@ -71,20 +71,18 @@ public class Action implements IActionDescription {
 	 * @param resultTypes
 	 *            the classes of the results of this action
 	 */
-	public Action(String name, IEffector providerBean, Class<?>[] inputTypes, Class<?>[] resultTypes) {
-		this(
-	        name,
-	        providerBean,
-	        inputTypes != null ? Arrays.asList(inputTypes) : null,
-	        resultTypes != null ? Arrays.asList(resultTypes) : null
-        );
+	public Action(String name, IEffector providerBean, Class<?>[] inputTypes,
+			Class<?>[] resultTypes) {
+		this(name, providerBean, inputTypes != null ? Arrays.asList(inputTypes)
+				: null, resultTypes != null ? Arrays.asList(resultTypes) : null);
 	}
-	
-	public Action(String name, IEffector providerBean, List<Class<?>> inputTypes, List<Class<?>> resultTypes) {
-	    setName(name);
-	    setProviderBean(providerBean);
-	    setInputTypes(inputTypes);
-	    setResultTypes(resultTypes);
+
+	public Action(String name, IEffector providerBean,
+			List<Class<?>> inputTypes, List<Class<?>> resultTypes) {
+		setName(name);
+		setProviderBean(providerBean);
+		setInputTypes(inputTypes);
+		setResultTypes(resultTypes);
 	}
 
 	/**
@@ -96,10 +94,10 @@ public class Action implements IActionDescription {
 	public Action(Action action) {
 		_name = action.getName();
 		providerBean = action.getProviderBean();
-		
+
 		// we can exchange references here, because the lists are immutable
-		_inputTypes= action.getInputTypes();
-		_resultTypes= action.getResultTypes();
+		_inputTypes = action.getInputTypes();
+		_resultTypes = action.getResultTypes();
 	}
 
 	/**
@@ -118,7 +116,7 @@ public class Action implements IActionDescription {
 	public DoAction createDoAction(Object[] newParams, ResultReceiver source) {
 		return new DoAction(this, source, newParams);
 	}
-	
+
 	/**
 	 * Creates a new DoAction-object for this action. The resulting object can
 	 * be written to the memory to trigger the action.
@@ -132,14 +130,15 @@ public class Action implements IActionDescription {
 	 * @return a new DoAction-object that can be used (by writing it to the
 	 *         memory) to call the action.
 	 */
-	public DoAction createDoAction(Object[] newParams, ResultReceiver source, long timeToLive) {
+	public DoAction createDoAction(Object[] newParams, ResultReceiver source,
+			long timeToLive) {
 		return new DoAction(this, source, newParams);
 	}
-	
 
 	/**
 	 * Creates a new Result-object for this action. The resulting object can be
 	 * written to the memory to return the results of the action. *
+	 * 
 	 * @param source
 	 *            the entity that created the results of the action (usually the
 	 *            providing component)
@@ -183,12 +182,12 @@ public class Action implements IActionDescription {
 	public final IEffector getProviderBean() {
 		return providerBean;
 	}
-	
-	public final IAgentDescription getProviderDescription() {
-        return _providerDescription;
-    }
 
-    /**
+	public final IAgentDescription getProviderDescription() {
+		return _providerDescription;
+	}
+
+	/**
 	 * Getter for the result classes.
 	 * 
 	 * @return an array containing the classes of the return-values in correct
@@ -211,12 +210,12 @@ public class Action implements IActionDescription {
 	 *            the parameters to set
 	 */
 	public final void setInputTypes(List<Class<?>> inputTypes) {
-		if(inputTypes != null) {
-		    List<Class<?>> copy= new ArrayList<Class<?>>();
-		    copy.addAll(inputTypes);
-		    _inputTypes= Collections.unmodifiableList(copy);
+		if (inputTypes != null) {
+			List<Class<?>> copy = new ArrayList<Class<?>>();
+			copy.addAll(inputTypes);
+			_inputTypes = Collections.unmodifiableList(copy);
 		} else {
-		    _inputTypes= Collections.emptyList();
+			_inputTypes = Collections.emptyList();
 		}
 	}
 
@@ -228,22 +227,23 @@ public class Action implements IActionDescription {
 		this.providerBean = providerBean;
 	}
 
-	public final void setProviderDescription(IAgentDescription providerDescription) {
-        _providerDescription = providerDescription;
-    }
+	public final void setProviderDescription(
+			IAgentDescription providerDescription) {
+		_providerDescription = providerDescription;
+	}
 
-    /**
+	/**
 	 * @param resultTypes
 	 *            the results to set
 	 */
 	public final void setResultTypes(List<Class<?>> resultTypes) {
-	    if(resultTypes != null) {
-	        List<Class<?>> copy= new ArrayList<Class<?>>();
-	        copy.addAll(resultTypes);
-	        _resultTypes= Collections.unmodifiableList(copy);
-	    } else {
-	        _resultTypes= Collections.emptyList();
-	    }
+		if (resultTypes != null) {
+			List<Class<?>> copy = new ArrayList<Class<?>>();
+			copy.addAll(resultTypes);
+			_resultTypes = Collections.unmodifiableList(copy);
+		} else {
+			_resultTypes = Collections.emptyList();
+		}
 	}
 
 	/**
@@ -267,6 +267,15 @@ public class Action implements IActionDescription {
 			return false;
 		}
 
+		IAgentDescription myAgent = this._providerDescription;
+		IAgentDescription otherAgent = ((Action) obj).getProviderDescription();
+
+		if (myAgent != null && otherAgent != null) {
+			if (myAgent.getAid() != otherAgent.getAid()) {
+				return false;
+			}
+		}
+
 		Action other = (Action) obj;
 		return EqualityChecker.equals(_name, other.getName())
 				&& _inputTypes.equals(other.getInputTypes())
@@ -284,7 +293,10 @@ public class Action implements IActionDescription {
 		prettyPrintArray(builder, _inputTypes);
 		builder.append("\n results=");
 		prettyPrintArray(builder, _resultTypes);
-		builder.append('\n');
+		if (_providerDescription != null) {
+			builder.append("\n provider =");
+			builder.append(_providerDescription.getName());
+		}
 		return builder.toString();
 	}
 
@@ -293,7 +305,7 @@ public class Action implements IActionDescription {
 	 */
 	private void prettyPrintArray(StringBuilder builder, List<Class<?>> list) {
 		builder.append('[');
-		for(Iterator<Class<?>> iter= list.iterator(); iter.hasNext();) {
+		for (Iterator<Class<?>> iter = list.iterator(); iter.hasNext();) {
 			builder.append(iter.next().getName());
 
 			if (iter.hasNext()) {

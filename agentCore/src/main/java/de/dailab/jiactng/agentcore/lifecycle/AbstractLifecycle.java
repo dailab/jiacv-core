@@ -47,15 +47,15 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
         
     }
 
-    /**
-     * Constructor that creates an internally used lifecycle handler for the given mode.
-     * @param strict <code>true</code> for strict mode and <code>false</code> for loose mode
-     */
-    public AbstractLifecycle(boolean strict) {
-        
-        lifecycle = new DefaultLifecycleHandler(this, strict);
-        
-    }
+//    /**
+//     * Constructor that creates an internally used lifecycle handler for the given mode.
+//     * @param strict <code>true</code> for strict mode and <code>false</code> for loose mode
+//     */
+//    public AbstractLifecycle(boolean strict) {
+//        
+//        lifecycle = new DefaultLifecycleHandler(this, strict);
+//        
+//    }
     
     /**
      * The number of the next JMX compliant notification.
@@ -255,13 +255,13 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
         return getState().toString();
     }
     
-	/**
-	 * Getter for attribute "Strict" of the managed resource.
-	 * @return the lifecycle mode of this resource
-	 */
-	public boolean isStrict() {
-		return lifecycle.isStrict();
-	}
+//	/**
+//	 * Getter for attribute "Strict" of the managed resource.
+//	 * @return the lifecycle mode of this resource
+//	 */
+//	public boolean isStrict() {
+//		return lifecycle.isStrict();
+//	}
 	
     /**
      * Uses JMX to send notifications that the attribute "LifecycleState"

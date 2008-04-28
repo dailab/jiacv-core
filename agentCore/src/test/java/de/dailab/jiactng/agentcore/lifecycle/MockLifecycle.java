@@ -15,11 +15,11 @@ public class MockLifecycle extends AbstractLifecycle {
         
     }
     
-    public MockLifecycle(boolean strict) {
-        
-        super(strict);
-        
-    }
+//    public MockLifecycle(boolean strict) {
+//        
+//        super(strict);
+//        
+//    }
 
     public void doInit() throws LifecycleException {
     }

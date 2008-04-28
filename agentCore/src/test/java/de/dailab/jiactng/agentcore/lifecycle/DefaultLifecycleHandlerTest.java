@@ -41,7 +41,7 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
     
     public void testLoose() throws LifecycleException {
 
-        instance = new DefaultLifecycleHandler(this, false);
+        instance = new DefaultLifecycleHandler(this);
         instance.addLifecycleListener(this);
 
         init();
@@ -49,6 +49,9 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
         stop();
         cleanup();
         
+        boolean exception = false;
+        
+        try{
         cleanup();
         start();
         init();
@@ -57,12 +60,17 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
         cleanup();
         start();
         init();
+        } catch(IllegalStateException ise) {
+        	exception = true;
+        }
 
+        assertTrue("Expected exception from lifecycle change",exception);
+        
     }
     
     public void testStrict() throws LifecycleException {
         
-        instance = new DefaultLifecycleHandler(this, true);
+        instance = new DefaultLifecycleHandler(this);
         
         try {
             
@@ -211,7 +219,7 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
      */
     public void testGetState() throws LifecycleException {
         
-        instance = new DefaultLifecycleHandler(this, true);
+        instance = new DefaultLifecycleHandler(this);
         this.addLifecycleListener(this);
         
         assertEquals(instance.getState(), this.getState());
@@ -245,7 +253,7 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
      */
     public void testEvents() throws LifecycleException {
         
-        instance = new DefaultLifecycleHandler(this, true);
+        instance = new DefaultLifecycleHandler(this);
         this.addLifecycleListener(this);
         
         init();

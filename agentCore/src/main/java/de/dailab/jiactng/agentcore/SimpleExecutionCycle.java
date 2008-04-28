@@ -146,12 +146,11 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			 * If Session has a timeout 
 			 */
 			synchronized(memory){
-				Set<Session> sessions = memory.removeAll(new Session());
+				Set<Session> sessions = memory.readAll(new Session());
 				for (Session session : sessions){
 					long timeout = session.getCreationTime() + session.getTimeToLive();
 					if (timeout < System.currentTimeMillis()){
-						// session hasn't timeout yet
-						memory.write(session);
+						// session hasn't timeout yet so do nothing
 					} else {
 						//session has timeout
 						ArrayList<SessionEvent> history = session.getHistory();
@@ -185,6 +184,8 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 						if (!doActionFound){
 							log.warn("Session with no DoAction was deleted due to timeout. Session: " + session);
 						}
+						//last but not least remove timeout session from memory
+						memory.remove(session);
 					}
 				}
 			}

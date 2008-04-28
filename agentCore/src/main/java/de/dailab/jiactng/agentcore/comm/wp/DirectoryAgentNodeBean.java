@@ -159,7 +159,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	}
 
 	public void doCleanup(){
-		_refresher.destroy();
 		try {
 			destroyer.destroy();
 		} catch (DestroyFailedException e) {
@@ -303,7 +302,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 				log.debug("removing action " + action + " from directory");
 				synchronized(space){
+					System.err.println("space before " + space.readAll(new ActionData()));
 					space.remove(actionData);
+					System.err.println("space after " + space.readAll(new ActionData()));
 				}
 
 			} else if (message.getProtocol().equalsIgnoreCase(REMOTEACTION_PROTOCOL_ID)){
@@ -339,22 +340,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	}
 
 	private class SpaceRefresher extends TimerTask{
-
-		/* This space will be used to store actions with logical timeout that had to be rechecked for actual presence.
-		*  it will be used to compare Actions from Agents with the timeoutActions
-		*/
-		SpaceDestroyer<ActionData> timeoutDestroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<ActionData>("TimeoutSpace"));
-		EventedTupleSpace<ActionData> timeoutSpace = timeoutDestroyer.destroybleSpace;
 		
-		public void destroy(){
-			try {
-				timeoutDestroyer.destroy();
-			} catch (DestroyFailedException e) {
-				e.printStackTrace();
-			}
-			timeoutSpace = null;
-			timeoutDestroyer = null;
-		}
 		/**
 		 * Method to keep the actions stored within the tuplespace up to date.
 		 * within a regular interval this method is called. It checks which actiondata
@@ -370,19 +356,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 				log.debug("Beginning refreshment of stored actions");
 				// Check the Space for timeouts by using the current and now obsolete logical time
-				Set<ActionData> timeouts = space.removeAll(actionTemplate);
-				if (timeouts.isEmpty()){
-					return;
-				} else {
-				for (ActionData timeout : timeouts)
-					timeoutSpace.write(timeout);
-				}
+				Set<ActionData> timeouts = space.readAll(actionTemplate);
+				
 
 				// as long as timeouts are existing...
-				while (timeoutSpace.iterator().hasNext()){
-					System.err.println("as long as timeouts are not empty");
+				while (!timeouts.isEmpty()){
 					//get the first of them and the action stored within it
-					ActionData actionData = timeoutSpace.iterator().next();
+					ActionData actionData = timeouts.iterator().next();
+					timeouts.remove(actionData);
 					IActionDescription timeoutActionDesc = actionData.getActionDescription();
 
 					// now let's see if the agent still provides any actions
@@ -393,7 +374,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					IAgent timeoutAgent = null;
 
 					List<IAgent> agents = agentNode.findAgents();
-					System.err.println("find timeoutagent");
 					//TODO find an alternative solution for agents that are not on this agentnode
 					for (IAgent agent : agents){
 						if (agent.getAgentId().equals(timeoutAgentID)){
@@ -403,12 +383,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					}
 					
 					if (timeoutAgent == null){
-						System.err.println("no timeoutagent found");
 						log.warn("Agent with ID " + timeoutAgentID + " hasn't removed it's actions from Directory and isn't present anymore");
-						timeouts.remove(actionData);
+						space.remove(actionData);
 						continue;
 					} else {
-						System.err.println("found timeoutagent now getting list of actions");
 						actions = timeoutAgent.getActionList();
 						if (actions != null){
 							/*
@@ -417,24 +395,23 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 							 * same time
 							 */
 							for (IActionDescription action: actions){
-								System.err.println("as long as there are actions...");
 
 								ActionData refreshAction = new ActionData();
 								refreshAction.setActionDescription((IActionDescription) action);
 								// remove this action from the timeouts if it is within them so it hasn't to be looked up twice
-								if (timeoutSpace.remove(refreshAction) != null){
-									System.err.println("found timeout-action");
+								
+								if ( (space.remove(refreshAction)) != null){
 									/*  if the action was within the timeouts and though shall be known to the outside world
 									 *  let's refresh it too since we're already refreshing
 									 */
+									timeouts.remove(refreshAction);
 									refreshAction.setCreationTime(_currentLogicTime + 1);
 									space.write(refreshAction);
 								}
 							}
 						} else {
-							System.err.println("action isn't present anymore!");
 							// Action isn't present anymore on agent
-							timeoutSpace.remove(actionData);
+							space.remove(actionData);
 						}
 					}
 				}
@@ -475,6 +452,18 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 		public IActionDescription getActionDescription(){
 			return _action;
+		}
+		
+		public String toString(){
+			String thisString = "ActionData: ";
+			if (_action != null){
+				thisString += "Action.name= " + _action.getName() + ";";
+			}
+			if (_creationTime != null){
+				thisString += "CreationTime=" + _creationTime + ";";
+			}
+			
+			return thisString;
 		}
 
 	}

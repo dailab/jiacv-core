@@ -10,8 +10,8 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 public class RemoteActionTestBean extends AbstractAgentBean implements ResultReceiver{
 
 	private Action _requestAction;
-	private DoAction _lastDoAction = null;
 	private ActionResult _lastActionResult = null;
+	private DoAction _lastDoAction = null;
 
 	public void doStart() throws Exception {
 		super.doStart();
@@ -58,6 +58,12 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 
 		_lastActionResult = result;
 
+	}
+	
+	@Override
+	public void cancelAction(DoAction doAction) {
+		System.err.println("GOT TIMEOUT! GOT TIMEOUT! GOT FRAGGING TIMEOUT WITHIN REMOTE_ACTION_TEST_BEAN!!!");
+		super.cancelAction(doAction);
 	}
 
 }

@@ -22,7 +22,6 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 	public final static String ACTION_TIMEOUT_TEST = "de.dailab.jiactng.agentcore.comm.wp.RemoteActionTestBean#timeoutTest";
 	public final static String ACTION_GET_SOME_RESULT = "de.dailab.jiactng.agentcore.comm.wp.RemoteActionTestBean#getSomeResult";
 
-	private Object _timeoutLock;
 	private Action _sendAction;
 	private String _messageboxName;
 	private ICommunicationAddress _directoryAddress;
@@ -100,7 +99,7 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 	 */ 
 	public Object timeoutTest(){
 		try {
-			_timeoutLock.wait();
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -112,7 +111,6 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 	 */
 	public Object getSomeResult(Object result) {
 		log.debug("somebody wants a result? ... tztz");
-//		_timeoutLock.notify();
 		return result;
 	}
 

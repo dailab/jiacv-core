@@ -148,10 +148,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			synchronized(memory){
 				Set<Session> sessions = memory.readAll(new Session());
 				for (Session session : sessions){
-					long timeout = session.getCreationTime() + session.getTimeToLive();
-					if (timeout < System.currentTimeMillis()){
-						// session hasn't timeout yet so do nothing
-					} else {
+					if (session.isTimeout()){
 						//session has timeout
 						ArrayList<SessionEvent> history = session.getHistory();
 						

@@ -132,7 +132,7 @@ public class Action implements IActionDescription {
 	 */
 	public DoAction createDoAction(Object[] newParams, ResultReceiver source,
 			long timeToLive) {
-		return new DoAction(this, source, newParams);
+		return new DoAction(this, source, newParams, timeToLive);
 	}
 
 	/**

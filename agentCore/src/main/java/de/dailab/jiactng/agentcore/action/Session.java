@@ -201,6 +201,10 @@ public class Session implements IFact {
 	public Long getCreationTime() {
 		return creationTime;
 	}
+	
+	public boolean isTimeout(){
+		return (System.currentTimeMillis() > (creationTime.longValue() + timeToLive.longValue()));
+	}
 
 	/**
 	 * @param creationTime

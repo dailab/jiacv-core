@@ -39,23 +39,23 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		IExecutionCycle {
 
 	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
-	
+
 	/**
 	 * Run-method for the execution cycle. The method iterates over the list of
 	 * agentbeans and calls the execute method of each <i>active</i> agentbean.
 	 * 
-	 * This method also takes care of new <code>DoAction</code>s and 
+	 * This method also takes care of new <code>DoAction</code>s and
 	 * <code>ActionResult</code>s.
 	 * 
 	 * The <code>SimpleExecutionCycle</code> only executes agentbeans and
-	 * handles DoActions and ActionResults when it has reached 
+	 * handles DoActions and ActionResults when it has reached
 	 * <code>LifecycleStates.STARTED</code>.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.IExecutionCycle#run()
 	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
 	public void run() {
-		//check if lifecycle has been started --> execute if STARTED
+		// check if lifecycle has been started --> execute if STARTED
 		if (getState() == LifecycleStates.STARTED) {
 			// execute the ripest bean
 			IAgentBean minBean = null;
@@ -66,26 +66,26 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 				if (bean.getState() != LifecycleStates.STARTED) {
 					continue;
 				}
-	
+
 				// check if bean has cyclic behavior, if not --> reject
 				if (bean.getExecuteInterval() <= 0) {
 					continue;
 				}
-	
+
 				// execution time not reached yet --> reject
 				if (bean.getNextExecutionTime() > now) {
 					continue;
 				}
-	
+
 				// execution time is not minimum --> reject
 				if (bean.getNextExecutionTime() > minExecutionTime) {
 					continue;
 				}
-	
+
 				minBean = bean;
 				minExecutionTime = bean.getNextExecutionTime();
 			}
-	
+
 			// if there is a minBean then execute
 			if (minBean != null) {
 				try {
@@ -94,103 +94,121 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 					log.error("Error when executing bean \'"
 							+ minBean.getBeanName() + "\'", ex);
 				}
-	
+
 				// reschedule bean
-				minBean.setNextExecutionTime(now + minBean.getExecuteInterval());
-			} 
-//			else {
-//				log.debug("No active beans to execute");
-//			}
-	
+				minBean
+						.setNextExecutionTime(now
+								+ minBean.getExecuteInterval());
+			}
+			// else {
+			// log.debug("No active beans to execute");
+			// }
+
 			// process one doAction
 			// TODO: check if read can be used
 			DoAction act = memory.remove(new DoAction(null, null, null, null));
-	
+
 			if (act != null) {
 				synchronized (this) {
 					performDoAction(act);
 				}
 			}
-	
+
 			// process one actionResult
 			// TODO: check if read can be used
-			Set<ActionResult> resultSet = memory.removeAll(new ActionResult(null, null));
+			Set<ActionResult> resultSet = memory.removeAll(new ActionResult(
+					null, null));
 			int countNew = 0;
-			for(ActionResult ar : resultSet) {
-				if(ar.getSource()!= null && ((DoAction)ar.getSource()).getSource()!=null) {
-					synchronized(this) {
+			for (ActionResult ar : resultSet) {
+				if (ar.getSource() != null
+						&& ((DoAction) ar.getSource()).getSource() != null) {
+					synchronized (this) {
 						pendingResults.add(ar);
 						countNew++;
 					}
 				}
 			}
-		
-			if(!pendingResults.isEmpty()) {
-				synchronized(this) {
-					ActionResult actionResult = pendingResults.iterator().next(); 
+
+			if (!pendingResults.isEmpty()) {
+				synchronized (this) {
+					ActionResult actionResult = pendingResults.iterator()
+							.next();
 					processResult(actionResult);
 					pendingResults.remove(actionResult);
 				}
 			}
-			
-//			ActionResult actionResult = memory.remove(new ActionResult(null, null));
-//			if (actionResult != null) {
-//				synchronized (this) {
-//					processResult(actionResult);
-//				}
-//			}
-			
+
+			// ActionResult actionResult = memory.remove(new ActionResult(null,
+			// null));
+			// if (actionResult != null) {
+			// synchronized (this) {
+			// processResult(actionResult);
+			// }
+			// }
+
 			/*
 			 * Session-Cleanup
 			 * 
-			 * If Session has a timeout 
+			 * If Session has a timeout
 			 */
-			synchronized(memory){
+			synchronized (memory) {
 				Set<Session> sessions = memory.readAll(new Session());
 				for (Session session : sessions){
 					if (session.isTimeout()){
-						//session has timeout
+						// session has timeout
 						ArrayList<SessionEvent> history = session.getHistory();
-						
+
 						// Does Session is related to DoAction?
 						boolean doActionFound = false;
-						for(SessionEvent event : history){
-							if (event instanceof DoAction){
-								//doAction found
+						for (SessionEvent event : history) {
+							if (event instanceof DoAction) {
+								// doAction found
 								doActionFound = true;
 								DoAction doAction = (DoAction) event;
-								if (doAction.getAction() instanceof Action){
-									// Got an Action, so let's cancel this doAction
-									
-									Action action = (Action) doAction.getAction();
+								if (doAction.getAction() instanceof Action) {
+									// Got an Action, so let's cancel this
+									// doAction
+
+									Action action = (Action) doAction
+											.getAction();
 									log.debug("canceling DoAction " + doAction);
-									action.getProviderBean().cancelAction(doAction);
-								} else if (session.getSource() != null){
-									// there isn't an Action, so let's send the failure to the source
-									
-									log.debug("Sending timeout Result to source of Session " + session);
-									ResultReceiver receiver = session.getSource();
-									ActionResult result = new ActionResult(doAction, new RuntimeException("DoAction has timeout"));
+									action.getProviderBean().cancelAction(
+											doAction);
+								} else if (session.getSource() != null) {
+									// there isn't an Action, so let's send the
+									// failure to the source
+
+									log
+											.debug("Sending timeout Result to source of Session "
+													+ session);
+									ResultReceiver receiver = session
+											.getSource();
+									ActionResult result = new ActionResult(
+											doAction, new RuntimeException(
+													"DoAction has timeout"));
 									receiver.receiveResult(result);
 								} else {
-									log.warn("DoAction has to be canceled due to sessiontimeout " + doAction);
+									log
+											.warn("DoAction has to be canceled due to sessiontimeout "
+													+ doAction);
 								}
 							}
 						}
-						
-						if (!doActionFound){
-							log.warn("Session with no DoAction was deleted due to timeout. Session: " + session);
+
+						if (!doActionFound) {
+							log
+									.warn("Session with no DoAction was deleted due to timeout. Session: "
+											+ session);
 						}
 						//last but not least remove timeout session from memory
 						memory.remove(session);
 					}
 				}
 			}
-			
-			
-		} 
 
-		//reject execution if SimpleExecutionCycle hasn't been started
+		}
+
+		// reject execution if SimpleExecutionCycle hasn't been started
 		else {
 			log.error("Trying to run SimpleExecutionCycle in state "
 					+ getState());
@@ -201,14 +219,13 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		long start = System.nanoTime();
 		boolean success = false;
 
-		if (((Action)act.getAction()).getProviderBean() != null) {
+		if (((Action) act.getAction()).getProviderBean() != null) {
 			try {
-//				memory.write(act.getSession());
-				((Action)act.getAction()).getProviderBean().doAction(act);
+				memory.write(act.getSession());
+				((Action) act.getAction()).getProviderBean().doAction(act);
 				success = true;
 			} catch (Throwable t) {
-				log.error("--- action failed: "
-						+ act.getAction().getName());
+				log.error("--- action failed: " + act.getAction().getName());
 			}
 		} else {
 			log.error("--- found action without bean: "
@@ -216,7 +233,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		}
 
 		long end = System.nanoTime();
-		actionPerformed(act, end-start, success);		
+		actionPerformed(act, end - start, success);
 	}
 
 	private void processResult(ActionResult actionResult) {
@@ -224,17 +241,18 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		// den Memory schreiben
 		if (((DoAction) actionResult.getSource()) == null
 				|| ((DoAction) actionResult.getSource()).getSource() == null) {
-			//memory.write(actionResult);
-;
+			// memory.write(actionResult);
+			;
 		} else {
-		    DoAction doAct = ((DoAction) actionResult.getSource());
-//		    Session template= new Session(doAct.getSessionId(),doAct.getSession().getCreationTime(),null,null);
-//			memory.remove(new ActionResult(null,template,null,null));
-//			DoAction doAct = ((DoAction) actionResult.getSource());
-			//memory.remove(doAct.getSession());
-//			memory.remove(template);
+			DoAction doAct = ((DoAction) actionResult.getSource());
+			// Session template= new
+			// Session(doAct.getSessionId(),doAct.getSession().getCreationTime(),null,null);
+			// memory.remove(new ActionResult(null,template,null,null));
+			// DoAction doAct = ((DoAction) actionResult.getSource());
+			memory.remove(doAct.getSession());
+			// memory.remove(template);
 			((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
-			
+
 		}
 		// ArrayList history = actionResult.getSession().getHistory();
 		// for (int i = history.size() - 1; i >= 0; i--) {
@@ -246,50 +264,49 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		// }
 	}
 
-    /**
-     * Uses JMX to send notifications that an action was performed
-     * by the managed execution cycle of an agent.
-     *
-     * @param action the performed action.
-     * @param duration the duration of the execution.
-     */
-    public void actionPerformed(DoAction action, long duration, boolean success) {
-        Notification n =
-                new ActionPerformedNotification(this,
-                sequenceNumber++,
-                System.currentTimeMillis(),
-                "Action performed",
-                action, duration, success);
-        
-        sendNotification(n);
-    }
+	/**
+	 * Uses JMX to send notifications that an action was performed by the
+	 * managed execution cycle of an agent.
+	 * 
+	 * @param action
+	 *            the performed action.
+	 * @param duration
+	 *            the duration of the execution.
+	 */
+	public void actionPerformed(DoAction action, long duration, boolean success) {
+		Notification n = new ActionPerformedNotification(this,
+				sequenceNumber++, System.currentTimeMillis(),
+				"Action performed", action, duration, success);
 
-    /**
-     * Gets information about all notifications this execution cycle instance may send.
-     * This contains also information about the <code>ActionPerformedNotification</code> 
-     * to notify about performed actions.
-     * @return list of notification information.
-     */
-    @Override
-    public MBeanNotificationInfo[] getNotificationInfo() {
-    	MBeanNotificationInfo[] parent = super.getNotificationInfo();
-    	int size = parent.length;
-    	MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
-    	for (int i=0; i<size; i++) {
-    		result[i] = parent[i];
-    	}
-    	
-        String[] types = new String[] {
-        		ActionPerformedNotification.ACTION_PERFORMED
-        };
-        String name = ActionPerformedNotification.class.getName();
-        String description = "An action was performed";
-        MBeanNotificationInfo info =
-                new MBeanNotificationInfo(types, name, description);
-        result[size] = info;
-        return result;
-    }
-    
+		sendNotification(n);
+	}
+
+	/**
+	 * Gets information about all notifications this execution cycle instance
+	 * may send. This contains also information about the
+	 * <code>ActionPerformedNotification</code> to notify about performed
+	 * actions.
+	 * 
+	 * @return list of notification information.
+	 */
+	@Override
+	public MBeanNotificationInfo[] getNotificationInfo() {
+		MBeanNotificationInfo[] parent = super.getNotificationInfo();
+		int size = parent.length;
+		MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
+		for (int i = 0; i < size; i++) {
+			result[i] = parent[i];
+		}
+
+		String[] types = new String[] { ActionPerformedNotification.ACTION_PERFORMED };
+		String name = ActionPerformedNotification.class.getName();
+		String description = "An action was performed";
+		MBeanNotificationInfo info = new MBeanNotificationInfo(types, name,
+				description);
+		result[size] = info;
+		return result;
+	}
+
 	/**
 	 * Registers the execution cycle for management
 	 * 
@@ -342,12 +359,12 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 		_manager = null;
 	}
-	
+
 	@SuppressWarnings("serial")
-	public class TimeoutException extends RuntimeException{
-		public TimeoutException(String s){
+	public class TimeoutException extends RuntimeException {
+		public TimeoutException(String s) {
 			super(s);
 		}
 	}
-	
+
 }

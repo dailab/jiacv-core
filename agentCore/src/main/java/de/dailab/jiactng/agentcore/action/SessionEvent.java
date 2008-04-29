@@ -15,8 +15,8 @@ public class SessionEvent implements IFact {
 	/** SerialVersionUID for Serialization */
 	private static final long serialVersionUID = 2754758742968423185L;
 
-//	/** The session of the session this session event belongs to. */
-//	private Session session;
+	/** The session of the session this session event belongs to. */
+	private Session session;
 
 	/** Redundant for the sake of SimpleSpace. */
 	private String sessionId;
@@ -47,35 +47,17 @@ public class SessionEvent implements IFact {
 			this.sessionId = session.getSessionId();
 		}
 		
+		this.session = session;
 		this.action = action;
 		this.source = source;
 	}
 	
-//	/**
-//	 * Subclasses use this constructor to set the session and action of a
-//	 * session event.
-//	 * 
-//	 * @param session
-//	 *            the session this event belongs to
-//	 * @param action
-//	 *            the action this event is trigger or result of
-//	 * @param source
-//	 *            the originator of this event
-//	 */
-//	public SessionEvent(String sessionId, IActionDescription action, Object source) {
-////		this.session = session;
-////		if (session != null)
-//		this.sessionId = sessionId;
-//		this.action = action;
-//		this.source = source;
-//	}
-
 	public SessionEvent(DoAction source) {
 		this(null, null, source);
 		if (source != null) {
 			this.sessionId = source.getSessionId();
-//			if (this.session != null)
-//				this.sessionId = this.session.getId();
+			if (this.session != null)
+				this.sessionId = this.session.getSessionId();
 			this.action = source.getAction();
 		}
 	}
@@ -110,13 +92,13 @@ public class SessionEvent implements IFact {
 		this.source = source;
 	}
 
-//	/**
-//	 * @return the session
-//	 */
-//	public Session getSession() {
-//		return session;
-//	}
-//
+	/**
+	 * @return the session
+	 */
+	public Session getSession() {
+		return session;
+	}
+
 //	/**
 //	 * @param session
 //	 *            the session to set
@@ -124,7 +106,7 @@ public class SessionEvent implements IFact {
 //	public void setSession(Session session) {
 //		this.session = session;
 //		if (session != null)
-//			this.sessionId = session.getId();
+//			this.sessionId = session.getSessionId();
 //	}
 
 	/**

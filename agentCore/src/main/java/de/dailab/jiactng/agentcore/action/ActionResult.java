@@ -44,16 +44,16 @@ public class ActionResult extends SessionEvent {
 	public ActionResult(DoAction source, Object[] results) {
 		super(source);
 		this._results = results;
-//		if (getSession() != null)
-//			getSession().addToSessionHistory(this);
+		if (getSession() != null)
+			getSession().addToSessionHistory(this);
 		if ((source != null) && (source.getMetaData() != null))
 			super.setMetaData(source.getMetaData());
 	}
 
 	public ActionResult(DoAction source, Serializable failure) {
 		super(source);
-//		if (getSession() != null)
-//			getSession().addToSessionHistory(this);
+		if (getSession() != null)
+			getSession().addToSessionHistory(this);
 		if ((source != null) && (source.getMetaData() != null))
 			super.setMetaData(source.getMetaData());
 		_failure = failure;

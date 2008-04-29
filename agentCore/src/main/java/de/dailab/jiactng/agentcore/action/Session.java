@@ -223,13 +223,13 @@ public class Session implements IFact {
 		return history;
 	}
 
-	/**
-	 * @param history
-	 *            the history to set
-	 */
-	public void setHistory(ArrayList<SessionEvent> history) {
-		this.history = history;
-	}
+//	/**
+//	 * @param history
+//	 *            the history to set
+//	 */
+//	public void setHistory(ArrayList<SessionEvent> history) {
+//		this.history = history;
+//	}
 
 	/**
 	 * Will add the given object to the session history.
@@ -305,5 +305,19 @@ public class Session implements IFact {
 
 		builder.append('\n');
 		return builder.toString();
+	}
+	
+	public int hashCode() {
+		return this.sessionId.hashCode();
+	}
+	
+	public boolean equals(Object obj) {
+		if(obj == null  || !(obj instanceof Session)) 
+			return false;
+		Session other = (Session)obj;
+		if(this.sessionId==null || other.sessionId==null)
+			return true;
+		else
+			return this.sessionId.equals(other.sessionId);
 	}
 }

@@ -26,30 +26,35 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	private Action _requestAction;
 	private Action _addActionAction;
 	private Action _removeActionAction;
-	
+	private Action _addAutoEnlistActionTemplate;
+	private Action _removeAutoEnlistActionTemplate;
+	private ActionResult _lastFailure = null;
+
 	List<IFact> _results = new ArrayList<IFact>();
 	DoAction _lastDoAction = null;
-	
+
 	/**
 	 * 
 	 */
 	public WhitePagesTestBean() {
 	}
-	
+
 	@Override
 	public void doInit() throws Exception {
 		super.doInit();
 		//nothing to do yet
 	}
-	
+
 	@Override
 	public void doStart() throws Exception {
 		super.doStart();
 		_requestAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch"));
 		_addActionAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory"));
 		_removeActionAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory"));
+		_addAutoEnlistActionTemplate = memory.read(new Action(DirectoryAccessBean.ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE));
+		_removeAutoEnlistActionTemplate = memory.read(new Action(DirectoryAccessBean.ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE));
 	}
-	
+
 	/**
 	 * Creates an action and starts a search for an Agent with the name of agentname
 	 * 
@@ -63,7 +68,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		_lastDoAction = action;
 		memory.write(action);
 	}
-	
+
 	public void searchForActionDesc(IActionDescription actionDesc){
 		log.debug("Searching for Action " + actionDesc.toString());
 		Object[] params = {actionDesc};
@@ -71,7 +76,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		_lastDoAction = action;
 		memory.write(action);
 	}
-	
+
 	public void addActionToDirectory(IActionDescription actionDesc){
 		log.debug("Adding Action to Directory: " + actionDesc);
 		Object[] params = {actionDesc};
@@ -79,7 +84,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		_lastDoAction = action;
 		memory.write(action);
 	}
-	
+
 	public void removeActionFromDirectory(IActionDescription actionDesc){
 		log.debug("removing Action from Directory");
 		Object[] params = {actionDesc};
@@ -87,12 +92,24 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		_lastDoAction = action;
 		memory.write(action);
 	}
-	
+
+	public void TimeoutTest(){
+		log.debug("trying timeoutsearch");
+		DoAction action = _requestAction.createDoAction(new Object[] {new AgentDescription(null, "NixAgentos", null, null)}, this, 1);
+		memory.write(action);
+		((Action) action.getAction()).getProviderBean().cancelAction(action); 
+	}
+
+
 	public Action getSendAction(){
 		return memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 	}
 	
-	
+	public void addAutoEnlistActionTemplate(IActionDescription template){
+		
+	}
+
+
 	/**
 	 * Receives the result for the action created in searchForAgentDesc and stores it for later withdrawl
 	 */
@@ -101,19 +118,29 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	synchronized public void receiveResult(ActionResult result) {
 		log.debug("WhitePagesTestBean Receiving Result");
 		if (result != null) log.debug("Result reads: " + result);
-		
-		Object[] actionResults = result.getResults();
 
-		if (actionResults[0] != null) {
-			List<IFact> results = (List<IFact>) actionResults[0];
-			synchronized(_results){
-				_results = new ArrayList<IFact>();
-				for (Object obj : results){
-					if (obj instanceof IFact)
-						_results.add((IFact) obj);
+		if (result.getResults() != null){
+			Object[] actionResults = result.getResults();
+
+			if (actionResults[0] != null) {
+				List<IFact> results = (List<IFact>) actionResults[0];
+				synchronized(_results){
+					_results = new ArrayList<IFact>();
+					for (Object obj : results){
+						if (obj instanceof IFact)
+							_results.add((IFact) obj);
+					}
 				}
 			}
+		} else {
+			_lastFailure = result;
 		}
+	}
+
+	public ActionResult getLastFailure(){
+		ActionResult result = _lastFailure;
+		_lastFailure = null;
+		return result;
 	}
 	
 	/**

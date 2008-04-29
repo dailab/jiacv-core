@@ -103,7 +103,7 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return "This message should never come through to the caller of this action";
 	}
 
 	/*

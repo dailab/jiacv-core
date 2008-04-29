@@ -30,7 +30,7 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 	public void useRemoteAction(Action action, Object[] params, long timeToLive){
 		log.debug("using remote Action " + action.getName());
 		DoAction remoteAction = action.createDoAction(params, this, timeToLive);
-
+		
 		_lastDoAction = remoteAction;
 		memory.write(remoteAction);
 	}
@@ -48,22 +48,16 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 	}
 
 	/**
-	 * Receives the result for the action created in searchForAgentDesc and stores it for later withdrawl
+	 * Receives the result for the action created in <code>useRemoteAction</code> and stores it for later withdrawl
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	synchronized public void receiveResult(ActionResult result) {
-		log.debug("WhitePagesTestBean Receiving Result");
+		log.debug("RemoteActionTestBean Receiving Result");
 		if (result != null) log.debug("Result reads: " + result);
 
 		_lastActionResult = result;
 
-	}
-	
-	@Override
-	public void cancelAction(DoAction doAction) {
-		System.err.println("GOT TIMEOUT! GOT TIMEOUT! GOT FRAGGING TIMEOUT WITHIN REMOTE_ACTION_TEST_BEAN!!!");
-		super.cancelAction(doAction);
 	}
 
 }

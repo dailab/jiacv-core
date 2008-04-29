@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
 
 import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
@@ -647,14 +648,15 @@ public class JmxManager implements Manager {
 	}
 
 	/**
-	 * Creates all specified connector server for remote management and registers
-	 * them in the MBean server.
+	 * Creates all specified connector server for remote management, registers
+	 * them in the MBean server and announces them via multicast periodically.
 	 * @param nodeId the unique identifier of the agent node
 	 * @param nodeName the unique identifier of the agent node
 	 * @param jmxConnectors a set of connector configurations
 	 * @see JMXServiceURL#JMXServiceURL(String, String, int, String)
 	 * @see JMXConnectorServerFactory#newJMXConnectorServer(JMXServiceURL, Map, MBeanServer)
 	 * @see javax.management.remote.JMXConnectorServerMBean#start()
+	 * @see JmxMulticastSender
 	 */
 	public void enableRemoteManagement(String nodeId, String nodeName, Set<Map<String,String>> jmxConnectors) {
 		if (!jmxConnectors.isEmpty()) {
@@ -758,10 +760,17 @@ public class JmxManager implements Manager {
 				System.err.println("WARNING: Unable to register JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");
 				System.err.println(e.getMessage());
 			}
-
-			// register connector server
-			// TODO register the connector server in a server directory
 		}		
+
+		// send addresses of all connector servers via multicast periodically
+		String[] jmxURLs = new String[_connectorServer.size()];
+		for (int i=0; i<_connectorServer.size(); i++) {
+			jmxURLs[i] = _connectorServer.get(i).getAddress().toString();
+		}
+		Timer ti = new Timer();
+		JmxMulticastSender multiSend = new JmxMulticastSender(9999, "226.6.6.7", 1, jmxURLs);
+		ti.schedule(multiSend, 1000, 3600);
+		System.out.println("Initiated multicast sender on port 9999 with group 226.6.6.7 and interval 3600");
 	}
 
 	/**

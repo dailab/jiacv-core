@@ -5,27 +5,27 @@
 	- Application context definition for usage within CommunicationBean related tests and examples 
 -->
 <beans>
-	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
 
 	<bean name="CommunicationPlatform" parent="Platform">
 		<property name="agentNodeBeans">
 			<list>
-				<ref bean="FanzyBroker"/>
+				<ref bean="FanzyBroker" />
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean name="FanzyBroker" parent="ActiveMQBroker" singleton="true">
 		<property name="connectors">
 			<set>
-				<ref bean="FanzyConnector"/>
+				<ref bean="FanzyConnector" />
 			</set>
 		</property>
 	</bean>
-	
+
 	<bean name="FanzyConnector" parent="ActiveMQTransportConnector" singleton="true">
-      <property name="transportURI" value="tcp://10.0.4.76:0" />
-      <property name="discoveryURI" value="multicast://239.255.7.42:5555" />
-   </bean>
+		<property name="transportURI" value="tcp://10.0.4.76:0" />
+		<property name="discoveryURI" value="multicast://simplechat" />
+	</bean>
 </beans>

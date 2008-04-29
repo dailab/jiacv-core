@@ -9,7 +9,7 @@ import de.dailab.jiactng.agentcore.IExecutionCycle;
 
 /**
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class FakeExecutionCycle extends AbstractAgentBean implements IExecutionCycle {
     public void setAgent(IAgent agent) {

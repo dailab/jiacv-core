@@ -45,6 +45,7 @@ public class JmxManager implements Manager {
 	private final static String DOMAIN = "de.dailab.jiactng";
 	private MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 	private ArrayList<JMXConnectorServer> _connectorServer = new ArrayList<JMXConnectorServer>();
+	private Timer ti = null;
 
 	/**
 	 * Constructs a JMX compliant name for the management of an agent node.
@@ -767,7 +768,7 @@ public class JmxManager implements Manager {
 		for (int i=0; i<_connectorServer.size(); i++) {
 			jmxURLs[i] = _connectorServer.get(i).getAddress().toString();
 		}
-		Timer ti = new Timer();
+		ti = new Timer();
 		JmxMulticastSender multiSend = new JmxMulticastSender(9999, "226.6.6.7", 1, jmxURLs);
 		ti.schedule(multiSend, 1000, 3600);
 		System.out.println("Initiated multicast sender on port 9999 with group 226.6.6.7 and interval 3600");
@@ -779,6 +780,12 @@ public class JmxManager implements Manager {
 	 * @see javax.management.remote.JMXConnectorServerMBean#stop()
 	 */
 	public void disableRemoteManagement(String nodeName) {
+		// stop multicast sender
+		if (ti != null) {
+			ti.cancel();
+			ti = null;
+		}
+
 		// Deregister and stop all connector servers
 		Iterator<JMXConnectorServer> i = this._connectorServer.iterator();
 		while (i.hasNext()) {

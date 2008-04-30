@@ -37,8 +37,8 @@ MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 JmxManager manager = new JmxManager();
 try {
     ObjectName node = manager.getMgmtNameOfAgentNode("<i>myAgentNodeName</i>");
-    ObjectName agent = manager.getMgmtNameOfAgent("<i>myAgentNodeName</i>", "<i>myAgentName</i>");
-    ObjectName bean = manager.getMgmtNameOfAgentBean("<i>myAgentNodeName</i>", "<i>myAgentName</i>", "<i>myAgentBeanName</i>");
+    ObjectName agent = manager.getMgmtNameOfAgent("<i>myAgentNodeName</i>", "<i>myAgentId</i>");
+    ObjectName bean = manager.getMgmtNameOfAgentBean("<i>myAgentNodeName</i>", "<i>myAgentId</i>", "<i>myAgentBeanName</i>");
 } catch (Exception e) {
     System.err.println("Wrong parameter format for construction of the object name of resources");
 }</source>
@@ -111,18 +111,58 @@ try {
 	       <a href="http://mx4j.sourceforge.net/">SOAP</a>, 
 	       <a href="https://ws-jmx-connector.dev.java.net/">WS</a>, 
 	       <a href="http://lingo.codehaus.org/">JMS</a>) but 
-	       only the RMI connector is part of JRE version 1.5 or higher. If you want
-	       to use a RMI registry as a lookup service, you have to specify the host
-	       and port of the registry as well as the name of the agent node within the
-	       URL path instead of specify host, port and JMX-ID of the agent node directly.
+	       only the RMI connector is part of JRE version 1.5 or higher. 
+	    </p>
+	    <p> 
+	       To get the URL of the
+	       JMX connector servers of agent nodes you can use a RMI registry or the multicast
+	       mechanism. With the following code you can read the entries of a registry.
+	       <source>
+String[] nodeIds = new String[0];
+try {
+    Registry registry = LocateRegistry.getRegistry(<i>myRegistryHost</i>, <i>myRegistryPort</i>);
+    nodeIds = registry.list();
+catch(RemoteException e) {
+    System.err.println("Registry on specified host and port not available");
+}
+for (int i=0; i&lt;nodeIds.length; i++) {
+    if (nodeIds[i].startsWith(IdFactory.IdPrefix.Node.toString())) {
+        try {
+            JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + <i>myRegistryHost</i> + ":" + <i>myRegistryPort</i> + "/" + nodeIds[i]);
+            ...
+        }
+        catch (MalformedURLException e) {
+            System.err.println("One of the URL parts are syntactically incorrect or the local host name can not be identified");
+        }
+    }
+}</source>
+	       To receive the URLs via multicast within the same subnet you can use the following code:
 	       <source>
 try {
-    JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + <i>myRegistryHost</i> + ":" + <i>myRegistryPort</i> + "/" + <i>myAgentNodeName</i>);
+    byte[] buffer = new byte[1000];
+    DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+    MulticastSocket socket = new MulticastSocket(9999);
+    socket.setTimeToLive(1);
+    InetAddress group = InetAddress.getByName("226.6.6.7");
+    socket.joinGroup(group);
+    while (true) {
+        dp.setLength(1000);
+        socket.receive(dp);
+        buffer = dp.getData();
+        String message = new String(buffer, 0, dp.getLength());
+        JMXServiceURL url = new JMXServiceURL(message);
+        ...
+    }
+    socket.leaveGroup(group);
+} catch (Exception e) {
+    System.err.println("Error while getting URL of JMX connector servers");
+}</source>
+	       To establish a MBean server connection to a remote agent node you
+	       have to do following:
+	       <source>
+try {
     JMXConnector jmxc = JMXConnectorFactory.connect(url);
     MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
-}
-catch (MalformedURLException e) {
-    System.err.println("One of the URL parts are syntactically incorrect or the local host name can not be identified");
 }
 catch (IOException) {
     System.err.println("Communication problem when creating connector or connection");
@@ -130,15 +170,11 @@ catch (IOException) {
 	       For client authentication you have to specify username and password:
 	       <source>
 try {
-    JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + <i>myRegistryHost</i> + ":" + <i>myRegistryPort</i> + "/" + <i>myAgentNodeName</i>);
     HashMap&lt;String,Object&gt; env = new HashMap&lt;String,Object&gt;();
     String[] creds = {<i>myUserName</i>, <i>myPassword</i>};
     env.put(JMXConnector.CREDENTIALS, creds);
     JMXConnector jmxc = JMXConnectorFactory.connect(url, env);
     MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
-}
-catch (MalformedURLException e) {
-    System.err.println("One of the URL parts are syntactically incorrect or the local host name can not be identified");
 }
 catch (IOException) {
     System.err.println("Communication problem when creating connector or connection");
@@ -148,14 +184,15 @@ catch (SecurityException) {
 }</source>
 	       Condition for the remote management is that the agent node has created
 	       a corresponding connector server for the choosed protocol. This can be
-	       achieved by extension of the agent node's spring configuration.
+	       achieved by using "PlatformWithJMX" or "PlatformWithRegistry" as parent 
+	       of agent node's spring configuration instead of "Platform" or by 
+	       extension of the agent node's spring configuration in the following way.
 	       <source>
 &lt;bean name="<i>myPlatform</i>" class="de.dailab.jiactng.agentcore.SimpleAgentNode"&gt;
   &lt;property name="jmxConnectors"&gt;
     &lt;set&gt;
       &lt;map&gt;
         &lt;entry key="protocol" value="rmi"/&gt;
-        &lt;entry key="registryHost" value="<i>myRegistryHost</i>"/&gt;
         &lt;entry key="registryPort" value="<i>myRegistryPort</i>"/&gt;
       &lt;/map&gt;
     &lt;/set&gt;
@@ -169,7 +206,6 @@ catch (SecurityException) {
     &lt;set&gt;
       &lt;map&gt;
         &lt;entry key="protocol" value="rmi"/&gt;
-        &lt;entry key="registryHost" value="<i>myRegistryHost</i>"/&gt;
         &lt;entry key="registryPort" value="<i>myRegistryPort</i>"/&gt;
         &lt;entry key="authenticator" value="de.dailab.usermanagement.auth.JiacJMXAuthenticator"/&gt;
       &lt;/map&gt;
@@ -182,9 +218,7 @@ catch (SecurityException) {
   &lt;/property&gt;
 &lt;/bean&gt;
 
-&lt;bean name="UserManagementAgent" class="de.dailab.jiactng.agentcore.Agent"&gt;
-  &lt;property name="memory"&gt;&lt;ref bean="memory"/&gt;&lt;/property&gt;
-  &lt;property name="execution"&gt;&lt;ref bean="simpleExecCycle"/&gt;&lt;/property&gt;
+&lt;bean name="UserManagementAgent" parent="SimpleAgent"&gt;
   &lt;property name="agentBeans"&gt;
     &lt;list&gt;
       &lt;ref bean="UserManagementAgentBean"/&gt;
@@ -192,8 +226,7 @@ catch (SecurityException) {
   &lt;/property&gt;
 &lt;/bean&gt;
 
-&lt;bean name="UserManagementAgentBean" class="de.dailab.usermanagement.agent.UserManagementAgentBean" singleton="false"&gt;
-&lt;/bean&gt;</source>
+&lt;bean name="UserManagementAgentBean" class="de.dailab.usermanagement.agent.UserManagementAgentBean" singleton="false"/&gt;</source>
            To be allowed to remotely manage this agent node you have to be registered as user
            of provider "admin" within the user management agent. See documentation of module 
            <a href="../basicServices/userManagement/">userManagement</a> for a description 

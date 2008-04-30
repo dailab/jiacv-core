@@ -9,7 +9,7 @@
   <import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
   <import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
 
-  <bean name="myPlatform" parent="Platform">
+  <bean name="myPlatform" parent="PlatformWithJMX">
     <property name="agents">
       <list>
         <ref bean="HelloWorldAgent"/>

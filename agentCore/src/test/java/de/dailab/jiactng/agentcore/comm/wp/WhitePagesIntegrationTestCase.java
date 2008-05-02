@@ -1,6 +1,8 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.IAgent;
@@ -266,17 +268,59 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	public void testEnlistening(){
 		//TODO Test for automatic enlistening. ... in Progress
-//		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction());
-//		
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		List<IFact> foundSendActions = _whitePagesTestBean.getLastResult();
-//		assertTrue(foundSendActions.isEmpty());
+		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction());
 		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		List<IFact> foundSendActions = _whitePagesTestBean.getLastResult();
+		assertTrue(foundSendActions.isEmpty());
+		
+		Action template = new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send");
+		
+		List<Action> templates = new ArrayList<Action>();
+		templates.add(template);
+		
+		_whitePagesTestBean.addAutoEnlistActionTemplate(templates);
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction());
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		foundSendActions = _whitePagesTestBean.getLastResult();
+		assertEquals(1, foundSendActions.size() ); 
+		
+		_whitePagesTestBean.removeAutoEnlistActionTemplate(templates);
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction());
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		foundSendActions = _whitePagesTestBean.getLastResult();
+		assertEquals(0, foundSendActions.size() ); 
 		
 		
 	}

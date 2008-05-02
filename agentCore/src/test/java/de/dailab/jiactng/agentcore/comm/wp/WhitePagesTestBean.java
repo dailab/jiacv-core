@@ -105,10 +105,15 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		return memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 	}
 	
-	public void addAutoEnlistActionTemplate(IActionDescription template){
-		
+	public void addAutoEnlistActionTemplate(List<Action> templates){
+		DoAction action = _addAutoEnlistActionTemplate.createDoAction(new Object[] {templates}, this);
+		memory.write(action);
 	}
 
+	public void removeAutoEnlistActionTemplate(List<Action> templates){
+		DoAction action = _removeAutoEnlistActionTemplate.createDoAction(new Object[] {templates}, this);
+		memory.write(action);
+	}
 
 	/**
 	 * Receives the result for the action created in searchForAgentDesc and stores it for later withdrawl

@@ -39,7 +39,6 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  *
  */
 
-//TODO Get RemoteActionProcessing working.
 
 public class DirectoryAccessBean extends AbstractAgentBean implements IEffector {
 
@@ -51,11 +50,13 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	private static final IJiacMessage WHITEPAGES_SEARCH_MESSAGETEMPLATE;
 	private static final IJiacMessage WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE;
+	private static final IJiacMessage WHITEPAGES_REFRESH_MESSAGETEMPLATE;
 
 	private ICommunicationAddress directoryAddress = null;
 	private SearchRequestHandler _searchRequestHandler = null;
 	private ActionRequestHandler _actionRequestHandler = null;
 	private RemoteActionHandler _remoteActionHandler = null;
+	private RefreshAgent _refreshAgent = null;
 	private final ResultDump _resultDump = new ResultDump();
 	private final DirectoryAccessBean _myAccessBean = this;
 
@@ -79,7 +80,11 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 		JiacMessage remoteActionTemplate = new JiacMessage();
 		remoteActionTemplate.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
-		WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE = remoteActionTemplate;	
+		WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE = remoteActionTemplate;
+		
+		JiacMessage refreshMessage = new JiacMessage();
+		refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
+		WHITEPAGES_REFRESH_MESSAGETEMPLATE = refreshMessage;
 	}
 
 
@@ -96,6 +101,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
 		_autoentlistActionTemplates = new ArrayList<Action>();
 		_autoEnlister = new AutoEnlister();
+		_refreshAgent = new RefreshAgent();
 	}
 
 	public void doStart() throws Exception{
@@ -103,6 +109,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		log.debug("starting DirectoryAccessBean");
 		memory.attach(_searchRequestHandler, WHITEPAGES_SEARCH_MESSAGETEMPLATE);
 		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
+		memory.attach(_refreshAgent, WHITEPAGES_REFRESH_MESSAGETEMPLATE);
 		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 		_timer = new Timer();
 		_timer.schedule(_autoEnlister, _firstAutoEnlistening, _autoEnlisteningInterval);
@@ -167,9 +174,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_ACTION_FROM_DIRECTORY)){
 			log.debug("doAction is an Action to remove to the Directory");
 			_actionRequestHandler.removeActionFromDirectory((Action) params[0]);
-		}else if (actionName.equalsIgnoreCase(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE)){
+		} else if (actionName.equalsIgnoreCase(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE)){
 			_autoentlistActionTemplates.addAll((List<Action>) params[0]);
-		}else if (actionName.equalsIgnoreCase(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE)){
+		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE)){
 			synchronized (_offeredActions) {
 				List<Action> templatesToRemove = (List<Action>) params[0];
 				_autoentlistActionTemplates.removeAll(templatesToRemove);
@@ -182,7 +189,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					}
 				}
 			}
-		}else {
+		} else {
 			log.debug("doAction is an Action that has to be invoked remotely");
 			_remoteActionHandler.invokeActionRemote(doAction);
 		}
@@ -232,9 +239,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	/**
 	 * Inner Class for handling searchRequests 
-	 * 
-	 * TODO: Change this to a generic search request handler for all templates and specify
-	 *       _one_ generic search header for the messages.
 	 * 
 	 * @author Martin Loeffelholz
 	 *
@@ -434,6 +438,18 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 							memory.write(send);
 						} 
 
+					} else if (message.getPayload() instanceof DirectoryAgentNodeBean.NoSuchActionException){
+						// Action isn't present (anymore) in the Directory
+						System.err.println("NO SUCH ACTION! NO SUCH ACTION! NO SUCH ACTION!");
+						String sessionID = message.getHeader("SESSION_ID");
+						DoAction remoteAction = openSessionsToProviders.remove(sessionID);
+						
+						if (remoteAction != null){
+							log.debug("RemoteAction wasn't found within the Directory");
+							
+							ActionResult result = ((Action) remoteAction.getAction()).createActionResult(remoteAction, new Object[] {message.getPayload()});
+							memory.write(result);
+						}
 					}
 
 
@@ -549,6 +565,35 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
+	@SuppressWarnings("serial")
+	private class RefreshAgent implements SpaceObserver<IFact>{
+		@Override
+		@SuppressWarnings("unchecked")
+		public void notify(SpaceEvent<? extends IFact> event) {
+			if(event instanceof WriteCallEvent) {
+				WriteCallEvent wceTemp = (WriteCallEvent) event;
+				if (wceTemp.getObject() instanceof IJiacMessage){
+					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
+					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
+						if (message.getPayload() instanceof IActionDescription){
+							IActionDescription actionDesc = (IActionDescription) message.getPayload();
+
+							for (Action action : thisAgent.getActionList()){
+								if (action.equals(actionDesc)){
+									// If Action still active, send a message back
+									JiacMessage refreshMessage = new JiacMessage(actionDesc);
+									refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
+									DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage}, _resultDump);
+									memory.write(send);
+									return;
+								}
+							}
+						} 
+					}
+				} 
+			}
+		}
+	}
 
 
 

@@ -11,6 +11,7 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 
 	private Action _requestAction;
 	private ActionResult _lastActionResult = null;
+	@SuppressWarnings("unused")
 	private DoAction _lastDoAction = null;
 
 	public void doStart() throws Exception {
@@ -44,7 +45,9 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 	}
 	
 	public ActionResult getLastActionResult(){
-		return _lastActionResult;
+		ActionResult result = _lastActionResult;
+		_lastActionResult = null;
+		return result;
 	}
 
 	/**

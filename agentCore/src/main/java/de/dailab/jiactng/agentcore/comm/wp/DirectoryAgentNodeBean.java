@@ -1,8 +1,6 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,11 +12,12 @@ import org.apache.commons.logging.LogFactory;
 import org.sercho.masp.space.SimpleObjectSpace;
 import org.sercho.masp.space.event.EventedSpaceWrapper;
 import org.sercho.masp.space.event.EventedTupleSpace;
+import org.sercho.masp.space.event.SpaceEvent;
+import org.sercho.masp.space.event.SpaceObserver;
+import org.sercho.masp.space.event.WriteCallEvent;
 import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
-import de.dailab.jiactng.agentcore.IAgent;
-import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
@@ -52,6 +51,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public final static String ADD_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AddAction";
 	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
 	public final static String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#UseRemoteAction";
+	public final static String REFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#Refresh";
 
 	private long _refreshingIntervall = 4000;
 	private long _firstRefresh = 5000;
@@ -309,27 +309,34 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				log.debug("Message is request for provideraddress of remote Action");
 
 				DoAction remoteAction = (DoAction) message.getPayload();
-				log.debug("Searching for provider of (remote)Action " + remoteAction);
+				log.debug("Searching for provider of (remote)Action " + remoteAction.getAction().getName());
 
 				ActionData templateData = new ActionData();
 				templateData.setActionDescription(remoteAction.getAction());
 
 				ActionData foundData = space.read(templateData);
 
+				JiacMessage resultMessage;
+				
+				
 				if (foundData != null){
 					IActionDescription resultDescription = foundData.getActionDescription();
 					ICommunicationAddress providerAddress = resultDescription.getProviderDescription().getMessageBoxAddress();
-					JiacMessage resultMessage = new JiacMessage(providerAddress);
-					resultMessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
-					resultMessage.setHeader("SESSION_ID", remoteAction.getSessionId());
-					try {
-						messageTransport.send(resultMessage, message.getSender());
-					} catch (CommunicationException e) {
-						e.printStackTrace();
-					}
+					resultMessage = new JiacMessage(providerAddress);
 				} else {
-					//TODO Send Exception if no Action like the searched is stored within the memory
+					// TODO resultMessage doesn't seem to be serializeable. Ask Marcel about that problem!
+					NoSuchActionException exp = new NoSuchActionException("Action " + remoteAction.getAction() + " isn't present within Directory");
+					resultMessage = new JiacMessage(exp);
 				}
+
+				resultMessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
+				resultMessage.setHeader("SESSION_ID", remoteAction.getSessionId());
+				try {
+					messageTransport.send(resultMessage, message.getSender());
+				} catch (CommunicationException e) {
+					e.printStackTrace();
+				}
+
 
 			} else {
 				log.warn("Message has unknown protocol " + message.getProtocol());
@@ -337,7 +344,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		}
 	}
 
-	private class SpaceRefresher extends TimerTask{
+	@SuppressWarnings("serial")
+	private class SpaceRefresher extends TimerTask implements SpaceObserver<IFact>{
+		Set<IActionDescription> ongoingRefreshs = new HashSet<IActionDescription>();
 		
 		/**
 		 * Method to keep the actions stored within the tuplespace up to date.
@@ -347,10 +356,21 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		 */
 		@Override
 		public void run() {
+			
+			// before checking for new timeouts, let's check for old ones from the last run,
+			// that didn't had replys in time to refresh them.
+			for(IActionDescription actionDesc : ongoingRefreshs){
+				ActionData actDat = new ActionData();
+				actDat.setActionDescription(actionDesc);
+				space.remove(actDat);
+			}
+			
+			ongoingRefreshs.clear();
+			
+			
 			ActionData actionTemplate = new ActionData(_currentLogicTime);
 
 			// During maintenance there must not be any other changes to the tupespace, so...
-			synchronized(space){
 
 				log.debug("Beginning refreshment of stored actions");
 				// Check the Space for timeouts by using the current and now obsolete logical time
@@ -358,66 +378,101 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				
 
 				// as long as timeouts are existing...
-				while (!timeouts.isEmpty()){
+				for (ActionData actionData : timeouts){
 					//get the first of them and the action stored within it
-					ActionData actionData = timeouts.iterator().next();
-					timeouts.remove(actionData);
 					IActionDescription timeoutActionDesc = actionData.getActionDescription();
 
-					// now let's see if the agent still provides any actions
-					List<Action> actions = new ArrayList<Action>();
 					IAgentDescription agentDesc = timeoutActionDesc.getProviderDescription();
-					String timeoutAgentID = agentDesc.getAid();
-
-					IAgent timeoutAgent = null;
-
-					List<IAgent> agents = agentNode.findAgents();
-					//TODO find an alternative solution for agents that are not on this agentnode
-					for (IAgent agent : agents){
-						if (agent.getAgentId().equals(timeoutAgentID)){
-							timeoutAgent = agent;
-							break;
-						}
-					}
+					ICommunicationAddress refreshAddress = agentDesc.getMessageBoxAddress();
 					
-					if (timeoutAgent == null){
-						log.warn("Agent with ID " + timeoutAgentID + " hasn't removed it's actions from Directory and isn't present anymore");
-						space.remove(actionData);
-						continue;
-					} else {
-						actions = timeoutAgent.getActionList();
-						if (actions != null){
-							/*
-							 * It would be quite inefficient to not check the other actions of this agent also
-							 * to possibly be outdated since all actions of an agent are usually stored at the
-							 * same time
-							 */
-							for (IActionDescription action: actions){
-
-								ActionData refreshAction = new ActionData();
-								refreshAction.setActionDescription((IActionDescription) action);
-								// remove this action from the timeouts if it is within them so it hasn't to be looked up twice
-								
-								if ( (space.remove(refreshAction)) != null){
-									/*  if the action was within the timeouts and though shall be known to the outside world
-									 *  let's refresh it too since we're already refreshing
-									 */
-									timeouts.remove(refreshAction);
-									refreshAction.setCreationTime(_currentLogicTime + 1);
-									space.write(refreshAction);
-								}
-							}
-						} else {
-							// Action isn't present anymore on agent
-							space.remove(actionData);
-						}
+					ongoingRefreshs.add(actionData._action);
+					
+					JiacMessage refreshMessage = new JiacMessage(actionData._action);
+					try {
+						messageTransport.send(refreshMessage, refreshAddress);
+					} catch (CommunicationException e) {
+						e.printStackTrace();
 					}
 				}
-			}
+					
+					
+//					String timeoutAgentID = agentDesc.getAid();
+//
+//					IAgent timeoutAgent = null;
+//
+//					List<IAgent> agents = agentNode.findAgents();
+//					//TODO find an alternative solution for agents that are not on this agentnode
+//					for (IAgent agent : agents){
+//						if (agent.getAgentId().equals(timeoutAgentID)){
+//							timeoutAgent = agent;
+//							break;
+//						}
+//					}
+//					
+//					if (timeoutAgent == null){
+//						log.warn("Agent with ID " + timeoutAgentID + " hasn't removed it's actions from Directory and isn't present anymore");
+//						space.remove(actionData);
+//						continue;
+//					} else {
+//						actions = timeoutAgent.getActionList();
+//						if (actions != null){
+//							/*
+//							 * It would be quite inefficient to not check the other actions of this agent also
+//							 * to possibly be outdated since all actions of an agent are usually stored at the
+//							 * same time
+//							 */
+//							for (IActionDescription action: actions){
+//
+//								ActionData refreshAction = new ActionData();
+//								refreshAction.setActionDescription((IActionDescription) action);
+//								// remove this action from the timeouts if it is within them so it hasn't to be looked up twice
+//								
+//								if ( (space.remove(refreshAction)) != null){
+//									/*  if the action was within the timeouts and though shall be known to the outside world
+//									 *  let's refresh it too since we're already refreshing
+//									 */
+//									timeouts.remove(refreshAction);
+//									refreshAction.setCreationTime(_currentLogicTime + 1);
+//									space.write(refreshAction);
+//								}
+//							}
+//						} else {
+//							// Action isn't present anymore on agent
+//							space.remove(actionData);
+//						}
+//					}
+//				}
+			
 			// finally after processing all timeouts let's give the clock a little nudge
 			_currentLogicTime++;
 			log.debug("Finished refreshment of stored actions");
 		}
+		
+		@Override
+		@SuppressWarnings("unchecked")
+		public void notify(SpaceEvent<? extends IFact> event) {
+			if(event instanceof WriteCallEvent) {
+				WriteCallEvent wceTemp = (WriteCallEvent) event;
+				if (wceTemp.getObject() instanceof IJiacMessage){
+					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
+					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
+						if (message.getPayload() instanceof IActionDescription){
+							IActionDescription actDesc = (IActionDescription) message.getPayload();
+							ongoingRefreshs.remove(actDesc);
+							ActionData actDat = new ActionData();
+							actDat.setActionDescription(actDesc);
+							//let's remove the old one
+							space.remove(actDat);
+							
+							// put the new version into it
+							actDat.setCreationTime(_currentLogicTime +1);
+							space.write(actDat);
+						}
+					}
+				}
+			}
+		}
+		
 	}
 
 	@SuppressWarnings("serial")
@@ -464,6 +519,23 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			return thisString;
 		}
 
+	}
+	
+	@SuppressWarnings("serial")
+	public class NoSuchActionException implements IFact{
+		private String exception;
+		
+		public NoSuchActionException(String s){
+			exception = s;
+		}
+		
+		public String getException(){
+			return exception;
+		}
+		
+		public String toString (){
+			return exception;
+		}
 	}
 
 }

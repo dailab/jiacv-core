@@ -333,7 +333,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					resultMessage = new JiacMessage(providerAddress);
 				} else {
 					// TODO resultMessage doesn't seem to be serializeable. Ask Marcel about that problem!
-					NoSuchActionException exp = new NoSuchActionException("Action " ); //+ remoteAction.getAction() + " isn't present within Directory");
+					NoSuchActionException exp = new NoSuchActionException("Action " + remoteAction.getAction() + " isn't present within Directory");
 					resultMessage = new JiacMessage(exp);
 				}
 
@@ -343,22 +343,28 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					_messageTransport.send(resultMessage, message.getSender());
 				} catch (CommunicationException e) {
 					e.printStackTrace();
-					System.err.println("THIS ERROR!!!");
 				}
 
 
 			} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
 				if (message.getPayload() instanceof IActionDescription){
 					IActionDescription actDesc = (IActionDescription) message.getPayload();
-					_ongoingRefreshs.remove(actDesc);
-					ActionData actDat = new ActionData();
-					actDat.setActionDescription(actDesc);
-					//let's remove the old one
-					space.remove(actDat);
-					
-					// put the new version into it
-					actDat.setCreationTime(_currentLogicTime +1);
-					space.write(actDat);
+					for (IActionDescription action : _ongoingRefreshs){
+						if (actDesc.getName().equalsIgnoreCase(action.getName())){
+							if (actDesc.getProviderDescription().getAid().equalsIgnoreCase(action.getProviderDescription().getAid())){
+								_ongoingRefreshs.remove(action);
+								ActionData actDat = new ActionData();
+								actDat.setActionDescription(actDesc);
+								//let's remove the old one
+								space.remove(actDat);
+								
+								// put the new version into it
+								actDat.setCreationTime(_currentLogicTime +1);
+								space.write(actDat);
+								return;
+							}
+						}
+					}
 				}
 			} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
 				IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
@@ -425,7 +431,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				log.debug("Beginning refreshment of stored actions");
 				// Check the Space for timeouts by using the current and now obsolete logical time
 				Set<ActionData> timeouts = space.readAll(actionTemplate);
-				
 
 				// as long as timeouts are existing...
 				for (ActionData actionData : timeouts){

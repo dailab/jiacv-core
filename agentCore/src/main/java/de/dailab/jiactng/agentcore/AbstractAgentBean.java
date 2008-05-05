@@ -7,13 +7,14 @@
 package de.dailab.jiactng.agentcore;
 
 import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
-import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * Abstract superclass of all agentbeans. This includes core-components as well
@@ -279,7 +280,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	public void handleLifecycleException(LifecycleException e, @SuppressWarnings("unused") LifecycleStates state) {
 		throw new RuntimeException(e);
 	}
-
+	
 	protected String invoke(Action a, Object[] inputParams) {
 		return invoke(a, inputParams, null);
 	}
@@ -289,5 +290,37 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		DoAction doAct = a.createDoAction(inputParams, receiver);
 		memory.write(doAct);
 		return doAct.getSessionId();
+	}
+	
+//	protected ActionResult syncInvoke(Action a, Object[] inputParams) {
+//		DoAction doAct = a.createDoAction(inputParams, null);
+//		return ((Agent)thisAgent).syncInvoke(doAct);
+//	}
+	
+	protected void returnResult(DoAction origin, Object[] results) {
+		ActionResult res = ((Action) origin.getAction()).createActionResult(
+				origin, results);
+		memory.write(res);
+	}
+	
+	protected Action retrieveAction(String actionName) {
+		Action retAct = memory.read(new Action(actionName));
+		if (retAct == null) {
+			log.warn("Could not find \'" + actionName
+					+ "\'.");
+		}
+		return retAct;
+	}
+	
+	protected Action retrieveAction(String actionName, IAgentDescription provider) {
+		Action template = new Action(actionName);
+		template.setProviderDescription(provider);
+		
+		Action retAct = memory.read(template);
+		if (retAct == null) {
+			log.warn("Could not find \'" + actionName
+					+ "\'.");
+		}
+		return retAct;
 	}
 }

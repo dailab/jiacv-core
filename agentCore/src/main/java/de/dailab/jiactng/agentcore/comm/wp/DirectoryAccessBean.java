@@ -382,7 +382,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					memory.write(result);
 
 				} else {
-					log.warn("tried to cancel non existing doAction");
+					log.warn("tried to cancel non existing doAction: " + remoteAction.getAction().getName());
 				} 
 			}
 		}

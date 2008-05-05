@@ -211,7 +211,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					memory.write(result);
 
 				} else {
-					log.warn("tried to cancel non existing doAction");
+					log.warn("tried to cancel non existing doAction: " + doAction.getAction().getName());
 				}
 			}else {
 				_remoteActionHandler.cancelRemoteAction(doAction);
@@ -589,6 +589,10 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 								}
 							}
 						} 
+					} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
+						JiacMessage pingMessage = new JiacMessage(thisAgent.getAgentDescription());
+						DoAction send = _sendAction.createDoAction(new Object[] {pingMessage, message.getSender()}, _resultDump);
+						memory.write(send);
 					}
 				} 
 			}

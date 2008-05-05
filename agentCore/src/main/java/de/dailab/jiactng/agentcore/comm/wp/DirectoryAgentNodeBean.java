@@ -343,6 +343,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					_messageTransport.send(resultMessage, message.getSender());
 				} catch (CommunicationException e) {
 					e.printStackTrace();
+					System.err.println("THIS ERROR!!!");
 				}
 
 
@@ -359,7 +360,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					actDat.setCreationTime(_currentLogicTime +1);
 					space.write(actDat);
 				}
-			} if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
+			} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
 				IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
 				_ongoingAgentPings.remove(agentDesc);
 			} else {

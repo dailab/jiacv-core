@@ -438,6 +438,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					ongoingRefreshs.add(actionData._action);
 					
 					JiacMessage refreshMessage = new JiacMessage(actionData._action);
+					refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
 					try {
 						messageTransport.send(refreshMessage, refreshAddress);
 					} catch (CommunicationException e) {

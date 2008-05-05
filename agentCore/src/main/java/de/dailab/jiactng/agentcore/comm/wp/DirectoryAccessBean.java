@@ -376,13 +376,13 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 				if (sourceAction != null){
 					String owner = sourceAction.getSource().toString();
-					log.warn("RemoteAction from owner " + owner + " has timeout");
+					log.warn("RemoteAction " + remoteAction.getAction().getName() + " from owner " + owner + " has timeout");
 
 					ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
 					memory.write(result);
 
 				} else {
-					log.warn("tried to cancel non existing doAction: " + remoteAction.getAction().getName());
+					log.warn("tried to cancel non existing remote doAction: " + remoteAction.getAction().getName());
 				} 
 			}
 		}

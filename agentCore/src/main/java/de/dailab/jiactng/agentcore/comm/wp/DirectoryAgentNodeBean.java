@@ -12,9 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.sercho.masp.space.SimpleObjectSpace;
 import org.sercho.masp.space.event.EventedSpaceWrapper;
 import org.sercho.masp.space.event.EventedTupleSpace;
-import org.sercho.masp.space.event.SpaceEvent;
-import org.sercho.masp.space.event.SpaceObserver;
-import org.sercho.masp.space.event.WriteCallEvent;
 import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
@@ -54,7 +51,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public final static String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#UseRemoteAction";
 	public final static String REFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#Refresh";
 	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
-
+	
 	private long _refreshingIntervall = 4000;
 	private long _firstRefresh = 5000;
 	
@@ -62,8 +59,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 	private SpaceDestroyer<IFact> destroyer = null;
 	private EventedTupleSpace<IFact> space = null;
-	private MessageTransport messageTransport = null;
-	private ICommunicationAddress myAddress = null; 
+	private MessageTransport _messageTransport = null;
+	private ICommunicationAddress _myAddress = null; 
+	private Set<IActionDescription> _ongoingRefreshs;
+	private Set<IAgentDescription> _ongoingAgentPings;
 
 	private RequestHandler _searchRequestHandler = null;
 
@@ -131,22 +130,24 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 	public void doInit(){
 		_searchRequestHandler = new RequestHandler();
-		messageTransport.setDefaultDelegate(_searchRequestHandler);
+		_messageTransport.setDefaultDelegate(_searchRequestHandler);
 		try {
-			messageTransport.doInit();
+			_messageTransport.doInit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		_refresher = new SpaceRefresher();
 		_agentPinger = new AgentPinger();
+		_ongoingRefreshs = new HashSet<IActionDescription>();
+		_ongoingAgentPings = new HashSet<IAgentDescription>();
 
 	}
 
 	public void doStart(){
-		myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getUUID() + SEARCHREQUESTSUFFIX);
+		_myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getUUID() + SEARCHREQUESTSUFFIX);
 		try {
-			messageTransport.listen(myAddress, null);
+			_messageTransport.listen(_myAddress, null);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -154,12 +155,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		_timer = new Timer();
 		_timer.schedule(_refresher, _firstRefresh, _refreshingIntervall);
 		_timer.schedule(_agentPinger, _agentPingIntervall);
-
 	}
 
 	public void doStop(){
 		try {
-			messageTransport.stopListen(myAddress, null);
+			_messageTransport.stopListen(_myAddress, null);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -178,7 +178,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	}
 
 	public void setMessageTransport(MessageTransport mt){
-		messageTransport = mt;
+		_messageTransport = mt;
 	}
 
 	public void setRefreshingIntervall(long intervall){
@@ -244,7 +244,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					try {
 						log.debug("AgentNode: sending Message " + resultMessage);
 						log.debug("sending it to " + message.getSender());
-						messageTransport.send(resultMessage, message.getSender());
+						_messageTransport.send(resultMessage, message.getSender());
 					} catch (CommunicationException e) {
 						e.printStackTrace();
 					}
@@ -279,7 +279,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					try {
 						log.debug("AgentNode: sending Message " + resultMessage);
 						log.debug("sending it to " + message.getSender());
-						messageTransport.send(resultMessage, message.getSender());
+						_messageTransport.send(resultMessage, message.getSender());
 					} catch (CommunicationException e) {
 						e.printStackTrace();
 					}
@@ -340,12 +340,28 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				resultMessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
 				resultMessage.setHeader("SESSION_ID", remoteAction.getSessionId());
 				try {
-					messageTransport.send(resultMessage, message.getSender());
+					_messageTransport.send(resultMessage, message.getSender());
 				} catch (CommunicationException e) {
 					e.printStackTrace();
 				}
 
 
+			} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
+				if (message.getPayload() instanceof IActionDescription){
+					IActionDescription actDesc = (IActionDescription) message.getPayload();
+					_ongoingRefreshs.remove(actDesc);
+					ActionData actDat = new ActionData();
+					actDat.setActionDescription(actDesc);
+					//let's remove the old one
+					space.remove(actDat);
+					
+					// put the new version into it
+					actDat.setCreationTime(_currentLogicTime +1);
+					space.write(actDat);
+				}
+			} if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
+				IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
+				_ongoingAgentPings.remove(agentDesc);
 			} else {
 				log.warn("Message has unknown protocol " + message.getProtocol());
 			}
@@ -353,50 +369,34 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	}
 	
 	@SuppressWarnings("serial")
-	private class AgentPinger extends TimerTask implements SpaceObserver<IFact>{
-		
-		Set<IAgentDescription> ongoingAgentPings = new HashSet<IAgentDescription>();
+	private class AgentPinger extends TimerTask{
 		
 		public void run(){
 			// All Agents that haven't ping back are most likely to be non existent anymore
-			for (IAgentDescription agent : ongoingAgentPings){
+			for (IAgentDescription agent : _ongoingAgentPings){
 				IAgentDescription spaceAgent = space.remove(agent);
+				log.warn("Agent doesn't seem to be present anymore. Probably shutdown. Agent is " + spaceAgent);
 			}
 			
-			ongoingAgentPings.clear();
+			_ongoingAgentPings.clear();
 			
 			for (IAgentDescription agent : space.readAll(new AgentDescription())){
-				ongoingAgentPings.add(agent);
+				_ongoingAgentPings.add(agent);
 				ICommunicationAddress pingAddress = agent.getMessageBoxAddress();
 				JiacMessage message = new JiacMessage();
+				message.setProtocol(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID);
+				message.setSender(_myAddress);
 				try {
-					messageTransport.send(message, pingAddress);
+					_messageTransport.send(message, pingAddress);
 				} catch (CommunicationException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		
-		@SuppressWarnings("unchecked")
-		@Override
-		public void notify(SpaceEvent<? extends IFact> event) {
-			if(event instanceof WriteCallEvent) {
-				WriteCallEvent wceTemp = (WriteCallEvent) event;
-				if (wceTemp.getObject() instanceof IJiacMessage){
-					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
-					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
-						IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
-						ongoingAgentPings.remove(agentDesc);
-					}
-				}
-			}
-		}
-		
 	}
 
 	@SuppressWarnings("serial")
-	private class SpaceRefresher extends TimerTask implements SpaceObserver<IFact>{
-		Set<IActionDescription> ongoingRefreshs = new HashSet<IActionDescription>();
+	private class SpaceRefresher extends TimerTask {
 		
 		/**
 		 * Method to keep the actions stored within the tuplespace up to date.
@@ -406,21 +406,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		 */
 		@Override
 		public void run() {
-			
 			// before checking for new timeouts, let's check for old ones from the last run,
 			// that didn't had replys in time to refresh them.
-			for(IActionDescription actionDesc : ongoingRefreshs){
+			for(IActionDescription actionDesc : _ongoingRefreshs){
 				ActionData actDat = new ActionData();
 				actDat.setActionDescription(actionDesc);
 				space.remove(actDat);
 			}
 			
-			ongoingRefreshs.clear();
+			_ongoingRefreshs.clear();
 			
 			
 			ActionData actionTemplate = new ActionData(_currentLogicTime);
 
-			// During maintenance there must not be any other changes to the tupespace, so...
+			// During maintenance there must not be any other changes to the tuplespace, so...
 
 				log.debug("Beginning refreshment of stored actions");
 				// Check the Space for timeouts by using the current and now obsolete logical time
@@ -435,12 +434,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					IAgentDescription agentDesc = timeoutActionDesc.getProviderDescription();
 					ICommunicationAddress refreshAddress = agentDesc.getMessageBoxAddress();
 					
-					ongoingRefreshs.add(actionData._action);
+					_ongoingRefreshs.add(actionData._action);
 					
 					JiacMessage refreshMessage = new JiacMessage(actionData._action);
+					refreshMessage.setSender(_myAddress);
 					refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
 					try {
-						messageTransport.send(refreshMessage, refreshAddress);
+						_messageTransport.send(refreshMessage, refreshAddress);
 					} catch (CommunicationException e) {
 						e.printStackTrace();
 					}
@@ -452,7 +452,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 //					IAgent timeoutAgent = null;
 //
 //					List<IAgent> agents = agentNode.findAgents();
-//					//TODO find an alternative solution for agents that are not on this agentnode
+//					
 //					for (IAgent agent : agents){
 //						if (agent.getAgentId().equals(timeoutAgentID)){
 //							timeoutAgent = agent;
@@ -498,33 +498,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			_currentLogicTime++;
 			log.debug("Finished refreshment of stored actions");
 		}
-		
-		@Override
-		@SuppressWarnings("unchecked")
-		public void notify(SpaceEvent<? extends IFact> event) {
-			if(event instanceof WriteCallEvent) {
-				WriteCallEvent wceTemp = (WriteCallEvent) event;
-				if (wceTemp.getObject() instanceof IJiacMessage){
-					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
-					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
-						if (message.getPayload() instanceof IActionDescription){
-							IActionDescription actDesc = (IActionDescription) message.getPayload();
-							ongoingRefreshs.remove(actDesc);
-							ActionData actDat = new ActionData();
-							actDat.setActionDescription(actDesc);
-							//let's remove the old one
-							space.remove(actDat);
-							
-							// put the new version into it
-							actDat.setCreationTime(_currentLogicTime +1);
-							space.write(actDat);
-						}
-					}
-				}
-			}
-		}
-		
 	}
+		
 
 	@SuppressWarnings("serial")
 	public static class ActionData implements IFact{

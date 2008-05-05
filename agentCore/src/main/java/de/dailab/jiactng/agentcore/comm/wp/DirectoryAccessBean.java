@@ -114,6 +114,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_timer = new Timer();
 		_timer.schedule(_autoEnlister, _firstAutoEnlistening, _autoEnlisteningInterval);
 
+		for (Action action : memory.readAll(new Action())){
+			_actionRequestHandler.addActionToDirectory(action);
+		}
 	}
 
 	public void doStop() throws Exception{
@@ -551,6 +554,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	private class AutoEnlister extends TimerTask {
 
 		public void run() {
+			
 			synchronized (_offeredActions) {
 				for (Action actionTemplate : _autoentlistActionTemplates){
 					Set<Action> actions = memory.readAll(actionTemplate);
@@ -578,14 +582,16 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						if (message.getPayload() instanceof Action){
 							Action remoteAction = (Action) message.getPayload();
 
-							for (Action action : thisAgent.getActionList()){
-								if (action.equals(remoteAction)){
-									// If Action still active, send a message back
-									JiacMessage refreshMessage = new JiacMessage(remoteAction);
-									refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
-									DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage, message.getSender()}, _resultDump);
-									memory.write(send);
-									return;
+							for (Action action : memory.readAll(new Action())){
+								if (action.getName().equalsIgnoreCase(remoteAction.getName())){
+									if (action.getProviderDescription().getAid().equalsIgnoreCase(remoteAction.getProviderDescription().getAid())){
+										// If Action still active, send a message back
+										JiacMessage refreshMessage = new JiacMessage(remoteAction);
+										refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
+										DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage, message.getSender()}, _resultDump);
+										memory.write(send);
+										return;
+									}
 								}
 							}
 						} 

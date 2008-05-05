@@ -27,6 +27,7 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
@@ -52,9 +53,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
 	public final static String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#UseRemoteAction";
 	public final static String REFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#Refresh";
+	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
 
 	private long _refreshingIntervall = 4000;
 	private long _firstRefresh = 5000;
+	
+	private long _agentPingIntervall = 12000;
 
 	private SpaceDestroyer<IFact> destroyer = null;
 	private EventedTupleSpace<IFact> space = null;
@@ -64,7 +68,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	private RequestHandler _searchRequestHandler = null;
 
 	private Timer _timer;
-	private SpaceRefresher _refresher; 
+	private SpaceRefresher _refresher = null; 
+	private AgentPinger _agentPinger = null;
 	private long _currentLogicTime = 0;
 
 	public DirectoryAgentNodeBean() {
@@ -132,6 +137,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		_refresher = new SpaceRefresher();
+		_agentPinger = new AgentPinger();
 
 	}
 
@@ -144,8 +152,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		}
 
 		_timer = new Timer();
-		_refresher = new SpaceRefresher();
 		_timer.schedule(_refresher, _firstRefresh, _refreshingIntervall);
+		_timer.schedule(_agentPinger, _agentPingIntervall);
 
 	}
 
@@ -325,7 +333,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					resultMessage = new JiacMessage(providerAddress);
 				} else {
 					// TODO resultMessage doesn't seem to be serializeable. Ask Marcel about that problem!
-					NoSuchActionException exp = new NoSuchActionException("Action " + remoteAction.getAction() + " isn't present within Directory");
+					NoSuchActionException exp = new NoSuchActionException("Action " ); //+ remoteAction.getAction() + " isn't present within Directory");
 					resultMessage = new JiacMessage(exp);
 				}
 
@@ -342,6 +350,48 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				log.warn("Message has unknown protocol " + message.getProtocol());
 			}
 		}
+	}
+	
+	@SuppressWarnings("serial")
+	private class AgentPinger extends TimerTask implements SpaceObserver<IFact>{
+		
+		Set<IAgentDescription> ongoingAgentPings = new HashSet<IAgentDescription>();
+		
+		public void run(){
+			// All Agents that haven't ping back are most likely to be non existent anymore
+			for (IAgentDescription agent : ongoingAgentPings){
+				IAgentDescription spaceAgent = space.remove(agent);
+			}
+			
+			ongoingAgentPings.clear();
+			
+			for (IAgentDescription agent : space.readAll(new AgentDescription())){
+				ongoingAgentPings.add(agent);
+				ICommunicationAddress pingAddress = agent.getMessageBoxAddress();
+				JiacMessage message = new JiacMessage();
+				try {
+					messageTransport.send(message, pingAddress);
+				} catch (CommunicationException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public void notify(SpaceEvent<? extends IFact> event) {
+			if(event instanceof WriteCallEvent) {
+				WriteCallEvent wceTemp = (WriteCallEvent) event;
+				if (wceTemp.getObject() instanceof IJiacMessage){
+					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
+					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
+						IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
+						ongoingAgentPings.remove(agentDesc);
+					}
+				}
+			}
+		}
+		
 	}
 
 	@SuppressWarnings("serial")

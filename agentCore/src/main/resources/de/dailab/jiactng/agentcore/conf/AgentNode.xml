@@ -21,7 +21,6 @@
          <set>
             <map>
                <entry key="protocol" value="rmi" />
-               <entry key="port" value="1100" />
             </map>
          </set>
       </property>

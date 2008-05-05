@@ -575,15 +575,15 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				if (wceTemp.getObject() instanceof IJiacMessage){
 					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
 					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
-						if (message.getPayload() instanceof IActionDescription){
-							IActionDescription actionDesc = (IActionDescription) message.getPayload();
+						if (message.getPayload() instanceof Action){
+							Action remoteAction = (Action) message.getPayload();
 
 							for (Action action : thisAgent.getActionList()){
-								if (action.equals(actionDesc)){
+								if (action.equals(remoteAction)){
 									// If Action still active, send a message back
-									JiacMessage refreshMessage = new JiacMessage(actionDesc);
+									JiacMessage refreshMessage = new JiacMessage(remoteAction);
 									refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
-									DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage}, _resultDump);
+									DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage, message.getSender()}, _resultDump);
 									memory.write(send);
 									return;
 								}

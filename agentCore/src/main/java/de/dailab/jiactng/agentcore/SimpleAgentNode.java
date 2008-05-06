@@ -486,7 +486,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					anb.init();
 				} catch (LifecycleException lce) {
 					// TODO
-					lce.printStackTrace();
+					if(log != null) {
+						log.error("Failure when initializing agentnodebean: "+anb.getBeanName(),lce);
+					} else {
+						System.err.println("Failure when initializing agentnodebean: "+anb.getBeanName());
+						lce.printStackTrace();
+					}
 				}
 			}
 		}
@@ -502,8 +507,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					a.init();				
 				} catch (LifecycleException e) {
 					// TODO:
-					// e.printStackTrace();
-					System.out.println(e.getMessage());
+					if(log != null) {
+						log.error("Failure when initializing agentnodebean: "+a.getAgentName(),e);
+					} else {
+						System.err.println("Failure when initializing agentnodebean: "+a.getAgentName());
+						e.printStackTrace();
+					}
 				}
 
 				// Check if White Pages bean is present

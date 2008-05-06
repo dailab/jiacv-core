@@ -333,7 +333,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					resultMessage = new JiacMessage(providerAddress);
 				} else {
 					// TODO resultMessage doesn't seem to be serializeable. Ask Marcel about that problem!
-					NoSuchActionException exp = new NoSuchActionException("Action " + remoteAction.getAction() + " isn't present within Directory");
+					NoSuchActionException exp = new NoSuchActionException("Action " + remoteAction.getAction().getName() + " isn't present within Directory");
 					resultMessage = new JiacMessage(exp);
 				}
 

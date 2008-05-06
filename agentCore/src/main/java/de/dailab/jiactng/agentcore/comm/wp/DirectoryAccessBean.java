@@ -13,6 +13,8 @@ import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
 
+import com.sun.org.apache.xpath.internal.operations.Equals;
+
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
@@ -174,11 +176,14 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		} else if (actionName.equalsIgnoreCase(ACTION_ADD_ACTION_TO_DIRECTORY)){
 			log.debug("doAction is an Action to add to the Directory");	
 			_actionRequestHandler.addActionToDirectory((Action) params[0]);
+			cleanupSession(doAction);
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_ACTION_FROM_DIRECTORY)){
 			log.debug("doAction is an Action to remove to the Directory");
 			_actionRequestHandler.removeActionFromDirectory((Action) params[0]);
+			cleanupSession(doAction);
 		} else if (actionName.equalsIgnoreCase(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE)){
 			_autoentlistActionTemplates.addAll((List<Action>) params[0]);
+			cleanupSession(doAction);
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE)){
 			synchronized (_offeredActions) {
 				List<Action> templatesToRemove = (List<Action>) params[0];
@@ -192,6 +197,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					}
 				}
 			}
+			cleanupSession(doAction);
 		} else {
 			log.debug("doAction is an Action that has to be invoked remotely");
 			_remoteActionHandler.invokeActionRemote(doAction);
@@ -239,6 +245,16 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	public void setFirstAutoEnlistening(long firstAutoEnlistening){
 		_firstAutoEnlistening = firstAutoEnlistening;
 	}
+	
+	
+	private void cleanupSession(DoAction doAction){
+		doAction.setSource(_resultDump);
+		ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Object[] {});
+		memory.write(result);
+	}
+	
+	
+	
 
 	/**
 	 * Inner Class for handling searchRequests 

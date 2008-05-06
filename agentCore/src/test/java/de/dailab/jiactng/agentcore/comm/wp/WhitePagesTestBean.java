@@ -29,6 +29,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	private Action _addAutoEnlistActionTemplate;
 	private Action _removeAutoEnlistActionTemplate;
 	private ActionResult _lastFailure = null;
+	private ResultDump _resultDump = new ResultDump();
 
 	List<IFact> _results = new ArrayList<IFact>();
 	DoAction _lastDoAction = null;

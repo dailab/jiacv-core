@@ -13,8 +13,6 @@ import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
 
-import com.sun.org.apache.xpath.internal.operations.Equals;
-
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
@@ -116,9 +114,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_timer = new Timer();
 		_timer.schedule(_autoEnlister, _firstAutoEnlistening, _autoEnlisteningInterval);
 
-		for (Action action : memory.readAll(new Action())){
-			_actionRequestHandler.addActionToDirectory(action);
-		}
 	}
 
 	public void doStop() throws Exception{
@@ -457,16 +452,15 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 							memory.write(send);
 						} 
 
-					} else if (message.getPayload() instanceof DirectoryAgentNodeBean.NoSuchActionException){
+					} else if (message.getPayload() instanceof NoSuchActionException){
 						// Action isn't present (anymore) in the Directory
-						System.err.println("NO SUCH ACTION! NO SUCH ACTION! NO SUCH ACTION!");
 						String sessionID = message.getHeader("SESSION_ID");
 						DoAction remoteAction = openSessionsToProviders.remove(sessionID);
 						
 						if (remoteAction != null){
 							log.debug("RemoteAction wasn't found within the Directory");
 							
-							ActionResult result = ((Action) remoteAction.getAction()).createActionResult(remoteAction, new Object[] {message.getPayload()});
+							ActionResult result = new ActionResult(remoteAction, message.getPayload()); 
 							memory.write(result);
 						}
 					}
@@ -595,22 +589,17 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				if (wceTemp.getObject() instanceof IJiacMessage){
 					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
 					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
-						if (message.getPayload() instanceof Action){
-							Action remoteAction = (Action) message.getPayload();
+							
+						Set<IFact> facts = new HashSet<IFact>();
+						for (Action action : memory.readAll(new Action())){
+							facts.add(action);
+						}
 
-							for (Action action : memory.readAll(new Action())){
-								if (action.getName().equalsIgnoreCase(remoteAction.getName())){
-									if (action.getProviderDescription().getAid().equalsIgnoreCase(remoteAction.getProviderDescription().getAid())){
-										// If Action still active, send a message back
-										JiacMessage refreshMessage = new JiacMessage(remoteAction);
-										refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
-										DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage, message.getSender()}, _resultDump);
-										memory.write(send);
-										return;
-									}
-								}
-							}
-						} 
+						JiacMessage refreshMessage = new JiacMessage(new FactSet(facts));
+						refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
+						DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage, message.getSender()}, _resultDump);
+						memory.write(send);
+						
 					} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
 						JiacMessage pingMessage = new JiacMessage(thisAgent.getAgentDescription());
 						DoAction send = _sendAction.createDoAction(new Object[] {pingMessage, message.getSender()}, _resultDump);
@@ -621,7 +610,14 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
-
+	@SuppressWarnings("serial")
+	public class FactSet implements IFact{
+		Set<IFact> _facts;
+		
+		public FactSet(Set<IFact> facts){
+			_facts = facts;
+		}
+	}
 
 	private class SessionData {
 		public DoAction clientSource;

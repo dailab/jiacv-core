@@ -63,7 +63,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	private Action _sendAction = null;
 	private Map<String, DoAction> _requestID2ActionMap = new HashMap<String, DoAction>();
 
-	private List<Action> _autoentlistActionTemplates = null;
+	private List<Action> _autoenlistActionTemplates = null;
 	private Set<Action> _offeredActions = new HashSet<Action>();
 	// the intervall the autoenlistener should check for new actions to enlist
 	private long _autoEnlisteningInterval = 2000;
@@ -99,7 +99,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_remoteActionHandler = new RemoteActionHandler();
 		String messageboxName = thisAgent.getAgentNode().getUUID() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
-		_autoentlistActionTemplates = new ArrayList<Action>();
+		_autoenlistActionTemplates = new ArrayList<Action>();
 		_autoEnlister = new AutoEnlister();
 		_refreshAgent = new RefreshAgent();
 	}
@@ -180,18 +180,24 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			_actionRequestHandler.removeActionFromDirectory((Action) params[0]);
 			cleanupSession(doAction);
 		} else if (actionName.equalsIgnoreCase(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE)){
-			_autoentlistActionTemplates.addAll((List<Action>) params[0]);
+			synchronized(_autoenlistActionTemplates){
+				_autoenlistActionTemplates.addAll((List<Action>) params[0]);
+			}
 			cleanupSession(doAction);
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE)){
 			synchronized (_offeredActions) {
 				List<Action> templatesToRemove = (List<Action>) params[0];
-				_autoentlistActionTemplates.removeAll(templatesToRemove);
+				synchronized(_autoenlistActionTemplates){
+					_autoenlistActionTemplates.removeAll(templatesToRemove);
+				}
 
-				for (Action removeTemplate: templatesToRemove){
-					Set<Action> actions = memory.readAll(removeTemplate);
-					for (Action action : actions){
-						if (_offeredActions.remove(action))
-							_actionRequestHandler.removeActionFromDirectory(action);
+				synchronized(_offeredActions){
+					for (Action removeTemplate: templatesToRemove){
+						Set<Action> actions = memory.readAll(removeTemplate);
+						for (Action action : actions){
+							if (_offeredActions.remove(action))
+								_actionRequestHandler.removeActionFromDirectory(action);
+						}
 					}
 				}
 			}
@@ -590,7 +596,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		public void run() {
 
 			synchronized (_offeredActions) {
-				for (Action actionTemplate : _autoentlistActionTemplates){
+				for (Action actionTemplate : _autoenlistActionTemplates){
 					Set<Action> actions = memory.readAll(actionTemplate);
 					for (Action action : actions){
 						if(!_offeredActions.contains(action)){

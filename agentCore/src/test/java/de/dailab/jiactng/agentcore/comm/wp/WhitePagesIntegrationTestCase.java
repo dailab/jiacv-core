@@ -14,7 +14,6 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean;
-import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean.TimeoutException;
 
 import junit.framework.TestCase;
 
@@ -172,46 +171,46 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 	}
 	
-//	public void testRemoteActionTimeoutHandling(){
-//		System.err.println("TestRemoteActionTimeoutHandling");
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		Action action = new Action(RemoteActionProviderBean.ACTION_TIMEOUT_TEST);
-//		_whitePagesTestBean.searchForActionDesc(action);
-//		
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		List<IFact> results = _whitePagesTestBean.getLastResult();
-//		assertNotNull(results);
-//		
-//		if (results.get(0) instanceof Action){
-//			Action remoteAction = (Action) results.get(0);
-//			_remoteActionTestBean.useRemoteAction(remoteAction, new Object[] {}, 1000);
-//		}
-//		
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		ActionResult actionResult = _remoteActionTestBean.getLastActionResult();
-//		assertNotNull(actionResult);
-//		
-//		assertNull(actionResult.getResults());
-//		assertNotNull(actionResult.getFailure());
-//		assertTrue(actionResult.getFailure() instanceof TimeoutException);
-//		
-//	}
-//	
+	public void testRemoteActionTimeoutHandling(){
+		System.err.println("TestRemoteActionTimeoutHandling");
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		Action action = new Action(RemoteActionProviderBean.ACTION_TIMEOUT_TEST);
+		_whitePagesTestBean.searchForActionDesc(action);
+		
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		List<IFact> results = _whitePagesTestBean.getLastResult();
+		assertNotNull(results);
+		
+		if (results.get(0) instanceof Action){
+			Action remoteAction = (Action) results.get(0);
+			_remoteActionTestBean.useRemoteAction(remoteAction, new Object[] {}, 1000);
+		}
+		
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		ActionResult actionResult = _remoteActionTestBean.getLastActionResult();
+		assertNotNull(actionResult);
+		
+		assertNull(actionResult.getResults());
+		assertNotNull(actionResult.getFailure());
+		assertTrue(actionResult.getFailure() instanceof TimeoutException);
+		
+	}
+	
 	public void testSearchTimeout(){
 		System.err.println("TestSearchTimeout");
 		_whitePagesTestBean.TimeoutTest();
@@ -235,6 +234,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 //			e.printStackTrace();
 //		}
 //		
+//		System.err.println(": : Searching for Action");
 //		final String REMOTE_RESULT = "Live long and prosper";
 //	
 //		Action action = new Action(RemoteActionProviderBean.ACTION_GET_SOME_RESULT);
@@ -246,6 +246,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 //			e.printStackTrace();
 //		}
 //		
+//		System.err.println(": : Checking for Result");
 //		List<IFact> remoteActions = _whitePagesTestBean.getLastResult();
 //		assertNotNull(remoteActions);
 //		assertNotNull(remoteActions.get(0));
@@ -254,6 +255,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 //		Action remoteAction = (Action) remoteActions.get(0);
 //		Object[] params = {REMOTE_RESULT};
 //		
+//		System.err.println(": : Trying to use the remote Action");
 //		_remoteActionTestBean.useRemoteAction(remoteAction, params);
 //		
 //		try {
@@ -262,6 +264,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 //			e.printStackTrace();
 //		}
 //		
+//		System.err.println(": : Checking for Result again");
 //		ActionResult result = _remoteActionTestBean.getLastActionResult();
 //		assertNotNull(result);
 //		

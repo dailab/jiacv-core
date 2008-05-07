@@ -81,7 +81,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	 */
 	public void addAgentDescription(IAgentDescription agentDescription){
 		if (agentDescription != null) {
-			space.write(agentDescription);
+			synchronized (space) {
+				space.write(agentDescription);	
+			}
 		}
 	}
 
@@ -92,7 +94,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	 */
 	public void removeAgentDescription(IAgentDescription agentDescription){
 		if (agentDescription != null) {
-			space.remove(agentDescription);
+			synchronized (space) {
+				space.remove(agentDescription);
+			}
 		}
 	}
 
@@ -107,7 +111,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		if (action != null){
 			ActionData actionData = new ActionData(_currentLogicTime);
 			actionData.setActionDescription(action);
-			space.write(actionData);
+			synchronized (space) {
+				space.write(actionData);	
+			}
 		}
 	}
 
@@ -123,7 +129,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		if (action != null) {
 			ActionData actionData = new ActionData();
 			actionData.setActionDescription(action);
-			space.remove(actionData);
+			synchronized (space) {
+				space.remove(actionData);
+			}
 		}
 	}
 
@@ -301,13 +309,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				actionData.setActionDescription(action);
 
 				log.debug("removing possible obsolete version from directory");
-				space.remove(actionData);
+				synchronized (space) {
+					space.remove(actionData);
 
-				actionData.setCreationTime(_currentLogicTime + 1);
+					actionData.setCreationTime(_currentLogicTime + 1);
 
-				log.debug("writing new action to tuplespace");
-				space.write(actionData);
-
+					log.debug("writing new action to tuplespace");
+					space.write(actionData);
+				}
+				
 			} else if (message.getProtocol().equalsIgnoreCase(REMOVE_ACTION_PROTOCOL_ID)){
 				log.debug("Message is holding Action for removal");
 				IActionDescription action = (IActionDescription) message.getPayload();
@@ -327,11 +337,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 				ActionData templateData = new ActionData();
 				templateData.setActionDescription(remoteAction.getAction());
-
-				ActionData foundData = space.read(templateData);
+				ActionData foundData = null;
+				synchronized (space) {
+					foundData = space.read(templateData);
+				}
 
 				JiacMessage resultMessage;
-				
 				
 				if (foundData != null){
 					IActionDescription resultDescription = foundData.getActionDescription();
@@ -385,7 +396,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				
 			} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
 				IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
-				_ongoingAgentPings.remove(agentDesc);
+				synchronized(_ongoingAgentPings){
+					_ongoingAgentPings.remove(agentDesc);
+				}
 			} else {
 				log.warn("Message has unknown protocol " + message.getProtocol());
 			}
@@ -397,24 +410,29 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		
 		public void run(){
 			// All Agents that haven't ping back are most likely to be non existent anymore
-			
-			for (IAgentDescription agent : _ongoingAgentPings){
-				IAgentDescription spaceAgent = space.remove(agent);
-				log.warn("Agent doesn't seem to be present anymore. Probably shutdown. Agent is " + spaceAgent);
-			}
-			
-			_ongoingAgentPings.clear();
-			
-			for (IAgentDescription agent : space.readAll(new AgentDescription())){
-				_ongoingAgentPings.add(agent);
-				ICommunicationAddress pingAddress = agent.getMessageBoxAddress();
-				JiacMessage message = new JiacMessage();
-				message.setProtocol(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID);
-				message.setSender(_myAddress);
-				try {
-					_messageTransport.send(message, pingAddress);
-				} catch (CommunicationException e) {
-					e.printStackTrace();
+			synchronized (_ongoingAgentPings) {
+				
+				synchronized (space) {
+					for (IAgentDescription agent : _ongoingAgentPings){
+						IAgentDescription spaceAgent = space.remove(agent);
+						log.warn("Agent doesn't seem to be present anymore. Probably shutdown. Agent is " + spaceAgent);
+					}
+
+
+					_ongoingAgentPings.clear();
+
+					for (IAgentDescription agent : space.readAll(new AgentDescription())){
+						_ongoingAgentPings.add(agent);
+						ICommunicationAddress pingAddress = agent.getMessageBoxAddress();
+						JiacMessage message = new JiacMessage();
+						message.setProtocol(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID);
+						message.setSender(_myAddress);
+						try {
+							_messageTransport.send(message, pingAddress);
+						} catch (CommunicationException e) {
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 		}
@@ -436,6 +454,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 			// During maintenance there must not be any other changes to the tuplespace, so...
 			synchronized(space){
+//				System.err.println("removing outdated actions");
 				ActionData oldAct = new ActionData();
 				oldAct.setCreationTime(_currentLogicTime - 1);
 				space.removeAll(oldAct);
@@ -445,6 +464,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				log.debug("Beginning refreshment of stored actions");
 				// Check the Space for timeouts by using the current and now obsolete logical time
 
+//				System.err.println("Actions : " + space.readAll(new ActionData()).size());
+//				System.err.println("Timeouts: " + space.readAll(actionTemplate).size());
 				for (ActionData actionData : space.readAll(actionTemplate)){
 					//as long as timeouts are existing...
 					//get the first of them and the action stored within it

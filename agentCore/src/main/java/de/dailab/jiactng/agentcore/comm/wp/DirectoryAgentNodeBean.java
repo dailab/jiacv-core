@@ -23,7 +23,6 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
-import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean.FactSet;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
@@ -365,7 +364,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 						refreshData.setCreationTime(_currentLogicTime + 1);
 						space.write(refreshData);
 					}
-				} else if (message.getPayload() instanceof DirectoryAccessBean.FactSet){
+				} else if (message.getPayload() instanceof FactSet){
 					FactSet FS = (FactSet) message.getPayload();
 					
 					synchronized(space){

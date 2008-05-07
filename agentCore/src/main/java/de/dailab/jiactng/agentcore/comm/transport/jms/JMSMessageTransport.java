@@ -124,22 +124,30 @@ public class JMSMessageTransport extends MessageTransport {
      * @throws JMSException
      */
     static Message pack(IJiacMessage message, Session session) throws JMSException {
-        IFact payload= message.getPayload();
-        Message result;
-        
-        if(payload != null && payload instanceof BinaryContent) {
-            result= session.createBytesMessage();
-            ((BytesMessage)result).writeBytes(((BinaryContent)payload).getData());
-        } else {
-            result= session.createObjectMessage();
-            ((ObjectMessage)result).setObject(payload);
-        }
-        
-        for(String key : message.getHeaderKeys()) {
-            result.setStringProperty(key, message.getHeader(key));
-        }
-        
-        return result;
+    	IFact payload= message.getPayload();
+    	try {
+//	        IFact payload= message.getPayload();
+	        Message result;
+	        
+	        if(payload != null && payload instanceof BinaryContent) {
+	            result= session.createBytesMessage();
+	            ((BytesMessage)result).writeBytes(((BinaryContent)payload).getData());
+	        } else {
+	            result= session.createObjectMessage();
+	            ((ObjectMessage)result).setObject(payload);
+	        }
+	        
+	        for(String key : message.getHeaderKeys()) {
+	            result.setStringProperty(key, message.getHeader(key));
+	        }
+	        
+	        return result;
+    	} catch(RuntimeException re) {
+    		if(payload != null) {
+    			System.out.println("\n\tund das is der payload: " + payload.getClass()+"\n");
+    		}
+    		throw re;
+    	}
     }
     
 

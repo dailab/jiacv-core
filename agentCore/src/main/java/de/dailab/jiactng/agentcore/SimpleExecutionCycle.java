@@ -225,7 +225,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 				((Action) act.getAction()).getProviderBean().doAction(act);
 				success = true;
 			} catch (Throwable t) {
-				log.error("--- action failed: " + act.getAction().getName());
+				log.error("--- action failed: " + act.getAction().getName(),t);
 			}
 		} else {
 			log.error("--- found action without bean: "

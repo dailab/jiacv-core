@@ -610,14 +610,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
-	@SuppressWarnings("serial")
-	public class FactSet implements IFact{
-		Set<IFact> _facts;
-		
-		public FactSet(Set<IFact> facts){
-			_facts = facts;
-		}
-	}
 
 	private class SessionData {
 		public DoAction clientSource;
@@ -629,20 +621,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
-	@SuppressWarnings("serial")
-	public class TimeoutException extends RuntimeException{
-		public TimeoutException(String s){
-			super(s);
-		}
-	}
+	
 
-	@SuppressWarnings("serial")
-	public class ActionNotPresentException extends RuntimeException{
-		IActionDescription _actionDesc = null;
 
-		public ActionNotPresentException(IActionDescription actionDesc) {
-			super("Action isn't present anymore");
-			_actionDesc = actionDesc;
-		}
-	}
 }

@@ -81,7 +81,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		JiacMessage remoteActionTemplate = new JiacMessage();
 		remoteActionTemplate.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
 		WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE = remoteActionTemplate;
-		
+
 		JiacMessage refreshMessage = new JiacMessage();
 		refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
 		WHITEPAGES_REFRESH_MESSAGETEMPLATE = refreshMessage;
@@ -114,6 +114,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_timer = new Timer();
 		_timer.schedule(_autoEnlister, _firstAutoEnlistening, _autoEnlisteningInterval);
 
+//		for (Action action : memory.readAll(new Action())){
+//		_actionRequestHandler.addActionToDirectory(action);
+//		}
 	}
 
 	public void doStop() throws Exception{
@@ -240,16 +243,16 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	public void setFirstAutoEnlistening(long firstAutoEnlistening){
 		_firstAutoEnlistening = firstAutoEnlistening;
 	}
-	
-	
+
+
 	private void cleanupSession(DoAction doAction){
 		doAction.setSource(_resultDump);
 		ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Object[] {});
 		memory.write(result);
 	}
-	
-	
-	
+
+
+
 
 	/**
 	 * Inner Class for handling searchRequests 
@@ -415,11 +418,15 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				JiacMessage message = new JiacMessage(doAction);
 				message.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
 
+
 				Object[] params = {message, directoryAddress};
 				DoAction send = _sendAction.createDoAction(params, _resultDump);
-				openSessionsToProviders.put(doAction.getSessionId(), doAction);
+				synchronized(openSessionsToProviders){
+					openSessionsToProviders.put(doAction.getSessionId(), doAction);
+				}
 				log.debug("searching for provider of remoteAction");
 				memory.write(send);
+
 			}
 		}
 
@@ -455,11 +462,15 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					} else if (message.getPayload() instanceof NoSuchActionException){
 						// Action isn't present (anymore) in the Directory
 						String sessionID = message.getHeader("SESSION_ID");
-						DoAction remoteAction = openSessionsToProviders.remove(sessionID);
+						
+						DoAction remoteAction = null;
+						synchronized(openSessionsToProviders){
+							 remoteAction = openSessionsToProviders.remove(sessionID);
+						}
 						
 						if (remoteAction != null){
 							log.debug("RemoteAction wasn't found within the Directory");
-							
+
 							ActionResult result = new ActionResult(remoteAction, message.getPayload()); 
 							memory.write(result);
 						}
@@ -483,7 +494,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 								remoteDoAction = foundAction.createDoAction(params, this);
 
 								remoteActionFound = true;
-								openSessionsFromClients.put(remoteDoAction.getSessionId(), new SessionData(doAction, message.getSender()));
+								synchronized (openSessionsFromClients) {
+									openSessionsFromClients.put(remoteDoAction.getSessionId(), new SessionData(doAction, message.getSender()));	
+								}
 								memory.write(remoteDoAction);
 								break;
 							}
@@ -505,7 +518,10 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					} else if (message.getPayload() instanceof ActionResult && ((message = memory.remove(message)) != null)){
 						log.debug("got resultmessage from remoteAction, result reads: " + (ActionResult) message.getPayload());
 						ActionResult result = (ActionResult) message.getPayload();
-						DoAction doAction= openSessionsToProviders.remove(result.getSessionId());
+						DoAction doAction = null;
+						synchronized(openSessionsToProviders){
+							openSessionsToProviders.remove(result.getSessionId());
+						}
 
 						if(doAction != null) {
 							result.setSource(doAction);
@@ -528,25 +544,33 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		public void receiveResult(ActionResult result) {
 			log.debug("Got Result for Remote Action!");
 
-			SessionData sessionData = openSessionsFromClients.remove(result.getSessionId());
-			ICommunicationAddress recipient = sessionData.clientAddress;
+			SessionData sessionData = null;
+			synchronized (openSessionsFromClients) {
+				sessionData = openSessionsFromClients.remove(result.getSessionId());	
+			}
+			if (sessionData != null){
+				ICommunicationAddress recipient = sessionData.clientAddress;
 
-			Action providerAction = (Action) sessionData.clientSource.getAction();
-			ActionResult remoteResult = providerAction.createActionResult(sessionData.clientSource, result.getResults());
+				Action providerAction = (Action) sessionData.clientSource.getAction();
+				ActionResult remoteResult = providerAction.createActionResult(sessionData.clientSource, result.getResults());
 
-			if(recipient != null) {
-				log.debug("Indeed waiting for a result for that remoteaction!");
-				JiacMessage resultMessage = new JiacMessage(remoteResult);
-				resultMessage.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
+				if(recipient != null) {
+					log.debug("Indeed waiting for a result for that remoteaction!");
+					JiacMessage resultMessage = new JiacMessage(remoteResult);
+					resultMessage.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
 
-				Object[] params = {resultMessage, recipient};
-				DoAction send = _sendAction.createDoAction(params, _resultDump);
+					Object[] params = {resultMessage, recipient};
+					DoAction send = _sendAction.createDoAction(params, _resultDump);
 
-				log.debug("sending result to client");
-				memory.write(send);
+					log.debug("sending result to client");
+					memory.write(send);
+				} else {
+					log.debug("No recipient for ActionResult");
+				}
 			} else {
 				log.debug("Remote Action isn't valid anymore");
 			}
+			
 		}
 
 		@Override
@@ -564,7 +588,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	private class AutoEnlister extends TimerTask {
 
 		public void run() {
-			
+
 			synchronized (_offeredActions) {
 				for (Action actionTemplate : _autoentlistActionTemplates){
 					Set<Action> actions = memory.readAll(actionTemplate);
@@ -589,7 +613,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				if (wceTemp.getObject() instanceof IJiacMessage){
 					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
 					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
-							
+
 						Set<IFact> facts = new HashSet<IFact>();
 						for (Action action : memory.readAll(new Action())){
 							facts.add(action);
@@ -599,7 +623,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
 						DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage, message.getSender()}, _resultDump);
 						memory.write(send);
-						
+
 					} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
 						JiacMessage pingMessage = new JiacMessage(thisAgent.getAgentDescription());
 						DoAction send = _sendAction.createDoAction(new Object[] {pingMessage, message.getSender()}, _resultDump);
@@ -621,7 +645,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
-	
+
 
 
 }

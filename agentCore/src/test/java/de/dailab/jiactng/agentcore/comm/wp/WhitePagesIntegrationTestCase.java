@@ -226,56 +226,56 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		assertTrue(result.getFailure() instanceof TimeoutException);
 	}
 	
-//	public void testRemoteActionHandling(){
-//		System.err.println("TestRemoteActionHandling");
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		System.err.println(": : Searching for Action");
-//		final String REMOTE_RESULT = "Live long and prosper";
-//	
-//		Action action = new Action(RemoteActionProviderBean.ACTION_GET_SOME_RESULT);
-//		_whitePagesTestBean.searchForActionDesc(action);
-//		
-//		try {
-//			Thread.sleep(3500);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		System.err.println(": : Checking for Result");
-//		List<IFact> remoteActions = _whitePagesTestBean.getLastResult();
-//		assertNotNull(remoteActions);
-//		assertNotNull(remoteActions.get(0));
-//		assertTrue(remoteActions.get(0) instanceof Action);
-//		
-//		Action remoteAction = (Action) remoteActions.get(0);
-//		Object[] params = {REMOTE_RESULT};
-//		
-//		System.err.println(": : Trying to use the remote Action");
-//		_remoteActionTestBean.useRemoteAction(remoteAction, params);
-//		
-//		try {
-//			Thread.sleep(2000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		System.err.println(": : Checking for Result again");
-//		ActionResult result = _remoteActionTestBean.getLastActionResult();
-//		assertNotNull(result);
-//		
-//		Object[] actionResults = result.getResults();
-//		
-//		assertTrue(actionResults[0] instanceof String);
-//		String remoteResult = (String) actionResults[0];
-//		
-//		assertTrue(remoteResult.equalsIgnoreCase(REMOTE_RESULT));
-//		_lastTestDone = true;
-//	}
+	public void testRemoteActionHandling(){
+		System.err.println("TestRemoteActionHandling");
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		System.err.println(": : Searching for Action");
+		final String REMOTE_RESULT = "Live long and prosper";
+	
+		Action action = new Action(RemoteActionProviderBean.ACTION_GET_SOME_RESULT);
+		_whitePagesTestBean.searchForActionDesc(action);
+		
+		try {
+			Thread.sleep(3500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		System.err.println(": : Checking for Result");
+		List<IFact> remoteActions = _whitePagesTestBean.getLastResult();
+		assertNotNull(remoteActions);
+		assertNotNull(remoteActions.get(0));
+		assertTrue(remoteActions.get(0) instanceof Action);
+		
+		Action remoteAction = (Action) remoteActions.get(0);
+		Object[] params = {REMOTE_RESULT};
+		
+		System.err.println(": : Trying to use the remote Action");
+		_remoteActionTestBean.useRemoteAction(remoteAction, params);
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		System.err.println(": : Checking for Result again");
+		ActionResult result = _remoteActionTestBean.getLastActionResult();
+		assertNotNull(result);
+		
+		Object[] actionResults = result.getResults();
+		
+		assertTrue(actionResults[0] instanceof String);
+		String remoteResult = (String) actionResults[0];
+		
+		assertTrue(remoteResult.equalsIgnoreCase(REMOTE_RESULT));
+		_lastTestDone = true;
+	}
 	
 	public void testEnlistening(){
 		System.err.println("TestEnlistening");

@@ -526,7 +526,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						ActionResult result = (ActionResult) message.getPayload();
 						DoAction doAction = null;
 						synchronized(openSessionsToProviders){
-							openSessionsToProviders.remove(result.getSessionId());
+							doAction = openSessionsToProviders.remove(result.getSessionId());
 						}
 
 						if(doAction != null) {

@@ -75,7 +75,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	private HashMap<String, Future<?>> agentFutures = null;
 
 	/** Configuration of a set of JMX connector server. */
-	private Set<Map<String, String>> _jmxConnectors = null;
+	private Set<Map<String, Object>> _jmxConnectors = null;
 
 	/** The manager of the agent node */
 	private Manager _manager = null;
@@ -125,7 +125,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @param jmxConnectors
 	 *            the set of connectors.
 	 */
-	public void setJmxConnectors(Set<Map<String, String>> jmxConnectors) {
+	public void setJmxConnectors(Set<Map<String, Object>> jmxConnectors) {
 		this._jmxConnectors = jmxConnectors;
 	}
 

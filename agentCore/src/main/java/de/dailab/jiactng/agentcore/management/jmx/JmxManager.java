@@ -22,6 +22,7 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
+import javax.management.remote.JMXAuthenticator;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
@@ -659,19 +660,19 @@ public class JmxManager implements Manager {
 	 * @see javax.management.remote.JMXConnectorServerMBean#start()
 	 * @see JmxMulticastSender
 	 */
-	public void enableRemoteManagement(String nodeId, String nodeName, Set<Map<String,String>> jmxConnectors) {
+	public void enableRemoteManagement(String nodeId, String nodeName, Set<Map<String,Object>> jmxConnectors) {
 		if (!jmxConnectors.isEmpty()) {
 			System.setProperty("com.sun.management.jmxremote", "");
 		}
 		// Create and register all specified JMX connector servers
-		for (Map<String,String> conf : jmxConnectors) {
+		for (Map<String,Object> conf : jmxConnectors) {
 			// get parameters of connector server
-			String protocol = conf.get("protocol");
+			String protocol = (String) conf.get("protocol");
 			if (protocol == null) {
 				System.out.println("WARNING: No protocol specified for a JMX connector server");
 				continue;
 			}
-			String portStr = conf.get("port");
+			String portStr = (String) conf.get("port");
 			int port = 0;
 			if (portStr != null) {
 				try {
@@ -681,13 +682,13 @@ public class JmxManager implements Manager {
 					System.err.println(e.getMessage());
 				}
 			}
-			String path = conf.get("path");
-			String authenticator = conf.get("authenticator");
+			String path = (String) conf.get("path");
+			JMXAuthenticator authenticator = (JMXAuthenticator) conf.get("authenticator");
 
 			if (protocol.equals("rmi")) {
 				// check use of RMI registry
-				String registryPort = conf.get("registryPort");
-				String registryHost = conf.get("registryHost");
+				String registryPort = (String) conf.get("registryPort");
+				String registryHost = (String) conf.get("registryHost");
 				if ((registryPort != null) || (registryHost != null)) {
 					path = "/jndi/rmi://" + ((registryHost == null) ? "localhost" : registryHost)
 																									+ ((registryPort == null) ? "" : ":" + registryPort) + "/" + nodeId;
@@ -697,14 +698,7 @@ public class JmxManager implements Manager {
 			// configure authentication
 			HashMap<String,Object> env = new HashMap<String,Object>();
 			if (authenticator != null) {
-				try {
-					Object auth = Class.forName(authenticator).newInstance();
-					env.put(JMXConnectorServer.AUTHENTICATOR, auth);
-				}
-				catch (Exception e) {
-					System.err.println("WARNING: Initialisation of JMX authentication failed, because can not create instance of " + authenticator);
-					System.err.println(e.getMessage());
-				}
+				env.put(JMXConnectorServer.AUTHENTICATOR, authenticator);
 			}
 
 			// construct server URL

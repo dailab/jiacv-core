@@ -179,9 +179,13 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         if(method != null) {
             try {
                 Object result= method.invoke(this, doAction.getParams());
-    			memory.write(action.createActionResult(
-    					doAction, new Object[] { result }));
-                log.debug("action processed and result written...");
+                if (result != null){ 
+                	memory.write(action.createActionResult(
+                			doAction, new Object[] { result }));
+                	log.debug("action processed and result written...");
+                } else {
+                	log.debug("action processed and no result written");
+                }
                 return;
             }  catch (IllegalAccessException iae) {
                 // should not happen

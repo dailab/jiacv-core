@@ -221,9 +221,11 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 		if (((Action) act.getAction()).getProviderBean() != null) {
 			try {
-				memory.write(act.getSession());
 				((Action) act.getAction()).getProviderBean().doAction(act);
 				success = true;
+				if (!act.getAction().getResultTypes().isEmpty()){
+					memory.write(act.getSession());
+				} 
 			} catch (Throwable t) {
 				log.error("--- action failed: " + act.getAction().getName(),t);
 			}
@@ -249,7 +251,9 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			// Session(doAct.getSessionId(),doAct.getSession().getCreationTime(),null,null);
 			// memory.remove(new ActionResult(null,template,null,null));
 			// DoAction doAct = ((DoAction) actionResult.getSource());
-			memory.remove(doAct.getSession());
+			if (memory.remove(doAct.getSession()) == null){
+				log.warn("ActionResult for Action" + actionResult.getAction().getName() + " written with non existing Session.");
+			}
 			// memory.remove(template);
 			((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
 

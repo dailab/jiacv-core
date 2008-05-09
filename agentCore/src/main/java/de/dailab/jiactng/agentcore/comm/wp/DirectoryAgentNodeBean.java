@@ -15,7 +15,6 @@ import org.sercho.masp.space.event.EventedTupleSpace;
 import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
-import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -48,8 +47,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public final static String SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#SearchRequest";
 	public final static String ADD_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AddAction";
 	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
-	public final static String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#UseRemoteAction";
-	public final static String REFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#Refresh";
+	public final static String ACTIONREFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
 	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
 	
 	private long _refreshingIntervall = 4000;
@@ -61,7 +59,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	private EventedTupleSpace<IFact> space = null;
 	private MessageTransport _messageTransport = null;
 	private ICommunicationAddress _myAddress = null; 
-	private Set<IAgentDescription> _ongoingAgentPings;
 
 	private RequestHandler _searchRequestHandler = null;
 
@@ -146,8 +143,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		
 		_refresher = new SpaceRefresher();
 		_agentPinger = new AgentPinger();
-		_ongoingAgentPings = new HashSet<IAgentDescription>();
-
+		
 	}
 
 	public void doStart(){
@@ -329,40 +325,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					space.remove(actionData);
 				}
 
-			} else if (message.getProtocol().equalsIgnoreCase(REMOTEACTION_PROTOCOL_ID)){
-				log.debug("Message is request for provideraddress of remote Action");
-
-				DoAction remoteAction = (DoAction) message.getPayload();
-				log.debug("Searching for provider of (remote)Action " + remoteAction.getAction().getName());
-
-				ActionData templateData = new ActionData();
-				templateData.setActionDescription(remoteAction.getAction());
-				ActionData foundData = null;
-				synchronized (space) {
-					foundData = space.read(templateData);
-				}
-
-				JiacMessage resultMessage;
-				
-				if (foundData != null){
-					IActionDescription resultDescription = foundData.getActionDescription();
-					ICommunicationAddress providerAddress = resultDescription.getProviderDescription().getMessageBoxAddress();
-					resultMessage = new JiacMessage(providerAddress);
-				} else {
-					NoSuchActionException exp = new NoSuchActionException("Action " + remoteAction.getAction().getName() + " isn't present within Directory");
-					resultMessage = new JiacMessage(exp);
-				}
-
-				resultMessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
-				resultMessage.setHeader("SESSION_ID", remoteAction.getSessionId());
-				try {
-					_messageTransport.send(resultMessage, message.getSender());
-				} catch (CommunicationException e) {
-					e.printStackTrace();
-				}
-
-
-			} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID)){
+			} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID)){
 				if (message.getPayload() instanceof IActionDescription){
 					IActionDescription actDesc = (IActionDescription) message.getPayload();
 					ActionData refreshData = new ActionData();
@@ -396,9 +359,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				
 			} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
 				IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
-				synchronized(_ongoingAgentPings){
-					_ongoingAgentPings.remove(agentDesc);
-				}
+				_agentPinger.removePing(agentDesc);
 			} else {
 				log.warn("Message has unknown protocol " + message.getProtocol());
 			}
@@ -407,6 +368,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	
 	@SuppressWarnings("serial")
 	private class AgentPinger extends TimerTask{
+		
+		private Set<IAgentDescription> _ongoingAgentPings = new HashSet<IAgentDescription>();
 		
 		public void run(){
 			// All Agents that haven't ping back are most likely to be non existent anymore
@@ -434,6 +397,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 						}
 					}
 				}
+			}
+		}
+		
+		public void removePing(IAgentDescription agentDesc){
+			synchronized(_ongoingAgentPings){
+				_ongoingAgentPings.remove(agentDesc);
 			}
 		}
 	}
@@ -476,7 +445,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 					JiacMessage refreshMessage = new JiacMessage(actionData._action);
 					refreshMessage.setSender(_myAddress);
-					refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
+					refreshMessage.setProtocol(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID);
 					try {
 						_messageTransport.send(refreshMessage, refreshAddress);
 					} catch (CommunicationException e) {

@@ -216,8 +216,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				DoAction sourceAction = _requestID2ActionMap.remove(doAction.getSessionId());
 
 				if (sourceAction != null){
-					String owner = sourceAction.getOwner();
-					log.warn("SearchRequest from owner " + owner + " has timeout");
+					String owner = sourceAction.getSource().toString();
+					log.warn("SearchRequest from " + owner + " has timeout");
 
 					ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
 					memory.write(result);

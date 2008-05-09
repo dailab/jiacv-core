@@ -81,7 +81,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	/**
 	 * The list of agentbeans of this agent.
 	 */
-	private ArrayList<IAgentBean> agentBeans = new ArrayList<IAgentBean>();
+	protected final ArrayList<IAgentBean> agentBeans = new ArrayList<IAgentBean>();
 
 	/**
 	 * activity Flag (could be replaced by statecheck
@@ -142,7 +142,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * {@inheritDoc}
 	 */
 	public void setAgentBeans(List<IAgentBean> agentbeans) {
-		this.agentBeans = new ArrayList<IAgentBean>();
+		this.agentBeans.clear();
 		this.agentBeans.addAll(agentbeans);
 
 		// set references for all agent beans
@@ -481,9 +481,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * @throws LifecycleException
 	 *             if the corresponding lifecycle method throws an exception.
 	 * @see ILifecycle
+	 * 
 	 */
 	public void setBeanState(IAgentBean bean, LifecycleStates newState)
 			throws LifecycleException {
+	    
 		String beanName = bean.getBeanName();
 
 		if (log != null && log.isInfoEnabled()) {
@@ -865,4 +867,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	//
 	// - addAgentBean method
 	// - removeAgentBean method
+	//   -> suggestion: use the add, addAll, remove, and removeAll methods of List.
+	//      Then we do not have to render the list unmodifiable...
+	//   -> the (add|remove)All methods are convenient to install/remove new beans and synchronize their state changes between them
+	// - setBeanState method should be renamed and moved to the AbstractLifecycle and ILifecycle
 }

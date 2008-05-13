@@ -1,11 +1,16 @@
 package de.dailab.jiactng.agentcore.management.jmx;
 
 import java.io.IOException;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.management.remote.JMXAuthenticator;
+import javax.management.remote.JMXPrincipal;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -49,9 +54,16 @@ public class JaasAuthenticator implements JMXAuthenticator {
 					new JaasCallbackHandler(aCredentials[0], aCredentials[1].toCharArray()), 
 					configuration);
 			lc.login();
-			Subject subject = lc.getSubject();
+			Set<Principal> principals = lc.getSubject().getPrincipals();
+
+			// transform to JMX principals
+			HashSet<JMXPrincipal> jmxPrincipals = new HashSet<JMXPrincipal>();
+			for (Principal principal : principals) {
+				jmxPrincipals.add(new JMXPrincipal(principal.getName()));
+			}
+
 			lc.logout();
-			return subject;
+            return new Subject(true, jmxPrincipals, Collections.EMPTY_SET, Collections.EMPTY_SET);
 		} catch (LoginException le) {
 		    le.printStackTrace();
 		    throw new SecurityException("Authentication failed");

@@ -167,7 +167,59 @@ try {
 catch (IOException) {
     System.err.println("Communication problem when creating connector or connection");
 }</source>
-	       For client authentication you have to specify username and password:
+	       Condition for the remote management is that the agent node has created
+	       at least one JMX connector server. You can achieve this for example by 
+	       using "PlatformWithJMX" or "PlatformWithRegistry" instead of "Platform" 
+	       as parent of agent node's spring configuration.
+	       <source>
+&lt;bean name="<i>myPlatform</i>" parent="PlatformWithJMX"&gt;
+&lt;/bean&gt;</source>
+           The first configuration creates a RMI connector server which URL is
+           announced via multicast on port 9999 and group "226.6.6.7". The second
+           configuration uses additionally a local registry on port 1099 to
+           announce the URL.
+	    </p>
+    </subsection>
+
+    <subsection name="Security">
+	    <p>
+	       To restrict the access to remote management functions you may add authentication and 
+	       authorization to the agent node. For authentication you can use "PlatformWithSecuredJMX"
+	       as parent of agent node's spring configuration which contains a JAAS-based authenticator
+	       for an active directory. Instead of this configuration you may use any other authenticators
+           (e.g. of module <a href="../basicServices/userManagement/">userManagement</a>) which implement the interface 
+           <a href="http://java.sun.com/javase/6/docs/api/javax/management/remote/JMXAuthenticator.html">JMXAuthenticator</a>.
+	       <source>
+&lt;bean name="<i>myPlatform</i>" parent="PlatformWithSecuredJMX"&gt;
+  &lt;property name="authorizationPolicyFilename" value="<i>myJavaPolicyFile</i>"/&gt;
+&lt;/bean&gt;</source>
+           For authorization you can specify the name of a Java policy file which defines the
+           permissions of different users:
+	       <source>
+// read-write access for all classes loaded by the JVM of the agent node (local management)
+grant codeBase "file:../lib/*" {
+    permission java.security.AllPermission;
+};
+
+// read-write access for user1 (remote management)
+grant principal javax.management.remote.JMXPrincipal "<i>user1@DAI-LAB.DE</i>" {
+    permission java.security.AllPermission;
+};
+
+// read-only access for user2 (remote management)
+grant principal javax.management.remote.JMXPrincipal "<i>user2@DAI-LAB.DE</i>" {
+    permission javax.management.MBeanPermission "*", "getDomains";
+    permission javax.management.MBeanPermission "*", "queryMBeans";
+    permission javax.management.MBeanPermission "*", "queryNames";
+    permission javax.management.MBeanPermission "*", "getMBeanInfo";
+    permission javax.management.MBeanPermission "*", "getAttribute";
+    permission javax.management.MBeanPermission "*", "addNotificationListener";
+    permission javax.management.MBeanPermission "*", "removeNotificationListener";
+    permission java.lang.RuntimePermission "accessDeclaredMembers";
+    permission java.lang.RuntimePermission "getClassLoader";
+    permission java.util.PropertyPermission "*", "read";
+};</source>
+	       To connect to a secured agent node the client has also to specify username and password:
 	       <source>
 try {
     HashMap&lt;String,Object&gt; env = new HashMap&lt;String,Object&gt;();
@@ -182,56 +234,6 @@ catch (IOException) {
 catch (SecurityException) {
     System.err.println("Authentication failed");
 }</source>
-	       Condition for the remote management is that the agent node has created
-	       a corresponding connector server for the choosed protocol. This can be
-	       achieved by using "PlatformWithJMX" or "PlatformWithRegistry" as parent 
-	       of agent node's spring configuration instead of "Platform" or by 
-	       extension of the agent node's spring configuration in the following way.
-	       <source>
-&lt;bean name="<i>myPlatform</i>" class="de.dailab.jiactng.agentcore.SimpleAgentNode"&gt;
-  &lt;property name="jmxConnectors"&gt;
-    &lt;set&gt;
-      &lt;map&gt;
-        &lt;entry key="protocol" value="rmi"/&gt;
-        &lt;entry key="registryPort" value="<i>myRegistryPort</i>"/&gt;
-      &lt;/map&gt;
-    &lt;/set&gt;
-  &lt;/property&gt;
-&lt;/bean&gt;</source>
-	       To require authentication for remote management you may add an authenticator 
-	       (e.g. based on a user management agent) to the agent node:
-	       <source>
-&lt;bean name="<i>myPlatform</i>" class="de.dailab.jiactng.agentcore.SimpleAgentNode"&gt;
-  &lt;property name="jmxConnectors"&gt;
-    &lt;set&gt;
-      &lt;map&gt;
-        &lt;entry key="protocol" value="rmi"/&gt;
-        &lt;entry key="registryPort" value="<i>myRegistryPort</i>"/&gt;
-        &lt;entry key="authenticator" value="de.dailab.usermanagement.auth.JiacJMXAuthenticator"/&gt;
-      &lt;/map&gt;
-    &lt;/set&gt;
-  &lt;/property&gt;
-  &lt;property name="agents"&gt;
-    &lt;list&gt;
-      &lt;ref bean="UserManagementAgent"/&gt;
-    &lt;/list&gt;
-  &lt;/property&gt;
-&lt;/bean&gt;
-
-&lt;bean name="UserManagementAgent" parent="SimpleAgent"&gt;
-  &lt;property name="agentBeans"&gt;
-    &lt;list&gt;
-      &lt;ref bean="UserManagementAgentBean"/&gt;
-    &lt;/list&gt;
-  &lt;/property&gt;
-&lt;/bean&gt;
-
-&lt;bean name="UserManagementAgentBean" class="de.dailab.usermanagement.agent.UserManagementAgentBean" singleton="false"/&gt;</source>
-           To be allowed to remotely manage this agent node you have to be registered as user
-           of provider "admin" within the user management agent. See documentation of module 
-           <a href="../basicServices/userManagement/">userManagement</a> for a description 
-           how to define users. Instead of this user management you may use any other authenticators
-           which implement the interface <a href="http://java.sun.com/javase/6/docs/api/javax/management/remote/JMXAuthenticator.html">JMXAuthenticator</a>.
 	    </p>
     </subsection>
     </section>

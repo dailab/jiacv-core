@@ -50,9 +50,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public final static String ACTIONREFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
 	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
 	
+	/*
+	 * After this intervall messages the space will be checked for old actions,
+	 * for each of this actions a message will be send to the agent providing it,
+	 * which will sent back a message with the actions provided to refresh them.
+	 * When the next intervall begins all actions that weren't refreshed will be removed
+	 */ 
 	private long _refreshingIntervall = 4000;
 	private long _firstRefresh = 5000;
 	
+	/*
+	 * An interval after that a pingmessage is sent to an agent to check if it's still alive
+	 * After waiting for one interval all agents that hadn't pinged back are erased from the
+	 * directory.
+	 */
 	private long _agentPingIntervall = 12000;
 
 	private SpaceDestroyer<IFact> destroyer = null;
@@ -435,21 +446,29 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 //				System.err.println("Actions : " + space.readAll(new ActionData()).size());
 //				System.err.println("Timeouts: " + space.readAll(actionTemplate).size());
+				
+				Set<IAgentDescription> agentsAllreadyTold = new HashSet<IAgentDescription>();
+				
 				for (ActionData actionData : space.readAll(actionTemplate)){
 					//as long as timeouts are existing...
 					//get the first of them and the action stored within it
 					IActionDescription timeoutActionDesc = actionData.getActionDescription();
 
 					IAgentDescription agentDesc = timeoutActionDesc.getProviderDescription();
-					ICommunicationAddress refreshAddress = agentDesc.getMessageBoxAddress();
+					if (agentsAllreadyTold.contains(agentDesc)){
+						continue;
+					} else {
+						agentsAllreadyTold.add(agentDesc);
+						ICommunicationAddress refreshAddress = agentDesc.getMessageBoxAddress();
 
-					JiacMessage refreshMessage = new JiacMessage(actionData._action);
-					refreshMessage.setSender(_myAddress);
-					refreshMessage.setProtocol(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID);
-					try {
-						_messageTransport.send(refreshMessage, refreshAddress);
-					} catch (CommunicationException e) {
-						e.printStackTrace();
+						JiacMessage refreshMessage = new JiacMessage(actionData._action);
+						refreshMessage.setSender(_myAddress);
+						refreshMessage.setProtocol(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID);
+						try {
+							_messageTransport.send(refreshMessage, refreshAddress);
+						} catch (CommunicationException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}		

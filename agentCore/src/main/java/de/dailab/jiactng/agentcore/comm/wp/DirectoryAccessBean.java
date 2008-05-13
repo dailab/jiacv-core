@@ -65,8 +65,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	private Action _sendAction = null;
 	private Map<String, DoAction> _requestID2ActionMap = new HashMap<String, DoAction>();
 
-	private List<Action> _autoenlistActionTemplates = null;
-	private Set<Action> _offeredActions = new HashSet<Action>();
+	private List<IActionDescription> _autoenlistActionTemplates = null;
+	private Set<IActionDescription> _offeredActions = new HashSet<IActionDescription>();
 	// the intervall the autoenlistener should check for new actions to enlist
 	private long _autoEnlisteningInterval = 2000;
 	private long _firstAutoEnlistening = 2000;
@@ -101,7 +101,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_remoteActionHandler = new RemoteActionHandler();
 		String messageboxName = thisAgent.getAgentNode().getUUID() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
-		_autoenlistActionTemplates = new ArrayList<Action>();
+		_autoenlistActionTemplates = new ArrayList<IActionDescription>();
 		_autoEnlister = new AutoEnlister();
 		_refreshAgent = new RefreshAgent();
 	}
@@ -360,6 +360,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 			log.debug("sending Message to register action in directory " + message);
 			memory.write(send);
+			synchronized(_offeredActions){
+				_offeredActions.add(actionDesc);
+			}
 		}
 
 		public void removeActionFromDirectory(IActionDescription actionDesc){
@@ -370,6 +373,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 			log.debug("sending Message to register action in directory " + message);
 			memory.write(send);
+			synchronized(_offeredActions){
+				_offeredActions.remove(actionDesc);
+			}
 		}
 	}
 
@@ -424,8 +430,36 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				JiacMessage message = new JiacMessage(doAction);
 				message.setProtocol(REMOTEACTION_PROTOCOL_ID);
 
-				ICommunicationAddress address = doAction.getAction().getProviderDescription().getMessageBoxAddress();
-
+				ICommunicationAddress address = null;
+				if (doAction.getAction().getProviderDescription() != null){
+					if (doAction.getAction().getProviderDescription().getMessageBoxAddress() != null){
+						// so there is indeed a messageboxaddress.. wonderful, so let's use it.
+						address = doAction.getAction().getProviderDescription().getMessageBoxAddress();
+					} else {
+						log.error("Action is not valid! No MessageBoxAddress attached! Action: " + doAction.getAction());
+						if (doAction.getAction().getResultTypes() != null){
+							if (!doAction.getAction().getResultTypes().isEmpty()){
+								ActionResult result = new ActionResult(doAction, new DirectoryAccessException("No MessageBoxAddress attached"));
+								memory.write(result);
+								return;
+							}
+						} else {
+							log.error("There aren't ResultTypes either!");
+						}
+					}
+				} else {
+					log.error("Action is not valid! No ProviderDescription attached! Action: " + doAction.getAction());
+					if (doAction.getAction().getResultTypes() != null){
+						if (!doAction.getAction().getResultTypes().isEmpty()){
+							ActionResult result = new ActionResult(doAction, new DirectoryAccessException("No ProviderDescription attached"));
+							memory.write(result);
+							return;
+						}
+					} else {
+						log.error("There aren't ResultTypes either!");
+					}
+				}
+					
 				Object[] params = {message, address};
 				DoAction send = _sendAction.createDoAction(params, _resultDump);
 				synchronized(openSessionsToProviders){
@@ -580,11 +614,21 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	private class AutoEnlister extends TimerTask {
 
 		public void run() {
-
+			
 			synchronized (_offeredActions) {
-				for (Action actionTemplate : _autoenlistActionTemplates){
-					Set<Action> actions = memory.readAll(actionTemplate);
-					for (Action action : actions){
+				// check if offered actions are still present at the agent
+				for (IActionDescription action : _offeredActions){
+					// if action isn't present anymore...
+					if (memory.read(action) == null){
+						_offeredActions.remove(action);
+						_actionRequestHandler.removeActionFromDirectory(action);
+					}
+				}
+				
+				// now check for something new
+				for (IActionDescription actionTemplate : _autoenlistActionTemplates){
+					Set<IActionDescription> actions = memory.readAll(actionTemplate);
+					for (IActionDescription action : actions){
 						if(!_offeredActions.contains(action)){
 							_offeredActions.add(action);
 							_actionRequestHandler.addActionToDirectory(action);
@@ -607,7 +651,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID)){
 
 						Set<IFact> facts = new HashSet<IFact>();
-						for (Action action : memory.readAll(new Action())){
+						for (IActionDescription action : _offeredActions){
 							facts.add(action);
 						}
 
@@ -636,30 +680,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			clientAddress = address;
 		}
 	}
-
-
-
-//	if((message.getPayload() instanceof ICommunicationAddress) && ((message = memory.remove(message)) != null)){
-//	log.debug("Got Provideragent for remote Action to contact for remote invokation");
-//	ICommunicationAddress providerAddress = (ICommunicationAddress) message.getPayload();
-//	String sessionID = message.getHeader("SESSION_ID");
-//
-//	DoAction remoteAction = openSessionsToProviders.get(sessionID);
-//	if (remoteAction != null){
-//		log.debug("No timeout happend, preparing message for providerAgent");
-//		//If no timeout happend and the remote request still exists
-//
-//		JiacMessage remoteActionInvokationMessage = new JiacMessage(remoteAction);
-//		remoteActionInvokationMessage.setProtocol(DirectoryAgentNodeBean.REMOTEACTION_PROTOCOL_ID);
-//
-//		// now let's send the action to the agent that can provide the action...
-//		Object[] params = {remoteActionInvokationMessage, providerAddress};
-//		DoAction send = _sendAction.createDoAction(params, _resultDump);
-//		log.debug("sending message to providerAgent");
-//		memory.write(send);
-//	} 
-
-//} else 
 	
 
 }

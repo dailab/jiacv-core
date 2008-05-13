@@ -8,11 +8,6 @@ import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
-import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
-import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
-import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
-import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
-import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
@@ -22,9 +17,7 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 	public final static String ACTION_TIMEOUT_TEST = "de.dailab.jiactng.agentcore.comm.wp.RemoteActionTestBean#timeoutTest";
 	public final static String ACTION_GET_SOME_RESULT = "de.dailab.jiactng.agentcore.comm.wp.RemoteActionTestBean#getSomeResult";
 
-	private Action _sendAction;
-	private String _messageboxName;
-	private ICommunicationAddress _directoryAddress;
+	private Action _addAction;
 	
 	private final ResultDump _resultDump = new ResultDump();
 	
@@ -36,9 +29,7 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 	@Override
 	public void doStart() throws Exception {
 		super.doStart();
-		_messageboxName = thisAgent.getAgentNode().getUUID() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
-		_directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(_messageboxName);
-		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
+		_addAction = memory.read(new Action(DirectoryAccessBean.ACTION_ADD_ACTION_TO_DIRECTORY));
 		
 		Action timeout = new Action(ACTION_TIMEOUT_TEST, this, new Class[] {}, new Class[] {Object.class});
 		Action getSomeResult = new Action(ACTION_GET_SOME_RESULT, this, new Class[] {Object.class}, new Class[] {Object.class});
@@ -47,20 +38,11 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 		timeout.setProviderDescription(myAgentDescription);
 		getSomeResult.setProviderDescription(myAgentDescription);
 		
-		JiacMessage timeoutMessage = new JiacMessage(timeout);
-		JiacMessage getSomeResultMessage = new JiacMessage(getSomeResult);
+		DoAction addTimeout = _addAction.createDoAction(new Object[] {timeout}, _resultDump);
+		DoAction addSomeResult = _addAction.createDoAction(new Object[] {getSomeResult}, _resultDump);
 		
-		timeoutMessage.setProtocol(DirectoryAgentNodeBean.ADD_ACTION_PROTOCOL_ID);
-		getSomeResultMessage.setProtocol(DirectoryAgentNodeBean.ADD_ACTION_PROTOCOL_ID);
-		
-		Object[] timeoutParams = {timeoutMessage, _directoryAddress};
-		Object[] getSomeResultParams = {getSomeResultMessage, _directoryAddress};
-		
-		DoAction sendTimeout = _sendAction.createDoAction(timeoutParams, _resultDump);
-		DoAction sendSomeResult = _sendAction.createDoAction(getSomeResultParams, _resultDump);
-		
-		memory.write(sendTimeout);
-		memory.write(sendSomeResult);
+		memory.write(addTimeout);
+		memory.write(addSomeResult);
 	}
 
 	@Override

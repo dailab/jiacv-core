@@ -48,7 +48,13 @@ public interface IEffector extends IAgentBean {
 	 */
 	public void doAction(DoAction doAction) throws Exception;
 	
-	
+	/**
+	 * Cancels a <code>DoAction</code> because it's <code>Session</code> had a timeout.
+	 * Notes: At this moment the only place this method is called is within the sessiontimeoutmanagment.
+	 * 
+	 * @param doAction This is the DoAction that has to be canceled
+	 * @return may be null or an ActionResult, that has finaly to be delivered to the source of the action 
+	 */
 	public ActionResult cancelAction(DoAction doAction);
 
 }

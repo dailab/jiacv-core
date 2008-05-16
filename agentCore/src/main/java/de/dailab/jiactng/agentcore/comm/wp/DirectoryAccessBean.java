@@ -208,7 +208,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	}
 
 	@Override
-	public void cancelAction(DoAction doAction) {
+	public ActionResult cancelAction(DoAction doAction) {
 		log.debug("DoAction has timeout!");
 
 		synchronized(_requestID2ActionMap){
@@ -220,13 +220,14 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					log.warn("SearchRequest from " + owner + " has timeout");
 
 					ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
-					memory.write(result);
+					return result;
 
 				} else {
 					log.warn("tried to cancel non existing doAction: " + doAction.getAction().getName());
+					return null;
 				}
 			}else {
-				_remoteActionHandler.cancelRemoteAction(doAction);
+				return _remoteActionHandler.cancelRemoteAction(doAction);
 			}
 		}
 	}
@@ -249,6 +250,16 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_firstAutoEnlistening = firstAutoEnlistening;
 	}
 
+	// check if offered actions are still present at the agent
+	private synchronized void checkActionPresence(){
+		for (IActionDescription action : _offeredActions){
+			// if action isn't present anymore...
+			if (memory.read(action) == null){
+				_offeredActions.remove(action);
+				_actionRequestHandler.removeActionFromDirectory(action);
+			}
+		}
+	}
 
 //	private void cleanupSession(DoAction doAction){
 //		doAction.setSource(_resultDump);
@@ -398,7 +409,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			openSessionsToProviders = new HashMap<String, DoAction>();
 		}
 
-		public void cancelRemoteAction(DoAction remoteAction){
+		public ActionResult cancelRemoteAction(DoAction remoteAction){
 			log.debug("Canceling remoteAction");
 			synchronized(openSessionsToProviders){
 				DoAction sourceAction = openSessionsToProviders.remove(remoteAction.getSessionId());
@@ -408,10 +419,11 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					log.warn("RemoteAction " + remoteAction.getAction().getName() + " from owner " + owner + " has timeout");
 
 					ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
-					memory.write(result);
+					return result;
 
 				} else {
 					log.warn("tried to cancel non existing remote doAction: " + remoteAction.getAction().getName());
+					return null;
 				} 
 			}
 		}
@@ -617,13 +629,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			
 			synchronized (_offeredActions) {
 				// check if offered actions are still present at the agent
-				for (IActionDescription action : _offeredActions){
-					// if action isn't present anymore...
-					if (memory.read(action) == null){
-						_offeredActions.remove(action);
-						_actionRequestHandler.removeActionFromDirectory(action);
-					}
-				}
+				checkActionPresence();
 				
 				// now check for something new
 				for (IActionDescription actionTemplate : _autoenlistActionTemplates){
@@ -649,7 +655,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				if (wceTemp.getObject() instanceof IJiacMessage){
 					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
 					if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID)){
-
+						// check if offered actions are still present at the agent
+						checkActionPresence();
+						
 						Set<IFact> facts = new HashSet<IFact>();
 						for (IActionDescription action : _offeredActions){
 							facts.add(action);

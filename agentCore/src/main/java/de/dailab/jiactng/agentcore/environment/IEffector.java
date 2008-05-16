@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 
 /**
@@ -48,6 +49,6 @@ public interface IEffector extends IAgentBean {
 	public void doAction(DoAction doAction) throws Exception;
 	
 	
-	public void cancelAction(DoAction doAction);
+	public ActionResult cancelAction(DoAction doAction);
 
 }

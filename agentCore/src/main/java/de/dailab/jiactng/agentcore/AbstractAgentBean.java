@@ -162,8 +162,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	public void doCleanup() throws Exception {
 	}
 	
-	public void cancelAction(DoAction doAction){
-		
+	public ActionResult cancelAction(DoAction doAction){
+		return null;
 	}
 
 	/**

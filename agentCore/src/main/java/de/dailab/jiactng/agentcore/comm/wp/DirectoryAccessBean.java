@@ -64,6 +64,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	private Action _sendAction = null;
 	private Map<String, DoAction> _requestID2ActionMap = new HashMap<String, DoAction>();
+	private Map<String, Set<IFact>> _requestID2ResponseMap = new HashMap<String, Set<IFact>>();
 
 	private List<IActionDescription> _autoenlistActionTemplates = null;
 	private Set<IActionDescription> _offeredActions = new HashSet<IActionDescription>();
@@ -137,7 +138,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	public List<? extends Action> getActions(){
 		List<Action> actions = new ArrayList<Action>();
 
-		Action action = new Action(ACTION_REQUEST_SEARCH, this, new Class<?>[]{IFact.class}, new Class<?>[]{List.class});
+		Action action = new Action(ACTION_REQUEST_SEARCH, this, new Class<?>[]{IFact.class, Boolean.class}, new Class<?>[]{List.class});
 		actions.add(action);
 
 		action = new Action(ACTION_ADD_ACTION_TO_DIRECTORY, this, new Class<?>[]{IActionDescription.class}, null);
@@ -166,12 +167,18 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		String actionName= doAction.getAction().getName();
 		if (actionName.equalsIgnoreCase(ACTION_REQUEST_SEARCH)){
 			log.debug("doAction is a SearchRequest");
-			if (params[0] instanceof IFact){
+
+			if ((params[0] instanceof IFact) && (params[1] instanceof Boolean)){
 				IFact template = (IFact) params[0];
+				Boolean isGlobal = (Boolean) params[1];
 				SearchRequest request = new SearchRequest(template);
 				request.setID(doAction.getSessionId());
 				_requestID2ActionMap.put(request.getID(), doAction);
-				_searchRequestHandler.requestSearch(request);
+				if (isGlobal){
+					_requestID2ResponseMap.put(request.getID(), new HashSet<IFact>());
+				}
+				_searchRequestHandler.requestSearch(request, isGlobal);
+				
 			} 
 
 		} else if (actionName.equalsIgnoreCase(ACTION_ADD_ACTION_TO_DIRECTORY)){
@@ -207,6 +214,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public ActionResult cancelAction(DoAction doAction) {
 		log.debug("DoAction has timeout!");
@@ -219,7 +229,16 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					String owner = sourceAction.getSource().toString();
 					log.warn("SearchRequest from " + owner + " has timeout");
 
-					ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
+					ActionResult result = null;
+					Set<IFact> results = _requestID2ResponseMap.remove(doAction.getSessionId());
+					if (results != null){
+						// DoAction was global SearchRequest
+						result = new ActionResult(sourceAction, new Object[] {results});
+					} else {
+						// DoAction was local SearchRequest or global without answers
+						result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
+					}
+					
 					return result;
 
 				} else {
@@ -237,9 +256,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	 * @param <E> extends IFact
 	 * @param template the template to search for
 	 */
-	public <E extends IFact> void requestSearch(E template){
+	public <E extends IFact> void requestSearch(E template, Boolean isGlobal){
 		log.debug("Received SearchRequest via direct invocation. Searching for Agents with template: " + template);
-		_searchRequestHandler.requestSearch(template);
+		_searchRequestHandler.requestSearch(template, isGlobal);
 	}
 
 	public void setAutoEnlisteningInterval(long autoEnlisteningInterval){
@@ -286,9 +305,10 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		 * @param <E> extends IFact
 		 * @param template of the entrys to look for
 		 */
-		public <E extends IFact> void requestSearch(E template){
+		public <E extends IFact> void requestSearch(E template, Boolean isGlobal){
 			JiacMessage message = new JiacMessage(template);
 			message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
+			message.setHeader("isGlobal", isGlobal.toString());
 
 			Object[] params = {message, directoryAddress};
 			DoAction send = _sendAction.createDoAction(params, _resultDump);
@@ -308,7 +328,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				WriteCallEvent wceTemp = (WriteCallEvent) event;
 				if (wceTemp.getObject() instanceof IJiacMessage){
 					IJiacMessage message = (IJiacMessage) wceTemp.getObject();
-
+					
 					if (message.getPayload() instanceof SearchResponse && ((message= memory.remove(message)) != null)){
 						log.debug("DirectoryAccessBean: Got reply to SearchRequest");
 
@@ -317,33 +337,42 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 						log.debug("processing reply on SearchRequest with ID " + request.getID());
 
-						DoAction sourceDoAction = _requestID2ActionMap.remove(request.getID());
+						if ((_requestID2ResponseMap.containsKey(request.getID())) && (response.getResult() != null)){
+							// if SearchRequest was global just add results to the others already stored
+							Set<IFact> results = _requestID2ResponseMap.get(request.getID());
+							results.addAll(response.getResult());
+							return;
+						} else {
+							// The SearchRequest was local so it's time to let the source know the results
+							DoAction sourceDoAction = _requestID2ActionMap.remove(request.getID());
 
-						if (sourceDoAction != null){
-							// if request exists and hasn't timed out yet
-							List<IFact> result = new ArrayList<IFact>();
-							if (response.getResult() != null){
-								// if there is an at least empty result
+							if (sourceDoAction != null){
+								// if request exists and hasn't timed out yet
+								List<IFact> result = new ArrayList<IFact>();
+								if (response.getResult() != null){
+									// if there is an at least empty result
 
-								Set<IFact> facts = response.getResult();
-								if (!facts.isEmpty()){
-									// and it is in fact not empty
-									if (facts.iterator().next() instanceof Action){
-										for (IFact fact : facts){
-											Action act = (Action) fact;
-											act.setProviderBean(_myAccessBean);
-											result.add(act);
+									Set<IFact> facts = response.getResult();
+									if (!facts.isEmpty()){
+										// and it is in fact not empty
+										if (facts.iterator().next() instanceof Action){
+											for (IFact fact : facts){
+												Action act = (Action) fact;
+												act.setProviderBean(_myAccessBean);
+												result.add(act);
+											}
+										} else {
+											result.addAll(response.getResult());
 										}
-									} else {
-										result.addAll(response.getResult());
 									}
-								}
-							} 
+								} 
 
-							ActionResult actionResult = ((Action)sourceDoAction.getAction()).createActionResult(sourceDoAction, new Object[] {result});
-							log.debug("DirectoryAccessBean is writing actionResult: " + actionResult);
+								ActionResult actionResult = ((Action)sourceDoAction.getAction()).createActionResult(sourceDoAction, new Object[] {result});
+								log.debug("DirectoryAccessBean is writing actionResult: " + actionResult);
 
-							memory.write(actionResult);
+								memory.write(actionResult);
+
+							}
 						} 
 					}
 				}
@@ -431,7 +460,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		/*
 		 * Gets a DoAction that has to be invoked remotely
 		 * starts a search for the real provider in the directory
-		 * actual invocation will be done within the notifymethod
+		 * actual invocation will be done within the notify-method
 		 * 
 		 * @param doAction
 		 */

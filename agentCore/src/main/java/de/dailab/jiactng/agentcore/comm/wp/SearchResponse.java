@@ -4,6 +4,7 @@ import java.util.Set;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
+@SuppressWarnings("serial")
 public class SearchResponse implements IFact {
 	
 	private SearchRequest _request = null;
@@ -16,6 +17,10 @@ public class SearchResponse implements IFact {
 
 	public Set<IFact> getResult(){
 		return _result;
+	}
+	
+	public void setResult(Set<IFact> result){
+		_result = result;
 	}
 	
 	public SearchRequest getSearchRequest(){

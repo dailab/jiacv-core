@@ -20,9 +20,9 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 	}
 
 
-	public void searchForActionDesc(IActionDescription actionDesc){
+	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal){
 		log.debug("Searching for Action " + actionDesc.toString());
-		Object[] params = {actionDesc};
+		Object[] params = {actionDesc, new Boolean(isGlobal)};
 		DoAction action = _requestAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);

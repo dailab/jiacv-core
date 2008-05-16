@@ -22,7 +22,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	private static ClassPathXmlApplicationContext _xmlContext;
 	private static boolean _setup = true;
 	private static boolean _lastTestDone = false;
-	private static boolean _debug = true;
+	private static boolean _debug = false;
 	
 	private static IAgentNode _agentNode;
 	private static IAgent _whitePagesAgent;
@@ -72,14 +72,14 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	public void testFindAgent(){
 		if (_debug) {
-			System.err.println("TestFindAgent");
+			System.err.println("--- TestFindAgent ---");
 		}
 		/* check if the setup is done properly */
 		assertNotNull("Setup Failure", _agentNode);
 		assertNotNull("Setup Failure", _whitePagesAgent);
 		assertNotNull("Setup Failure", _whitePagesTestBean);
 		
-		_whitePagesTestBean.searchForAgentDesc("FindMeAgent");
+		_whitePagesTestBean.searchForAgentDesc("FindMeAgent", false);
 		try {
 			Thread.sleep(3500);
 		} catch (InterruptedException e) {
@@ -99,9 +99,9 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	public void testNothingToFind(){
 		if (_debug) {
-			System.err.println("TestNothingToFind");
+			System.err.println("--- TestNothingToFind ---");
 		}
-		_whitePagesTestBean.searchForAgentDesc("NixaAgentos");
+		_whitePagesTestBean.searchForAgentDesc("NixaAgentos", false);
 		try {
 			Thread.sleep(2500);
 		} catch (InterruptedException e) {
@@ -115,7 +115,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	public void testActionStorage(){
 		if (_debug) {
-			System.err.println("TestActionStorage");
+			System.err.println("--- TestActionStorage ---");
 		}
 		// Test for storing, searching for and removing actions
 		_sendAction = _whitePagesTestBean.getSendAction();
@@ -132,7 +132,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 		// now let's search for it
 		IActionDescription actionDesc = new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send");
-		_whitePagesTestBean.searchForActionDesc(actionDesc);
+		_whitePagesTestBean.searchForActionDesc(actionDesc, false);
 		
 		try {
 			Thread.sleep(3500);
@@ -163,7 +163,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 		
 		// no let's see if it was removed properly
-		_whitePagesTestBean.searchForActionDesc(actionDesc);
+		_whitePagesTestBean.searchForActionDesc(actionDesc, false);
 		
 		try {
 			Thread.sleep(3500);
@@ -173,14 +173,13 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 		results = _whitePagesTestBean.getLastResult();
 		assertNotNull(results);
-		
 		assertEquals("There shouldn't be any results", 0, results.size());
 		
 	}
 	
 	public void testRemoteActionTimeoutHandling(){
 		if (_debug) {
-			System.err.println("TestRemoteActionTimeoutHandling");
+			System.err.println("--- TestRemoteActionTimeoutHandling ---");
 		}
 		try {
 			Thread.sleep(3500);
@@ -189,7 +188,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 		
 		Action action = new Action(RemoteActionProviderBean.ACTION_TIMEOUT_TEST);
-		_whitePagesTestBean.searchForActionDesc(action);
+		_whitePagesTestBean.searchForActionDesc(action, false);
 		
 		try {
 			Thread.sleep(3500);
@@ -222,7 +221,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	public void testSearchTimeout(){
 		if (_debug) {
-			System.err.println("TestSearchTimeout");
+			System.err.println("--- TestSearchTimeout ---");
 		}
 		_whitePagesTestBean.TimeoutTest();
 		try {
@@ -239,7 +238,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	public void testRemoteActionHandling(){
 		if (_debug) {
-			System.err.println("TestRemoteActionHandling");
+			System.err.println("--- TestRemoteActionHandling ---");
 		}
 		try {
 			Thread.sleep(3500);
@@ -253,7 +252,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		final String REMOTE_RESULT = "Live long and prosper";
 	
 		Action action = new Action(RemoteActionProviderBean.ACTION_GET_SOME_RESULT);
-		_whitePagesTestBean.searchForActionDesc(action);
+		_whitePagesTestBean.searchForActionDesc(action, false);
 		
 		try {
 			Thread.sleep(3500);
@@ -299,9 +298,9 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	
 	public void testEnlistening(){
 		if (_debug) {
-			System.err.println("TestEnlistening");
+			System.err.println("--- TestEnlistening ---");
 		}
-		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction());
+		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction(), false);
 		
 		try {
 			Thread.sleep(2000);
@@ -325,7 +324,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			e.printStackTrace();
 		}
 		
-		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction());
+		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction(), false);
 		
 		try {
 			Thread.sleep(2000);
@@ -344,7 +343,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			e.printStackTrace();
 		}
 		
-		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction());
+		_whitePagesTestBean.searchForActionDesc(_whitePagesTestBean.getSendAction(), false);
 		
 		try {
 			Thread.sleep(2000);

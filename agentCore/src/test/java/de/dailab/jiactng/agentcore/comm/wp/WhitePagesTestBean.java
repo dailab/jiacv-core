@@ -23,7 +23,7 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  */
 public class WhitePagesTestBean extends AbstractAgentBean implements ResultReceiver{
 
-	private Action _requestAction;
+	private Action _requestSearchAction;
 	private Action _addActionAction;
 	private Action _removeActionAction;
 	private Action _addAutoEnlistActionTemplate;
@@ -48,7 +48,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	@Override
 	public void doStart() throws Exception {
 		super.doStart();
-		_requestAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch"));
+		_requestSearchAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch"));
 		_addActionAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory"));
 		_removeActionAction = memory.read(new Action("de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory"));
 		_addAutoEnlistActionTemplate = memory.read(new Action(DirectoryAccessBean.ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE));
@@ -60,19 +60,19 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	 * 
 	 * @param agentName name of the agent to search for
 	 */
-	public void searchForAgentDesc(String agentName){
+	public void searchForAgentDesc(String agentName, boolean isGlobal){
 		log.debug("Searching for Agent " + agentName);
 		AgentDescription desc = new AgentDescription(null, agentName, null, null);
-		Object[] params = {desc};
-		DoAction action = _requestAction.createDoAction(params, this);
+		Object[] params = {desc, new Boolean(isGlobal)};
+		DoAction action = _requestSearchAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
 	}
 
-	public void searchForActionDesc(IActionDescription actionDesc){
+	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal){
 		log.debug("Searching for Action " + actionDesc.toString());
-		Object[] params = {actionDesc};
-		DoAction action = _requestAction.createDoAction(params, this);
+		Object[] params = {actionDesc, new Boolean(isGlobal)};
+		DoAction action = _requestSearchAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
 	}
@@ -95,7 +95,11 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 
 	public void TimeoutTest(){
 		log.debug("trying timeoutsearch");
-		DoAction action = _requestAction.createDoAction(new Object[] {new AgentDescription(null, "NixAgentos", null, null)}, this, 1);
+		DoAction action = _requestSearchAction.createDoAction(
+				new Object[] {
+						new AgentDescription(null, "NixAgentos", null, null), 
+						new Boolean(false)}, 
+				this, 1);
 		memory.write(action); 
 	}
 

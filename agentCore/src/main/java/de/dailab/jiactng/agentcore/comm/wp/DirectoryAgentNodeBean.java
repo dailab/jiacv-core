@@ -50,6 +50,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public final static String ACTIONREFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
 	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
 	
+	public final static String AGENTNODESGROUP = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#GroupAddress";
 	/*
 	 * After this intervall messages the space will be checked for old actions,
 	 * for each of this actions a message will be send to the agent providing it,
@@ -69,7 +70,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	private SpaceDestroyer<IFact> destroyer = null;
 	private EventedTupleSpace<IFact> space = null;
 	private MessageTransport _messageTransport = null;
-	private ICommunicationAddress _myAddress = null; 
+	private ICommunicationAddress _myAddress = null;
+	private ICommunicationAddress _otherNodes = null;
 
 	private RequestHandler _searchRequestHandler = null;
 
@@ -159,8 +161,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 	public void doStart(){
 		_myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getUUID() + SEARCHREQUESTSUFFIX);
+		_otherNodes = CommunicationAddressFactory.createGroupAddress(AGENTNODESGROUP);
 		try {
 			_messageTransport.listen(_myAddress, null);
+			_messageTransport.listen(_otherNodes, null);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -173,6 +177,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public void doStop(){
 		try {
 			_messageTransport.stopListen(_myAddress, null);
+			_messageTransport.stopListen(_otherNodes, null);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
@@ -242,70 +247,82 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 			log.debug("got message " + message);
 			if (message.getProtocol().equalsIgnoreCase(SEARCH_REQUEST_PROTOCOL_ID)){
-				SearchRequest request = (SearchRequest) message.getPayload();
+				if (message.getPayload() instanceof SearchRequest){
+					SearchRequest request = (SearchRequest) message.getPayload();
 
-				log.debug("Message is holding SearchRequest");
-				if (request.getSearchTemplate() instanceof IAgentDescription){
-					log.debug("SearchRequest hold SearchTemplate of type IAgentDescription");
-					IAgentDescription template = (IAgentDescription) request.getSearchTemplate();
+					/*
+					 * This header will only be set once by the AccessBean so there will be
+					 * only one AgentNodeBean that get's a true at this point and so will be
+					 * the only AgentNodeBean that sends a request through the AgentNodeGroup
+					 */
+					boolean isGlobal = message.getHeader("isGlobal").equalsIgnoreCase("true");
 
-					log.debug("SearchRequest holds template " + template);
-					Set<IAgentDescription> descriptions;
-					synchronized(space){
-						descriptions = space.readAll(template);
+					log.debug("Message is holding SearchRequest");
+					if (request.getSearchTemplate() != null){
+						
+						// notMe == true, if message is global and coming from me, so I don't have to answer again.
+						boolean notMe = false;
+						
+						if (message.getHeader("SpareMe") != null){
+							notMe = message.getHeader("SpareMe").equalsIgnoreCase(_myAddress.toString());
+						}
+
+						log.debug("SearchRequest hold SearchTemplate of type IAgentDescription");
+						IFact template = request.getSearchTemplate();
+
+						log.debug("SearchRequest holds template " + template);
+						Set<IFact> result;
+						
+						if (!notMe){
+							if (template instanceof IActionDescription){
+								ActionData actDat = new ActionData();
+								actDat.setActionDescription((IActionDescription) template);
+								Set<ActionData> actDatSet;
+								synchronized(space){
+									actDatSet = space.readAll(actDat);
+								}
+								result = new HashSet<IFact>();
+								for (ActionData resultData : actDatSet){
+									result.add(resultData.getActionDescription());
+								}
+							} else {
+								synchronized(space){
+									result = space.readAll(template);
+								}
+							}
+							
+							log.debug("Result to send reads " + result);
+
+							SearchResponse response = new SearchResponse(request, result);
+
+							JiacMessage resultMessage = new JiacMessage(response);
+							resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
+							try {
+								log.debug("AgentNode: sending Message " + resultMessage);
+								log.debug("sending it to " + message.getSender());
+								_messageTransport.send(resultMessage, message.getSender());
+							} catch (CommunicationException e) {
+								e.printStackTrace();
+							}
+						}
+						if (isGlobal){
+							//GLOBAL SEARCH CALL!!!
+							JiacMessage globalMessage;
+							globalMessage = new JiacMessage(template);
+							globalMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
+							globalMessage.setHeader("SpareMe", _myAddress.toString());
+							globalMessage.setSender(message.getSender());
+
+							try {
+								_messageTransport.send(globalMessage, _otherNodes);
+							} catch (CommunicationException e) {
+								e.printStackTrace();
+							}
+
+						}
+					} else {
+						log.warn("SearchRequest without template received. SearchOperation aborted.");
 					}
-					Set<IFact> result = new HashSet<IFact>();
-					result.addAll(descriptions);
-					log.debug("Result to send reads " + result);
-
-					SearchResponse response = new SearchResponse(request, result);
-
-					JiacMessage resultMessage = new JiacMessage(response);
-					resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
-					try {
-						log.debug("AgentNode: sending Message " + resultMessage);
-						log.debug("sending it to " + message.getSender());
-						_messageTransport.send(resultMessage, message.getSender());
-					} catch (CommunicationException e) {
-						e.printStackTrace();
-					}
-
-				} else if (request.getSearchTemplate() instanceof IActionDescription){
-					log.debug("SearchRequest hold SearchTemplate of type Action");
-					IActionDescription template = (IActionDescription) request.getSearchTemplate();
-
-					log.debug("SearchRequest holds template " + template);
-
-					ActionData templateData = new ActionData();
-					templateData.setActionDescription(template);
-
-					Set<ActionData> foundData;
-					synchronized (space) {
-						foundData = space.readAll(templateData);
-					}
-					Set<IActionDescription> resultDescriptions = new HashSet<IActionDescription>();
-
-					for (ActionData data: foundData){
-						resultDescriptions.add(data.getActionDescription());
-					}
-
-					Set<IFact> result = new HashSet<IFact>();
-					result.addAll(resultDescriptions);
-					log.debug("Result to send reads " + result);
-
-					SearchResponse response = new SearchResponse(request, result);
-
-					JiacMessage resultMessage = new JiacMessage(response);
-					resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
-					try {
-						log.debug("AgentNode: sending Message " + resultMessage);
-						log.debug("sending it to " + message.getSender());
-						_messageTransport.send(resultMessage, message.getSender());
-					} catch (CommunicationException e) {
-						e.printStackTrace();
-					}
-				} else {
-					log.warn("SearchRequest hold SearchTemplate of unknown type "+request.getSearchTemplate().getClass().getName());
 				}
 
 

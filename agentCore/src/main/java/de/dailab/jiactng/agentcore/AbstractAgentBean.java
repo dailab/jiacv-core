@@ -162,6 +162,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	public void doCleanup() throws Exception {
 	}
 	
+	/**
+	 * is only meant to be called through SimpleExecutionCycle during Timeoutmanagment
+	 * 
+	 * @param doAction
+	 * @return
+	 */
 	public ActionResult cancelAction(DoAction doAction){
 		return null;
 	}

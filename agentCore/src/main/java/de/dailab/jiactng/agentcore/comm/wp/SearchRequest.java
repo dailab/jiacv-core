@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.comm.wp;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
+@SuppressWarnings("serial")
 public class SearchRequest implements IFact{
 
 	/**  The Template to search for */
@@ -12,6 +13,7 @@ public class SearchRequest implements IFact{
 	
 	/** optional ID used e.g. for tracking within the DirectoryAccessBean */
 	private String _ID;
+	
 	
 	public SearchRequest(IFact template) {
 		_searchTemplate = template;
@@ -37,4 +39,5 @@ public class SearchRequest implements IFact{
 	public String getID(){
 		return _ID;
 	}
+	
 }

@@ -94,14 +94,17 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
             doInit();
             
         } catch (Throwable t) {
-            if (t instanceof LifecycleException) {
+        	// keep in state UNDEFINED in case of exception
+        	lifecycle.afterInit(false);
+
+        	if (t instanceof LifecycleException) {
                 throw (LifecycleException)t;
             }
             
             throw new LifecycleException("Failed to initialize", t);
         }
         
-        lifecycle.afterInit();
+        lifecycle.afterInit(true);
         
     }
     
@@ -130,14 +133,17 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
             doStart();
             
         } catch (Throwable t) {
-            if (t instanceof LifecycleException) {
+        	// keep in state INITIALIZED in case of exception
+        	lifecycle.afterStart(false);
+
+        	if (t instanceof LifecycleException) {
                 throw (LifecycleException)t;
             }
             
             throw new LifecycleException("Failed to start", t);
         }
         
-        lifecycle.afterStart();
+        lifecycle.afterStart(true);
         
     }
     
@@ -169,6 +175,9 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
             doStop();
             
         } catch (Throwable t) {
+        	// switch to state STOPPED also in case of exception for completion of a shutdown 
+            lifecycle.afterStop();
+
             if (t instanceof LifecycleException) {
                 throw (LifecycleException)t;
             }
@@ -206,6 +215,9 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
             doCleanup();
             
         } catch (Throwable t) {
+        	// switch to state CLEANED_UP also in case of exception for completion of a shutdown 
+            lifecycle.afterCleanup();
+
             if (t instanceof LifecycleException) {
                 throw (LifecycleException)t;
             }

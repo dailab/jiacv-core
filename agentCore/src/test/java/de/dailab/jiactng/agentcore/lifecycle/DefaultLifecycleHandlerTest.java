@@ -306,7 +306,7 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
     public void start() throws LifecycleException {
         
         instance.beforeStart();
-        instance.afterStart();
+        instance.afterStart(true);
         
     }
     
@@ -320,7 +320,7 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
     public void init() throws LifecycleException {
         
         instance.beforeInit();
-        instance.afterInit();
+        instance.afterInit(true);
         
     }
     

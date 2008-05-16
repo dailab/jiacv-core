@@ -178,28 +178,33 @@ public class DefaultLifecycleHandler {
         LifecycleStates oldState = state;
         state = INITIALIZING;
         
-        lifecycle.stateChanged(oldState, INITIALIZING);
+        lifecycle.stateChanged(oldState, state);
         fireLifecycleEvent(
-                new LifecycleEvent(lifecycle, INITIALIZING));
+                new LifecycleEvent(lifecycle, state));
         
     }
     
     /**
-     * Call this method when leaving <CODE>init()</CODE>. It sets the state to
-     * INITIALIZED and informs all listener.
+     * Call this method when leaving <CODE>init()</CODE>. It sets the state to INITIALIZED
+     * in case of success or UNDEFINED in case of failure and informs all listener.
+     * @param success the success of the initialization
      * @throws IllegalStateException never
      * @see LifecycleStates#INITIALIZED
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void afterInit() throws IllegalStateException {
+    public void afterInit(boolean success) throws IllegalStateException {
         
         LifecycleStates oldState = state;
-        state = INITIALIZED;
+        if (success) {
+        	state = INITIALIZED;
+        } else {
+        	state = UNDEFINED;
+        }
         
-        lifecycle.stateChanged(oldState, INITIALIZED);
+        lifecycle.stateChanged(oldState, state);
         fireLifecycleEvent(
-                new LifecycleEvent(lifecycle, INITIALIZED));
+                new LifecycleEvent(lifecycle, state));
         
     }
     
@@ -238,28 +243,33 @@ public class DefaultLifecycleHandler {
         LifecycleStates oldState = state;
         state = STARTING;
         
-        lifecycle.stateChanged(oldState, STARTING);
+        lifecycle.stateChanged(oldState, state);
         fireLifecycleEvent(
-                new LifecycleEvent(lifecycle, STARTING));
+                new LifecycleEvent(lifecycle, state));
         
     }
     
     /**
-     * Call this method when leaving <CODE>start()</CODE>. It sets the state to
-     * STARTED and informs all listener.
+     * Call this method when leaving <CODE>start()</CODE>. It sets the state to STARTED
+     * in case of success or INITIALIZED in case of failure and informs all listener.
+     * @param success the success of the initialization
      * @throws IllegalStateException never
      * @see LifecycleStates#STARTED
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
      * @see #fireLifecycleEvent(LifecycleEvent)
      */
-    public void afterStart() throws IllegalStateException {
+    public void afterStart(boolean success) throws IllegalStateException {
         
         LifecycleStates oldState = state;
-        state = STARTED;
+        if (success) {
+        	state = STARTED;
+        } else {
+        	state = INITIALIZED;
+        }
         
-        lifecycle.stateChanged(oldState, STARTED);
+        lifecycle.stateChanged(oldState, state);
         fireLifecycleEvent(
-                new LifecycleEvent(lifecycle, STARTED));
+                new LifecycleEvent(lifecycle, state));
         
     }
     
@@ -285,9 +295,9 @@ public class DefaultLifecycleHandler {
         LifecycleStates oldState = state;
         state = STOPPING;
         
-        lifecycle.stateChanged(oldState, STOPPING);
+        lifecycle.stateChanged(oldState, state);
         fireLifecycleEvent(
-                new LifecycleEvent(lifecycle, STOPPING));
+                new LifecycleEvent(lifecycle, state));
         
     }
     
@@ -304,9 +314,9 @@ public class DefaultLifecycleHandler {
         LifecycleStates oldState = state;
         state = STOPPED;
         
-        lifecycle.stateChanged(oldState, STOPPED);
+        lifecycle.stateChanged(oldState, state);
         fireLifecycleEvent(
-                new LifecycleEvent(lifecycle, STOPPED));
+                new LifecycleEvent(lifecycle, state));
         
     }
     
@@ -344,9 +354,9 @@ public class DefaultLifecycleHandler {
         LifecycleStates oldState = state;
         state = CLEANING_UP;
         
-        lifecycle.stateChanged(oldState, CLEANING_UP);
+        lifecycle.stateChanged(oldState, state);
         fireLifecycleEvent(
-                new LifecycleEvent(lifecycle, CLEANING_UP));
+                new LifecycleEvent(lifecycle, state));
         
     }
     
@@ -363,9 +373,9 @@ public class DefaultLifecycleHandler {
         LifecycleStates oldState = state;
         state = CLEANED_UP;
         
-        lifecycle.stateChanged(oldState, CLEANED_UP);
+        lifecycle.stateChanged(oldState, state);
         fireLifecycleEvent(
-                new LifecycleEvent(lifecycle, CLEANED_UP));
+                new LifecycleEvent(lifecycle, state));
         
     }
     

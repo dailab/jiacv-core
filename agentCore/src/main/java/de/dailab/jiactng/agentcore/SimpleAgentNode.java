@@ -508,9 +508,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				} catch (LifecycleException e) {
 					// TODO:
 					if(log != null) {
-						log.error("Failure when initializing agentnodebean: "+a.getAgentName(),e);
+						log.error("Failure when initializing agent: "+a.getAgentName(),e);
 					} else {
-						System.err.println("Failure when initializing agentnodebean: "+a.getAgentName());
+						System.err.println("Failure when initializing agent: "+a.getAgentName());
 						e.printStackTrace();
 					}
 				}

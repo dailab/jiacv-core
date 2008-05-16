@@ -456,10 +456,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		stop();
 		cleanup();
 
+		// remove agents
+		while (!_agents.isEmpty()) {
+			removeAgent(_agents.get(_agents.size()-1));
+		}
+
 		// disable management of agent node and all its resources
 		disableManagement();
 
-		_agents.clear();
 		_agentNodeBeans.clear();
 
 		if (log != null) {

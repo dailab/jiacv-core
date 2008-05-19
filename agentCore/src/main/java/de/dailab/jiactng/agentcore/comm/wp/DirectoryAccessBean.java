@@ -168,18 +168,23 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		if (actionName.equalsIgnoreCase(ACTION_REQUEST_SEARCH)){
 			log.debug("doAction is a SearchRequest");
 
-			if ((params[0] instanceof IFact) && (params[1] instanceof Boolean)){
-				IFact template = (IFact) params[0];
-				Boolean isGlobal = (Boolean) params[1];
-				SearchRequest request = new SearchRequest(template);
-				request.setID(doAction.getSessionId());
-				_requestID2ActionMap.put(request.getID(), doAction);
-				if (isGlobal){
-					_requestID2ResponseMap.put(request.getID(), new HashSet<IFact>());
-				}
-				_searchRequestHandler.requestSearch(request, isGlobal);
-				
-			} 
+			if (params.length == 2){
+				if ((params[0] instanceof IFact) && (params[1] instanceof Boolean)){
+					IFact template = (IFact) params[0];
+					Boolean isGlobal = (Boolean) params[1];
+					SearchRequest request = new SearchRequest(template);
+					request.setID(doAction.getSessionId());
+					_requestID2ActionMap.put(request.getID(), doAction);
+					if (isGlobal){
+						_requestID2ResponseMap.put(request.getID(), new HashSet<IFact>());
+					}
+					_searchRequestHandler.requestSearch(request, isGlobal);
+				} 
+			} else {
+				log.error("Request for search was called with false no. of arguments.");
+				log.error("Arguments are as follows: first argument: IFact so search for; second Argument: boolean is this search global or just on that agentnode?");
+				log.error("given Arguments were: " + params);
+			}
 
 		} else if (actionName.equalsIgnoreCase(ACTION_ADD_ACTION_TO_DIRECTORY)){
 			log.debug("doAction is an Action to add to the Directory");	

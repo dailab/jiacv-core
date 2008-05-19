@@ -68,11 +68,28 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		_lastDoAction = action;
 		memory.write(action);
 	}
+	
+	public void searchForAgentDesc(String agentName, boolean isGlobal, long timeToSearch){
+		log.debug("Searching for Agent " + agentName);
+		AgentDescription desc = new AgentDescription(null, agentName, null, null);
+		Object[] params = {desc, new Boolean(isGlobal)};
+		DoAction action = _requestSearchAction.createDoAction(params, this, timeToSearch);
+		_lastDoAction = action;
+		memory.write(action);
+	}
 
 	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal){
 		log.debug("Searching for Action " + actionDesc.toString());
 		Object[] params = {actionDesc, new Boolean(isGlobal)};
 		DoAction action = _requestSearchAction.createDoAction(params, this);
+		_lastDoAction = action;
+		memory.write(action);
+	}
+	
+	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal, long timeToSearch){
+		log.debug("Searching for Action " + actionDesc.toString());
+		Object[] params = {actionDesc, new Boolean(isGlobal)};
+		DoAction action = _requestSearchAction.createDoAction(params, this, timeToSearch);
 		_lastDoAction = action;
 		memory.write(action);
 	}
@@ -133,7 +150,6 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 			if (actionResults[0] != null) {
 				List<IFact> results = (List<IFact>) actionResults[0];
 				synchronized(_results){
-					_results = new ArrayList<IFact>();
 					for (Object obj : results){
 						if (obj instanceof IFact)
 							_results.add((IFact) obj);

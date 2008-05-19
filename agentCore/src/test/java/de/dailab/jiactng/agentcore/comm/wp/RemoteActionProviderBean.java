@@ -95,5 +95,7 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 		log.debug("somebody wants a result? ... tztz");
 		return result;
 	}
+	
+
 
 }

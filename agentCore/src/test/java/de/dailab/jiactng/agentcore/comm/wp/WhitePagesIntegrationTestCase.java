@@ -23,8 +23,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	private static boolean _setup = true;
 	private static boolean _lastTestDone = false;
 	private static boolean _debug = false;
+	private static boolean _deactivateTests = false;
 	
 	private static IAgentNode _agentNode;
+//	private static IAgentNode _otherNode;
 	private static IAgent _whitePagesAgent;
 	private static WhitePagesTestBean _whitePagesTestBean;
 	private static RemoteActionTestBean _remoteActionTestBean;
@@ -42,6 +44,8 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			_xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/wp/WhitePagesIntegrationTestContext.xml");
 			
 			_agentNode = (IAgentNode) _xmlContext.getBean("WhitePagePlatform");
+//			_otherNode = (IAgentNode) _xmlContext.getBean("RemoteWhitePagePlatform");
+			
 			List<IAgent> agents = _agentNode.findAgents();
 			
 			for (IAgent agent : agents){
@@ -71,6 +75,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testFindAgent(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
 		if (_debug) {
 			System.err.println("--- TestFindAgent ---");
 		}
@@ -98,6 +106,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testNothingToFind(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
 		if (_debug) {
 			System.err.println("--- TestNothingToFind ---");
 		}
@@ -114,6 +126,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testActionStorage(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
 		if (_debug) {
 			System.err.println("--- TestActionStorage ---");
 		}
@@ -178,6 +194,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testRemoteActionTimeoutHandling(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
 		if (_debug) {
 			System.err.println("--- TestRemoteActionTimeoutHandling ---");
 		}
@@ -220,6 +240,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testSearchTimeout(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
 		if (_debug) {
 			System.err.println("--- TestSearchTimeout ---");
 		}
@@ -237,6 +261,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testRemoteActionHandling(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
 		if (_debug) {
 			System.err.println("--- TestRemoteActionHandling ---");
 		}
@@ -297,6 +325,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testEnlistening(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
 		if (_debug) {
 			System.err.println("--- TestEnlistening ---");
 		}
@@ -356,6 +388,122 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			
 	}
 	
+	public void testGlobalRemoteActionSearchingAndHandling(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
+		if (_debug) {
+			System.err.println("--- TestGlobalRemoteActionSearchingAndHandling ---");
+		}
+		
+		if (_debug) {
+			System.err.println(": : Searching for Action on other Node");
+		}
+	
+		Action action = new Action(GlobalRemoteActionProviderBean.ACTION_GET_GLOBAL_RESULT);
+		_whitePagesTestBean.searchForActionDesc(action, true, 5000);
+		
+		try {
+			Thread.sleep(7500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (_debug) {
+			System.err.println(": : Checking for Result");
+		}
+		List<IFact> remoteActions = _whitePagesTestBean.getLastResult();
+		if (_debug) {
+			System.err.println("Result found reads: " + remoteActions);
+		}
+		
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} 
+		assertNotNull(remoteActions);
+		assertNotNull(remoteActions.get(0));
+		assertTrue(remoteActions.get(0) instanceof Action);
+		
+		Action remoteAction = (Action) remoteActions.get(0);
+		Object[] params = {};
+		
+		if (_debug) {
+			System.err.println(": : Trying to use the global remote Action");
+		}
+		_remoteActionTestBean.useRemoteAction(remoteAction, params);
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (_debug) {
+			System.err.println(": : Checking for Result again");
+		}
+		ActionResult result = _remoteActionTestBean.getLastActionResult();
+		assertNotNull(result);
+		
+		Object[] actionResults = result.getResults();
+		
+		assertTrue(actionResults[0] instanceof String);
+		String remoteResult = (String) actionResults[0];
+		
+		System.err.println("REMOTE RESULT READS: " + remoteResult);
+		
+		assertTrue(remoteResult.equalsIgnoreCase("RemoteAgentOnOtherNode"));
+	}
+	
+	public void testGlobalAgentSearching(){
+//		if (_deactivateTests) {
+//			assertTrue(true);
+//			return;
+//		}
+		if (_debug) {
+			System.err.println("--- TestGlobalAgentSearching ---");
+		}
+		try {
+			Thread.sleep(7500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (_debug) {
+			System.err.println(": : Searching for RemoteAgentOnOtherNode");
+		}
+		
+		_whitePagesTestBean.searchForAgentDesc("RemoteAgentOnOtherNode", true, 5000);
+		
+		try {
+			Thread.sleep(7500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (_debug) {
+			System.err.println(": : Checking for Results");
+		}
+		
+		List<IFact> results = _whitePagesTestBean.getLastResult();
+		
+		if (_debug) {
+			System.err.println(": : Result found reads " + results);
+		}
+		
+		assertNotNull(results);
+		assertEquals(1, results.size());
+		assertNotNull(results.get(0));
+		assertTrue(results.get(0) instanceof AgentDescription);
+		AgentDescription agentDesc = (AgentDescription) results.get(0);
+		assertEquals("RemoteAgentOnOtherNode", agentDesc.getName());
+		
+	}
+	
+	
+	//TODO Testcase for global searches for agents on other Nodes. 
 	
 	//TODO NoSuchAction Exception isn't thrown at the moment. Check and Resolve
 //	public void testNoSuchAction(){

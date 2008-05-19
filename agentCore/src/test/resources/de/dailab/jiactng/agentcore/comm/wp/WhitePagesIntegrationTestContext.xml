@@ -27,6 +27,22 @@
 		</property>
 	</bean>
 
+	<bean name="RemoteWhitePagePlatform" parent="Platform">
+		<property name="loggingConfig"
+			value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties" />
+		<property name="agents">
+			<list>
+				<ref bean="RemoteAgentOnOtherNode" />
+			</list>
+		</property>
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="DirectoryAgentNodeBean" />
+			</list>
+		</property>
+	</bean>
+
+
 	<bean name="WhitePagesAgent" parent="SimpleAgent" singleton="false">
 		<property name="agentBeans">
 			<list>
@@ -48,13 +64,27 @@
 	</property>
 	</bean>
 	
-	<bean name="WhitePagesTestBean" class="de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean">
+	<bean name="RemoteAgentOnOtherNode" parent="SimpleAgent" singleton="false">
+		<property name="agentBeans">
+			<list>
+				<ref bean="CommunicationBean" />
+				<ref bean="DirectoryAccessBean" />
+				<ref bean="GlobalRemoteActionProviderBean" />
+			</list>
+		</property>
 	</bean>
 	
-	<bean name="RemoteActionTestBean" class="de.dailab.jiactng.agentcore.comm.wp.RemoteActionTestBean">
+	
+	<bean name="WhitePagesTestBean" class="de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean" singleton="false">
 	</bean>
 	
-	<bean name="RemoteActionProviderBean" class="de.dailab.jiactng.agentcore.comm.wp.RemoteActionProviderBean">
+	<bean name="RemoteActionTestBean" class="de.dailab.jiactng.agentcore.comm.wp.RemoteActionTestBean" singleton="false">
+	</bean>
+	
+	<bean name="RemoteActionProviderBean" class="de.dailab.jiactng.agentcore.comm.wp.RemoteActionProviderBean" singleton="false">
+	</bean>
+	
+	<bean name="GlobalRemoteActionProviderBean" class="de.dailab.jiactng.agentcore.comm.wp.GlobalRemoteActionProviderBean" singleton="false">
 	</bean>
 	
 	<!-- 

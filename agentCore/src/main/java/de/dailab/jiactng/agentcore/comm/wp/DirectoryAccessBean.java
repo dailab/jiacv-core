@@ -64,7 +64,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	private Action _sendAction = null;
 	private Map<String, DoAction> _requestID2ActionMap = new HashMap<String, DoAction>();
-	private Map<String, Set<IFact>> _requestID2ResponseMap = new HashMap<String, Set<IFact>>();
+	private Map<String, List<IFact>> _requestID2ResponseMap = new HashMap<String, List<IFact>>();
 
 	private List<IActionDescription> _autoenlistActionTemplates = null;
 	private Set<IActionDescription> _offeredActions = new HashSet<IActionDescription>();
@@ -168,7 +168,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		if (actionName.equalsIgnoreCase(ACTION_REQUEST_SEARCH)){
 			log.debug("doAction is a SearchRequest");
 
-			if (params.length == 2){
+			if (params.length >= 2){
 				if ((params[0] instanceof IFact) && (params[1] instanceof Boolean)){
 					IFact template = (IFact) params[0];
 					Boolean isGlobal = (Boolean) params[1];
@@ -176,13 +176,14 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					request.setID(doAction.getSessionId());
 					_requestID2ActionMap.put(request.getID(), doAction);
 					if (isGlobal){
-						_requestID2ResponseMap.put(request.getID(), new HashSet<IFact>());
+						_requestID2ResponseMap.put(request.getID(), new ArrayList<IFact>());
 					}
 					_searchRequestHandler.requestSearch(request, isGlobal);
 				} 
 			} else {
-				log.error("Request for search was called with false no. of arguments.");
-				log.error("Arguments are as follows: first argument: IFact so search for; second Argument: boolean is this search global or just on that agentnode?");
+				log.error("Request for search was called with false no. of arguments. Arguments are as follows:");
+				log.error("First argument: IFact so search for; second Argument: boolean is this search global or just on that agentnode?");
+				log.error("Third Argument: (OPTIONAL) TimeToSearch. Default: 60 seconds");
 				log.error("given Arguments were: " + params);
 			}
 
@@ -235,8 +236,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					log.warn("SearchRequest from " + owner + " has timeout");
 
 					ActionResult result = null;
-					Set<IFact> results = _requestID2ResponseMap.remove(doAction.getSessionId());
+					List<IFact> results = _requestID2ResponseMap.remove(doAction.getSessionId());
 					if (results != null){
+						log.debug("DoAction was global SearchRequest with replys ... writing result.");
 						// DoAction was global SearchRequest
 						result = new ActionResult(sourceAction, new Object[] {results});
 					} else {
@@ -344,8 +346,18 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 						if ((_requestID2ResponseMap.containsKey(request.getID())) && (response.getResult() != null)){
 							// if SearchRequest was global just add results to the others already stored
-							Set<IFact> results = _requestID2ResponseMap.get(request.getID());
-							results.addAll(response.getResult());
+							List<IFact> results = _requestID2ResponseMap.get(request.getID());
+							
+							//but don't forget to add our AccessBean as providerbean
+							for (IFact fact : response.getResult()){
+								if (fact instanceof Action){
+									Action act = (Action) fact;
+									act.setProviderBean(_myAccessBean);
+									results.add(act);
+								} else {
+									results.add(fact);
+								}
+							}
 							return;
 						} else {
 							// The SearchRequest was local so it's time to let the source know the results

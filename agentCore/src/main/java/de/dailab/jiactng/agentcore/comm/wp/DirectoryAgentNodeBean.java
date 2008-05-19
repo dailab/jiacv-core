@@ -49,6 +49,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
 	public final static String ACTIONREFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
 	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
+	public final static String REMOTE_ACTION_REFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoteActionRefresh";
 	
 	public final static String AGENTNODESGROUP = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#GroupAddress";
 	/*
@@ -255,8 +256,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					 * only one AgentNodeBean that get's a true at this point and so will be
 					 * the only AgentNodeBean that sends a request through the AgentNodeGroup
 					 */
-					boolean isGlobal = message.getHeader("isGlobal").equalsIgnoreCase("true");
 
+					boolean isGlobal = false;
+					if (message.getHeader("isGlobal") != null){
+						isGlobal = message.getHeader("isGlobal").equalsIgnoreCase("true");
+					}
+					
 					log.debug("Message is holding SearchRequest");
 					if (request.getSearchTemplate() != null){
 						
@@ -267,7 +272,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 							notMe = message.getHeader("SpareMe").equalsIgnoreCase(_myAddress.toString());
 						}
 
-						log.debug("SearchRequest hold SearchTemplate of type IAgentDescription");
 						IFact template = request.getSearchTemplate();
 
 						log.debug("SearchRequest holds template " + template);
@@ -297,6 +301,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 							JiacMessage resultMessage = new JiacMessage(response);
 							resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
+							resultMessage.setSender(_myAddress);
 							try {
 								log.debug("AgentNode: sending Message " + resultMessage);
 								log.debug("sending it to " + message.getSender());
@@ -304,11 +309,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 							} catch (CommunicationException e) {
 								e.printStackTrace();
 							}
-						}
 						if (isGlobal){
 							//GLOBAL SEARCH CALL!!!
+							log.debug("SearchRequest was GLOBAL request. Sending searchmessage to otherNodes");
 							JiacMessage globalMessage;
-							globalMessage = new JiacMessage(template);
+							globalMessage = new JiacMessage(request);
 							globalMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
 							globalMessage.setHeader("SpareMe", _myAddress.toString());
 							globalMessage.setSender(message.getSender());
@@ -318,11 +323,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 							} catch (CommunicationException e) {
 								e.printStackTrace();
 							}
+						}
 
 						}
 					} else {
 						log.warn("SearchRequest without template received. SearchOperation aborted.");
 					}
+				} else {
+					log.warn("SearchRequest-message received without actual Request in it. SearchOperation aborted.");
 				}
 
 
@@ -454,7 +462,25 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 //				System.err.println("removing outdated actions");
 				ActionData oldAct = new ActionData();
 				oldAct.setCreationTime(_currentLogicTime - 1);
+				
 				space.removeAll(oldAct);
+				// First let's remove all not refreshed actions and communicate them to the other AgentNodes
+//				Set<ActionData> oldSet;
+//				if ((oldSet = space.removeAll(oldAct)) != null){
+//					Set<IFact> oldFacts = new HashSet<IFact>();
+//					oldFacts.addAll(oldSet);
+//					FactSet factSet = new FactSet(oldFacts);
+//					
+//					JiacMessage timeoutMessage = new JiacMessage(factSet);
+//					timeoutMessage.setSender(_myAddress);
+//					timeoutMessage.setProtocol(REMOTE_ACTION_REFRESH_PROTOCOL_ID);
+//					try {
+//						_messageTransport.send(timeoutMessage, _otherNodes);
+//					} catch (CommunicationException e) {
+//						e.printStackTrace();
+//					}
+//				}
+				
 
 				ActionData actionTemplate = new ActionData(_currentLogicTime);
 

@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -17,6 +18,7 @@ import javax.management.relation.MBeanServerNotificationFilter;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
+import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
 import junit.framework.TestCase;
 
@@ -200,7 +202,11 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	 */
 	public void testAddAgents() {
 		try {
-			manager.invokeAgentNode(nodeName, "addAgents", new Object[] {"de/dailab/jiactng/agentcore/agentCreationTest"}, new String[] {"java.lang.String"});
+			InputStream is = getClass().getClassLoader().getResourceAsStream("de/dailab/jiactng/agentcore/agentCreationTest.xml");
+			byte[] config = new byte[is.available()];
+			is.read(config);
+			is.close();
+			manager.invokeAgentNode(nodeName, "addAgents", new Object[] {config,new ArrayList<JARMemory>()}, new String[] {"[B","java.util.List"});
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Error while adding new agents to the agent node");

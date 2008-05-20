@@ -6,6 +6,7 @@ import java.util.List;
 import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
+import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
 /**
  * JMX compliant management interface of agent nodes to get information
@@ -41,10 +42,12 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	public List<String> getAgents();
 
 	/**
-	 * Deploys new agents on this agent node.
-	 * @param configFile name of the XML file which contains the spring configuration of the agents
+	 * Deploys and starts new agents on this agent node.
+	 * @param configuration The spring configuration of the agents in XML syntax.
+	 * @param libraries The list of agent-specific JARs.
+	 * @throws Exception if the agents can not be created.
 	 */
-	public void addAgents(String configFile);
+	public void addAgents(byte[] configuration, List<JARMemory> libraries) throws Exception;
 
 	/**
 	 * Getter for attribute "Owner" of the managed agent node.

@@ -28,7 +28,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.log4j.net.SocketAppender;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
@@ -41,6 +44,8 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
 import de.dailab.jiactng.agentcore.util.IdFactory;
+import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
+import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
 /**
  * Simple agent node implementation
@@ -333,14 +338,23 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
-	 * Deploys and starts new agents on this agent node.
-	 * 
-	 * @param configFile
-	 *            name of the XML file which contains the spring configuration
-	 *            of the agents
+	 * {@inheritDoc}
 	 */
-	public void addAgents(String configFile) {
-		ClassPathXmlApplicationContext appContext = new ClassPathXmlApplicationContext(new String[] { configFile + ".xml" });
+	public void addAgents(byte[] configuration, List<JARMemory> libraries) throws Exception {
+		// create classloader for the new agents
+		JARClassLoader cl = new JARClassLoader();
+		for (JARMemory jar: libraries) {
+			cl.addJAR(jar);
+		}
+
+		// create spring application context
+		GenericApplicationContext appContext = new GenericApplicationContext();
+		appContext.setClassLoader(cl);
+		XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(appContext);
+		xmlReader.loadBeanDefinitions(new ByteArrayResource(configuration));
+		appContext.refresh();
+
+		// add and start all created agents
 		Collection<?> newAgents = appContext.getBeansOfType(IAgent.class).values();
 		for (Object a : newAgents) {
 			IAgent agent = (IAgent) a;

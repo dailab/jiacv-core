@@ -7,7 +7,7 @@
 <beans>
 
   <import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
-  <import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+  <import resource="classpath:agent.xml" />
 
   <bean name="myPlatform" parent="PlatformWithJMX">
     <property name="agents">
@@ -17,18 +17,6 @@
         <ref bean="HelloWorldAgent"/>
       </list>
     </property>
-  </bean>
-
-  <bean name="HelloWorldAgent" parent="SimpleAgent" singleton="false">
-    <property name="agentBeans">
-      <list>
-        <ref bean="helloBean"/>
-      </list>
-    </property>
-  </bean>
-
-  <bean name="helloBean" class="de.dailab.jiactng.examples.helloWorld.HelloBean" singleton="false">
-    <property name="logLevel" value="INFO"/>
   </bean>
 
 </beans>

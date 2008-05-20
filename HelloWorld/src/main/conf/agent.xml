@@ -6,24 +6,18 @@
   -->
 <beans>
 
-  <bean name="TestAgent1" class="de.dailab.jiactng.agentcore.Agent">
-    <property name="memory"><ref bean="memory"/></property>
-    <property name="execution"><ref bean="simpleExecCycle"/></property>
+  <import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+  <bean name="HelloWorldAgent" parent="SimpleAgent" singleton="false">
     <property name="agentBeans">
       <list>
         <ref bean="helloBean"/>
       </list>
     </property>
   </bean>
-  
-  <bean name="memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false">
-    <!--property name="timeOut" value="-1"/-->
-  </bean>
 
   <bean name="helloBean" class="de.dailab.jiactng.examples.helloWorld.HelloBean" singleton="false">
-  </bean>
-
-  <bean name="simpleExecCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false">
+    <property name="logLevel" value="INFO"/>
   </bean>
 
 </beans>

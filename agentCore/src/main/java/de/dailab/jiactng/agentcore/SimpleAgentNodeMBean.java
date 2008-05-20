@@ -45,9 +45,10 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * Deploys and starts new agents on this agent node.
 	 * @param configuration The spring configuration of the agents in XML syntax.
 	 * @param libraries The list of agent-specific JARs.
+	 * @param owner The owner of the new agents.
 	 * @throws Exception if the agents can not be created.
 	 */
-	public void addAgents(byte[] configuration, List<JARMemory> libraries) throws Exception;
+	public void addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception;
 
 	/**
 	 * Getter for attribute "Owner" of the managed agent node.

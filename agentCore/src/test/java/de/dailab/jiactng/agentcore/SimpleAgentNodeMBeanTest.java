@@ -206,7 +206,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 			byte[] config = new byte[is.available()];
 			is.read(config);
 			is.close();
-			manager.invokeAgentNode(nodeName, "addAgents", new Object[] {config,new ArrayList<JARMemory>()}, new String[] {"[B","java.util.List"});
+			manager.invokeAgentNode(nodeName, "addAgents", new Object[] {config,new ArrayList<JARMemory>(),System.getProperty("user.name")}, new String[] {"[B","java.util.List","java.lang.String"});
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Error while adding new agents to the agent node");

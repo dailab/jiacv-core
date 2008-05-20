@@ -138,6 +138,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 	public void setAgents(List<IAgent> agents) {
+		// owner of agent node is also owner of the initially created agents
+		String owner = getOwner();
+		for (IAgent agent : agents) {
+			agent.setOwner(owner);
+		}
+
+		// refresh agent list
 		_agents.clear();// TODO is this really necessary???
 		_agents.addAll(agents);
 	}
@@ -340,7 +347,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addAgents(byte[] configuration, List<JARMemory> libraries) throws Exception {
+	public void addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception {
 		// create classloader for the new agents
 		JARClassLoader cl = new JARClassLoader();
 		for (JARMemory jar: libraries) {
@@ -358,6 +365,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		Collection<?> newAgents = appContext.getBeansOfType(IAgent.class).values();
 		for (Object a : newAgents) {
 			IAgent agent = (IAgent) a;
+			agent.setOwner(owner);
 			addAgent(agent);
 			try {
 				agent.init();

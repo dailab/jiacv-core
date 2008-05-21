@@ -452,7 +452,9 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		assertTrue(actionResults[0] instanceof String);
 		String remoteResult = (String) actionResults[0];
 		
-		System.err.println("REMOTE RESULT READS: " + remoteResult);
+		if(_debug){
+			System.err.println("REMOTE RESULT READS: " + remoteResult);
+		}
 		
 		assertTrue(remoteResult.equalsIgnoreCase("RemoteAgentOnOtherNode"));
 	}

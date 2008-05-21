@@ -397,12 +397,24 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			log.debug("doAction is an Action to remove to the Directory");
 			_actionRequestHandler.removeActionFromDirectory((Action) params[0]);
 			
+			/*
+			 * if an Actiontemplate should be added to the autoenlistment list it will be handled here 
+			 */
 		} else if (actionName.equalsIgnoreCase(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE)){
 			List<IActionDescription> templatesToAdd = (List<IActionDescription>) params[0];
 			_autoEnlister.addActionTemplates(templatesToAdd);
+			
+			/*
+			 * if an Actiontemplate should be removed from the autoenlistment list it will be handled here
+			 */
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE)){
 			List<IActionDescription> templatesToRemove = (List<IActionDescription>) params[0];
 			_autoEnlister.removeActionTemplates(templatesToRemove);
+			
+			/*
+			 * All other Actions this AccessBean is set as providerbean are remote Actions these will
+			 * be handled here
+			 */
 		} else {
 			log.debug("doAction is an Action that has to be invoked remotely");
 			_remoteActionHandler.invokeRemoteAction(doAction);
@@ -410,7 +422,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	}
 
 	/**
-	 * 
+	 * if an Action has a timeout or should be aborted this Method will do the actual work outside of the <code>SimpleExecutioncycle</code>
 	 */
 	@Override
 	public ActionResult cancelAction(DoAction doAction) {
@@ -446,8 +458,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			}
 		}
 	}
-
-	//TODO Search REquests misslingen ploetzlich!
 	
 //	/**
 //	 * Starts a search for DirectoryEntrys that are conform to the template given
@@ -460,19 +470,30 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 //		_searchRequestHandler.requestSearch(template, isGlobal);
 //	}
 
+	/**
+	 * sets the intervall in milliseconds after which the autoenlistener will check for changes in the present actions of the agent
+	 * Default is 2000 ms
+	 */
 	public void setAutoEnlisteningInterval(long autoEnlisteningInterval){
 		_autoEnlisteningInterval = autoEnlisteningInterval;
 	}
 
+	/**
+	 * sets the time in milliseconds after the start of this bean which shall look for changes in the present actions of the agent for the first time
+	 * Default is 2000 ms 
+	 */
 	public void setFirstAutoEnlistening(long firstAutoEnlistening){
 		_firstAutoEnlistening = firstAutoEnlistening;
 	}
 
-	// check if offered actions are still present at the agent
+	/**
+	 * checks if offered actions are still present at the agent
+	 */
 	private synchronized void checkActionPresence(){
 		for (IActionDescription action : _offeredActions){
 			// if action isn't present anymore...
 			if (memory.read(action) == null){
+				// remove it and discard it from the directory
 				_offeredActions.remove(action);
 				_actionRequestHandler.removeActionFromDirectory(action);
 			}
@@ -492,6 +513,12 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	private class SearchRequestHandler implements SpaceObserver<IFact> {
 
 
+		/**
+		 * Here an actual SearchRequest will be processed. 
+		 * @param doAction ACTION_REQUEST_SEARCH which includes a local or global search for IFacts in the directory
+		 * 
+		 * Note: More information within the getActions Method
+		 */
 		public void requestSearch(DoAction doAction){
 			Object[] actionParams = doAction.getParams();
 			// Check if parameter have minimum length as the last parameter (timeToSearch) is optional

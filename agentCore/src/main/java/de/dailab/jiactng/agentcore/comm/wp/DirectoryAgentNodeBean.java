@@ -176,12 +176,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	}
 
 	public void doStop(){
-		try {
-			_messageTransport.stopListen(_myAddress, null);
-			_messageTransport.stopListen(_otherNodes, null);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			_messageTransport.stopListen(_myAddress, null);
+//			_messageTransport.stopListen(_otherNodes, null);
+//		} catch (CommunicationException e) {
+//			e.printStackTrace();
+//		}
 		_timer.cancel();
 	}
 

@@ -41,41 +41,147 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 
 public class DirectoryAccessBean extends AbstractAgentBean implements IEffector {
+	
+	/*
+	 * NOTE: For more Infos about parameters of Actions see Comments within getActions
+	 */
 
+	/**
+	 * Action to request a search for agents or actions. Theoretically it allows
+	 * to even search for every IFact that is stored within a directory
+	 */
 	public static final String ACTION_REQUEST_SEARCH = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch";
+	
+	/**
+	 * Action to add an action to the directory
+	 */
 	public static final String ACTION_ADD_ACTION_TO_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory";
+	
+	/**
+	 * Action to remove an action from the directory
+	 */
 	public static final String ACTION_REMOVE_ACTION_FROM_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory";
+	
+	/**
+	 * Action to add a template to the AccessBean. The Bean will search regulary
+	 * for actions that are matching with this template and add them to the 
+	 * directory if necessary
+	 */
 	public static final String ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addAutoenlistActionTemplate";
+	
+	/**
+	 * Action to remove a template from the AccessBean. All Actions matching with
+	 * the template and that are stored within the directory at the moment of
+	 * removal of the template will be removed from the directory. 
+	 */
 	public static final String ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeAutoenlistActionTemplate";
 
+	/**
+	 * Protocol for coordinating remoteaction-invocations 
+	 */
 	public final static String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#UseRemoteAction";
 	
+	/*
+	 * Messagetemplates to channel messages to the handlingmodules
+	 */
 	private static final IJiacMessage WHITEPAGES_SEARCH_MESSAGETEMPLATE;
 	private static final IJiacMessage WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE;
 	private static final IJiacMessage WHITEPAGES_REFRESH_MESSAGETEMPLATE;
 
+	/**
+	 * the address of the directory at the local agentnode
+	 */
 	private ICommunicationAddress directoryAddress = null;
+	
+	/**
+	 * handles searchrequests
+	 */
 	private SearchRequestHandler _searchRequestHandler = null;
+	
+	/**
+	 * Handles adding and removal of actions to the directory 
+	 */
 	private ActionRequestHandler _actionRequestHandler = null;
+	
+	/**
+	 * handles remote action invocation, processing and resultdelivery
+	 */
 	private RemoteActionHandler _remoteActionHandler = null;
+	
+	/**
+	 * handles messages needed to refresh agents and actions in the directory 
+	 */
 	private RefreshAgent _refreshAgent = null;
+	
+	/**
+	 * sometimes you realy don't want to get a result
+	 * besides that a ResultDump keeps the memory clean
+	 */
 	private final ResultDump _resultDump = new ResultDump();
+	
+	/**
+	 * myself. Needed by some modules
+	 */
 	private final DirectoryAccessBean _myAccessBean = this;
 
+	/**
+	 * Action needed to send messages through the communicationBean
+	 */
 	private Action _sendAction = null;
+	
+	/**
+	 * stores searchRequests while waiting on reply(s)
+	 * This has to be a global Map as it is needed by different modules especially in case of timeouts.
+	 */
 	private Map<String, DoAction> _requestID2ActionMap = new HashMap<String, DoAction>();
+	
+	/**
+	 * if a SearchRequest is global this Map stores all responses got for it until a timeout
+	 * happens and ends the search. Then all responses will be delivered as actionresult to
+	 * the source of the original searchrequest.
+	 */
 	private Map<String, List<IFact>> _requestID2ResponseMap = new HashMap<String, List<IFact>>();
 
+	/**
+	 * List of templates. All actions provided by this agent that are matching on one of these templates
+	 * will be offered within the directory
+	 */
 	private List<IActionDescription> _autoenlistActionTemplates = null;
+	
+	/**
+	 * This set stores all actions that are allready stored within the directory.
+	 * Those actions that are forwarded by the autoenlister as well as any action
+	 * that is offered "by hand" through an action
+	 */
 	private Set<IActionDescription> _offeredActions = new HashSet<IActionDescription>();
-	// the intervall the autoenlistener should check for new actions to enlist
+
+	/**
+	 * the intervall the autoenlistener should check for new actions to enlist
+	 * Availability of offered actions will also be checked at these times.
+	 * If an Action isn't present anymore within the agent it will be removed.  
+	 */
 	private long _autoEnlisteningInterval = 2000;
+	
+	/**
+	 * the time of the first check as mentioned above.
+	 */
 	private long _firstAutoEnlistening = 2000;
+	
+	/**
+	 * The autoenlistener checkes for changes in the availability of already
+	 * presented actions within the agent and will remove actions offered that
+	 * are present nomore and offer new actions that are matching with one of
+	 * the autoenlistmenttemplates to the directory to store them.
+	 */
 	private AutoEnlister _autoEnlister = null;
 
+	/**
+	 * Timerobject to schedule refreshing and autoenlisting of actions
+	 */
 	private Timer _timer;
 
 
+	// Initializing messagetemplates for getting the incomming messages to the modules they are needed to go
 	static {
 		JiacMessage agentSearchTemplate = new JiacMessage();
 		agentSearchTemplate.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
@@ -95,6 +201,10 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	}
 
 
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to initialize this AccessBean
+	 */
 	public void doInit() throws Exception{
 		super.doInit();
 		_searchRequestHandler = new SearchRequestHandler();
@@ -107,6 +217,10 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_refreshAgent = new RefreshAgent();
 	}
 
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to get this AccessBean started up and running
+	 */
 	public void doStart() throws Exception{
 		super.doStart();
 		log.debug("starting DirectoryAccessBean");
@@ -122,34 +236,126 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 //		}
 	}
 
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to stop this AccessBean, so it...
+	 * <ul> 
+	 * 	<li> won't receive any more messages</li>
+	 * 	<li> stops to check for actions to update</li>
+	 * 	<li> will abort all ongoing searchRequests and write results to the memory</li>
+	 * 	<li> will remove all offered actions from the directory </li>
+	 * 	<li> all remote actions still waiting for a result will be canceled, ActionResults(Failures) will be written into the memory for them</li>
+	 * 	<li> erase all Data</li>
+	 * </ul> 
+	 * 
+	 */
 	public void doStop() throws Exception{
 		super.doStop();
 		log.debug("stopping DirectoryAccessBean");
+		_timer.cancel();
 		memory.detach(_searchRequestHandler);
 		memory.detach(_remoteActionHandler);
-		_timer.cancel();
+		
+		synchronized (_requestID2ActionMap){
+			for (String key : _requestID2ActionMap.keySet()){
+				DoAction searchAction = _requestID2ActionMap.remove(key);
+				ActionResult result = cancelAction(searchAction);
+				memory.write(result);
+			}
+		}
+		synchronized(_autoenlistActionTemplates){
+			_autoEnlister.removeActionTemplates(_autoenlistActionTemplates);
+			_autoenlistActionTemplates.clear();
+		}
+		
+		_actionRequestHandler.removeAllActionsFromDirectory();
+		_remoteActionHandler.cancelAllRemoteActions();
+		
 	}
 
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to cleanup this AccessBean after stoping it
+	 * All data will be erased.
+	 */
 	public void doCleanup() throws Exception{
 		// nothing to do yet
 		super.doCleanup();
+		_requestID2ActionMap.clear();
+		_requestID2ResponseMap.clear();
+		_offeredActions.clear();
+		_actionRequestHandler = null;
+		_autoEnlister = null;
+		_searchRequestHandler = null;
+		_refreshAgent = null;
+		_remoteActionHandler = null;
 	}
 
+	/**
+	 * returns all Actions provided by this Bean
+	 */
 	public List<? extends Action> getActions(){
 		List<Action> actions = new ArrayList<Action>();
 
-		Action action = new Action(ACTION_REQUEST_SEARCH, this, new Class<?>[]{IFact.class, Boolean.class}, new Class<?>[]{List.class});
+		/**
+		 * Action to search for IFacts within the directory(s) on the AgentNode(s).
+		 * Input Parameters:
+		 * <ul>
+		 * 	<li>IFact 	e.g. implementation of IActionDescription or IAgentDescription </li>
+		 * 	<li>Boolean	decides if this search <b>isGlobal</b>, if false search will be only within directory of local AgentNode </li>
+		 * 	<li>Long	OPTIONAL gives search a timeout. Makes it possible to decide how long to wait for responses in global search </li>
+		 * </ul>
+		 * 
+		 * Result Types:
+		 * 	List of IFacts depending on the IFact-implementation the search was started with
+		 * 	
+		 */
+		Action action = new Action(ACTION_REQUEST_SEARCH, this, new Class<?>[]{IFact.class, Boolean.class, Long.class}, new Class<?>[]{List.class});
 		actions.add(action);
-
+		
+		/**
+		 * Action to add another Action to the local Directory
+		 * Input Parameter:
+		 * 	IActionDescription or implementation to store
+		 * 
+		 * ResultTypes: 
+		 * 	none
+		 */
 		action = new Action(ACTION_ADD_ACTION_TO_DIRECTORY, this, new Class<?>[]{IActionDescription.class}, null);
 		actions.add(action);
 
+		/**
+		 * Action to remove an Action from the local Directory
+		 * Input Parameter:
+		 * 	IActionDescription or implementation to remove from the local Directory
+		 */
 		action = new Action(ACTION_REMOVE_ACTION_FROM_DIRECTORY, this, new Class<?>[]{IActionDescription.class}, null);
 		actions.add(action);
 
+		/**
+		 * Action to add ActionTemplates. All Actions that are provided within the Agent that match these templates will
+		 * be offered through the directory on the local AgentNode. The AccessBean checks for changes on Actions matching
+		 * with the templates stored within it regulary.
+		 * 
+		 * Input Parameter:
+		 * 	List of IActionDescriptions. All entries will be added to the List
+		 * 
+		 * Result Types:
+		 * 	none
+		 */
 		action = new Action(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE, this, new Class<?>[] {List.class}, null);
 		actions.add(action);
 
+		/**
+		 * Action to remove ActionTemplates. All Actions that are matching these templates will be removed from
+		 * from the local directory. 
+		 * 
+		 * Input Parameter:
+		 * 	List of IActionDescriptions. All entries will be removed from the List
+		 * 
+		 * Result Types:
+		 * 	none
+		 */
 		action = new Action(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE, this, new Class<?>[] {List.class}, null);
 		actions.add(action);
 
@@ -158,6 +364,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 
 
+	/**
+	 * This method get's all doActions for actions this bean provides and forwards them to the places where they are processed
+	 */
 	@SuppressWarnings("unchecked")
 	public void doAction(DoAction doAction){
 		log.debug("Received DoAction... decoding begins");
@@ -165,55 +374,35 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 		Object[] params = doAction.getParams();
 		String actionName= doAction.getAction().getName();
+		
+		/*
+		 * If a Search is started it will be handled here 
+		 */
 		if (actionName.equalsIgnoreCase(ACTION_REQUEST_SEARCH)){
 			log.debug("doAction is a SearchRequest");
+			_searchRequestHandler.requestSearch(doAction);
 
-			if (params.length >= 2){
-				if ((params[0] instanceof IFact) && (params[1] instanceof Boolean)){
-					IFact template = (IFact) params[0];
-					Boolean isGlobal = (Boolean) params[1];
-					SearchRequest request = new SearchRequest(template);
-					request.setID(doAction.getSessionId());
-					_requestID2ActionMap.put(request.getID(), doAction);
-					if (isGlobal){
-						_requestID2ResponseMap.put(request.getID(), new ArrayList<IFact>());
-					}
-					_searchRequestHandler.requestSearch(request, isGlobal);
-				} 
-			} else {
-				log.error("Request for search was called with false no. of arguments. Arguments are as follows:");
-				log.error("First argument: IFact so search for; second Argument: boolean is this search global or just on that agentnode?");
-				log.error("Third Argument: (OPTIONAL) TimeToSearch. Default: 60 seconds");
-				log.error("given Arguments were: " + params);
-			}
-
+			
+			/*
+			 * if an Action is added to the Directory it will be handled here
+			 */
 		} else if (actionName.equalsIgnoreCase(ACTION_ADD_ACTION_TO_DIRECTORY)){
 			log.debug("doAction is an Action to add to the Directory");	
 			_actionRequestHandler.addActionToDirectory((Action) params[0]);
+			
+			/*
+			 * if an Action has to be removed from the Directory it will be handled here
+			 */
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_ACTION_FROM_DIRECTORY)){
 			log.debug("doAction is an Action to remove to the Directory");
 			_actionRequestHandler.removeActionFromDirectory((Action) params[0]);
+			
 		} else if (actionName.equalsIgnoreCase(ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE)){
-			synchronized(_autoenlistActionTemplates){
-				_autoenlistActionTemplates.addAll((List<Action>) params[0]);
-			}
+			List<IActionDescription> templatesToAdd = (List<IActionDescription>) params[0];
+			_autoEnlister.addActionTemplates(templatesToAdd);
 		} else if (actionName.equalsIgnoreCase(ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE)){
-			synchronized (_offeredActions) {
-				List<Action> templatesToRemove = (List<Action>) params[0];
-				synchronized(_autoenlistActionTemplates){
-					_autoenlistActionTemplates.removeAll(templatesToRemove);
-				}
-
-				synchronized(_offeredActions){
-					for (Action removeTemplate: templatesToRemove){
-						Set<Action> actions = memory.readAll(removeTemplate);
-						for (Action action : actions){
-							if (_offeredActions.remove(action))
-								_actionRequestHandler.removeActionFromDirectory(action);
-						}
-					}
-				}
-			}
+			List<IActionDescription> templatesToRemove = (List<IActionDescription>) params[0];
+			_autoEnlister.removeActionTemplates(templatesToRemove);
 		} else {
 			log.debug("doAction is an Action that has to be invoked remotely");
 			_remoteActionHandler.invokeRemoteAction(doAction);
@@ -258,15 +447,18 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
-	/**
-	 * Starts a search for DirectoryEntrys that are conform to the template given
-	 * @param <E> extends IFact
-	 * @param template the template to search for
-	 */
-	public <E extends IFact> void requestSearch(E template, Boolean isGlobal){
-		log.debug("Received SearchRequest via direct invocation. Searching for Agents with template: " + template);
-		_searchRequestHandler.requestSearch(template, isGlobal);
-	}
+	//TODO Search REquests misslingen ploetzlich!
+	
+//	/**
+//	 * Starts a search for DirectoryEntrys that are conform to the template given
+//	 * @param <E> extends IFact
+//	 * @param template the template to search for
+//	 */
+//	public <E extends IFact> void requestSearch(E template, Boolean isGlobal){
+//		System.err.println("SEARCHREQUEST VIA DIRECT INVOCATION ! ! !");
+//		log.debug("Received SearchRequest via direct invocation. Searching for Agents with template: " + template);
+//		_searchRequestHandler.requestSearch(template, isGlobal);
+//	}
 
 	public void setAutoEnlisteningInterval(long autoEnlisteningInterval){
 		_autoEnlisteningInterval = autoEnlisteningInterval;
@@ -287,12 +479,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
-//	private void cleanupSession(DoAction doAction){
-//		doAction.setSource(_resultDump);
-//		ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Object[] {});
-//		memory.write(result);
-//	}
-
 
 
 
@@ -306,23 +492,70 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	private class SearchRequestHandler implements SpaceObserver<IFact> {
 
 
-		/**
-		 * just gets the SearchRequest to the directory
-		 * 
-		 * @param <E> extends IFact
-		 * @param template of the entrys to look for
-		 */
-		public <E extends IFact> void requestSearch(E template, Boolean isGlobal){
-			JiacMessage message = new JiacMessage(template);
-			message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
-			message.setHeader("isGlobal", isGlobal.toString());
+		public void requestSearch(DoAction doAction){
+			Object[] actionParams = doAction.getParams();
+			// Check if parameter have minimum length as the last parameter (timeToSearch) is optional
+			if (actionParams.length >= 2){
+				if ((actionParams[0] instanceof IFact) && (actionParams[1] instanceof Boolean)){
+					IFact template = (IFact) actionParams[0];
+					Boolean isGlobal = (Boolean) actionParams[1];
+					if (actionParams.length == 3){
+						/*
+						 * if time to search is set, it has to be set within the Session, 
+						 * so a timeout will happen at the right moment, ending the search
+						 */
+						if (actionParams[2] instanceof Long){
+							Long timeToSearch = (Long) actionParams[2];
+							doAction.getSession().setTimeToLive(timeToSearch);
+						}
+					}
+					SearchRequest request = new SearchRequest(template);
+					request.setID(doAction.getSessionId());
+					/*
+					 *  put running search into the Map to make it possible to find the 
+					 *  original doAction for ActionResult creation purposes later when
+					 *  the reply is coming in.
+					 */
+					_requestID2ActionMap.put(request.getID(), doAction);
+					if (isGlobal){
+						/*
+						 *  if the search is global, responses from different AgentNodes have to be
+						 *  collected here.
+						 */
+						_requestID2ResponseMap.put(request.getID(), new ArrayList<IFact>());
+					}
+					// now let's get the SearchRequest out and to the AgentNode
+					JiacMessage message = new JiacMessage(request);
+					message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
+					message.setHeader("isGlobal", isGlobal.toString());
 
-			Object[] params = {message, directoryAddress};
-			DoAction send = _sendAction.createDoAction(params, _resultDump);
+					Object[] params = {message, directoryAddress};
+					DoAction send = _sendAction.createDoAction(params, _resultDump);
 
-			log.debug("sending message with searchrequest to directory " + message);
-			memory.write(send);
+					log.debug("sending message with searchrequest to directory " + message);
+					memory.write(send);
+				} 
+			} else {
+				log.error("Request for search was called with false no. of arguments. Arguments are as follows:");
+				log.error("First argument: IFact so search for; second Argument: boolean is this search global or just on that agentnode?");
+				log.error("Third Argument: (OPTIONAL) TimeToSearch. Default: 60 seconds");
+				log.error("given Arguments were: " + actionParams);
+			}
 		}
+		
+//		public <E extends IFact> void requestSearch(E template, Boolean isGlobal){
+//			JiacMessage message = new JiacMessage(template);
+//			message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
+//			message.setHeader("isGlobal", isGlobal.toString());
+//
+//			Object[] params = {message, directoryAddress};
+//			DoAction send = _sendAction.createDoAction(params, _resultDump);
+//
+//			log.debug("sending message with searchrequest to directory " + message);
+//			memory.write(send);
+//		}
+		
+		
 
 		/**
 		 * receives the answers from the directory and processes them. 
@@ -428,10 +661,25 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			Object[] params = {message, directoryAddress};
 			DoAction send = _sendAction.createDoAction(params, _resultDump);
 
-			log.debug("sending Message to register action in directory " + message);
+			log.debug("sending Message to remove action from directory " + message);
 			memory.write(send);
 			synchronized(_offeredActions){
 				_offeredActions.remove(actionDesc);
+			}
+		}
+		
+		public void removeAllActionsFromDirectory(){
+			synchronized(_offeredActions){
+				for (IActionDescription actionDesc : _offeredActions){
+					JiacMessage message = new JiacMessage(actionDesc);
+					message.setProtocol(DirectoryAgentNodeBean.REMOVE_ACTION_PROTOCOL_ID);
+					Object[] params = {message, directoryAddress};
+					DoAction send = _sendAction.createDoAction(params, _resultDump);
+
+					log.debug("sending Message to remove action from directory " + message);
+					memory.write(send);
+				}
+				_offeredActions.clear();
 			}
 		}
 	}
@@ -473,6 +721,20 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				} 
 			}
 		}
+		
+		public void cancelAllRemoteActions(){
+			synchronized(openSessionsToProviders){
+				for (String key : openSessionsToProviders.keySet()){
+					DoAction actionToCancel = openSessionsToProviders.get(key);
+
+					ActionResult result = new ActionResult(actionToCancel, new TimeoutException("Failure due to ordered stop of AccessBean"));
+					
+					memory.write(result);
+				}
+			}
+		}
+		
+		
 
 		/*
 		 * Gets a DoAction that has to be invoked remotely
@@ -684,6 +946,30 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						if(!_offeredActions.contains(action)){
 							_offeredActions.add(action);
 							_actionRequestHandler.addActionToDirectory(action);
+						}
+					}
+				}
+			}
+		}
+		
+		public void addActionTemplates(List<IActionDescription> actionTemplatesToAdd) {
+			synchronized(_autoenlistActionTemplates){
+				_autoenlistActionTemplates.addAll(actionTemplatesToAdd);
+			}
+		}
+		
+		public void removeActionTemplates(List<IActionDescription> templatesToRemove){
+			synchronized (_offeredActions) {
+				synchronized(_autoenlistActionTemplates){
+					_autoenlistActionTemplates.removeAll(templatesToRemove);
+				}
+
+				synchronized(_offeredActions){
+					for (IActionDescription removeTemplate: templatesToRemove){
+						Set<IActionDescription> actions = memory.readAll(removeTemplate);
+						for (IActionDescription action : actions){
+							if (_offeredActions.remove(action))
+								_actionRequestHandler.removeActionFromDirectory(action);
 						}
 					}
 				}

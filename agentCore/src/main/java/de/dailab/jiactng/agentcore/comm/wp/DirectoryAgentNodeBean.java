@@ -43,17 +43,43 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  */
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
+	/**
+	 * suffix for addresscreation purposes. Will be added to the UUID of AgentNode to create Beanaddress
+	 */
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
-	public final static String SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#SearchRequest";
-	public final static String ADD_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AddAction";
-	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
-	public final static String ACTIONREFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
-	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
-	public final static String REMOTE_ACTION_REFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoteActionRefresh";
 	
+	/**
+	 * Protocol for search Requests
+	 */
+	public final static String SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#SearchRequest";
+	
+	/**
+	 * Protocol for adding of actions to the Directory
+	 */
+	public final static String ADD_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AddAction";
+	
+	/**
+	 * Protocol for removing of actions to the Directory
+	 */
+	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
+	
+	/**
+	 * Protocol for refreshing of Actions
+	 */
+	public final static String ACTIONREFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
+	
+	/**
+	 * Protocol for refreshing Agents
+	 */
+	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
+	
+	/**
+	 * Address of AgentNodeGroup. Is used to communicate between AgentNodes for purposes like global searches.
+	 */
 	public final static String AGENTNODESGROUP = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#GroupAddress";
-	/*
-	 * After this intervall messages the space will be checked for old actions,
+	
+	/**
+	 * After this intervall the space will be checked for old actions,
 	 * for each of this actions a message will be send to the agent providing it,
 	 * which will sent back a message with the actions provided to refresh them.
 	 * When the next intervall begins all actions that weren't refreshed will be removed
@@ -61,26 +87,68 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	private long _refreshingIntervall = 4000;
 	private long _firstRefresh = 5000;
 	
-	/*
+	/**
 	 * An interval after that a pingmessage is sent to an agent to check if it's still alive
 	 * After waiting for one interval all agents that hadn't pinged back are erased from the
 	 * directory.
 	 */
 	private long _agentPingIntervall = 12000;
 
+	/**
+	 * Destroyer for the Directory
+	 */
 	private SpaceDestroyer<IFact> destroyer = null;
+	
+	/**
+	 * The Actual Directory
+	 */
 	private EventedTupleSpace<IFact> space = null;
+	
+	/**
+	 * The needed direct connection to the outsideworld
+	 */
 	private MessageTransport _messageTransport = null;
+	
+	/**
+	 * Address of this <code>DirectoryAgentNodeBean</code>
+	 */
 	private ICommunicationAddress _myAddress = null;
+	
+	/**
+	 * Groupaddress of all <code>AgentNode</code>s used for inter-AgentNode-communication
+	 */
 	private ICommunicationAddress _otherNodes = null;
 
+	/**
+	 * Module that handles local and global searchrequests
+	 */
 	private RequestHandler _searchRequestHandler = null;
 
+	/**
+	 * Timerobject that schedules update and refreshment activities
+	 */
 	private Timer _timer;
+	
+	/**
+	 * Module that holds all stored <code>Action</code>s within the Directory up to date
+	 */
 	private SpaceRefresher _refresher = null; 
+	
+	/**
+	 * Module that regulary ping <code>Agent</code>s to check if they are still alive
+	 */
 	private AgentPinger _agentPinger = null;
+	
+	/**
+	 * holds the current logic time. 
+	 * These are iterational steps marking up-to-dateness of Actions 
+	 * and helps to decide if an <code>Action</code> has to be refreshed
+	 */
 	private long _currentLogicTime = 0;
 
+	/**
+	 * standard constructor method
+	 */
 	public DirectoryAgentNodeBean() {
 		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("WhitePages"));
 		space = destroyer.destroybleSpace;
@@ -146,6 +214,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		}
 	}
 
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to initialize this AgentNodeBean
+	 */
 	public void doInit(){
 		_searchRequestHandler = new RequestHandler();
 		_messageTransport.setDefaultDelegate(_searchRequestHandler);
@@ -160,6 +232,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		
 	}
 
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to get this AgentNodeBean going
+	 */
 	public void doStart(){
 		_myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getUUID() + SEARCHREQUESTSUFFIX);
 		_otherNodes = CommunicationAddressFactory.createGroupAddress(AGENTNODESGROUP);
@@ -175,16 +251,24 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		_timer.schedule(_agentPinger, _agentPingIntervall);
 	}
 
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to stop this AgentNodeBean and hold all activity
+	 */
 	public void doStop(){
-//		try {
-//			_messageTransport.stopListen(_myAddress, null);
-//			_messageTransport.stopListen(_otherNodes, null);
-//		} catch (CommunicationException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			_messageTransport.stopListen(_myAddress, null);
+			_messageTransport.stopListen(_otherNodes, null);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
 		_timer.cancel();
 	}
 
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to cleanup this AgentNodeBean and give free used memory
+	 */
 	public void doCleanup(){
 		try {
 			destroyer.destroy();
@@ -196,52 +280,122 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		_timer.purge();
 	}
 
+	/**
+	 * sets the MessageTransport to use for sending and receiving messages
+	 * 
+	 * @param mt the MessageTransport mentioned above
+	 */
 	public void setMessageTransport(MessageTransport mt){
 		_messageTransport = mt;
 	}
 
+	/**
+	 * Sets the refreshing interval. After this interval the space will be checked for old actions,
+	 * for each of this actions a message will be send to the agent providing it,
+	 * which will sent back a message with the actions provided to refresh them.
+	 * When the next interval begins all actions that weren't refreshed will be removed
+	 * 
+	 * Default: 2000 milliseconds
+	 *
+	 * @param intervall time in milliseconds
+	 */
 	public void setRefreshingIntervall(long intervall){
 		_refreshingIntervall = intervall;
 	}
 
+	/**
+	 * gets the Interval in milliseconds after which actionentries will be refreshed
+	 * and their presence on the providing agents will be checked
+	 * 
+	 * Default: 2000 milliseconds
+	 * 
+	 * @return interval in milliseconds
+	 */
 	public long getRefrehsingIntervall(){
 		return _refreshingIntervall;
 	}
 
+	/**
+	 * sets the first time (in milliseconds) a refreshment of actions stored 
+	 * within the Directory will be commenced. Can be different from 
+	 * refreshinginterval given with the other setter
+	 * 
+	 * Default: 2000 milliseconds
+	 * 
+	 * @param firstRefresh
+	 */
 	public void setFirstRefresh(long firstRefresh){
 		_firstRefresh = firstRefresh;
 	}
 
+	/**
+	 * gets the first time (in milliseconds) a refreshment of actions stored 
+	 * within the Directory will be commenced. Can be different from 
+	 * refreshinginterval given with the other setter
+	 * 
+	 * Default: 2000 milliseconds
+	 * 
+	 * @param firstRefresh
+	 */
 	public long getFirstRefresh(){
 		return _firstRefresh;
 	}
 	
+	/**
+	 * sets the interval after which the AgentNodeBean will ping all agents stored within it
+	 * to check if they are still alive.
+	 * 
+	 * Default: 12000 milliseconds
+	 * 
+	 * @param agentPingIntervall time in milliseconds
+	 */
 	public void setAgentPingIntervall(long agentPingIntervall){
 		_agentPingIntervall = agentPingIntervall;
 	}
 	
+	
+	/**
+	 * sets the interval after which the AgentNodeBean will ping all agents stored within it
+	 * to check if they are still alive.
+	 * 
+	 * Default: 12000 milliseconds
+	 * 
+	 * @param agentPingIntervall time in milliseconds
+	 */
 	public long getAgentPingIntervall(){
 		return _agentPingIntervall;
 	}
 
-	/*
+	/**
+	 * 
 	 * inner Class to handle the incoming and outgoing searchRequests
+	 * it also holds the handling of all incoming messages
 	 * 
 	 * @author Martin Loeffelholz
 	 *
 	 */
 	private class RequestHandler implements IMessageTransportDelegate {
 
+		/**
+		 * gets the log of this Bean
+		 */
 		public Log getLog(String extension){
 			//TODO Creating a method within the AgentNode to get a log for AgentNodeBeans and use it here
 			return LogFactory.getLog(getClass().getName() + "." + extension);
 		}
 
+		/**
+		 * receives asynchronous exceptions from the messagetransports and prints them into the console
+		 */
 		@Override
 		public void onAsynchronousException(MessageTransport source, Exception e) {
 			e.printStackTrace();
 		}
 
+		
+		/**
+		 * This method receives and handles <b>all</b> incoming messages to this AgentNodeBean and handles them
+		 */
 		@Override
 		public void onMessage(MessageTransport source, IJiacMessage message,
 				ICommunicationAddress at) {
@@ -402,11 +556,23 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		}
 	}
 	
+	/**
+	 * Module that pings all stored agents and checks if they are still alive.
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	@SuppressWarnings("serial")
 	private class AgentPinger extends TimerTask{
 		
+		/**
+		 * Set of Pings that got out to the agents but didn't came back yet
+		 */
 		private Set<IAgentDescription> _ongoingAgentPings = new HashSet<IAgentDescription>();
 		
+		/**
+		 * Pings all <code>Agent</code>s stored within the Directory and checks if they have replied
+		 */
 		public void run(){
 			// All Agents that haven't ping back are most likely to be non existent anymore
 			synchronized (_ongoingAgentPings) {
@@ -436,6 +602,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			}
 		}
 		
+		/**
+		 * if an Agent replies to a ping message this method will be used to make a note of that
+		 * 
+		 * @param agentDesc the Description of the agent replying
+		 */
 		public void removePing(IAgentDescription agentDesc){
 			synchronized(_ongoingAgentPings){
 				_ongoingAgentPings.remove(agentDesc);
@@ -443,6 +614,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		}
 	}
 
+	/**
+	 * Module that keeps the actions stored within the Directory up to date.
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	@SuppressWarnings("serial")
 	private class SpaceRefresher extends TimerTask {
 		
@@ -463,23 +640,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				ActionData oldAct = new ActionData();
 				oldAct.setCreationTime(_currentLogicTime - 1);
 				
+				//First let's remove all not refreshed actions
 				space.removeAll(oldAct);
-				// First let's remove all not refreshed actions and communicate them to the other AgentNodes
-//				Set<ActionData> oldSet;
-//				if ((oldSet = space.removeAll(oldAct)) != null){
-//					Set<IFact> oldFacts = new HashSet<IFact>();
-//					oldFacts.addAll(oldSet);
-//					FactSet factSet = new FactSet(oldFacts);
-//					
-//					JiacMessage timeoutMessage = new JiacMessage(factSet);
-//					timeoutMessage.setSender(_myAddress);
-//					timeoutMessage.setProtocol(REMOTE_ACTION_REFRESH_PROTOCOL_ID);
-//					try {
-//						_messageTransport.send(timeoutMessage, _otherNodes);
-//					} catch (CommunicationException e) {
-//						e.printStackTrace();
-//					}
-//				}
+				 
 				
 
 				ActionData actionTemplate = new ActionData(_currentLogicTime);
@@ -523,6 +686,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	}
 		
 
+	/**
+	 * Wrapperclass to connect an action stored within the Directory with a (logical) creationtime
+	 * so making it possible to filter them out of the Directory
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	@SuppressWarnings("serial")
 	public static class ActionData implements IFact{
 		private IActionDescription _action = null;
@@ -533,28 +703,50 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		}
 
 		/**
-		 * This Constructor is only meant to be used for Templatecreation
+		 * standard Constructor method
 		 */
 		public ActionData(){
 			_creationTime = null;
 		}
 
+		/**
+		 * sets the (logical) time of creation of the <code>ActionData</code>
+		 * 
+		 * @param creationTime (logical) time of creation
+		 */
 		public void setCreationTime(Long creationTime){
 			_creationTime = creationTime;
 		}
 
+		/**
+		 * gets the (logical) time of creation of this instance of <code>ActionData</code>
+		 * @return
+		 */
 		public Long getCreationTime(){
 			return _creationTime;
 		}
 
+		/**
+		 * sets an ActionDescription to be stored within this <code>ActionData</code>
+		 * 
+		 * @param action implements IActionDescription
+		 */
 		public void setActionDescription(IActionDescription action){
 			_action = action;
 		}
 
+		/**
+		 * gets the ActionDescription stored within this <code>ActionData</code>
+		 * 
+		 * @return IActionDescription stored within this <code>ActionData</code>
+		 */
 		public IActionDescription getActionDescription(){
 			return _action;
 		}
 		
+		/**
+		 * returns Stringrepresentation of this <code>ActionData</code>
+		 */
 		public String toString(){
 			String thisString = "ActionData: ";
 			if (_action != null){

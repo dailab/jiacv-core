@@ -81,7 +81,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	 */
 	public final static String REMOTEACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#UseRemoteAction";
 	
-	/*
+	/**
 	 * Messagetemplates to channel messages to the handlingmodules
 	 */
 	private static final IJiacMessage WHITEPAGES_SEARCH_MESSAGETEMPLATE;
@@ -430,13 +430,16 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 		synchronized(_requestID2ActionMap){
 			if (_requestID2ActionMap.containsKey(doAction.getSessionId())){
+				//if still waiting for this action to finish get it out of the map
 				DoAction sourceAction = _requestID2ActionMap.remove(doAction.getSessionId());
-
+				
 				if (sourceAction != null){
+					// got it
 					String owner = sourceAction.getSource().toString();
 					log.warn("SearchRequest from " + owner + " has timeout");
 
 					ActionResult result = null;
+					// now let's check if answers for this request were stored
 					List<IFact> results = _requestID2ResponseMap.remove(doAction.getSessionId());
 					if (results != null){
 						log.debug("DoAction was global SearchRequest with replys ... writing result.");
@@ -608,7 +611,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 							// if SearchRequest was global just add results to the others already stored
 							List<IFact> results = _requestID2ResponseMap.get(request.getID());
 							
-							//but don't forget to add our AccessBean as providerbean
+							//but don't forget to add our AccessBean as providerbean for remoteActions
 							for (IFact fact : response.getResult()){
 								if (fact instanceof Action){
 									Action act = (Action) fact;
@@ -659,16 +662,21 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	}
 
 
+	/**
+	 * Inner Class that handles adding & removal of Actions to the Directory 
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	@SuppressWarnings("serial")
 	private class ActionRequestHandler {
 
+		
 		/**
-		 * just gets the SearchRequest to the directory
+		 * adds an <code>Action</code> to the Directory on the <code>AgentNode</code>
 		 * 
-		 * @param <E> extends IFact
-		 * @param template of the entrys to look for
+		 * @param actionDesc	implements IActionDescription
 		 */
-
 		public void addActionToDirectory(IActionDescription actionDesc){
 			JiacMessage message = new JiacMessage(actionDesc);
 			message.setProtocol(DirectoryAgentNodeBean.ADD_ACTION_PROTOCOL_ID);
@@ -682,6 +690,11 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			}
 		}
 
+		/**
+		 * removes an <code>Action</code> to the Directory on the <code>AgentNode</code>
+		 * 
+		 * @param actionDesc	implements IActionDescription
+		 */
 		public void removeActionFromDirectory(IActionDescription actionDesc){
 			JiacMessage message = new JiacMessage(actionDesc);
 			message.setProtocol(DirectoryAgentNodeBean.REMOVE_ACTION_PROTOCOL_ID);
@@ -695,6 +708,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			}
 		}
 		
+		/**
+		 * removes <b>all</b> <code>Action</code>s from the Directory that were offered through this <code>DirectoryAccessBean</code>
+		 */
 		public void removeAllActionsFromDirectory(){
 			synchronized(_offeredActions){
 				for (IActionDescription actionDesc : _offeredActions){
@@ -712,24 +728,40 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	}
 
 	
+	/**
+	 * Inner Class that handles invocation and result-delivery of remoteactions 
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	@SuppressWarnings("serial")
 	private class RemoteActionHandler implements SpaceObserver<IFact>, ResultReceiver {
 
-		/* stores RemoteActions, that were received through messages from other agents 
+		/** 
+		 * stores RemoteActions, that were received through messages from other agents 
 		 * and are currently processed by other beans of this Agent
 		 */ 
 		private HashMap<String, SessionData> openSessionsFromClients = null;
-		/* stores RemoteActions, that were received through the agents memory and holding the connection to the actual
+		/** 
+		 * stores RemoteActions, that were received through the agents memory and holding the connection to the actual
 		 * creator of that doActions so Results can handed over to them.
 		 */ 
 		private HashMap<String, DoAction> openSessionsToProviders = null;
 
-
+		/**
+		 * standard constructor method
+		 */
 		public RemoteActionHandler() {
 			openSessionsFromClients = new HashMap<String, SessionData>();
 			openSessionsToProviders = new HashMap<String, DoAction>();
 		}
 
+		/**
+		 * Cancels a RemoteAction in case of a timeout
+		 * 
+		 * @param remoteAction
+		 * @return
+		 */
 		public ActionResult cancelRemoteAction(DoAction remoteAction){
 			log.debug("Canceling remoteAction");
 			synchronized(openSessionsToProviders){
@@ -749,6 +781,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			}
 		}
 		
+		/**
+		 * Cancels all still open remoteActions
+		 */
 		public void cancelAllRemoteActions(){
 			synchronized(openSessionsToProviders){
 				for (String key : openSessionsToProviders.keySet()){
@@ -763,7 +798,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		
 		
 
-		/*
+		/**
 		 * Gets a DoAction that has to be invoked remotely
 		 * starts a search for the real provider in the directory
 		 * actual invocation will be done within the notify-method
@@ -818,6 +853,11 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			}
 		}
 
+		
+		/**
+		 * Receives messages with remoteActioncalls to invoke locally, results of such actions etc.
+		 * and handles them
+		 */
 		@Override
 		@SuppressWarnings("unchecked")
 		public void notify(SpaceEvent<? extends IFact> event) {
@@ -899,6 +939,13 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			}
 		}
 
+		/**
+		 * compares two actions with each other
+		 * 
+		 * @param action1 first action to compare with...
+		 * @param action2 ... this second action.
+		 * @return
+		 */
 		private boolean actionsAreEqual(IActionDescription action1, IActionDescription action2){
 			boolean equal = (action1 != null)&&(action2 != null); 
 			equal &= action1.getName().equals(action2.getName());
@@ -907,6 +954,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			return equal;
 		}
 
+		/**
+		 * Implementation of ResultReceiver. Gets a result and handles it.
+		 */
 		@Override
 		public void receiveResult(ActionResult result) {
 			log.debug("Got Result for Remote Action!");
@@ -945,11 +995,17 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			
 		}
 
+		/**
+		 * getter for local beanname
+		 */
 		@Override
 		public String getBeanName() {
 			return _myAccessBean.getBeanName();
 		}
 
+		/**
+		 * setter for local beanname
+		 */
 		@Override
 		public void setBeanName(String name) {
 			_myAccessBean.setBeanName(name);
@@ -957,6 +1013,18 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	}
 
+	/**
+	 * 
+	 * Inner Class that handles ActionTemplates and automatically once at the beginning of each interval...
+	 * <ul>
+	 * <li> adds actions that are matching to the templates to the Directory </li>
+	 * <li> removes actions that are no longer present on the agent (and were formerly added) from the directory </li>
+	 * <li> if an ActionTemplate is removed, removes all actions that are matching on that template and were formerly offered from the directory </li>
+	 * </ul>
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	//TODO ThreadPool?? Ask Marcel about it .. later
 	private class AutoEnlister extends TimerTask {
 
@@ -979,12 +1047,22 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			}
 		}
 		
+		/**
+		 * adds a template for autoenlistment 
+		 * @param actionTemplatesToAdd
+		 */
 		public void addActionTemplates(List<IActionDescription> actionTemplatesToAdd) {
 			synchronized(_autoenlistActionTemplates){
 				_autoenlistActionTemplates.addAll(actionTemplatesToAdd);
 			}
 		}
 		
+		/**
+		 * removes a template for autoenlistment and all <code>Action</code>s that are matching on that template
+		 * that are formerly added to the directory from it.
+		 * 
+		 * @param templatesToRemove
+		 */
 		public void removeActionTemplates(List<IActionDescription> templatesToRemove){
 			synchronized (_offeredActions) {
 				synchronized(_autoenlistActionTemplates){
@@ -1004,6 +1082,12 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
+	/**
+	 * InnerClass that replys to refreshmessages from the AgentNode either on messages regarding actions or on such ones regarding this agent
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	@SuppressWarnings("serial")
 	private class RefreshAgent implements SpaceObserver<IFact>{
 		@Override
@@ -1038,6 +1122,12 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	}
 
 
+	/**
+	 * wrapper class to connect a doAction with the address of an Agent
+	 * 
+	 * @author Martin Loeffelholz
+	 *
+	 */
 	private class SessionData {
 		public DoAction clientSource;
 		public ICommunicationAddress clientAddress;

@@ -11,6 +11,7 @@ import java.security.CodeSource;
 import java.security.cert.Certificate;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -31,7 +32,10 @@ public class JARClassLoader extends URLClassLoader {
     }
 
     private final JARClassPath _jarCP= new JARClassPath();
-    
+
+    /** The already loaded classes by this class loader instance. */
+    private HashMap<String,Class<?>> loadedClasses = new HashMap<String,Class<?>>();
+
     /** 
      * Creates an empty class loader with the current class loader as parent.
      */
@@ -85,8 +89,8 @@ public class JARClassLoader extends URLClassLoader {
 
     @Override
     public synchronized URL findResource(String name) {
-        URL result= super.findResource(name);
-        return result == null ? _jarCP.getURL(name) : result;
+    	URL result = _jarCP.getURL(name);
+        return result == null ? super.findResource(name) : result;
     }
 
     @Override
@@ -138,17 +142,28 @@ public class JARClassLoader extends URLClassLoader {
     }
 
     @Override
-    protected synchronized Class<?> findClass(String name) throws ClassNotFoundException {
-        try {
-            return super.findClass(name);
-        } catch (ClassNotFoundException e) {
-            // fall through
-        }
-        
-        String fileName = new StringBuffer().append(name.replace('.', '/')).append(".class").toString();
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+    	// check if class is already loaded
+    	Class<?> c = loadedClasses.get(name);
+    	if (c != null) {
+    		return c;
+    	}
 
-        JAR jar= _jarCP.getContainer(fileName);
-        
+    	// load class
+    	try {
+    		c = findClass(name);
+    		loadedClasses.put(name, c);
+    		return c;
+    	} catch (ClassNotFoundException e) {
+    		return super.loadClass(name);
+    	}
+    }
+
+    @Override
+    protected synchronized Class<?> findClass(String name) throws ClassNotFoundException {
+        // get class from the class path of this child class loader
+        String fileName = new StringBuffer().append(name.replace('.', '/')).append(".class").toString();
+        JAR jar= _jarCP.getContainer(fileName);        
         if(jar != null) {
             try {
                 InputStream is = jar.getInputStream(fileName);
@@ -157,9 +172,7 @@ public class JARClassLoader extends URLClassLoader {
                 URL url = _jarCP.getURL(jar, fileName);
                 CodeSource cs = url == null ? null : new CodeSource(url, (Certificate[]) null);
                 return defineClass(name, classCode, 0, classCode.length, cs);
-            } catch (IOException ioe) {
-                throw new ClassNotFoundException(name, ioe);
-            }
+            } catch (IOException ioe) {}
         }
 
         throw new ClassNotFoundException(name);

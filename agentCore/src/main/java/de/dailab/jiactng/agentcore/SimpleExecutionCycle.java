@@ -363,7 +363,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	}
 
 	@SuppressWarnings("serial")
-	public class TimeoutException extends RuntimeException {
+	public static class TimeoutException extends RuntimeException {
 		public TimeoutException(String s) {
 			super(s);
 		}

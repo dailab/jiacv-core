@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
+import java.io.Serializable;
+
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
@@ -22,13 +24,13 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 
 	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal){
 		log.debug("Searching for Action " + actionDesc.toString());
-		Object[] params = {actionDesc, new Boolean(isGlobal)};
+		Serializable[] params = {actionDesc, new Boolean(isGlobal)};
 		DoAction action = _requestAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
 	}
 
-	public void useRemoteAction(Action action, Object[] params, long timeToLive){
+	public void useRemoteAction(Action action, Serializable[] params, long timeToLive){
 		log.debug("using remote Action " + action.getName());
 		DoAction remoteAction = action.createDoAction(params, this, timeToLive);
 		
@@ -36,7 +38,7 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 		memory.write(remoteAction);
 	}
 
-	public void useRemoteAction(Action action, Object[] params){
+	public void useRemoteAction(Action action, Serializable[] params){
 		log.debug("using remote Action " + action.getName());
 		DoAction remoteAction = action.createDoAction(params, this);
 

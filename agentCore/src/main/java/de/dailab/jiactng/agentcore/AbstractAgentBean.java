@@ -6,6 +6,8 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import java.io.Serializable;
+
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
@@ -287,11 +289,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		throw new RuntimeException(e);
 	}
 	
-	protected String invoke(Action a, Object[] inputParams) {
+	protected String invoke(Action a, Serializable[] inputParams) {
 		return invoke(a, inputParams, null);
 	}
 
-	protected String invoke(Action a, Object[] inputParams,
+	protected String invoke(Action a, Serializable[] inputParams,
 			ResultReceiver receiver) {
 		DoAction doAct = a.createDoAction(inputParams, receiver);
 		memory.write(doAct);
@@ -303,7 +305,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 //		return ((Agent)thisAgent).syncInvoke(doAct);
 //	}
 	
-	protected void returnResult(DoAction origin, Object[] results) {
+	protected void returnResult(DoAction origin, Serializable[] results) {
 		ActionResult res = ((Action) origin.getAction()).createActionResult(
 				origin, results);
 		memory.write(res);

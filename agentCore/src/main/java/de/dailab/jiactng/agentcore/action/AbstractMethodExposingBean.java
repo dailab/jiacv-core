@@ -3,6 +3,7 @@
  */
 package de.dailab.jiactng.agentcore.action;
 
+import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -178,10 +179,10 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         Method method= searchMethod(action.getName(), action.getInputTypes());
         if(method != null) {
             try {
-                Object result= method.invoke(this, doAction.getParams());
+                Serializable result= (Serializable)method.invoke(this, doAction.getParams());
                 if (result != null){ 
                 	memory.write(action.createActionResult(
-                			doAction, new Object[] { result }));
+                			doAction, new Serializable[] { result }));
                 	log.debug("action processed and result written...");
                 } else {
                 	log.debug("action processed and no result written");
@@ -195,7 +196,7 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
                 // should not happen -> type checking have to be implemented in the DoAction constructor!
                 log.debug("error while invoking action", ite);
                 Throwable cause= ite.getCause();
-                memory.write(action.createActionResult(doAction, new Object[]{cause != null ? cause : ite}));
+                memory.write(action.createActionResult(doAction, new Serializable[]{cause != null ? cause : ite}));
                 throw new Exception("error while invoking action" + method.getName(), ite);
 //                // delegate runtime exceptions
 //                if(cause != null && cause instanceof RuntimeException) {

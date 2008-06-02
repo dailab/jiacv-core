@@ -6,6 +6,7 @@
  */
 package de.dailab.jiactng.agentcore.action;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -113,7 +114,7 @@ public class Action implements IActionDescription {
 	 * @return a new DoAction-object that can be used (by writing it to the
 	 *         memory) to call the action.
 	 */
-	public DoAction createDoAction(Object[] newParams, ResultReceiver source) {
+	public DoAction createDoAction(Serializable[] newParams, ResultReceiver source) {
 		return new DoAction(this, source, newParams);
 	}
 
@@ -130,7 +131,7 @@ public class Action implements IActionDescription {
 	 * @return a new DoAction-object that can be used (by writing it to the
 	 *         memory) to call the action.
 	 */
-	public DoAction createDoAction(Object[] newParams, ResultReceiver source,
+	public DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
 			long timeToLive) {
 		return new DoAction(this, source, newParams, timeToLive);
 	}
@@ -149,7 +150,7 @@ public class Action implements IActionDescription {
 	 * @return a new ActionResult-object that can be used (by writing it to the
 	 *         memory) to return the results of the action.
 	 */
-	public ActionResult createActionResult(DoAction source, Object[] results) {
+	public ActionResult createActionResult(DoAction source, Serializable[] results) {
 		ActionResult ret = new ActionResult(source, results);
 		ret.setMetaData(source.getMetaData());
 		return ret;

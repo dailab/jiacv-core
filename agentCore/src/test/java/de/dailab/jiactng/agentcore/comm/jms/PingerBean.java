@@ -3,6 +3,8 @@
  */
 package de.dailab.jiactng.agentcore.comm.jms;
 
+import java.io.Serializable;
+
 import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
@@ -55,7 +57,7 @@ public class PingerBean extends AbstractAgentBean implements ResultReceiver {
         
         Action action= memory.read(new Action(PingPongTestCase.ACTION_NAME));
         IJiacMessage  message= new JiacMessage(new ObjectContent("Ping"));
-            DoAction doAction= action.createDoAction(new Object[]{
+            DoAction doAction= action.createDoAction(new Serializable[]{
                 message,
                 CommunicationAddressFactory.createGroupAddress(PingPongTestCase.DUMMY_ADDRESS)
             },

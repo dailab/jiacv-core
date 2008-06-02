@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ private Action _addAction;
 		AgentDescription myAgentDescription = memory.read(new ThisAgentDescription());
 		getGlobalResult.setProviderDescription(myAgentDescription);
 		
-		DoAction addGlobalResult = _addAction.createDoAction(new Object[] {getGlobalResult}, _resultDump);
+		DoAction addGlobalResult = _addAction.createDoAction(new Serializable[] {getGlobalResult}, _resultDump);
 		
 		memory.write(addGlobalResult);
 		
@@ -56,7 +57,7 @@ private Action _addAction;
 		
 		if (actionName.endsWith(ACTION_GET_GLOBAL_RESULT)){
 			String name = getGlobalResult();
-			ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Object[] {name});
+			ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Serializable[] {name});
 			log.debug("writing result for getGlobalResult");
 			memory.write(result);
 		}

@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,8 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 		timeout.setProviderDescription(myAgentDescription);
 		getSomeResult.setProviderDescription(myAgentDescription);
 		
-		DoAction addTimeout = _addAction.createDoAction(new Object[] {timeout}, _resultDump);
-		DoAction addSomeResult = _addAction.createDoAction(new Object[] {getSomeResult}, _resultDump);
+		DoAction addTimeout = _addAction.createDoAction(new Serializable[] {timeout}, _resultDump);
+		DoAction addSomeResult = _addAction.createDoAction(new Serializable[] {getSomeResult}, _resultDump);
 		
 		memory.write(addTimeout);
 		memory.write(addSomeResult);
@@ -59,17 +60,17 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 	
 	@Override
 	public void doAction(DoAction doAction) throws Exception {
-		Object[] params = doAction.getParams();
+		Serializable[] params = doAction.getParams();
 		String actionName= doAction.getAction().getName();
 		
 		if (actionName.equalsIgnoreCase(ACTION_TIMEOUT_TEST)){
-			Object obj = timeoutTest();
-			ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Object[] {obj});
+			String obj = timeoutTest();
+			ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Serializable[] {obj});
 			log.debug("writing result for timeoutTest");
 			memory.write(result);
 		} else if (actionName.equalsIgnoreCase(ACTION_GET_SOME_RESULT)){
-			Object obj = getSomeResult(params[0]);
-			ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Object[] {obj});
+			Serializable obj = getSomeResult(params[0]);
+			ActionResult result = ((Action) doAction.getAction()).createActionResult(doAction, new Serializable[] {obj});
 			log.debug("writing result for getSomeResult");
 			memory.write(result);
 		}
@@ -79,7 +80,7 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 	/*
 	 * To be flexible just let's wait until the next action is coming in.
 	 */ 
-	public Object timeoutTest(){
+	public String timeoutTest(){
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
@@ -91,7 +92,7 @@ public class RemoteActionProviderBean extends AbstractAgentBean implements IEffe
 	/*
 	 * will just return what's sent to it
 	 */
-	public Object getSomeResult(Object result) {
+	public Serializable getSomeResult(Serializable result) {
 		log.debug("somebody wants a result? ... tztz");
 		return result;
 	}

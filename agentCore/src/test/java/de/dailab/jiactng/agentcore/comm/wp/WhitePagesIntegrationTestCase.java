@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.comm.wp;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -221,7 +222,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 		if (results.get(0) instanceof Action){
 			Action remoteAction = (Action) results.get(0);
-			_remoteActionTestBean.useRemoteAction(remoteAction, new Object[] {}, 1000);
+			_remoteActionTestBean.useRemoteAction(remoteAction, new Serializable[] {}, 1000);
 		}
 		
 		try {
@@ -297,7 +298,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		assertTrue(remoteActions.get(0) instanceof Action);
 		
 		Action remoteAction = (Action) remoteActions.get(0);
-		Object[] params = {REMOTE_RESULT};
+		Serializable[] params = {REMOTE_RESULT};
 		
 		if (_debug) {
 			System.err.println(": : Trying to use the remote Action");
@@ -345,7 +346,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 		Action template = new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send");
 		
-		List<Action> templates = new ArrayList<Action>();
+		ArrayList<Action> templates = new ArrayList<Action>();
 		templates.add(template);
 		
 		_whitePagesTestBean.addAutoEnlistActionTemplate(templates);
@@ -428,7 +429,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		assertTrue(remoteActions.get(0) instanceof Action);
 		
 		Action remoteAction = (Action) remoteActions.get(0);
-		Object[] params = {};
+		Serializable[] params = {};
 		
 		if (_debug) {
 			System.err.println(": : Trying to use the global remote Action");

@@ -3,6 +3,8 @@
  */
 package de.dailab.jiactng.agentcore.comm.service;
 
+import java.io.Serializable;
+
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
@@ -51,13 +53,13 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
                 return "action '" + LOG_ACTION + "' not found";
             }
             
-            DoAction doAction= action.createDoAction(new Object[]{"Hallo Welt"}, this);
+            DoAction doAction= action.createDoAction(new Serializable[]{"Hallo Welt"}, this);
             String check;
             if((check= doAction.typeCheck()) != null) {
                 throw new IllegalStateException("something wrong here [" + check + "]");
             }
             
-            memory.write(action.createDoAction(new Object[]{"Hallo Welt"}, this));
+            memory.write(action.createDoAction(new Serializable[]{"Hallo Welt"}, this));
             
             try {
                 _logLock.wait(MAX_TIMEOUT);
@@ -80,7 +82,7 @@ public class ClientBean extends AbstractAgentBean implements ResultReceiver {
                 return "action '" + TIME_ACTION + "' not found";
             }
             
-            memory.write(action.createDoAction(new Object[0], this));
+            memory.write(action.createDoAction(new Serializable[0], this));
             
             try {
                 _timeLock.wait(MAX_TIMEOUT);

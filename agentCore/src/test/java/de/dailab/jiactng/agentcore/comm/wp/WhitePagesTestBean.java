@@ -3,6 +3,7 @@
  */
 package de.dailab.jiactng.agentcore.comm.wp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	public void searchForAgentDesc(String agentName, boolean isGlobal){
 		log.debug("Searching for Agent " + agentName);
 		AgentDescription desc = new AgentDescription(null, agentName, null, null);
-		Object[] params = {desc, new Boolean(isGlobal)};
+		Serializable[] params = {desc, new Boolean(isGlobal)};
 		DoAction action = _requestSearchAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
@@ -72,7 +73,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	public void searchForAgentDesc(String agentName, boolean isGlobal, long timeToSearch){
 		log.debug("Searching for Agent " + agentName);
 		AgentDescription desc = new AgentDescription(null, agentName, null, null);
-		Object[] params = {desc, new Boolean(isGlobal)};
+		Serializable[] params = {desc, new Boolean(isGlobal)};
 		DoAction action = _requestSearchAction.createDoAction(params, this, timeToSearch);
 		_lastDoAction = action;
 		memory.write(action);
@@ -80,7 +81,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 
 	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal){
 		log.debug("Searching for Action " + actionDesc.toString());
-		Object[] params = {actionDesc, new Boolean(isGlobal)};
+		Serializable[] params = {actionDesc, new Boolean(isGlobal)};
 		DoAction action = _requestSearchAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
@@ -88,7 +89,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	
 	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal, long timeToSearch){
 		log.debug("Searching for Action " + actionDesc.toString());
-		Object[] params = {actionDesc, new Boolean(isGlobal)};
+		Serializable[] params = {actionDesc, new Boolean(isGlobal)};
 		DoAction action = _requestSearchAction.createDoAction(params, this, timeToSearch);
 		_lastDoAction = action;
 		memory.write(action);
@@ -96,7 +97,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 
 	public void addActionToDirectory(IActionDescription actionDesc){
 		log.debug("Adding Action to Directory: " + actionDesc);
-		Object[] params = {actionDesc};
+		Serializable[] params = {actionDesc};
 		DoAction action = _addActionAction.createDoAction(params, null);
 		_lastDoAction = action;
 		memory.write(action);
@@ -104,7 +105,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 
 	public void removeActionFromDirectory(IActionDescription actionDesc){
 		log.debug("removing Action from Directory");
-		Object[] params = {actionDesc};
+		Serializable[] params = {actionDesc};
 		DoAction action = _removeActionAction.createDoAction(params, null);
 		_lastDoAction = action;
 		memory.write(action);
@@ -113,7 +114,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	public void TimeoutTest(){
 		log.debug("trying timeoutsearch");
 		DoAction action = _requestSearchAction.createDoAction(
-				new Object[] {
+				new Serializable[] {
 						new AgentDescription(null, "NixAgentos", null, null), 
 						new Boolean(false)}, 
 				this, 1);
@@ -125,13 +126,13 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		return memory.read(new Action("de.dailab.jiactng.agentcore.comm.ICommunicationBean#send",null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 	}
 	
-	public void addAutoEnlistActionTemplate(List<Action> templates){
-		DoAction action = _addAutoEnlistActionTemplate.createDoAction(new Object[] {templates}, this);
+	public void addAutoEnlistActionTemplate(ArrayList<Action> templates){
+		DoAction action = _addAutoEnlistActionTemplate.createDoAction(new Serializable[] {templates}, this);
 		memory.write(action);
 	}
 
-	public void removeAutoEnlistActionTemplate(List<Action> templates){
-		DoAction action = _removeAutoEnlistActionTemplate.createDoAction(new Object[] {templates}, this);
+	public void removeAutoEnlistActionTemplate(ArrayList<Action> templates){
+		DoAction action = _removeAutoEnlistActionTemplate.createDoAction(new Serializable[] {templates}, this);
 		memory.write(action);
 	}
 

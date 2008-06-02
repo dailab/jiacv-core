@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -559,7 +560,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
 					message.setHeader("isGlobal", isGlobal.toString());
 
-					Object[] params = {message, directoryAddress};
+					Serializable[] params = {message, directoryAddress};
 					DoAction send = _sendAction.createDoAction(params, _resultDump);
 
 					log.debug("sending message with searchrequest to directory " + message);
@@ -628,7 +629,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 							if (sourceDoAction != null){
 								// if request exists and hasn't timed out yet
-								List<IFact> result = new ArrayList<IFact>();
+								ArrayList<IFact> result = new ArrayList<IFact>();
 								if (response.getResult() != null){
 									// if there is an at least empty result
 
@@ -647,7 +648,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 									}
 								} 
 
-								ActionResult actionResult = ((Action)sourceDoAction.getAction()).createActionResult(sourceDoAction, new Object[] {result});
+								ActionResult actionResult = ((Action)sourceDoAction.getAction()).createActionResult(sourceDoAction, new Serializable[] {result});
 								log.debug("DirectoryAccessBean is writing actionResult: " + actionResult);
 
 								memory.write(actionResult);
@@ -680,7 +681,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		public void addActionToDirectory(IActionDescription actionDesc){
 			JiacMessage message = new JiacMessage(actionDesc);
 			message.setProtocol(DirectoryAgentNodeBean.ADD_ACTION_PROTOCOL_ID);
-			Object[] params = {message, directoryAddress};
+			Serializable[] params = {message, directoryAddress};
 			DoAction send = _sendAction.createDoAction(params, _resultDump);
 
 			log.debug("sending Message to register action in directory " + message);
@@ -698,7 +699,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		public void removeActionFromDirectory(IActionDescription actionDesc){
 			JiacMessage message = new JiacMessage(actionDesc);
 			message.setProtocol(DirectoryAgentNodeBean.REMOVE_ACTION_PROTOCOL_ID);
-			Object[] params = {message, directoryAddress};
+			Serializable[] params = {message, directoryAddress};
 			DoAction send = _sendAction.createDoAction(params, _resultDump);
 
 			log.debug("sending Message to remove action from directory " + message);
@@ -716,7 +717,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				for (IActionDescription actionDesc : _offeredActions){
 					JiacMessage message = new JiacMessage(actionDesc);
 					message.setProtocol(DirectoryAgentNodeBean.REMOVE_ACTION_PROTOCOL_ID);
-					Object[] params = {message, directoryAddress};
+					Serializable[] params = {message, directoryAddress};
 					DoAction send = _sendAction.createDoAction(params, _resultDump);
 
 					log.debug("sending Message to remove action from directory " + message);
@@ -842,7 +843,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					}
 				}
 					
-				Object[] params = {message, address};
+				Serializable[] params = {message, address};
 				DoAction send = _sendAction.createDoAction(params, _resultDump);
 				synchronized(openSessionsToProviders){
 					openSessionsToProviders.put(doAction.getSessionId(), doAction);
@@ -892,7 +893,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 						// now let's look if our agent still supports this action
 						DoAction remoteDoAction;
-						Object[] params = doAction.getParams();
+						Serializable[] params = doAction.getParams();
 						boolean remoteActionFound = false;
 
 						List<Action> actions = thisAgent.getActionList();
@@ -914,7 +915,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 							ActionNotPresentException exception = new ActionNotPresentException(doAction.getAction());
 
 							Action missingAction = (Action) doAction.getAction();
-							ActionResult result = missingAction.createActionResult(doAction, new Object[] {exception});
+							ActionResult result = missingAction.createActionResult(doAction, new Serializable[] {exception});
 
 							this.receiveResult(result);
 
@@ -981,7 +982,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					JiacMessage resultMessage = new JiacMessage(remoteResult);
 					resultMessage.setProtocol(REMOTEACTION_PROTOCOL_ID);
 
-					Object[] params = {resultMessage, recipient};
+					Serializable[] params = {resultMessage, recipient};
 					DoAction send = _sendAction.createDoAction(params, _resultDump);
 
 					log.debug("sending result to client");
@@ -1108,12 +1109,12 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 						JiacMessage refreshMessage = new JiacMessage(new FactSet(facts));
 						refreshMessage.setProtocol(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID);
-						DoAction send = _sendAction.createDoAction(new Object[] {refreshMessage, message.getSender()}, _resultDump);
+						DoAction send = _sendAction.createDoAction(new Serializable[] {refreshMessage, message.getSender()}, _resultDump);
 						memory.write(send);
 
 					} else if (message.getProtocol().equalsIgnoreCase(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID)){
 						JiacMessage pingMessage = new JiacMessage(thisAgent.getAgentDescription());
-						DoAction send = _sendAction.createDoAction(new Object[] {pingMessage, message.getSender()}, _resultDump);
+						DoAction send = _sendAction.createDoAction(new Serializable[] {pingMessage, message.getSender()}, _resultDump);
 						memory.write(send);
 					}
 				} 

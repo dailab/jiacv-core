@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.action;
 
+import java.io.Serializable;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
@@ -23,10 +24,10 @@ public class DoAction extends SessionEvent {
 	 */
 	private static final long serialVersionUID = -8741204284564770003L;
 
-	private final static Object[] EMPTY_OBJECTS = new Object[0];
+	private final static Serializable[] EMPTY_OBJECTS = new Serializable[0];
 
 	/** The input-parameters for the action-call */
-	private Object[] params;
+	private Serializable[] params;
 
 	/**
 	 * The owner of this action/invocation / simple implementation of a
@@ -49,7 +50,7 @@ public class DoAction extends SessionEvent {
 	 * @param params
 	 *            the input-parameters for the call.
 	 */
-	public DoAction(Action thisAction, ResultReceiver source, Object[] params) {
+	public DoAction(Action thisAction, ResultReceiver source, Serializable[] params) {
 		this(new Session(source), thisAction, source, params);
 	}
 	
@@ -68,7 +69,7 @@ public class DoAction extends SessionEvent {
 	 * @param timeToLive
 	 * 			  time until timeout in milliseconds
 	 */
-	public DoAction(Action thisAction, ResultReceiver source, Object[] params, long timeToLive) {
+	public DoAction(Action thisAction, ResultReceiver source, Serializable[] params, long timeToLive) {
 		this(new Session(source, timeToLive), thisAction, source, params);
 	}
 
@@ -88,7 +89,7 @@ public class DoAction extends SessionEvent {
 	 *            the input-parameters for the call.
 	 */
 	public DoAction(Session session, Action thisAction, ResultReceiver source,
-			Object[] params) {
+			Serializable[] params) {
 		super(session, thisAction, source);
 		setParams(params);
 	}
@@ -99,7 +100,7 @@ public class DoAction extends SessionEvent {
 	 * 
 	 * @return an array containing the parameters for the action-call.
 	 */
-	public Object[] getParams() {
+	public Serializable[] getParams() {
 		return params;
 	}
 
@@ -109,7 +110,7 @@ public class DoAction extends SessionEvent {
 	 * @param params
 	 *            the params to set
 	 */
-	public void setParams(Object[] params) {
+	public void setParams(Serializable[] params) {
 		this.params = params == null ? EMPTY_OBJECTS : params;
 	}
 

@@ -11,7 +11,7 @@ public class ActionResult extends SessionEvent {
 	private static final long serialVersionUID = 7941825814785637285L;
 
 	/** The return values of the action. */
-	private Object[] _results;
+	private Serializable[] _results;
 	
 	/**
 	 * A field for exceptions, strings or other kinds of failureresults
@@ -31,7 +31,7 @@ public class ActionResult extends SessionEvent {
 	 * @param source
 	 *            the object that created the results
 	 */
-	public ActionResult(Action action, Session session, Object[] results,
+	public ActionResult(Action action, Session session, Serializable[] results,
 			DoAction source) {
 		super(session, action, source);
 		this._results = results;
@@ -41,7 +41,7 @@ public class ActionResult extends SessionEvent {
 			super.setMetaData(source.getMetaData());
 	}
 
-	public ActionResult(DoAction source, Object[] results) {
+	public ActionResult(DoAction source, Serializable[] results) {
 		super(source);
 		this._results = results;
 		if (getSession() != null)
@@ -76,7 +76,7 @@ public class ActionResult extends SessionEvent {
 	/**
 	 * @return the results
 	 */
-	public Object[] getResults() {
+	public Serializable[] getResults() {
 		return _results;
 	}
 
@@ -84,7 +84,7 @@ public class ActionResult extends SessionEvent {
 	 * @param results
 	 *            the results to set
 	 */
-	public void setResults(Object[] results) {
+	public void setResults(Serializable[] results) {
 		this._results = results;
 	}
 

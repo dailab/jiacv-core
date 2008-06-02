@@ -84,6 +84,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** The manager of the agent node */
 	private Manager _manager = null;
+	
+	/** Optional: DirectoryAgentNodeBean to add local Agents to */
+	private DirectoryAgentNodeBean _directory = null;
 
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
@@ -202,6 +205,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// register agent for management
 		agent.enableManagement(_manager);
+		
+		if (_directory != null){
+			_directory.addAgentDescription(agent.getAgentDescription());
+		}
 	}
 
 	/**
@@ -218,6 +225,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		List<String> oldAgentList = getAgents();
 		_agents.remove(agent);
 		agentListChanged(oldAgentList, getAgents());
+		
+		if (_directory != null){
+			_directory.removeAgentDescription(agent.getAgentDescription());
+		}
 	}
 
 	/**
@@ -541,14 +552,19 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					}
 				}
 
-				// Check if White Pages bean is present
-				for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
-					if (agentNodeBean instanceof DirectoryAgentNodeBean) {
-						// directory is present so add agentdescription to it.
-						DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
-						directory.addAgentDescription(a.getAgentDescription());
-						break;//????
+				if (_directory == null){
+					
+					// Check if White Pages bean is present
+					for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
+						if (agentNodeBean instanceof DirectoryAgentNodeBean) {
+							// directory is present so add agentdescription to it.
+							_directory = (DirectoryAgentNodeBean) agentNodeBean;
+							break;// we found what we were looking for so we can stop searching
+						}
 					}
+					_directory.addAgentDescription(a.getAgentDescription());
+				} else {
+					_directory.addAgentDescription(a.getAgentDescription());
 				}
 			}
 		}

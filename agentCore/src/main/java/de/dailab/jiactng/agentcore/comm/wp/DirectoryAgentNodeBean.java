@@ -41,8 +41,33 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * @author Martin Loeffelholz
  *
  */
+
+
+//TODO: s.u.
+/*
+ * 1. New AgentNode is connecting -> request to group with own local actions AND agents - flag if cached -> send back local actions of receiving nodes?
+ * 		reaction: Every receiving node sends own local entries (actions AND agents) to sending node, if cacheflag is set within message
+ * 2. every change has to be forwarded to all other nodes within the group
+ * 3. Buffer changes and send them via interval. - Interval has to be configureable
+ * 		update own data with received data
+ * 4. All agentNodes are sending Pings within 3,5s. Receiving AgentNodes note time of last contact.
+ * 		if last contact is older or exactly two pingperiods away erase all entries from that agentNode
+ * 5. Every Node sends ping even when cache is deactivated
+ * 6. If cache is deactivated, changes will still be sent (over groupaddress). Cacheconfig just decides if actions of other nodes will be noted or not
+ * 
+ * Konfigurierbar: PingIntervall, Aenderungsintervall, Caching aktivierbar
+ */
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
+	//TODO Possibility to filter own (local) actions - done
+	//TODO make groupaddress configureable with spring - done
+	//TODO send collected local changes after each _changePropagationInterval 
+	//TODO reveice collected global changes and update own data with it
+	//TODO note last contacts of all AgentNodes from which messages were received and if cacheflag was active
+	// cacheflag = will mind other entries so sent them to this one.
+	//TODO if last contact is older or exactly two pingperiods away erase all entries from that agentNode 
+
+	
 	/**
 	 * suffix for addresscreation purposes. Will be added to the UUID of AgentNode to create Beanaddress
 	 */
@@ -93,7 +118,19 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	 * directory.
 	 */
 	private long _agentPingIntervall = 12000;
+	
+	/**
+	 * Interval after which an AgentNode finaly sends a ping message if there weren't sent changes during this period
+	 */
+	private long _agentNodePingIntervall = 3500;
 
+	/**
+	 * Interval after which changes are propagated to the other nodes
+	 */
+	private long _changePropagateInterval = 3000;
+	
+	
+	
 	/**
 	 * Destroyer for the Directory
 	 */
@@ -175,6 +212,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		if (agentDescription != null) {
 			synchronized (space) {
 				space.remove(agentDescription);
+				
+				// As an Agent is removed from the directory also remove all his published Actions;
+				ActionData agentAction = new ActionData();
+				agentAction.setProviderDescription(agentDescription);
+				space.removeAll(agentAction);
 			}
 		}
 	}
@@ -190,6 +232,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		if (action != null){
 			ActionData actionData = new ActionData(_currentLogicTime);
 			actionData.setActionDescription(action);
+			actionData.setProviderDescription(action.getProviderDescription());
 			synchronized (space) {
 				space.write(actionData);	
 			}
@@ -230,13 +273,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		_refresher = new SpaceRefresher();
 		_agentPinger = new AgentPinger();
 		
-	}
-
-	/**
-	 * Method of the LifeCycle Interface
-	 * This method will be called to get this AgentNodeBean going
-	 */
-	public void doStart(){
+		//formerly in doStart this has to happen much earlier now
 		_myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getUUID() + SEARCHREQUESTSUFFIX);
 		_otherNodes = CommunicationAddressFactory.createGroupAddress(AGENTNODESGROUP);
 		try {
@@ -245,6 +282,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
+		
+	}
+
+	/**
+	 * Method of the LifeCycle Interface
+	 * This method will be called to get this AgentNodeBean going
+	 */
+	public void doStart(){
+		//TODO let's get in touch with the other Nodes
 
 		_timer = new Timer();
 		_timer.schedule(_refresher, _firstRefresh, _refreshingIntervall);
@@ -366,6 +412,64 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		return _agentPingIntervall;
 	}
 
+	/**
+	 * sets the interval after which collected local changes will be propagated to the other AgentNodes
+	 * 
+	 * Default: 3000 milliseconds
+	 * 
+	 * @param cpInterval	interval in milliseconds
+	 */
+	public void setChangePropagateInterval(long cpInterval){
+		_changePropagateInterval = cpInterval;
+	}
+	
+	/**
+	 * gets the interval after which collected local changes will be propagated to the other AgentNodes
+	 * 
+	 * Default: 3000 milliseconds
+	 * 
+	 */
+	public long getChangePropagateInterval(){
+		return _changePropagateInterval;
+	}
+	
+	
+	/**
+	 * gets Interval after which a ping will be sent to the other AgentNodes if no changes were sent during that period
+	 * so the other AgentNodes will know this one is still alive
+	 * 
+	 * Default: 3500 milliseconds
+	 * 
+	 * @return time in milliseconds
+	 */
+	public long getAgentNodePingIntervall() {
+		return _agentNodePingIntervall;
+	}
+
+	/**
+	 * sets Interval after which a ping will be sent to the other AgentNodes if no changes were sent during that period
+	 * so the other AgentNodes will know this one is still alive
+	 * 
+	 * Default: 3500 milliseconds
+	 * 
+	 * @param nodePingIntervall time in milliseconds
+	 */
+	public void setAgentNodePingIntervall(long nodePingIntervall) {
+		_agentNodePingIntervall = nodePingIntervall;
+	}
+	
+
+	/**
+	 * sets the communicationAddress on which all <code>AgentNode</code>s group together and exchange searchRequests and
+	 * necessary overhead
+	 * 
+	 * @param nodes <code>GroupAddress</code> on which all <code>AgentNode</code>s register
+	 */
+	public void setOtherNodes(ICommunicationAddress nodes) {
+		_otherNodes = nodes;
+	}
+	
+	
 	/**
 	 * 
 	 * inner Class to handle the incoming and outgoing searchRequests
@@ -493,12 +597,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				IActionDescription action = (IActionDescription) message.getPayload();
 				ActionData actionData = new ActionData();
 				actionData.setActionDescription(action);
+				actionData.setProviderDescription(action.getProviderDescription());
 
 				log.debug("removing possible obsolete version from directory");
 				synchronized (space) {
 					space.remove(actionData);
 
 					actionData.setCreationTime(_currentLogicTime + 1);
+					// only the local accessBean uses this protocol, so the action has to be local too
+					actionData.setLocal(true);
 
 					log.debug("writing new action to tuplespace");
 					space.write(actionData);
@@ -522,10 +629,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					refreshData.setActionDescription(actDesc);
 					synchronized(space){
 						//let's remove the old one
-						space.remove(refreshData);
+						refreshData = space.remove(refreshData);
 
 						// put the new version into it
 						refreshData.setCreationTime(_currentLogicTime + 1);
+						
 						space.write(refreshData);
 					}
 				} else if (message.getPayload() instanceof FactSet){
@@ -538,7 +646,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 								ActionData actDat = new ActionData();
 								actDat.setActionDescription(actDesc);
 								
-								if (space.remove(actDat) != null){
+								if ((actDat = space.remove(actDat)) != null){
 									actDat.setCreationTime(_currentLogicTime + 1);
 									space.write(actDat);
 								}
@@ -697,6 +805,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public static class ActionData implements IFact{
 		private IActionDescription _action = null;
 		private Long _creationTime = null;
+		private boolean _isLocal = false;
+		private IAgentDescription _providerDescription = null; 
 
 		public ActionData(long creationtime){
 			_creationTime = new Long(creationtime);
@@ -744,6 +854,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			return _action;
 		}
 		
+		public void setLocal(boolean local){
+			_isLocal = local;
+		}
+		
+		public boolean getLocal(){
+			return _isLocal;
+		}
+		
 		/**
 		 * returns Stringrepresentation of this <code>ActionData</code>
 		 */
@@ -757,6 +875,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			}
 			
 			return thisString;
+		}
+
+		public IAgentDescription get_providerDescription() {
+			return _providerDescription;
+		}
+
+		public void setProviderDescription(IAgentDescription description) {
+			_providerDescription = description;
 		}
 
 	}

@@ -282,7 +282,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 				this.agentName, LifecycleStates.INITIALIZING.name(),
 				CommunicationAddressFactory
 						.createMessageBoxAddress(this.agentNode.getUUID() + '/'
-								+ this.agentId)));
+								+ this.agentId), this.getAgentNode()));
 
 		this.execution.setMemory(memory);
 		this.execution.init();
@@ -454,7 +454,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	private void updateState(ILifecycle.LifecycleStates newState) {
 		memory.update(new ThisAgentDescription(), new ThisAgentDescription(
-				null, null, newState.name(), null));
+				null, null, newState.name(), null, this.getAgentNode()));
 	}
 
 	/**

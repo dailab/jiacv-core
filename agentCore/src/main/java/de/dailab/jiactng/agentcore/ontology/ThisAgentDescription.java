@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.ontology;
 
+import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 
 
@@ -18,7 +19,7 @@ public class ThisAgentDescription extends AgentDescription {
 	 * @param name the name of the agent.
 	 * @param state the agents current state.
 	 */
-	public ThisAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress) {
-		super(aid, name, state, messageBoxAddress);
+	public ThisAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, IAgentNode agentNode) {
+		super(aid, name, state, messageBoxAddress, agentNode);
 	}
 }

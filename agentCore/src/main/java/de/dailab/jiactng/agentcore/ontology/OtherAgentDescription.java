@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.ontology;
 
+import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 
 
@@ -19,8 +20,8 @@ public class OtherAgentDescription extends AgentDescription implements IAgentDes
 	 * @param name the name of the other agent
 	 * @param state the state of the other agent
 	 */
-	public OtherAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress) {
-		super(aid, name, state, messageBoxAddress);
+	public OtherAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, IAgentNode agentNode) {
+		super(aid, name, state, messageBoxAddress, agentNode);
 	}
 
 	/**
@@ -28,10 +29,10 @@ public class OtherAgentDescription extends AgentDescription implements IAgentDes
 	 * @param descr the agent description to create a description of an other agent
 	 */
 	public OtherAgentDescription(AgentDescription descr) {
-		super(descr.getAid(), descr.getName(), descr.getState(), descr.getMessageBoxAddress());
+		super(descr.getAid(), descr.getName(), descr.getState(), descr.getMessageBoxAddress(), descr.getAgentNode());
 	}
 	
 	public OtherAgentDescription(IAgentDescription descr) {
-	    super(descr.getAid(), descr.getName(), null, descr.getMessageBoxAddress());
+	    super(descr.getAid(), descr.getName(), null, descr.getMessageBoxAddress(), descr.getAgentNode());
 	}
 }

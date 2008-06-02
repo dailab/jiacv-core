@@ -141,7 +141,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	 * happens and ends the search. Then all responses will be delivered as actionresult to
 	 * the source of the original searchrequest.
 	 */
-	private Map<String, List<IFact>> _requestID2ResponseMap = new HashMap<String, List<IFact>>();
+	private Map<String, ArrayList<IFact>> _requestID2ResponseMap = new HashMap<String, ArrayList<IFact>>();
 
 	/**
 	 * List of templates. All actions provided by this agent that are matching on one of these templates
@@ -441,11 +441,11 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 					ActionResult result = null;
 					// now let's check if answers for this request were stored
-					List<IFact> results = _requestID2ResponseMap.remove(doAction.getSessionId());
+					ArrayList<IFact> results = _requestID2ResponseMap.remove(doAction.getSessionId());
 					if (results != null){
 						log.debug("DoAction was global SearchRequest with replys ... writing result.");
 						// DoAction was global SearchRequest
-						result = new ActionResult(sourceAction, new Object[] {results});
+						result = new ActionResult(sourceAction, new Serializable[] {results});
 					} else {
 						// DoAction was local SearchRequest or global without answers
 						result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));

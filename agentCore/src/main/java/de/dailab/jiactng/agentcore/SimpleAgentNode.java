@@ -206,9 +206,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// register agent for management
 		agent.enableManagement(_manager);
 		
-		if (_directory != null){
-			_directory.addAgentDescription(agent.getAgentDescription());
-		}
+//		if (_directory != null){
+//			_directory.addAgentDescription(agent.getAgentDescription());
+//		}
 	}
 
 	/**

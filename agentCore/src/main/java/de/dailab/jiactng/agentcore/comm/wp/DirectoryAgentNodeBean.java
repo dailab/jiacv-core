@@ -239,7 +239,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			ActionData actionData = new ActionData(_currentLogicTime);
 			actionData.setActionDescription(action);
 			actionData.setProviderDescription(action.getProviderDescription());
-			actionData.setLocal(true);
+//			actionData.setLocal(true);
 			synchronized (space) {
 				space.write(actionData);	
 			}
@@ -296,7 +296,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	private Set<IFact> getLocalActions(){
 		
 		ActionData actDat = new ActionData();
-		actDat.setLocal(true);
+//		actDat.setLocal(true);
 		Set<ActionData> localActionData = space.readAll(actDat);
 		// As java generics aren't very cunning we have to make this not very cunning conversion
 		Set<IFact> actionDataFacts = new HashSet<IFact>();
@@ -642,7 +642,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				actionData.setProviderDescription(action.getProviderDescription());
 
 				// only the local accessBean uses this protocol, so the action has to be local too
-				actionData.setLocal(true);
+//				actionData.setLocal(true);
 
 				log.debug("removing possible obsolete version from directory");
 				synchronized (space) {
@@ -672,7 +672,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					synchronized(space){
 						//let's remove the old one
 						refreshData = space.remove(refreshData);
-						System.err.println("Refresh is local? " + refreshData.getLocal());
 						
 
 						// put the new version into it
@@ -850,7 +849,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public static class ActionData implements IFact{
 		private IActionDescription _action = null;
 		private Long _creationTime = null;
-		private Boolean _isLocal = null;
+//		private Boolean _isLocal = null;
 		private IAgentDescription _providerDescription = null; 
 
 		public ActionData(long creationtime){
@@ -899,16 +898,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			return _action;
 		}
 		
-		public void setLocal(boolean local){
-			_isLocal = new Boolean(local);
-		}
+//		public void setLocal(boolean local){
+//			_isLocal = new Boolean(local);
+//		}
 		
-		public boolean getLocal(){
-			if (_isLocal == null)
-				return false;
-			else 
-				return _isLocal;
-		}
+//		public boolean isLocal(){
+//			return _isLocal;
+//		}
 		
 		/**
 		 * returns Stringrepresentation of this <code>ActionData</code>

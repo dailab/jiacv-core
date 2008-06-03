@@ -786,7 +786,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			synchronized(space){
 				log.debug("Beginning refreshment of stored actions");
 				
-				System.err.println("removing outdated actions");
+//				System.err.println("removing outdated actions");
 				ActionData oldAct = new ActionData();
 				oldAct.setCreationTime(_currentLogicTime - 1);
 				
@@ -799,8 +799,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				
 				// Check the Space for timeouts by using the current and now obsolete logical time
 
-				System.err.println("Actions : " + space.readAll(new ActionData()).size());
-				System.err.println("Timeouts: " + space.readAll(actionTemplate).size());
+//				System.err.println("Actions : " + space.readAll(new ActionData()).size());
+//				System.err.println("Timeouts: " + space.readAll(actionTemplate).size());
 				
 				Set<IAgentDescription> agentsAllreadyTold = new HashSet<IAgentDescription>();
 				

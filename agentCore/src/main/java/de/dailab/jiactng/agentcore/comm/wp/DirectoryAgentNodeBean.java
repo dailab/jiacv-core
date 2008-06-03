@@ -239,6 +239,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 			ActionData actionData = new ActionData(_currentLogicTime);
 			actionData.setActionDescription(action);
 			actionData.setProviderDescription(action.getProviderDescription());
+			actionData.setLocal(true);
 			synchronized (space) {
 				space.write(actionData);	
 			}
@@ -305,7 +306,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	}
 	
 	private Set<IFact> getLocalAgents(){
-		AgentDescription agentDesc = new AgentDescription(null, null, null, null);
+		AgentDescription agentDesc = new AgentDescription(null, null, null, null, this.agentNode.getUUID());
 		
 		Set<IFact> agentFacts = new HashSet<IFact>();
 		agentFacts.addAll(space.readAll(agentDesc));
@@ -640,13 +641,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 				actionData.setActionDescription(action);
 				actionData.setProviderDescription(action.getProviderDescription());
 
+				// only the local accessBean uses this protocol, so the action has to be local too
+				actionData.setLocal(true);
+
 				log.debug("removing possible obsolete version from directory");
 				synchronized (space) {
 					space.remove(actionData);
-
 					actionData.setCreationTime(_currentLogicTime + 1);
-					// only the local accessBean uses this protocol, so the action has to be local too
-					actionData.setLocal(true);
 
 					log.debug("writing new action to tuplespace");
 					space.write(actionData);
@@ -671,6 +672,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 					synchronized(space){
 						//let's remove the old one
 						refreshData = space.remove(refreshData);
+						System.err.println("Refresh is local? " + refreshData.getLocal());
+						
 
 						// put the new version into it
 						refreshData.setCreationTime(_currentLogicTime + 1);
@@ -901,7 +904,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		}
 		
 		public boolean getLocal(){
-			return _isLocal;
+			if (_isLocal == null)
+				return false;
+			else 
+				return _isLocal;
 		}
 		
 		/**

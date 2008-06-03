@@ -26,6 +26,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
+import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 
 /**
  * This class is meant to work on the side of the agentnode. It stores a
@@ -62,7 +63,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	//TODO Possibility to filter own (local) actions - done
 	//TODO make groupaddress configureable with spring - done
 	//TODO send collected local changes after each _changePropagationInterval 
-	//TODO reveice collected global changes and update own data with it
+	//TODO receive collected global changes and update own data with it
 	//TODO note last contacts of all AgentNodes from which messages were received and if cacheflag was active
 	// cacheflag = will mind other entries so sent them to this one.
 	//TODO if last contact is older or exactly two pingperiods away erase all entries from that agentNode 
@@ -97,6 +98,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	 * Protocol for refreshing Agents
 	 */
 	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
+	
+	/**
+	 * Protocol for propagating changes on an AgentNode-Directory and to communicate all what is stored within it when a new AgentNode shows up 
+	 */
+	public final static String CHANGE_PROPAGATION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ChangePropagation";
 	
 	/**
 	 * Address of AgentNodeGroup. Is used to communicate between AgentNodes for purposes like global searches.
@@ -285,6 +291,29 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		
 	}
 
+	
+	private Set<IFact> getLocalActions(){
+		
+		ActionData actDat = new ActionData();
+		actDat.setLocal(true);
+		Set<ActionData> localActionData = space.readAll(actDat);
+		// As java generics aren't very cunning we have to make this not very cunning conversion
+		Set<IFact> actionDataFacts = new HashSet<IFact>();
+		actionDataFacts.addAll(localActionData);
+		
+		return actionDataFacts;
+	}
+	
+	private Set<IFact> getLocalAgents(){
+		AgentDescription agentDesc = new AgentDescription(null, null, null, null, this.agentNode.getUUID());
+		
+		Set<IFact> agentFacts = new HashSet<IFact>();
+		agentFacts.addAll(space.readAll(agentDesc));
+		
+		return agentFacts;
+	}
+	
+	
 	/**
 	 * Method of the LifeCycle Interface
 	 * This method will be called to get this AgentNodeBean going
@@ -292,6 +321,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public void doStart(){
 		//TODO let's get in touch with the other Nodes
 
+		FactSet myData = new FactSet(getLocalActions());
+		myData.add(getLocalAgents());
+		
+		JiacMessage helloWorldMessage = new JiacMessage(myData);
+//		try {
+//			// let the world now what we have to offer
+//			_messageTransport.send(helloWorldMessage, _otherNodes);
+//		} catch (CommunicationException e) {
+//			e.printStackTrace();
+//		}
+		
 		_timer = new Timer();
 		_timer.schedule(_refresher, _firstRefresh, _refreshingIntervall);
 		_timer.schedule(_agentPinger, _agentPingIntervall);
@@ -744,22 +784,23 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 			// During maintenance there must not be any other changes to the tuplespace, so...
 			synchronized(space){
-//				System.err.println("removing outdated actions");
+				log.debug("Beginning refreshment of stored actions");
+				
+				System.err.println("removing outdated actions");
 				ActionData oldAct = new ActionData();
 				oldAct.setCreationTime(_currentLogicTime - 1);
 				
 				//First let's remove all not refreshed actions
 				space.removeAll(oldAct);
 				 
-				
 
 				ActionData actionTemplate = new ActionData(_currentLogicTime);
 
-				log.debug("Beginning refreshment of stored actions");
+				
 				// Check the Space for timeouts by using the current and now obsolete logical time
 
-//				System.err.println("Actions : " + space.readAll(new ActionData()).size());
-//				System.err.println("Timeouts: " + space.readAll(actionTemplate).size());
+				System.err.println("Actions : " + space.readAll(new ActionData()).size());
+				System.err.println("Timeouts: " + space.readAll(actionTemplate).size());
 				
 				Set<IAgentDescription> agentsAllreadyTold = new HashSet<IAgentDescription>();
 				
@@ -805,7 +846,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public static class ActionData implements IFact{
 		private IActionDescription _action = null;
 		private Long _creationTime = null;
-		private boolean _isLocal = false;
+		private Boolean _isLocal = null;
 		private IAgentDescription _providerDescription = null; 
 
 		public ActionData(long creationtime){
@@ -855,7 +896,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		}
 		
 		public void setLocal(boolean local){
-			_isLocal = local;
+			_isLocal = new Boolean(local);
 		}
 		
 		public boolean getLocal(){

@@ -32,6 +32,7 @@ import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
@@ -101,6 +102,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public String getID() {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.getID();
 	}
 
@@ -108,6 +112,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public ObjectMatcher getMatcher() {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.getMatcher();
 	}
 
@@ -115,6 +122,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public ObjectUpdater getUpdater() {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.getUpdater();
 	}
 
@@ -122,6 +132,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public <E extends IFact> E read(E template) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.read(template);
 	}
 
@@ -129,6 +142,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public <E extends IFact> E read(E template, long timeout) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.read(template, timeout);
 	}
 
@@ -136,6 +152,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public <E extends IFact> Set<E> readAll(E template) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.readAll(template);
 	}
 
@@ -143,6 +162,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public <E extends IFact> Set<E> readAllOfType(Class<E> c) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.readAllOfType(c);
 	}
 
@@ -150,6 +172,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public <E extends IFact> E remove(E template) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.remove(template);
 	}
 
@@ -157,6 +182,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public <E extends IFact> E remove(E template, long timeout) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.remove(template, timeout);
 	}
 
@@ -164,6 +192,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public <E extends IFact> Set<E> removeAll(E template) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.removeAll(template);
 	}
 
@@ -171,6 +202,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public <E extends IFact> boolean update(E template, E pattern) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.update(template, pattern);
 	}
 
@@ -178,6 +212,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	 * {@inheritDoc}
 	 */
 	public void write(IFact fact) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		space.write(fact);
 	}
 
@@ -185,6 +222,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public Iterator<IFact> iterator() {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.iterator();
 	}
 
@@ -192,6 +232,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public void attach(SpaceObserver<? super IFact> observer) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		space.attach(observer);
 	}
 
@@ -199,6 +242,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public void attach(SpaceObserver<? super IFact> observer, IFact template) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		space.attach(observer, template);
 	}
 
@@ -206,6 +252,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public void detach(SpaceObserver<? super IFact> observer) {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		space.detach(observer);
 	}
 
@@ -327,6 +376,9 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
      * {@inheritDoc}
      */
 	public Set<IFact> readAll() {
+		if(space==null) {
+			throw new RuntimeException("Memory has not yet been initialized!");
+		}
 		return space.readAll();
 	}	  
 }

@@ -199,7 +199,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// TODO: statechanges?
 		List<String> oldAgentList = getAgents();
-		_agents.add(agent);
+		synchronized(_agents) {
+			_agents.add(agent);
+		}
 		agent.addLifecycleListener(this.lifecycle.createLifecycleListener());
 		agentListChanged(oldAgentList, getAgents());
 
@@ -591,17 +593,19 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		// call start() and instantiate Threads for all agents if any
-		if (_agents != null) {
-			for (IAgent a : _agents) {
-				try {
-					if (log != null) {
-						log.info("Trying to start agent: " + a.getAgentName());
+		synchronized(_agents) {
+			// call start() and instantiate Threads for all agents if any
+			if (_agents != null) {
+				for (IAgent a : _agents) {
+					try {
+						if (log != null) {
+							log.info("Trying to start agent: " + a.getAgentName());
+						}
+						a.start();
+					} catch (Exception ex) {
+						// TODO
+						ex.printStackTrace();
 					}
-					a.start();
-				} catch (Exception ex) {
-					// TODO
-					ex.printStackTrace();
 				}
 			}
 		}

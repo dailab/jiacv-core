@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore.ontology;
 
-import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
@@ -25,23 +24,19 @@ public class AgentDescription implements IAgentDescription {
 	/** Communication Identifier. */
 	private IMessageBoxAddress messageBoxAddress;
 	
-	/** AgentNode that's holding this agent */
-	private final IAgentNode _agentNode;
-	
 //	public AgentDescription(String aid, String name, String state) {
 //        this(aid, name, state, name != null ? CommunicationAddressFactory.createMessageBoxAddress(aid) : null);
 //	}
     
 	public AgentDescription() {
-	    this(null, null, null, null, null);
+	    this(null, null, null, null);
 	}
 	
-    public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, IAgentNode agentNode) {
+    public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress) {
         this.aid=aid;
         this.name=name;
         this.state=state;
         this.messageBoxAddress= messageBoxAddress;
-        this._agentNode = agentNode;
     }
     
     
@@ -81,11 +76,6 @@ public class AgentDescription implements IAgentDescription {
 		return state;
 	}
 	
-	@Override
-	public IAgentNode getAgentNode() {
-		return _agentNode;
-	}
-
 	/**
 	 * @param state the state to set
 	 */

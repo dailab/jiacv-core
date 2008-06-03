@@ -3,7 +3,6 @@
  */
 package de.dailab.jiactng.agentcore.ontology;
 
-import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
@@ -38,11 +37,4 @@ public interface IAgentDescription extends IFact {
      * @return      the communication address
      */
     IMessageBoxAddress getMessageBoxAddress();
-    
-    /**
-     * This method returns the local AgentNode that's holding this Agent
-     * 
-     * @return the local AgentNode of this Agent
-     */
-    IAgentNode getAgentNode();
 }

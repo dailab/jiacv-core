@@ -325,12 +325,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		myData.add(getLocalAgents());
 		
 		JiacMessage helloWorldMessage = new JiacMessage(myData);
-//		try {
-//			// let the world now what we have to offer
-//			_messageTransport.send(helloWorldMessage, _otherNodes);
-//		} catch (CommunicationException e) {
-//			e.printStackTrace();
-//		}
+		helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
+		try {
+			// let the world now what we have to offer
+			_messageTransport.send(helloWorldMessage, _otherNodes);
+		} catch (CommunicationException e) {
+			e.printStackTrace();
+		}
 		
 		_timer = new Timer();
 		_timer.schedule(_refresher, _firstRefresh, _refreshingIntervall);

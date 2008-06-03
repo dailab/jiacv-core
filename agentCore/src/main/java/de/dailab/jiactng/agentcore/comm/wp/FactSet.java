@@ -10,4 +10,9 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 		public FactSet(Set<IFact> facts){
 			_facts = facts;
 		}
+		
+		public void add(Set<IFact> factsToAdd){
+			_facts.addAll(factsToAdd);
+		}
+		
 	}

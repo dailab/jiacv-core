@@ -306,7 +306,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	}
 	
 	private Set<IFact> getLocalAgents(){
-		AgentDescription agentDesc = new AgentDescription(null, null, null, null);
+		AgentDescription agentDesc = new AgentDescription(null, null, null, null, this.agentNode.getUUID());
 		
 		Set<IFact> agentFacts = new HashSet<IFact>();
 		agentFacts.addAll(space.readAll(agentDesc));

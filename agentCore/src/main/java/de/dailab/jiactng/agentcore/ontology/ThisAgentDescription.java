@@ -18,7 +18,7 @@ public class ThisAgentDescription extends AgentDescription {
 	 * @param name the name of the agent.
 	 * @param state the agents current state.
 	 */
-	public ThisAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress) {
-		super(aid, name, state, messageBoxAddress);
+	public ThisAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
+		super(aid, name, state, messageBoxAddress, agentNodeUUID);
 	}
 }

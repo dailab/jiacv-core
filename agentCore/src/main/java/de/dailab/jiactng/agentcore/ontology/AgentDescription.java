@@ -24,19 +24,23 @@ public class AgentDescription implements IAgentDescription {
 	/** Communication Identifier. */
 	private IMessageBoxAddress messageBoxAddress;
 	
+	/** UUID of the AgentNode that holds this agent */
+	private String agentNodeUUID;
+	
 //	public AgentDescription(String aid, String name, String state) {
 //        this(aid, name, state, name != null ? CommunicationAddressFactory.createMessageBoxAddress(aid) : null);
 //	}
     
 	public AgentDescription() {
-	    this(null, null, null, null);
+	    this(null, null, null, null, null);
 	}
 	
-    public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress) {
+    public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
         this.aid=aid;
         this.name=name;
         this.state=state;
         this.messageBoxAddress= messageBoxAddress;
+        this.agentNodeUUID = agentNodeUUID;
     }
     
     
@@ -156,4 +160,12 @@ public class AgentDescription implements IAgentDescription {
         builder.append('\n');
         return builder.toString();
     }
+
+    /**
+     * Returns the UUID of the AgentNode that is holding this agent
+     * @return
+     */
+	public String getAgentNodeUUID() {
+		return agentNodeUUID;
+	}
 }

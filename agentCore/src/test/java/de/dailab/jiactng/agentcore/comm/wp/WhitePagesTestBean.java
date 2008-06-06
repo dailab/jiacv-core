@@ -63,7 +63,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	 */
 	public void searchForAgentDesc(String agentName, boolean isGlobal){
 		log.debug("Searching for Agent " + agentName);
-		AgentDescription desc = new AgentDescription(null, agentName, null, null);
+		AgentDescription desc = new AgentDescription(null, agentName, null, null, null);
 		Serializable[] params = {desc, new Boolean(isGlobal)};
 		DoAction action = _requestSearchAction.createDoAction(params, this);
 		_lastDoAction = action;
@@ -72,7 +72,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	
 	public void searchForAgentDesc(String agentName, boolean isGlobal, long timeToSearch){
 		log.debug("Searching for Agent " + agentName);
-		AgentDescription desc = new AgentDescription(null, agentName, null, null);
+		AgentDescription desc = new AgentDescription(null, agentName, null, null, null);
 		Serializable[] params = {desc, new Boolean(isGlobal)};
 		DoAction action = _requestSearchAction.createDoAction(params, this, timeToSearch);
 		_lastDoAction = action;
@@ -115,7 +115,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		log.debug("trying timeoutsearch");
 		DoAction action = _requestSearchAction.createDoAction(
 				new Serializable[] {
-						new AgentDescription(null, "NixAgentos", null, null), 
+						new AgentDescription(null, "NixAgentos", null, null, null), 
 						new Boolean(false)}, 
 				this, 1);
 		memory.write(action); 

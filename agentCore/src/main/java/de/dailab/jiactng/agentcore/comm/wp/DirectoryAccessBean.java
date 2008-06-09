@@ -23,6 +23,14 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.ActionNotPresentException;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.DirectoryAccessException;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.FactSet;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.NoSuchActionException;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.ResultDump;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.SearchRequest;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.SearchResponse;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.TimeoutException;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
@@ -897,6 +905,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						boolean remoteActionFound = false;
 
 						List<Action> actions = thisAgent.getActionList();
+						// TODO thisAgent.getActionList -> search within agents memory
 						for (Action foundAction : actions){
 							if (actionsAreEqual(foundAction, doAction.getAction())) {
 								// so after finding it let's create the actual DoAction for our agent here
@@ -1103,9 +1112,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						checkActionPresence();
 						
 						Set<IFact> facts = new HashSet<IFact>();
-						for (IActionDescription action : _offeredActions){
-							facts.add(action);
-						}
+						facts.addAll(_offeredActions);
 
 						JiacMessage refreshMessage = new JiacMessage(new FactSet(facts));
 						refreshMessage.setProtocol(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID);

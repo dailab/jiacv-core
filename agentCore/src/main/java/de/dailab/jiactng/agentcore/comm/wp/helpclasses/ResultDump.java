@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.wp;
+package de.dailab.jiactng.agentcore.comm.wp.helpclasses;
 
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;

@@ -22,7 +22,7 @@
 		<property name="agentNodeBeans">
 			<list>
 				<ref bean="WhitePagesTestJMSBroker" />
-				<ref bean="DirectoryAgentNodeBean"/>
+				<ref bean="DirectoryAgentNodeBeanWithoutCache"/>
 			</list>
 		</property>
 	</bean>
@@ -85,6 +85,12 @@
 	</bean>
 	
 	<bean name="GlobalRemoteActionProviderBean" class="de.dailab.jiactng.agentcore.comm.wp.GlobalRemoteActionProviderBean" singleton="false">
+	</bean>
+	
+	<bean name="DirectoryAgentNodeBeanWithoutCache" parent="DirectoryAgentNodeBean" singleton="false">
+		<property name="cacheIsActive"
+			value="false">
+		</property>
 	</bean>
 	
 	<!-- 

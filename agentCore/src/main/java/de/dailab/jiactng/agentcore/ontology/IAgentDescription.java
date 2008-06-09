@@ -39,4 +39,6 @@ public interface IAgentDescription extends IFact {
     IMessageBoxAddress getMessageBoxAddress();
   
     String getAgentNodeUUID();
+    
+    void setAgentNodeUUID(String UUID);
 }

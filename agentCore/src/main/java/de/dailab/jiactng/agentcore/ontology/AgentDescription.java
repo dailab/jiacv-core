@@ -168,4 +168,11 @@ public class AgentDescription implements IAgentDescription {
 	public String getAgentNodeUUID() {
 		return agentNodeUUID;
 	}
+	
+	/**
+	 * sets the UUID of the AgentNode that is holding this agent
+	 */
+	public void setAgentNodeUUID(String UUID){
+		agentNodeUUID = UUID;
+	}
 }

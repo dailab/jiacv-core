@@ -16,12 +16,24 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 			_facts.addAll(facts);
 		}
 		
+		public void add(IFact fact){
+			_facts.add(fact);
+		}
+		
 		public void add(Set<IFact> factsToAdd){
 			_facts.addAll(factsToAdd);
 		}
 		
 		public HashSet<IFact> getFacts(){
 			return _facts;
+		}
+		
+		public boolean remove(IFact fact){
+			return _facts.remove(fact);
+		}
+		
+		public boolean remove(Set<IFact> facts){
+			return _facts.removeAll(facts);
 		}
 		
 		public void clear(){

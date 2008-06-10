@@ -9,12 +9,14 @@ import java.util.List;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
+import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean;
+import de.dailab.jiactng.agentcore.comm.wp.helpclasses.TimeoutException;
 
 import junit.framework.TestCase;
 
@@ -31,7 +33,8 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	private static IAgent _whitePagesAgent;
 	private static WhitePagesTestBean _whitePagesTestBean;
 	private static RemoteActionTestBean _remoteActionTestBean;
-	private static DirectoryAccessBean _directoryAccessBean;
+//	private static DirectoryAccessBean _directoryAccessBean;
+	private static DirectoryAgentNodeBean _directoryAgentNodeBean;
 	
 	private static Action _sendAction = null;
 	
@@ -47,6 +50,13 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			_agentNode = (IAgentNode) _xmlContext.getBean("WhitePagePlatform");
 //			_otherNode = (IAgentNode) _xmlContext.getBean("RemoteWhitePagePlatform");
 			
+			List<IAgentNodeBean> agentNodeBeans = _agentNode.getAgentNodeBeans();
+			for (IAgentNodeBean bean : agentNodeBeans){
+				if (bean instanceof DirectoryAgentNodeBean){
+					_directoryAgentNodeBean = (DirectoryAgentNodeBean) bean;
+				}
+			}
+			
 			List<IAgent> agents = _agentNode.findAgents();
 			
 			for (IAgent agent : agents){
@@ -61,9 +71,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 					_whitePagesTestBean = (WhitePagesTestBean) bean;
 				} else if (bean.getBeanName().equalsIgnoreCase("RemoteActionTestBean")){
 					_remoteActionTestBean = (RemoteActionTestBean) bean;
-				} else if (bean.getBeanName().equalsIgnoreCase("DirectoryAccessBean")){
-					_directoryAccessBean = (DirectoryAccessBean) bean;
-				}
+				} 
+//				else if (bean.getBeanName().equalsIgnoreCase("DirectoryAccessBean")){
+//					_directoryAccessBean = (DirectoryAccessBean) bean;
+//				}
 			}
 		}
 	}
@@ -394,6 +405,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			assertTrue(true);
 			return;
 		}
+			
 		if (_debug) {
 			System.err.println("--- TestGlobalRemoteActionSearchingAndHandling ---");
 		}
@@ -425,6 +437,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			e.printStackTrace();
 		} 
 		assertNotNull(remoteActions);
+		assertEquals(1, remoteActions.size());
 		assertNotNull(remoteActions.get(0));
 		assertTrue(remoteActions.get(0) instanceof Action);
 		
@@ -461,10 +474,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 	
 	public void testGlobalAgentSearching(){
-//		if (_deactivateTests) {
-//			assertTrue(true);
-//			return;
-//		}
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
 		if (_debug) {
 			System.err.println("--- TestGlobalAgentSearching ---");
 		}
@@ -502,9 +515,140 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		assertTrue(results.get(0) instanceof AgentDescription);
 		AgentDescription agentDesc = (AgentDescription) results.get(0);
 		assertEquals("RemoteAgentOnOtherNode", agentDesc.getName());
-		
 	}
 	
+	public void testGlobalRemoteActionSearchingAndHandlingWithoutCache(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
+			
+		_directoryAgentNodeBean.setCacheIsActive(false);
+		
+		if (_debug) {
+			System.err.println("--- TestGlobalRemoteActionSearchingAndHandling ---");
+		}
+		
+		if (_debug) {
+			System.err.println(": : Searching for Action on other Node");
+		}
+	
+		Action action = new Action(GlobalRemoteActionProviderBean.ACTION_GET_GLOBAL_RESULT);
+		_whitePagesTestBean.searchForActionDesc(action, true, 5000);
+		
+		try {
+			Thread.sleep(7500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (_debug) {
+			System.err.println(": : Checking for Result");
+		}
+		List<IFact> remoteActions = _whitePagesTestBean.getLastResult();
+		if (_debug) {
+			System.err.println("Result found reads: " + remoteActions);
+		}
+		
+		try {
+			Thread.sleep(1500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} 
+		assertNotNull(remoteActions);
+		assertEquals(2, remoteActions.size());
+		assertNotNull(remoteActions.get(0));
+		assertNotNull(remoteActions.get(1));
+		assertTrue(remoteActions.get(0) instanceof Action);
+		assertTrue(remoteActions.get(1) instanceof Action);	
+		
+		Action remoteAction = (Action) remoteActions.get(0);
+		Serializable[] params = {};
+		
+		if (_debug) {
+			System.err.println(": : Trying to use the global remote Action");
+		}
+		_remoteActionTestBean.useRemoteAction(remoteAction, params);
+		
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (_debug) {
+			System.err.println(": : Checking for Result again");
+		}
+		ActionResult result = _remoteActionTestBean.getLastActionResult();
+		assertNotNull(result);
+		
+		Object[] actionResults = result.getResults();
+		
+		assertTrue(actionResults[0] instanceof String);
+		String remoteResult = (String) actionResults[0];
+		
+		if(_debug){
+			System.err.println("REMOTE RESULT READS: " + remoteResult);
+		}
+		
+		assertTrue(remoteResult.equalsIgnoreCase("RemoteAgentOnOtherNode"));
+	}
+	
+	public void testGlobalAgentSearchingWithoutCache(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
+		
+		_directoryAgentNodeBean.setCacheIsActive(false);
+		
+		if (_debug) {
+			System.err.println("--- TestGlobalAgentSearching ---");
+		}
+		try {
+			Thread.sleep(7500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (_debug) {
+			System.err.println(": : Searching for RemoteAgentOnOtherNode");
+		}
+		
+		_whitePagesTestBean.searchForAgentDesc("RemoteAgentOnOtherNode", true, 5000);
+		
+		try {
+			Thread.sleep(7500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if (_debug) {
+			System.err.println(": : Checking for Results");
+		}
+		
+		List<IFact> results = _whitePagesTestBean.getLastResult();
+		
+		if (_debug) {
+			System.err.println(": : Result found reads " + results);
+		}
+		
+		assertNotNull(results);
+		assertEquals(2, results.size());
+		
+		assertNotNull(results.get(0));
+		assertTrue(results.get(0) instanceof AgentDescription);
+		AgentDescription agentDesc = (AgentDescription) results.get(0);
+		assertEquals("RemoteAgentOnOtherNode", agentDesc.getName());
+		
+		assertNotNull(results.get(1));
+		assertTrue(results.get(1) instanceof AgentDescription);
+		agentDesc = (AgentDescription) results.get(1);
+		assertEquals("RemoteAgentOnOtherNode", agentDesc.getName());
+		
+		_lastTestDone = true;
+	}
+		
 	
 	//TODO Testcase for global searches for agents on other Nodes. 
 	

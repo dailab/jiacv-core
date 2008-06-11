@@ -208,9 +208,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// register agent for management
 		agent.enableManagement(_manager);
 		
-//		if (_directory != null){
-//			_directory.addAgentDescription(agent.getAgentDescription());
-//		}
 	}
 
 	/**
@@ -227,10 +224,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		List<String> oldAgentList = getAgents();
 		_agents.remove(agent);
 		agentListChanged(oldAgentList, getAgents());
-		
-		if (_directory != null){
-			_directory.removeAgentDescription(agent.getAgentDescription());
-		}
 	}
 
 	/**
@@ -564,7 +557,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 							break;// we found what we were looking for so we can stop searching
 						}
 					}
-					_directory.addAgentDescription(a.getAgentDescription());
+					if(_directory!= null) {
+						_directory.addAgentDescription(a.getAgentDescription());
+					}
 				} else {
 					_directory.addAgentDescription(a.getAgentDescription());
 				}

@@ -85,7 +85,7 @@ public final class IdFactory {
     }
 
     public static String createId(IdPrefix prefix, int hashcode) {
-        return new StringBuilder(prefix.toString()).append(Long.toHexString(System.currentTimeMillis() + hashcode))
+        return new StringBuilder(prefix.toString()).append(Long.toHexString(System.nanoTime() + hashcode))
                 .toString();
     }
 

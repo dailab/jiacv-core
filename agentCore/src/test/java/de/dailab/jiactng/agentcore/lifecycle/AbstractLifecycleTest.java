@@ -26,7 +26,6 @@ import javax.management.ObjectName;
 
 import junit.framework.TestCase;
 
-import org.springframework.context.ApplicationContext;
 /**
  *
  * @author joachim

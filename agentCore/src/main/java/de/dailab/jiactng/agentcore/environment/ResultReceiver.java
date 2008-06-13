@@ -16,7 +16,7 @@ import de.dailab.jiactng.agentcore.action.ActionResult;
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.action.Action
  */
-public interface ResultReceiver { // extends IAgentBean {
+public interface ResultReceiver { 
 
 	
 	/**
@@ -26,19 +26,20 @@ public interface ResultReceiver { // extends IAgentBean {
 	 */
 	public void receiveResult(ActionResult result);
 
-	/**
-	 * Setter for the beanName. This method is called by Spring during
-	 * initialization.
-	 * 
-	 * @param name the unqualified name of the bean.
-	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
-	 */
-	public void setBeanName(String name);
-
-	/**
-	 * Getter for the name of the agentbean.
-	 * 
-	 * @return a string representing the name of the agentbean.
-	 */
-	public String getBeanName();
+//	/**
+//	 * Setter for the beanName. This method is called by Spring during
+//	 * initialization.
+//	 * 
+//	 * @param name the unqualified name of the bean.
+//	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+//	 */
+//	
+//	public void setBeanName(String name);
+//
+//	/**
+//	 * Getter for the name of the agentbean.
+//	 * 
+//	 * @return a string representing the name of the agentbean.
+//	 */
+//	public String getBeanName();
 }

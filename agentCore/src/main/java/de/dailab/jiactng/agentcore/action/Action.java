@@ -216,7 +216,7 @@ public class Action implements IActionDescription {
 			copy.addAll(inputTypes);
 			_inputTypes = Collections.unmodifiableList(copy);
 		} else {
-			_inputTypes = Collections.emptyList();
+			_inputTypes = null;
 		}
 	}
 
@@ -243,7 +243,7 @@ public class Action implements IActionDescription {
 			copy.addAll(resultTypes);
 			_resultTypes = Collections.unmodifiableList(copy);
 		} else {
-			_resultTypes = Collections.emptyList();
+			_resultTypes = null;
 		}
 	}
 
@@ -254,8 +254,6 @@ public class Action implements IActionDescription {
 	public int hashCode() {
 		int hash = Action.class.hashCode();
 		hash ^= _name != null ? _name.hashCode() : 0;
-		hash ^= _inputTypes.hashCode();
-		hash ^= _resultTypes.hashCode();
 		return hash;
 	}
 
@@ -268,19 +266,24 @@ public class Action implements IActionDescription {
 			return false;
 		}
 
-		IAgentDescription myAgent = this._providerDescription;
-		IAgentDescription otherAgent = ((Action) obj).getProviderDescription();
+		if(this == obj) {
+			return true;
+		}
+		
+		Action other = (Action) obj;
+		
+		IAgentDescription myAgent = this.getProviderDescription();
+		IAgentDescription otherAgent = other.getProviderDescription();
 
-		if (myAgent != null && otherAgent != null) {
-			if (myAgent.getAid() != otherAgent.getAid()) {
+		if((myAgent!=null) && (otherAgent != null)) {
+			if(!EqualityChecker.equalsOrNull(myAgent.getAid(), otherAgent.getAid())) {
 				return false;
 			}
 		}
 
-		Action other = (Action) obj;
-		return EqualityChecker.equals(_name, other.getName())
-				&& _inputTypes.equals(other.getInputTypes())
-				&& _resultTypes.equals(other.getResultTypes());
+		return EqualityChecker.equalsOrNull(this.getName(), other.getName())
+				&& EqualityChecker.equalsOrNull(this.getInputTypes(), other.getInputTypes())
+				&& EqualityChecker.equalsOrNull(this.getResultTypes(), other.getResultTypes());
 	}
 
 	/**
@@ -305,15 +308,19 @@ public class Action implements IActionDescription {
 	 * Utility-method for a nicely formatted output
 	 */
 	private void prettyPrintArray(StringBuilder builder, List<Class<?>> list) {
-		builder.append('[');
-		for (Iterator<Class<?>> iter = list.iterator(); iter.hasNext();) {
-			builder.append(iter.next().getName());
-
-			if (iter.hasNext()) {
-				builder.append("; ");
+		if(list == null) {
+			builder.append("null");
+		} else {
+			builder.append('[');
+			for (Iterator<Class<?>> iter = list.iterator(); iter.hasNext();) {
+				builder.append(iter.next().getName());
+	
+				if (iter.hasNext()) {
+					builder.append("; ");
+				}
 			}
+	
+			builder.append(']');
 		}
-
-		builder.append(']');
 	}
 }

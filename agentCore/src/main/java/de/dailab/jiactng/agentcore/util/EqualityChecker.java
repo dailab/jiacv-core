@@ -21,6 +21,22 @@ public class EqualityChecker {
         return a != null && b != null ? a.equals(b) : a == b;
     }
     
+    public static boolean equalsOrNull(Object a, Object b) {
+    	if(a == b) {
+    		return true;
+    	}
+    	
+    	if(a == null) {
+    		return true;
+    	}
+    	
+    	if(b == null) {
+    		return true;
+    	}
+    	
+    	return a.equals(b);
+    }
+    
     public static void main(String[] args) {
         Set<IFact> facts= new HashSet<IFact>();
         

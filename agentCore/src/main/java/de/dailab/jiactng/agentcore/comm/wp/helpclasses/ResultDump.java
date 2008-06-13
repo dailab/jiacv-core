@@ -9,14 +9,14 @@ public final class ResultDump implements ResultReceiver{
 		// Just here to keep the Memory clean.
 		
 	}
-	@Override
-	public String getBeanName() {
-		return "ResultDump";
-	}
-	
-	@Override
-	public void setBeanName(String name) {
-		
-	}
+//	@Override
+//	public String getBeanName() {
+//		return "ResultDump";
+//	}
+//	
+//	@Override
+//	public void setBeanName(String name) {
+//		
+//	}
 	
 }

@@ -29,7 +29,7 @@ public class Session implements IFact {
 	/** Optional attribute for timeout conditions, 
 	 * it only is relevant when the session is written into the memory
 	 * Default value is 60 seconds*/
-	private Long timeToLive = new Long(60000); 
+	private Long timeToLive = Long.valueOf(60000); 
 
 	/** Stores the reference to the creator of this session. */
 	/*
@@ -72,7 +72,7 @@ public class Session implements IFact {
 		this(IdFactory.createSessionId((source != null) ? source.hashCode()
 				: Session.class.hashCode()), System.currentTimeMillis(),
 				source, new ArrayList<SessionEvent>());
-		this.timeToLive = new Long(timeToLive);
+		this.timeToLive = Long.valueOf(timeToLive);
 	}
 	
 
@@ -106,7 +106,7 @@ public class Session implements IFact {
 		this.source = source;
 		this.history = history;
 		if (timeToLive != 0){
-			this.timeToLive = new Long(timeToLive);
+			this.timeToLive = Long.valueOf(timeToLive);
 		} else{
 			this.timeToLive = null;
 		}
@@ -165,7 +165,7 @@ public class Session implements IFact {
 	 * @param timeout
 	 */
 	public void setTimeToLive(long timeout){
-		timeToLive = new Long(timeout);
+		timeToLive = Long.valueOf(timeout);
 	}
 	
 	public Long getTimeToLive(){
@@ -211,7 +211,7 @@ public class Session implements IFact {
 	 *            the creationTime to set
 	 */
 	public void setCreationTime(long creationTime) {
-		this.creationTime = new Long(creationTime);
+		this.creationTime = Long.valueOf(creationTime);
 	}
 
 	/**

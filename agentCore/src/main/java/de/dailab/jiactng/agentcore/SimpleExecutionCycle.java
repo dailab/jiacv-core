@@ -221,7 +221,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			try {
 				((Action) act.getAction()).getProviderBean().doAction(act);
 				success = true;
-				if (!act.getAction().getResultTypes().isEmpty()){
+				if (act.getAction().getResultTypes()!=null){
 					memory.write(act.getSession());
 				} 
 			} catch (Throwable t) {

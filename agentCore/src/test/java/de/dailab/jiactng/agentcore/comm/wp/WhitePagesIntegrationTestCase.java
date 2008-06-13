@@ -10,6 +10,7 @@ import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.IAgentNodeBean;
+import de.dailab.jiactng.agentcore.SimpleAgentNodeMBean;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
@@ -83,6 +84,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	protected void tearDown() throws Exception {
 		if(_lastTestDone){
 			super.tearDown();
+			((SimpleAgentNodeMBean)_agentNode).shutdown();
 		}
 	}
 	

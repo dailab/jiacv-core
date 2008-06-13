@@ -959,7 +959,12 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		private boolean actionsAreEqual(IActionDescription action1, IActionDescription action2){
 			boolean equal = (action1 != null)&&(action2 != null); 
 			equal &= action1.getName().equals(action2.getName());
-			equal &= action1.getInputTypes().equals(action2.getInputTypes());
+			
+			if((action1.getInputTypes() != null) && (action2.getInputTypes() != null)) {
+				equal &= action1.getInputTypes().equals(action2.getInputTypes());
+			}
+			
+			if((action1.getResultTypes() != null) && (action2.getResultTypes() != null))
 			equal &= action1.getResultTypes().equals(action2.getResultTypes());
 			return equal;
 		}
@@ -1005,21 +1010,21 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			
 		}
 
-		/**
-		 * getter for local beanname
-		 */
-		@Override
-		public String getBeanName() {
-			return _myAccessBean.getBeanName();
-		}
-
-		/**
-		 * setter for local beanname
-		 */
-		@Override
-		public void setBeanName(String name) {
-			_myAccessBean.setBeanName(name);
-		}
+//		/**
+//		 * getter for local beanname
+//		 */
+//		@Override
+//		public String getBeanName() {
+//			return _myAccessBean.getBeanName();
+//		}
+//
+//		/**
+//		 * setter for local beanname
+//		 */
+//		@Override
+//		public void setBeanName(String name) {
+//			_myAccessBean.setBeanName(name);
+//		}
 
 	}
 

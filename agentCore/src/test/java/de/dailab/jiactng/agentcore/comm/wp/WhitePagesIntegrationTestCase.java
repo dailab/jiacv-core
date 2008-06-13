@@ -558,11 +558,9 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			e.printStackTrace();
 		} 
 		assertNotNull(remoteActions);
-		assertEquals(2, remoteActions.size());
+		assertEquals(1, remoteActions.size());
 		assertNotNull(remoteActions.get(0));
-		assertNotNull(remoteActions.get(1));
-		assertTrue(remoteActions.get(0) instanceof Action);
-		assertTrue(remoteActions.get(1) instanceof Action);	
+		assertTrue(remoteActions.get(0) instanceof Action);	
 		
 		Action remoteAction = (Action) remoteActions.get(0);
 		Serializable[] params = {};
@@ -636,16 +634,11 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 		
 		assertNotNull(results);
-		assertEquals(2, results.size());
+		assertEquals(1, results.size());
 		
 		assertNotNull(results.get(0));
 		assertTrue(results.get(0) instanceof AgentDescription);
 		AgentDescription agentDesc = (AgentDescription) results.get(0);
-		assertEquals("RemoteAgentOnOtherNode", agentDesc.getName());
-		
-		assertNotNull(results.get(1));
-		assertTrue(results.get(1) instanceof AgentDescription);
-		agentDesc = (AgentDescription) results.get(1);
 		assertEquals("RemoteAgentOnOtherNode", agentDesc.getName());
 		
 		_lastTestDone = true;

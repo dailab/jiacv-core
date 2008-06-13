@@ -34,7 +34,7 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
- * This class is meant to work on the side of the agentnode. It stores a
+ * This class is meant to work on the side of the AgentNode. It stores a
  * directory based on IFacts so although its meant to store AgentDescriptions
  * it could theoretically also be used for other subclasses of IFact
  * 
@@ -63,18 +63,15 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * 
  * Konfigurierbar: PingIntervall, Aenderungsintervall, Caching aktivierbar
  */
-public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
+public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate{
 
-	//TODO Possibility to filter own (local) actions - done
-	//TODO make groupaddress configureable with spring - done
-	//TODO send collected local changes after each _changePropagationInterval - done
 	//TODO receive collected global changes and update own data with it - done
-	//TODO note last contacts of all AgentNodes from which messages were received and if cacheflag was active
+	//TODO note last contacts of all AgentNodes from which messages were received and if cache-flag was active
 	// cacheflag = will mind other entries so sent them to this one.
-	//TODO if last contact is older or exactly two pingperiods away erase all entries from that agentNode 
+	//TODO if last contact is older or exactly two ping-periods away erase all entries from that agentNode 
 
 
-	/** suffix for addresscreation purposes. Will be added to the UUID of AgentNode to create Beanaddress */
+	/** suffix for address-creation purposes. Will be added to the UUID of AgentNode to create Beanaddress */
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
 
 	/** Protocol for search Requests */
@@ -99,22 +96,22 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	public final static String AGENTNODESGROUP = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#GroupAddress";
 
 	/**
-	 * After this intervall the space will be checked for old actions,
+	 * After this interval the space will be checked for old actions,
 	 * for each of this actions a message will be send to the agent providing it,
 	 * which will sent back a message with the actions provided to refresh them.
-	 * When the next intervall begins all actions that weren't refreshed will be removed
+	 * When the next interval begins all actions that weren't refreshed will be removed
 	 */ 
 	private long _refreshingIntervall = 4000;
 	private long _firstRefresh = 5000;
 
 	/**
-	 * An interval after that a pingmessage is sent to an agent to check if it's still alive
+	 * An interval after that a ping-message is sent to an agent to check if it's still alive
 	 * After waiting for one interval all agents that hadn't pinged back are erased from the
 	 * directory.
 	 */
 	private long _agentPingIntervall = 12000;
 
-	/** Interval after which an AgentNode finaly sends a ping message if there weren't sent changes during this period */
+	/** Interval after which an AgentNode finally sends a ping message if there weren't sent changes during this period */
 	private long _agentNodePingIntervall = 3500;
 
 	/** Interval after which changes are propagated to the other nodes */
@@ -137,9 +134,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 
 	/** Groupaddress of all <code>AgentNode</code>s used for inter-AgentNode-communication */
 	private ICommunicationAddress _otherNodes = null;
-
-	/** Module that handles local and global searchrequests */
-	private RequestHandler _searchRequestHandler = null;
 
 	/** Timerobject that schedules update and refreshment activities */
 	private Timer _timer;
@@ -285,8 +279,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		_additionBuffer = new FactSet();
 		_removalBuffer = new FactSet();
 		_changePropagator = new MessengerOfChange();
-		_searchRequestHandler = new RequestHandler();
-		_messageTransport.setDefaultDelegate(_searchRequestHandler);
+		_messageTransport.setDefaultDelegate(this);
 		try {
 			_messageTransport.doInit();
 		} catch (Exception e) {
@@ -363,7 +356,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		helloWorldMessage.setHeader("UUID", agentNode.getUUID());
 		helloWorldMessage.setSender(_myAddress);
 		try {
-			// let the world now what we have to offer
+			// let the world now what we had to offer so the other Nodes can remove it
 			_messageTransport.send(helloWorldMessage, _otherNodes);
 		} catch (CommunicationException e) {
 			e.printStackTrace();
@@ -533,9 +526,51 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 	 * 
 	 * @param isActive if true, incoming entries will be cached within local directory
 	 * Note: Default = true
+	 * 
+	 * <b>IMPORTANT</b>: if set to false during <b>runtime</b> all nonlocal entries will be removed from the directory!
 	 */
 	public void setCacheIsActive(boolean isActive){
 		_cacheIsActive = isActive;
+		
+		
+		if (getState() == LifecycleStates.STARTED){	
+			if (isActive == false){
+				log.warn("Cache within DirectoryAgentNodeBean on AgentNode " + agentNode + " DISABLED -> erasing all nonlocal entries!");
+				
+				synchronized(space){
+					FactSet myData = new FactSet(getLocalActions());
+					myData.add(getLocalAgents());
+
+					space.removeAll(new ActionData());
+					space.removeAll(new AgentDescription());
+
+					for (IFact fact : myData.getFacts()){
+						space.write(fact);
+					}
+				}
+			} else {
+				log.info("Cache within DirectoryAgentNodeBean on AgentNode " + agentNode + " ENABLED -> getting entries from other Nodes");
+				
+				FactSet myData = new FactSet(getLocalActions());
+				myData.add(getLocalAgents());
+
+				MessageOfChange moc = new MessageOfChange(myData, null);
+
+				JiacMessage helloWorldMessage = new JiacMessage(moc);
+				helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
+				helloWorldMessage.setHeader("HelloWorld", "true");
+				helloWorldMessage.setHeader("UUID", agentNode.getUUID());
+				helloWorldMessage.setSender(_myAddress);
+				try {
+					// let the world now what we have to offer
+					_messageTransport.send(helloWorldMessage, _otherNodes);
+				} catch (CommunicationException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		
 	}
 
 	/**
@@ -569,508 +604,498 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean {
 		return agentFacts;
 	}
 
+
+
 	/**
-	 * 
-	 * inner Class to handle the incoming and outgoing searchRequests
-	 * it also holds the handling of all incoming messages
-	 * 
-	 * @author Martin Loeffelholz
-	 *
+	 * gets the log of this Bean
 	 */
-	private class RequestHandler implements IMessageTransportDelegate {
+	public Log getLog(String extension){
+		//TODO Creating a method within the AgentNode to get a log for AgentNodeBeans and use it here
+		return LogFactory.getLog(getClass().getName() + "." + extension);
+	}
 
-		/**
-		 * gets the log of this Bean
-		 */
-		public Log getLog(String extension){
-			//TODO Creating a method within the AgentNode to get a log for AgentNodeBeans and use it here
-			return LogFactory.getLog(getClass().getName() + "." + extension);
-		}
-
-		/**
-		 * receives asynchronous exceptions from the messagetransports and prints them into the console
-		 */
-		@Override
-		public void onAsynchronousException(MessageTransport source, Exception e) {
-			e.printStackTrace();
-		}
+	/**
+	 * receives asynchronous exceptions from the messagetransports and prints them into the console
+	 */
+	@Override
+	public void onAsynchronousException(MessageTransport source, Exception e) {
+		e.printStackTrace();
+	}
 
 
-		/**
-		 * This method receives and handles <b>all</b> incoming messages to this AgentNodeBean and handles them
-		 */
-		@Override
-		public void onMessage(MessageTransport source, IJiacMessage message,
-				ICommunicationAddress at) {
-			if (!message.getSender().toString().equalsIgnoreCase(_myAddress.toString())){
+	/**
+	 * This method receives and handles <b>all</b> incoming messages to this AgentNodeBean and handles them
+	 */
+	@Override
+	public void onMessage(MessageTransport source, IJiacMessage message,
+			ICommunicationAddress at) {
+		if (!message.getSender().toString().equalsIgnoreCase(_myAddress.toString())){
 
-				log.debug("got message " + message);
-				if (message.getProtocol().equalsIgnoreCase(SEARCH_REQUEST_PROTOCOL_ID)){
-					if (message.getPayload() instanceof SearchRequest){
-						SearchRequest request = (SearchRequest) message.getPayload();
+			log.debug("got message " + message);
+			if (message.getProtocol().equalsIgnoreCase(SEARCH_REQUEST_PROTOCOL_ID)){
+				if (message.getPayload() instanceof SearchRequest){
+					SearchRequest request = (SearchRequest) message.getPayload();
 
-						/*
-						 * This header will only be set once by the AccessBean so there will be
-						 * only one AgentNodeBean that get's a true at this point and so will be
-						 * the only AgentNodeBean that sends a request through the AgentNodeGroup
-						 * 
-						 * isGlobal will be true if headerflag is set and cache is deactivated
-						 * If the cache is active there is no need for a true global search!
-						 */
+					/*
+					 * This header will only be set once by the AccessBean so there will be
+					 * only one AgentNodeBean that get's a true at this point and so will be
+					 * the only AgentNodeBean that sends a request through the AgentNodeGroup
+					 * 
+					 * isGlobal will be true if headerflag is set and cache is deactivated
+					 * If the cache is active there is no need for a true global search!
+					 */
 
-						boolean isGlobal = false;
-						boolean header = false;
-						if (message.getHeader("isGlobal") != null){
-							header = message.getHeader("isGlobal").equalsIgnoreCase("true");
-							isGlobal = header && !_cacheIsActive;
+					boolean isGlobal = false;
+					boolean header = false;
+					if (message.getHeader("isGlobal") != null){
+						header = message.getHeader("isGlobal").equalsIgnoreCase("true");
+						isGlobal = header && !_cacheIsActive;
+					}
+
+					log.debug("Message is holding SearchRequest");
+					if (request.getSearchTemplate() != null){
+
+						// notMe == true, if message is global and coming from me, so I don't have to answer again.
+						boolean notMe = false;
+
+						if (message.getHeader("SpareMe") != null){
+							notMe = message.getHeader("SpareMe").equalsIgnoreCase(_myAddress.toString());
 						}
 
-						log.debug("Message is holding SearchRequest");
-						if (request.getSearchTemplate() != null){
+						IFact template = request.getSearchTemplate();
 
-							// notMe == true, if message is global and coming from me, so I don't have to answer again.
-							boolean notMe = false;
+						log.debug("SearchRequest holds template " + template);
+						Set<IFact> result;
 
-							if (message.getHeader("SpareMe") != null){
-								notMe = message.getHeader("SpareMe").equalsIgnoreCase(_myAddress.toString());
-							}
+						if (!notMe){
+							if (template instanceof IActionDescription){
+								ActionData actDat = new ActionData();
+								actDat.setActionDescription((IActionDescription) template);
 
-							IFact template = request.getSearchTemplate();
-
-							log.debug("SearchRequest holds template " + template);
-							Set<IFact> result;
-
-							if (!notMe){
-								if (template instanceof IActionDescription){
-									ActionData actDat = new ActionData();
-									actDat.setActionDescription((IActionDescription) template);
-
-									if (!header){
-										// searchRequest is strictly local!
-										actDat.setLocal(true);
-									}
-
-									Set<ActionData> actDatSet;
-									synchronized(space){
-										actDatSet = space.readAll(actDat);
-										ActionData bla = new ActionData();
-									}
-									result = new HashSet<IFact>();
-									for (ActionData resultData : actDatSet){
-										result.add(resultData.getActionDescription());
-									}
-								} else if (template instanceof IAgentDescription){
-									IAgentDescription agentDesc = (IAgentDescription) template;
-
-									if(!header){
-										// searchRequest is strictly local!
-										agentDesc.setAgentNodeUUID(agentNode.getUUID());
-									}
-
-									result = space.readAll(template);
-								} else {
-									synchronized(space){
-										result = space.readAll(template);
-									}
+								if (!header){
+									// searchRequest is strictly local!
+									actDat.setLocal(true);
 								}
 
-								log.debug("Result to send reads " + result);
+								Set<ActionData> actDatSet;
+								synchronized(space){
+									actDatSet = space.readAll(actDat);
+								}
+								result = new HashSet<IFact>();
+								for (ActionData resultData : actDatSet){
+									result.add(resultData.getActionDescription());
+								}
+							} else if (template instanceof IAgentDescription){
+								IAgentDescription agentDesc = (IAgentDescription) template;
 
-								SearchResponse response = new SearchResponse(request, result);
+								if(!header){
+									// searchRequest is strictly local!
+									agentDesc.setAgentNodeUUID(agentNode.getUUID());
+								}
 
-								JiacMessage resultMessage = new JiacMessage(response);
-								resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
-								resultMessage.setSender(_myAddress);
+								result = space.readAll(template);
+							} else {
+								synchronized(space){
+									result = space.readAll(template);
+								}
+							}
+
+							log.debug("Result to send reads " + result);
+
+							SearchResponse response = new SearchResponse(request, result);
+
+							JiacMessage resultMessage = new JiacMessage(response);
+							resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
+							resultMessage.setSender(_myAddress);
+							try {
+								log.debug("AgentNode: sending Message " + resultMessage);
+								log.debug("sending it to " + message.getSender());
+								_messageTransport.send(resultMessage, message.getSender());
+							} catch (CommunicationException e) {
+								e.printStackTrace();
+							}
+							if (isGlobal){
+								//GLOBAL SEARCH CALL!!!
+								log.debug("SearchRequest was GLOBAL request. Sending searchmessage to otherNodes");
+								JiacMessage globalMessage;
+								globalMessage = new JiacMessage(request);
+								globalMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
+								globalMessage.setHeader("SpareMe", _myAddress.toString());
+								globalMessage.setSender(message.getSender());
+
 								try {
-									log.debug("AgentNode: sending Message " + resultMessage);
-									log.debug("sending it to " + message.getSender());
-									_messageTransport.send(resultMessage, message.getSender());
+									_messageTransport.send(globalMessage, _otherNodes);
 								} catch (CommunicationException e) {
 									e.printStackTrace();
 								}
-								if (isGlobal){
-									//GLOBAL SEARCH CALL!!!
-									log.debug("SearchRequest was GLOBAL request. Sending searchmessage to otherNodes");
-									JiacMessage globalMessage;
-									globalMessage = new JiacMessage(request);
-									globalMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
-									globalMessage.setHeader("SpareMe", _myAddress.toString());
-									globalMessage.setSender(message.getSender());
-
-									try {
-										_messageTransport.send(globalMessage, _otherNodes);
-									} catch (CommunicationException e) {
-										e.printStackTrace();
-									}
-								}
-
 							}
-						} else {
-							log.warn("SearchRequest without template received. SearchOperation aborted.");
+
 						}
 					} else {
-						log.warn("SearchRequest-message received without actual Request in it. SearchOperation aborted.");
+						log.warn("SearchRequest without template received. SearchOperation aborted.");
 					}
+				} else {
+					log.warn("SearchRequest-message received without actual Request in it. SearchOperation aborted.");
+				}
 
 
-				} else if (message.getProtocol().equalsIgnoreCase(ADD_ACTION_PROTOCOL_ID)){
-					log.debug("Message is holding Action for storage");
-					IActionDescription action = (IActionDescription) message.getPayload();
-					ActionData actionData = new ActionData();
-					actionData.setActionDescription(action);
-					actionData.setProviderDescription(action.getProviderDescription());
+			} else if (message.getProtocol().equalsIgnoreCase(ADD_ACTION_PROTOCOL_ID)){
+				log.debug("Message is holding Action for storage");
+				IActionDescription action = (IActionDescription) message.getPayload();
+				ActionData actionData = new ActionData();
+				actionData.setActionDescription(action);
+				actionData.setProviderDescription(action.getProviderDescription());
 
-					// only the local accessBean uses this protocol, so the action has to be local too
-					actionData.setLocal(true);
+				// only the local accessBean uses this protocol, so the action has to be local too
+				actionData.setLocal(true);
 
-					log.debug("removing possible obsolete version from directory");
-					synchronized (space) {
-						space.remove(actionData);
-						actionData.setCreationTime(_currentLogicTime + 1);
+				log.debug("removing possible obsolete version from directory");
+				synchronized (space) {
+					space.remove(actionData);
+					actionData.setCreationTime(_currentLogicTime + 1);
 
-						log.debug("writing new action to tuplespace");
-						space.write(actionData);
-						synchronized(_bufferlock){
-							actionData.setCreationTime(null);
-							_removalBuffer.remove(actionData);
-							_additionBuffer.add(actionData);
-						}
+					log.debug("writing new action to tuplespace");
+					space.write(actionData);
+					synchronized(_bufferlock){
+						actionData.setCreationTime(null);
+						_removalBuffer.remove(actionData);
+						_additionBuffer.add(actionData);
 					}
+				}
 
-				} else if (message.getProtocol().equalsIgnoreCase(REMOVE_ACTION_PROTOCOL_ID)){
-					log.debug("Message is holding Action for removal");
-					IActionDescription action = (IActionDescription) message.getPayload();
-					ActionData actionData = new ActionData();
-					actionData.setActionDescription(action);
+			} else if (message.getProtocol().equalsIgnoreCase(REMOVE_ACTION_PROTOCOL_ID)){
+				log.debug("Message is holding Action for removal");
+				IActionDescription action = (IActionDescription) message.getPayload();
+				ActionData actionData = new ActionData();
+				actionData.setActionDescription(action);
 
-					log.debug("removing action " + action + " from directory");
+				log.debug("removing action " + action + " from directory");
+				synchronized(space){
+					ActionData removeData = space.remove(actionData);
+					synchronized(_bufferlock){
+						removeData.setCreationTime(null);
+						_additionBuffer.remove(removeData);
+						_removalBuffer.add(removeData);
+					}
+				}
+
+			} else if (message.getProtocol().equalsIgnoreCase(ACTIONREFRESH_PROTOCOL_ID)){
+				if (message.getPayload() instanceof IActionDescription){
+					IActionDescription actDesc = (IActionDescription) message.getPayload();
+					ActionData refreshData = new ActionData();
+					refreshData.setActionDescription(actDesc);
 					synchronized(space){
-						ActionData removeData = space.remove(actionData);
-						synchronized(_bufferlock){
-							removeData.setCreationTime(null);
-							_additionBuffer.remove(removeData);
-							_removalBuffer.add(removeData);
+						//let's remove the old one
+						refreshData = space.remove(refreshData);
+
+
+						// put the new version into it
+						refreshData.setCreationTime(_currentLogicTime + 1);
+
+						space.write(refreshData);
+					}
+				} else if (message.getPayload() instanceof FactSet){
+					FactSet FS = (FactSet) message.getPayload();
+
+					synchronized(space){
+						for (IFact fact : FS.getFacts()){
+							if (fact instanceof IActionDescription){
+								IActionDescription actDesc = (IActionDescription) fact;
+								ActionData actDat = new ActionData();
+								actDat.setActionDescription(actDesc);
+
+								if ((actDat = space.remove(actDat)) != null){
+									actDat.setCreationTime(_currentLogicTime + 1);
+									space.write(actDat);
+								}
+							}
+						}
+					}
+				}
+
+			} else if (message.getProtocol().equalsIgnoreCase(AGENTPING_PROTOCOL_ID)){
+				IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
+				_agentPinger.removePing(agentDesc);
+
+			} else if (message.getProtocol().equalsIgnoreCase(CHANGE_PROPAGATION_PROTOCOL_ID)){
+
+				// this Message can only come from another AgentNode so mark it as alive.
+				AgentNodeData otherNode = new AgentNodeData();
+				otherNode.setAddress(message.getSender());
+
+				AgentNodeData storedData = space.remove(otherNode);
+				if(storedData == null){
+					// AgentNode is formerly unknown, so let's add it to our list
+					otherNode.setCreationTime(_currentAgentNodeTime + 1);
+					otherNode.setUUID(message.getHeader("UUID"));
+					space.write(otherNode);
+
+					if (message.getHeader("HelloWorld") == null){
+						/*
+						 * This seems to be the first contact, but the other one doesn't know that.
+						 * So there might have happen some partially or bad timed dis- and reconnection.
+						 * We have to send an HelloWorld Message to get it's offers back into our space
+						 * completely and to make sure there is no timeout of our entries over there interferring
+						 * we sent all what we have to offer with it.
+						 */
+						FactSet myData = new FactSet(getLocalActions());
+						myData.add(getLocalAgents());
+
+						MessageOfChange mocBack = new MessageOfChange(myData, null);
+
+						JiacMessage helloWorldMessage = new JiacMessage(mocBack);
+						helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
+						helloWorldMessage.setHeader("UUID", agentNode.getUUID());
+						helloWorldMessage.setHeader("HelloWorld", "true");
+						helloWorldMessage.setSender(_myAddress);
+						try {
+							// let the world now what we have to offer
+							_messageTransport.send(helloWorldMessage, message.getSender());
+						} catch (CommunicationException e) {
+							e.printStackTrace();
 						}
 					}
 
-				} else if (message.getProtocol().equalsIgnoreCase(ACTIONREFRESH_PROTOCOL_ID)){
-					if (message.getPayload() instanceof IActionDescription){
-						IActionDescription actDesc = (IActionDescription) message.getPayload();
-						ActionData refreshData = new ActionData();
-						refreshData.setActionDescription(actDesc);
-						synchronized(space){
-							//let's remove the old one
-							refreshData = space.remove(refreshData);
+				} else {
+					storedData.setCreationTime(_currentAgentNodeTime + 1);
+					space.write(otherNode);
+				}
 
 
-							// put the new version into it
-							refreshData.setCreationTime(_currentLogicTime + 1);
 
-							space.write(refreshData);
-						}
-					} else if (message.getPayload() instanceof FactSet){
-						FactSet FS = (FactSet) message.getPayload();
+				// Message holds Changes for the global Cache send from another Node
+				if (message.getPayload() instanceof MessageOfChange){
+					if (message.getPayload() != null){
 
-						synchronized(space){
-							for (IFact fact : FS.getFacts()){
-								if (fact instanceof IActionDescription){
-									IActionDescription actDesc = (IActionDescription) fact;
-									ActionData actDat = new ActionData();
-									actDat.setActionDescription(actDesc);
+						MessageOfChange moc = (MessageOfChange) message.getPayload();
 
-									if ((actDat = space.remove(actDat)) != null){
+						if (_cacheIsActive){
+							// So the cache is actually up and running so let's get to work on it.
+
+							// first let's remove what have changed or got obsolete
+							if (moc.getRemovals() != null){
+								FactSet removals = moc.getRemovals();
+								for (IFact fact : removals.getFacts()){
+									if (fact instanceof IAgentDescription){
+										space.remove(fact);
+									} else if (fact instanceof ActionData){
+										ActionData actDat = (ActionData) fact;
+										actDat.setCreationTime(null);
+										actDat.setLocal(false);
+										space.remove(actDat);
+									}
+								}
+							}
+
+							// now let's add the newest additions
+							if (moc.getAdditions() != null){
+								FactSet additions = moc.getAdditions();
+								for (IFact fact : additions.getFacts()){
+									if (fact instanceof IAgentDescription){
+										space.write(fact);
+									} else if (fact instanceof ActionData){
+										ActionData actDat = (ActionData) fact;
+										actDat.setLocal(false);
 										actDat.setCreationTime(_currentLogicTime + 1);
 										space.write(actDat);
 									}
 								}
 							}
 						}
-					}
+					} 
+					if (message.getHeader("HelloWorld") != null){
+						FactSet myData = new FactSet(getLocalActions());
+						myData.add(getLocalAgents());
 
-				} else if (message.getProtocol().equalsIgnoreCase(AGENTPING_PROTOCOL_ID)){
-					IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
-					_agentPinger.removePing(agentDesc);
+						MessageOfChange mocBack = new MessageOfChange(myData, null);
 
-				} else if (message.getProtocol().equalsIgnoreCase(CHANGE_PROPAGATION_PROTOCOL_ID)){
-
-					// this Message can only come from another AgentNode so mark it as alive.
-					AgentNodeData otherNode = new AgentNodeData();
-					otherNode.setAddress(message.getSender());
-
-					AgentNodeData storedData = space.remove(otherNode);
-					if(storedData == null){
-						// AgentNode is formerly unknown, so let's add it to our list
-						otherNode.setCreationTime(_currentAgentNodeTime + 1);
-						otherNode.setUUID(message.getHeader("UUID"));
-						space.write(otherNode);
-						
-						if (message.getHeader("HelloWorld") == null){
-							/*
-							 * This seems to be the first contact, but the other one doesn't know that.
-							 * So there might have happen some partially or bad timed dis- and reconnection.
-							 * We have to send an HelloWorld Message to get it's offers back into our space
-							 * completely and to make sure there is no timeout of our entries over there interferring
-							 * we sent all what we have to offer with it.
-							 */
-							FactSet myData = new FactSet(getLocalActions());
-							myData.add(getLocalAgents());
-
-							MessageOfChange mocBack = new MessageOfChange(myData, null);
-
-							JiacMessage helloWorldMessage = new JiacMessage(mocBack);
-							helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-							helloWorldMessage.setHeader("UUID", agentNode.getUUID());
-							helloWorldMessage.setHeader("HelloWorld", "true");
-							helloWorldMessage.setSender(_myAddress);
-							try {
-								// let the world now what we have to offer
-								_messageTransport.send(helloWorldMessage, message.getSender());
-							} catch (CommunicationException e) {
-								e.printStackTrace();
-							}
-						}
-
-					} else {
-						storedData.setCreationTime(_currentAgentNodeTime + 1);
-						space.write(otherNode);
-					}
-
-
-
-					// Message holds Changes for the global Cache send from another Node
-					if (message.getPayload() instanceof MessageOfChange){
-						if (message.getPayload() != null){
-
-							MessageOfChange moc = (MessageOfChange) message.getPayload();
-
-							if (_cacheIsActive){
-								// So the cache is actually up and running so let's get to work on it.
-
-								// first let's remove what have changed or got obsolete
-								if (moc.getRemovals() != null){
-									FactSet removals = moc.getRemovals();
-									for (IFact fact : removals.getFacts()){
-										if (fact instanceof IAgentDescription){
-											space.remove(fact);
-										} else if (fact instanceof ActionData){
-											ActionData actDat = (ActionData) fact;
-											actDat.setCreationTime(null);
-											actDat.setLocal(false);
-											space.remove(actDat);
-										}
-									}
-								}
-
-								// now let's add the newest additions
-								if (moc.getAdditions() != null){
-									FactSet additions = moc.getAdditions();
-									for (IFact fact : additions.getFacts()){
-										if (fact instanceof IAgentDescription){
-											space.write(fact);
-										} else if (fact instanceof ActionData){
-											ActionData actDat = (ActionData) fact;
-											actDat.setLocal(false);
-											actDat.setCreationTime(_currentLogicTime + 1);
-											space.write(actDat);
-										}
-									}
-								}
-							}
-						} 
-						if (message.getHeader("HelloWorld") != null){
-							FactSet myData = new FactSet(getLocalActions());
-							myData.add(getLocalAgents());
-
-							MessageOfChange mocBack = new MessageOfChange(myData, null);
-
-							JiacMessage helloWorldMessage = new JiacMessage(mocBack);
-							helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-							helloWorldMessage.setHeader("UUID", agentNode.getUUID());
-							helloWorldMessage.setSender(_myAddress);
-							try {
-								// let the world now what we have to offer
-								_messageTransport.send(helloWorldMessage, message.getSender());
-							} catch (CommunicationException e) {
-								e.printStackTrace();
-							}
+						JiacMessage helloWorldMessage = new JiacMessage(mocBack);
+						helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
+						helloWorldMessage.setHeader("UUID", agentNode.getUUID());
+						helloWorldMessage.setSender(_myAddress);
+						try {
+							// let the world now what we have to offer
+							_messageTransport.send(helloWorldMessage, message.getSender());
+						} catch (CommunicationException e) {
+							e.printStackTrace();
 						}
 					}
-
-
-				} else {
-					log.warn("Message has unknown protocol " + message.getProtocol());
 				}
+
+
 			} else {
-				// own Message do nothing
+				log.warn("Message has unknown protocol " + message.getProtocol());
 			}
-		} 
-	}
+		} else {
+			// own Message do nothing
+		}
+	} 
+
+/**
+ * Module that pings all stored agents and checks if they are still alive.
+ * 
+ * @author Martin Loeffelholz
+ *
+ */
+@SuppressWarnings("serial")
+private class AgentPinger extends TimerTask{
 
 	/**
-	 * Module that pings all stored agents and checks if they are still alive.
-	 * 
-	 * @author Martin Loeffelholz
-	 *
+	 * Set of Pings that got out to the agents but didn't came back yet
 	 */
-	@SuppressWarnings("serial")
-	private class AgentPinger extends TimerTask{
-
-		/**
-		 * Set of Pings that got out to the agents but didn't came back yet
-		 */
-		private Set<IAgentDescription> _ongoingAgentPings = new HashSet<IAgentDescription>();
-
-		/**
-		 * Pings all <code>Agent</code>s stored within the Directory and checks if they have replied
-		 */
-		public void run(){
-			// All Agents that haven't ping back are most likely to be non existent anymore
-			synchronized (_ongoingAgentPings) {
-
-				synchronized (space) {
-					for (IAgentDescription agent : _ongoingAgentPings){
-						IAgentDescription spaceAgent = space.remove(agent);
-						log.warn("Agent doesn't seem to be present anymore. Probably shutdown. Agent is " + spaceAgent);
-					}
-
-
-					_ongoingAgentPings.clear();
-
-					for (IAgentDescription agent : space.readAll(new AgentDescription())){
-						_ongoingAgentPings.add(agent);
-						ICommunicationAddress pingAddress = agent.getMessageBoxAddress();
-						JiacMessage message = new JiacMessage();
-						message.setProtocol(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID);
-						message.setSender(_myAddress);
-						try {
-							_messageTransport.send(message, pingAddress);
-						} catch (CommunicationException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-		}
-
-		/**
-		 * if an Agent replies to a ping message this method will be used to make a note of that
-		 * 
-		 * @param agentDesc the Description of the agent replying
-		 */
-		public void removePing(IAgentDescription agentDesc){
-			synchronized(_ongoingAgentPings){
-				_ongoingAgentPings.remove(agentDesc);
-			}
-		}
-	}
+	private Set<IAgentDescription> _ongoingAgentPings = new HashSet<IAgentDescription>();
 
 	/**
-	 * Module that keeps the actions stored within the Directory up to date.
-	 * 
-	 * @author Martin Loeffelholz
-	 *
+	 * Pings all <code>Agent</code>s stored within the Directory and checks if they have replied
 	 */
-	@SuppressWarnings("serial")
-	private class SpaceRefresher extends TimerTask {
+	public void run(){
+		// All Agents that haven't ping back are most likely to be non existent anymore
+		synchronized (_ongoingAgentPings) {
 
-		/**
-		 * Method to keep the actions stored within the tuplespace up to date.
-		 * within a regular interval this method is called. It checks which actiondata
-		 * tends to be obsolete and get's updated informations from each agent that actions
-		 * might be 
-		 */
-		@Override
-		public void run() {
-			// before checking for new timeouts, let's check for old ones from the last run,
-			// that didn't had replys in time to refresh them.
-
-			// During maintenance there must not be any other changes to the tuplespace, so...
-			synchronized(space){
-				log.debug("Beginning refreshment of stored actions");
-
-				ActionData oldAct = new ActionData();
-				oldAct.setCreationTime(_currentLogicTime - 1);
-//				System.err.println("Removing actions with timeout");
-				//First let's remove all not refreshed actions
-				space.removeAll(oldAct);
-
-
-				ActionData actionTemplate = new ActionData(_currentLogicTime);
-
-
-				// Check the Space for timeouts by using the current and now obsolete logical time
-
-//				System.err.println("Actions : " + space.readAll(new ActionData()).size());
-//				System.err.println("Timeouts: " + space.readAll(actionTemplate).size());
-
-				Set<IAgentDescription> agentsAllreadyTold = new HashSet<IAgentDescription>();
-
-				for (ActionData actionData : space.readAll(actionTemplate)){
-					//as long as timeouts are existing...
-					//get the first of them and the action stored within it
-					IActionDescription timeoutActionDesc = actionData.getActionDescription();
-
-					IAgentDescription agentDesc = timeoutActionDesc.getProviderDescription();
-					if (agentsAllreadyTold.contains(agentDesc)){
-						continue;
-					} else {
-						agentsAllreadyTold.add(agentDesc);
-						ICommunicationAddress refreshAddress = agentDesc.getMessageBoxAddress();
-
-						JiacMessage refreshMessage = new JiacMessage(actionData.getActionDescription());
-						refreshMessage.setSender(_myAddress);
-						refreshMessage.setProtocol(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID);
-						try {
-							_messageTransport.send(refreshMessage, refreshAddress);
-						} catch (CommunicationException e) {
-							e.printStackTrace();
-						}
-					}
+			synchronized (space) {
+				for (IAgentDescription agent : _ongoingAgentPings){
+					IAgentDescription spaceAgent = space.remove(agent);
+					log.warn("Agent doesn't seem to be present anymore. Probably shutdown. Agent is " + spaceAgent);
 				}
-			}		
 
-			// finally after processing all timeouts let's give the clock a little nudge
-			_currentLogicTime++;
-			log.debug("Finished refreshment of stored actions");
-		}
-	}
 
-	private class MessengerOfChange extends TimerTask {
-		@Override
-		public void run() {
+				_ongoingAgentPings.clear();
 
-			if ((!_additionBuffer.isEmpty()) || (!_removalBuffer.isEmpty())){
-				synchronized(_bufferlock){
-					MessageOfChange moc = new MessageOfChange(_additionBuffer, _removalBuffer);
-
-					JiacMessage changePropagationMessage = new JiacMessage(moc);
-					changePropagationMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-					changePropagationMessage.setSender(_myAddress);
+				for (IAgentDescription agent : space.readAll(new AgentDescription())){
+					_ongoingAgentPings.add(agent);
+					ICommunicationAddress pingAddress = agent.getMessageBoxAddress();
+					JiacMessage message = new JiacMessage();
+					message.setProtocol(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID);
+					message.setSender(_myAddress);
 					try {
-						// let the world now what we have to offer
-						_messageTransport.send(changePropagationMessage, _otherNodes);
+						_messageTransport.send(message, pingAddress);
 					} catch (CommunicationException e) {
 						e.printStackTrace();
 					}
-					
-					_additionBuffer.clear();
-					_removalBuffer.clear();
-				}
-			} else {
-
-				// we don't have actual changes but are still alive. So let's shout it out loud
-				JiacMessage stillAliveMessage = new JiacMessage();
-				stillAliveMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-				stillAliveMessage.setSender(_myAddress);
-				try {
-					// let the world now what we have to offer
-					_messageTransport.send(stillAliveMessage, _otherNodes);
-				} catch (CommunicationException e) {
-					e.printStackTrace();
 				}
 			}
 		}
 	}
+
+	/**
+	 * if an Agent replies to a ping message this method will be used to make a note of that
+	 * 
+	 * @param agentDesc the Description of the agent replying
+	 */
+	public void removePing(IAgentDescription agentDesc){
+		synchronized(_ongoingAgentPings){
+			_ongoingAgentPings.remove(agentDesc);
+		}
+	}
+}
+
+/**
+ * Module that keeps the actions stored within the Directory up to date.
+ * 
+ * @author Martin Loeffelholz
+ *
+ */
+@SuppressWarnings("serial")
+private class SpaceRefresher extends TimerTask {
+
+	/**
+	 * Method to keep the actions stored within the tuplespace up to date.
+	 * within a regular interval this method is called. It checks which actiondata
+	 * tends to be obsolete and get's updated informations from each agent that actions
+	 * might be 
+	 */
+	@Override
+	public void run() {
+		// before checking for new timeouts, let's check for old ones from the last run,
+		// that didn't had replys in time to refresh them.
+
+		// During maintenance there must not be any other changes to the tuplespace, so...
+		synchronized(space){
+			log.debug("Beginning refreshment of stored actions");
+
+			ActionData oldAct = new ActionData();
+			oldAct.setCreationTime(_currentLogicTime - 1);
+//			System.err.println("Removing actions with timeout");
+			//First let's remove all not refreshed actions
+			space.removeAll(oldAct);
+
+
+			ActionData actionTemplate = new ActionData(_currentLogicTime);
+
+
+			// Check the Space for timeouts by using the current and now obsolete logical time
+
+//			System.err.println("Actions : " + space.readAll(new ActionData()).size());
+//			System.err.println("Timeouts: " + space.readAll(actionTemplate).size());
+
+			Set<IAgentDescription> agentsAllreadyTold = new HashSet<IAgentDescription>();
+
+			for (ActionData actionData : space.readAll(actionTemplate)){
+				//as long as timeouts are existing...
+				//get the first of them and the action stored within it
+				IActionDescription timeoutActionDesc = actionData.getActionDescription();
+
+				IAgentDescription agentDesc = timeoutActionDesc.getProviderDescription();
+				if (agentsAllreadyTold.contains(agentDesc)){
+					continue;
+				} else {
+					agentsAllreadyTold.add(agentDesc);
+					ICommunicationAddress refreshAddress = agentDesc.getMessageBoxAddress();
+
+					JiacMessage refreshMessage = new JiacMessage(actionData.getActionDescription());
+					refreshMessage.setSender(_myAddress);
+					refreshMessage.setProtocol(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID);
+					try {
+						_messageTransport.send(refreshMessage, refreshAddress);
+					} catch (CommunicationException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}		
+
+		// finally after processing all timeouts let's give the clock a little nudge
+		_currentLogicTime++;
+		log.debug("Finished refreshment of stored actions");
+	}
+}
+
+private class MessengerOfChange extends TimerTask {
+	@Override
+	public void run() {
+
+		if ((!_additionBuffer.isEmpty()) || (!_removalBuffer.isEmpty())){
+			synchronized(_bufferlock){
+				MessageOfChange moc = new MessageOfChange(_additionBuffer, _removalBuffer);
+
+				JiacMessage changePropagationMessage = new JiacMessage(moc);
+				changePropagationMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
+				changePropagationMessage.setSender(_myAddress);
+				try {
+					// let the world now what we have to offer
+					_messageTransport.send(changePropagationMessage, _otherNodes);
+				} catch (CommunicationException e) {
+					e.printStackTrace();
+				}
+
+				_additionBuffer.clear();
+				_removalBuffer.clear();
+			}
+		} else {
+
+			// we don't have actual changes but are still alive. So let's shout it out loud
+			JiacMessage stillAliveMessage = new JiacMessage();
+			stillAliveMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
+			stillAliveMessage.setSender(_myAddress);
+			try {
+				// let the world now what we have to offer
+				_messageTransport.send(stillAliveMessage, _otherNodes);
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+}
 
 
 }

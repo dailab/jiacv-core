@@ -902,24 +902,10 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						// now let's look if our agent still supports this action
 						DoAction remoteDoAction;
 						Serializable[] params = doAction.getParams();
-						boolean remoteActionFound = false;
 
-						List<Action> actions = thisAgent.getActionList();
-						// TODO thisAgent.getActionList -> search within agents memory
-						for (Action foundAction : actions){
-							if (actionsAreEqual(foundAction, doAction.getAction())) {
-								// so after finding it let's create the actual DoAction for our agent here
-								remoteDoAction = foundAction.createDoAction(params, this);
+						Action foundAction = (Action) memory.read(doAction.getAction());
 
-								remoteActionFound = true;
-								synchronized (openSessionsFromClients) {
-									openSessionsFromClients.put(remoteDoAction.getSessionId(), new SessionData(doAction, message.getSender()));	
-								}
-								memory.write(remoteDoAction);
-								break;
-							}
-						}
-						if (!remoteActionFound) {
+						if (foundAction == null) {
 							log.debug("Requested Action doesn't exist on this Agent -- FAILURE!");
 							ActionNotPresentException exception = new ActionNotPresentException(doAction.getAction());
 
@@ -929,6 +915,13 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 							this.receiveResult(result);
 
 						} else {
+							// so after finding it let's create the actual DoAction for our agent here
+							remoteDoAction = foundAction.createDoAction(params, this);
+							synchronized (openSessionsFromClients) {
+								openSessionsFromClients.put(remoteDoAction.getSessionId(), new SessionData(doAction, message.getSender()));	
+							}
+							memory.write(remoteDoAction);
+
 							log.debug("RemoteAction written to Agents Memory");
 						}
 						
@@ -941,40 +934,24 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						}
 
 						if(doAction != null) {
+							log.debug("Found doAction for that result. Now delivering Actionresult to " + doAction.getSource());
 							result.setSource(doAction);
 							memory.write(result);
+						} else {
+							log.debug("Discarding ActionResult for no more existing DoAction!");
 						}
 					}
 				} 
 			}
 		}
 
-		/**
-		 * compares two actions with each other
-		 * 
-		 * @param action1 first action to compare with...
-		 * @param action2 ... this second action.
-		 * @return
-		 */
-		private boolean actionsAreEqual(IActionDescription action1, IActionDescription action2){
-			boolean equal = (action1 != null)&&(action2 != null); 
-			equal &= action1.getName().equals(action2.getName());
-			
-			if((action1.getInputTypes() != null) && (action2.getInputTypes() != null)) {
-				equal &= action1.getInputTypes().equals(action2.getInputTypes());
-			}
-			
-			if((action1.getResultTypes() != null) && (action2.getResultTypes() != null))
-			equal &= action1.getResultTypes().equals(action2.getResultTypes());
-			return equal;
-		}
-
+		
 		/**
 		 * Implementation of ResultReceiver. Gets a result and handles it.
 		 */
 		@Override
 		public void receiveResult(ActionResult result) {
-			log.debug("Got Result for Remote Action!");
+			log.debug("Got Result for Remote Action! Actionname reads: " + result.getAction().getName());
 
 			SessionData sessionData = null;
 			synchronized (openSessionsFromClients) {

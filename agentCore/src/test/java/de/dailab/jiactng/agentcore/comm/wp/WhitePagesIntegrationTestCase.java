@@ -528,7 +528,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		_directoryAgentNodeBean.setCacheIsActive(false);
 		
 		if (_debug) {
-			System.err.println("--- TestGlobalRemoteActionSearchingAndHandling ---");
+			System.err.println("--- TestGlobalRemoteActionSearchingAndHandlingWithoutCache ---");
 		}
 		
 		if (_debug) {
@@ -603,7 +603,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		_directoryAgentNodeBean.setCacheIsActive(false);
 		
 		if (_debug) {
-			System.err.println("--- TestGlobalAgentSearching ---");
+			System.err.println("--- TestGlobalAgentSearchingWithoutCache ---");
 		}
 		try {
 			Thread.sleep(7500);

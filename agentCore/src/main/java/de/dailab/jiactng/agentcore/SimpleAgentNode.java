@@ -205,6 +205,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		agent.addLifecycleListener(this.lifecycle.createLifecycleListener());
 		agentListChanged(oldAgentList, getAgents());
 
+		if (_directory != null){
+			agent.addLifecycleListener(_directory);
+		}
 		// register agent for management
 		agent.enableManagement(_manager);
 		
@@ -652,17 +655,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// call cleanup for all agents if any
 		if (_agents != null) {
 			for (IAgent a : _agents) {
-				// Check if White Pages bean is present
-				for (IAgentNodeBean agentNodeBean : _agentNodeBeans) {
-					if (agentNodeBean instanceof DirectoryAgentNodeBean) {
-						// directory is present so remove agentdescription from
-						// it before cleaning up the agent
-						DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) agentNodeBean;
-						directory.removeAgentDescription(a.getAgentDescription());
-						break;
-					}
-				}
-
 				try {
 					if (log != null) {
 						log.info("Trying to cleanup agent: " + a.getAgentName());

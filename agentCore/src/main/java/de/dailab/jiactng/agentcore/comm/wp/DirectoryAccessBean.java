@@ -389,7 +389,57 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		 */
 		if (actionName.equalsIgnoreCase(ACTION_REQUEST_SEARCH)){
 			log.debug("doAction is a SearchRequest");
-			_searchRequestHandler.requestSearch(doAction);
+			
+				Object[] actionParams = doAction.getParams();
+				// Check if parameter have minimum length as the last parameter (timeToSearch) is optional
+				if (actionParams.length >= 2){
+					if ((actionParams[0] instanceof IFact) && (actionParams[1] instanceof Boolean)){
+						IFact template = (IFact) actionParams[0];
+						Boolean isGlobal = (Boolean) actionParams[1];
+						if (actionParams.length > 2){
+							/*
+							 * if time to search is set, it has to be set within the Session, 
+							 * so a timeout will happen at the right moment, ending the search
+							 */
+							
+							Long timeToSearch = (Long) actionParams[2];
+							doAction.getSession().setTimeToLive(timeToSearch);
+
+						}
+						SearchRequest request = new SearchRequest(template);
+						request.setID(doAction.getSessionId());
+						/*
+						 *  put running search into the Map to make it possible to find the 
+						 *  original doAction for ActionResult creation purposes later when
+						 *  the reply is coming in.
+						 */
+						_requestID2ActionMap.put(request.getID(), doAction);
+						if (isGlobal){
+							/*
+							 *  if the search is global, responses from different AgentNodes have to be
+							 *  collected here.
+							 */
+							_requestID2ResponseMap.put(request.getID(), new ArrayList<IFact>());
+						}
+						// now let's get the SearchRequest out and to the AgentNode
+						JiacMessage message = new JiacMessage(request);
+						message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
+						message.setHeader("isGlobal", isGlobal.toString());
+
+						Serializable[] newParams = {message, directoryAddress};
+						DoAction send = _sendAction.createDoAction(newParams, _resultDump);
+
+						log.debug("sending message with searchrequest to directory " + message);
+						memory.write(send);
+					} 
+				} else {
+					log.error("Request for search was called with false no. of arguments. Arguments are as follows:");
+					log.error("First argument: IFact so search for; second Argument: boolean is this search global or just on that agentnode?");
+					log.error("Third Argument: (OPTIONAL) TimeToSearch. Default: 60 seconds");
+					log.error("given Arguments were: " + actionParams);
+				}
+			
+
 
 			
 			/*
@@ -522,79 +572,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	 *
 	 */
 	@SuppressWarnings("serial")
-	private class SearchRequestHandler implements SpaceObserver<IFact> {
-
-
-		/**
-		 * Here an actual SearchRequest will be processed. 
-		 * @param doAction ACTION_REQUEST_SEARCH which includes a local or global search for IFacts in the directory
-		 * 
-		 * Note: More information within the getActions Method
-		 */
-		public void requestSearch(DoAction doAction){
-			Object[] actionParams = doAction.getParams();
-			// Check if parameter have minimum length as the last parameter (timeToSearch) is optional
-			if (actionParams.length >= 2){
-				if ((actionParams[0] instanceof IFact) && (actionParams[1] instanceof Boolean)){
-					IFact template = (IFact) actionParams[0];
-					Boolean isGlobal = (Boolean) actionParams[1];
-					if (actionParams.length == 3){
-						/*
-						 * if time to search is set, it has to be set within the Session, 
-						 * so a timeout will happen at the right moment, ending the search
-						 */
-						if (actionParams[2] instanceof Long){
-							Long timeToSearch = (Long) actionParams[2];
-							doAction.getSession().setTimeToLive(timeToSearch);
-						}
-					}
-					SearchRequest request = new SearchRequest(template);
-					request.setID(doAction.getSessionId());
-					/*
-					 *  put running search into the Map to make it possible to find the 
-					 *  original doAction for ActionResult creation purposes later when
-					 *  the reply is coming in.
-					 */
-					_requestID2ActionMap.put(request.getID(), doAction);
-					if (isGlobal){
-						/*
-						 *  if the search is global, responses from different AgentNodes have to be
-						 *  collected here.
-						 */
-						_requestID2ResponseMap.put(request.getID(), new ArrayList<IFact>());
-					}
-					// now let's get the SearchRequest out and to the AgentNode
-					JiacMessage message = new JiacMessage(request);
-					message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
-					message.setHeader("isGlobal", isGlobal.toString());
-
-					Serializable[] params = {message, directoryAddress};
-					DoAction send = _sendAction.createDoAction(params, _resultDump);
-
-					log.debug("sending message with searchrequest to directory " + message);
-					memory.write(send);
-				} 
-			} else {
-				log.error("Request for search was called with false no. of arguments. Arguments are as follows:");
-				log.error("First argument: IFact so search for; second Argument: boolean is this search global or just on that agentnode?");
-				log.error("Third Argument: (OPTIONAL) TimeToSearch. Default: 60 seconds");
-				log.error("given Arguments were: " + actionParams);
-			}
-		}
-		
-//		public <E extends IFact> void requestSearch(E template, Boolean isGlobal){
-//			JiacMessage message = new JiacMessage(template);
-//			message.setProtocol(DirectoryAgentNodeBean.SEARCH_REQUEST_PROTOCOL_ID);
-//			message.setHeader("isGlobal", isGlobal.toString());
-//
-//			Object[] params = {message, directoryAddress};
-//			DoAction send = _sendAction.createDoAction(params, _resultDump);
-//
-//			log.debug("sending message with searchrequest to directory " + message);
-//			memory.write(send);
-//		}
-		
-		
+	private class SearchRequestHandler implements SpaceObserver<IFact> {	
 
 		/**
 		 * receives the answers from the directory and processes them. 

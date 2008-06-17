@@ -64,11 +64,11 @@ public class ActionData implements IFact{
 		return _action;
 	}
 	
-	public void setLocal( Boolean local){
-		_isLocal = local;
+	public void setIsLocal( Boolean isLocal){
+		_isLocal = isLocal;
 	}
 	
-	public Boolean isLocal(){
+	public Boolean getIsLocal(){
 		return _isLocal;
 	}
 	
@@ -87,7 +87,7 @@ public class ActionData implements IFact{
 		return thisString;
 	}
 
-	public IAgentDescription get_providerDescription() {
+	public IAgentDescription getProviderDescription() {
 		return _providerDescription;
 	}
 

@@ -70,11 +70,11 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		memory.write(action);
 	}
 	
-	public void searchForAgentDesc(String agentName, boolean isGlobal, long timeToSearch){
+	public void searchForAgentDesc(String agentName, boolean isGlobal, Long timeToSearch){
 		log.debug("Searching for Agent " + agentName);
 		AgentDescription desc = new AgentDescription(null, agentName, null, null, null);
-		Serializable[] params = {desc, new Boolean(isGlobal)};
-		DoAction action = _requestSearchAction.createDoAction(params, this, timeToSearch);
+		Serializable[] params = {desc, new Boolean(isGlobal), timeToSearch};
+		DoAction action = _requestSearchAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
 	}
@@ -87,10 +87,10 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 		memory.write(action);
 	}
 	
-	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal, long timeToSearch){
+	public void searchForActionDesc(IActionDescription actionDesc, boolean isGlobal, Long timeToSearch){
 		log.debug("Searching for Action " + actionDesc.toString());
-		Serializable[] params = {actionDesc, new Boolean(isGlobal)};
-		DoAction action = _requestSearchAction.createDoAction(params, this, timeToSearch);
+		Serializable[] params = {actionDesc, new Boolean(isGlobal), timeToSearch};
+		DoAction action = _requestSearchAction.createDoAction(params, this);
 		_lastDoAction = action;
 		memory.write(action);
 	}
@@ -117,7 +117,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 				new Serializable[] {
 						new AgentDescription(null, "NixAgentos", null, null, null), 
 						new Boolean(false)}, 
-				this, 1);
+				this, new Long(1));
 		memory.write(action); 
 	}
 

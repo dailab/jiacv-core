@@ -70,9 +70,9 @@ public class Session implements IFact {
 	 */
 	public Session(ResultReceiver source, long timeToLive) {
 		this(IdFactory.createSessionId((source != null) ? source.hashCode()
-				: Session.class.hashCode()), System.currentTimeMillis(),
+				: Session.class.hashCode()), new Long(System.currentTimeMillis()),
 				source, new ArrayList<SessionEvent>());
-		this.timeToLive = Long.valueOf(timeToLive);
+		this.timeToLive = new Long(timeToLive);
 	}
 	
 
@@ -100,13 +100,13 @@ public class Session implements IFact {
 	 *            
 	 */
 	public Session(String id, Long creationTime, ResultReceiver source,
-			ArrayList<SessionEvent> history, long timeToLive) {
+			ArrayList<SessionEvent> history, Long timeToLive) {
 		this.sessionId = id;
 		this.creationTime = creationTime;
 		this.source = source;
 		this.history = history;
 		if (timeToLive != 0){
-			this.timeToLive = Long.valueOf(timeToLive);
+			this.timeToLive = timeToLive;
 		} else{
 			this.timeToLive = null;
 		}
@@ -164,8 +164,8 @@ public class Session implements IFact {
 	 * 
 	 * @param timeout
 	 */
-	public void setTimeToLive(long timeout){
-		timeToLive = Long.valueOf(timeout);
+	public void setTimeToLive(Long timeout){
+		timeToLive = timeout;
 	}
 	
 	public Long getTimeToLive(){

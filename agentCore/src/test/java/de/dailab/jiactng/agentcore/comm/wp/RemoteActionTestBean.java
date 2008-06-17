@@ -30,7 +30,7 @@ public class RemoteActionTestBean extends AbstractAgentBean implements ResultRec
 		memory.write(action);
 	}
 
-	public void useRemoteAction(Action action, Serializable[] params, long timeToLive){
+	public void useRemoteAction(Action action, Serializable[] params, Long timeToLive){
 		log.debug("using remote Action " + action.getName());
 		DoAction remoteAction = action.createDoAction(params, this, timeToLive);
 		

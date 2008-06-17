@@ -6,12 +6,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.dailab.jiactng.agentcore.Agent;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.SimpleAgentNodeMBean;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.action.Action;
@@ -87,7 +89,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			((SimpleAgentNodeMBean)_agentNode).shutdown();
 		}
 	}
-	
+		
 	public void testFindAgent(){
 		if (_deactivateTests) {
 			assertTrue(true);
@@ -207,6 +209,78 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 	}
 	
+	public void testAddAndRemoveAgent(){
+		if (_deactivateTests) {
+			assertTrue(true);
+			return;
+		}
+		if (_debug) {
+			System.err.println("--- TestAddAndRemoveAgent ---");
+		}
+			
+			_whitePagesTestBean.searchForAgentDesc("AddMeAgent", false);
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			List<IFact> results = _whitePagesTestBean.getLastResult();
+			
+			assertNotNull(results);
+			assertEquals(0, results.size());
+			// Thats right because the agent should be on the node at this point
+			
+			// now let's add a new agent during runtime
+			Agent newAgent = (Agent) _xmlContext.getBean("AddMeAgent");
+			_agentNode.addAgent(newAgent);
+			try {
+				newAgent.init();
+				newAgent.start();
+			} catch (LifecycleException e1) {
+				e1.printStackTrace();
+			}
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			_whitePagesTestBean.searchForAgentDesc("AddMeAgent", false);
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			results = _whitePagesTestBean.getLastResult();
+			
+			assertNotNull(results);
+			assertEquals(1, results.size());
+			
+			AgentDescription addme = null;
+			if (results.size() > 0){
+				if (results.get(0) instanceof AgentDescription)
+					addme = (AgentDescription) results.get(0);
+			}
+			
+			assertNotNull(results);
+			assertEquals(1, results.size());
+			assertTrue(addme.getName().equalsIgnoreCase("AddMeAgent"));
+		
+			// now let's remove the agent again
+			try {
+				newAgent.stop();
+				newAgent.cleanup();
+			} catch (LifecycleException e) {
+				e.printStackTrace();
+			}
+			
+			//TODO Check if it really has gone from the directory
+			
+	}
+
+	
+	
 	public void testRemoteActionTimeoutHandling(){
 		if (_deactivateTests) {
 			assertTrue(true);
@@ -233,9 +307,12 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		List<IFact> results = _whitePagesTestBean.getLastResult();
 		assertNotNull(results);
 		
-		if (results.get(0) instanceof Action){
-			Action remoteAction = (Action) results.get(0);
-			_remoteActionTestBean.useRemoteAction(remoteAction, new Serializable[] {}, 1000);
+		assertTrue(results.size() >= 1);
+		if (results.size() >= 1){
+			if (results.get(0) instanceof Action){
+				Action remoteAction = (Action) results.get(0);
+				_remoteActionTestBean.useRemoteAction(remoteAction, new Serializable[] {}, new Long(1000));
+			}
 		}
 		
 		try {
@@ -417,7 +494,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 	
 		Action action = new Action(GlobalRemoteActionProviderBean.ACTION_GET_GLOBAL_RESULT);
-		_whitePagesTestBean.searchForActionDesc(action, true, 5000);
+		_whitePagesTestBean.searchForActionDesc(action, true, new Long(5000));
 		
 		try {
 			Thread.sleep(7500);
@@ -433,11 +510,6 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			System.err.println("Result found reads: " + remoteActions);
 		}
 		
-		try {
-			Thread.sleep(1500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} 
 		assertNotNull(remoteActions);
 		assertEquals(1, remoteActions.size());
 		assertNotNull(remoteActions.get(0));
@@ -493,7 +565,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			System.err.println(": : Searching for RemoteAgentOnOtherNode");
 		}
 		
-		_whitePagesTestBean.searchForAgentDesc("RemoteAgentOnOtherNode", true, 5000);
+		_whitePagesTestBean.searchForAgentDesc("RemoteAgentOnOtherNode", true, new Long(5000));
 		
 		try {
 			Thread.sleep(7500);
@@ -536,7 +608,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 	
 		Action action = new Action(GlobalRemoteActionProviderBean.ACTION_GET_GLOBAL_RESULT);
-		_whitePagesTestBean.searchForActionDesc(action, true, 5000);
+		_whitePagesTestBean.searchForActionDesc(action, true, new Long(5000));
 		
 		try {
 			Thread.sleep(7500);
@@ -615,7 +687,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			System.err.println(": : Searching for RemoteAgentOnOtherNode");
 		}
 		
-		_whitePagesTestBean.searchForAgentDesc("RemoteAgentOnOtherNode", true, 5000);
+		_whitePagesTestBean.searchForAgentDesc("RemoteAgentOnOtherNode", true, new Long(5000));
 		
 		try {
 			Thread.sleep(7500);
@@ -645,7 +717,6 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	}
 		
 	
-	//TODO Testcase for global searches for agents on other Nodes. 
 	
 	//TODO NoSuchAction Exception isn't thrown at the moment. Check and Resolve
 //	public void testNoSuchAction(){

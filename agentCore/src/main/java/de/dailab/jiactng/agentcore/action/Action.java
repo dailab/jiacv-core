@@ -132,7 +132,7 @@ public class Action implements IActionDescription {
 	 *         memory) to call the action.
 	 */
 	public DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
-			long timeToLive) {
+			Long timeToLive) {
 		return new DoAction(this, source, newParams, timeToLive);
 	}
 

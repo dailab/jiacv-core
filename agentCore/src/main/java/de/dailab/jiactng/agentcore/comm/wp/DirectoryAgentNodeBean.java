@@ -15,6 +15,7 @@ import org.sercho.masp.space.event.EventedTupleSpace;
 import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
+import de.dailab.jiactng.agentcore.Agent;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -30,6 +31,8 @@ import de.dailab.jiactng.agentcore.comm.wp.helpclasses.MessageOfChange;
 import de.dailab.jiactng.agentcore.comm.wp.helpclasses.SearchRequest;
 import de.dailab.jiactng.agentcore.comm.wp.helpclasses.SearchResponse;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
@@ -49,7 +52,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  *
  */
 
-public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate{
+public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate, ILifecycleListener{
 
 
 	/** suffix for address-creation purposes. Will be added to the UUID of AgentNode to create Beanaddress */
@@ -96,7 +99,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 *  This Interval is used for Alive-detection of other AgentNodes too. If there will be no message from another
 	 *  AgentNode within two times this interval the AgentNode will be removed from this Directory with all entries
 	 *  of Agents or Actions from it. */
-	private long _changePropagateInterval = 3500;
+	private long _changePropagateInterval = 3000;
 
 
 	/** Destroyer for the Directory */
@@ -108,6 +111,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 	/** The needed direct connection to the outside world */
 	private MessageTransport _messageTransport = null;
+	private boolean _messageTransportIsActive = false;
 
 	/** Address of this <code>DirectoryAgentNodeBean</code> */
 	private ICommunicationAddress _myAddress = null;
@@ -197,8 +201,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				// As an Agent is removed from the directory also remove all his published Actions;
 				ActionData agentAction = new ActionData();
 				agentAction.setProviderDescription(agentDescription);
+				agentAction.setIsLocal(true);
 
 				Set<ActionData> actionsRemoved = space.removeAll(agentAction);
+				
 				Set<IFact> factsToRemove = new HashSet<IFact>();
 				factsToRemove.addAll(actionsRemoved);
 				synchronized(_bufferlock){
@@ -221,7 +227,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			ActionData actionData = new ActionData(_currentLogicTime);
 			actionData.setActionDescription(action);
 			actionData.setProviderDescription(action.getProviderDescription());
-			actionData.setLocal(true);
+			actionData.setIsLocal(true);
 			synchronized (space) {
 				space.write(actionData);
 				synchronized(_bufferlock){
@@ -267,7 +273,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		_messageTransport.setDefaultDelegate(this);
 		try {
 			_messageTransport.doInit();
+			_messageTransportIsActive = true;
 		} catch (Exception e) {
+			_messageTransportIsActive = false;
 			e.printStackTrace();
 		}
 
@@ -318,6 +326,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * This method will be called to stop this AgentNodeBean and hold all activity
 	 */
 	public void doStop(){
+		//TODO Broker is stopped before this message get's out! change that
 		_timerStop = true;
 		_timer.cancel();
 
@@ -340,6 +349,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
+
+		_messageTransportIsActive = false;
 	}
 
 	/**
@@ -367,10 +378,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		message.setSender(_myAddress);
 		message.setHeader("UUID", this.agentNode.getUUID());
 
-		try {
-			_messageTransport.send(message, address);
-		} catch (CommunicationException e) {
-			e.printStackTrace();
+		if (_messageTransportIsActive){
+			try {
+				_messageTransport.send(message, address);
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -378,10 +391,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		message.setSender(replyTo);
 		message.setHeader("UUID", this.agentNode.getUUID());
 
-		try{
-			_messageTransport.send(message, address);
-		}catch (CommunicationException e) {
-			e.printStackTrace();
+		if (_messageTransportIsActive){
+			try{
+				_messageTransport.send(message, address);
+			}catch (CommunicationException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -568,7 +583,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	private synchronized Set<IFact> getLocalActions(){
 
 		ActionData actDat = new ActionData();
-		actDat.setLocal(true);
+		actDat.setIsLocal(true);
 		Set<ActionData> localActionData = space.readAll(actDat);
 		// As java generics aren't very cunning we have to make this not very cunning conversion
 		Set<IFact> actionDataFacts = new HashSet<IFact>();
@@ -663,7 +678,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 								if (!header){
 									// searchRequest is strictly local!
-									actDat.setLocal(true);
+									actDat.setIsLocal(true);
 								}
 
 								Set<ActionData> actDatSet;
@@ -731,7 +746,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				actionData.setProviderDescription(action.getProviderDescription());
 
 				// only the local accessBean uses this protocol, so the action has to be local too
-				actionData.setLocal(true);
+				actionData.setIsLocal(true);
 
 				log.debug("removing possible obsolete version from directory");
 				synchronized (space) {
@@ -867,7 +882,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 										} else if (fact instanceof ActionData){
 											ActionData actDat = (ActionData) fact;
 											actDat.setCreationTime(null);
-											actDat.setLocal(false);
+											actDat.setIsLocal(false);
 											space.remove(actDat);
 										}
 									}
@@ -881,7 +896,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 											space.write(fact);
 										} else if (fact instanceof ActionData){
 											ActionData actDat = (ActionData) fact;
-											actDat.setLocal(false);
+											actDat.setIsLocal(false);
 											actDat.setCreationTime(_currentLogicTime + 1);
 											space.write(actDat);
 										}
@@ -916,6 +931,26 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		}
 	} 
 
+	/**
+	 * method from ILifeCycleListener that receives lifecycleevents from the local agents
+	 * 
+	 * @param evt
+	 */
+	public void onEvent(LifecycleEvent evt){
+		
+		if (evt.getState() == LifecycleStates.STARTED){
+			if (evt.getSource() instanceof Agent){
+				Agent newAgent = (Agent) evt.getSource();
+				this.addAgentDescription(newAgent.getAgentDescription());
+			}
+		} else if (evt.getState() == LifecycleStates.STOPPED){
+			if (evt.getSource() instanceof Agent){
+				Agent newAgent = (Agent) evt.getSource();
+				this.removeAgentDescription(newAgent.getAgentDescription());
+			}
+		}
+	}
+	
 	/**
 	 * Module that pings all stored agents and checks if they are still alive.
 	 * 

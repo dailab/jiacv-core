@@ -71,8 +71,8 @@ public class JMSMessageTransport extends MessageTransport {
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport commences Cleanup");
 		}
-        try {_receiver.doCleanup();} catch (Exception e) {log.warn("clean up receiver failed", e);}
-		try {_sender.doCleanup();} catch (Exception e) {log.warn("clean up sender failed", e);}
+        try {_receiver.doCleanup();} catch (Exception e) {log.warn("Clean up receiver failed, because " + e.getLocalizedMessage());}
+		try {_sender.doCleanup();} catch (Exception e) {log.warn("Clean up sender failed, because " + e.getLocalizedMessage());}
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport cleaned up");
 		}
@@ -171,8 +171,8 @@ public class JMSMessageTransport extends MessageTransport {
             _sender.send(message, commAdd);
         } catch (JMSException jms) {
         	if (log.isErrorEnabled()){
-        		log.error("Sending of Message to address '" + commAdd.toUnboundAddress() + "' through JMS failed!");
-        		log.error("Errorcause reads '" + jms.getCause() + "'");
+        		log.error("Sending of Message to address '" + commAdd.toUnboundAddress() + 
+        				"' through JMS failed! Errorcause reads '" + jms.getCause() + "'");
         	}
         	throw new CommunicationException("error while sending message", jms);
         }

@@ -382,7 +382,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			try {
 				_messageTransport.send(message, address);
 			} catch (CommunicationException e) {
-				e.printStackTrace();
+	        	if (log.isErrorEnabled()){
+	        		log.error("Sending of " + message.getProtocol() + " message failed!");
+	        	}
 			}
 		}
 	}
@@ -395,7 +397,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			try{
 				_messageTransport.send(message, address);
 			}catch (CommunicationException e) {
-				e.printStackTrace();
+	        	if (log.isErrorEnabled()){
+	        		log.error("Sending of " + message.getProtocol() + " message failed!");
+	        	}
 			}
 		}
 	}

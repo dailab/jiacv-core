@@ -33,6 +33,7 @@
       <property name="agentBeans">
          <list>
             <ref bean="CommunicationBean" />
+            <ref bean="DirectoryAccessBean" />
          </list>
       </property>
    </bean>

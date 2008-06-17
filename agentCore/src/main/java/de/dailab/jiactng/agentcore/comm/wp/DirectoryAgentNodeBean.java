@@ -16,6 +16,7 @@ import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.Agent;
+import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -68,10 +69,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
 
 	/** Protocol for refreshing of Actions */
-	public final static String ACTIONREFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
-
-	/** Protocol for refreshing Agents */
-	public final static String AGENTPING_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AgentPing";
+	public final static String REFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
 
 	/** Protocol for propagating changes on an AgentNode-Directory and to communicate all what is stored within it when a new AgentNode shows up */
 	public final static String CHANGE_PROPAGATION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ChangePropagation";
@@ -99,7 +97,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 *  This Interval is used for Alive-detection of other AgentNodes too. If there will be no message from another
 	 *  AgentNode within two times this interval the AgentNode will be removed from this Directory with all entries
 	 *  of Agents or Actions from it. */
-	private long _changePropagateInterval = 3000;
+	private long _changePropagateInterval = 3500;
 
 
 	/** Destroyer for the Directory */
@@ -124,7 +122,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	/** decides if timer should be stopped */
 	private boolean _timerStop = false;
 
-	/** Module that holds all stored <code>Action</code>s within the Directory up to date */
+	/** Module that holds all stored local <code>Action</code>s within the Directory up to date */
 	private SpaceRefresher _refresher = null; 
 
 	/** Module that regulary ping <code>Agent</code>s to check if they are still alive */
@@ -264,6 +262,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * This method will be called to initialize this AgentNodeBean
 	 */
 	public void doInit(){
+		log.debug("##init## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " is initializing.");
 		_otherNodesBase = new AgentNodeDataBase();
 
 		_additionBuffer = new FactSet();
@@ -292,7 +291,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		} catch (CommunicationException e) {
 			e.printStackTrace();
 		}
-
+		log.debug("##init## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " has been initialized.");
 	}
 
 
@@ -301,6 +300,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * This method will be called to get this AgentNodeBean going
 	 */
 	public void doStart(){
+
+		log.debug("##start## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " is starting.");
 
 		FactSet myData = new FactSet(getLocalActions());
 		myData.add(getLocalAgents());
@@ -316,9 +317,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 		_timer = new Timer();
 		_timer.schedule(_refresher, _firstRefresh, _refreshingIntervall);
-		_timer.schedule(_agentPinger, _agentPingIntervall);
-		_timer.schedule(_changePropagator, _changePropagateInterval);
-		_timer.schedule(_agentNodeWatcher, 1000);
+		_timer.schedule(_agentPinger, 1000, _agentPingIntervall);
+		_timer.schedule(_changePropagator, 1000, _changePropagateInterval);
+		_timer.schedule(_agentNodeWatcher, 1000, 1000);
+		log.debug("##start## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " has been started.");
 	}
 
 	/**
@@ -326,7 +328,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * This method will be called to stop this AgentNodeBean and hold all activity
 	 */
 	public void doStop(){
-		//TODO Broker is stopped before this message get's out! change that
+		log.debug("##stop## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " is stopping.");
 		_timerStop = true;
 		_timer.cancel();
 
@@ -351,6 +353,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		}
 
 		_messageTransportIsActive = false;
+		log.debug("##stop## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " has stopped.");
 	}
 
 	/**
@@ -358,6 +361,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * This method will be called to cleanup this AgentNodeBean and give free used memory
 	 */
 	public void doCleanup(){
+		log.debug("##cleanup## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " is cleaning up.");
 		try {
 			_messageTransport.doCleanup();
 		} catch (Exception e1) {
@@ -372,6 +376,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		destroyer = null;
 		_otherNodesBase = null;
 		_timer.purge();
+		log.debug("##cleanup## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " has cleaned up.");
 	}
 
 	private void sendMessage(JiacMessage message, ICommunicationAddress address){
@@ -663,77 +668,69 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 					log.debug("Message is holding SearchRequest");
 					if (request.getSearchTemplate() != null){
 
-						// notMe == true, if message is global and coming from me, so I don't have to answer again.
-						boolean notMe = false;
-
-						if (message.getHeader("SpareMe") != null){
-							notMe = message.getHeader("SpareMe").equalsIgnoreCase(_myAddress.toString());
-						}
-
 						IFact template = request.getSearchTemplate();
 
 						log.debug("SearchRequest holds template " + template);
 						Set<IFact> result;
 
-						if (!notMe){
-							if (template instanceof IActionDescription){
-								ActionData actDat = new ActionData();
-								actDat.setActionDescription((IActionDescription) template);
+						if (template instanceof IActionDescription){
+							ActionData actDat = new ActionData();
+							actDat.setActionDescription((IActionDescription) template);
 
-								if (!header){
-									// searchRequest is strictly local!
-									actDat.setIsLocal(true);
-								}
+							if (!header){
+								// searchRequest is strictly local!
+								actDat.setIsLocal(true);
+							}
 
-								Set<ActionData> actDatSet;
-								synchronized(space){
-									actDatSet = space.readAll(actDat);
-								}
-								result = new HashSet<IFact>();
-								for (ActionData resultData : actDatSet){
-									result.add(resultData.getActionDescription());
-								}
-							} else if (template instanceof IAgentDescription){
-								IAgentDescription agentDesc = (IAgentDescription) template;
+							Set<ActionData> actDatSet;
+							synchronized(space){
+								actDatSet = space.readAll(actDat);
+							}
+							result = new HashSet<IFact>();
+							for (ActionData resultData : actDatSet){
+								result.add(resultData.getActionDescription());
+							}
 
-								if(!header){
-									// searchRequest is strictly local!
-									agentDesc.setAgentNodeUUID(agentNode.getUUID());
-								}
+						} else if (template instanceof IAgentDescription){
+							IAgentDescription agentDesc = (IAgentDescription) template;
 
+							if(!header){
+								// searchRequest is strictly local!
+								agentDesc.setAgentNodeUUID(agentNode.getUUID());
+							}
+
+							result = space.readAll(template);
+						} else {
+							synchronized(space){
 								result = space.readAll(template);
-							} else {
-								synchronized(space){
-									result = space.readAll(template);
-								}
 							}
+						}
 
-							log.debug("Result to send reads " + result);
+						log.debug("Result to send reads " + result);
 
-							SearchResponse response = new SearchResponse(request, result);
+						SearchResponse response = new SearchResponse(request, result);
 
-							JiacMessage resultMessage = new JiacMessage(response);
-							resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
+						JiacMessage resultMessage = new JiacMessage(response);
+						resultMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
 
-							log.debug("AgentNode: sending Message " + resultMessage);
-							log.debug("sending it to " + message.getSender());
+						log.debug("AgentNode: sending Message " + resultMessage);
+						log.debug("sending it to " + message.getSender());
 
-							sendMessage(resultMessage, message.getSender());
+						sendMessage(resultMessage, message.getSender());
 
-							if (isGlobal){
-								//GLOBAL SEARCH CALL!!!
-								log.debug("SearchRequest was GLOBAL request. Sending searchmessage to otherNodes");
-								JiacMessage globalMessage;
-								globalMessage = new JiacMessage(request);
-								globalMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
-								globalMessage.setHeader("SpareMe", _myAddress.toString());
+						if (isGlobal){
+							//GLOBAL SEARCH CALL!!!
+							log.debug("SearchRequest was GLOBAL request. Sending searchmessage to otherNodes");
+							JiacMessage globalMessage;
+							globalMessage = new JiacMessage(request);
+							globalMessage.setProtocol(SEARCH_REQUEST_PROTOCOL_ID);
+							globalMessage.setHeader("SpareMe", _myAddress.toString());
 
-								// Send a SearchRequest to the other Nodes
-								sendMessage(globalMessage, _otherNodes, message.getSender());
-
-							}
+							// Send a SearchRequest to the other Nodes
+							sendMessage(globalMessage, _otherNodes, message.getSender());
 
 						}
+
 					} else {
 						log.warn("SearchRequest without template received. SearchOperation aborted.");
 					}
@@ -782,7 +779,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 					}
 				}
 
-			} else if (message.getProtocol().equalsIgnoreCase(ACTIONREFRESH_PROTOCOL_ID)){
+			} else if (message.getProtocol().equalsIgnoreCase(REFRESH_PROTOCOL_ID)){
 				if (message.getPayload() instanceof IActionDescription){
 					IActionDescription actDesc = (IActionDescription) message.getPayload();
 					ActionData refreshData = new ActionData();
@@ -797,6 +794,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 						space.write(refreshData);
 					}
+				}else if (message.getPayload() instanceof IAgentDescription){
+					IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
+					_agentPinger.removePing(agentDesc);
+					
 				} else if (message.getPayload() instanceof FactSet){
 					FactSet FS = (FactSet) message.getPayload();
 
@@ -815,10 +816,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						}
 					}
 				}
-
-			} else if (message.getProtocol().equalsIgnoreCase(AGENTPING_PROTOCOL_ID)){
-				IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
-				_agentPinger.removePing(agentDesc);
 
 			} else if (message.getProtocol().equalsIgnoreCase(CHANGE_PROPAGATION_PROTOCOL_ID)){
 
@@ -941,7 +938,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * @param evt
 	 */
 	public void onEvent(LifecycleEvent evt){
-		
+
 		if (evt.getState() == LifecycleStates.STARTED){
 			if (evt.getSource() instanceof Agent){
 				Agent newAgent = (Agent) evt.getSource();
@@ -954,7 +951,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			}
 		}
 	}
-	
+
 	/**
 	 * Module that pings all stored agents and checks if they are still alive.
 	 * 
@@ -991,8 +988,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 					for (IAgentDescription agent : space.readAll(new AgentDescription())){
 						_ongoingAgentPings.add(agent);
 						ICommunicationAddress pingAddress = agent.getMessageBoxAddress();
-						JiacMessage message = new JiacMessage();
-						message.setProtocol(DirectoryAgentNodeBean.AGENTPING_PROTOCOL_ID);
+						JiacMessage message = new JiacMessage(agent);
+						message.setProtocol(REFRESH_PROTOCOL_ID);
 
 						sendMessage(message, pingAddress);
 
@@ -1042,12 +1039,19 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 				ActionData oldAct = new ActionData();
 				oldAct.setCreationTime(_currentLogicTime - 1);
+				oldAct.setIsLocal(true);
 //				System.err.println("Removing actions with timeout");
 				//First let's remove all not refreshed actions
-				space.removeAll(oldAct);
-
-
+				
+				Set<ActionData> removals = space.removeAll(oldAct);
+				synchronized(_bufferlock){
+					for (ActionData action : removals){
+						_removalBuffer.add(action);
+					}
+				}
+				
 				ActionData actionTemplate = new ActionData(_currentLogicTime);
+				actionTemplate.setIsLocal(true);
 
 
 				// Check the Space for timeouts by using the current and now obsolete logical time
@@ -1069,8 +1073,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						agentsAllreadyTold.add(agentDesc);
 						ICommunicationAddress refreshAddress = agentDesc.getMessageBoxAddress();
 
-						JiacMessage refreshMessage = new JiacMessage(actionData.getActionDescription());
-						refreshMessage.setProtocol(DirectoryAgentNodeBean.ACTIONREFRESH_PROTOCOL_ID);
+						JiacMessage refreshMessage = new JiacMessage(new Action());
+						refreshMessage.setProtocol(DirectoryAgentNodeBean.REFRESH_PROTOCOL_ID);
 
 						sendMessage(refreshMessage, refreshAddress);
 					}
@@ -1134,22 +1138,22 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 							// We've got a timeout!
 
 							// first remove agentNode from directory of known agentNodes
-							AgentNodeData agentNode = _otherNodesBase.removeFirstTimeoutNode();
+							AgentNodeData otherAgentNode = _otherNodesBase.removeFirstTimeoutNode();
 
-							log.warn("AgentNode " + agentNode.getUUID() + " isn't avaiable anymore. Removing associated Agents... ");
+							log.warn(agentNode.getName() + ": AgentNode " + otherAgentNode.getUUID() + " isn't avaiable anymore. Removing associated Agents... ");
 
-							String UUID = agentNode.getUUID();
+							String UUID = otherAgentNode.getUUID();
 							// now get all agents associated with it
 							Set<AgentDescription> timeoutAgents = space.removeAll(new AgentDescription(null, null, null, null, UUID));
 
 							for (AgentDescription agent : timeoutAgents){
 
 								// for every agent on the timeout node remove all actions related to it
-								log.warn("Removing agent from Directory because of AgentNodeTimeout. Agent is named: " + agent.getName());
+								log.warn(agentNode.getName() + ": Removing agent from Directory because of AgentNodeTimeout. Agent is named: " + agent.getName());
 								ActionData timeoutActionTemplate = new ActionData();
 								timeoutActionTemplate.setProviderDescription(agent);
 								for (ActionData actDat : space.removeAll(timeoutActionTemplate)){
-									log.warn("Removing action due to AgentNodeTimeout. Action removed is called: " + actDat.getActionDescription().getName());
+									log.warn(agentNode.getName() + ": Removing action due to AgentNodeTimeout. Action removed is called: " + actDat.getActionDescription().getName());
 								}
 							}	
 						} else {

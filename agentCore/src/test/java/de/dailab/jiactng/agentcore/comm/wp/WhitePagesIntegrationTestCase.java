@@ -32,7 +32,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	private static boolean _deactivateTests = false;
 	
 	private static IAgentNode _agentNode;
-//	private static IAgentNode _otherNode;
+	private static IAgentNode _otherNode;
 	private static IAgent _whitePagesAgent;
 	private static WhitePagesTestBean _whitePagesTestBean;
 	private static RemoteActionTestBean _remoteActionTestBean;
@@ -51,7 +51,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			_xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/wp/WhitePagesIntegrationTestContext.xml");
 			
 			_agentNode = (IAgentNode) _xmlContext.getBean("WhitePagePlatform");
-//			_otherNode = (IAgentNode) _xmlContext.getBean("RemoteWhitePagePlatform");
+			_otherNode = (IAgentNode) _xmlContext.getBean("RemoteWhitePagePlatform");
 			
 			List<IAgentNodeBean> agentNodeBeans = _agentNode.getAgentNodeBeans();
 			for (IAgentNodeBean bean : agentNodeBeans){
@@ -105,7 +105,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		
 		_whitePagesTestBean.searchForAgentDesc("FindMeAgent", false);
 		try {
-			Thread.sleep(3500);
+			Thread.sleep(1500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -131,7 +131,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 		_whitePagesTestBean.searchForAgentDesc("NixaAgentos", false);
 		try {
-			Thread.sleep(2500);
+			Thread.sleep(1500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -167,7 +167,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		_whitePagesTestBean.searchForActionDesc(actionDesc, false);
 		
 		try {
-			Thread.sleep(3500);
+			Thread.sleep(2500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -198,7 +198,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		_whitePagesTestBean.searchForActionDesc(actionDesc, false);
 		
 		try {
-			Thread.sleep(3500);
+			Thread.sleep(2500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -275,7 +275,18 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 				e.printStackTrace();
 			}
 			
-			//TODO Check if it really has gone from the directory
+			// last but not least check if it realy is gone
+			_whitePagesTestBean.searchForAgentDesc("AddMeAgent", false);
+			try {
+				Thread.sleep(2500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			results = _whitePagesTestBean.getLastResult();
+			
+			assertNotNull(results);
+			assertEquals(0, results.size());
+			
 			
 	}
 
@@ -396,7 +407,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		_remoteActionTestBean.useRemoteAction(remoteAction, params);
 		
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(4000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -494,10 +505,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 	
 		Action action = new Action(GlobalRemoteActionProviderBean.ACTION_GET_GLOBAL_RESULT);
-		_whitePagesTestBean.searchForActionDesc(action, true, new Long(5000));
+		_whitePagesTestBean.searchForActionDesc(action, true, new Long(2000));
 		
 		try {
-			Thread.sleep(7500);
+			Thread.sleep(3500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -556,7 +567,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			System.err.println("--- TestGlobalAgentSearching ---");
 		}
 		try {
-			Thread.sleep(7500);
+			Thread.sleep(1500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -565,10 +576,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 			System.err.println(": : Searching for RemoteAgentOnOtherNode");
 		}
 		
-		_whitePagesTestBean.searchForAgentDesc("RemoteAgentOnOtherNode", true, new Long(5000));
+		_whitePagesTestBean.searchForAgentDesc("RemoteAgentOnOtherNode", true, new Long(2000));
 		
 		try {
-			Thread.sleep(7500);
+			Thread.sleep(2500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -608,10 +619,10 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		}
 	
 		Action action = new Action(GlobalRemoteActionProviderBean.ACTION_GET_GLOBAL_RESULT);
-		_whitePagesTestBean.searchForActionDesc(action, true, new Long(5000));
+		_whitePagesTestBean.searchForActionDesc(action, true, new Long(2000));
 		
 		try {
-			Thread.sleep(7500);
+			Thread.sleep(2500);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -713,32 +724,87 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 		AgentDescription agentDesc = (AgentDescription) results.get(0);
 		assertEquals("RemoteAgentOnOtherNode", agentDesc.getName());
 		
-		_lastTestDone = true;
 	}
-		
 	
 	
-	//TODO NoSuchAction Exception isn't thrown at the moment. Check and Resolve
-//	public void testNoSuchAction(){
-//		
-//		if (_debug) {
-//			System.err.println("TestNoSuchAction");
+	public void testAgentNodeShutdown(){
+//		if (_deactivateTests) {
+//			assertTrue(true);
+//			return;
 //		}
-//		Action fakeRemoteAction = new Action("NoSuchAction", _directoryAccessBean, new Class[] {}, new Class[] {Object.class});
-//		_remoteActionTestBean.useRemoteAction(fakeRemoteAction, new Object[] {Object.class});
-//		
-//		try {
-//			Thread.sleep(3500);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//		ActionResult result = _remoteActionTestBean.getLastActionResult();
-//		assertNotNull(result);
-//		assertNotNull(result.getFailure());
-//		assertTrue(result.getFailure() instanceof NoSuchActionException);
-//		_lastTestDone = true;
-//	}
+		if (_debug) {
+			System.err.println("--- TestAgentNodeShutdown ---");
+		}
 
 	
+	_directoryAgentNodeBean.setCacheIsActive(true);
+	
+	try {
+		Thread.sleep(4000);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	
+	Action action = new Action();
+	
+	_whitePagesTestBean.searchForActionDesc(action, true, new Long(2000));
+	
+	try {
+		Thread.sleep(3500);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	
+	List<IFact> results = _whitePagesTestBean.getLastResult();
+	
+	assertEquals(3, results.size());
+	
+	try {
+		Thread.sleep(3500);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	
+	try {
+		((SimpleAgentNodeMBean)_otherNode).shutdown();
+	} catch (Exception e1) {
+		e1.printStackTrace();
+	}
+	
+	try {
+		Thread.sleep(10000);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	
+	_whitePagesTestBean.searchForActionDesc(action, true, new Long(2000));
+	
+	try {
+		Thread.sleep(3500);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	
+	results = _whitePagesTestBean.getLastResult();
+	
+	assertEquals(2, results.size());
+		
+	}	
+	
+	public void testAgentNodeTimeout(){
+		if (_deactivateTests) {
+		assertTrue(true);
+		return;
+		}
+		
+		if (_debug) {
+			System.err.println("--- TestAgentNodeTimeout ---");
+		}
+		
+		//TODO AgentNode is set to decent changepropagationinterval, wait, check, shutdown
+		// Note: PropagationInterval has to be set on startup. Timerobject seems to doesn't change when interval is changed during runtime!
+		
+		
+		_lastTestDone = true;
+	}
 }

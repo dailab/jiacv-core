@@ -631,10 +631,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		// call stop on all beans of the agentnode
+		// call stop on all beans of the agentnode in reverse order
 		// TODO testing
 		if (_agentNodeBeans != null) {
-			for (IAgentNodeBean anb : _agentNodeBeans) {
+			for (int i=_agentNodeBeans.size()-1; i>=0; i--) {
+				IAgentNodeBean anb = _agentNodeBeans.get(i);
 				try {
 					if (log != null) {
 						log.info("Trying to stop agentnodebean: " + anb.getBeanName());
@@ -667,10 +668,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		// call cleanup on all beans of the agentnode
+		// call cleanup on all beans of the agentnode in reverse order
 		// TODO testing
 		if (_agentNodeBeans != null) {
-			for (IAgentNodeBean anb : _agentNodeBeans) {
+			for (int i=_agentNodeBeans.size()-1; i>=0; i--) {
+				IAgentNodeBean anb = _agentNodeBeans.get(i);
 				try {
 					if (log != null) {
 						log.info("Trying to cleanup agentnodebean: " + anb.getBeanName());

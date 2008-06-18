@@ -21,7 +21,7 @@
 		</property>
 		<property name="agentNodeBeans">
 			<list>
-				<ref bean="WhitePagesTestJMSBroker" />
+				<ref bean="WhitePagesPlatformJMSBroker" />
 				<ref bean="DirectoryAgentNodeBean"/>
 			</list>
 		</property>
@@ -64,6 +64,9 @@
 	</property>
 	</bean>
 	
+	<bean name="AddMeAgent" parent="SimpleAgent" singleton="false">
+	</bean>
+	
 	<bean name="RemoteAgentOnOtherNode" parent="SimpleAgent" singleton="false">
 		<property name="agentBeans">
 			<list>
@@ -91,7 +94,7 @@
 		The special JMS Broker.
 		It has a standard TCP connector
 	-->
-	<bean name="WhitePagesTestJMSBroker" parent="ActiveMQBroker" singleton="true" lazy-init="true">	
+	<bean name="WhitePagesPlatformJMSBroker" parent="ActiveMQBroker" singleton="true" lazy-init="true">	
 	</bean>
 	
 </beans>

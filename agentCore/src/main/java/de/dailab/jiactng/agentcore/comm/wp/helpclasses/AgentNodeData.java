@@ -22,7 +22,14 @@ public class AgentNodeData implements Comparable<AgentNodeData>{
 
 	@Override
 	public int compareTo(AgentNodeData otherNode) {
-		return _timeoutTime.compareTo(otherNode.getTimeoutTime());	
+		if (_UUID.equals(otherNode.getUUID())){
+			return 0;
+		} else if (_timeoutTime != otherNode.getTimeoutTime()){
+			return _timeoutTime.compareTo(otherNode.getTimeoutTime());
+		} else {
+			otherNode.setTimeoutTime(otherNode.getTimeoutTime() + 1);
+			return _timeoutTime.compareTo(otherNode.getTimeoutTime());
+		}
 	}
 
 	@Override
@@ -37,6 +44,11 @@ public class AgentNodeData implements Comparable<AgentNodeData>{
 		} else {
 			return super.equals(obj);
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return new String("AgentNode UUID: " + _UUID + "; has timeout=" + _timeoutTime);
 	}
 
 }

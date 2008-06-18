@@ -119,6 +119,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 	/** Timerobject that schedules update and refreshment activities */
 	private Timer _timer;
+	
 	/** decides if timer should be stopped */
 	private boolean _timerStop = false;
 
@@ -340,7 +341,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 		JiacMessage helloWorldMessage = new JiacMessage(moc);
 		helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-		helloWorldMessage.setHeader("HelloWorld", "true");
+		helloWorldMessage.setHeader("ByeWorld", "true");
 
 		// let the world now what we had to offer so the other Nodes can remove it
 		sendMessage(helloWorldMessage, _otherNodes);
@@ -548,7 +549,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 		if (getState() == LifecycleStates.STARTED){	
 			if (isActive == false){
-				log.warn("Cache within DirectoryAgentNodeBean on AgentNode " + agentNode + " DISABLED -> erasing all nonlocal entries!");
+				log.info("Cache within DirectoryAgentNodeBean on AgentNode " + agentNode + " DISABLED -> erasing all nonlocal entries!");
 
 				synchronized(space){
 					FactSet myData = new FactSet(getLocalActions());
@@ -866,8 +867,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 
 					// Message holds Changes for the global Cache send from another Node
-					if (message.getPayload() instanceof MessageOfChange){
-						if (message.getPayload() != null){
+					if (message.getPayload() != null){
+						if (message.getPayload() instanceof MessageOfChange){
 
 							MessageOfChange moc = (MessageOfChange) message.getPayload();
 
@@ -902,6 +903,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 											space.write(actDat);
 										}
 									}
+								}
+								
+								if (message.getHeader("ByeWorld") != null){
+									log.info("AgentNode with UUID " + message.getHeader("UUID") + " is shutting down.");
+									_otherNodesBase.remove(message.getHeader("UUID"));
 								}
 							}
 						} 

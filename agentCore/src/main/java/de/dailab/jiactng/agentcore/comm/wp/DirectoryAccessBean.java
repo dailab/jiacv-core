@@ -36,7 +36,6 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
-import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * This Class is meant to work on the side of the agent that is searching
@@ -266,6 +265,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_timer.cancel();
 		memory.detach(_searchRequestHandler);
 		memory.detach(_remoteActionHandler);
+//		memory.detach(_refreshAgent);
 
 		synchronized (_requestID2ActionMap){
 			for (String key : _requestID2ActionMap.keySet()){

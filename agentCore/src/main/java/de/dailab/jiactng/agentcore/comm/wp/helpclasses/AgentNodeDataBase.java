@@ -2,62 +2,55 @@ package de.dailab.jiactng.agentcore.comm.wp.helpclasses;
 
 import java.util.TreeMap;
 
+/**
+ * 
+ * This Class is meant to store AgentNodeData within a Database that's capable of sorting them
+ * both by timeouts and UUIDs. It is used within the <code>DirectoryAgentNodeBean</code> to keep track of
+ * other AgentNodes that have committed entries to it.
+ * 
+ * @author Martin Loeffelholz
+ *
+ */
 public class AgentNodeDataBase {
-	private TreeMap<String, AgentNodeData> _addressToAgentNodeDataMap;
-	private TreeMap<Long, AgentNodeData> _timeoutToAgentNodeDataMap;
-	
+	private TreeMap<AgentNodeData, AgentNodeData> _dataBase;
+
 	public AgentNodeDataBase() {
-		_addressToAgentNodeDataMap = new TreeMap<String, AgentNodeData>();
-		_timeoutToAgentNodeDataMap = new TreeMap<Long, AgentNodeData>();
+		_dataBase = new TreeMap<AgentNodeData, AgentNodeData>();
 	}
 	
 	public synchronized void clear(){
-		_addressToAgentNodeDataMap.clear();
-		_timeoutToAgentNodeDataMap.clear();
+		_dataBase.clear();
 	}
 	
 	public synchronized void put(AgentNodeData otherNode){
-		if ((otherNode.getUUID() == null) || (otherNode.getTimeoutTime() == null)){
-			System.err.println("AgentNodeDataBase ERROR: AgentNodeData had eith no UUID or TimeoutTime - storage denied!");
-			return;
+		if (_dataBase.containsKey(otherNode)){
+			_dataBase.remove(otherNode);
+			_dataBase.put(otherNode, otherNode);
+		} else {
+			_dataBase.put(otherNode, otherNode);
 		}
-		_addressToAgentNodeDataMap.put(otherNode.getUUID(), otherNode);
-		_timeoutToAgentNodeDataMap.put(otherNode.getTimeoutTime(), otherNode);
 	}
 	
 	public synchronized AgentNodeData get(String UUID){
-		if (UUID == null){
-			return null;
-		} else {
-			return _addressToAgentNodeDataMap.get(UUID);
-		}
-	}
-	
-	public synchronized AgentNodeData get(Long timeout){
-		if (timeout == null){
-			return null;
-		} else {
-			return _timeoutToAgentNodeDataMap.get(timeout);
-		}
+		AgentNodeData element = new AgentNodeData();
+		element.setUUID(UUID);
+		
+		return _dataBase.get(element);
 	}
 	
 	public synchronized Long getFirstTimeout(){
-		if (_timeoutToAgentNodeDataMap.isEmpty()){
+		if (_dataBase.isEmpty()){
 			return null;
 		} else {
-			return _timeoutToAgentNodeDataMap.firstKey();
+			return _dataBase.firstKey().getTimeoutTime();
 		}
 	}
 	
 	public synchronized AgentNodeData removeFirstTimeoutNode(){
-		if (_timeoutToAgentNodeDataMap.isEmpty()) {
+		if (_dataBase.isEmpty()){
 			return null;
 		} else {
-			AgentNodeData otherNode = _timeoutToAgentNodeDataMap.remove(_timeoutToAgentNodeDataMap.firstKey());
-			if (otherNode != null) {
-				_addressToAgentNodeDataMap.remove(otherNode.getUUID());
-			}
-			return otherNode;
+			return _dataBase.remove(_dataBase.firstKey());
 		}
 	}
 	
@@ -65,16 +58,22 @@ public class AgentNodeDataBase {
 		if (UUID == null){
 			return null;
 		} else {
-			AgentNodeData otherNode = _addressToAgentNodeDataMap.remove(UUID);
-			if (otherNode != null){
-				_timeoutToAgentNodeDataMap.remove(otherNode.getTimeoutTime());
-			}
-			return otherNode;
+			AgentNodeData otherNode = new AgentNodeData();
+			otherNode.setUUID(UUID);
+			return _dataBase.remove(otherNode);
 		}
 	}
 	
 	public boolean isEmpty(){
-		return (_addressToAgentNodeDataMap.isEmpty() && _timeoutToAgentNodeDataMap.isEmpty());
+		return _dataBase.isEmpty();
+	}
+	
+	public void printDataBase(){
+		System.out.println("AgentNode-DataBase is having the following Entries: ");
+		int n = 1;
+		for (AgentNodeData and : _dataBase.keySet()){
+			System.out.println("Entry " + n++ + " reads: " + and);
+		}
 	}
 
 }

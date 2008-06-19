@@ -35,6 +35,9 @@ public class ActionPerformedNotification extends Notification {
 	/** The description of the performed action. */
 	private String _action;
 
+	/** The description of the action parameters. */
+	private Object[] _actionParameters;
+
 	/** The duration of action execution in nanoseconds. */
 	private long _duration;
 
@@ -62,6 +65,18 @@ public class ActionPerformedNotification extends Notification {
 		_action = action.toString();
 		_duration = duration;
 		_success = success;
+		
+		// extract parameters
+		Object[] params = action.getParams();
+		int size = params.length;
+		_actionParameters = new Object[size];
+		for (int i=0; i<size; i++) {
+			try {
+				_actionParameters[i] = ((JmxDescriptionSupport)params[i]).getDescription();
+			} catch (Exception e) {
+				_actionParameters[i] = params[i].toString();
+			}
+		}
 	}
 
 	/**
@@ -112,6 +127,17 @@ public class ActionPerformedNotification extends Notification {
 	 */
 	public String getAction() {
 		return _action;
+	}
+
+	/**
+	 * Gets the description of the action parameters.
+	 * @return The array of action parameter descriptions. The representation of each parameter is 
+	 * either a string or based on JMX open types.
+	 * @see Object#toString()
+	 * @see JmxDescriptionSupport#getDescription()
+	 */
+	public Object[] getActionParameters() {
+		return _actionParameters;
 	}
 
 	/**

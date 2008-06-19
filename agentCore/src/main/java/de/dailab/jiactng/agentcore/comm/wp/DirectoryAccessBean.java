@@ -495,10 +495,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 				DoAction sourceAction = _requestID2ActionMap.remove(doAction.getSessionId());
 
 				if (sourceAction != null){
-					// got it
-					String owner = sourceAction.getSource().toString();
-					log.warn("SearchRequest from " + owner + " has timeout");
-
 					ActionResult result = null;
 					// now let's check if answers for this request were stored
 					ArrayList<IFact> results = _requestID2ResponseMap.remove(doAction.getSessionId());
@@ -507,6 +503,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						// DoAction was global SearchRequest
 						result = new ActionResult(sourceAction, new Serializable[] {results});
 					} else {
+						String owner = sourceAction.getSource().toString();
+						log.warn("SearchRequest from " + owner + " has timeout");
 						// DoAction was local SearchRequest or global without answers
 						result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
 					}

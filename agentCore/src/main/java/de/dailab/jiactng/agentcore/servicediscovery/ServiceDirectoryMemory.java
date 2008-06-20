@@ -39,24 +39,15 @@ public class ServiceDirectoryMemory {
 		space = destroyer.destroybleSpace;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void doStart() {
 	// nothing to do yet
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void doStop() {
 	// nothing to do yet
 	// persistency may go here
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void doCleanup() {
 		try {
 			destroyer.destroy();
@@ -67,114 +58,66 @@ public class ServiceDirectoryMemory {
 		destroyer = null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public String getID() {
 		return space.getID();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public ObjectMatcher getMatcher() {
 		return space.getMatcher();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public ObjectUpdater getUpdater() {
 		return space.getUpdater();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <E extends IFact> E read(E template) {
 		return space.read(template);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <E extends IFact> E read(E template, long timeout) {
 		return space.read(template, timeout);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <E extends IFact> Set<E> readAll(E template) {
 		return space.readAll(template);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <E extends IFact> Set<E> readAllOfType(Class<E> c) {
 		return space.readAllOfType(c);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <E extends IFact> E remove(E template) {
 		return space.remove(template);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <E extends IFact> E remove(E template, long timeout) {
 		return space.remove(template, timeout);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <E extends IFact> Set<E> removeAll(E template) {
 		return space.removeAll(template);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public <E extends IFact> boolean update(E template, E pattern) {
 		return space.update(template, pattern);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void write(IFact fact) {
 		space.write(fact);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public Iterator<IFact> iterator() {
 		return space.iterator();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void attach(SpaceObserver<? super IFact> observer) {
 		space.attach(observer);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void attach(SpaceObserver<? super IFact> observer, IFact template) {
 		space.attach(observer, template);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void detach(SpaceObserver<? super IFact> observer) {
 		space.detach(observer);
 	}

@@ -844,6 +844,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			System.err.println(e.getMessage());
 		}
 
+		// register agent node beans for management
+		if (_agentNodeBeans != null) {
+			for (IAgentNodeBean anb : this._agentNodeBeans) {
+				anb.enableManagement(manager);
+			}
+		}
+
 		// register agents for management
 		if (_agents != null) {
 			for (IAgent a : this._agents) {
@@ -874,6 +881,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// deregister agents from management
 		for (IAgent a : this._agents) {
 			a.disableManagement();
+		}
+
+		// deregister agent node beans from management
+		for (IAgentNodeBean anb : this._agentNodeBeans) {
+			anb.disableManagement();
 		}
 
 		// deregister agent node from management

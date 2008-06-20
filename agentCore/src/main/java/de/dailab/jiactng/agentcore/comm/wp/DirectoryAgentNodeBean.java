@@ -53,7 +53,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  *
  */
 
-public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate, ILifecycleListener{
+public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate, ILifecycleListener, DirectoryAgentNodeBeanMBean {
 
 
 	/** suffix for address-creation purposes. Will be added to the UUID of AgentNode to create Beanaddress */
@@ -465,7 +465,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * 
 	 * Default: 2000 milliseconds
 	 * 
-	 * @param firstRefresh
+	 * @return first time of refresh
 	 */
 	public long getFirstRefresh(){
 		return _firstRefresh;
@@ -490,7 +490,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * 
 	 * Default: 12000 milliseconds
 	 * 
-	 * @param agentPingIntervall time in milliseconds
+	 * @return time in milliseconds
 	 */
 	public long getAgentPingIntervall(){
 		return _agentPingIntervall;
@@ -581,8 +581,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 			}
 		}
+	}
 
-
+	/**
+	 * Checks, if incoming entries from other agent nodes are stored or ignored.
+	 * 
+	 * Default: true
+	 * 
+	 * @return <code>true</code>, if incoming entries are cached within local directory
+	 */
+	public boolean getCacheIsActive() {
+		return _cacheIsActive;
 	}
 
 	/**

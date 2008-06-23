@@ -726,7 +726,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
                 Iterator<ListenerContext> it = values.iterator();
                 int j = 0;
                 while (it.hasNext()) {
-                    String selector = it.next().selector.toString();
+                    IJiacMessage selector = it.next().selector;
                     if (selector == null) {
                         value[j] = "null";
                     } else {

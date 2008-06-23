@@ -302,7 +302,7 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         	String[] itemNames = new String[] {"Name", "InputTypes", "ResultTypes", "ProviderBean"};
         	OpenType[] itemTypes = new OpenType[] {SimpleType.STRING, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), SimpleType.STRING};
         	CompositeType rowType = new CompositeType(actions.get(0).getClass().getName(), "provided action", itemNames, itemNames, itemTypes);
-        	TabularType tabularType = new TabularType(actions.getClass().getName(), "list of provided actions", rowType, new String[] {"Name"});
+        	TabularType tabularType = new TabularType(actions.getClass().getName(), "list of provided actions", rowType, new String[] {"Name", "InputTypes"});
         	TabularData actionList = new TabularDataSupport(tabularType);
 
         	// fill table

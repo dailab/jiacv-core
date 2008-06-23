@@ -16,12 +16,6 @@ import java.util.concurrent.Future;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.CompositeDataSupport;
-import javax.management.openmbean.CompositeType;
-import javax.management.openmbean.OpenDataException;
-import javax.management.openmbean.OpenType;
-import javax.management.openmbean.SimpleType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -752,35 +746,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			Log4jConfigurer.initLogging(loggingConfig);
 		} catch (FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
-		}
-	}
-
-	/**
-	 * Getter for attribute "AmqBroker" of the managed agent node.
-	 * 
-	 * @return the configuration of the embedded ActiveMQ broker of this agent
-	 *         node
-	 */
-	public CompositeData getAmqBrokerValues() {
-		// if ((_embeddedBroker == null) || (_embeddedBroker.getValues() ==
-		// null)) {
-		// return null;
-		// }
-		// BrokerValues values = _embeddedBroker.getValues();
-		String[] itemNames = new String[] { "DiscoveryAddress", "DiscoveryMethod", "Name", "Url", "Jmx", "Persistent", "Port", "Protocol" };
-		try {
-			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "ActiveMQ broker values", itemNames, new String[] { "DiscoveryAddress", "DiscoveryMethod",
-					"Name", "Url", "Jmx", "Persistent", "Port", "Protocol" }, new OpenType[] { SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.STRING, SimpleType.BOOLEAN,
-					SimpleType.BOOLEAN, SimpleType.STRING, SimpleType.STRING });
-			return new CompositeDataSupport(type, itemNames, new Object[] {
-			// values.getDiscoveryAddress(), values.getDiscoveryMethod(),
-					// values.getName(), values.getUrl(), values.isJmx(),
-					// values.isPersistent(), values.getPort(),
-					// values.getProtocol()
-					});
-		} catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
 		}
 	}
 

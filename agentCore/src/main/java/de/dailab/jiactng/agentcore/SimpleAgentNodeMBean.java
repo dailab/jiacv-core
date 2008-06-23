@@ -3,8 +3,6 @@ package de.dailab.jiactng.agentcore;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import javax.management.openmbean.CompositeData;
-
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
 import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
@@ -97,12 +95,6 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * @return the class of agent beans running in this agent node
 	 */
 	public List<String> getAgentNodeBeanClasses();
-
-	/**
-	 * Getter for attribute "AmqBroker" of the managed agent node.
-	 * @return the configuration of the embedded ActiveMQ broker of this agent node
-	 */
-	public CompositeData getAmqBrokerValues();
 
 	/**
 	 * Shuts down the managed agent node.

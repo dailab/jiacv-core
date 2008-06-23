@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+	<properties>
+		<title>Directory of Agents and Services</title>
+		<author email="martin.loeffelholz@dai-labor.de"> Martin Loeffelholz	</author>
+	</properties>
+	<body>
+		<section name="Introduction">
+			<subsection name="What does this Directory provide">
+				<p>
+					This directory is supplying actions for...
+					<ul>
+						<li>storing agents and actions</li>
+						<li>
+							searching for agents or actions
+							<p>
+								doing so either on the local agentnode
+								or globally within a group of agentnodes
+							</p>
+						</li>
+						<li>
+							using actions that are provided by other
+							agents on the same or a remote agentnode
+						</li>
+						<li>
+							automatic template-driven enlistment of
+							actions provided by an agent
+						</li>
+						<li>
+							removal of actions from the directory by
+							usage of templates
+						</li>
+					</ul>
+				</p>
+				<p>
+					This directory also provides...
+					<ul>
+						<li>
+							caching for agents and actions on remote
+							agentnodes (configurable)
+						</li>
+						<li>
+							automatic propagation of changes on one
+							agentnode to the other agentnodes of it's
+							group
+						</li>
+						<li>
+							timeout- and refreshment-managment for
+							stored information
+						</li>
+					</ul>
+				</p>
+			</subsection>
+
+			<subsection name="Directorybeans and what they do">
+				<p>
+					This Directory consists of two beans.
+					<ul>
+						<li>
+							The DirectoryAccessBean
+							<p>
+								This bean provides the agent side of the
+								directory usage. It also provides
+								result-routing for actions provided by
+								remote agents.
+							</p>
+						</li>
+						<li>
+							The DirectoryAgentNodeBean
+							<p>
+								This bean holds the actual directory and
+								is placed onto the AgentNode. It
+								communicates with other AgentNodes that
+								are within the same group as itself and
+								may cache remote entries from other
+								Nodes, which is by default activated.
+							</p>
+						</li>
+					</ul>
+				</p>
+			</subsection>
+		</section>
+
+
+		<section name="Getting started">
+
+			<subsection name="The Agent-Side">
+				<p>
+					To use the directory every agent that want to
+					provide actions to the public needs to have an
+					<code>DirectoryAccessBean</code>
+					. It basicaly needs no more configuration and will
+					find the
+					<code>DirectoryAgentNodeBean</code>
+					, (which has to be present on the local agentnode),
+					automaticly.
+				</p>
+				<p>
+					If you want to use autoenlistment of actions on this
+					agent you might want to change the interval after
+					which there will be a check for new actions to make
+					public. The default is 2 seconds. To actualy have an
+					action been provided through this system an agent
+					has to add every action that it wants to provide to
+					the public has to be added to the directory. Either
+					via „ACTION_ADD_ACTION_TO_DIRECTORY“ or by using
+					templates. Actions that are not communicated in
+					either one of this ways won't be found through a
+					searchaction.
+				</p>
+				<p>
+					You can configure the
+					<code>DirectoryAccessBean</code>
+					by Spring
+					<source>
+						<bean name="DirectoryAccessBean"
+							class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean"
+							singleton="false" />
+						</beans>
+
+						<bean
+							name="DirectoryAccessBeanWithDifferentAutoEnlistInterval"
+							class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean"
+							singleton="false" />
+						<property name="autoEnlisteningInterval"
+							value="3000" />
+						</beans>
+
+					</source>
+				</p>
+			</subsection>
+
+			<subsection name="The AgentNode-Side">
+				<p>
+					Every agentnode on which agents want to use and
+					communicate themselves and their services an
+					<code>DirectoryAgentNodeBean</code>
+					is needed. This is the actual directory. It stores
+					all agents on that node and the actions they
+					provide. It also keeps track of other agentnodes
+					within it's group and deletes all information from
+					an agentnode and its agents if there won't be any
+					communication with it during a given
+					timeout-interval. The user doesn't have to produce
+					traffic to keep agentnodes alive within the cache of
+					the other nodes within it's group as there will be
+					some overhead all the time between the Nodes to do
+					so.
+				</p>
+			</subsection>
+		</section>
+	</body>
+
+</document>

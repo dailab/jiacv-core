@@ -171,7 +171,7 @@ public class WhitePagesTestBean extends AbstractAgentBean implements ResultRecei
 	/**
 	 * returns the last result(s) of a searchrequest and deletes the resultstorage
 	 * 
-	 * @return
+	 * @return the last result this bean received
 	 */
 	public List<IFact> getLastResult(){
 		synchronized(_results){

@@ -1,0 +1,338 @@
+<?xml version="1.0"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+	<properties>
+		<title>Directory of Agents and Services</title>
+		<author email="martin.loeffelholz@dai-labor.de"> Martin Loeffelholz	</author>
+	</properties>
+	<body>
+		<section name="Introduction">
+			<subsection name="What does this Directory provide">
+				<p>
+					This directory is supplying actions for...
+					<ul>
+						<li>storing agents and actions</li>
+						<li>
+							searching for agents or actions doing so
+							either on the local agentnode or globally
+							within a group of agentnodes
+						</li>
+						<li>
+							using actions that are provided by other
+							agents on the same or a remote agentnode
+						</li>
+						<li>
+							automatic template-driven enlistment of
+							actions provided by an agent
+						</li>
+						<li>
+							removal of actions from the directory by
+							usage of templates
+						</li>
+					</ul>
+				</p>
+				<p>
+					This directory also provides...
+					<ul>
+						<li>
+							caching for agents and actions on remote
+							agentnodes (configurable)
+						</li>
+						<li>
+							automatic propagation of changes on one
+							agentnode to the other agentnodes of it's
+							group
+						</li>
+						<li>
+							timeout- and refreshment-managment for
+							stored information
+						</li>
+					</ul>
+				</p>
+			</subsection>
+
+			<subsection name="Directorybeans and what they do">
+				<p>
+					This Directory consists of two beans.
+					<ul>
+						<li>
+							<b>The DirectoryAccessBean</b>
+							<br />
+								This bean provides the agent side of the
+								directory usage. It also provides
+								result-routing for actions provided by
+								remote agents.
+						</li>
+						<li>
+							<b>The DirectoryAgentNodeBean</b>
+							<br />
+								This bean holds the actual directory and
+								is placed onto the AgentNode. It
+								communicates with other AgentNodes that
+								are within the same group as itself and
+								may cache remote entries from other
+								Nodes, which is by default activated.
+						</li>
+					</ul>
+				</p>
+			</subsection>
+		</section>
+
+
+		<section name="Getting started">
+			<subsection name="The Agent-Side">
+				<p>
+					To use the directory every agent that want to
+					provide actions to the public needs to have an
+					<code>DirectoryAccessBean</code>
+					. It basically needs no more configuration and will
+					find the
+					<code>DirectoryAgentNodeBean</code>
+					, (which has to be present on the local AgentNode),
+					automatically. <br />
+					<br />
+					<b>Important:</b><i>You still need a CommunicationBean
+					on the Agent, so that the DirectoryAccessBean will
+					be able to actually communicate with the Directory,
+					as it doesn't have own means of communication within
+					itself. </i> <br />
+				</p>
+				<p>
+				<br />
+					If you want to use autoenlistment of actions on this
+					agent you might want to change the interval after
+					which there will be a check for new actions to make
+					public. The default is 2 seconds. To actually have an
+					action been provided through this system an agent
+					has to add every action that it wants to provide to
+					the public has to be added to the directory. Either
+					via &quot;ACTION_ADD_ACTION_TO_DIRECTORY&quot; or by using
+					templates. Actions that are not communicated in
+					either one of this ways won't be found through a
+					search-action.
+				</p>
+				<p>
+					You can configure the
+					<code>DirectoryAccessBean</code>
+					by using Spring
+					<source>
+	&lt;bean name="DirectoryAccessBean" 
+		class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean"	singleton="false" /&gt;
+
+	&lt;bean name="DirectoryAccessBeanWithDifferentAutoEnlistInterval"
+		class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean"
+		singleton="false" /&gt;
+			&lt;property name="autoEnlisteningInterval" value="3000" /&gt;
+	&lt;/bean&gt;
+					</source>
+				</p>
+			</subsection>
+
+			<subsection name="The AgentNode-Side">
+				<p>
+					Every AgentNode on which agents want to use and
+					communicate themselves and their services an
+					<code>DirectoryAgentNodeBean</code>
+					is needed. <br /> This is the actual directory. It stores
+					all agents on that node and the actions they
+					provide. It also keeps track of other AgentNodes
+					within it's group and deletes all information from
+					an AgentNode and its agents if there won't be any
+					communication with it during a given
+					timeout-interval. (see also changePropagationInterval below) <br />
+					<br />
+					<i><b>Note</b>The user doesn't have to produce
+					traffic to keep AgentNodes alive within the cache of
+					the other nodes within it's group as there will be
+					some overhead all the time between the Nodes to do
+					so.</i>
+				</p>
+				<p>
+					Configureable inside the DirectoryAgentNodeBean are
+					
+					<ul>
+						<li>
+							<b>The messageTransport</b>
+							<br />
+							As there is no memory on an AgentNode and so
+							no way of processing send-actions from the
+							CommunicationBean the DirectoryAgentNodeBean
+							has to use it's own MessageTransport. This
+							transport has to implement the
+							de.dailab.jiactng.agentcore.comm.transport.MessageTransport
+							Interface.
+							<br /><br />
+							<i> <b>Note:</b> this is the only option that has to be
+							actually configured before using this bean.
+							All other Options have default-values
+							already set to them.</i>
+							<br />
+							It is discouraged to change it during runtime.
+							<br /><br />
+						</li>
+						<br />
+						<li>
+							<b>The refreshInterval</b>
+							<br />
+							After each of this intervals the presence of
+							all stored actions that weren't refreshed
+							during this interval will be checked. To do so
+							a Message will be sent to each Agent that had
+							stored such actions within the directory ordering
+							it to refresh them. The DirectoryAccessBean will do
+							so automatically. Each Action that isn't refreshed
+							in time will be erased from the directory.
+							<br /><br />
+							<i><b>Note:</b> The default value is 2000 ms <br />
+							It only will have any effect to change it if this is done before the start state.
+							Changing it during runtime would require the Bean to first been stopped waited
+							for a while and then be started again.</i>
+							<br />
+							<i><b>Important:</b> Only local actions will be checked.
+							To keep remote actions updated it is trusted
+							that other AgentNodes will send messages.
+							(see also changePropagateInterval)</i>
+							<br /><br />
+						</li>
+						<br />
+						<li>
+							<b>The firstRefresh</b>
+							<br />
+							The DirectoryAgentNodeBean will wait for this time
+							before it will check the timeouts of actions 
+							(see RefreshInterval) the first time
+							<br /><br />
+							<i><b>Note:</b> The default value is 2000 ms <br />
+							It only will have any effect to change it if this is done before the start state.
+							Changing it during runtime would require the Bean to first been stopped waited
+							for a while and then be started again.</i>
+							<br /><br />
+						</li>
+						<br />
+						<li>
+							<b>The agentPingInterval</b>
+							<br />
+							After each of these intervals the presence
+							of local Agents stored within will be
+							checked. As for remote actions it is trusted
+							that every AgentNode will communicate changes
+							of it's local Agents to the other nodes of that
+							group. (see also changePropagateInterval) 
+							<br /><br />
+							<i><b>Note:</b> The default value is 12000 ms, first interval will be started with 1000 ms delay <br />
+							It only will have any effect to change it if this is done before the start state.
+							Changing it during runtime would require the Bean to first been stopped waited
+							for a while and then be started again.</i>
+							<br /><br />
+						</li>
+						<br />
+						<li>
+							<b>The changePropagateInterval</b>
+							<br />
+							After each of this intervals this
+							DirectoryAgentNodeBean will communicate all
+							changes made to it's Directory to the other
+							AgentNodes within its group. If there are no
+							changes it will send an empty pingmessage
+							<br />
+							Furthermore this interval is used to decide if
+							an AgentNode is still active, by erasing all
+							AgentNodes, their Agents and Actions that havn't
+							send a Message of this kind within two times this
+							interval.
+							<br />
+							One Idea of this activity-check is that only
+							local checks of agents and actions have to be
+							made, minimizing the number and size of Messages
+							needed as overhead.
+							<br /><br />
+							<i><b>Note:</b> The default value is 3000 milliseconds <br />
+							It only will have any effect to change it if this is done before the start state.
+							Changing it during runtime would require the Bean to first been stopped waited
+							for a while and then be started again.</i>
+							<br /><br />
+						</li>
+						<br />
+						<li>
+							<b>The otherNodes address</b>
+							<br />
+							This address allows it to group different AgentNodes and
+							connecting them to a network of Directories. This address
+							will be used to communicate all changes on a local agentnode
+							to other nodes using the same address.
+							<br />
+							A DirectoryAgentNodeBean can only be member of one group.
+							<br />
+							If the cache is disabled this address is also used to
+							communicate global search-actions to the world outside of
+							the AgentNode this bean is on.
+							<br /><br />
+							<i><b>Note:</b> The default address is created from the AGENTNODESGROUP entry. <br />
+							It is strongly discouraged to change this address during runtime.
+							<!--This address may be changed during runtime. In that case it is
+							encouraged to first deactivate the cache and activate it after
+							changing the address. --></i>
+							<br /><br />
+						</li>
+						<br />
+						<li>
+							<b>The cacheIsActive flag</b>
+							<br />
+							If set the cache within the DirectoryAgentNodeBean will be active.
+							So all remote entries communicated from other Nodes will be stored
+							localy, vastly speeding up the search process as global searches
+							havn't to wait until timeout for perhaps incoming searchresponses
+							from other nodes, but resulting in quick responses delivering
+							matching entries from the local agentnodes cache.
+							<br />
+							<br />
+							This flag may be changed during runtime if
+							needed.
+							<br />
+							If the flag is changed to false all remote
+							Entries will be deleted from the Directory.<br />
+							
+							If changed to true, a message will be sent
+							to the other Nodes propagating local entries
+							and requesting all (local) entries from the
+							other Nodes.
+							<br />
+							<br />
+							<i><b>Note:</b> The default value is true.</i>
+							<br />
+						</li>
+					</ul>
+
+					All of this Options may be configured using Spring. Here is a simple example:
+					<source>
+&lt;bean name="DirectoryAgentNodeBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean" singleton="false"&gt; 
+	&lt;property name="messageTransport"&gt;
+		&lt;ref bean="StandardJMSMessageTransport" /&gt;
+	&lt;/property&gt;
+&lt;/bean&gt;
+					</source>
+					
+					For these who want to have as much control as possible here is a more complex example using mostly default values, with exception of the groupname:
+					<source>
+&lt;bean name="DirectoryAgentNodeBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean" singleton="false"&gt; 
+	&lt;property name="messageTransport"&gt;
+		&lt;ref bean="StandardJMSMessageTransport" /&gt;
+	&lt;/property&gt;
+	&lt;property name="refreshInterval" value="2000" /&gt;
+	&lt;property name="firstRefresh" value="2000" /&gt;
+	&lt;property name="agentPingInterval" value="12000" /&gt;
+	&lt;property name="changePropagateInterval" value="3000" /&gt;
+	&lt;property name="otherNodes" value="myGroupName" /&gt;
+	&lt;property name="cacheIsActive" value="true" /&gt;
+&lt;/bean&gt;
+					
+					</source>
+					
+					Last but not Least a tip to the unexperienced: <br />
+					You'll find a complete Context for a test-setup in src/test/resources/de.dailab.jiactng.agentcore.comm.wp.WhitePagesIntegrationTestContext.xml
+				</p>
+			</subsection>
+		</section>
+	</body>
+
+</document>

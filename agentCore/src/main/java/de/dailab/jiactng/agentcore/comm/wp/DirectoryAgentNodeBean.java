@@ -65,8 +65,10 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  *
  */
 
-public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate, ILifecycleListener, DirectoryAgentNodeBeanMBean {
+//TODO Meldungen ueber abmeldungen oder durch timeout verlorene Informationen ueberpruefen und ggf noch einbauen
+//TODO x-Doc!
 
+public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate, ILifecycleListener, DirectoryAgentNodeBeanMBean {
 
 	/** suffix for address-creation purposes. Will be added to the UUID of AgentNode to create Beanaddress */
 	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
@@ -95,7 +97,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * which will sent back a message with the actions provided to refresh them.
 	 * When the next interval begins all actions that weren't refreshed will be removed
 	 */ 
-	private long _refreshingIntervall = 4000;
+	private long _refreshingInterval = 4000;
+	
+	/**
+	 * Time after which the first refreshment of stored actions will be initiated
+	 */
 	private long _firstRefresh = 5000;
 
 	/**
@@ -103,7 +109,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * After waiting for one interval all agents that hadn't pinged back are erased from the
 	 * directory.
 	 */
-	private long _agentPingIntervall = 12000;
+	private long _agentPingInterval = 12000;
 
 	/** Interval after which changes are propagated to the other nodes 
 	 *  This Interval is used for Alive-detection of other AgentNodes too. If there will be no message from another
@@ -297,7 +303,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 		//formerly in doStart this has to happen much earlier now
 		_myAddress = CommunicationAddressFactory.createMessageBoxAddress(agentNode.getUUID() + SEARCHREQUESTSUFFIX);
-		_otherNodes = CommunicationAddressFactory.createGroupAddress(AGENTNODESGROUP);
+		if (_otherNodes == null){
+			_otherNodes = CommunicationAddressFactory.createGroupAddress(AGENTNODESGROUP);
+		}
 		try {
 			_messageTransport.listen(_myAddress, null);
 			_messageTransport.listen(_otherNodes, null);
@@ -329,8 +337,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		sendMessage(helloWorldMessage, _otherNodes);
 
 		_timer = new Timer();
-		_timer.schedule(_refresher, _firstRefresh, _refreshingIntervall);
-		_timer.schedule(_agentPinger, 1000, _agentPingIntervall);
+		_timer.schedule(_refresher, _firstRefresh, _refreshingInterval);
+		_timer.schedule(_agentPinger, 1000, _agentPingInterval);
 		_timer.schedule(_changePropagator, 1000, _changePropagateInterval);
 		_timer.schedule(_agentNodeWatcher, 1000, 1000);
 		log.debug("##start## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " has been started.");
@@ -439,10 +447,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * 
 	 * Default: 2000 milliseconds
 	 *
-	 * @param intervall time in milliseconds
+	 * @param interval time in milliseconds
 	 */
-	public void setRefreshingIntervall(long intervall){
-		_refreshingIntervall = intervall;
+	public void setRefreshingInterval(long interval){
+		_refreshingInterval = interval;
 	}
 
 	/**
@@ -453,8 +461,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * 
 	 * @return interval in milliseconds
 	 */
-	public long getRefreshingIntervall(){
-		return _refreshingIntervall;
+	public long getRefreshingInterval(){
+		return _refreshingInterval;
 	}
 
 	/**
@@ -489,10 +497,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * 
 	 * Default: 12000 milliseconds
 	 * 
-	 * @param agentPingIntervall time in milliseconds
+	 * @param agentPingInterval time in milliseconds
 	 */
-	public void setAgentPingIntervall(long agentPingIntervall){
-		_agentPingIntervall = agentPingIntervall;
+	public void setAgentPingInterval(long agentPingInterval){
+		_agentPingInterval = agentPingInterval;
 	}
 
 
@@ -504,8 +512,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * 
 	 * @return time in milliseconds
 	 */
-	public long getAgentPingIntervall(){
-		return _agentPingIntervall;
+	public long getAgentPingInterval(){
+		return _agentPingInterval;
 	}
 
 	/**
@@ -543,8 +551,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * 
 	 * @param nodes <code>GroupAddress</code> on which all <code>AgentNode</code>s register
 	 */
-	public void setOtherNodes(ICommunicationAddress nodes) {
-		_otherNodes = nodes;
+	public void setOtherNodes(String groupName) {
+		_otherNodes = CommunicationAddressFactory.createGroupAddress(groupName);
 	}
 
 	/**

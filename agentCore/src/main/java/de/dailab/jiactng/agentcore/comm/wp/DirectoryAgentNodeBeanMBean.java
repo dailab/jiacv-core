@@ -20,7 +20,7 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 * 
 	 * @param intervall time in milliseconds
 	 */
-	public void setRefreshingIntervall(long intervall);
+	public void setRefreshingInterval(long intervall);
 
 	/**
 	 * Gets the interval in milliseconds after which action entries will be refreshed
@@ -28,7 +28,7 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 * 
 	 * @return interval in milliseconds
 	 */
-	public long getRefreshingIntervall();
+	public long getRefreshingInterval();
 
 	/**
 	 * Sets the first time (in milliseconds) a refreshment of actions stored 
@@ -54,7 +54,7 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 * 
 	 * @param agentPingIntervall time in milliseconds
 	 */
-	public void setAgentPingIntervall(long agentPingIntervall);
+	public void setAgentPingInterval(long agentPingIntervall);
 
 	/**
 	 * Gets the interval after which the directory will ping all agents stored within it
@@ -62,7 +62,7 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 * 
 	 * @return time in milliseconds
 	 */
-	public long getAgentPingIntervall();
+	public long getAgentPingInterval();
 
 	/**
 	 * Sets the interval after which changes are propagated to the other nodes.

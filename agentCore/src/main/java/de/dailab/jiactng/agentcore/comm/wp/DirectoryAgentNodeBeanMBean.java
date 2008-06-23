@@ -1,5 +1,9 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
+import java.util.Set;
+
+import javax.management.openmbean.CompositeData;
+
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBeanMBean;
 
 /**
@@ -95,4 +99,27 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 */
 	public boolean getCacheIsActive();
 
+	/**
+	 * Information about the facts stored in the directory memory.
+	 * @return information about facts stored in directory memory
+	 */
+	public CompositeData getSpace();
+
+	/**
+	 * Checks if the message transport is active.
+	 * @return <code>true</code>, if the message transport is active
+	 */
+	public boolean isMessageTransportActive();
+
+	/**
+	 * Gets the identifier of the used message transport.
+	 * @return identifier of the message transport
+	 */
+	public String getMessageTransportIdentifier();
+
+	/**
+	 * Gets the UUIDs of the other agent nodes which directory content is cached in the local directory.
+	 * @return the set of UUIDs
+	 */
+	public Set<String> getOtherNodes();
 }

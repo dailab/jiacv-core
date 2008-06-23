@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.wp.helpclasses;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -62,6 +64,14 @@ public class AgentNodeDataBase {
 			otherNode.setUUID(UUID);
 			return _dataBase.remove(otherNode);
 		}
+	}
+	
+	public synchronized Set<String> getUUIDs(){
+		Set<String> ids = new HashSet<String>();
+		for (AgentNodeData node : _dataBase.keySet()) {
+			ids.add(node.getUUID());
+		}
+		return ids;
 	}
 	
 	public boolean isEmpty(){

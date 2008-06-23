@@ -1,10 +1,22 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
 import javax.security.auth.DestroyFailedException;
 
 import org.apache.commons.logging.Log;
@@ -625,6 +637,89 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		return agentFacts;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+    public CompositeData getSpace() {
+		// read all facts from directory memory
+		if(space==null) {
+			throw new RuntimeException("Directory memory has not yet been initialized!");
+		}
+	    Set<IFact> facts = space.readAllOfType(IFact.class);
+	    if (facts.isEmpty()) {
+	    	return null;
+	    }
+
+	    // create map with current memory state
+		Map<String,List<String>> map = new Hashtable<String,List<String>>();
+	    for (IFact fact : facts) {
+	    	String classname = fact.getClass().getName();
+	    	List<String> values = map.get(classname);
+	    	if (values == null) {
+	    		values = new ArrayList<String>();
+	    		map.put(classname, values);
+	    	}
+    		values.add(fact.toString());
+	    }
+
+	    // create composite data
+	    CompositeData data = null;
+	    int size = map.size();
+	    String[] itemNames = new String[size];
+	    OpenType<?>[] itemTypes = new OpenType[size];
+	    Object[] itemValues = new Object[size];
+	    Object[] classes = map.keySet().toArray();
+	    try {
+	    	for (int i=0; i<size; i++) {
+	    		String classname = (String) classes[i];
+	    		itemNames[i] = classname;
+	    		itemTypes[i] = new ArrayType(1, SimpleType.STRING);
+	    		List<String> values = map.get(classname);
+	    		String[] value = new String[values.size()];
+	    		Iterator<String> it = values.iterator();	    		
+	    		int j = 0;
+	    		while (it.hasNext()) {
+	    			value[j] = it.next();
+	    			j++;
+	    		}
+	    		itemValues[i] = value;
+	    	}
+	    	CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the directory memory", itemNames, itemNames, itemTypes);
+	    	data = new CompositeDataSupport(compositeType, itemNames, itemValues);
+	    }
+	    catch (OpenDataException e) {
+	    	e.printStackTrace();
+	    }
+
+	    return data;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean isMessageTransportActive() {
+		return _messageTransportIsActive;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getMessageTransportIdentifier() {
+		if (_messageTransport == null) {
+			return null;
+		}
+		return _messageTransport.getTransportIdentifier();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public Set<String> getOtherNodes() {
+		if (_otherNodesBase == null) {
+			return null;
+		}
+		return _otherNodesBase.getUUIDs();
+	}
 
 
 	/**
@@ -636,7 +731,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	}
 
 	/**
-	 * receives asynchronous exceptions from the messagetransports and prints them into the console
+	 * receives asynchronous exceptions from the message transports and prints them into the console
 	 */
 	@Override
 	public void onAsynchronousException(MessageTransport source, Exception e) {

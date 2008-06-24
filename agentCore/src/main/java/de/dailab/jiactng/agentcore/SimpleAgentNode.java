@@ -139,8 +139,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		String owner = getOwner();
 		for (IAgent agent : agents) {
 			agent.setOwner(owner);
+			if (_directory != null){
+				agent.addLifecycleListener(_directory);
+			}
 		}
-
+		
 		// refresh agent list
 		_agents.clear();// TODO is this really necessary???
 		_agents.addAll(agents);
@@ -522,12 +525,29 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 						lce.printStackTrace();
 					}
 				}
+				
+				if (_directory == null){
+					
+					// Check if White Pages bean is present
+					for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
+						if (agentNodeBean instanceof DirectoryAgentNodeBean) {
+							// directory is present so add agentdescription to it.
+							_directory = (DirectoryAgentNodeBean) agentNodeBean;
+							break;// we found what we were looking for so we can stop searching
+						}
+					}
+				}
 			}
 		}
 
 		// call init and set references for all agents if any
 		if (_agents != null) {
 			for (IAgent a : _agents) {
+				
+				if (_directory != null){
+					a.addLifecycleListener(_directory);
+				}
+				
 				log.info("Initializing agent: " + a.getAgentName());
 				try {
 					if (log != null && log.isInfoEnabled()) {
@@ -542,23 +562,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 						System.err.println("Failure when initializing agent: "+a.getAgentName());
 						e.printStackTrace();
 					}
-				}
-
-				if (_directory == null){
-					
-					// Check if White Pages bean is present
-					for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
-						if (agentNodeBean instanceof DirectoryAgentNodeBean) {
-							// directory is present so add agentdescription to it.
-							_directory = (DirectoryAgentNodeBean) agentNodeBean;
-							break;// we found what we were looking for so we can stop searching
-						}
-					}
-					if(_directory!= null) {
-						_directory.addAgentDescription(a.getAgentDescription());
-					}
-				} else {
-					_directory.addAgentDescription(a.getAgentDescription());
 				}
 			}
 		}
@@ -725,7 +728,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void setAgentNodeBeans(List<IAgentNodeBean> agentnodebeans) {
 		_agentNodeBeans.clear();
-		_agentNodeBeans.addAll(agentnodebeans);
+		_agentNodeBeans.addAll(agentnodebeans); 
 	}
 
 	/**

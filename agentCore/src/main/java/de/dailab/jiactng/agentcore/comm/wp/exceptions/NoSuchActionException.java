@@ -1,4 +1,4 @@
-package de.dailab.jiactng.agentcore.comm.wp.helpclasses;
+package de.dailab.jiactng.agentcore.comm.wp.exceptions;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 

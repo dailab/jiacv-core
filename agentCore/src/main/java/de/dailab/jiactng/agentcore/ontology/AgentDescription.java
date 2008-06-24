@@ -19,7 +19,7 @@ public class AgentDescription implements IAgentDescription {
 	private String name;
 	
 	/** Agent's state. */
-	private transient String state;
+	private String state;
 	
 	/** Communication Identifier. */
 	private IMessageBoxAddress messageBoxAddress;

@@ -28,6 +28,7 @@ import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.Agent;
+import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
@@ -98,7 +99,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * When the next interval begins all actions that weren't refreshed will be removed
 	 */ 
 	private long _refreshingInterval = 4000;
-	
+
 	/**
 	 * Time after which the first refreshment of stored actions will be initiated
 	 */
@@ -137,7 +138,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 	/** Timerobject that schedules update and refreshment activities */
 	private Timer _timer;
-	
+
 	/** decides if timer should be stopped */
 	private boolean _timerStop = false;
 
@@ -145,7 +146,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	private SpaceRefresher _refresher = null; 
 
 	/** Module that regulary ping <code>Agent</code>s to check if they are still alive */
-	private AgentPinger _agentPinger = null;
+	private AgentRefresher _agentPinger = null;
 
 	/** Module that manages messages from other AgentNodes and updates global entries within this AgentNodes Directory */
 	private MessengerOfChange _changePropagator = null;
@@ -173,10 +174,21 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	private Object _bufferlock = new Object();
 
 	/**
-	 * flag if entries from other AgentNodes should be cached locally or
+	 * flag: true if entries from other AgentNodes should be cached locally or false
 	 * if they should be ignored
+	 * 
+	 * By default it's set to true
 	 */
 	private boolean _cacheIsActive = true;
+
+	/**
+	 * flag: true if changes should be propagated the moment they are made or false
+	 * if they should be buffered and propagated after a configurable interval
+	 * 
+	 *  By default it's set to false 
+	 *  for reference on the mentioned interval see changePropagationInterval
+	 */
+	private boolean _instantPropagation = false;
 
 	/**
 	 * standard constructor method
@@ -198,6 +210,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 					synchronized(_bufferlock){
 						_removalBuffer.remove(agentDescription);		
 						_additionBuffer.add(agentDescription);
+						
+						if (_instantPropagation){
+							sendMessageOfChange(_additionBuffer, null, false, false);
+							_additionBuffer.clear();
+						}
 					}
 				}
 			}
@@ -221,12 +238,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				agentAction.setIsLocal(true);
 
 				Set<ActionData> actionsRemoved = space.removeAll(agentAction);
-				
+
 				Set<IFact> factsToRemove = new HashSet<IFact>();
 				factsToRemove.addAll(actionsRemoved);
 				synchronized(_bufferlock){
 					_additionBuffer.remove(factsToRemove);
 					_removalBuffer.add(factsToRemove);
+					
+					if (_instantPropagation){
+						sendMessageOfChange(null, _removalBuffer, false, false);
+						_removalBuffer.clear();
+					}
 				}
 			}
 		}
@@ -249,6 +271,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				space.write(actionData);
 				synchronized(_bufferlock){
 					_additionBuffer.add(actionData);
+					
+					if (_instantPropagation){
+						sendMessageOfChange(_additionBuffer, null, false, false);
+						_additionBuffer.clear();
+					}
 				}
 			}
 		}
@@ -271,6 +298,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				synchronized(_bufferlock){
 					_additionBuffer.remove(actionData);
 					_removalBuffer.add(actionData);
+					
+					if (_instantPropagation){
+						sendMessageOfChange(null, _removalBuffer, false, false);
+						_removalBuffer.clear();
+					}
 				}
 			}
 		}
@@ -298,7 +330,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		}
 
 		_refresher = new SpaceRefresher();
-		_agentPinger = new AgentPinger();
+		_agentPinger = new AgentRefresher();
 		_agentNodeWatcher = new AgentNodeWatcher();
 
 		//formerly in doStart this has to happen much earlier now
@@ -327,22 +359,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		FactSet myData = new FactSet(getLocalActions());
 		myData.add(getLocalAgents());
 
-		MessageOfChange moc = new MessageOfChange(myData, null);
-
-		JiacMessage helloWorldMessage = new JiacMessage(moc);
-		helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-		helloWorldMessage.setHeader("HelloWorld", "true");
-
 		// let the world now what we have to offer
-		sendMessage(helloWorldMessage, _otherNodes);
+		sendMessageOfChange(myData, null, true, false);
 
 		_timer = new Timer();
 		_timer.schedule(_refresher, _firstRefresh, _refreshingInterval);
-		_timer.schedule(_agentPinger, 1000, _agentPingInterval);
-		_timer.schedule(_changePropagator, 1000, _changePropagateInterval);
+		_timer.schedule(_agentPinger, _agentPingInterval, _agentPingInterval);
+		_timer.schedule(_changePropagator, _changePropagateInterval, _changePropagateInterval);
 		_timer.schedule(_agentNodeWatcher, 1000, 1000);
 		log.debug("##start## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " has been started.");
 	}
+
 
 	/**
 	 * Method of the LifeCycle Interface
@@ -357,14 +384,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		FactSet myData = new FactSet(getLocalActions());
 		myData.add(getLocalAgents());
 
-		MessageOfChange moc = new MessageOfChange(null, myData);
-
-		JiacMessage helloWorldMessage = new JiacMessage(moc);
-		helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-		helloWorldMessage.setHeader("ByeWorld", "true");
-
 		// let the world now what we had to offer so the other Nodes can remove it
-		sendMessage(helloWorldMessage, _otherNodes);
+		sendMessageOfChange(null, myData, false, true);
 
 		try {
 			_messageTransport.stopListen(_myAddress, null);
@@ -408,9 +429,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			try {
 				_messageTransport.send(message, address);
 			} catch (CommunicationException e) {
-	        	if (log.isErrorEnabled()){
-	        		log.error("Sending of " + message.getProtocol() + " message failed!");
-	        	}
+				if (log.isErrorEnabled()){
+					log.error("Sending of " + message.getProtocol() + " message failed!");
+				}
 			}
 		}
 	}
@@ -423,9 +444,63 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			try{
 				_messageTransport.send(message, address);
 			}catch (CommunicationException e) {
-	        	if (log.isErrorEnabled()){
-	        		log.error("Sending of " + message.getProtocol() + " message failed!");
-	        	}
+				if (log.isErrorEnabled()){
+					log.error("Sending of " + message.getProtocol() + " message failed!");
+				}
+			}
+		}
+	}
+
+	private void sendMessageOfChange(FactSet additions, FactSet removals, boolean helloWorld, boolean byeWorld){
+
+		MessageOfChange moc = new MessageOfChange(additions, removals);
+
+		JiacMessage message = new JiacMessage(moc);
+		message.setSender(_myAddress);
+		message.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
+
+		if (helloWorld){
+			message.setHeader("HelloWorld", "true");
+		}
+
+		if (byeWorld) {
+			message.setHeader("ByeWorld", "true");
+		}
+
+		message.setHeader("UUID", this.agentNode.getUUID());
+
+		if (_messageTransportIsActive){
+			try{
+				_messageTransport.send(message, _otherNodes);
+			}catch (CommunicationException e) {
+				if (log.isErrorEnabled()){
+					log.error("Sending of " + message.getProtocol() + " message failed!");
+				}
+			}
+		}
+	}
+
+	private void sendMessageOfChange(FactSet additions, FactSet removals, boolean helloWorld, ICommunicationAddress otherAddress){
+
+		MessageOfChange moc = new MessageOfChange(additions, removals);
+
+		JiacMessage message = new JiacMessage(moc);
+		message.setSender(_myAddress);
+		message.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
+
+		if (helloWorld){
+			message.setHeader("HelloWorld", "true");
+		}
+
+		message.setHeader("UUID", this.agentNode.getUUID());
+
+		if (_messageTransportIsActive){
+			try{
+				_messageTransport.send(message, otherAddress);
+			}catch (CommunicationException e) {
+				if (log.isErrorEnabled()){
+					log.error("Sending of " + message.getProtocol() + " message failed!");
+				}
 			}
 		}
 	}
@@ -591,13 +666,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				FactSet myData = new FactSet(getLocalActions());
 				myData.add(getLocalAgents());
 
-				MessageOfChange moc = new MessageOfChange(myData, null);
-
-				JiacMessage helloWorldMessage = new JiacMessage(moc);
-				helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-				helloWorldMessage.setHeader("HelloWorld", "true");
-
-				sendMessage(helloWorldMessage, _otherNodes);
+				sendMessageOfChange(myData, null, true, false);
 
 			}
 		}
@@ -612,6 +681,28 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 */
 	public boolean getCacheIsActive() {
 		return _cacheIsActive;
+	}
+	
+	
+	/**
+	 * sets if changes should be propagated instantly or a collection of changes should be send every <code>changePropagationInterval</code> ms
+	 * 
+	 * @param instantPropagation is false by default -> changes will be collected and send as a bundle
+	 * 
+	 * Note: can be changed during runtime without causing problems
+	 */
+	public void setInstantPropagation(boolean instantPropagation){
+		_instantPropagation = instantPropagation;
+	}
+	
+	/**
+	 * 
+	 * @return <code>true</code>, if changes should be propageted instantly to the other <code>AgentNode</code>s.
+	 * 
+	 * Default: false -> local changes will be buffered and send every <code>changePropagationInterval</code> ms
+	 */
+	public boolean getInstantPropagation(){
+		return _instantPropagation;
 	}
 
 	/**
@@ -648,58 +739,58 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	/**
 	 * {@inheritDoc}
 	 */
-    public CompositeData getSpace() {
+	public CompositeData getSpace() {
 		// read all facts from directory memory
 		if(space==null) {
 			throw new RuntimeException("Directory memory has not yet been initialized!");
 		}
-	    Set<IFact> facts = space.readAllOfType(IFact.class);
-	    if (facts.isEmpty()) {
-	    	return null;
-	    }
+		Set<IFact> facts = space.readAllOfType(IFact.class);
+		if (facts.isEmpty()) {
+			return null;
+		}
 
-	    // create map with current memory state
+		// create map with current memory state
 		Map<String,List<String>> map = new Hashtable<String,List<String>>();
-	    for (IFact fact : facts) {
-	    	String classname = fact.getClass().getName();
-	    	List<String> values = map.get(classname);
-	    	if (values == null) {
-	    		values = new ArrayList<String>();
-	    		map.put(classname, values);
-	    	}
-    		values.add(fact.toString());
-	    }
+		for (IFact fact : facts) {
+			String classname = fact.getClass().getName();
+			List<String> values = map.get(classname);
+			if (values == null) {
+				values = new ArrayList<String>();
+				map.put(classname, values);
+			}
+			values.add(fact.toString());
+		}
 
-	    // create composite data
-	    CompositeData data = null;
-	    int size = map.size();
-	    String[] itemNames = new String[size];
-	    OpenType<?>[] itemTypes = new OpenType[size];
-	    Object[] itemValues = new Object[size];
-	    Object[] classes = map.keySet().toArray();
-	    try {
-	    	for (int i=0; i<size; i++) {
-	    		String classname = (String) classes[i];
-	    		itemNames[i] = classname;
-	    		itemTypes[i] = new ArrayType(1, SimpleType.STRING);
-	    		List<String> values = map.get(classname);
-	    		String[] value = new String[values.size()];
-	    		Iterator<String> it = values.iterator();	    		
-	    		int j = 0;
-	    		while (it.hasNext()) {
-	    			value[j] = it.next();
-	    			j++;
-	    		}
-	    		itemValues[i] = value;
-	    	}
-	    	CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the directory memory", itemNames, itemNames, itemTypes);
-	    	data = new CompositeDataSupport(compositeType, itemNames, itemValues);
-	    }
-	    catch (OpenDataException e) {
-	    	e.printStackTrace();
-	    }
+		// create composite data
+		CompositeData data = null;
+		int size = map.size();
+		String[] itemNames = new String[size];
+		OpenType<?>[] itemTypes = new OpenType[size];
+		Object[] itemValues = new Object[size];
+		Object[] classes = map.keySet().toArray();
+		try {
+			for (int i=0; i<size; i++) {
+				String classname = (String) classes[i];
+				itemNames[i] = classname;
+				itemTypes[i] = new ArrayType(1, SimpleType.STRING);
+				List<String> values = map.get(classname);
+				String[] value = new String[values.size()];
+				Iterator<String> it = values.iterator();	    		
+				int j = 0;
+				while (it.hasNext()) {
+					value[j] = it.next();
+					j++;
+				}
+				itemValues[i] = value;
+			}
+			CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the directory memory", itemNames, itemNames, itemTypes);
+			data = new CompositeDataSupport(compositeType, itemNames, itemValues);
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+		}
 
-	    return data;
+		return data;
 	}
 
 	/**
@@ -873,6 +964,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						actionData.setCreationTime(null);
 						_removalBuffer.remove(actionData);
 						_additionBuffer.add(actionData);
+						
+						if (_instantPropagation){
+							sendMessageOfChange(_additionBuffer, null, false, false);
+							_additionBuffer.clear();
+						}
 					}
 				}
 
@@ -889,6 +985,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						removeData.setCreationTime(null);
 						_additionBuffer.remove(removeData);
 						_removalBuffer.add(removeData);
+						
+						if (_instantPropagation){
+							sendMessageOfChange(null, _removalBuffer, false, false);
+							_removalBuffer.clear();
+						}
 					}
 				}
 
@@ -907,10 +1008,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 						space.write(refreshData);
 					}
-				}else if (message.getPayload() instanceof IAgentDescription){
-					IAgentDescription agentDesc = (IAgentDescription) message.getPayload();
-					_agentPinger.removePing(agentDesc);
-					
 				} else if (message.getPayload() instanceof FactSet){
 					FactSet FS = (FactSet) message.getPayload();
 
@@ -957,14 +1054,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 							FactSet myData = new FactSet(getLocalActions());
 							myData.add(getLocalAgents());
 
-							MessageOfChange mocBack = new MessageOfChange(myData, null);
-
-							JiacMessage helloWorldMessage = new JiacMessage(mocBack);
-							helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-							helloWorldMessage.setHeader("HelloWorld", "true");
-
 							// let the world now what we have to offer						
-							sendMessage(helloWorldMessage, message.getSender());
+							sendMessageOfChange(myData, null, true, message.getSender());
 						}
 
 					} else {
@@ -1016,7 +1107,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 										}
 									}
 								}
-								
+
 								if (message.getHeader("ByeWorld") != null){
 									log.info("AgentNode with UUID " + message.getHeader("UUID") + " is shutting down.");
 									_otherNodesBase.remove(message.getHeader("UUID"));
@@ -1027,13 +1118,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 							FactSet myData = new FactSet(getLocalActions());
 							myData.add(getLocalAgents());
 
-							MessageOfChange mocBack = new MessageOfChange(myData, null);
-
-							JiacMessage helloWorldMessage = new JiacMessage(mocBack);
-							helloWorldMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-
 							// let the world now what we have to offer
-							sendMessage(helloWorldMessage, message.getSender());
+							sendMessageOfChange(myData, null, false, message.getSender());
 
 						}
 					}
@@ -1056,16 +1142,26 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * @param evt
 	 */
 	public void onEvent(LifecycleEvent evt){
-
-		if (evt.getState() == LifecycleStates.STARTED){
+		if (evt.getState() == LifecycleStates.INITIALIZED){
 			if (evt.getSource() instanceof Agent){
 				Agent newAgent = (Agent) evt.getSource();
 				this.addAgentDescription(newAgent.getAgentDescription());
 			}
-		} else if (evt.getState() == LifecycleStates.STOPPED){
+		} else if (evt.getState() == LifecycleStates.CLEANING_UP){
 			if (evt.getSource() instanceof Agent){
 				Agent newAgent = (Agent) evt.getSource();
 				this.removeAgentDescription(newAgent.getAgentDescription());
+			}
+		} else if (!((evt.getState() == LifecycleStates.INITIALIZING) || (evt.getState() == LifecycleStates.CLEANED_UP))){
+			Agent newAgent = (Agent) evt.getSource();
+			AgentDescription newAgentDesc = newAgent.getAgentDescription();
+			
+			newAgentDesc.setState(null);
+			
+			synchronized(space){
+				AgentDescription foundAgent = space.remove(newAgent.getAgentDescription());
+				foundAgent.setState(evt.getState().toString());
+				space.write(foundAgent);
 			}
 		}
 	}
@@ -1077,54 +1173,95 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 *
 	 */
 	@SuppressWarnings("serial")
-	private class AgentPinger extends TimerTask{
+	private class AgentRefresher extends TimerTask{
 
 		/**
-		 * Set of Pings that got out to the agents but didn't came back yet
-		 */
-		private Set<IAgentDescription> _ongoingAgentPings = new HashSet<IAgentDescription>();
-
-		/**
-		 * Pings all <code>Agent</code>s stored within the Directory and checks if they have replied
+		 * Checks all local <code>Agent</code>s stored within the Directory to be still present
 		 */
 		public void run(){
 			if (_timerStop)
 				this.cancel();
 
-			// All Agents that haven't ping back are most likely to be non existent anymore
-			synchronized (_ongoingAgentPings) {
+			Set<AgentDescription> agentsFromDirectory;
+			Set<AgentDescription> agentsFromNode;
 
-				synchronized (space) {
-					for (IAgentDescription agent : _ongoingAgentPings){
-						IAgentDescription spaceAgent = space.remove(agent);
-						log.warn("Agent doesn't seem to be present anymore. Probably shutdown. Agent is " + spaceAgent);
+			synchronized(space){
+
+				// get all local agents from the directory
+				AgentDescription localAgentDescription = new AgentDescription();
+				localAgentDescription.setAgentNodeUUID(agentNode.getUUID());
+				agentsFromDirectory = space.removeAll(localAgentDescription);
+
+				// get all local agents from the agentnode and pickup their descriptions
+				List<IAgent> foundAgents = agentNode.findAgents();
+				agentsFromNode = new HashSet<AgentDescription>();
+
+				for (IAgent agent : foundAgents){
+					switch(agent.getState()){
+					case INITIALIZED:
+					case STARTING:
+					case STARTED:
+					case STOPPING:
+					case STOPPED:
+						agentsFromNode.add(agent.getAgentDescription());
 					}
 
+				}
 
-					_ongoingAgentPings.clear();
+				// filter out all agents that are still present on the agentnode
+				Iterator<AgentDescription> afdIterator = agentsFromDirectory.iterator();
+				while(afdIterator.hasNext()){
 
-					for (IAgentDescription agent : space.readAll(new AgentDescription())){
-						_ongoingAgentPings.add(agent);
-						ICommunicationAddress pingAddress = agent.getMessageBoxAddress();
-						JiacMessage message = new JiacMessage(agent);
-						message.setProtocol(REFRESH_PROTOCOL_ID);
+					AgentDescription agentDesc = afdIterator.next();
+					if (agentsFromNode.remove(agentDesc)){
+						space.write(agentDesc);
+						afdIterator.remove();
+					}
+				}
 
-						sendMessage(message, pingAddress);
+			}
+			/*
+			 * At this point 
+			 * agentsFromNode is holding agents that somehow didn't got listed in the directory (should be empty)
+			 * agentsFromDirectory is holding agents that are no longer listed on the agentnode
+			 */
 
+			if (agentsFromNode != null){
+				if (!agentsFromNode.isEmpty()){
+					log.warn("There are " + agentsFromNode.size() + " agents on the Node that aren't listed within the Directory!");
+					synchronized(_bufferlock){
+
+						for (AgentDescription forgottenAgent : agentsFromNode){
+							log.warn("Adding agent " + forgottenAgent.getName() + " to the Directory");
+							space.write(forgottenAgent);
+							_additionBuffer.add(forgottenAgent);
+						}
+						
+						if (_instantPropagation){
+							sendMessageOfChange(_additionBuffer, null, false, false);
+							_additionBuffer.clear();
+						}
 					}
 				}
 			}
-		}
 
-		/**
-		 * if an Agent replies to a ping message this method will be used to make a note of that
-		 * 
-		 * @param agentDesc the Description of the agent replying
-		 */
-		public void removePing(IAgentDescription agentDesc){
-			synchronized(_ongoingAgentPings){
-				_ongoingAgentPings.remove(agentDesc);
+			if (agentsFromDirectory != null){
+				if (!agentsFromDirectory.isEmpty()){
+					synchronized(_bufferlock){
+						for (AgentDescription timeoutAgent : agentsFromDirectory){
+							log.warn("Agent " + timeoutAgent.getName() + " doesn't seem to be present anymore on this AgentNode, thus removing it from the Directory");
+							_removalBuffer.add(timeoutAgent);
+
+						}
+						
+						if (_instantPropagation){
+							sendMessageOfChange(null, _removalBuffer, false, false);
+							_removalBuffer.clear();
+						}
+					}
+				}
 			}
+
 		}
 	}
 
@@ -1160,14 +1297,18 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				oldAct.setIsLocal(true);
 //				System.err.println("Removing actions with timeout");
 				//First let's remove all not refreshed actions
-				
+
 				Set<ActionData> removals = space.removeAll(oldAct);
 				synchronized(_bufferlock){
 					for (ActionData action : removals){
 						_removalBuffer.add(action);
 					}
+					if (_instantPropagation){
+						sendMessageOfChange(null, _removalBuffer, false, false);
+						_removalBuffer.clear();
+					}
 				}
-				
+
 				ActionData actionTemplate = new ActionData(_currentLogicTime);
 				actionTemplate.setIsLocal(true);
 
@@ -1213,13 +1354,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 			if ((!_additionBuffer.isEmpty()) || (!_removalBuffer.isEmpty())){
 				synchronized(_bufferlock){
-					MessageOfChange moc = new MessageOfChange(_additionBuffer, _removalBuffer);
 
-					JiacMessage changePropagationMessage = new JiacMessage(moc);
-					changePropagationMessage.setProtocol(CHANGE_PROPAGATION_PROTOCOL_ID);
-
-					// let the world now what we have to offer
-					sendMessage(changePropagationMessage, _otherNodes);
+					sendMessageOfChange(_additionBuffer, _removalBuffer, false, false);
 
 					_additionBuffer.clear();
 					_removalBuffer.clear();

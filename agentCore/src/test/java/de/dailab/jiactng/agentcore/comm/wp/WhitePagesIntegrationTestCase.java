@@ -19,7 +19,7 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean;
-import de.dailab.jiactng.agentcore.comm.wp.helpclasses.TimeoutException;
+import de.dailab.jiactng.agentcore.comm.wp.exceptions.TimeoutException;
 
 import junit.framework.TestCase;
 

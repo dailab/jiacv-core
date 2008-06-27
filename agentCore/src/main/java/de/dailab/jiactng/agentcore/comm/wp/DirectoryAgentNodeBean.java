@@ -1152,7 +1152,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				Agent newAgent = (Agent) evt.getSource();
 				this.removeAgentDescription(newAgent.getAgentDescription());
 			}
-		} else if (!((evt.getState() == LifecycleStates.INITIALIZING) || (evt.getState() == LifecycleStates.CLEANED_UP))){
+		} else if (!((evt.getState() == LifecycleStates.UNDEFINED) || (evt.getState() == LifecycleStates.INITIALIZING) || (evt.getState() == LifecycleStates.CLEANED_UP))){
 			Agent newAgent = (Agent) evt.getSource();
 			AgentDescription newAgentDesc = newAgent.getAgentDescription();
 			

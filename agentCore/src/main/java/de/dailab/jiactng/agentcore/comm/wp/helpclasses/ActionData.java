@@ -40,7 +40,7 @@ public class ActionData implements IFact{
 
 	/**
 	 * gets the (logical) time of creation of this instance of <code>ActionData</code>
-	 * @return
+	 * @return the time of creation
 	 */
 	public Long getCreationTime(){
 		return _creationTime;

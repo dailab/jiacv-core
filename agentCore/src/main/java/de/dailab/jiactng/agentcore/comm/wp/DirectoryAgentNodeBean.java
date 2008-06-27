@@ -624,7 +624,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * sets the communicationAddress on which all <code>AgentNode</code>s group together and exchange searchRequests and
 	 * necessary overhead
 	 * 
-	 * @param nodes <code>GroupAddress</code> on which all <code>AgentNode</code>s register
+	 * @param groupName <code>GroupAddress</code> on which all <code>AgentNode</code>s register
 	 */
 	public void setOtherNodes(String groupName) {
 		_otherNodes = CommunicationAddressFactory.createGroupAddress(groupName);

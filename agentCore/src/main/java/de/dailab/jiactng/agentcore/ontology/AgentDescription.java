@@ -163,7 +163,7 @@ public class AgentDescription implements IAgentDescription {
 
     /**
      * Returns the UUID of the AgentNode that is holding this agent
-     * @return
+     * @return UUID of the agent node
      */
 	public String getAgentNodeUUID() {
 		return agentNodeUUID;

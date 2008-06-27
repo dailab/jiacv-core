@@ -167,8 +167,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 	/**
 	 * is only meant to be called through SimpleExecutionCycle during Timeoutmanagment
 	 * 
-	 * @param doAction
-	 * @return
+	 * @param doAction the action execution to be canceled
+	 * @return the result of the canceled action (always <code>null</code> if this method is not overwritten)
 	 */
 	public ActionResult cancelAction(DoAction doAction){
 		return null;

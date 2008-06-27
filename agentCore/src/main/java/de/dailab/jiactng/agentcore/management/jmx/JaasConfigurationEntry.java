@@ -41,7 +41,6 @@ public class JaasConfigurationEntry {
 	/**
 	 * Setter for the control flag of the login module.
 	 * @param controlFlag One of "optional", "required", "requisite" or "sufficient".
-	 * @see AppConfigurationEntry.LoginModuleControlFlag
 	 */
 	public void setControlFlag(String controlFlag) {
 		this.controlFlag = controlFlag;

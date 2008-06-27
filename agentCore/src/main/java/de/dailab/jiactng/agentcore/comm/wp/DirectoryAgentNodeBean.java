@@ -66,7 +66,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  *
  */
 
-//TODO Meldungen ueber abmeldungen oder durch timeout verlorene Informationen ueberpruefen und ggf noch einbauen
+//TODO Usermanagment CC-IRML
 //TODO x-Doc!
 
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate, ILifecycleListener, DirectoryAgentNodeBeanMBean {
@@ -188,7 +188,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 *  By default it's set to false 
 	 *  for reference on the mentioned interval see changePropagationInterval
 	 */
-	private boolean _instantPropagation = false;
+	private boolean _instantPropagation = true;
 
 	/**
 	 * standard constructor method

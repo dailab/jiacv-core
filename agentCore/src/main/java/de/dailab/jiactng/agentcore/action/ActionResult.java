@@ -17,7 +17,7 @@ public class ActionResult extends SessionEvent {
 	 * A field for exceptions, strings or other kinds of failureresults
 	 */
 	private Serializable _failure = null;
-
+	
 	/**
 	 * An <code>ActionResult</code> will be used as return object for a
 	 * <code>DoAction</code> request.

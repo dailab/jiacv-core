@@ -311,6 +311,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		memory.write(res);
 	}
 	
+	protected void returnFailure(DoAction origin, Serializable failure) {
+		ActionResult res = new ActionResult(origin,failure);
+		memory.write(res);
+	}
+	
 	protected Action retrieveAction(String actionName) {
 		Action retAct = memory.read(new Action(actionName));
 		if (retAct == null) {

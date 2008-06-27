@@ -14,12 +14,12 @@
 						<li>storing agents and actions</li>
 						<li>
 							searching for agents or actions doing so
-							either on the local agentnode or globally
-							within a group of agentnodes
+							either on the local <code>AgentNode</code> or globally
+							within a group of <code>AgentNode</code>s
 						</li>
 						<li>
 							using actions that are provided by other
-							agents on the same or a remote agentnode
+							agents on the same or a remote <code>AgentNode</code>
 						</li>
 						<li>
 							automatic template-driven enlistment of
@@ -36,15 +36,15 @@
 					<ul>
 						<li>
 							caching for agents and actions on remote
-							agentnodes (configurable)
+							<code>AgentNode</code>s (configurable)
 						</li>
 						<li>
 							automatic propagation of changes on one
-							agentnode to the other agentnodes of it's
-							group
+							<code>AgentNode</code> to the other AgentNodes of it's
+							group - either buffered or instantaneous
 						</li>
 						<li>
-							timeout- and refreshment-managment for
+							timeout- and refreshment-management for
 							stored information
 						</li>
 					</ul>
@@ -99,7 +99,7 @@
 				</p>
 				<p>
 				<br />
-					If you want to use autoenlistment of actions on this
+					If you want to use auto-enlistment of actions on this
 					agent you might want to change the interval after
 					which there will be a check for new actions to make
 					public. The default is 2 seconds. To actually have an
@@ -148,7 +148,7 @@
 					so.</i>
 				</p>
 				<p>
-					Configureable inside the DirectoryAgentNodeBean are
+					Configurable inside the DirectoryAgentNodeBean are
 					
 					<ul>
 						<li>
@@ -229,28 +229,43 @@
 						<li>
 							<b>The changePropagateInterval</b>
 							<br />
-							After each of this intervals this
+							serves as AgentNode-ping-interval (for use
+							in this context it will be doubled details
+							see below)
+							<br />
+							<br />
+							if the instantPropagation flag is set to
+							false then after each of this intervals this
 							DirectoryAgentNodeBean will communicate all
 							changes made to it's Directory to the other
 							AgentNodes within its group. If there are no
-							changes it will send an empty pingmessage
+							changes it will send an empty ping-message
 							<br />
-							Furthermore this interval is used to decide if
-							an AgentNode is still active, by erasing all
-							AgentNodes, their Agents and Actions that havn't
-							send a Message of this kind within two times this
-							interval.
+							Furthermore this interval is used to decide
+							if an AgentNode is still active, by erasing
+							all AgentNodes, their Agents and Actions
+							that havn't send a Message of this kind
+							within two times this interval.
 							<br />
 							One Idea of this activity-check is that only
-							local checks of agents and actions have to be
-							made, minimizing the number and size of Messages
-							needed as overhead.
-							<br /><br />
-							<i><b>Note:</b> The default value is 3000 milliseconds <br />
-							It only will have any effect to change it if this is done before the start state.
-							Changing it during runtime would require the Bean to first been stopped waited
-							for a while and then be started again.</i>
-							<br /><br />
+							local checks of agents and actions have to
+							be made, minimizing the number and size of
+							Messages needed as overhead.
+							<br />
+							<br />
+							<i>
+								<b>Note:</b>
+								The default value is 3000 milliseconds
+								<br />
+								It only will have any effect to change
+								it if this is done before the start
+								state. Changing it during runtime would
+								require the Bean to first been stopped
+								waited for a while and then be started
+								again, doing so is still discouraged.
+							</i>
+							<br />
+							<br />
 						</li>
 						<br />
 						<li>
@@ -258,7 +273,7 @@
 							<br />
 							This address allows it to group different AgentNodes and
 							connecting them to a network of Directories. This address
-							will be used to communicate all changes on a local agentnode
+							will be used to communicate all changes on a local <code>AgentNode</code>
 							to other nodes using the same address.
 							<br />
 							A DirectoryAgentNodeBean can only be member of one group.
@@ -280,10 +295,10 @@
 							<br />
 							If set the cache within the DirectoryAgentNodeBean will be active.
 							So all remote entries communicated from other Nodes will be stored
-							localy, vastly speeding up the search process as global searches
-							havn't to wait until timeout for perhaps incoming searchresponses
+							local, vastly speeding up the search process as global searches
+							havn't to wait until timeout for perhaps incoming <code>SearchResponse</code>s
 							from other nodes, but resulting in quick responses delivering
-							matching entries from the local agentnodes cache.
+							matching entries from the local <code>AgentNode</code>s cache.
 							<br />
 							<br />
 							This flag may be changed during runtime if
@@ -299,8 +314,28 @@
 							<br />
 							<br />
 							<i><b>Note:</b> The default value is true.</i>
-							<br />
+							<br /><br />
 						</li>
+						<br />
+						<li>
+							<b>The instantPropagation flag</b>
+							<br />
+							If set to true all changes on a local
+							<code>AgentNode</code>
+							will be propagated the instant they are
+							done.
+							<br />
+							If set to false all changes will be stored
+							in a buffer and propagated each
+							changePropagationInterval. By doing so the
+							no. of messages can be decreased to increase
+							performance or decrease costs.
+							<br />
+							<br />
+							<i><b>Note:</b> By default this flag is true.</i>
+							<br /><br />
+						</li>
+						<br />
 					</ul>
 
 					All of this Options may be configured using Spring. Here is a simple example:
@@ -324,6 +359,7 @@
 	&lt;property name="changePropagateInterval" value="3000" /&gt;
 	&lt;property name="otherNodes" value="myGroupName" /&gt;
 	&lt;property name="cacheIsActive" value="true" /&gt;
+	&lt;property name="instantPropagation" value="true" /&gt;
 &lt;/bean&gt;
 					
 					</source>
@@ -333,6 +369,188 @@
 				</p>
 			</subsection>
 		</section>
+		
+		<section name="Usage - How to...">
+
+		<subsection name="How to add and remove agents">
+			You don't have to. Every
+			<code>AgentNode</code>
+			will keep track of it's all local agents and propagate them
+			to the other AgentNodes. They will be automatically added
+			when they are
+			<code>LifecycleStates.INITIALIZED</code>
+			and removed as they are
+			<code>LifecycleStates.CLEANING_UP</code>
+			For every state between that the state entry of it's
+			agentdescription within the directory will be updated. So it
+			is possible to get the actual state of an agent using the
+			directory.
+		</subsection>
+
+		<subsection name="How to add and remove actions by hand">
+			<b> Important:</b> To do one of these actions you have 
+			to install a <code>DirectoryAccessBean</code>
+			on the <code>Agent</code> that wants to do so.
+			<br />
+			<br />
+			<b> How to add an Action</b><br /> 
+			To add an <code>Action</code> you have to first get
+			its <code>IActionDescription</code> or create one. 
+			Then just include it into a <code>DoAction</code>
+			using corresponding the "Add Action" action from the memory.
+			<br />
+			<br />
+			<i>Example:</i>
+			
+			<source>
+Action addActionAction = memory.read(new Action(DirectoryAccessBean.ACTION_ADD_ACTION_TO_DIRECTORY));
+			
+Serializable[] params = {<i>include your actionDescription here</i>};
+DoAction action = addActionAction.createDoAction(params, null);
+memory.write(action);
+		
+			</source>
+			<br />
+			The Action will be added to the directory and propagated to all other <code>AgentNode</code>s within
+			the local <code>AgentNode</code>'s group. 
+			<br />
+			<br />
+			<b> How to remove an Action </b><br />
+			To remove an <code>Action</code> you have to first get
+			its <code>IActionDescription</code> or create one. 
+			Then just include it into a <code>DoAction</code>
+			using the corresponding "Remove Action" action from the memory.
+			<br />
+			<br />
+			<i>Example:</i>
+			
+			<source>
+Action removeActionAction = memory.read(new Action(DirectoryAccessBean.ACTION_REMOVE_ACTION_FROM_DIRECTORY));
+			
+Serializable[] params = {<i>include your actionDescription here</i>};
+DoAction action = removeActionAction.createDoAction(params, null);
+memory.write(action);
+		
+			</source>
+			<br />
+			The Action will be removed from the directory and the change be propagated
+			to all other <code>AgentNode</code>s within the local <code>AgentNode</code>'s group. 
+			<br />
+			
+			
+		</subsection>
+		
+		<subsection name="How to add and remove actions automatically - or: How to use AutoEnlistment">
+			<b>Adding Actions using a template </b><br />
+			If you have some <code>Action</code>s that share a common key 
+			or you want to simply add all <code>Action</code>s of your <code>Agent</code>
+			you can do so by using a template.
+			<br />
+			<br />
+			<b>Note:</b><i> If a template is used the <code>DirectoryAccessBean</code> will
+			check in a regular period for new actions matching this template to add them
+			automatically (see autoEnlisteningInterval for details)</i>
+			<br />
+			<br />
+			
+			Example to automatically add all actions of an <code>Agent</code>
+			<source>
+Action template = new Action();
+ArrayList&lt;Action&gt; templates = new ArrayList&lt;Action&gt;();
+templates.add(template);
+Action addAutoEnlistActionTemplate = memory.read(new Action(DirectoryAccessBean.ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE));
+	
+DoAction action = addAutoEnlistActionTemplate.createDoAction(new Serializable[] {templates}, this);
+memory.write(action);
+			</source>
+			If you want to be more selective you have to use a at least partially filled template. Set every field of your <code>Action</code>
+			that you don't want to be checked to <code>null</code>. All actions that fields are equal to the fields you are setting will
+			be chosen to be added to the directory, ignoring all that don't. You can use more than one template if you want to.
+			<br />
+			<br />
+			<b> Removing Actions using templates</b> <br />
+			You can remove actions from the directory using templates even if you didn't added them this way.<br />
+			If you are using this action the template you use will be removed from the autoenlistment-templates if it's included there.
+			Besides that every action that was added to the directory through this agent that matches on this template will be removed. <br />
+			<br />
+			<b>Note:</b><i>All Actions matching with the given template will be removed even if there is a template
+			within the autoenlistmenttemplates that is still matching to it. However actions to which still matching 
+			autoenlistmenttemplates	are existing will be added again when the autoenlistmentInterval is over the next time.</i>
+			<br />
+			<br />
+			Example to remove all actions of an <code>Agent</code>
+			<source>
+Action template = new Action();
+ArrayList&lt;Action&gt; templates = new ArrayList&lt;Action&gt;();
+templates.add(template);
+Action addAutoEnlistActionTemplate = memory.read(new Action(DirectoryAccessBean.ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE));
+	
+DoAction action = addAutoEnlistActionTemplate.createDoAction(new Serializable[] {templates}, this);
+memory.write(action);
+			</source>
+			If you want to be more selective you have to use a more decent template as mentioned above for adding actions with templates.
+			
+		</subsection>
+		
+		<subsection name="How to start a search">
+		To start a search you have to first decide two things. <br />
+		<br />
+		First you have to decide if you want to search just on your local <code>AgentNode</code>
+		or global within the whole group your <code>AgentNode</code> is part of.<br />
+		<br />
+		<b>Note:</b> <i>You will get only local results from a local search even if the cache is
+		active and entries from other <code>AgentNode</code>s are actually stored within the
+		directory.</i> <br />
+		<br />
+		<br />
+		Second you have to decide if you want to use a timeout for your search. This parameter
+		is optional and can be ignored but ignoring it is discouraged when you are running
+		a global search.<br />
+		<br />
+		<b>Note:</b> <i>If you are running a local search you will get a nearly instantaneous response
+		from your local Directory including just local results. If you are running a global
+		search with an active Cache it will be likewise. <b>But</b> if the cache is deactivated
+		and you are running a global search without a timeout set to your action the <code>AgentNode</code>
+		will sent your search-message to all other Nodes and wait for the default timeout to
+		happen, which is set to 60 seconds.</i><br />
+		<br />
+		<b>Important:</b> <i>The default timeout is 60 seconds. It's optional but encouraged to
+		set a decent own timeout for your searching actions.</i>
+		<br />
+		<br />
+		To search for <code>Agent</code>s or <code>Action</code>s is absolutely equivalent.
+		So there will be only an example to search for an <code>Agent</code>. To search for
+		an <code>Action</code> you just have to change the <code>AgentDescription</code> 
+		within the example into an <code>Action</code> using it as template by setting all
+		fields you want to be compared leaving all fields set to <code>null</code> you
+		want to be ignored during the matching.	
+		<br />
+		<br />
+		Example to search for an Agent:
+		<source>
+Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
+
+AgentDescription desc = new AgentDescription(null,agentName, null, null, null); 
+Serializable[] params = {desc, new Boolean(isGlobal), timeToSearch}; 
+
+DoAction action = requestSearchAction.createDoAction(params, this);
+memory.write(action);
+		</source>
+		</subsection>
+		
+		<subsection name="How to use remote actions">
+			Basically using a remote <code>Action</code> that was found 
+			using a search action as mentioned above is like using an
+			action provided by the very same <code>Agent</code> the invoking
+			bean is on. It will be processed from the DirectoryAccessBean
+			and the result will be delivered the same way as for every other
+			<code>Action</code> you are using. It will be as if the 
+			<code>DirectoryAccessBean</code> is the actual providerbean for
+			this action.
+		</subsection>
+		
+		</section>
+		
 	</body>
 
 </document>

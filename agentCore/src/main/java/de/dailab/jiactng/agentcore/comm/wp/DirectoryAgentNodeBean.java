@@ -516,9 +516,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 	/**
 	 * Sets the refreshing interval. After this interval the space will be checked for old actions,
-	 * for each of this actions a message will be send to the agent providing it,
-	 * which will sent back a message with the actions provided to refresh them.
-	 * When the next interval begins all actions that weren't refreshed will be removed
+	 * for each agent holding an possible obsolete action a message will be sent to him, requesting
+	 * him to refresh his Actions within the Directory. 
+	 * When the next interval begins all actions that havn't got a refreshment are erased.
 	 * 
 	 * Default: 2000 milliseconds
 	 *
@@ -567,8 +567,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	}
 
 	/**
-	 * sets the interval after which the AgentNodeBean will ping all agents stored within it
-	 * to check if they are still alive.
+	 * Sets the interval after which the directory will check all local agents stored within it
+	 * if they are still alive.
 	 * 
 	 * Default: 12000 milliseconds
 	 * 
@@ -580,11 +580,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 
 	/**
-	 * sets the interval after which the AgentNodeBean will ping all agents stored within it
-	 * to check if they are still alive.
+	 * Gets the interval after which the directory will check all local agents stored within it
+	 * if they are still alive.
 	 * 
 	 * Default: 12000 milliseconds
-	 * 
+	 *  
 	 * @return time in milliseconds
 	 */
 	public long getAgentPingInterval(){
@@ -592,7 +592,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	}
 
 	/**
-	 * sets the interval after which changes are propagated to the other nodes 
+	 * Sets the interval after which changes are propagated to the other nodes  (if instantPropagation == false)
 	 *  This Interval is used for "Alivedetection" of other AgentNodes too. If there will be no message from another
 	 *  AgentNode within two times this interval the AgentNode will be removed from this Directory with all entries
 	 *  of Agents or Actions from it.
@@ -606,7 +606,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	}
 
 	/**
-	 * gets the interval after which changes are propagated to the other nodes 
+	 * gets the interval after which changes are propagated to the other nodes (if instantPropagation == false)
 	 *  This Interval is used for "Alivedetection" of other AgentNodes too. If there will be no message from another
 	 *  AgentNode within two times this interval the AgentNode will be removed from this Directory with all entries
 	 *  of Agents or Actions from it.
@@ -697,7 +697,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	
 	/**
 	 * 
-	 * @return <code>true</code>, if changes should be propageted instantly to the other <code>AgentNode</code>s.
+	 * @return <code>true</code>, if changes should be propagated instantly to the other <code>AgentNode</code>s.
 	 * 
 	 * Default: false -> local changes will be buffered and send every <code>changePropagationInterval</code> ms
 	 */

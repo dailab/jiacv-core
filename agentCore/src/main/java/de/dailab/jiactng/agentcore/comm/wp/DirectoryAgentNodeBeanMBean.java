@@ -14,11 +14,13 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 
 	/**
 	 * Sets the refreshing interval. After this interval the space will be checked for old actions,
-	 * for each of this actions a message will be send to the agent providing it,
-	 * which will sent back a message with the actions provided to refresh them.
-	 * When the next interval begins all actions that weren't refreshed will be removed.
+	 * for each agent holding an possible obsolete action a message will be sent to him, requesting
+	 * him to refresh his Actions within the Directory. 
+	 * When the next interval begins all actions that havn't got a refreshment are erased.
 	 * 
-	 * @param intervall time in milliseconds
+	 * Default: 2000 milliseconds
+	 *
+	 * @param interval time in milliseconds
 	 */
 	public void setRefreshingInterval(long intervall);
 
@@ -35,6 +37,8 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 * within the directory will be commenced. Can be different from 
 	 * refreshing interval given with the other setter.
 	 * 
+	 * Default: 2000 milliseconds
+	 * 
 	 * @param firstRefresh the first time of refreshment
 	 */
 	public void setFirstRefresh(long firstRefresh);
@@ -44,41 +48,51 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 * within the directory will be commenced. Can be different from 
 	 * refreshing interval given with the other getter.
 	 * 
+	 * Default: 2000 milliseconds
+	 * 
 	 * @return firstRefresh the first time of refreshment
 	 */
 	public long getFirstRefresh();
 
 	/**
-	 * Sets the interval after which the directory will ping all agents stored within it
-	 * to check if they are still alive.
+	 * Sets the interval after which the directory will check all local agents stored within it
+	 * if they are still alive.
+	 * 
+	 * Default: 12000 milliseconds
 	 * 
 	 * @param agentPingIntervall time in milliseconds
 	 */
 	public void setAgentPingInterval(long agentPingIntervall);
 
 	/**
-	 * Gets the interval after which the directory will ping all agents stored within it
-	 * to check if they are still alive.
+	 * Gets the interval after which the directory will check all local agents stored within it
+	 * if they are still alive.
+	 * 
+	 * Default: 12000 milliseconds
 	 * 
 	 * @return time in milliseconds
 	 */
 	public long getAgentPingInterval();
 
 	/**
-	 * Sets the interval after which changes are propagated to the other nodes.
+	 * Sets the interval after which changes are propagated to the other nodes. (if instantPropagation == false)
 	 * This interval is used for "alive detection" of other agent nodes too. If there will be no message from another
 	 * agent node within two times this interval the agent node will be removed from this directory with all entries
 	 * of agents or actions from it.
+	 *  
+	 * Default: 3000 milliseconds
 	 *  
 	 * @param cpInterval interval in milliseconds
 	 */
 	public void setChangePropagateInterval(long cpInterval);
 
 	/**
-	 * Gets the interval after which changes are propagated to the other nodes.
+	 * Gets the interval after which changes are propagated to the other nodes. (if instantPropagation == false)
 	 * This interval is used for "alive detection" of other agent nodes too. If there will be no message from another
 	 * agent node within two times this interval the agent node will be removed from this directory with all entries
 	 * of agents or actions from it.
+	 * 
+ 	 * Default: 3000 milliseconds
 	 * 
 	 * @return interval in milliseconds
 	 */
@@ -99,6 +113,14 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 */
 	public boolean getCacheIsActive();
 
+	/**
+	 * sets the communicationAddress on which all <code>AgentNode</code>s group together and exchange searchRequests and
+	 * necessary overhead
+	 * 
+	 * @param nodes <code>GroupAddress</code> on which all <code>AgentNode</code>s register
+	 */
+	public void setOtherNodes(String groupName);
+	
 	/**
 	 * Information about the facts stored in the directory memory.
 	 * @return information about facts stored in directory memory
@@ -122,4 +144,22 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 * @return the set of UUIDs
 	 */
 	public Set<String> getOtherNodes();
+	
+	/**
+	 * sets if changes should be propagated instantly or a collection of changes should be send every <code>changePropagationInterval</code> ms
+	 * 
+	 * @param instantPropagation is false by default -> changes will be collected and send as a bundle
+	 * 
+	 * Note: can be changed during runtime without causing problems
+	 */
+	public void setInstantPropagation(boolean instantPropagation);
+	
+	/**
+	 * 
+	 * @return <code>true</code>, if changes should be propagated instantly to the other <code>AgentNode</code>s.
+	 * 
+	 * Default: false -> local changes will be buffered and send every <code>changePropagationInterval</code> ms
+	 */
+	public boolean getInstantPropagation();
+	
 }

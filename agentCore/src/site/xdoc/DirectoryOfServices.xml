@@ -116,12 +116,15 @@
 					<code>DirectoryAccessBean</code>
 					by using Spring
 					<source>
+from <i>src/main/resources/AgentBeans.xml</i>					
 	&lt;bean name="DirectoryAccessBean" 
 		class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean"	singleton="false" /&gt;
 
+
+or you can use this configuration if you want to change the autoenlisteninginterval:
+
 	&lt;bean name="DirectoryAccessBeanWithDifferentAutoEnlistInterval"
-		class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean"
-		singleton="false" /&gt;
+		class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean" singleton="false" /&gt;
 			&lt;property name="autoEnlisteningInterval" value="3000" /&gt;
 	&lt;/bean&gt;
 					</source>
@@ -364,7 +367,31 @@
 					
 					</source>
 					
-					Last but not Least a tip to the unexperienced: <br />
+					<br />
+					Another Example is this simple standard-configuration of a platform with directory:
+					
+					<source>
+from <i>src/main/resources/AgentNode.xml</i>
+  
+  &lt;!--
+      # The default AgentNode Spring configuration
+      # provides an empty platform definition without JMX support but with a distributed agent and service directory.
+      # the platform bean may be set as parent in any other platfom definitions 
+      
+   --&gt;
+  
+  &lt;bean name="PlatformWithDirectory" parent="Platform" abstract="true"&gt;
+		&lt;property name="agentNodeBeans"&gt;
+			&lt;list&gt;
+				&lt;ref bean="StandardJMSBroker"/&gt;
+				&lt;ref bean="DirectoryAgentNodeBean"/&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+   &lt;/bean&gt;
+   					</source>
+
+					Last but not Least a tip to the unexperienced:
+					<br />
 					You'll find a complete Context for a test-setup in src/test/resources/de.dailab.jiactng.agentcore.comm.wp.WhitePagesIntegrationTestContext.xml
 				</p>
 			</subsection>

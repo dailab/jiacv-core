@@ -16,11 +16,6 @@
 
    <dependencies>
       <dependency>
-         <groupId>com.jgoodies</groupId>
-         <artifactId>forms</artifactId>
-         <version>1.0.7</version>
-      </dependency>
-      <dependency>
          <groupId>de.dailab.jiactng</groupId>
          <artifactId>agentCore</artifactId>
          <version>${project.version}</version>

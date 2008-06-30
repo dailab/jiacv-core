@@ -66,9 +66,6 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  *
  */
 
-//TODO Usermanagment CC-IRML
-//TODO x-Doc!
-
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate, ILifecycleListener, DirectoryAgentNodeBeanMBean {
 
 	/** suffix for address-creation purposes. Will be added to the UUID of AgentNode to create Beanaddress */
@@ -135,6 +132,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 	/** Groupaddress of all <code>AgentNode</code>s used for inter-AgentNode-communication */
 	private ICommunicationAddress _otherNodes = null;
+	
+	/** Name of the group of AgentNodes this AgentNode is associated with.*/
+	private String _groupName = AGENTNODESGROUP;
 
 	/** Timerobject that schedules update and refreshment activities */
 	private Timer _timer;
@@ -626,9 +626,29 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * 
 	 * @param groupName <code>GroupAddress</code> on which all <code>AgentNode</code>s register
 	 */
-	public void setOtherNodes(String groupName) {
-		_otherNodes = CommunicationAddressFactory.createGroupAddress(groupName);
+	public void setNodeGroup(String groupName) {
+		_groupName = groupName;
+		_otherNodes = CommunicationAddressFactory.createGroupAddress(_groupName);
 	}
+	
+	/**
+	 * get the name of the group (->Groupaddress) on which all <code>AgentNode</code>s group 
+	 * together and exchange searchRequests and necessary overhead
+	 * 
+	 * @return name for <code>GroupAddress</code> on which all <code>AgentNode</code>s register
+	 */	
+	public String getNodeGroup(){
+		return _groupName;
+	}
+	
+	/**
+	 * 
+	 * @return the actual GroupAddress this AgentNode communicates with other Nodes of it's group
+	 */
+	public ICommunicationAddress getNodeGroupAddress() {
+		return _otherNodes;
+	}
+	
 
 	/**
 	 * sets if incoming entries from other AgentNodes will be stored of ignored

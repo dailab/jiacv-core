@@ -272,8 +272,9 @@ or you can use this configuration if you want to change the autoenlisteninginter
 						</li>
 						<br />
 						<li>
-							<b>The otherNodes address</b>
+							<b>The NodeGroup address</b>
 							<br />
+							The given name is used to create the group-address.
 							This address allows it to group different AgentNodes and
 							connecting them to a network of Directories. This address
 							will be used to communicate all changes on a local <code>AgentNode</code>
@@ -360,7 +361,7 @@ or you can use this configuration if you want to change the autoenlisteninginter
 	&lt;property name="firstRefresh" value="2000" /&gt;
 	&lt;property name="agentPingInterval" value="12000" /&gt;
 	&lt;property name="changePropagateInterval" value="3000" /&gt;
-	&lt;property name="otherNodes" value="myGroupName" /&gt;
+	&lt;property name="nodeGroup" value="myGroupName" /&gt;
 	&lt;property name="cacheIsActive" value="true" /&gt;
 	&lt;property name="instantPropagation" value="true" /&gt;
 &lt;/bean&gt;

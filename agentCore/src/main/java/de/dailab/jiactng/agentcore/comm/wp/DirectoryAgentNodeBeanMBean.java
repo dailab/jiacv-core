@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBeanMBean;
+import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 
 /**
  * JMX-based management interface of the directory bean.
@@ -114,12 +115,26 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	public boolean getCacheIsActive();
 
 	/**
-	 * sets the communicationAddress on which all <code>AgentNode</code>s group together and exchange searchRequests and
-	 * necessary overhead
+	 * sets the name of the group (->Groupaddress) on which all <code>AgentNode</code>s group 
+	 * together and exchange searchRequests and necessary overhead
 	 * 
-	 * @param nodes <code>GroupAddress</code> on which all <code>AgentNode</code>s register
+	 * @param groupName name for <code>GroupAddress</code> on which all <code>AgentNode</code>s register
 	 */
-	public void setOtherNodes(String groupName);
+	public void setNodeGroup(String groupName);
+	
+	/**
+	 * get the name of the group (->Groupaddress) on which all <code>AgentNode</code>s group 
+	 * together and exchange searchRequests and necessary overhead
+	 * 
+	 * @return name for <code>GroupAddress</code> on which all <code>AgentNode</code>s register
+	 */	
+	public String getNodeGroup();
+	
+	/**
+	 * 
+	 * @return the actual GroupAddress this AgentNode communicates with other Nodes of it's group
+	 */
+	public ICommunicationAddress getNodeGroupAddress();
 	
 	/**
 	 * Information about the facts stored in the directory memory.

@@ -11,6 +11,7 @@ import java.io.Serializable;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
@@ -299,6 +300,13 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements
 		memory.write(doAct);
 		return doAct.getSessionId();
 	}
+	
+  protected String invoke(Action a, Session parent, Serializable[] inputParams,
+      ResultReceiver receiver) {
+    DoAction doAct = a.createDoAction(parent, inputParams, receiver);
+    memory.write(doAct);
+    return doAct.getSessionId();
+  }	
 	
 //	protected ActionResult syncInvoke(Action a, Object[] inputParams) {
 //		DoAction doAct = a.createDoAction(inputParams, null);

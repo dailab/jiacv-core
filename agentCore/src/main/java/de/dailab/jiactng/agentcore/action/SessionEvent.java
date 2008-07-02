@@ -55,9 +55,10 @@ public class SessionEvent implements IFact {
 	public SessionEvent(DoAction source) {
 		this(null, null, source);
 		if (source != null) {
-			this.sessionId = source.getSessionId();
-			if (this.session != null)
+			this.session = source.getSession();
+			if (this.session != null) {
 				this.sessionId = this.session.getSessionId();
+			}
 			this.action = source.getAction();
 		}
 	}

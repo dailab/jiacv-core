@@ -136,6 +136,23 @@ public class Action implements IActionDescription {
 		return new DoAction(this, source, newParams, timeToLive);
 	}
 
+	 /**
+   * Creates a new DoAction-object for this action. The resulting object can
+   * be written to the memory to trigger the action.
+   * 
+   * @see de.dailab.jiactng.agentcore.action.DoAction
+   * @param newParams
+   *            the input-parameters that should be used when executing the
+   *            action.
+   * @param source
+   *            the caller of the action.
+   * @return a new DoAction-object that can be used (by writing it to the
+   *         memory) to call the action.
+   */
+  public DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source) {
+    return new DoAction(parent, this, source, newParams);
+  }
+	
 	/**
 	 * Creates a new Result-object for this action. The resulting object can be
 	 * written to the memory to return the results of the action. *

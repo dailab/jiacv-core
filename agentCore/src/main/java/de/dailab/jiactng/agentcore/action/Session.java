@@ -2,6 +2,8 @@ package de.dailab.jiactng.agentcore.action;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
@@ -220,7 +222,9 @@ public class Session implements IFact {
 	 * @return an Arraylist containing the history.
 	 */
 	public ArrayList<SessionEvent> getHistory() {
-		return history;
+	  ArrayList<SessionEvent> copy = new ArrayList<SessionEvent>();
+    copy.addAll(history);
+	  return copy;
 	}
 
 //	/**

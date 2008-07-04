@@ -179,7 +179,7 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         Method method= searchMethod(action.getName(), action.getInputTypes());
         if(method != null) {
             try {
-                Serializable result= (Serializable)method.invoke(this, doAction.getParams());
+                Serializable result= (Serializable)method.invoke(this, (Object[]) doAction.getParams());
                 if (result != null){ 
                 	memory.write(action.createActionResult(
                 			doAction, new Serializable[] { result }));
@@ -307,20 +307,10 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
 
         	// fill table
         	for (Action action : actions) {
-        		// get parameter classes
-        	    List<Class<?>> inputTypes = action.getInputTypes();
-        		int size = inputTypes.size();
-        		String[] inputTypeList = new String[size];
-        		for (int i=0; i<size; i++) {
-        			inputTypeList[i] = inputTypes.get(i).getName();
-        		}
-        		// get result classes
-        		List<Class<?>> resultTypes = action.getResultTypes();
-        		size = resultTypes.size();
-        		String[] resultTypeList = new String[size];
-        		for (int i=0; i<size; i++) {
-        			resultTypeList[i] = resultTypes.get(i).getName();
-        		}
+        		// get names of parameter and result classes
+        	    String[] inputTypeList = (action.getInputTypeNames()==null)? null:(String[]) action.getInputTypeNames().toArray();
+        		String[] resultTypeList = (action.getResultTypeNames()==null)? null:(String[]) action.getResultTypeNames().toArray();
+
         		// create and add action description
         		Object[] itemValues = new Object[] {action.getName(), inputTypeList, resultTypeList, action.getProviderBean().getBeanName()};
         		CompositeData value = new CompositeDataSupport(rowType, itemNames, itemValues);

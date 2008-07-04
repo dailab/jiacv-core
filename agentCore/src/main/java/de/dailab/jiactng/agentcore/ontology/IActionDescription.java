@@ -24,7 +24,7 @@ public interface IActionDescription extends IFact {
     String getName();
     
     /**
-     * This method returns the types of the input
+     * This method returns the type names of the input
      * parameters that the action accepts.
      * 
      * <p>
@@ -32,13 +32,13 @@ public interface IActionDescription extends IFact {
      * </p>
      *
      * @see Collections#unmodifiableList(List)
-     * @return      the unmodifiable list of input parameter types
+     * @return      the unmodifiable list of input parameter type names
      *              or <code>null</code> if not set
      */
-    List<Class<?>> getInputTypes();
+    List<String> getInputTypeNames();
     
     /**
-     * This method returns the result types of the described
+     * This method returns the result type names of the described
      * action.
      * 
      * <p>
@@ -46,10 +46,30 @@ public interface IActionDescription extends IFact {
      * </p>
      * 
      * @see Collections#unmodifiableList(List)
-     * @return      the unmodifiable list of result types or
+     * @return      the unmodifiable list of result type names or
      *              <code>null</code> if not set
      */
-    List<Class<?>> getResultTypes();
+    List<String> getResultTypeNames();
+    
+    /**
+     * This method returns the types of the input
+     * parameters that the action accepts.
+     * 
+     * @return      a created list of input parameter types
+     *              or <code>null</code> if corresponding list of parameter type names is not set
+	 * @throws ClassNotFoundException if one of the classes is unknown.
+     */
+    List<Class<?>> getInputTypes() throws ClassNotFoundException;
+    
+    /**
+     * This method returns the result types of the described
+     * action.
+     * 
+     * @return      a created list of result types or
+     *              <code>null</code> if corresponding list of result type names is not set
+	 * @throws ClassNotFoundException if one of the classes is unknown.
+     */
+    List<Class<?>> getResultTypes() throws ClassNotFoundException;
     
     /**
      * This method returns the agent description of the

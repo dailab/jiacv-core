@@ -141,7 +141,13 @@ public class DoAction extends SessionEvent {
 	 *         the mismatch otherwise.
 	 */
 	public String typeCheck() {
-		List<Class<?>> types = getAction().getInputTypes();
+		List<Class<?>> types;
+		try {
+			types = getAction().getInputTypes();
+		}
+		catch (ClassNotFoundException e) {
+			return e.toString();
+		}
 
 		if (types.size() != params.length) {
 			return "type length is '" + types.size()

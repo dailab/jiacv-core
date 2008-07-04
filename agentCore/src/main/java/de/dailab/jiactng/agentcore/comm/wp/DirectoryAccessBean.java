@@ -806,8 +806,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 						address = doAction.getAction().getProviderDescription().getMessageBoxAddress();
 					} else {
 						log.error("Action is not valid! No MessageBoxAddress attached! Action: " + doAction.getAction());
-						if (doAction.getAction().getResultTypes() != null){
-							if (!doAction.getAction().getResultTypes().isEmpty()){
+						if (doAction.getAction().getResultTypeNames() != null){
+							if (!doAction.getAction().getResultTypeNames().isEmpty()){
 								ActionResult result = new ActionResult(doAction, new DirectoryAccessException("No MessageBoxAddress attached"));
 								memory.write(result);
 								return;
@@ -818,8 +818,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 					}
 				} else {
 					log.error("Action is not valid! No ProviderDescription attached! Action: " + doAction.getAction());
-					if (doAction.getAction().getResultTypes() != null){
-						if (!doAction.getAction().getResultTypes().isEmpty()){
+					if (doAction.getAction().getResultTypeNames() != null){
+						if (!doAction.getAction().getResultTypeNames().isEmpty()){
 							ActionResult result = new ActionResult(doAction, new DirectoryAccessException("No ProviderDescription attached"));
 							memory.write(result);
 							return;

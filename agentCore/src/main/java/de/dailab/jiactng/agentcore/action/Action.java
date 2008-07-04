@@ -37,11 +37,11 @@ public class Action implements IActionDescription {
 	/** The component that holds the funtionality for this action */
 	private transient IEffector providerBean;
 
-	/** The classes of the input-parameters of this action */
-	private List<Class<?>> _inputTypes;
+	/** The class names of the input-parameters of this action */
+	private List<String> _inputTypeNames;
 
-	/** The classes of the results of this action */
-	private List<Class<?>> _resultTypes;
+	/** The class names of the results of this action */
+	private List<String> _resultTypeNames;
 
 	private IAgentDescription _providerDescription;
 
@@ -97,8 +97,8 @@ public class Action implements IActionDescription {
 		providerBean = action.getProviderBean();
 
 		// we can exchange references here, because the lists are immutable
-		_inputTypes = action.getInputTypes();
-		_resultTypes = action.getResultTypes();
+		_inputTypeNames = action.getInputTypeNames();
+		_resultTypeNames = action.getResultTypeNames();
 	}
 
 	/**
@@ -183,13 +183,32 @@ public class Action implements IActionDescription {
 	}
 
 	/**
+	 * Getter for the input-parameter class names.
+	 * 
+	 * @return an array containing the class names of the parameters in correct
+	 *         order.
+	 */
+	public final List<String> getInputTypeNames() {
+		return _inputTypeNames;
+	}
+
+	/**
 	 * Getter for the input-parameter classes.
 	 * 
 	 * @return an array containing the classes of the parameters in correct
 	 *         order.
+	 * @throws ClassNotFoundException if one of the classes is unknown.
 	 */
-	public final List<Class<?>> getInputTypes() {
-		return _inputTypes;
+	public final List<Class<?>> getInputTypes() throws ClassNotFoundException {
+		if (_inputTypeNames != null) {
+			List<Class<?>> list = new ArrayList<Class<?>>();
+			for (String type : _inputTypeNames) {
+				list.add(Class.forName(type));
+			}
+			return list;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -206,13 +225,32 @@ public class Action implements IActionDescription {
 	}
 
 	/**
+	 * Getter for the result class names.
+	 * 
+	 * @return an array containing the class names of the return-values in correct
+	 *         order.
+	 */
+	public final List<String> getResultTypeNames() {
+		return _resultTypeNames;
+	}
+
+	/**
 	 * Getter for the result classes.
 	 * 
 	 * @return an array containing the classes of the return-values in correct
 	 *         order.
+	 * @throws ClassNotFoundException if one of the classes is unknown.
 	 */
-	public final List<Class<?>> getResultTypes() {
-		return _resultTypes;
+	public final List<Class<?>> getResultTypes() throws ClassNotFoundException {
+		if (_resultTypeNames != null) {
+			List<Class<?>> list = new ArrayList<Class<?>>();
+			for (String type : _resultTypeNames) {
+				list.add(Class.forName(type));
+			}
+			return list;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -224,16 +262,32 @@ public class Action implements IActionDescription {
 	}
 
 	/**
+	 * @param inputTypeNames
+	 *            the parameters to set
+	 */
+	public final void setInputTypeNames(List<String> inputTypeNames) {
+		if (inputTypeNames != null) {
+			List<String> copy = new ArrayList<String>();
+			copy.addAll(inputTypeNames);
+			_inputTypeNames = Collections.unmodifiableList(copy);
+		} else {
+			_inputTypeNames = null;
+		}
+	}
+
+	/**
 	 * @param inputTypes
 	 *            the parameters to set
 	 */
 	public final void setInputTypes(List<Class<?>> inputTypes) {
 		if (inputTypes != null) {
-			List<Class<?>> copy = new ArrayList<Class<?>>();
-			copy.addAll(inputTypes);
-			_inputTypes = Collections.unmodifiableList(copy);
+			List<String> copy = new ArrayList<String>();
+			for (Class<?> type : inputTypes) {
+				copy.add(type.getName());
+			}
+			_inputTypeNames = Collections.unmodifiableList(copy);
 		} else {
-			_inputTypes = null;
+			_inputTypeNames = null;
 		}
 	}
 
@@ -251,16 +305,32 @@ public class Action implements IActionDescription {
 	}
 
 	/**
+	 * @param resultTypeNames
+	 *            the results to set
+	 */
+	public final void setResultTypeNames(List<String> resultTypeNames) {
+		if (resultTypeNames != null) {
+			List<String> copy = new ArrayList<String>();
+			copy.addAll(resultTypeNames);
+			_resultTypeNames = Collections.unmodifiableList(copy);
+		} else {
+			_resultTypeNames = null;
+		}
+	}
+
+	/**
 	 * @param resultTypes
 	 *            the results to set
 	 */
 	public final void setResultTypes(List<Class<?>> resultTypes) {
 		if (resultTypes != null) {
-			List<Class<?>> copy = new ArrayList<Class<?>>();
-			copy.addAll(resultTypes);
-			_resultTypes = Collections.unmodifiableList(copy);
+			List<String> copy = new ArrayList<String>();
+			for (Class<?> type : resultTypes) {
+				copy.add(type.getName());
+			}
+			_resultTypeNames = Collections.unmodifiableList(copy);
 		} else {
-			_resultTypes = null;
+			_resultTypeNames = null;
 		}
 	}
 
@@ -299,8 +369,8 @@ public class Action implements IActionDescription {
 		}
 
 		return EqualityChecker.equalsOrNull(this.getName(), other.getName())
-				&& EqualityChecker.equalsOrNull(this.getInputTypes(), other.getInputTypes())
-				&& EqualityChecker.equalsOrNull(this.getResultTypes(), other.getResultTypes());
+				&& EqualityChecker.equalsOrNull(this.getInputTypeNames(), other.getInputTypeNames())
+				&& EqualityChecker.equalsOrNull(this.getResultTypeNames(), other.getResultTypeNames());
 	}
 
 	/**
@@ -311,9 +381,9 @@ public class Action implements IActionDescription {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Action:\n name='").append(_name).append("'");
 		builder.append("\n parameters=");
-		prettyPrintArray(builder, _inputTypes);
+		prettyPrintArray(builder, _inputTypeNames);
 		builder.append("\n results=");
-		prettyPrintArray(builder, _resultTypes);
+		prettyPrintArray(builder, _resultTypeNames);
 		if (_providerDescription != null) {
 			builder.append("\n provider =");
 			builder.append(_providerDescription.getName());
@@ -324,13 +394,13 @@ public class Action implements IActionDescription {
 	/*
 	 * Utility-method for a nicely formatted output
 	 */
-	private void prettyPrintArray(StringBuilder builder, List<Class<?>> list) {
+	private void prettyPrintArray(StringBuilder builder, List<String> list) {
 		if(list == null) {
 			builder.append("null");
 		} else {
 			builder.append('[');
-			for (Iterator<Class<?>> iter = list.iterator(); iter.hasNext();) {
-				builder.append(iter.next().getName());
+			for (Iterator<String> iter = list.iterator(); iter.hasNext();) {
+				builder.append(iter.next());
 	
 				if (iter.hasNext()) {
 					builder.append("; ");

@@ -353,7 +353,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception {
+	public List<String> addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception {
 		// create classloader for the new agents
 		JARClassLoader cl = new JARClassLoader();
 		for (JARMemory jar: libraries) {
@@ -368,11 +368,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		appContext.refresh();
 
 		// add and start all created agents
+		List<String> agentIds = new ArrayList<String>();
 		Collection<?> newAgents = appContext.getBeansOfType(IAgent.class).values();
 		for (Object a : newAgents) {
 			IAgent agent = (IAgent) a;
 			agent.setOwner(owner);
 			addAgent(agent);
+			agentIds.add(agent.getAgentId());
 			try {
 				agent.init();
 				agent.start();
@@ -381,6 +383,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				e.printStackTrace();
 			}
 		}
+
+		return agentIds;
 	}
 
 	/**

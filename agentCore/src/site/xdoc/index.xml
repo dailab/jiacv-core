@@ -48,7 +48,9 @@
            switches to the intermediate state, invokes the corresponding method of
            the abstract class 
            <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
-           <code>AbstractLifecycle</code></a> and switches to the final state.</p>
+           <code>AbstractLifecycle</code></a> and switches to the final state.
+           In case of a failed doInit() or doStart() method the state of this 
+           resource will be changed back to the original state.</p>
 
         <p>
           <a href="images/Lifecycle.png">

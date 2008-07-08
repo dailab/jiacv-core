@@ -84,42 +84,42 @@
           <tr>
 	        <td>JVM without any application</td>
 	        <td>-</td>
-	        <td>243</td>
-	        <td>2198</td>
+	        <td>262</td>
+	        <td>12395</td>
 	        <td>5</td>
-	        <td>319</td>
+	        <td>337</td>
 	      </tr>
 	      <tr>
 	        <td>Agent node without any features</td>
-	        <td>785</td>
-	        <td>1325</td>
-	        <td>6978</td>
+	        <td>765</td>
+	        <td>1290</td>
+	        <td>15990</td>
 	        <td>5</td>
-            <td>1312</td>
+            <td>1313</td>
 	      </tr>
 	      <tr>
 	        <td>Agent node only with one small agent</td>
-	        <td>892</td>
-	        <td>1195</td>
-	        <td>7270</td>
-	        <td>8</td>
-            <td>1376</td>
+	        <td>884</td>
+	        <td>1373</td>
+	        <td>16326</td>
+	        <td>7</td>
+            <td>1392</td>
 	      </tr>
 	      <tr>
 	        <td>Agent node only with RMI connector</td>
-	        <td>1036</td>
-	        <td>1178</td>
-	        <td>8418</td>
-	        <td>10</td>
-            <td>1652</td>
+	        <td>1072</td>
+	        <td>933</td>
+	        <td>16649</td>
+	        <td>9</td>
+            <td>1550</td>
 	      </tr>
 	      <tr>
 	        <td>Agent node only with communication</td>
-	        <td></td>
-	        <td></td>
-	        <td></td>
-	        <td></td>
-	        <td></td>
+	        <td>1327</td>
+	        <td>1361</td>
+	        <td>17326</td>
+	        <td>9</td>
+	        <td>1632</td>
 	      </tr>
 	    </table>
 	  </subsection>

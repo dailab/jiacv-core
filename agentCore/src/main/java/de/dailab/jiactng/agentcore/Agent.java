@@ -127,8 +127,19 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * {@inheritDoc}
 	 */
 	public void setMemory(IMemory memory) {
+		// disable management of old memory
+		if (isManagementEnabled() && (this.memory != null)) {
+			this.memory.disableManagement();
+		}
+
+		// change memory
 		this.memory = memory;
 		memory.setThisAgent(this);
+
+		// enable management of new memory
+		if (isManagementEnabled() && (this.memory != null)) {
+			this.memory.enableManagement(_manager);
+		}
 	}
 
 	/**
@@ -142,12 +153,24 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * {@inheritDoc}
 	 */
 	public void setAgentBeans(List<IAgentBean> agentbeans) {
+		// disable management of all old agent beans
+		if (isManagementEnabled() && (this.agentBeans != null)) {
+			for (IAgentBean ab : this.agentBeans) {
+				ab.disableManagement();
+			}
+		}
+
+		// change agent beans
 		this.agentBeans.clear();
 		this.agentBeans.addAll(agentbeans);
 
-		// set references for all agent beans
+		// set references for all new agent beans and
+		// enable management of all new agent beans
 		for (IAgentBean ab : this.agentBeans) {
 			ab.setThisAgent(this);
+			if (isManagementEnabled()) {
+				ab.enableManagement(_manager);
+			}
 		}
 	}
 
@@ -576,8 +599,19 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 * {@inheritDoc}
 	 */
 	public void setExecution(IExecutionCycle execution) {
+		// disable management of old execution cycle
+		if (isManagementEnabled() && (this.execution != null)) {
+			this.execution.disableManagement();
+		}
+
+		// change execution cycle
 		this.execution = execution;
 		this.execution.setThisAgent(this);
+
+		// enable management of new execution cycle
+		if (isManagementEnabled() && (this.execution != null)) {
+			this.execution.enableManagement(_manager);
+		}
 	}
 
 	/**

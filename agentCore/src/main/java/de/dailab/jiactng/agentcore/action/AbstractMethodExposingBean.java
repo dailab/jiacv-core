@@ -32,6 +32,7 @@ import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
+import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 
 /**
@@ -171,7 +172,33 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
     
     private static final Class<?>[] EMPTY_CLASSES= new Class[0];
     protected static final char METHOD_SEPARATING_CHAR= '#';
-    
+
+    private Set<String> _registeredActions = Collections.emptySet();
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void doStart() throws Exception {
+		super.doStart();
+
+		// register actions in directory
+		Action registerActionAction = memory.read(new Action(DirectoryAccessBean.ACTION_ADD_ACTION_TO_DIRECTORY));
+		if (registerActionAction != null) {
+			for (Action act : getActions()) {
+				if (_registeredActions.contains(act.getName())) {
+					Serializable[] params = {act};
+					DoAction action = registerActionAction.createDoAction(params, null);
+					memory.write(action);
+				}
+			}
+		}
+	}
+
+	public void setRegisteredActions(Set<String> actions) {
+		_registeredActions = actions;
+	}
+
     public final void doAction(DoAction doAction) throws Exception {
 log.debug("typechecking is '" + doAction.typeCheck() + "'");
         

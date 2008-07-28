@@ -59,30 +59,61 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	/**
 	 * Action to request a search for agents or actions. Theoretically it allows
 	 * to even search for every IFact that is stored within a directory
+	 * InputParameter: 
+	 * 	IFact 	- template for what you are searching for
+	 * 	Boolean - global? - false if you are wanting local entries only
+	 * 	Long	- time(out) in milliseconds for the search to run at max.
+	 * 			Default is 60.000 ms although a search witch an active cache should take less than 1000 ms
+	 * 
+	 * Result Types:
+	 * 	List 	- List of entries matching the template. List will be empty if no matching entry was found
 	 */
 	public static final String ACTION_REQUEST_SEARCH = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch";
 
 	/**
 	 * Action to add an action to the directory
+	 * 
+	 * InputParameter:
+	 * 	IActionDescription - the Action you want to store
+	 * 
+	 * Result Types:
+	 * 	none
 	 */
 	public static final String ACTION_ADD_ACTION_TO_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory";
 
 	/**
 	 * Action to remove an action from the directory
+	 * 
+	 * InputParameter:
+	 * 	IActionDescription - the Action you want to remove
+	 * 
+	 * Result Types:
+	 * 	none
 	 */
 	public static final String ACTION_REMOVE_ACTION_FROM_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory";
 
 	/**
-	 * Action to add a template to the AccessBean. The Bean will search regulary
-	 * for actions that are matching with this template and add them to the 
-	 * directory if necessary
+	 * Action to add ActionTemplates. All Actions that are provided within the Agent that match these templates will
+	 * be offered through the directory on the local AgentNode. The AccessBean checks for changes on Actions matching
+	 * with the templates stored within it regulary.
+	 * 
+	 * Input Parameter:
+	 * 	List of IActionDescriptions. All entries will be added to the List
+	 * 
+	 * Result Types:
+	 * 	none
 	 */
 	public static final String ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addAutoenlistActionTemplate";
 
 	/**
-	 * Action to remove a template from the AccessBean. All Actions matching with
-	 * the template and that are stored within the directory at the moment of
-	 * removal of the template will be removed from the directory. 
+	 * Action to remove ActionTemplates. All Actions that are matching these templates will be removed from
+	 * from the local directory. 
+	 * 
+	 * Input Parameter:
+	 * 	List of IActionDescriptions. All entries will be removed from the List
+	 * 
+	 * Result Types:
+	 * 	none
 	 */
 	public static final String ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeAutoenlistActionTemplate";
 

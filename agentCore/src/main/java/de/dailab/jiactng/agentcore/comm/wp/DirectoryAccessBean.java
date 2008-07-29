@@ -59,36 +59,37 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	/**
 	 * Action to request a search for agents or actions. Theoretically it allows
 	 * to even search for every IFact that is stored within a directory
-	 * InputParameter: 
-	 * 	IFact 	- template for what you are searching for
-	 * 	Boolean - global? - false if you are wanting local entries only
-	 * 	Long	- time(out) in milliseconds for the search to run at max.
-	 * 			Default is 60.000 ms although a search witch an active cache should take less than 1000 ms
-	 * 
-	 * Result Types:
-	 * 	List 	- List of entries matching the template. List will be empty if no matching entry was found
+	 * <br />
+	 * <b>InputParameter</b> <br /> 
+	 * 	IFact 	- template for what you are searching for<br />
+	 * 	Boolean - global? - false if you are wanting local entries only<br />
+	 * 	Long	- time(out) in milliseconds for the search to run at max.<br />
+	 * 			Default is 60.000 ms although a search witch an active cache should take less than 1000 ms<br />
+	 * <br />
+	 * <b>Result Types:</b> <br />
+	 * 	List 	- List of entries matching the template. List will be empty if no matching entry was found<br />
 	 */
 	public static final String ACTION_REQUEST_SEARCH = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#requestSearch";
 
 	/**
 	 * Action to add an action to the directory
-	 * 
-	 * InputParameter:
-	 * 	IActionDescription - the Action you want to store
-	 * 
-	 * Result Types:
-	 * 	none
+	 * <br />
+	 * <b>InputParameter:</b><br />
+	 * 	IActionDescription - the Action you want to store<br />
+	 * <br />
+	 * <b>Result Types:</b><br />
+	 * 	none<br />
 	 */
 	public static final String ACTION_ADD_ACTION_TO_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addActionToDirectory";
 
 	/**
 	 * Action to remove an action from the directory
-	 * 
-	 * InputParameter:
-	 * 	IActionDescription - the Action you want to remove
-	 * 
-	 * Result Types:
-	 * 	none
+	 * <br />
+	 * <b>InputParameter:</b><br />
+	 * 	IActionDescription - the Action you want to remove<br />
+	 * <br />
+	 * <b>Result Types:</b><br />
+	 * 	none<br />
 	 */
 	public static final String ACTION_REMOVE_ACTION_FROM_DIRECTORY = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeActionFromDirectory";
 
@@ -96,24 +97,24 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	 * Action to add ActionTemplates. All Actions that are provided within the Agent that match these templates will
 	 * be offered through the directory on the local AgentNode. The AccessBean checks for changes on Actions matching
 	 * with the templates stored within it regulary.
-	 * 
-	 * Input Parameter:
-	 * 	List of IActionDescriptions. All entries will be added to the List
-	 * 
-	 * Result Types:
-	 * 	none
+	 * <br />
+	 * <b>Input Parameter:</b><br />
+	 * 	List of IActionDescriptions. All entries will be added to the List<br />
+	 * <br />
+	 * <b>Result Types:</b><br />
+	 * 	none<br />
 	 */
 	public static final String ACTION_ADD_AUTOENTLISTMENT_ACTIONTEMPLATE = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#addAutoenlistActionTemplate";
 
 	/**
 	 * Action to remove ActionTemplates. All Actions that are matching these templates will be removed from
 	 * from the local directory. 
-	 * 
-	 * Input Parameter:
-	 * 	List of IActionDescriptions. All entries will be removed from the List
-	 * 
-	 * Result Types:
-	 * 	none
+	 * <br />
+	 * <b>Input Parameter:</b><br />
+	 * 	List of IActionDescriptions. All entries will be removed from the List<br />
+	 * <br />
+	 * <b>Result Types:</b><br />
+	 * 	none<br />
 	 */
 	public static final String ACTION_REMOVE_AUTOENTLISTMENT_ACTIONTEMPLATE = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean#removeAutoenlistActionTemplate";
 
@@ -244,7 +245,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 
 	/**
 	 * Method of the LifeCycle Interface
-	 * This method will be called to initialize this AccessBean
+	 * This method will be called to initialize this AccessBean and make it listen
 	 */
 	public void doInit() throws Exception{
 		super.doInit();
@@ -256,6 +257,12 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_autoenlistActionTemplates = new ArrayList<IActionDescription>();
 		_autoEnlister = new AutoEnlister();
 		_refreshAgent = new RefreshAgent();
+		
+		memory.attach(_searchRequestHandler, WHITEPAGES_SEARCH_MESSAGETEMPLATE);
+		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
+		memory.attach(_refreshAgent, WHITEPAGES_REFRESH_MESSAGETEMPLATE);
+		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
+		
 	}
 
 	/**
@@ -265,10 +272,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	public void doStart() throws Exception{
 		super.doStart();
 		log.debug("starting DirectoryAccessBean");
-		memory.attach(_searchRequestHandler, WHITEPAGES_SEARCH_MESSAGETEMPLATE);
-		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
-		memory.attach(_refreshAgent, WHITEPAGES_REFRESH_MESSAGETEMPLATE);
-		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 		_timer = new Timer();
 		_timer.schedule(_autoEnlister, _firstAutoEnlistening, _autoEnlisteningInterval);
 

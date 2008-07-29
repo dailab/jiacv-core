@@ -258,11 +258,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		_autoEnlister = new AutoEnlister();
 		_refreshAgent = new RefreshAgent();
 		
-		memory.attach(_searchRequestHandler, WHITEPAGES_SEARCH_MESSAGETEMPLATE);
-		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
-		memory.attach(_refreshAgent, WHITEPAGES_REFRESH_MESSAGETEMPLATE);
-		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
-		
 	}
 
 	/**
@@ -272,6 +267,12 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 	public void doStart() throws Exception{
 		super.doStart();
 		log.debug("starting DirectoryAccessBean");
+		
+		memory.attach(_searchRequestHandler, WHITEPAGES_SEARCH_MESSAGETEMPLATE);
+		memory.attach(_remoteActionHandler, WHITEPAGES_REMOTEACTION_MESSAGETEMPLATE);
+		memory.attach(_refreshAgent, WHITEPAGES_REFRESH_MESSAGETEMPLATE);
+		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
+		
 		_timer = new Timer();
 		_timer.schedule(_autoEnlister, _firstAutoEnlistening, _autoEnlisteningInterval);
 

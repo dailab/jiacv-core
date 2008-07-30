@@ -788,13 +788,18 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 			log.debug("Canceling remoteAction");
 			synchronized(openSessionsToProviders){
 				DoAction sourceAction = openSessionsToProviders.remove(remoteAction.getSessionId());
-
+				
 				if (sourceAction != null){
-					String owner = sourceAction.getSource().toString();
-					log.warn("RemoteAction " + remoteAction.getAction().getName() + " from owner " + owner + " has timeout");
+					if (sourceAction.getSource() != null){
+						String owner = sourceAction.getSource().toString();
+						log.warn("RemoteAction " + remoteAction.getAction().getName() + " from owner " + owner + " has timeout");
 
-					ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
-					return result;
+						ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
+						return result;
+					} else {
+						log.warn("RemoteAction " + remoteAction.getAction().getName() + " without source has timeout");
+						return null;
+					}
 
 				} else {
 					log.warn("tried to cancel non existing remote doAction: " + remoteAction.getAction().getName());

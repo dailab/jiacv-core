@@ -1,6 +1,8 @@
 package de.dailab.jiactng.agentcore.action;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
@@ -162,5 +164,16 @@ public class DoAction extends SessionEvent {
 		}
 
 		return null;
+	}
+	
+	@Override
+	public String toString() {
+	    StringBuilder sb = new StringBuilder("DoAction(");
+	    sb.append("owner="+owner+", ");
+        sb.append("action="+getAction().getName()+", ");
+        sb.append("action_provider="+getAction().getProviderDescription().getName()+", ");
+	    sb.append("params="+Arrays.asList(params));
+	    sb.append(")");
+	    return sb.toString();
 	}
 }

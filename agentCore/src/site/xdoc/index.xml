@@ -2,98 +2,78 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
   <properties>
-    <title>UserManagement Documentation</title>
-    <author email="martin.loeffelholz@dai-labor.de">Martin Loeffelholz</author>
+    <title>agentCore Documentation</title>
+    <author email="axel.hessler@dai-labor.de">axle</author>
+    <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
   </properties>
   <body>
-    <section name="The UserManagementBean"> 
-      <p></p>
-      <p>This service is meant to provide storage and retrieval abilities from within the Jiac Multi Agent Framework.</p>
-      <p>This Bean provide the actions needed for this purpose.</p>
-      <p>To do so, this bean uses the models of the UserManagement-Project created by CC-IRML at the dai-lab as pictured here
-       <a href="images/um-schema.png">
-	      <img src="images/um-schema.png"/>
+    <section name="AgentCore Documentation"> 
+      <p>This section provides an overview about agentCore.</p>
+      <p>The next figure gives an overview about the hierarchy of
+         classes and interfaces related to all lifecycle-aware and
+         manageable elements (agent nodes, agents and agent beans) of JIAC TNG.
+         It contains all methods specified by the interfaces, all
+         attributes of the classes and all methods implemented by the 
+         classes additional to their implemented interfaces. The type
+         of attributes and the type of method results are given after
+         the colon. Input parameters are ignored in this view. The
+         character before the name of attributes and methods describes
+         their visibility (-private, #protected, +public).</p>
+
+      <p>		         
+         <a href="images/StaticStructure.png">
+	      <img src="images/StaticStructure.png"/>
 	     </a>
 	  </p>
-      
-      <subsection name="Configuration of the UserManagementBean">
-      <p> The configuration within spring is quite simple. Her is a code Example </p>
+     
+      <p>The next figure shows the startup procedure of a JIAC TNG
+         application. Firstly the spring framework creates the agent node,
+         agents and agent beans and sets the properties of these elements
+         according to the application context. Afterwards it invokes the
+         method afterPropertiesSet() of the agent node, which enables the
+         management, and initializes and starts all elements.</p>
 
-<source>
-      
-<!--
-	- Application context for the UserManagementBean
--->
-
-<beans>
-      
-	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
-	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
-	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml" />
-
-	<bean name="UserManagementPlatform" parent="Platform">
-		<property name="loggingConfig"
-			value="classpath:de/dailab/basicServices/userManagement/userManagementTestLog4j.properties" />
-		<property name="agents">
-			<list>
-				<ref bean="UserManagerAgent" />
-			</list>
-		</property>
-	</bean>
-
-	<bean name="UserManagerAgent" parent="SimpleAgent" singleton="false">
-		<property name="agentBeans">
-			<list>
-				<ref bean="UserManagementBean" />
-			</list>
-		</property>
-	</bean>
-	
-	<bean name="UserManagementBean" class="de.dailab.basicServices.userManagement.UserManagementBean" singleton="false">
-	</bean>
-	
-	
-</beans>
-
-</source>
-
-      <p> As you can see there is no real configuration necessary for the UserManagementBean within the application-context,
-      but you still have to make important configurations in another place. Within the main/resources/um.environment.properties
-      file you'll find all you have to configure to make use of the db-connectivity of this bean. <br />
-      As an alternative you can configure these settings during the runtime too by first reading the Configuration from the
-      DbController class and then modify it. After being finished with that you have to create a new SessionFactory from that
-      and set it to the UserManagementBean which will reinitialize with the new settings and use them for the operations ahead. <br />
-      Here is a code example for that:
-<source>
-	Configuration config = DbController.getHibernateConfiguration();
-
-	config.setProperty("hibernate.connection.url", "jdbc:mysql://LocalHost:3306/myUserManagementDataBase");
-	config.setProperty("hibernate.connection.username", "Me");
-	config.setProperty("hibernate.connection.password", "HeyItsMeIsntIt?");
-	
-	SessionFactory aVeryNewSessionFactory = config.buildSessionFactory();
-	UserManagementBean myUserManagementBean.setSessionFactory(aVeryNewSessionFactory);
-</source>
-      </p>
-      
-      </subsection>
-      
-      <subsection name = "Creating Users">
-      	<p>To create</p>
-      </subsection>
- 
- <!--  
-          <a href="images/um-schema.png">
-	      <img src="images/um-schema.png"/>
+      <p>
+         <a href="images/Startup.png">
+	      <img src="images/Startup.png"/>
 	     </a>
-	     
+      </p>
 
+	  <subsection name="Agent Lifecycle">
+        <p>The following graph shows the possible lifecycle states and state
+           transitions of agent nodes, agents and agent beans. Each transition
+           is triggered by the corresponding method of interface
+           <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/ILifecycle.html">
+           <code>ILifecycle</code></a>, which optional checks the current state,
+           switches to the intermediate state, invokes the corresponding method of
+           the abstract class 
+           <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
+           <code>AbstractLifecycle</code></a> and switches to the final state.
+           In case of a failed doInit() or doStart() method the state of this 
+           resource will be changed back to the original state.</p>
+
+        <p>
+          <a href="images/Lifecycle.png">
+	        <img src="images/Lifecycle.png"/>
+	      </a>
+        </p>
+
+        <p>During each state transition of an agent node, the same transition is
+           automatically executed by all agents and other resources of this agent
+           node. The state transition of an agent in turn executes the same
+           transition on all agent beans and other resources of this agent.</p>
+	  </subsection>
+
+	  <subsection name="Measurement data">
+	    <p>The data below are measured by using the test class 
+	       <code>SetupMeasurement</code> with the following environment:
 	      <ul>
 	        <li>Processor: Intel Centrino Duo 2.00GHz</li>
 	        <li>Memory: 1.00GB RAM</li>
 	        <li>Operating system: Windows XP Professional 2002 SP2</li>
 	        <li>Java version: JRE 1.6.0_03</li>
 	      </ul>
+	    </p>
 	    <table>
 	      <tr>
 	        <td>Scenario</td>
@@ -144,8 +124,7 @@
 	        <td>1632</td>
 	      </tr>
 	    </table>
-	     -->
-
+	  </subsection>
     </section>
   </body>
 </document>

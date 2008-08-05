@@ -1,0 +1,336 @@
+<?xml version="1.0"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+	<properties>
+		<title>agentCore Documentation</title>
+		<author email="marcel.patzlaff@dai-labor.de">Marcel Patzlaff</author>
+		<author email="martin.loeffelholz@dai-labor.de">Martin Loeffelholz</author>
+	</properties>
+	<body>
+		<section name="Agent Communication">
+			<p>
+				AgentCore defines a generic layer for message-based communication. This layer is available in the
+				<a href="apidocs/de/dailab/jiactng/agentcore/comm/package-summary.html">
+					<code>de.dailab.jiactng.agentcore.comm</code>
+				</a>
+				and
+				<a href="apidocs/de/dailab/jiactng/agentcore/comm/transport/package-summary.html">
+					<code>de.dailab.jiactng.agentcore.comm.transport</code>
+				</a>
+				packages. The following list describes the most essential classes and their functions:
+				<ul>
+					<li>
+						<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationBean.html">
+							<code>CommunicationBean</code>
+						</a>
+						<br />
+						The CommunicationBean is an agent component which provides access to the message bus. It can be
+						configured with one or more message transports. If no transports are available, then this bean
+						cannot do anything.
+					</li>
+					<li>
+						<a href="apidocs/de/dailab/jiactng/agentcore/comm/transport/MessageTransport.html">
+							<code>MessageTransport</code>
+						</a>
+						<br />
+						The MessageTransport is an abstract class which defines send and un-/registering primitives for
+						the various message busses.
+					</li>
+					<li>
+						<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationAddressFactory.html">
+							<code>CommunicationAddressFactory</code>
+						</a>
+						<br />
+						This factory class is the only way to create communication addresses. There are two different
+						types of addresses which covers 1:1 (message box) and 1:n (group) communication.
+					</li>
+				</ul>
+			</p>
+			<p>
+				Currently the message bus in AgentCore, which connects agents (on the same or on remote hosts), is a JMS
+				implementation.
+			</p>
+			<subsection name="Using the CommunicationBean">
+				<p>
+					There are two ways to use the functionalities of the communication bean. First you can iterate
+					through the agent's beans list to find an instance of
+					<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationBean.html">
+						<code>CommunicationBean</code>
+					</a>
+					and use this reference. This is considered to be the dirty way.
+				</p>
+				<p>
+					The second and better possibility is to use the actions the
+					<code>CommunicationBean</code>
+					offers. Just take a look at the
+					<a href="actions.html">Action Handling in Agents</a>
+					for instructions how to use the standard action invocation mechanism.
+				</p>
+			</subsection>
+
+			<subsection name="Configuring the Communication">
+				<p>
+					AgentCore defines some beans for the communication in configuration files. There are beans for the
+					node which configure an ActiveMQ-Broker which is in fact our message bus. Client access for the
+					agents is granted through the <code>CommunicationBean</code> definition. The associated
+					<code>StandardJMSMessageTransport</code> connects to the broker through a VM-
+					<code>ConnectionFactory</code>.
+				</p>
+				<p>
+					An example configuration for two agents which can communicate is given:
+					<source>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd"&gt;
+
+&lt;!--
+	- Application context definition for "example" Ping-Pong Scenario.
+--&gt;
+&lt;beans&gt;
+	&lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml"/&gt;
+	&lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/&gt;
+	&lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/&gt;
+	
+	&lt;bean name="PingPongPlatform" parent="Platform"&gt;
+		&lt;property name="agentNodeBeans"&gt;
+			&lt;list&gt;
+				&lt;ref bean="StandardJMSBroker"/&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+		&lt;property name="agents"&gt;
+			&lt;list&gt;
+				&lt;ref bean="Pinger" /&gt;
+				&lt;ref bean="Ponger" /&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
+	
+	&lt;bean name="Pinger" parent="SimpleAgent" singleton="false"&gt;
+		&lt;property name="agentBeans"&gt;
+			&lt;list&gt;
+				&lt;ref bean="CommunicationBean" /&gt;
+				&lt;ref bean="PingerBean" /&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
+
+	&lt;bean name="Ponger" parent="SimpleAgent" singleton="false"&gt;
+		&lt;property name="agentBeans"&gt;
+			&lt;list&gt;
+				&lt;ref bean="CommunicationBean" /&gt;
+				&lt;ref bean="PongerBean" /&gt;
+			&lt;/list&gt;
+		&lt;/property&gt;
+	&lt;/bean&gt;
+
+	&lt;bean name="PongerBean" class="de.dailab.jiactng.agentcore.comm.jms.PongerBean" singleton="false" /&gt;
+	&lt;bean name="PingerBean" class="de.dailab.jiactng.agentcore.comm.jms.PingerBean" singleton="false" /&gt;
+&lt;/beans&gt;
+					</source>
+				</p>
+				<p>
+					Please take a look in the <code>de.dailab.jiactng.agentcore.conf</code> package where the default
+					configuration files are located.
+				</p>
+			</subsection>
+		</section>
+		
+		<section name = "How to communicate">
+				<subsection name="Using addresses">
+					<p>
+						Addresses are necessary to send and receive messages. There are two types of addresses which are
+						described further below. To receive messages it is necessary to register for an address.
+						Messages that are send to this address will then be received by the agent registered for it.
+					</p>
+					<p>
+						It is possible to filter messages that are send to an address with a "selector". This selector
+						will be described below in more detail.
+					</p>
+					<p>
+						It is of vital importance, that an agent that doesn't want to receive any more messages from an
+						address is deregistering as often from it as the agent has registered before. Doing so the agent
+						must use the same selector during deregistration from the address as it used before for
+						registration.
+					</p>
+					<p>
+						<i>
+							<b>Notes:</b>
+						</i>
+						If you want to receive all messages from an address or just doesn't want to bother with
+						selectors, this parameter may be set to null
+					</p>
+
+				</subsection>
+
+				<subsection name="Types of addresses">
+					<p>Within the CommunicationBean two address concepts are existing.</p>
+					<p>
+						<b>The MessageBox (1:1)</b>
+					</p>
+					<p>
+						This type of Address works like a single mailbox at your house. All messages are delivered to
+						one single point.
+					</p>
+					<p>
+
+					</p>
+					<p>
+						<b>The Group (1:n)</b>
+					</p>
+					<p>
+						A group is like a mailinglist for emails. When an agent sends a message to a group it will be
+						received by all agents that are registered for this group at that moment.
+					</p>
+				</subsection>
+
+				<subsection name = "Using Selectors">
+					<p>
+						To receive messages an agent has to be registered on an address, but it's possible, that an
+						agent doesn't want to get all messages send to this address. In that case
+						<i>Selectors are helping to filter the messages</i>
+						, by letting the agent only receive messages, that are fulfilling special criteria.
+					</p>
+					<p>
+						<b>How to create selectors?</b>
+					</p>
+					<p>
+						<i>Selectors used by the CommunicationBean are basically messagetemplates</i>
+					</p>
+					<p>
+						Example for creating a selector as used in the SimpleChatExample included in JiacTNG:
+						<source>
+
+private static final JiacMessage MESSAGE_TEMPLATE; 
+private static final String MESSAGE_HEADER = "SimpleChatExample";
+
+static {
+	MESSAGE_TEMPLATE = new JiacMessage();
+	MESSAGE_TEMPLATE.setHeader(IJiacMessage.Header.PROTOCOL, MESSAGE_HEADER); 
+}
+
+						</source>
+
+						<i>
+							This selector is being used to just get all messages with the same header set as the one in
+							the messagetemplate. In our example this would be the header IJiacMessage.Header.PROTOCOL
+							set to "SimpleChatExample".
+						</i>
+
+					</p>
+					
+					<p>
+						<b>How to use selectors?</b>
+					</p>
+					<p>
+						To use a selector the agent just has to pass the messagetemplate, that it wants to use as
+						selector, to the CommunicationBean while it registeres
+						<b>and</b>
+						unregisteres for an address.
+					</p>
+					<p>
+						<i>
+							<b>Caution:</b>
+						</i>
+						The agent must use the same selector when unregistering an address, that it used for registering
+						for this address, or the unregistering won't work.
+					</p>
+					<p>
+						Let's assume, that we just used the selector from our codeexample above, while registering for
+						an address. Each Message send to this address and is meant to be received by our agent, then has
+						to get the right header. Without this header it wouldn't get through the selecting process
+						filtering the messages.
+						<source>
+JiacMessage jMessage = new JiacMessage(payload); 
+// This header part is neccessary to filter the message from the memory
+jMessage.setHeader(IJiacMessage.Header.PROTOCOL, MESSAGE_HEADER);
+						</source>
+
+						<i>
+							<b>Notes:</b>
+						</i>
+						Every attribute of a messagetemplate that is set when it is used as selector will be checked.
+					</p>
+					
+				</subsection>
+				
+				<subsection name = "How to send Messages">
+					<p>
+						<b>How to create Messages</b>
+					</p>
+					<p>
+						First the agent has to create an address to send the message to. This might be either a
+						MessageBox- or a Groupaddress and has to be done with the CommunicationAddressFactory
+						<source>
+ICommunicationAddress toMessageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress("MessageBoxName");
+ICommunicationAddress toGroupAddress = CommunicationAddressFactory.createGroupAddress("GroupName");
+						</source>
+					</p>
+					
+					<p>
+						<b>How to create a Message</b>
+					</p>
+					<p>
+						A JiacMessage can transport within itself nearly every content. At this moment, predefined
+						contents are BinaryContent for non-serializable payloads, which is used especially with
+						MicroJiac and ObjectContent which can include every serializable object. However, every Object
+						inheriting
+						<a href="apidocs/de/dailab/jiactng/agentcore/knowledge/IFact.html">
+							<code>IFact</code>
+						</a>
+						is usable as payload, which is the only parameter needed for creating a standard JiacMessage
+					</p>
+					<p>
+						<i>
+							<b>How to actually send a message</b>
+						</i>
+					</p>
+					<p><i>THIS HAS TO BE REWRITTEN</i></p>
+					<p>
+						Actually sending a message is quite simple. If _cBean is the CommunicationBean of your agent the
+						agent just has to hand the message and the address over to the CommunicationBean.
+						<source>
+_cBean.send( jMessage,	toAddress ); 
+						</source>
+					</p>
+					
+				</subsection>
+				
+				<subsection name = "How to receive Messages">
+					<p>
+						All messages that are received by the CommunicationBean will be delegated to the memory of the
+						agent the CommunicationBean belongs too. To get notified when this happens, it is neccessary to
+						create an SpaceObserver or implement the SpaceObserver interface.
+					</p>
+					<p>
+						Done that, this SpaceObserver has to be attached to the memory of that agent, so it can be
+						notified when messages are coming in. Doing that is quite simple once access to the memory is
+						achieved.
+					</p>
+					<source>
+memory.attach(ourSpaceObserver, ourMessageTemplate);
+						</source>
+					<p>
+						If a message was delegated to the agents memory, the SpaceObservers notify method will be
+						called. Then it's up to the agent to retrieve the message from the memory.
+					</p>
+
+					<p><i><b>Example:</b></i></p>
+					
+					<source>
+public void notify(SpaceEvent&lt;? extends IFact&gt; event) {
+	IJiacMessage message = null;
+	ICommunicationAddress at = null;
+	ICommunicationAddress from = null;
+
+	if(event instanceof WriteCallEvent) {
+		WriteCallEvent&lt;IJiacMessage&gt; wce= (WriteCallEvent&lt;IJiacMessage&gt;) event;
+		message= memory.remove(wce.getObject());
+	}
+}					
+					</source>
+					
+				</subsection>
+				
+		</section>
+		
+	</body>
+</document>

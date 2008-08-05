@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+	<properties>
+		<title>agentCore Documentation</title>
+		<author email="marcel.patzlaff@dai-labor.de">Marcel Patzlaff</author>
+	</properties>
+	<body>
+		<section name="AgentBeans">
+			<p>
+				AgentBeans are components of an agent which encapsulate access to the agent's environment and other
+				essential functionalities.
+			</p>
+			<p>
+				The basic concepts of AgentBeans are implemented in the abstract class
+				<a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBean.html">
+					<code>AbstractAgentBean</code>
+				</a>
+				and should be used wherever possible. These basic concepts include the lifecycle management and activity
+				for AgentBeans. These two concepts are described in the following.
+			</p>
+			<subsection name="Lifecycle Handling in AgentBeans">
+				<p>
+					Like Nodes and Agents are subjected to the lifecycle (see
+					<a href="overview.html#Agent%20Lifecycle">Agent Lifecycle</a>
+					) so do the AgentBeans. There are several hook methods available in
+					<a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBean.html">
+						<code>AbstractAgentBean</code>
+					</a>
+					which should be overridden if required. The purpose of these methods are listed below:
+					<ul>
+						<li>
+							<b>doInit</b>
+							<br />
+							<p>
+								Should contain initialisation code that ensures the functionality of the AgentBean. In
+								this stage you should
+								<b>avoid</b>
+								the interaction with other AgentBeans as they might not have been initialised yet!
+							</p>
+						</li>
+						<li>
+							<b>doStart</b>
+							<br />
+							<p>
+								Code which activates the functionality of the AgentBean should be placed here.
+								Interaction with other AgentBeans is possible.
+							</p>
+						</li>
+						<li>
+							<b>doStop</b>
+							<br />
+							<p>
+								This method is called when the current AgentBean is due to be stopped. So code which
+								deactivates the AgentBean's functionality should be placed here. Interaction with other
+								AgentBeans is possible.
+							</p>
+						</li>
+						<li>
+							<b>doCleanup</b>
+							<br />
+							<p>
+								Before being removed from the Agent this method gives the opportunity to free every
+								resource acquired by and to finish all initiated processions of this AgentBean.
+								Afterwards, the state of this AgentBean should be the same as before initialisation!
+							</p>
+						</li>
+					</ul>
+					<p>
+						<b>Note:</b>
+						If you override some of the aforementioned hook methods, you
+						<b>should</b>
+						call the super methods in the appropriate order. This means you should invoke
+						<code>super.doInit()</code>
+						and
+						<code>super.doStart()</code>
+						<b>before</b>
+						and
+						<code>super.doStop()</code>
+						and
+						<code>super.doCleanup()</code>
+						<b>after</b>
+						your code!
+					</p>
+				</p>
+			</subsection>
+			<subsection name="Activity in AgentBeans">
+				<p>
+					By default, each AgentBean is a passive one, meaning that it is only requested for action or
+					knowledge procession. Nevertheless you have the possibility to declare your AgentBean active.
+				</p>
+				<p>
+					AgentBean activated by defining the execution interval through the configuration or by calling
+					<a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBean.html#setExecuteInterval(int)">
+						<code>setExecuteInterval(int)</code>
+					</a>
+					Active AgentBeans should also override the
+					<a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBean.html#execute()">
+						<code>execute()</code>
+					</a>
+					which does nothing by default.
+				</p>
+				<p>
+					<b>Note:</b>
+					Currently only one implementation of
+					<a href="apidocs/de/dailab/jiactng/agentcore/IExecutionCycle.html">
+						<code>IExecutionCycle</code>
+					</a>
+					is available which schedules the action procession and the invocation of the
+					<code>execute</code>
+					methods in a pipelining fashion. This means, that actions and executions that take very long will
+					delay all other computations within the same agent. You may look into the sources of
+					<a href="apidocs/de/dailab/jiactng/agentcore/SimpleExecutionCycle.html">
+						<code>SimpleExecutionCycle</code>
+					</a>
+					to get an idea of how this simple implementation works. More sophisticated realisations of the
+					interface are possible but not yet planned.
+				</p>
+			</subsection>
+			<subsection name="Pre-defined Spring Configurations">
+				There are Spring Bean definitions for the SimpleExecutionCycle and a SimpleAgent available. Please check
+				<code>de.dailab.jiactng.agentcore.conf.Agent.xml</code> for further details.
+			</subsection>
+		</section>
+	</body>
+</document>

@@ -225,6 +225,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 					memory.write(act.getSession());
 				} 
 			} catch (Throwable t) {
+			    memory.write(new ActionResult(act, t));
 				log.error("--- action failed: " + act.getAction().getName(),t);
 			}
 		} else {

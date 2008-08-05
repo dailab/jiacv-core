@@ -8,7 +8,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -205,35 +204,14 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         Action action= (Action)doAction.getAction();
         Method method= searchMethod(action.getName(), action.getInputTypes());
         if(method != null) {
-            try {
-                Serializable result= (Serializable)method.invoke(this, (Object[]) doAction.getParams());
-                if (result != null){ 
-                	memory.write(action.createActionResult(
-                			doAction, new Serializable[] { result }));
-                	log.debug("action processed and result written...");
-                } else {
-                	log.debug("action processed and no result written");
-                }
-                return;
-            }  catch (IllegalAccessException iae) {
-                // should not happen
-                log.debug("cannot access action", iae);
-                throw new IllegalArgumentException("doAction references a non-accessible method", iae);
-            } catch (InvocationTargetException ite) {
-                // should not happen -> type checking have to be implemented in the DoAction constructor!
-                log.debug("error while invoking action", ite);
-                Throwable cause= ite.getCause();
-                memory.write(action.createActionResult(doAction, new Serializable[]{cause != null ? cause : ite}));
-                throw new Exception("error while invoking action" + method.getName(), ite);
-//                // delegate runtime exceptions
-//                if(cause != null && cause instanceof RuntimeException) {
-//                    throw (RuntimeException) cause;
-//                }
-//                
-//                throw new RuntimeException("action invocation failed", ite);
-            } catch (Exception re) {
-                log.debug("something went wrong with this action '" + action.getName() + "' '" + method + "'", re);
+            Serializable result= (Serializable)method.invoke(this, (Object[]) doAction.getParams());
+            log.debug("action processed and about to write result...");
+            if(method.getReturnType() != void.class) {
+                memory.write(action.createActionResult(doAction, new Serializable[] { result }));
+            } else {
+                memory.write(action.createActionResult(doAction, new Serializable[0]));
             }
+            return;
         }
         
         // if we are here, then we have no method with 'name'

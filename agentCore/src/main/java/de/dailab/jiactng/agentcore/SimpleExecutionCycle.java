@@ -120,12 +120,9 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 					null, null));
 			int countNew = 0;
 			for (ActionResult ar : resultSet) {
-				if (ar.getSource() != null
-						&& ((DoAction) ar.getSource()).getSource() != null) {
-					synchronized (this) {
-						pendingResults.add(ar);
-						countNew++;
-					}
+				synchronized (this) {
+					pendingResults.add(ar);
+					countNew++;
 				}
 			}
 
@@ -238,24 +235,25 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	}
 
 	private void processResult(ActionResult actionResult) {
-		// entweder den ResultReceiver informieren oder das Ergebnis in
-		// den Memory schreiben
-		if (((DoAction) actionResult.getSource()) == null
-				|| ((DoAction) actionResult.getSource()).getSource() == null) {
-			// memory.write(actionResult);
-			;
-		} else {
-			DoAction doAct = ((DoAction) actionResult.getSource());
-			// Session template= new
-			// Session(doAct.getSessionId(),doAct.getSession().getCreationTime(),null,null);
-			// memory.remove(new ActionResult(null,template,null,null));
-			// DoAction doAct = ((DoAction) actionResult.getSource());
-			if (memory.remove(doAct.getSession()) == null){
-				log.warn("ActionResult for Action" + actionResult.getAction().getName() + " written with non existing Session.");
-			}
-			// memory.remove(template);
-			((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
+		DoAction doAct = (DoAction) actionResult.getSource();
 
+		// remove session from memory
+		if (memory.remove(doAct.getSession()) == null){
+			log.warn("ActionResult for Action" + actionResult.getAction().getName() + " written with non existing Session.");
+		} else {
+			log.debug("Session removed for action " + doAct.getAction().getName());
+		}
+		//Session template= new
+		//Session(doAct.getSessionId(),doAct.getSession().getCreationTime(),null,null);
+		//memory.remove(template);
+		
+		// inform ResultReceiver
+		if (doAct.getSource() == null) {
+			//memory.write(actionResult);
+			log.debug("No ResultReceiver for action " + doAct.getAction().getName());
+		} else {
+			((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
+			log.debug("ResultReceiver informed about result of action " + doAct.getAction().getName());
 		}
 		// ArrayList history = actionResult.getSession().getHistory();
 		// for (int i = history.size() - 1; i >= 0; i--) {

@@ -120,7 +120,8 @@
       # the platform bean may be set as parent in any other platfom definitions 
       
    -->
-   <bean name="Platform" class="de.dailab.jiactng.agentcore.SimpleAgentNode" abstract="true"></bean>
+   <bean name="Platform" class="de.dailab.jiactng.agentcore.SimpleAgentNode" abstract="true">
+   </bean>
 
 	<!-- 
 		##############################################################################################

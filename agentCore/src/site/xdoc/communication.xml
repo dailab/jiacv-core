@@ -181,6 +181,42 @@
 						received by all agents that are registered for this group at that moment.
 					</p>
 				</subsection>
+				
+				<subsection name = "Registering new addresses">
+					<p> In many cases you won't have to actually create your own addresses as every agent initializes
+					with it's own messageboxaddress. Using Selectors, as described in the passage below, many cases of
+					communication can be managed with just this one address in mind.</p>
+					<p> But if you need or want to register a new address to the system you can do that using the
+					CommunicationBean.ACTION_REGISTER action.</p>
+					Let's look at an Example:
+<source>
+Action register = memory.read(new Action(CommunicationBean.ACTION_REGISTER));
+DoAction doRegister = register.createDoAction(new Serializable[] {yourNewAddress, yourSelector}, this);
+memory.write(doRegister); 
+</source>
+				<p>Where yourNewAddress may be either a GroupAddress or a MessageBoxAddress, you want to register.
+				<br />The selector might be null if you want to receive simply all that is coming through that address.
+				<br />"this" is your ResultReceiver 
+				<br /> <i><b>Note:</b> You may register the same address with different selectors but will have to unregister
+				as many times and with the same selectors to clean it up afterwards.</i>
+				</p>
+				</subsection>
+				
+				
+				<subsection name = "Unregistering old addresses">
+				<p>To unregister an old address and stop listening to that one or just to a special selector
+				you registered for it, you can use the CommunicationBean.ACTION_UNREGISTER action like in the following
+				Example.</p>
+<source>
+Action unregister = memory.read(new Action(CommunicationBean.ACTION_UNREGISTER));
+DoAction doUnregister = unregister.createDoAction(new Serializable[] {yourOldAddress, yourSelector}, this);
+memory.write(doUnregister); 
+</source>				
+				<p>Where yourOldAddress is the address you want to stop listen to, yourSelector is the selector
+				you registered with this address or null if you set it to null in the first place and this
+				is whatever ResultReceiver shall get the ActionResult for what you just did.</p> 
+				</subsection>
+
 
 				<subsection name = "Using Selectors">
 					<p>
@@ -285,11 +321,17 @@ ICommunicationAddress toGroupAddress = CommunicationAddressFactory.createGroupAd
 					</p>
 					<p><i>THIS HAS TO BE REWRITTEN</i></p>
 					<p>
-						Actually sending a message is quite simple. If _cBean is the CommunicationBean of your agent the
-						agent just has to hand the message and the address over to the CommunicationBean.
+						Actually sending a message is quite simple. But first you have to get the sendAction from your
+						agents memory. When you retrieved it you can use it as often as you wish, like in this example:
+						
 						<source>
-_cBean.send( jMessage,	toAddress ); 
+Action send = memory.read(new Action(CommunicationBean.ACTION_SEND));
+DoAction sendMessage = send.createDoAction(new Serializable[] {yourMessage, theAddressToSendTo}, this);
+memory.write(sendMessage); 
 						</source>
+						
+						Where this is your ResultReceiver. In most cases this should be the bean that is sending that
+						message.
 					</p>
 					
 				</subsection>
@@ -307,7 +349,7 @@ _cBean.send( jMessage,	toAddress );
 					</p>
 					<source>
 memory.attach(ourSpaceObserver, ourMessageTemplate);
-						</source>
+					</source>
 					<p>
 						If a message was delegated to the agents memory, the SpaceObservers notify method will be
 						called. Then it's up to the agent to retrieve the message from the memory.

@@ -17,6 +17,8 @@ public interface ICommunicationBean {
     String ACTION_LEAVE_GROUP= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#leaveGroup";
     String ACTION_IS_LOCAL= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#isLocal";
     String ACTION_SEND= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#send";
+    String ACTION_REGISTER = "de.dailab.jiactng.agentcore.comm.ICommunicationBean#register";
+    String ACTION_UNREGISTER = "de.dailab.jiactng.agentcore.comm.ICommunicationBean#unregister";
     
     /**
      * Joins a group with the given address

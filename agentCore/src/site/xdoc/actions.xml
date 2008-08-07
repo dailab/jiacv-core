@@ -5,6 +5,7 @@
 		<title>agentCore Documentation</title>
 		<author email="axel.hessler@dai-labor.de">axle</author>
 		<author email="jan.keiser@dai-labor.de">Jan Keiser</author>
+		<author email="martin.loeffelholz@dai-labor.de">Martin Loeffelholz</author>
 	</properties>
 	<body>
 		<section name="Action Handling in Agents">
@@ -175,7 +176,39 @@
           now <code>this</code> instead of <code>null</code>, as the architecture 
           needs to know which agentbean should get the result of the action.
         </p>
+        
+        </subsection>
+        
+        
+        <subsection name = "Calling Actions using the invoke method">
+        
+        <p>
+        	There is another option how you can invoke an action. You can actual
+        	do so, by calling the invoke method, which will allow you to shorten
+			your invocation of an action to...
+        </p>
+<source>
+invoke(myAction, new Serializable[] {firstActionInput, secondActionInput, ...}); 
+</source>
+		<p>
+			The myAction will be used to create the DoAction and put it
+			into the memory.
+			<br /><b>Note:</b> You will still need to retrieve the Action to use from the memory as mentioned
+			above.
+		</p>
+		<p>
+			<br />
+			If you want to receive a result for that action you have to use
+			another invoke method.
+		</p>
+<source>
+invoke(myAction, new Serializable[] {firstActionInput, secondActionInput, ...}, myResultReceiver); 
+</source>	
+		<p>
+			So the ActionResult will be delivered to the specified ResultReceiver (myResultReceiver).
+		</p>	
 			</subsection>
+			
 		</section>
 	</body>
 </document>

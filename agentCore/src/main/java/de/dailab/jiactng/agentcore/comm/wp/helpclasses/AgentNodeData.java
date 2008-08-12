@@ -25,7 +25,13 @@ public class AgentNodeData implements Comparable<AgentNodeData>{
 		if (_UUID.equals(otherNode.getUUID())){
 			return 0;
 		} else if (_timeoutTime != otherNode.getTimeoutTime()){
-			return _timeoutTime.compareTo(otherNode.getTimeoutTime());
+			if (_timeoutTime == null) {
+				return new Long(Long.MAX_VALUE).compareTo(otherNode.getTimeoutTime());
+			} else if (otherNode.getTimeoutTime() == null) {
+				return _timeoutTime.compareTo(new Long(Long.MAX_VALUE));
+			} else {
+				return _timeoutTime.compareTo(otherNode.getTimeoutTime());
+			}
 		} else {
 			return _UUID.compareTo(otherNode.getUUID());
 		}

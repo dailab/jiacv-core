@@ -317,7 +317,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 * {@inheritDoc}
 	 */
 	public String getLogLevel() {
-		if (log != null) {
+		if (log != null && (log instanceof Log4JLogger)) {
 			logLevel = ((Log4JLogger)log).getLogger().getEffectiveLevel().toString();
 		}
 		return logLevel;
@@ -328,7 +328,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 */
 	public void setLogLevel(String level) {
 		logLevel = level;
-		if (log != null) {
+		if (log != null && (log instanceof Log4JLogger)) {
 			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
 		}
 	}
@@ -340,7 +340,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 */
 	protected void setLog(Log log) {
 		this.log = log;
-		if ((log != null) && (logLevel != null)) {
+		if ((log != null) && (logLevel != null) && (log instanceof Log4JLogger)) {
 			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
 		}
 	}

@@ -23,7 +23,7 @@ public interface DirectoryAgentNodeBeanMBean extends AbstractAgentNodeBeanMBean 
 	 *
 	 * @param interval time in milliseconds
 	 */
-	public void setRefreshingInterval(long intervall);
+	public void setRefreshingInterval(long interval);
 
 	/**
 	 * Gets the interval in milliseconds after which action entries will be refreshed

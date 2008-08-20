@@ -798,6 +798,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public String getDirectoryName() {
+		if (_directory == null) {
+			return null;
+		}
+		return _directory.getBeanName();
+	}
+
+	/**
 	 * Registers the agent node and all its resources for management
 	 * 
 	 * @param manager

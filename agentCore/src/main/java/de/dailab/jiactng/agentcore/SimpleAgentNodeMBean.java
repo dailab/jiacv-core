@@ -98,6 +98,12 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	public List<String> getAgentNodeBeanClasses();
 
 	/**
+	 * Getter for attribute "DirectoryName" of the managed agent node.
+	 * @return the name of the directory agent node bean or null if not exists
+	 */
+	public String getDirectoryName();
+
+	/**
 	 * Shuts down the managed agent node.
      * @throws LifecycleException if an error occurs during stop and cleanup of this agent node.
 	 */

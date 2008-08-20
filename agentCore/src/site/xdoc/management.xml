@@ -236,6 +236,16 @@ catch (SecurityException) {
 }</source>
 	    </p>
     </subsection>
+
+    <subsection name="Management Client">
+	    <p>
+	       With the <a href="apidocs/de/dailab/jiactng/agentcore/management/jmx/client/JmxManagementClient.html">
+	       management client API</a> it is very easy to manage local or remote JIAC TNG resources.
+	       It allows to search for JMX connector server, to establish connections to remote processes,
+	       and to get specific clients to manage agent nodes, agent node directories, agents, 
+	       agent memories, agent execution cycles, agent communication beans or other agent beans.
+	    </p>
+    </subsection>
     </section>
   </body>
 </document>

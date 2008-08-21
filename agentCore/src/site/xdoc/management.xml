@@ -22,6 +22,17 @@
 	       the executable operations (all other public methods) of these resources.
 	    </p>
 
+	    <p>This documentation of the management interface consists of four sections.
+	       The first section describes the use of JMX methods to get and set attributes,
+	       invoke operations and subscribe for events of local manageable resources. The
+	       second section shows how to configure the agent node to enable also the remote
+	       management of the resources and how to connect to such a remote agent node. In
+	       the third section the configuration and usage of authentication and authorization
+	       for the management interface will be described. The final section gives a link
+	       to the management client API which allows the easy management of JIAC TNG 
+	       resources without knowledge about the manageable resources and the JMX API.
+	    </p>
+
     <subsection name="Local Management">
 	    <p>While no security settings are made, every object has the possibility 
 	       to manage all resources. To manage resources which are located in the 

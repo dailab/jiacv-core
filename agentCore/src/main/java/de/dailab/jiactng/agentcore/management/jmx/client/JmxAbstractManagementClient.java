@@ -76,7 +76,12 @@ public abstract class JmxAbstractManagementClient {
       		return mbsc.getAttribute(resource, attributeName);
       	}
 		catch (MBeanException e) {
-			throw new RuntimeException(e);
+			if ((e.getCause() != null) && (e.getCause() instanceof RuntimeException)) {
+				throw ((RuntimeException) e.getCause());
+			}
+			else {
+				throw new RuntimeException(e);
+			}
 		}
 		catch (ReflectionException e) {
 			throw new RuntimeException(e);
@@ -100,7 +105,12 @@ public abstract class JmxAbstractManagementClient {
       		mbsc.setAttribute(resource, new Attribute(attributeName, attributeValue));
       	}
 		catch (MBeanException e) {
-			throw new RuntimeException(e);
+			if ((e.getCause() != null) && (e.getCause() instanceof RuntimeException)) {
+				throw ((RuntimeException) e.getCause());
+			}
+			else {
+				throw new RuntimeException(e);
+			}
 		}
 		catch (ReflectionException e) {
 			throw new RuntimeException(e);
@@ -115,16 +125,22 @@ public abstract class JmxAbstractManagementClient {
 	 * @param operationName The name of the operation.
 	 * @param params The parameter values for the method invocation.
 	 * @param signature The name of the parameter types of the operation.
+	 * @return The result of the invoked operation.
 	 * @throws IOException A communication problem occurred when invoking the operation of the remote resource.
 	 * @throws InstanceNotFoundException The resource does not exist in the JVM.
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 */
-	protected void invokeOperation(String operationName, Object[] params, String[] signature) throws IOException, InstanceNotFoundException {
+	protected Object invokeOperation(String operationName, Object[] params, String[] signature) throws IOException, InstanceNotFoundException {
       	try {
-      		mbsc.invoke(resource, operationName, params, signature);
+      		return mbsc.invoke(resource, operationName, params, signature);
       	}
 		catch (MBeanException e) {
-			throw new RuntimeException(e);
+			if ((e.getCause() != null) && (e.getCause() instanceof RuntimeException)) {
+				throw ((RuntimeException) e.getCause());
+			}
+			else {
+				throw new RuntimeException(e);
+			}
 		}
 		catch (ReflectionException e) {
 			throw new RuntimeException(e);

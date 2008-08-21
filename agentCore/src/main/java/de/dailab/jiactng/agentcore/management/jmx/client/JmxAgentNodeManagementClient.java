@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.management.Attribute;
@@ -17,6 +18,7 @@ import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
+import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
 /**
  * This JMX client enables the remote management of JIAC TNG agent nodes.
@@ -208,6 +210,21 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 */
 	public List<String> getAgents() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("Agents");
+	}
+
+	/**
+	 * Deploys and starts new agents on the managed agent node.
+	 * @param configuration The spring configuration of the agents in XML syntax.
+	 * @param libraries The list of agent-specific JARs.
+	 * @param owner The owner of the new agents.
+	 * @return The global unique identifier of the created agents.
+	 * @throws InstanceNotFoundException The agent node does not exist. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
+	 * @throws SecurityException if the operation cannot be invoked for security reasons.
+	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#addAgents(byte[], List, String)
+	 */
+	public List<String> addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws IOException, InstanceNotFoundException {
+		return (List<String>) invokeOperation("addAgents", new Object[] {configuration, libraries, owner}, new String[] {"[B","java.util.List","java.lang.String"});
 	}
 
 	/**

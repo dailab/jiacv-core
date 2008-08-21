@@ -2,6 +2,9 @@ package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
@@ -61,15 +64,49 @@ public class JmxManagementClient {
 	}
 
 	/**
-	 * Gets the URL of all JMX connector server announced by multicast messages.
+	 * Gets the URL of all JMX connector server announced by multicast messages within a time frame of 5 seconds.
 	 * @return The list of received JMX URLs.
-	 * @see JmxMulticastReceiver#getResult(long)
+	 * @throws IOException A communication problem occurred when creating a multicast socket or receiving multicast packets.
+	 * @see MulticastSocket#receive(DatagramPacket)
 	 */
-	public static List<JMXServiceURL> getURLsFromMulticast() {
-		JmxMulticastReceiver multiReceive = new JmxMulticastReceiver(9999, "226.6.6.7", 1);
-		Thread thread = new Thread(multiReceive);
-		thread.start();
-		return multiReceive.getResult(5000);
+	public static List<JMXServiceURL> getURLsFromMulticast() throws IOException {
+		List<JMXServiceURL> urls = new ArrayList<JMXServiceURL>();
+		byte[] buffer = new byte[1000];
+		long endTime = System.currentTimeMillis() + 5000;
+
+		// activate multicast socket
+		InetAddress group = InetAddress.getByName("226.6.6.7");
+		MulticastSocket socket = new MulticastSocket(9999);
+		socket.setTimeToLive(1);
+		DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+		socket.joinGroup(group);
+
+		// read multicast packets
+		while (System.currentTimeMillis() < endTime) {
+			// read message
+			dp.setLength(1000);
+			socket.receive(dp);
+			buffer = dp.getData();
+			String message = new String(buffer, 0, dp.getLength());
+
+			// add converted message to list of URLs
+			try {
+				JMXServiceURL url = new JMXServiceURL(message);
+				// replace localhost within URL path
+				if (url.getURLPath().contains("localhost")) {
+					url = new JMXServiceURL(message.replace("localhost", url.getHost()));
+				}
+				// check whether the URL is already known
+				if (!urls.contains(url)) {
+					urls.add(url);
+				}
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return urls;
 	}
 
 	/**

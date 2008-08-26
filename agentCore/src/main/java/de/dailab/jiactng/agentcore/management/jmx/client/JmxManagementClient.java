@@ -34,7 +34,8 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  */
 public class JmxManagementClient {
 
-	private MBeanServerConnection mbsc = null;
+	/** The connection to the MBeanServer of a JVM used to manage its resources. */
+	protected MBeanServerConnection mbsc = null;
 	private JMXConnector jmxc = null;
 
 	/**
@@ -151,6 +152,15 @@ public class JmxManagementClient {
 	}
 
 	/**
+	 * Creates a new management client which uses the JMX connection of another management client. This 
+	 * connection can only be closed by the original management client.
+	 * @param client The original management client.
+	 */
+	public JmxManagementClient(JmxManagementClient client) {
+		mbsc = client.mbsc;
+	}
+
+	/**
 	 * Closes the JMX connection to the remote agent node if exists.
 	 * @throws IOException if the connection cannot be closed cleanly.
 	 * @see JMXConnector#close()
@@ -260,23 +270,24 @@ public class JmxManagementClient {
 	}
 
 	/**
-	 * Gets a client for the management of an agent communication bean within the managed JVM.
+	 * Gets the clients for the management of the communication beans of an agent within the managed JVM.
 	 * @param agentNodeName The name of the agent node where the agent of the agent communication bean resides on.
 	 * @param agentID The global unique ID of the agent which contains the agent communication bean.
-	 * @return A management client for the agent communication bean.
+	 * @return The management clients for the instances of <code>CommunicationBean</code>.
 	 * @throws MalformedObjectNameException The name of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
-	 * @throws InstanceNotFoundException The agent does not contain a <code>CommunicationBean</code>. 
 	 * @throws IOException A communication problem occurred when searching for a communication bean of the remote agent.
 	 * @throws SecurityException if the search cannot be made for security reasons.
+	 * @see MBeanServerConnection#queryMBeans(ObjectName, javax.management.QueryExp)
 	 * @see JmxAgentCommunicationManagementClient#JmxAgentCommunicationManagementClient(MBeanServerConnection, ObjectName)
 	 */
-	public JmxAgentCommunicationManagementClient getAgentCommunicationManagementClient(String agentNodeName, String agentID) throws MalformedObjectNameException, IOException, InstanceNotFoundException {
+	public Set<JmxAgentCommunicationManagementClient> getAgentCommunicationManagementClients(String agentNodeName, String agentID) throws MalformedObjectNameException, IOException {
+		Set<JmxAgentCommunicationManagementClient> clients = new HashSet<JmxAgentCommunicationManagementClient>();
 		Set<ObjectInstance> beans = mbsc.queryMBeans(new JmxManager().getMgmtNameOfAgentBean(agentNodeName, agentID, "*"), null);
 		for (ObjectInstance bean : beans) {
 			if (bean.getClassName().equals(CommunicationBean.class.getName())) {
-				return new JmxAgentCommunicationManagementClient(mbsc, bean.getObjectName());
+				clients.add(new JmxAgentCommunicationManagementClient(mbsc, bean.getObjectName()));
 			}
 		}
-		throw new InstanceNotFoundException();
+		return clients;
 	}
 }

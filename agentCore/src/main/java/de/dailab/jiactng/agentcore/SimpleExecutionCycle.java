@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.management.AttributeChangeNotification;
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 
@@ -36,9 +37,16 @@ import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
  * @see ActionResult
  */
 public class SimpleExecutionCycle extends AbstractAgentBean implements
-		IExecutionCycle {
+		IExecutionCycle, SimpleExecutionCycleMBean {
 
 	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
+	private int executionWorkload = 0;
+	private int doActionWorkload = 0;
+	private int actionResultWorkload = 0;
+	private int numberSteps = 0;
+	private int numberExecutions = 0;
+	private int numberDoActions = 0;
+	private int numberActionResults = 0;
 
 	/**
 	 * Run-method for the execution cycle. The method iterates over the list of
@@ -55,6 +63,27 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
 	public void run() {
+		// check end of measurement interval and calculate workload if so
+		if (numberSteps == 100) {
+			if (executionWorkload != numberExecutions) {
+				workloadChanged("ExecutionWorkload", executionWorkload, numberExecutions);
+				executionWorkload = numberExecutions;
+			}
+			if (doActionWorkload != numberDoActions) {
+				workloadChanged("DoActionWorkload", doActionWorkload, numberDoActions);
+				doActionWorkload = numberDoActions;
+			}
+			if (actionResultWorkload != numberActionResults) {
+				workloadChanged("ActionResultWorkload", actionResultWorkload, numberActionResults);
+				actionResultWorkload = numberActionResults;
+			}
+			numberSteps = 0;
+			numberExecutions = 0;
+			numberDoActions = 0;
+			numberActionResults = 0;
+		}
+		numberSteps++;
+
 		// check if lifecycle has been started --> execute if STARTED
 		if (getState() == LifecycleStates.STARTED) {
 			// execute the ripest bean
@@ -88,6 +117,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 
 			// if there is a minBean then execute
 			if (minBean != null) {
+				numberExecutions++;
 				try {
 					minBean.execute();
 				} catch (Exception ex) {
@@ -100,15 +130,16 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 						.setNextExecutionTime(now
 								+ minBean.getExecuteInterval());
 			}
-			// else {
-			// log.debug("No active beans to execute");
-			// }
+			//else {
+			//	log.debug("No active beans to execute");
+			//}
 
 			// process one doAction
 			// TODO: check if read can be used
 			DoAction act = memory.remove(new DoAction(null, null, null, null));
 
 			if (act != null) {
+				numberDoActions++;
 				synchronized (this) {
 					performDoAction(act);
 				}
@@ -127,6 +158,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			}
 
 			if (!pendingResults.isEmpty()) {
+				numberActionResults++;
 				synchronized (this) {
 					ActionResult actionResult = pendingResults.iterator()
 							.next();
@@ -263,6 +295,40 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		// break;
 		// }
 		// }
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getExecutionWorkload() {
+		return executionWorkload;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getDoActionWorkload() {
+		return doActionWorkload;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getActionResultWorkload() {
+		return actionResultWorkload;
+	}
+
+	/**
+	 * Uses JMX to send notifications that one of the workload attributes of the managed
+	 * execution cycle has been changed.
+	 * @param attribute The name of the workload attribute.
+	 * @param oldWorkload The old value of the workload attribute.
+	 * @param newWorkload The new value of the workload attribute.
+	 */
+	private void workloadChanged(String attribute, int oldWorkload, int newWorkload) {
+		Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
+				"Workload changed", attribute, "int", oldWorkload, newWorkload);
+		sendNotification(n);
 	}
 
 	/**

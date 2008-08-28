@@ -255,7 +255,6 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		String messageboxName = thisAgent.getAgentNode().getUUID() + DirectoryAgentNodeBean.SEARCHREQUESTSUFFIX;
 		directoryAddress = CommunicationAddressFactory.createMessageBoxAddress(messageboxName);
 		_autoenlistActionTemplates = new ArrayList<IActionDescription>();
-		_autoEnlister = new AutoEnlister();
 		_refreshAgent = new RefreshAgent();
 		
 	}
@@ -273,6 +272,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		memory.attach(_refreshAgent, WHITEPAGES_REFRESH_MESSAGETEMPLATE);
 		_sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 		
+		_autoEnlister = new AutoEnlister();
 		_timer = new Timer();
 		_timer.schedule(_autoEnlister, _firstAutoEnlistening, _autoEnlisteningInterval);
 

@@ -9,6 +9,7 @@ package de.dailab.jiactng.agentcore;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.MBeanNotificationInfo;
@@ -40,13 +41,13 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 		IExecutionCycle, SimpleExecutionCycleMBean {
 
 	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
-	private int executionWorkload = 0;
-	private int doActionWorkload = 0;
-	private int actionResultWorkload = 0;
-	private int numberSteps = 0;
-	private int numberExecutions = 0;
-	private int numberDoActions = 0;
-	private int numberActionResults = 0;
+	private int[] workload = {0, 0, 0};
+	private final String[] ATTRIBUTES = {"ExecutionWorkload", "DoActionWorkload", "ActionResultWorkload"};
+	private final int EXECUTION = 0;
+	private final int DO_ACTION = 1;
+	private final int ACTION_RESULT = 2;
+	private int queueSize = 100;
+	private LinkedBlockingQueue[] queues = {new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize)};
 
 	/**
 	 * Run-method for the execution cycle. The method iterates over the list of
@@ -63,27 +64,6 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
 	public void run() {
-		// check end of measurement interval and calculate workload if so
-		if (numberSteps == 100) {
-			if (executionWorkload != numberExecutions) {
-				workloadChanged("ExecutionWorkload", executionWorkload, numberExecutions);
-				executionWorkload = numberExecutions;
-			}
-			if (doActionWorkload != numberDoActions) {
-				workloadChanged("DoActionWorkload", doActionWorkload, numberDoActions);
-				doActionWorkload = numberDoActions;
-			}
-			if (actionResultWorkload != numberActionResults) {
-				workloadChanged("ActionResultWorkload", actionResultWorkload, numberActionResults);
-				actionResultWorkload = numberActionResults;
-			}
-			numberSteps = 0;
-			numberExecutions = 0;
-			numberDoActions = 0;
-			numberActionResults = 0;
-		}
-		numberSteps++;
-
 		// check if lifecycle has been started --> execute if STARTED
 		if (getState() == LifecycleStates.STARTED) {
 			// execute the ripest bean
@@ -116,8 +96,9 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			}
 
 			// if there is a minBean then execute
+			boolean executionDone = false;
 			if (minBean != null) {
-				numberExecutions++;
+				executionDone = true;
 				try {
 					minBean.execute();
 				} catch (Exception ex) {
@@ -133,17 +114,20 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 			//else {
 			//	log.debug("No active beans to execute");
 			//}
+			updateWorkload(EXECUTION, executionDone);
 
 			// process one doAction
 			// TODO: check if read can be used
 			DoAction act = memory.remove(new DoAction(null, null, null, null));
 
+			boolean actionPerformed = false;
 			if (act != null) {
-				numberDoActions++;
+				actionPerformed = true;
 				synchronized (this) {
 					performDoAction(act);
 				}
 			}
+			updateWorkload(DO_ACTION, actionPerformed);
 
 			// process one actionResult
 			// TODO: check if read can be used
@@ -157,8 +141,9 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 				}
 			}
 
+			boolean resultProcessed = false;
 			if (!pendingResults.isEmpty()) {
-				numberActionResults++;
+				resultProcessed = true;
 				synchronized (this) {
 					ActionResult actionResult = pendingResults.iterator()
 							.next();
@@ -166,6 +151,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 					pendingResults.remove(actionResult);
 				}
 			}
+			updateWorkload(ACTION_RESULT, resultProcessed);
 
 			// ActionResult actionResult = memory.remove(new ActionResult(null,
 			// null));
@@ -301,21 +287,49 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 * {@inheritDoc}
 	 */
 	public int getExecutionWorkload() {
-		return executionWorkload;
+		return workload[EXECUTION];
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public int getDoActionWorkload() {
-		return doActionWorkload;
+		return workload[DO_ACTION];
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public int getActionResultWorkload() {
-		return actionResultWorkload;
+		return workload[ACTION_RESULT];
+	}
+
+	/**
+	 * Updates the value of a workload considering whether the execution cycle was active or not
+	 * in the current step.
+	 * @param type The type of workload (one of EXECUTION, DO_ACTION or ACTION_RESULT).
+	 * @param active <code>true</code>, if the execution cycle was active in this step.
+	 */
+	private void updateWorkload(int type, boolean active) {
+		// update queue
+		LinkedBlockingQueue<Boolean> queue = (LinkedBlockingQueue<Boolean>) queues[type];
+		if (queue.remainingCapacity() == 0) {
+			queue.poll();
+		}
+		queue.offer(active);
+
+		// update workload
+		int actives = 0;
+		for (boolean elem : queue) {
+			if (elem) {
+				actives++;
+			}
+		}
+		int oldWorkload = workload[type];
+		workload[type] = (actives * 100) / queueSize;
+		if (oldWorkload != workload[type]) {
+			workloadChanged(ATTRIBUTES[type], oldWorkload, workload[type]);
+		}
 	}
 
 	/**
@@ -327,7 +341,7 @@ public class SimpleExecutionCycle extends AbstractAgentBean implements
 	 */
 	private void workloadChanged(String attribute, int oldWorkload, int newWorkload) {
 		Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
-				"Workload changed", attribute, "int", oldWorkload, newWorkload);
+				"Workload changed ", attribute, "int", oldWorkload, newWorkload);
 		sendNotification(n);
 	}
 

@@ -203,7 +203,7 @@ public class Action implements IActionDescription {
 		if (_inputTypeNames != null) {
 			List<Class<?>> list = new ArrayList<Class<?>>();
 			for (String type : _inputTypeNames) {
-				list.add(Class.forName(type));
+				list.add(getClassForName(type));
 			}
 			return list;
 		} else {
@@ -245,7 +245,7 @@ public class Action implements IActionDescription {
 		if (_resultTypeNames != null) {
 			List<Class<?>> list = new ArrayList<Class<?>>();
 			for (String type : _resultTypeNames) {
-				list.add(Class.forName(type));
+				list.add(getClassForName(type));
 			}
 			return list;
 		} else {
@@ -408,6 +408,36 @@ public class Action implements IActionDescription {
 			}
 	
 			builder.append(']');
+		}
+	}
+
+	private Class<?> getClassForName(String type) throws ClassNotFoundException {
+		if (type.equals("boolean")) {
+			return boolean.class;
+		}
+		else if (type.equals("byte")) {
+			return byte.class;
+		}
+		else if (type.equals("char")) {
+			return char.class;
+		}
+		else if (type.equals("short")) {
+			return short.class;
+		}
+		else if (type.equals("int")) {
+			return int.class;
+		}
+		else if (type.equals("long")) {
+			return long.class;
+		}
+		else if (type.equals("float")) {
+			return float.class;
+		}
+		else if (type.equals("double")) {
+			return double.class;
+		}
+		else {
+			return Class.forName(type);
 		}
 	}
 }

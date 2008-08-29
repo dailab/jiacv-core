@@ -33,6 +33,7 @@ import javax.management.openmbean.TabularType;
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
 import de.dailab.jiactng.agentcore.environment.IEffector;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * An abstract Bean which exposes accessible methods which are marked with the
@@ -184,8 +185,10 @@ public abstract class AbstractMethodExposingBean extends AbstractAgentBean imple
 		// register actions in directory
 		Action registerActionAction = memory.read(new Action(DirectoryAccessBean.ACTION_ADD_ACTION_TO_DIRECTORY));
 		if (registerActionAction != null) {
+			IAgentDescription agentDescription= thisAgent.getAgentDescription();
 			for (Action act : getActions()) {
 				if (_registeredActions.contains(act.getName())) {
+					act.setProviderDescription(agentDescription);
 					Serializable[] params = {act};
 					DoAction action = registerActionAction.createDoAction(params, null);
 					memory.write(action);

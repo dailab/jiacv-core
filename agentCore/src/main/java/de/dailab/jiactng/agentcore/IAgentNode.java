@@ -9,7 +9,6 @@ import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
-import de.dailab.jiactng.agentcore.management.Manageable;
 
 /**
  * Interface for agentnodes. This interfaces defines functionalities, that are
@@ -18,7 +17,7 @@ import de.dailab.jiactng.agentcore.management.Manageable;
  * @author Joachim Fuchs
  * @author Thomas Konnerth
  */
-public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListener, Manageable {
+public interface IAgentNode extends ILifecycle, BeanNameAware, ILifecycleListener {
 
   /**
    * Returns the unique identifier for this agentnode. The identifier is created

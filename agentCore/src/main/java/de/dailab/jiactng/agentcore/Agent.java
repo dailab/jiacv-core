@@ -113,9 +113,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 
 	private ArrayList<Action> actionList = null;
 
-	/** The manager of the agent node */
-	protected Manager _manager = null;
-
 	/**
 	 * Public default constructor, creating the agent identifier.
 	 */
@@ -827,7 +824,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			execution.enableManagement(manager);
 		}
 
-		_manager = manager;
+		super.enableManagement(manager);
 	}
 
 	/**
@@ -864,16 +861,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			System.err.println(e.getMessage());
 		}
 
-		_manager = null;
-	}
-
-	/**
-	 * Checks wether the management of this object is enabled or not.
-	 * 
-	 * @return true if the management is enabled, otherwise false
-	 */
-	public boolean isManagementEnabled() {
-		return _manager != null;
+		super.disableManagement();
 	}
 
 	/**

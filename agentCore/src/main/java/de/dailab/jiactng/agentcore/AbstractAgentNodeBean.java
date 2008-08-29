@@ -12,7 +12,6 @@ import de.dailab.jiactng.agentcore.management.Manager;
  */
 public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements IAgentNodeBean, AbstractAgentNodeBeanMBean {
     protected IAgentNode agentNode;
-    protected Manager manager = null;
     
     private String _beanName;
 
@@ -40,14 +39,14 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
 
         // deregister node bean from management
         try {
-            manager.unregisterAgentNodeResource(agentNode.getName(), "agentNodeBean", getBeanName());
+            _manager.unregisterAgentNodeResource(agentNode.getName(), "agentNodeBean", getBeanName());
         } catch (Exception e) {
             System.err.println("WARNING: Unable to deregister node bean " + _beanName + " of node "
                     + agentNode.getName() + " as JMX resource.");
             System.err.println(e.getMessage());
         }
 
-        manager = null;
+        super.disableManagement();
     }
 
     /**
@@ -71,16 +70,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
             System.err.println(e.getMessage());
         }
 
-        this.manager = manager;
-    }
-
-    /**
-     * Checks wether the management of this object is enabled or not.
-     * 
-     * @return true if the management is enabled, otherwise false
-     */
-    public boolean isManagementEnabled() {
-        return manager != null;
+        super.enableManagement(manager);
     }
 
     @Override

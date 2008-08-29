@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
+import de.dailab.jiactng.agentcore.management.Manager;
+
 /**
  * @author Joachim Fuchs
  */
@@ -33,4 +35,9 @@ public class MockLifecycle extends AbstractLifecycle {
     public void doCleanup() throws LifecycleException {
     }
     
+	public void enableManagement(Manager manager) {
+	}
+	  
+	public void disableManagement() {
+	}
 }

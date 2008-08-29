@@ -649,6 +649,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		return _otherNodes;
 	}
 	
+	/**
+	 * 
+	 * @return the actual GroupAddress this AgentNode communicates with other Nodes of it's group
+	 */
+	public String getNodeGroupAddressName() {
+		return _otherNodes.toString();
+	}
+	
 
 	/**
 	 * sets if incoming entries from other AgentNodes will be stored of ignored

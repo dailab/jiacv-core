@@ -32,7 +32,6 @@ import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
-import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
@@ -52,9 +51,6 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 
 	/** The agent which contains this memory */
 	private transient IAgent thisAgent = null;
-
-	/** The manager of the memory */
-	private transient Manager _manager = null;
 
     /**
      * During initialization the TupleSpace is created.
@@ -340,7 +336,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 			System.err.println(e.getMessage());					
 		}
 
-		_manager = manager;
+		super.enableManagement(manager);
 	}
 	  
 	/**
@@ -361,15 +357,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 			System.err.println(e.getMessage());					
 		}
 		
-		_manager = null;
-	}
-
-	/**
-	 * Checks wether the management of this object is enabled or not.
-	 * @return true if the management is enabled, otherwise false
-	 */
-	public boolean isManagementEnabled() {
-		return _manager != null;
+		super.disableManagement();
 	}
 
     /**

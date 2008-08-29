@@ -11,7 +11,6 @@ import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
-import de.dailab.jiactng.agentcore.management.Manageable;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 /**
@@ -22,7 +21,7 @@ import de.dailab.jiactng.agentcore.ontology.AgentDescription;
  * @author Thomas Konnerth
  */
 public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
-    ILifecycle, Manageable {
+    ILifecycle {
 
   /**
    * Setter for the agentnode that hosts this agent. Called by the agentnode,

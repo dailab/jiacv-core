@@ -31,7 +31,6 @@ import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
-import de.dailab.jiactng.agentcore.management.Manageable;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
@@ -43,7 +42,7 @@ import de.dailab.jiactng.agentcore.management.Manager;
  * FIXME: MessageTransport muss konfiguriert werden
  *        
  */
-public class ServiceDirectory extends AbstractLifecycle implements IServiceDirectory, Runnable, Manageable, ServiceDirectoryMBean {
+public class ServiceDirectory extends AbstractLifecycle implements IServiceDirectory, Runnable, ServiceDirectoryMBean {
 	private static final long serialVersionUID = 1L;
 
 	private class ServiceDirectoryMessageDelegate implements IMessageTransportDelegate {
@@ -76,9 +75,6 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 
 	/* Time in milliseconds between publishment of services */
 	int _publishTimer = 10000;
-
-	/** The manager of the service directory */
-	private Manager _manager = null;
 
 	public ServiceDirectory() {
 		super();
@@ -356,7 +352,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 			System.err.println(e.getMessage());					
 		}
 
-		_manager = manager;
+		super.enableManagement(manager);
 	}
 	  
 	/**
@@ -377,14 +373,7 @@ public class ServiceDirectory extends AbstractLifecycle implements IServiceDirec
 			System.err.println(e.getMessage());					
 		}
 		
-		_manager = null;
+		super.disableManagement();
 	}
 
-	/**
-	 * Checks wether the management of this object is enabled or not.
-	 * @return true if the management is enabled, otherwise false
-	 */
-	public boolean isManagementEnabled() {
-		return _manager != null;
-	}  
 }

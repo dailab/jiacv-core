@@ -15,6 +15,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.log4j.Level;
 
+import de.dailab.jiactng.agentcore.management.Manager;
+
 /**
  * Abstract base class for <code>ILifecycle</code> implementations.
  * <b>Not threadsafe</b>
@@ -37,6 +39,11 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 * The configured log level. 
 	 */
 	private String logLevel = null;
+
+	/** 
+	 * The manager of the agent node 
+	 */
+	protected Manager _manager = null;
 
     /**
      * Default constructor that creates an internally used lifecycle handler for the default mode.
@@ -363,6 +370,31 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	  /**
+	   * Marks the resource as managed.
+	   * 
+	   * @param manager The manager responsible for this resource.
+	   */
+	  public void enableManagement(Manager manager) {
+	    _manager = manager;
+	  }
+
+	  /**
+	   * Marks the resource as unmanaged.
+	   */
+	  public void disableManagement() {
+	    _manager = null;
+	  }
+
+	/**
+	 * Checks whether the management of this object is enabled or not.
+	 * 
+	 * @return <code>true</code> if the management is enabled, otherwise <code>false</code>
+	 */
+	public boolean isManagementEnabled() {
+		return _manager != null;
 	}
 
 	/**

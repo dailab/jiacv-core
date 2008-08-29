@@ -16,6 +16,7 @@ import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.S
 import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STOPPED;
 import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.STOPPING;
 import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.UNDEFINED;
+import de.dailab.jiactng.agentcore.management.Manager;
 import junit.framework.TestCase;
 
 /**
@@ -355,5 +356,14 @@ public class DefaultLifecycleHandlerTest extends TestCase implements ILifecycle,
         lastEvent = evt;
         
     }
-    
+
+	public void enableManagement(Manager manager) {
+	}
+	  
+	public void disableManagement() {
+	}
+
+	public boolean isManagementEnabled() {
+		return false;
+	}
 }

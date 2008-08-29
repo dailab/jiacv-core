@@ -6,7 +6,6 @@ package de.dailab.jiactng.agentcore;
 import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
-import de.dailab.jiactng.agentcore.management.Manageable;
 
 /**
  * Interface for all beans of an agentNode. It declares all required methods
@@ -16,7 +15,7 @@ import de.dailab.jiactng.agentcore.management.Manageable;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public interface IAgentNodeBean extends ILifecycle, BeanNameAware, Manageable {
+public interface IAgentNodeBean extends ILifecycle, BeanNameAware {
     /**
      * Setter for the agentNode-reference that is responsible for this
      * agentNodeBean.

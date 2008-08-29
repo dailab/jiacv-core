@@ -1,11 +1,13 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
+import de.dailab.jiactng.agentcore.management.Manageable;
+
 /**
  * Basic lifecycle interface.
  *
  * @author Joachim Fuchs
  */
-public interface ILifecycle {
+public interface ILifecycle extends Manageable {
 
     /**
      * The states a <code>Lifecycle</code> can have.

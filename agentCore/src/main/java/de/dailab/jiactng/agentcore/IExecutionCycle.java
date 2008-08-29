@@ -8,7 +8,6 @@ package de.dailab.jiactng.agentcore;
 
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
-import de.dailab.jiactng.agentcore.management.Manageable;
 
 /**
  * Interface for Agent ExecutionCycles. This interface is used to decouple
@@ -21,7 +20,7 @@ import de.dailab.jiactng.agentcore.management.Manageable;
  * 
  * @author Thomas Konnerth
  */
-public interface IExecutionCycle extends ILifecycle, Runnable, Manageable {
+public interface IExecutionCycle extends ILifecycle, Runnable {
 
   /**
    * This method triggers the execution of the next agentbean in the list.

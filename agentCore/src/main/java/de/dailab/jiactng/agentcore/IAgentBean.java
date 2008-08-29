@@ -8,7 +8,6 @@ import org.springframework.beans.factory.BeanNameAware;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
-import de.dailab.jiactng.agentcore.management.Manageable;
 
 /**
  * Interface for all agentbeans. This Interfaces declares the generally
@@ -18,7 +17,7 @@ import de.dailab.jiactng.agentcore.management.Manageable;
  * @author moekon
  */
 
-public interface IAgentBean extends ILifecycle, BeanNameAware, Manageable {
+public interface IAgentBean extends ILifecycle, BeanNameAware {
 
 	/**
 	 * Setter for the agent-reference to the agent that holds this bean.

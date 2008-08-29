@@ -10,7 +10,6 @@ import org.sercho.masp.space.event.EventedTupleSpace;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
-import de.dailab.jiactng.agentcore.management.Manageable;
 
 /**
  * This interface declares methods which must be implemented
@@ -24,7 +23,7 @@ import de.dailab.jiactng.agentcore.management.Manageable;
  * @see org.sercho.masp.space.TupleSpace
  * @see org.sercho.masp.space.event.EventedTupleSpace
  */
-public interface IMemory extends ILifecycle, EventedTupleSpace<IFact>, Manageable {
+public interface IMemory extends ILifecycle, EventedTupleSpace<IFact> {
 
 	/**
 	 * Sets the reference to the agent which contains this memory.

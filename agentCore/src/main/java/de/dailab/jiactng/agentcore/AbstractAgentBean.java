@@ -40,9 +40,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   private long      nextExecutionTime = 0;
 
-  /** The manager of the agent node */
-  protected Manager _manager          = null;
-
   /**
    * Creates an agent bean that uses lifecycle support in loose mode
    */
@@ -198,7 +195,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
       System.err.println(e.getMessage());
     }
 
-    _manager = manager;
+    super.enableManagement(manager);
   }
 
   /**
@@ -219,16 +216,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
       System.err.println(e.getMessage());
     }
 
-    _manager = null;
-  }
-
-  /**
-   * Checks wether the management of this object is enabled or not.
-   * 
-   * @return true if the management is enabled, otherwise false
-   */
-  public boolean isManagementEnabled() {
-    return _manager != null;
+    super.disableManagement();
   }
 
   /**

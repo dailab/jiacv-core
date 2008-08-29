@@ -78,10 +78,19 @@ public class ActionData implements IFact{
 	public String toString(){
 		String thisString = "ActionData: ";
 		if (_action != null){
-			thisString += "Action.name= " + _action.getName() + ";";
+			thisString += "Action.name=" + _action.getName() + ";";
 		}
 		if (_creationTime != null){
 			thisString += "CreationTime=" + _creationTime + ";";
+		}
+		if (_isLocal != null){
+			thisString += "isLocal=" + _isLocal + ";";
+		}
+		if (_providerDescription != null){
+			thisString += "Provider=" + _providerDescription.getAid() + ";";
+		}
+		if ((_action != null) && (_action.getProviderDescription() != null)){
+			thisString += "Action.provider=" + _action.getProviderDescription().getAid() + ";";
 		}
 		
 		return thisString;

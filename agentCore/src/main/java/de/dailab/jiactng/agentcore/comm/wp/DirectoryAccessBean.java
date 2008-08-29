@@ -50,7 +50,7 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  */
 
 
-public class DirectoryAccessBean extends AbstractAgentBean implements IEffector {
+public class DirectoryAccessBean extends AbstractAgentBean implements IEffector, DirectoryAccessBeanMBean {
 
 	/*
 	 * NOTE: For more Infos about parameters of Actions see Comments within getActions
@@ -597,6 +597,16 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector 
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public Set<String> getOfferedActionNames() {
+		Set<String> actionNames = new HashSet<String>();
+		for (IActionDescription action : _offeredActions){
+			actionNames.add(action.getName());
+		}
+		return actionNames;
+	}
 
 
 

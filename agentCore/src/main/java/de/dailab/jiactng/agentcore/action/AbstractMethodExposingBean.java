@@ -313,8 +313,8 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
         	// fill table
         	for (Action action : actions) {
         		// get names of parameter and result classes
-        	    String[] inputTypeList = (action.getInputTypeNames()==null)? null:(String[]) action.getInputTypeNames().toArray();
-        		String[] resultTypeList = (action.getResultTypeNames()==null)? null:(String[]) action.getResultTypeNames().toArray();
+        	    String[] inputTypeList = (action.getInputTypeNames()==null)? null:action.getInputTypeNames().toArray(new String[0]);
+        		String[] resultTypeList = (action.getResultTypeNames()==null)? null:action.getResultTypeNames().toArray(new String[0]);
 
         		// create and add action description
         		Object[] itemValues = new Object[] {action.getName(), inputTypeList, resultTypeList, action.getProviderBean().getBeanName()};

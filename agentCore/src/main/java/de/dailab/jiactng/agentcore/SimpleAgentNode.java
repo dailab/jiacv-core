@@ -76,9 +76,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Configuration of a set of JMX connector server. */
 	private Set<Map<String, Object>> _jmxConnectors = null;
 
-	/** The manager of the agent node */
-	private Manager _manager = null;
-	
 	/** Optional: DirectoryAgentNodeBean to add local Agents to */
 	private DirectoryAgentNodeBean _directory = null;
 
@@ -846,7 +843,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			manager.enableRemoteManagement(_uuid, _name, _jmxConnectors);
 		}
 
-		_manager = manager;
+		super.enableManagement(manager);
 	}
 
 	/**
@@ -879,16 +876,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			System.err.println(e.getMessage());
 		}
 
-		_manager = null;
-	}
-
-	/**
-	 * Checks wether the management of this object is enabled or not.
-	 * 
-	 * @return true if the management is enabled, otherwise false
-	 */
-	public boolean isManagementEnabled() {
-		return _manager != null;
+		super.disableManagement();
 	}
 
 }

@@ -3,8 +3,10 @@
 
 <beans>
 
-	<bean name="myPlatform"
-		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+	<bean name="myPlatform" parent="Platform">
 		<property name="agents">
 			<list>
 				<ref bean="HelloWorldAgent1" />
@@ -13,27 +15,7 @@
 	</bean>
 
 
-	<bean name="HelloWorldAgent1"
-		class="de.dailab.jiactng.agentcore.Agent" singleton="false">
-		<property name="memory">
-			<ref bean="memory" />
-		</property>
-		<property name="execution">
-			<ref bean="simpleExecCycle" />
-		</property>
-		<property name="agentBeans">
-			<list></list>
-		</property>
-	</bean>
-
-	<bean name="memory"
-		class="de.dailab.jiactng.agentcore.knowledge.Memory"
-		singleton="false">
-	</bean>
-
-	<bean name="simpleExecCycle"
-		class="de.dailab.jiactng.agentcore.SimpleExecutionCycle"
-		singleton="false">
+	<bean name="HelloWorldAgent1" class="SimpleAgent" singleton="false">
 	</bean>
 
 </beans>

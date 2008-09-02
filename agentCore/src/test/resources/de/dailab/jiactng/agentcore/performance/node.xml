@@ -3,11 +3,9 @@
 
 <beans>
 
-	<bean name="myPlatform"
-		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
-		<property name="agents">
-			<list></list>
-		</property>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+
+	<bean name="myPlatform" parent="Platform">
 	</bean>
 
 </beans>

@@ -11,7 +11,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 
-import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
 
 /**
@@ -125,15 +124,15 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 
 	/**
 	 * Gets the node group address of the managed directory.
-	 * @return The directory's node group address.
+	 * @return The name of directory's node group address.
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getNodeGroupAddress()
+	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getNodeGroupAddressName()
 	 */
-	public ICommunicationAddress getNodeGroupAddress() throws IOException, InstanceNotFoundException {
-		return (ICommunicationAddress) getAttribute("NodeGroupAddress");
+	public String getNodeGroupAddress() throws IOException, InstanceNotFoundException {
+		return (String) getAttribute("NodeGroupAddressName");
 	}
 
 	/**

@@ -28,7 +28,7 @@
 		
 		maybe put timer option in here
 	-->
-	<bean name="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.SimpleExecutionCycle" singleton="false">
+	<bean name="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle" singleton="false">
 		<!--
 			<property name="timer" value="9999"/>
 		-->

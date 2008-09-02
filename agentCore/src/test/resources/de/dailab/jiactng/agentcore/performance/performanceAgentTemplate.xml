@@ -8,8 +8,5 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
 	
 	<bean name="PerformanceAgentTemplate" parent="SimpleAgent" abstract="true">
-		<property name="agentBeans">
-			<list></list>
-		</property>
 	</bean>
 </beans>

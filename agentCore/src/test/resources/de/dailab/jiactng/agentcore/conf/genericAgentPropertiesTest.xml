@@ -6,8 +6,9 @@
 -->
 <beans>
 
-	<bean name="myPlatform"
-		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+
+	<bean name="myPlatform" parent="Platform">
 		<property name="genericAgents">
 			<list>
 				<ref bean="generics" />

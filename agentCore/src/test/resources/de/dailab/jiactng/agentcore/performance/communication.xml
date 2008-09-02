@@ -3,10 +3,10 @@
 
 <beans>
 
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
 
-	<bean name="myPlatform"
-		class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+	<bean name="myPlatform" parent="Platform">
 		<property name="agentNodeBeans">
 			<list>
 				<ref bean="StandardJMSBroker"/>

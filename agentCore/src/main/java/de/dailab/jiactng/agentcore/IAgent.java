@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
@@ -181,5 +182,12 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @param actionList the list of actions.
    */
   public void setActionList(List<Action> actionList);
+
+  /**
+   * Gets the timeout after which the execution of a bean will be stopped.
+   * 
+   * @return the timeout in milliseconds
+   */
+  public long getBeanExecutionTimeout();
 
 }

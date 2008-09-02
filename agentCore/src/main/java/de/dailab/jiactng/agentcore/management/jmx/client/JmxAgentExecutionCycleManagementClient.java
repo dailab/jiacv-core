@@ -40,7 +40,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent execution cycle.
 	 * @throws SecurityException if the agent execution cycle's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.SimpleExecutionCycleMBean#getExecutionWorkload()
+	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getExecutionWorkload()
 	 */
 	public int getExecutionWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("ExecutionWorkload");
@@ -53,7 +53,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent execution cycle.
 	 * @throws SecurityException if the agent execution cycle's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.SimpleExecutionCycleMBean#getDoActionWorkload()
+	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getDoActionWorkload()
 	 */
 	public int getDoActionWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("DoActionWorkload");
@@ -66,7 +66,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent execution cycle.
 	 * @throws SecurityException if the agent execution cycle's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.SimpleExecutionCycleMBean#getActionResultWorkload()
+	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getActionResultWorkload()
 	 */
 	public int getActionResultWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("ActionResultWorkload");
@@ -113,7 +113,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws InstanceNotFoundException The agent execution cycle does not exist in the JVM.
 	 * @throws SecurityException if the listener can not be added to the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
-	 * @see de.dailab.jiactng.agentcore.SimpleExecutionCycle#actionPerformed(de.dailab.jiactng.agentcore.action.DoAction, long, boolean)
+	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycle#actionPerformed(de.dailab.jiactng.agentcore.action.DoAction, long, boolean)
 	 */
 	public void addActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, filter);
@@ -128,7 +128,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws ListenerNotFoundException The listener is not registered in the managed agent execution cycle, or it is not registered with the given filter.
 	 * @throws SecurityException if the listener can not be removed from the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
-	 * @see de.dailab.jiactng.agentcore.SimpleExecutionCycle#actionPerformed(de.dailab.jiactng.agentcore.action.DoAction, long, boolean)
+	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycle#actionPerformed(de.dailab.jiactng.agentcore.action.DoAction, long, boolean)
 	 */
 	public void removeActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, filter);

@@ -6,43 +6,9 @@
 -->
 <beans>
 
-	<bean name="NewAgent" class="de.dailab.jiactng.agentcore.Agent">
-		<property name="memory">
-			<ref bean="memory" />
-		</property>
-		<property name="execution">
-			<ref bean="simpleExecCycle" />
-		</property>
-		<property name="agentBeans">
-			<list></list>
-		</property>
-	</bean>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
 
-	<!--bean name="NewAgent2" class="de.dailab.jiactng.agentcore.Agent">
-		<property name="memory"><ref bean="memory"/></property>
-		<property name="agentBeans">
-		<list>
-		<ref bean="pongPing"/>
-		</list>
-		</property>
-		</bean-->
-
-	<bean name="memory"
-		class="de.dailab.jiactng.agentcore.knowledge.Memory"
-		singleton="false">
-		<!--property name="timeOut" value="-1"/-->
-	</bean>
-
-	<!-- bean name="helloBean" class="de.dailab.jiactng.test.helloworld.HelloBean" singleton="false">
-		</bean-->
-
-	<bean name="dummyBean" class="de.dailab.jiactng.agentcore.DummyBean"
-		singleton="false">
-	</bean>
-
-	<bean name="simpleExecCycle"
-		class="de.dailab.jiactng.agentcore.SimpleExecutionCycle"
-		singleton="false">
+	<bean name="NewAgent" parent="SimpleAgent">
 	</bean>
 
 </beans>

@@ -7,11 +7,14 @@
 package de.dailab.jiactng.agentcore;
 
 import java.io.Serializable;
+import java.util.List;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
+import de.dailab.jiactng.agentcore.action.ActionResultListener;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
+import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
@@ -275,6 +278,30 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
     throw new RuntimeException(e);
   }
 
+  /**
+   * Invokes an action and waits for its result. 
+   * NOTE: This method MUST NOT be used with a blocking execution cycle (e.g. SimpleExecutionCycle).
+   * 
+   * @param a The action to be invoked.
+   * @param inputParams The values for the input parameters.
+   * @return The result of the action.
+   */
+  protected ActionResult invokeAndWaitForResult(Action a, Serializable[] inputParams) {
+	// invoke action
+	ActionResultListener listener = new ActionResultListener();
+	invoke(a, inputParams, listener);
+
+	// wait for result
+	synchronized (listener) {
+		try {
+			listener.wait();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	return listener.getResult();
+  }
+
   protected String invoke(Action a, Serializable[] inputParams) {
     return invoke(a, inputParams, null);
   }
@@ -323,5 +350,68 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
       log.warn("Could not find \'" + actionName + "\'.");
     }
     return retAct;
+  }
+
+  /**
+   * Gets from the service directory a list of actions which match the given template. 
+   * NOTE: This method MUST NOT be used with a blocking execution cycle (e.g. SimpleExecutionCycle).
+   * 
+   * @param template The template for matching actions.
+   * @param isGlobal <code>true</code> for a global search and <code>false</code> for an agent node internal search.
+   * @param timeout The maximum duration of the global search. This value will be ignored by local search.
+   * @throws RuntimeException if the search failed or was not possible.
+   * @return The list of found actions.
+   */
+  protected List<Action> retrieveActionsFromDirectory(Action template, boolean isGlobal, long timeout) {
+	// get search action
+	Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
+	if (requestSearchAction == null) {
+		throw new RuntimeException("DirectoryAccessBean not available");
+	}
+
+	// invoke search action
+	Serializable[] params = {template, new Boolean(isGlobal), new Long(timeout)}; 
+	ActionResult result = invokeAndWaitForResult(requestSearchAction, params);
+	if (result == null) {
+		throw new RuntimeException("Got no result");
+	}
+
+	// get result
+	Serializable[] results = result.getResults();
+	if (results != null) {
+		if (results.length == 1) {
+			try {
+				return (List<Action>) results[0];
+			} catch (ClassCastException e) {
+				throw new RuntimeException("Got wrong type of results");
+			}
+/*			Object[] objects = (Object[]) results[0];
+			Action[] actions = new Action[objects.length];
+			for (int i=0; i<objects.length; i++) {
+				if (objects[i] instanceof Action) {
+					actions[i] = (Action) objects[i];
+				} else {
+					throw new RuntimeException("Got wrong type of results");
+				}
+			}
+			return actions;*/
+		} else {
+			throw new RuntimeException("Got wrong number of results");
+		}
+	}
+
+	// search failed
+	Serializable failure = result.getFailure();
+	if (failure != null) {
+		if (failure instanceof Throwable) {
+			throw new RuntimeException((Throwable) failure);
+		} else if (failure instanceof String) {
+			throw new RuntimeException((String) failure);
+		} else {
+			throw new RuntimeException("Search for actions failed");
+		}
+	}
+
+	throw new RuntimeException("Got neigther results nor failure");
   }
 }

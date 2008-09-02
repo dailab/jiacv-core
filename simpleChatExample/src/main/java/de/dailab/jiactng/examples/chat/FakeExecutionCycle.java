@@ -5,7 +5,7 @@ package de.dailab.jiactng.examples.chat;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.IAgent;
-import de.dailab.jiactng.agentcore.IExecutionCycle;
+import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
 
 /**
  * @author Marcel Patzlaff

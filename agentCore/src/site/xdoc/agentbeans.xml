@@ -2,7 +2,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
 	<properties>
-		<title>agentCore Documentation</title>
+		<title>AgentBeans Documentation</title>
 		<author email="marcel.patzlaff@dai-labor.de">Marcel Patzlaff</author>
 	</properties>
 	<body>
@@ -102,19 +102,29 @@
 				</p>
 				<p>
 					<b>Note:</b>
-					Currently only one implementation of
-					<a href="apidocs/de/dailab/jiactng/agentcore/IExecutionCycle.html">
+					Currently two implementations of
+					<a href="apidocs/de/dailab/jiactng/agentcore/execution/IExecutionCycle.html">
 						<code>IExecutionCycle</code>
 					</a>
-					is available which schedules the action procession and the invocation of the
-					<code>execute</code>
-					methods in a pipelining fashion. This means, that actions and executions that take very long will
-					delay all other computations within the same agent. You may look into the sources of
-					<a href="apidocs/de/dailab/jiactng/agentcore/SimpleExecutionCycle.html">
+					are available. The 
+					<a href="apidocs/de/dailab/jiactng/agentcore/execution/SimpleExecutionCycle.html">
 						<code>SimpleExecutionCycle</code>
 					</a>
-					to get an idea of how this simple implementation works. More sophisticated realisations of the
-					interface are possible but not yet planned.
+					schedules the action procession and the invocation of the <code>execute</code>
+					methods in a pipelining fashion. This means, that actions and executions that take very long will
+					delay all other computations within the same agent. You may look into the sources of
+					<a href="apidocs/de/dailab/jiactng/agentcore/execution/SimpleExecutionCycle.html">
+						<code>SimpleExecutionCycle</code>
+					</a>
+					to get an idea of how this simple implementation works. A more sophisticated realisation of the
+					interface is the 
+					<a href="apidocs/de/dailab/jiactng/agentcore/execution/NonBlockingExecutionCycle.html">
+						<code>NonBlockingExecutionCycle</code>
+					</a>
+					which invokes the action procession and <code>execute</code> methods in own threads
+					using the thread pool of the agent node. This means, that actions and executions
+					are allowed to invoke other actions synchronously or to wait for events, because they 
+					will not delay other computations within the agent.
 				</p>
 			</subsection>
 			<subsection name="Pre-defined Spring Configurations">

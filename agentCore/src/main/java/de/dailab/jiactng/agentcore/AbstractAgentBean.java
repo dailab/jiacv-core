@@ -385,16 +385,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 			} catch (ClassCastException e) {
 				throw new RuntimeException("Got wrong type of results");
 			}
-/*			Object[] objects = (Object[]) results[0];
-			Action[] actions = new Action[objects.length];
-			for (int i=0; i<objects.length; i++) {
-				if (objects[i] instanceof Action) {
-					actions[i] = (Action) objects[i];
-				} else {
-					throw new RuntimeException("Got wrong type of results");
-				}
-			}
-			return actions;*/
 		} else {
 			throw new RuntimeException("Got wrong number of results");
 		}

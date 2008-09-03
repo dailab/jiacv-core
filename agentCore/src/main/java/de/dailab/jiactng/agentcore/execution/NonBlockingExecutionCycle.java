@@ -27,7 +27,8 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * @see DoAction
  * @see ActionResult
  */
-public class NonBlockingExecutionCycle extends AbstractExecutionCycle {
+public class NonBlockingExecutionCycle extends AbstractExecutionCycle 
+	implements NonBlockingExecutionCycleMBean {
 
 	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
 	private TreeMap<Long,Future<?>> futures = new TreeMap<Long,Future<?>>();
@@ -47,11 +48,21 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle {
 	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
 	public void run() {
-		// cancel futures which has reached timeout
+		// cancel and remove futures which has reached timeout
 		long now = System.currentTimeMillis();
 		while (!futures.isEmpty() && (futures.firstKey() < now)) {
-			if (futures.pollFirstEntry().getValue().cancel(true)) {
+			Future<?> future = futures.pollFirstEntry().getValue();
+			if (future.cancel(true)) {
 				log.warn("Handler was interrupted by the execution cycle due to timeout constraints");
+			} else if (!future.isCancelled() && !future.isDone()) {
+				log.warn("Handler can not be canceled by the execution cycle");
+			}
+		}
+		// remove futures which are already done or canceled
+		for (Long key : futures.keySet()) {
+			Future<?> future = futures.get(key);
+			if (future.isCancelled() || future.isDone()) {
+				futures.remove(key);
 			}
 		}
 
@@ -187,6 +198,13 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle {
 			log.error("Trying to run NonBlockingExecutionCycle in state "
 					+ getState());
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getRunningHandlers() {
+		return futures.size();
 	}
 
 	private class ExecutionHandler implements Runnable {

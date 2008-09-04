@@ -26,12 +26,11 @@
 		# The Bean handling the execution of all Agent Threads #
 		########################################################
 		
-		maybe put timer option in here
 	-->
 	<bean name="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle" singleton="false">
-		<!--
-			<property name="timer" value="9999"/>
-		-->
+	</bean>
+
+	<bean name="NonBlockingExecutionCycle" class="de.dailab.jiactng.agentcore.execution.NonBlockingExecutionCycle" singleton="false">
 	</bean>
 
 

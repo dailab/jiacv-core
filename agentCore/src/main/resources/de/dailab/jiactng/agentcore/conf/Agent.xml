@@ -29,6 +29,10 @@
       <property name="execution" ref="SimpleExecutionCycle" />
    </bean>
 
+   <bean name="NonBlockingAgent" parent="SimpleAgent" abstract="true">
+      <property name="execution" ref="NonBlockingExecutionCycle" />
+   </bean>
+
    <bean name="SimpleAgentWithCommunication" parent="SimpleAgent" abstract="true">
       <property name="agentBeans">
          <list>
@@ -36,6 +40,10 @@
             <ref bean="DirectoryAccessBean" />
          </list>
       </property>
+   </bean>
+
+   <bean name="NonBlockingAgentWithCommunication" parent="SimpleAgentWithCommunication" abstract="true">
+      <property name="execution" ref="NonBlockingExecutionCycle" />
    </bean>
 </beans>
 

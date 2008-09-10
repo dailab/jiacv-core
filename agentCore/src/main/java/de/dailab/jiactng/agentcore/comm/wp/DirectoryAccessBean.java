@@ -525,14 +525,17 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 		log.debug("DoAction has timeout!");
 
 		synchronized(_requestID2ActionMap){
-			if (doAction.getSessionId() == null){
-				if (doAction != null){
-					log.warn("Tried to cancel Action without Session");
-				}else{
-					log.warn("Tried to cancel non existing Action (Action == null)");
-				}
+			if (doAction == null){
+				log.warn("Tried to cancel non existing Action (Action == null)");
 				return null;
+			} else {
+				if (doAction.getSessionId() != null){
+					log.warn("Tried to cancel Action without Session");
+					return null;
+				}	
 			}
+			
+			
 			if (_requestID2ActionMap.containsKey(doAction.getSessionId())){
 				//if still waiting for this action to finish get it out of the map
 				DoAction sourceAction = _requestID2ActionMap.remove(doAction.getSessionId());
@@ -805,13 +808,14 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 		public ActionResult cancelRemoteAction(DoAction remoteAction){
 			log.debug("Canceling remoteAction");
 			synchronized(openSessionsToProviders){
-				if (remoteAction.getSessionId() == null){
-					if (remoteAction != null){
-						log.warn("Tried to cancel Action without Session");
-					}else{
-						log.warn("Tried to cancel non existing Action (Action == null)");
-					}
+				if (remoteAction == null){
+					log.warn("Tried to cancel non existing Action (Action == null)");
 					return null;
+				} else {
+					if (remoteAction.getSessionId() != null){
+						log.warn("Tried to cancel Action without Session");
+						return null;
+					}	
 				}
 				
 				DoAction sourceAction = openSessionsToProviders.remove(remoteAction.getSessionId());

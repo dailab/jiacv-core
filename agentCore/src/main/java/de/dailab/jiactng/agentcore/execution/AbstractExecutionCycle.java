@@ -31,11 +31,11 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 
 		if (((Action) act.getAction()).getProviderBean() != null) {
 			try {
-				((Action) act.getAction()).getProviderBean().doAction(act);
-				success = true;
 				if (act.getAction().getResultTypes()!=null){
 					memory.write(act.getSession());
 				} 
+				((Action) act.getAction()).getProviderBean().doAction(act);
+				success = true;
 			} catch (Throwable t) {
 			    memory.write(new ActionResult(act, t));
 				log.error("--- action failed: " + act.getAction().getName(),t);

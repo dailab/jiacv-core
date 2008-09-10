@@ -306,7 +306,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 			for (String key : _requestID2ActionMap.keySet()){
 				DoAction searchAction = _requestID2ActionMap.remove(key);
 				ActionResult result = cancelAction(searchAction);
-				memory.write(result);
+				if (result != null)
+					memory.write(result);
 			}
 		}
 		synchronized(_autoenlistActionTemplates){
@@ -529,7 +530,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 				log.warn("Tried to cancel non existing Action (Action == null)");
 				return null;
 			} else {
-				if (doAction.getSessionId() != null){
+				if (doAction.getSessionId() == null){
 					log.warn("Tried to cancel Action without Session");
 					return null;
 				}	
@@ -812,7 +813,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 					log.warn("Tried to cancel non existing Action (Action == null)");
 					return null;
 				} else {
-					if (remoteAction.getSessionId() != null){
+					if (remoteAction.getSessionId() == null){
 						log.warn("Tried to cancel Action without Session");
 						return null;
 					}	

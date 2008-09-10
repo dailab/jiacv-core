@@ -525,6 +525,14 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 		log.debug("DoAction has timeout!");
 
 		synchronized(_requestID2ActionMap){
+			if (doAction.getSessionId() == null){
+				if (doAction != null){
+					log.warn("Tried to cancel Action without Session");
+				}else{
+					log.warn("Tried to cancel non existing Action (Action == null)");
+				}
+				return null;
+			}
 			if (_requestID2ActionMap.containsKey(doAction.getSessionId())){
 				//if still waiting for this action to finish get it out of the map
 				DoAction sourceAction = _requestID2ActionMap.remove(doAction.getSessionId());
@@ -539,7 +547,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 						result = new ActionResult(sourceAction, new Serializable[] {results});
 					} else {
 						String owner = sourceAction.getSource().toString();
-						log.warn("SearchRequest from " + owner + " has timeout");
+						log.debug("SearchRequest from " + owner + " has timeout");
 						// DoAction was local SearchRequest or global without answers
 						result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
 					}
@@ -797,17 +805,26 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 		public ActionResult cancelRemoteAction(DoAction remoteAction){
 			log.debug("Canceling remoteAction");
 			synchronized(openSessionsToProviders){
+				if (remoteAction.getSessionId() == null){
+					if (remoteAction != null){
+						log.warn("Tried to cancel Action without Session");
+					}else{
+						log.warn("Tried to cancel non existing Action (Action == null)");
+					}
+					return null;
+				}
+				
 				DoAction sourceAction = openSessionsToProviders.remove(remoteAction.getSessionId());
 				
 				if (sourceAction != null){
 					if (sourceAction.getSource() != null){
 						String owner = sourceAction.getSource().toString();
-						log.warn("RemoteAction " + remoteAction.getAction().getName() + " from owner " + owner + " has timeout");
+						log.debug("RemoteAction " + remoteAction.getAction().getName() + " from owner " + owner + " has timeout");
 
 						ActionResult result = new ActionResult(sourceAction, new TimeoutException("Failure due to Timeout for action " + sourceAction));
 						return result;
 					} else {
-						log.warn("RemoteAction " + remoteAction.getAction().getName() + " without source has timeout");
+						log.debug("RemoteAction " + remoteAction.getAction().getName() + " without source has timeout");
 						return null;
 					}
 

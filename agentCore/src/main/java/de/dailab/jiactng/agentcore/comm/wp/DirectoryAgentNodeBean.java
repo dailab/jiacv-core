@@ -1070,6 +1070,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						otherNode.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
 
 						_otherNodesBase.put(otherNode);
+						log.debug("Added agent node " + otherNode.getUUID() + " to database with timeout " + otherNode.getTimeoutTime().longValue());
 
 						if (message.getHeader("HelloWorld") == null){
 							/*
@@ -1084,6 +1085,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 							// let the world now what we have to offer						
 							sendMessageOfChange(myData, null, true, message.getSender());
+							log.debug("Sent own data to other agent nodes in order to get current data of agent node " + message.getHeader("UUID"));
 						}
 
 					} else {
@@ -1091,6 +1093,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						storedData.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
 
 						_otherNodesBase.put(storedData);
+						log.debug("Updated agent node " + storedData.getUUID() + " in database with timeout " + storedData.getTimeoutTime().longValue());
 
 					}
 
@@ -1422,7 +1425,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 							// first remove agentNode from directory of known agentNodes
 							AgentNodeData otherAgentNode = _otherNodesBase.removeFirstTimeoutNode();
 
-							log.warn(agentNode.getName() + ": AgentNode " + otherAgentNode.getUUID() + " isn't avaiable anymore. Removing associated Agents... ");
+							log.warn("AgentNode " + otherAgentNode.getUUID() + " with timeout " + firstTimeout.longValue() + " isn't available anymore. Removing associated Agents... ");
 
 							String UUID = otherAgentNode.getUUID();
 							// now get all agents associated with it

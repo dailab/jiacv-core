@@ -22,18 +22,21 @@ public class AgentNodeData implements Comparable<AgentNodeData>{
 
 	@Override
 	public int compareTo(AgentNodeData otherNode) {
+		// avoid two entries for the same agent node
 		if (_UUID.equals(otherNode.getUUID())){
 			return 0;
-		} else if (_timeoutTime != otherNode.getTimeoutTime()){
-			if (_timeoutTime == null) {
-				return new Long(Long.MAX_VALUE).compareTo(otherNode.getTimeoutTime());
-			} else if (otherNode.getTimeoutTime() == null) {
-				return _timeoutTime.compareTo(new Long(Long.MAX_VALUE));
-			} else {
-				return _timeoutTime.compareTo(otherNode.getTimeoutTime());
-			}
-		} else {
+		}
+
+		Long time1 = (_timeoutTime == null)? new Long(Long.MAX_VALUE):_timeoutTime;
+		Long time2 = (otherNode.getTimeoutTime() == null)? new Long(Long.MAX_VALUE):otherNode.getTimeoutTime();
+
+		// ordering by UUID in case of same timeout of different agent nodes
+		if (time1.equals(time2)) {
 			return _UUID.compareTo(otherNode.getUUID());
+		}
+		// ordering by timeout for different agent nodes
+		else {
+			return time1.compareTo(time2);
 		}
 	}
 

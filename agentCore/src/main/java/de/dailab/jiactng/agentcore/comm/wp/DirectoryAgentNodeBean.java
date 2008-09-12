@@ -1061,42 +1061,49 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				// But first let's see if we already know it or not
 
 				if (message.getHeader("UUID") != null){
-					AgentNodeData storedData = _otherNodesBase.remove(message.getHeader("UUID"));
+					synchronized(_otherNodesBase){
+						AgentNodeData storedData = _otherNodesBase.remove(message.getHeader("UUID"));
 
-					if(storedData == null){
-						// AgentNode is formerly unknown, so let's add it to our list
-						AgentNodeData otherNode = new AgentNodeData();
-						otherNode.setUUID(message.getHeader("UUID"));
-						otherNode.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
+						if(storedData == null){
+							// AgentNode is formerly unknown, so let's add it to our list
+							AgentNodeData otherNode = new AgentNodeData();
+							otherNode.setUUID(message.getHeader("UUID"));
+							otherNode.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
 
-						_otherNodesBase.put(otherNode);
-						log.debug("Added agent node " + otherNode.getUUID() + " to database with timeout " + otherNode.getTimeoutTime().longValue());
+							_otherNodesBase.put(otherNode);
+							log.debug("Added agent node " + otherNode.getUUID() + " to database with timeout " + otherNode.getTimeoutTime().longValue());
 
-						if (message.getHeader("HelloWorld") == null){
-							/*
-							 * This seems to be the first contact, but the other one doesn't know that.
-							 * So there might have happen some partially or bad timed dis- and reconnection.
-							 * We have to send an HelloWorld Message to get it's offers back into our space
-							 * completely and to make sure there is no timeout of our entries over there interfering
-							 * we sent all what we have to offer with it.
-							 */
-							FactSet myData = new FactSet(getLocalActions());
-							myData.add(getLocalAgents());
+							if (message.getHeader("HelloWorld") == null){
+								/*
+								 * This seems to be the first contact, but the other one doesn't know that.
+								 * So there might have happen some partially or bad timed dis- and reconnection.
+								 * We have to send an HelloWorld Message to get it's offers back into our space
+								 * completely and to make sure there is no timeout of our entries over there interfering
+								 * we sent all what we have to offer with it.
+								 */
+								FactSet myData = new FactSet(getLocalActions());
+								myData.add(getLocalAgents());
 
-							// let the world now what we have to offer						
-							sendMessageOfChange(myData, null, true, message.getSender());
-							log.debug("Sent own data to other agent nodes in order to get current data of agent node " + message.getHeader("UUID"));
+								// let the world now what we have to offer						
+								sendMessageOfChange(myData, null, true, message.getSender());
+								log.debug("Sent own data to other AgentNode in order to get current data of AgentNode " + message.getHeader("UUID"));
+							}
+
+						} else {
+							// we already know this AgentNode so just set it's timeout straight and put it back
+							storedData.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
+
+							_otherNodesBase.put(storedData);
+							log.debug("Updated agent node " + storedData.getUUID() + " in database with timeout " + storedData.getTimeoutTime().longValue());
+
 						}
-
-					} else {
-						// we already know this AgentNode so just set it's timeout straight and put it back
-						storedData.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
-
-						_otherNodesBase.put(storedData);
-						log.debug("Updated agent node " + storedData.getUUID() + " in database with timeout " + storedData.getTimeoutTime().longValue());
-
-					}
-
+						
+						if (message.getHeader("ByeWorld") != null){
+							log.info("AgentNode with UUID " + message.getHeader("UUID") + " is shutting down.");
+							_otherNodesBase.remove(message.getHeader("UUID"));
+						}
+						
+					} // end of synchronzied block for _otherNodesBase
 
 
 
@@ -1137,11 +1144,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 											space.write(actDat);
 										}
 									}
-								}
-
-								if (message.getHeader("ByeWorld") != null){
-									log.info("AgentNode with UUID " + message.getHeader("UUID") + " is shutting down.");
-									_otherNodesBase.remove(message.getHeader("UUID"));
 								}
 							}
 						} 
@@ -1416,38 +1418,40 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			boolean moreTimeouts = true;
 
 			synchronized (space) {
-				while (moreTimeouts){
-					Long firstTimeout = _otherNodesBase.getFirstTimeout();
-					if (firstTimeout != null){
-						if (firstTimeout <= System.currentTimeMillis()){
-							// We've got a timeout!
+				synchronized(_otherNodesBase){
+					while (moreTimeouts){
+						Long firstTimeout = _otherNodesBase.getFirstTimeout();
+						if (firstTimeout != null){
+							if (firstTimeout <= System.currentTimeMillis()){
+								// We've got a timeout!
 
-							// first remove agentNode from directory of known agentNodes
-							AgentNodeData otherAgentNode = _otherNodesBase.removeFirstTimeoutNode();
+								// first remove agentNode from directory of known agentNodes
+								AgentNodeData otherAgentNode = _otherNodesBase.removeFirstTimeoutNode();
 
-							log.warn("AgentNode " + otherAgentNode.getUUID() + " with timeout " + firstTimeout.longValue() + " isn't available anymore. Removing associated Agents... ");
+								log.warn("AgentNode " + otherAgentNode.getUUID() + " with timeout " + firstTimeout.longValue() + " isn't available anymore. Removing associated Agents... ");
 
-							String UUID = otherAgentNode.getUUID();
-							// now get all agents associated with it
-							Set<AgentDescription> timeoutAgents = space.removeAll(new AgentDescription(null, null, null, null, UUID));
+								String UUID = otherAgentNode.getUUID();
+								// now get all agents associated with it
+								Set<AgentDescription> timeoutAgents = space.removeAll(new AgentDescription(null, null, null, null, UUID));
 
-							for (AgentDescription agent : timeoutAgents){
+								for (AgentDescription agent : timeoutAgents){
 
-								// for every agent on the timeout node remove all actions related to it
-								log.warn(agentNode.getName() + ": Removing agent from Directory because of AgentNodeTimeout. Agent is named: " + agent.getName());
-								ActionData timeoutActionTemplate = new ActionData();
-								timeoutActionTemplate.setProviderDescription(agent);
-								for (ActionData actDat : space.removeAll(timeoutActionTemplate)){
-									log.warn(agentNode.getName() + ": Removing action due to AgentNodeTimeout. Action removed is called: " + actDat.getActionDescription().getName());
-								}
-							}	
+									// for every agent on the timeout node remove all actions related to it
+									log.warn(agentNode.getName() + ": Removing agent from Directory because of AgentNodeTimeout. Agent is named: " + agent.getName());
+									ActionData timeoutActionTemplate = new ActionData();
+									timeoutActionTemplate.setProviderDescription(agent);
+									for (ActionData actDat : space.removeAll(timeoutActionTemplate)){
+										log.warn(agentNode.getName() + ": Removing action due to AgentNodeTimeout. Action removed is called: " + actDat.getActionDescription().getName());
+									}
+								}	
+							} else {
+								// no more timeouts
+								moreTimeouts = false;
+							}
 						} else {
-							// no more timeouts
+							// no more entries in the DataBase, so there can't be more timeouts either
 							moreTimeouts = false;
 						}
-					} else {
-						// no more entries in the DataBase, so there can't be more timeouts either
-						moreTimeouts = false;
 					}
 				}
 			}

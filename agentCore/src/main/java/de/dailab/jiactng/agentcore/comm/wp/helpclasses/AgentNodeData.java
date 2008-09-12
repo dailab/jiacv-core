@@ -45,9 +45,6 @@ public class AgentNodeData implements Comparable<AgentNodeData>{
 		if (obj instanceof AgentNodeData){
 			AgentNodeData agentNode = (AgentNodeData) obj;
 			boolean isEqual =  _UUID.equals(agentNode.getUUID());
-			if ((agentNode.getTimeoutTime() != null) && (_timeoutTime != null)){
-				isEqual = isEqual && agentNode.getTimeoutTime().equals(_timeoutTime);
-			}
 			return isEqual;
 		} else {
 			return super.equals(obj);

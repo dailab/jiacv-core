@@ -25,19 +25,35 @@ public class AgentNodeDataBase {
 	}
 	
 	public synchronized void put(AgentNodeData otherNode){
-		if (_dataBase.containsKey(otherNode)){
-			_dataBase.remove(otherNode);
-			_dataBase.put(otherNode, otherNode);
-		} else {
-			_dataBase.put(otherNode, otherNode);
+//		printDataBase();
+//		System.out.println("Putting following element to database " + otherNode);
+
+		// remove old element if exists
+		AgentNodeData oldNodeData = null;
+		for (AgentNodeData key : _dataBase.keySet()) {
+			if (key.getUUID().equals(otherNode.getUUID())) {
+				oldNodeData = key;
+				break;
+			}
 		}
+		if (oldNodeData != null){
+			_dataBase.remove(oldNodeData);
+		}
+
+		// add new element
+		_dataBase.put(otherNode, otherNode);
+
+//		System.out.println("Putted following element to database " + otherNode);
+//		printDataBase();
 	}
 	
 	public synchronized AgentNodeData get(String UUID){
-		AgentNodeData element = new AgentNodeData();
-		element.setUUID(UUID);
-		
-		return _dataBase.get(element);
+		for (AgentNodeData key : _dataBase.keySet()) {
+			if (key.getUUID().equals(UUID)) {
+				return key;
+			}
+		}
+		return null;
 	}
 	
 	public synchronized Long getFirstTimeout(){
@@ -49,20 +65,44 @@ public class AgentNodeDataBase {
 	}
 	
 	public synchronized AgentNodeData removeFirstTimeoutNode(){
+//		printDataBase();
+//		System.out.println("Removing first element from database");
 		if (_dataBase.isEmpty()){
+//			System.out.println("Database is empty");
 			return null;
 		} else {
-			return _dataBase.remove(_dataBase.firstKey());
+			AgentNodeData result = _dataBase.remove(_dataBase.firstKey());
+//			System.out.println("Removed first element from database " + result);
+//			printDataBase();
+			return result;
 		}
 	}
 	
 	public synchronized AgentNodeData remove(String UUID){
+//		printDataBase();
+//		System.out.println("Removing element from database with UUID "+UUID);
 		if (UUID == null){
+//			System.out.println("UUID is unknown");
 			return null;
 		} else {
-			AgentNodeData otherNode = new AgentNodeData();
-			otherNode.setUUID(UUID);
-			return _dataBase.remove(otherNode);
+			AgentNodeData oldNodeData = null;
+			for (AgentNodeData key : _dataBase.keySet()) {
+				if (key.getUUID().equals(UUID)) {
+					oldNodeData = key;
+					break;
+				}
+			}
+			AgentNodeData result = null;
+			if (oldNodeData != null){
+				result = _dataBase.remove(oldNodeData);
+//				System.out.println("Removed element from database with UUID "+UUID);
+			}
+			else {
+//				System.out.println("No element found in database with UUID "+UUID);
+			}
+
+//			printDataBase();
+			return result;
 		}
 	}
 	

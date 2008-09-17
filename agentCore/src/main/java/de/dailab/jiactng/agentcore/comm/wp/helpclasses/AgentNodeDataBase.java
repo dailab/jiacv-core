@@ -29,40 +29,31 @@ public class AgentNodeDataBase {
 		System.out.println("Putting following element to database " + otherNode);
 
 		// remove old element if exists
-		_dataBase.remove(otherNode);
+		AgentNodeData oldNodeData = null;
+		for (AgentNodeData key : _dataBase.keySet()) {
+			if (key.getUUID().equals(otherNode.getUUID())) {
+				oldNodeData = key;
+				break;
+			}
+		}
+		if (oldNodeData != null){
+			_dataBase.remove(oldNodeData);
+		}
+
+		// add new element
 		_dataBase.put(otherNode, otherNode);
-		
-//		AgentNodeData oldNodeData = null;
-//		for (AgentNodeData key : _dataBase.keySet()) {
-//			if (key.getUUID().equals(otherNode.getUUID())) {
-//				oldNodeData = key;
-//				break;
-//			}
-//		}
-//		if (oldNodeData != null){
-//			_dataBase.remove(oldNodeData);
-//		}
-//
-//		// add new element
-//		_dataBase.put(otherNode, otherNode);
 
 		System.out.println("Putted following element to database " + otherNode);
 		printDataBase();
 	}
 	
 	public synchronized AgentNodeData get(String UUID){
-		AgentNodeData searchData = new AgentNodeData();
-		searchData.setUUID(UUID);
-		AgentNodeData gotcha = _dataBase.get(searchData);
-		System.out.println("Got following AgentNode from DataBase: " + gotcha);
-		return gotcha;
-		
-//		for (AgentNodeData key : _dataBase.keySet()) {
-//			if (key.getUUID().equals(UUID)) {
-//				return key;
-//			}
-//		}
-//		return null;
+		for (AgentNodeData key : _dataBase.keySet()) {
+			if (key.getUUID().equals(UUID)) {
+				return key;
+			}
+		}
+		return null;
 	}
 	
 	public synchronized Long getFirstTimeout(){
@@ -74,18 +65,15 @@ public class AgentNodeDataBase {
 	}
 	
 	public synchronized AgentNodeData removeFirstTimeoutNode(){
-		System.out.println("Timeoutremoval...");
 		printDataBase();
 		System.out.println("Removing first element from database");
 		if (_dataBase.isEmpty()){
 			System.out.println("Database is empty");
-			System.out.println("Timeoutremoval finished");
 			return null;
 		} else {
 			AgentNodeData result = _dataBase.remove(_dataBase.firstKey());
 			System.out.println("Removed first element from database " + result);
 			printDataBase();
-			System.out.println("Timeoutremoval finished");
 			return result;
 		}
 	}
@@ -93,42 +81,29 @@ public class AgentNodeDataBase {
 	public synchronized AgentNodeData remove(String UUID){
 		printDataBase();
 		System.out.println("Removing element from database with UUID "+UUID);
-		
-		AgentNodeData searchData = new AgentNodeData();
-		searchData.setUUID(UUID);
-		
-		AgentNodeData gotcha = _dataBase.remove(searchData);
-		if (gotcha != null){
-			System.out.println("Removed element from database with UUID "+UUID);
+		if (UUID == null){
+			System.out.println("UUID is unknown");
+			return null;
 		} else {
-			System.out.println("No element found in database with UUID "+UUID);
+			AgentNodeData oldNodeData = null;
+			for (AgentNodeData key : _dataBase.keySet()) {
+				if (key.getUUID().equals(UUID)) {
+					oldNodeData = key;
+					break;
+				}
+			}
+			AgentNodeData result = null;
+			if (oldNodeData != null){
+				result = _dataBase.remove(oldNodeData);
+				System.out.println("Removed element from database with UUID "+UUID);
+			}
+			else {
+				System.out.println("No element found in database with UUID "+UUID);
+			}
+
+			printDataBase();
+			return result;
 		}
-		printDataBase();
-		return gotcha;
-		
-//		if (UUID == null){
-////			System.out.println("UUID is unknown");
-//			return null;
-//		} else {
-//			AgentNodeData oldNodeData = null;
-//			for (AgentNodeData key : _dataBase.keySet()) {
-//				if (key.getUUID().equals(UUID)) {
-//					oldNodeData = key;
-//					break;
-//				}
-//			}
-//			AgentNodeData result = null;
-//			if (oldNodeData != null){
-//				result = _dataBase.remove(oldNodeData);
-////				System.out.println("Removed element from database with UUID "+UUID);
-//			}
-//			else {
-////				System.out.println("No element found in database with UUID "+UUID);
-//			}
-//
-////	
-//			return result;
-//		}
 	}
 	
 	public synchronized Set<String> getUUIDs(){
@@ -150,5 +125,5 @@ public class AgentNodeDataBase {
 			System.out.println("Entry " + n++ + " reads: " + and);
 		}
 	}
-	
+
 }

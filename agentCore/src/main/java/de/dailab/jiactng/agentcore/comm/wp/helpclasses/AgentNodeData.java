@@ -47,7 +47,8 @@ public class AgentNodeData implements Comparable<AgentNodeData>{
 			boolean isEqual =  _UUID.equals(agentNode.getUUID());
 			return isEqual;
 		} else {
-			return super.equals(obj);
+			System.err.println("AgentNodeData-ERROR: AgentNodeData.equals: Other Object was NOT instanceof AgentNodeData!");
+			return false;
 		}
 	}
 	

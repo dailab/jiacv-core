@@ -1456,6 +1456,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				}
 			}
 		}
+		
 	}
 
 

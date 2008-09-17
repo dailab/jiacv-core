@@ -472,8 +472,9 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 				} 
 			} else {
 				log.error("Request for search was called with false no. of arguments. Arguments are as follows:");
-				log.error("First argument: IFact so search for; second Argument: boolean is this search global or just on that agentnode?");
-				log.error("Third Argument: (OPTIONAL) TimeToSearch. Default: 60 seconds");
+				log.error("First argument: IFact to search for");
+				log.error("Second Argument: boolean is this search global or just on that agentnode?");
+				log.error("Third Argument: (OPTIONAL) TimeToSearch (Long). Default: 60 seconds");
 				log.error("given Arguments were: " + actionParams);
 			}
 

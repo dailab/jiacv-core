@@ -1058,19 +1058,25 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			} else if (message.getProtocol().equalsIgnoreCase(CHANGE_PROPAGATION_PROTOCOL_ID)){
 
 				// this Message can only come from another AgentNode so mark it as alive.
-				// But first let's see if we already know it or not
+				// But first let's see if it has sent a bye message and we already know it or not
 
 				if (message.getHeader("UUID") != null){
-					synchronized(_otherNodesBase){
-						AgentNodeData storedData = _otherNodesBase.remove(message.getHeader("UUID"));
+
+					// bye message => remove agent node from database
+					if (message.getHeader("ByeWorld") != null){
+						log.info("AgentNode with UUID " + message.getHeader("UUID") + " is shutting down.");
+						_otherNodesBase.remove(message.getHeader("UUID"));
+					}
+
+					// ping message => update the timeout of known agent node or add new agent node to database
+					else {
+						AgentNodeData otherNode = new AgentNodeData();
+						otherNode.setUUID(message.getHeader("UUID"));
+						otherNode.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
+						AgentNodeData storedData = _otherNodesBase.put(otherNode);
 
 						if(storedData == null){
-							// AgentNode is formerly unknown, so let's add it to our list
-							AgentNodeData otherNode = new AgentNodeData();
-							otherNode.setUUID(message.getHeader("UUID"));
-							otherNode.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
-
-							_otherNodesBase.put(otherNode);
+							// AgentNode was formerly unknown, so it was added to our list
 							log.debug("Added agent node " + otherNode.getUUID() + " to database with timeout " + otherNode.getTimeoutTime().longValue());
 
 							if (message.getHeader("HelloWorld") == null){
@@ -1090,22 +1096,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 							}
 
 						} else {
-							// we already know this AgentNode so just set it's timeout straight and put it back
-							storedData.setTimeoutTime(System.currentTimeMillis() + (2 * _changePropagateInterval));
-
-							_otherNodesBase.put(storedData);
-							log.debug("Updated agent node " + storedData.getUUID() + " in database with timeout " + storedData.getTimeoutTime().longValue());
+							// we have already known this AgentNode, so it was updated with a new timeout
+							log.debug("Updated agent node " + otherNode.getUUID() + " in database with timeout " + otherNode.getTimeoutTime().longValue());
 
 						}
-						
-						if (message.getHeader("ByeWorld") != null){
-							log.info("AgentNode with UUID " + message.getHeader("UUID") + " is shutting down.");
-							_otherNodesBase.remove(message.getHeader("UUID"));
-						}
-						
-					} // end of synchronzied block for _otherNodesBase
-
-
+					}
 
 					// Message holds Changes for the global Cache send from another Node
 					if (message.getPayload() != null){

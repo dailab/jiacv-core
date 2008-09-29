@@ -144,7 +144,8 @@ public class JMSMessageTransport extends MessageTransport {
 	        return result;
     	} catch(RuntimeException re) {
     		if(payload != null) {
-    			System.out.println("\n\tund das is der payload: " + payload.getClass()+"\n");
+    			System.out.println("\n\tund das is der payload: " + payload.getClass());
+    			System.out.println("\terror message: " + re.getMessage() +"\n");
     		}
     		throw re;
     	}

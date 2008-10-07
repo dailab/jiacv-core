@@ -23,15 +23,65 @@
 	    </p>
 
 	    <p>This documentation of the management interface consists of four sections.
-	       The first section describes the use of JMX methods to get and set attributes,
-	       invoke operations and subscribe for events of local manageable resources. The
-	       second section shows how to configure the agent node to enable also the remote
-	       management of the resources and how to connect to such a remote agent node. In
-	       the third section the configuration and usage of authentication and authorization
-	       for the management interface will be described. The final section gives a link
-	       to the management client API which allows the easy management of JIAC TNG 
-	       resources without knowledge about the manageable resources and the JMX API.
+	       The first section describes the management client API which allows the 
+	       easy management of JIAC TNG resources without knowledge about the manageable 
+	       resources and the JMX API. The second section describes the underlying use of 
+	       JMX methods to get and set attributes, invoke operations and subscribe for 
+	       events of local manageable resources. The third section shows how to configure 
+	       the agent node to enable also the remote management of the resources and how 
+	       to connect to such a remote agent node. In the final section the configuration 
+	       and usage of authentication and authorization for the management interface will 
+	       be described.
 	    </p>
+
+    <subsection name="Management Client">
+	    <p>
+	       With the <a href="apidocs/de/dailab/jiactng/agentcore/management/jmx/client/JmxManagementClient.html">
+	       management client API</a> it is very easy to manage local or remote JIAC TNG resources.
+	       It allows to search for JMX connector server, to establish connections to remote processes,
+	       and to get specific clients to manage agent nodes, agent node directories, agents, 
+	       agent memories, agent execution cycles, agent communication beans or other agent beans.
+	    </p>
+
+	    <p>
+	       The following code example shows how to use the management client API to create a new
+	       agent on the first found agent node:
+
+           <source>try {
+    // get content of agent configuration file
+    int size = configInputStream.available();
+    byte[] configuration = new byte[size];
+    configInputStream.read(configuration);
+    configInputStream.close();
+
+    // create list of application-specific jars
+    ArrayList&lt;JARMemory&gt; libraries = new ArrayList&lt;JARMemory&gt;();
+    for (int i=0; i&lt;jarFiles.length; i++) {
+        libraries.add(new JARMemory(jarFiles[i]));
+    }
+
+    // create agents
+    JMXServiceURL url = JmxManagementClient.getURLsFromMulticast().get(0);
+    JmxManagementClient client = new JmxManagementClient(url, username, password);
+    Set&lt;String&gt; nodeNames = client.getAgentNodeNames();
+    String nodeName = nodeNames.toArray(new String[nodeNames.size()])[0];
+    JmxAgentNodeManagementClient nodeClient = client.getAgentNodeManagementClient(nodeName);
+    List&lt;String&gt; newAgentIds = nodeClient.addAgents(configuration, libraries, owner);
+}
+catch (FileNotFoundException e) {
+    System.err.println("One of the given jar files does not exist.");
+}
+catch (IOException e) {
+    System.err.println("A communication problem occurred when reading configuration stream or jar files, getting multicast messages, establishing connection or creating agent.");
+}
+catch (SecurityException e) {
+    System.err.println("Authentication failed or agent creation is not permitted.");
+}
+catch (Exception e) {
+    System.err.println("Internal error when creating agent.");
+}</source>
+	    </p>
+    </subsection>
 
     <subsection name="Local Management">
 	    <p>While no security settings are made, every object has the possibility 
@@ -245,16 +295,6 @@ catch (IOException) {
 catch (SecurityException) {
     System.err.println("Authentication failed");
 }</source>
-	    </p>
-    </subsection>
-
-    <subsection name="Management Client">
-	    <p>
-	       With the <a href="apidocs/de/dailab/jiactng/agentcore/management/jmx/client/JmxManagementClient.html">
-	       management client API</a> it is very easy to manage local or remote JIAC TNG resources.
-	       It allows to search for JMX connector server, to establish connections to remote processes,
-	       and to get specific clients to manage agent nodes, agent node directories, agents, 
-	       agent memories, agent execution cycles, agent communication beans or other agent beans.
 	    </p>
     </subsection>
     </section>

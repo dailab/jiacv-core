@@ -304,7 +304,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 //		memory.detach(_refreshAgent);
 
 		synchronized (_requestID2ActionMap){
-			for (String key : _requestID2ActionMap.keySet()){
+			while (!_requestID2ActionMap.keySet().isEmpty()){
+				String key = _requestID2ActionMap.keySet().iterator().next();				
 				DoAction searchAction = _requestID2ActionMap.remove(key);
 				ActionResult result = cancelAction(searchAction);
 				if (result != null)

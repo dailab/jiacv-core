@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.comm.wp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -475,7 +476,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 				log.error("First argument: IFact to search for");
 				log.error("Second Argument: boolean is this search global or just on that agentnode?");
 				log.error("Third Argument: (OPTIONAL) TimeToSearch (Long). Default: 60.000 milliseconds");
-				log.error("given Arguments were: " + actionParams);
+				log.error("given Arguments were: " + Arrays.asList(actionParams));
 			}
 
 

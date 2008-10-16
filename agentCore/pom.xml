@@ -44,6 +44,13 @@
 			<version>4.1.1</version>
 		</dependency>
 
+		<!-- only necessary for UMAuthenticator  -->
+		<dependency> 
+			<groupId>de.dailab</groupId>
+			<artifactId>umws-client</artifactId>
+			<version>0.0.2</version>
+		</dependency>
+
 <!-- only necessary for JMX-Webservice connector, will only be needed in Projects -->
 		<!--dependency> 
 			<groupId>jsr262-ri</groupId>

@@ -40,7 +40,7 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	public List<String> getAgents();
 
 	/**
-	 * Deploys and starts new agents on this agent node.
+	 * Deploys but does not initialize new agents on this agent node.
 	 * @param configuration The spring configuration of the agents in XML syntax.
 	 * @param libraries The list of agent-specific JARs.
 	 * @param owner The owner of the new agents.

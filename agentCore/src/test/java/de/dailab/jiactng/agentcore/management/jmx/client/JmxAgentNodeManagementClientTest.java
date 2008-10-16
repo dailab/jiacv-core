@@ -195,7 +195,7 @@ public class JmxAgentNodeManagementClientTest extends TestCase implements Notifi
 		}
 
 		assertEquals("JmxAgentNodeManagementClient.addAgents() doesn't add new agent to agent node", 2, nodeRef.findAgents().size());
-		assertEquals("JmxAgentNodeManagementClient.addAgents() doesn't start new agent", "STARTED", nodeRef.findAgents().get(1).getState().toString());
+		assertEquals("JmxAgentNodeManagementClient.addAgents() creates new agent in wrong state", "UNDEFINED", nodeRef.findAgents().get(1).getState().toString());
 		
 		// check notification
 		ArrayList<String> agentList = new ArrayList<String>();

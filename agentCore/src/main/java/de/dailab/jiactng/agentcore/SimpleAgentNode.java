@@ -373,6 +373,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			agent.setOwner(owner);
 			addAgent(agent);
 			agentIds.add(agent.getAgentId());
+			/*
 			try {
 				agent.init();
 				agent.start();
@@ -380,6 +381,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				// TODO:
 				e.printStackTrace();
 			}
+			*/
 		}
 
 		return agentIds;

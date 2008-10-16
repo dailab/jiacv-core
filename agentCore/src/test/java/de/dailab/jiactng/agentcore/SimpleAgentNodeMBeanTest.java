@@ -229,7 +229,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 
 		assertEquals("SimpleAgentNodeMBean.addAgents doesn't register management of new agent", true, mbs.isRegistered(newAgent));
 		assertEquals("SimpleAgentNodeMBean.addAgents doesn't add new agent to agent node", 2, nodeRef.findAgents().size());
-		assertEquals("SimpleAgentNodeMBean.addAgents doesn't start new agent", "STARTED", nodeRef.findAgents().get(1).getState().toString());
+		assertEquals("SimpleAgentNodeMBean.addAgents creates new agent in wrong state", "UNDEFINED", nodeRef.findAgents().get(1).getState().toString());
 		
 		// check notification
 		ArrayList<String> agentList = new ArrayList<String>();

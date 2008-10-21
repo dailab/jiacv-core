@@ -51,7 +51,7 @@ public class TimeoutSimulatorBean extends AbstractAgentBean {
 	
 	private IMessageBoxAddress _myAddress = CommunicationAddressFactory.createMessageBoxAddress("TimeoutSimulatorBean");
 	
-	private String _myUUID = "YeeeeeecccccchhhhhhaaaaaaaIHaveAnUUID!";
+	private String _myUUID = "TimeoutSimulatorBeans_HaveUUIDsToo";
 	private AgentDescription _myAgent = new AgentDescription(null, "TimeoutAgent", null, _myAddress, _myUUID);
 	
 	

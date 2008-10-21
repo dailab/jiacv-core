@@ -38,6 +38,7 @@ public class AgentNodeDataBase {
 	 * 				agentnode so far before it was overwritten with otherNode
 	 */
 	public synchronized AgentNodeData put(AgentNodeData otherNode){
+		printDataBase();
 		AgentNodeData oldNodeData = remove(otherNode.getUUID());
 		_dataBase.add(otherNode);
 		return oldNodeData;
@@ -139,10 +140,14 @@ public class AgentNodeDataBase {
 	 * prints the entries from this database using System.out to do so
 	 */
 	public void printDataBase(){
-		System.out.println("AgentNode-DataBase is having the following Entries: ");
-		int n = 1;
-		for (AgentNodeData and : _dataBase){
-			System.out.println("Entry " + n++ + " reads: " + and);
+		 System.out.println("AgentNode-DataBase is having the following Entries: ");
+		if (_dataBase.isEmpty()){
+			 System.out.println("The Database is Empty.");
+		} else {
+			int n = 1;
+			for (AgentNodeData and : _dataBase){
+				 System.out.println("Entry " + n++ + " reads: " + and);
+			}
 		}
 	}
 

@@ -2,12 +2,14 @@ package de.dailab.jiactng.agentcore.comm.broker;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
+import org.apache.activemq.network.NetworkConnector;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 
@@ -31,6 +33,7 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
     private BrokerService _broker= null;
     private Set<ActiveMQTransportConnector> _connectors= new HashSet<ActiveMQTransportConnector>();
     private boolean _persistent = false;
+    private int _networkTTL = 1;
 
     public ActiveMQBroker() {
         synchronized (ActiveMQBroker.class) {
@@ -42,6 +45,18 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
         }
     }
 
+    public void setNetworkTTL(int networkTTL) throws Exception{
+    	_networkTTL = networkTTL;
+    	List<NetworkConnector> netcons = _broker.getNetworkConnectors();
+        int n = 0;
+        for (NetworkConnector net : netcons){
+        	_broker.removeNetworkConnector(net);
+        	System.out.println("+++NETWORK NETWORK NETWORK+++ TTL=" + net.getNetworkTTL() + " for " + net.getName());
+        	net.setNetworkTTL(8);
+        	_broker.addNetworkConnector(net);
+        }
+    }
+    
     // Lifecyclemethods:
     public void doInit() throws Exception {
         log.debug("initializing embedded broker");
@@ -82,6 +97,7 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
 
         _broker.start();
         log.debug("started broker");
+
     }
 
     public void doCleanup() throws Exception {

@@ -38,7 +38,6 @@ public class AgentNodeDataBase {
 	 * 				agentnode so far before it was overwritten with otherNode
 	 */
 	public synchronized AgentNodeData put(AgentNodeData otherNode){
-		printDataBase();
 		AgentNodeData oldNodeData = remove(otherNode.getUUID());
 		_dataBase.add(otherNode);
 		return oldNodeData;

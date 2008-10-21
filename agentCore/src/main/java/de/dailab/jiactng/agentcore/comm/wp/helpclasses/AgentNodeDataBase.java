@@ -91,6 +91,10 @@ public class AgentNodeDataBase {
 		}
 	}
 	
+	public synchronized int getSize(){
+		return _dataBase.size();
+	}
+	
 	/**
 	 * Removes the AgentNodeData about the AgentNode with the given UUID
 	 * @param UUID the UUID of the AgentNode whichs Data has to be removed

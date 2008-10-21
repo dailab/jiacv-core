@@ -29,10 +29,12 @@ import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.Agent;
 import de.dailab.jiactng.agentcore.IAgent;
+import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
@@ -88,6 +90,19 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 	/** Address of AgentNodeGroup. Is used to communicate between AgentNodes for purposes like global searches. */
 	public final static String AGENTNODESGROUP = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#GroupAddress";
+	
+	/** broker on this agentNode. This reference will be used to dynamicly set networkTTL on the broker to realy get all other nodes that
+	 * are connected with this broker through a network of brokers
+	 */ 
+	private ActiveMQBroker _broker = null;
+	
+	/**
+	 * determines if the DirectoryAgentNodeBean should change the networkTTL property of the networkconnector of the broker
+	 * dynamicly based upon the number of other AgentNodes it knows. The networkTTL property determines how many hops a
+	 * message may make over other brokers to get to all consumers within the network and so should be either changed dynamicly
+	 * or set to a number equal or higher than all AgentNodes/Brokers connected.
+	 */
+	private boolean _dynamicNetworkTTL = true;
 
 	/**
 	 * After this interval the space will be checked for old actions,
@@ -367,6 +382,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 		_timer.schedule(_agentPinger, _agentPingInterval, _agentPingInterval);
 		_timer.schedule(_changePropagator, _changePropagateInterval, _changePropagateInterval);
 		_timer.schedule(_agentNodeWatcher, 1000, 1000);
+		
+		List<IAgentNodeBean> nodeBeans = agentNode.getAgentNodeBeans();
+		for (IAgentNodeBean bean : nodeBeans){
+			if (bean instanceof ActiveMQBroker){
+				_broker = (ActiveMQBroker) bean;
+			}
+		}
+		
 		log.debug("##start## DirectoryAgentNodeBean on agentNode " + agentNode.getName() + " has been started.");
 	}
 
@@ -512,6 +535,18 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 */
 	public void setMessageTransport(MessageTransport mt){
 		_messageTransport = mt;
+	}
+	
+	
+	/**
+	 * determines if the DirectoryAgentNodeBean should change the networkTTL property of the networkconnector of the broker
+	 * dynamicly based upon the number of other AgentNodes it knows. The networkTTL property determines how many hops a
+	 * message may make over other brokers to get to all consumers within the network and so should be either changed dynamicly
+	 * or set to a number equal or higher than all AgentNodes/Brokers connected.
+	 * <br /> <b>Default = true</b>
+	 */
+	public void setDynamicNetworkTTL(boolean dynamicNetworkTLL){
+		_dynamicNetworkTTL = dynamicNetworkTLL;
 	}
 
 	/**
@@ -1405,12 +1440,26 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 * if an AgentNode with such a timeout is found it will be removed. All agents and their actions associated with it too.
 	 */ 
 	private class AgentNodeWatcher extends TimerTask {
+		
+		private int registeredAgentNodes = _otherNodesBase.getSize();
+		
 		@Override
 		public void run() {
 			if (_timerStop)
 				this.cancel();
 
 			boolean moreTimeouts = true;
+			
+			//If the Broker shall be configured dynamicaly to get all other AgentNodes... check if broker was found
+			if((_dynamicNetworkTTL) && (_broker == null)){
+				List<IAgentNodeBean> nodeBeans = agentNode.getAgentNodeBeans();
+				for (IAgentNodeBean bean : nodeBeans){
+					if (bean instanceof ActiveMQBroker){
+						_broker = (ActiveMQBroker) bean;
+						log.warn("Warning obsolete, Broker found by DirectoryAgentNodeBean");
+					}
+				}
+			}
 
 			synchronized (space) {
 				synchronized(_otherNodesBase){
@@ -1446,6 +1495,22 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						} else {
 							// no more entries in the DataBase, so there can't be more timeouts either
 							moreTimeouts = false;
+						}
+					}
+
+					// if number of known agentNodes changed... change no. of possible messagehops to meet new requirements
+					if (_dynamicNetworkTTL){
+						if (_otherNodesBase.getSize() != registeredAgentNodes){
+							registeredAgentNodes = _otherNodesBase.getSize();
+							try {
+								if (_broker != null)
+									// set it a little bit higher than necessary to find new agentNodes that are connecting too.
+									_broker.setNetworkTTL(registeredAgentNodes + 3);
+								else
+									log.warn("No Broker identified by DirectoryAgentNodeBean so far");
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 					}
 				}

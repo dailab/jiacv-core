@@ -48,11 +48,9 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
     public void setNetworkTTL(int networkTTL) throws Exception{
     	_networkTTL = networkTTL;
     	List<NetworkConnector> netcons = _broker.getNetworkConnectors();
-        int n = 0;
         for (NetworkConnector net : netcons){
         	_broker.removeNetworkConnector(net);
-        	System.out.println("+++NETWORK NETWORK NETWORK+++ TTL=" + net.getNetworkTTL() + " for " + net.getName());
-        	net.setNetworkTTL(8);
+        	net.setNetworkTTL(_networkTTL);
         	_broker.addNetworkConnector(net);
         }
     }
@@ -98,6 +96,12 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
         _broker.start();
         log.debug("started broker");
 
+        List<NetworkConnector> netcons = _broker.getNetworkConnectors();
+        for (NetworkConnector net : netcons){
+        	_broker.removeNetworkConnector(net);
+        	net.setNetworkTTL(_networkTTL);
+        	_broker.addNetworkConnector(net);
+        }
     }
 
     public void doCleanup() throws Exception {

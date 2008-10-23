@@ -20,6 +20,19 @@
 				packages. The following list describes the most essential classes and their functions:
 				<ul>
 					<li>
+					<a href="apidocs/de/dailab/jiactng/agentcore/comm/broker/ActiveMQBroker.html">
+							<code>ActiveMQBroker</code>
+						</a>
+						
+						<br />
+						The ActiveMQBroker is meant to be an AgentNode component.
+						<br />
+						The ActiveMQBroker is responsible for the actual deliverance of the messages.
+						There is no need for more than one per JVM as it has by default an vm Connector
+						in it which allows messages to be passed within an JVM to the broker and from
+						there to an consumer.
+					</li>
+					<li>
 						<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationBean.html">
 							<code>CommunicationBean</code>
 						</a>
@@ -75,6 +88,22 @@
 					agents is granted through the <code>CommunicationBean</code> definition. The associated
 					<code>StandardJMSMessageTransport</code> connects to the broker through a VM-
 					<code>ConnectionFactory</code>.
+				</p>
+				<p>
+					The ActiveMQ-Broker will build a network-of-brokers with other brokers within the network that are
+					sharing the same logical multicast-address. However, this network-of-brokers isn't necessarily showing
+					the form of a complete graph, so not every broker is connected with each other broker directly.
+					Messages eg. to groups that beans on different agentNodes are listening to may have to actually
+					hop over some other brokers to get to all other AgentNodes. <br />
+					The number of "hops" a message may do over or through other brokers can be configured through a
+					broker-property called "networkTTL". By default this property is set to 1. <br />
+					<b>Important Note:</b> If you are using a DirectoryAgentNodeBean on every AgentNode these beans
+					do configure the setting for networkTTL automatically, changing the setting dynamicly depending
+					on the number of other AgentNodes they already discovered. This automatic configuration may be
+					deactivated. See documentation on DirectoryAgentNodeBean for details. 
+					<b><i>Note:</i></b> To guarantee that all messages may be received on all brokers of the network
+					it is recommended to set the networkTTL value at least to the number of brokers within the network,
+					if you don't want to use the dynamic configuration provided by the <code>DirectoryAgentNodeBean</code>. 
 				</p>
 				<p>
 					An example configuration for two agents which can communicate is given:

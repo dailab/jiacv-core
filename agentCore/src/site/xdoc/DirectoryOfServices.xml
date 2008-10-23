@@ -47,6 +47,12 @@
 							timeout- and refreshment-management for
 							stored information
 						</li>
+						<li>
+							automatic configuration of networkTTL at the local broker
+							to guarantee that messages of this broker may reach all other
+							brokers, given that all other brokers are deployed with an
+							DirectoryAgentNodeBean on it's AgentNode too.
+						</li>
 					</ul>
 				</p>
 			</subsection>
@@ -171,6 +177,26 @@ or you can use this configuration if you want to change the autoenlisteninginter
 							already set to them.</i>
 							<br />
 							It is discouraged to change it during runtime.
+							<br /><br />
+						</li>
+						<br />
+						<li>
+							<b>The DynamicNetworkTTL flag</b>
+							<br />
+							As messages may have to make their way through not only
+							one but a mere network of brokers which doesn't need to
+							have direct connections from all to all brokers, it occurs
+							that messages will have to make some "hops" through or over
+							brokers. The networkTTL property of the broker decides how
+							many such "hops" a message may do before it decays. <br />
+							This flag decides if the DirectoryAgentNodeBean should configure
+							this property dynamicly based on it's knowledge over the
+							accessible network around it. <br />
+							This dynamic configuration guarantees, that if all brokers
+							are on AgentNodes with DirectoryAgentNodeBeans which flags
+							are set to true, every agent on this AgentNodes will be heard
+							by agents on all connected AgentNodes he wants to be heard by.<br />
+							<b>By default this is set to true</b>
 							<br /><br />
 						</li>
 						<br />
@@ -364,6 +390,7 @@ or you can use this configuration if you want to change the autoenlisteninginter
 	&lt;property name="nodeGroup" value="myGroupName" /&gt;
 	&lt;property name="cacheIsActive" value="true" /&gt;
 	&lt;property name="instantPropagation" value="true" /&gt;
+	&lt;property name="networkTTL" value="true" /&gt;
 &lt;/bean&gt;
 					
 					</source>

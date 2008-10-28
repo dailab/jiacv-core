@@ -79,6 +79,8 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * 
      */
     private final class MessageTransportDelegate implements IMessageTransportDelegate {
+        protected MessageTransportDelegate() {}
+        
         public void onAsynchronousException(MessageTransport source, Exception e) {
             processError(source, e);
         }

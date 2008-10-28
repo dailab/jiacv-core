@@ -370,7 +370,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 	}
 
 	// invoke search action
-	Serializable[] params = {template, new Boolean(isGlobal), new Long(timeout)}; 
+	Serializable[] params = {template, Boolean.valueOf(isGlobal), Long.valueOf(timeout)}; 
 	ActionResult result = invokeAndWaitForResult(requestSearchAction, params);
 	if (result == null) {
 		throw new RuntimeException("Got no result");

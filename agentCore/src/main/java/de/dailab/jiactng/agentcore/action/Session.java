@@ -72,7 +72,7 @@ public class Session implements IFact {
 	 */
 	public Session(ResultReceiver source, long timeToLive) {
 		this(IdFactory.createSessionId((source != null) ? source.hashCode()
-				: Session.class.hashCode()), new Long(System.currentTimeMillis()),
+				: Session.class.hashCode()), Long.valueOf(System.currentTimeMillis()),
 				source, new ArrayList<SessionEvent>());
 		this.timeToLive = new Long(timeToLive);
 	}

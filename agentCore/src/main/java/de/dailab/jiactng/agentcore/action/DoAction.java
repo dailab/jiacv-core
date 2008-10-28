@@ -2,7 +2,6 @@ package de.dailab.jiactng.agentcore.action;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;

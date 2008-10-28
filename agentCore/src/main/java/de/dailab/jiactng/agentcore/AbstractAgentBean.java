@@ -29,7 +29,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * 
  * @author Thomas Konnerth
  */
-public abstract class AbstractAgentBean extends AbstractLifecycle implements IAgentBean, AbstractAgentBeanMBean {
+public abstract class AbstractAgentBean extends AbstractLifecycle implements IAgentBean, AbstractAgentBeanMBean, ResultReceiver {
 
   /**
    * Interval by which the execute()-method of the bean is called. If negative,
@@ -42,6 +42,16 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * <code>executeInterval</code> is greater than 0.
    */
   private long      nextExecutionTime = 0;
+
+  /**
+   * Name of action to be used for authorization.
+   */
+  private String	authorizationActionName = null;
+
+  /**
+   * Action to be used for authorization.
+   */
+  private Action	authorizationAction = null;
 
   /**
    * Creates an agent bean that uses lifecycle support in loose mode
@@ -148,6 +158,15 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   @Override
   public void doStart() throws Exception {
+	  // search for authorization action
+	  if (authorizationActionName != null) {
+		Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
+		if (requestSearchAction == null) {
+			throw new RuntimeException("DirectoryAccessBean not available");
+		}
+		Serializable[] params = {new Action(authorizationActionName), new Boolean(false), new Long(0)}; 
+		invoke(requestSearchAction, params, this);
+	  }
   }
 
   /**
@@ -264,6 +283,30 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   }
 
   /**
+   * Get name of authorization action.
+   * @return the name of the action to be used for authorization after restart of the bean.
+   */
+  public String getAuthorizationActionName() {
+	  return authorizationActionName;
+  }
+
+  /**
+   * Set name of authorization action. The new action will be used after restart of this bean.
+   * @param authorizationActionName the name of the action to be used for authorization.
+   */
+  public void setAuthorizationActionName(String authorizationActionName) {
+	  this.authorizationActionName = authorizationActionName;
+  }
+
+  /**
+   * Get the action to be used for authorization.
+   * @return the action to be used for authorization.
+   */
+  protected Action getAuthorizationAction() {
+	  return authorizationAction;
+  }
+
+  /**
    * {@inheritDoc}
    */
   public void execute() {
@@ -276,6 +319,36 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   public void handleLifecycleException(LifecycleException e, @SuppressWarnings("unused")
   LifecycleStates state) {
     throw new RuntimeException(e);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void receiveResult(ActionResult result) {
+	  // handle result of search for authorization action
+	  if (result.getAction().getName().equals(DirectoryAccessBean.ACTION_REQUEST_SEARCH)) {
+		  Serializable[] results = result.getResults();
+		  if (results != null) {
+			  if (results.length == 1) {
+				  try {
+					  List<Action> actions = (List<Action>) results[0];
+					  if (actions.isEmpty()) {
+						  log.warn("Found no authorization action");
+					  }
+					  else if (actions.get(0).getName().equals(authorizationActionName)) {
+						  authorizationAction = actions.get(0);
+					  }
+				  } catch (ClassCastException e) {
+					  log.error("Got wrong type of search results");
+				  }
+			  } else {
+				  log.error("Got wrong number of search results");
+			  }
+		  }
+		  else {
+			  log.error("Search for authorization action failed");
+		  }
+	  }
   }
 
   /**

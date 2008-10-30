@@ -30,9 +30,7 @@ import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
-import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
-import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
@@ -44,7 +42,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public abstract class AbstractMethodExposingBean extends AbstractAgentBean implements IEffector, AbstractMethodExposingBeanMBean {
+public abstract class AbstractMethodExposingBean extends AbstractActionAuthorizationBean implements AbstractMethodExposingBeanMBean {
     /**
      * This annotation can be used to mark methods in a bean inherited from {@link AbstractMethodExposingBean}
      * as actions. So marked methods will be exposed automatically.

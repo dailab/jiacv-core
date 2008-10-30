@@ -7,9 +7,11 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
+import de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
@@ -29,12 +31,18 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 		long start = System.nanoTime();
 		boolean success = false;
 
-		if (((Action) act.getAction()).getProviderBean() != null) {
+		IEffector providerBean = ((Action) act.getAction()).getProviderBean();
+		if (providerBean != null) {
 			try {
 				if (act.getAction().getResultTypes()!=null){
 					memory.write(act.getSession());
-				} 
-				((Action) act.getAction()).getProviderBean().doAction(act);
+				}
+				if (providerBean instanceof AbstractActionAuthorizationBean) {
+					((AbstractActionAuthorizationBean)providerBean).authorize(act);
+				}
+				else {
+					providerBean.doAction(act);
+				}
 				success = true;
 			} catch (Throwable t) {
 			    memory.write(new ActionResult(act, t));

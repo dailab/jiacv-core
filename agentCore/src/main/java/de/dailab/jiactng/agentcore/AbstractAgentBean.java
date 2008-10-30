@@ -29,7 +29,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * 
  * @author Thomas Konnerth
  */
-public abstract class AbstractAgentBean extends AbstractLifecycle implements IAgentBean, AbstractAgentBeanMBean, ResultReceiver {
+public abstract class AbstractAgentBean extends AbstractLifecycle implements IAgentBean, AbstractAgentBeanMBean {
 
   /**
    * Interval by which the execute()-method of the bean is called. If negative,
@@ -42,16 +42,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * <code>executeInterval</code> is greater than 0.
    */
   private long      nextExecutionTime = 0;
-
-  /**
-   * Name of action to be used for authorization.
-   */
-  private String	authorizationActionName = null;
-
-  /**
-   * Action to be used for authorization.
-   */
-  private Action	authorizationAction = null;
 
   /**
    * Creates an agent bean that uses lifecycle support in loose mode
@@ -158,15 +148,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   @Override
   public void doStart() throws Exception {
-	  // search for authorization action
-	  if (authorizationActionName != null) {
-		Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
-		if (requestSearchAction == null) {
-			throw new RuntimeException("DirectoryAccessBean not available");
-		}
-		Serializable[] params = {new Action(authorizationActionName), new Boolean(false), new Long(0)}; 
-		invoke(requestSearchAction, params, this);
-	  }
   }
 
   /**
@@ -283,30 +264,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   }
 
   /**
-   * Get name of authorization action.
-   * @return the name of the action to be used for authorization after restart of the bean.
-   */
-  public String getAuthorizationActionName() {
-	  return authorizationActionName;
-  }
-
-  /**
-   * Set name of authorization action. The new action will be used after restart of this bean.
-   * @param authorizationActionName the name of the action to be used for authorization.
-   */
-  public void setAuthorizationActionName(String authorizationActionName) {
-	  this.authorizationActionName = authorizationActionName;
-  }
-
-  /**
-   * Get the action to be used for authorization.
-   * @return the action to be used for authorization.
-   */
-  protected Action getAuthorizationAction() {
-	  return authorizationAction;
-  }
-
-  /**
    * {@inheritDoc}
    */
   public void execute() {
@@ -319,36 +276,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   public void handleLifecycleException(LifecycleException e, @SuppressWarnings("unused")
   LifecycleStates state) {
     throw new RuntimeException(e);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void receiveResult(ActionResult result) {
-	  // handle result of search for authorization action
-	  if (result.getAction().getName().equals(DirectoryAccessBean.ACTION_REQUEST_SEARCH)) {
-		  Serializable[] results = result.getResults();
-		  if (results != null) {
-			  if (results.length == 1) {
-				  try {
-					  List<Action> actions = (List<Action>) results[0];
-					  if (actions.isEmpty()) {
-						  log.warn("Found no authorization action");
-					  }
-					  else if (actions.get(0).getName().equals(authorizationActionName)) {
-						  authorizationAction = actions.get(0);
-					  }
-				  } catch (ClassCastException e) {
-					  log.error("Got wrong type of search results");
-				  }
-			  } else {
-				  log.error("Got wrong number of search results");
-			  }
-		  }
-		  else {
-			  log.error("Search for authorization action failed");
-		  }
-	  }
   }
 
   /**
@@ -375,16 +302,37 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 	return listener.getResult();
   }
 
+  /**
+   * Invokes an action asynchronously without handling the result.
+   * @param a the action to be invoked.
+   * @param inputParams the input parameters used for the action invocation.
+   * @return the session id of the action invocation.
+   */
   protected String invoke(Action a, Serializable[] inputParams) {
     return invoke(a, inputParams, null);
   }
 
+  /**
+   * Invokes an action asynchronously with handling the result by a given receiver.
+   * @param a the action to be invoked.
+   * @param inputParams the input parameters used for the action invocation.
+   * @param receiver the receiver to be informed about the results.
+   * @return the session id of the action invocation.
+   */
   protected String invoke(Action a, Serializable[] inputParams, ResultReceiver receiver) {
     DoAction doAct = a.createDoAction(inputParams, receiver);
     memory.write(doAct);
     return doAct.getSessionId();
   }
 
+  /**
+   * Invokes an action asynchronously as part of a parent session with handling the result by a given receiver.
+   * @param a the action to be invoked.
+   * @param parent the session of the parent action.
+   * @param inputParams the input parameters used for the action invocation.
+   * @param receiver the receiver to be informed about the results.
+   * @return the session id of the action invocation.
+   */
   protected String invoke(Action a, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
     DoAction doAct = a.createDoAction(parent, inputParams, receiver);
     memory.write(doAct);
@@ -396,16 +344,31 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   // return ((Agent)thisAgent).syncInvoke(doAct);
   // }
 
+  /**
+   * Sends back the results of an action. 
+   * @param origin the invocation of the action.
+   * @param results the results of the action.
+   */
   protected void returnResult(DoAction origin, Serializable[] results) {
     ActionResult res = ((Action) origin.getAction()).createActionResult(origin, results);
     memory.write(res);
   }
 
+  /**
+   * Sends back the failure information of an action. 
+   * @param origin the invocation of the action.
+   * @param failure the failure information of the action.
+   */
   protected void returnFailure(DoAction origin, Serializable failure) {
     ActionResult res = new ActionResult(origin, failure);
     memory.write(res);
   }
 
+  /**
+   * Retrieves an action with a given name from the local memory.
+   * @param actionName the name of the action to be searched for.
+   * @return a found action matching the given name or null if no such action was found.
+   */
   protected Action retrieveAction(String actionName) {
     Action retAct = memory.read(new Action(actionName));
     if (retAct == null) {
@@ -414,6 +377,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
     return retAct;
   }
 
+  /**
+   * Retrieves an action with a given name and provider from the local memory.
+   * @param actionName the name of the action to be searched for.
+   * @param provider the provider of the action to be search for.
+   * @return a found action matching the given name and provider or null if no such action was found.
+   */
   protected Action retrieveAction(String actionName, IAgentDescription provider) {
     Action template = new Action(actionName);
     template.setProviderDescription(provider);
@@ -423,6 +392,24 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
       log.warn("Could not find \'" + actionName + "\'.");
     }
     return retAct;
+  }
+
+  /**
+   * Invokes an action for the search of actions in the service directory.
+   * @param template The template for searching actions.
+   * @param isGlobal <code>true</code> for a global search and <code>false</code> for an agent node internal search.
+   * @param timeout The maximum duration of the global search. This value will be ignored by local search.
+   * @param receiver the receiver to be informed about the found actions.
+   * @return the session id of the action invocation.
+   * @throws RuntimeException if the agent has no directory access bean.
+   */
+  protected String invokeActionSearch(Action template, boolean isGlobal, long timeout, ResultReceiver receiver) {
+	Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
+	if (requestSearchAction == null) {
+		throw new RuntimeException("DirectoryAccessBean not available");
+	}
+	Serializable[] params = {template, new Boolean(isGlobal), new Long(timeout)}; 
+	return invoke(requestSearchAction, params, receiver);
   }
 
   /**

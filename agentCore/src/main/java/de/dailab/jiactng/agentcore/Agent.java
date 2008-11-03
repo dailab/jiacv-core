@@ -6,8 +6,10 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -16,13 +18,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.management.AttributeChangeNotification;
+import javax.management.InstanceNotFoundException;
+import javax.management.ListenerNotFoundException;
+import javax.management.MalformedObjectNameException;
 import javax.management.Notification;
+import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
+import javax.management.timer.TimerNotification;
 
 import org.apache.commons.logging.Log;
 
@@ -36,6 +43,8 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
+import de.dailab.jiactng.agentcore.management.jmx.client.JmxAgentNodeTimerManagementClient;
+import de.dailab.jiactng.agentcore.management.jmx.client.JmxManagementClient;
 import de.dailab.jiactng.agentcore.ontology.AgentBeanDescription;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
@@ -50,7 +59,7 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.IAgent
  */
-public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
+public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, NotificationListener {
 
 	/**
 	 * The AID (agent identifier). This property is generated and assigned
@@ -113,6 +122,21 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	private long beanExecutionTimeout = 5 * 60 * 1000;
 
 	private ArrayList<Action> actionList = null;
+
+	/**
+	 * The id of the start time notification.
+	 */
+	private Integer startTimeId = null;
+
+	/**
+	 * The id of the stop time notification.
+	 */
+	private Integer stopTimeId = null;
+
+	/**
+	 * Client for accessing the agent node timer.
+	 */
+	private JmxAgentNodeTimerManagementClient timerClient = null;
 
 	/**
 	 * Public default constructor, creating the agent identifier.
@@ -284,6 +308,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 			log.info("Memory and executioncycle switched to state "
 					+ LifecycleStates.CLEANED_UP);
 		}
+
+		timerClient = null;
 	}
 
 	/**
@@ -291,6 +317,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	@Override
 	public void doInit() throws LifecycleException {
+		// initialize timer client
+		try {
+			timerClient = new JmxManagementClient().getAgentNodeTimerManagementClient(agentNode.getName());
+		}
+		catch (MalformedObjectNameException e) {
+			throw new LifecycleException("Error when initializing timer client", e);
+		}
+
 		// initialize agent elements
 		this.actionList = new ArrayList<Action>();
 
@@ -882,6 +916,161 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean {
 	 */
 	public void setExecutionInterval(int executionInterval) {
 		this.executionInterval = executionInterval;
+	}
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public Long getStartTime() throws InstanceNotFoundException {
+		if (startTimeId == null) {
+			return null;
+		}
+		try {
+			return timerClient.getDate(startTimeId).getTime();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public void setStartTime(Long startTime) throws InstanceNotFoundException {
+		// add listener if needed
+		if ((startTimeId == null) && (stopTimeId == null) && (startTime != null)) {
+			try {
+				timerClient.addTimerNotificationListener(this);
+			} 
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// remove old timer notification
+		if (startTimeId != null) {
+			try {
+				timerClient.removeNotification(startTimeId);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
+
+		// remove listener if no longer needed
+		if ((startTimeId != null) && (stopTimeId == null) && (startTime == null)) {
+			try {
+				timerClient.removeTimerNotificationListener(this);
+			} 
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			catch (ListenerNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// add new timer notification
+		if (startTime != null) {
+			try {
+				startTimeId = timerClient.addNotification(null, null, null, new Date(startTime));
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
+	}
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public Long getStopTime() throws InstanceNotFoundException {
+		if (stopTimeId == null) {
+			return null;
+		}
+		try {
+			return timerClient.getDate(stopTimeId).getTime();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+    /**
+	 * {@inheritDoc}
+	 */
+	public void setStopTime(Long stopTime) throws InstanceNotFoundException {
+		// add listener if needed
+		if ((startTimeId == null) && (stopTimeId == null) && (stopTime != null)) {
+			try {
+				timerClient.addTimerNotificationListener(this);
+			} 
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// remove old timer notification
+		if (stopTimeId != null) {
+			try {
+				timerClient.removeNotification(stopTimeId);
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
+
+		// remove listener if no longer needed
+		if ((startTimeId == null) && (stopTimeId != null) && (stopTime == null)) {
+			try {
+				timerClient.removeTimerNotificationListener(this);
+			} 
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			catch (ListenerNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// add new timer notification
+		if (stopTime != null) {
+			try {
+				stopTimeId = timerClient.addNotification(null, null, null, new Date(stopTime));
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
+	}
+
+	/**
+	 * Handles notifications about start and stop time.
+	 * @param notification the received notification.
+	 * @param handback the corresponding user data.
+	 */
+	public void handleNotification(Notification notification, Object handback) {
+		if (notification instanceof TimerNotification) {
+			Integer id = ((TimerNotification) notification).getNotificationID();
+			if (id.equals(startTimeId)) {
+				try {
+					start();
+				}
+				catch (LifecycleException e) {
+					e.printStackTrace();
+				}
+			}
+			if (id.equals(stopTimeId)) {
+				try {
+					stop();
+				}
+				catch (LifecycleException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	// ///////////////////////////////////

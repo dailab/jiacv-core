@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore;
 
 import java.util.List;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
@@ -87,5 +88,33 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	 * @return name of agent beans contained in this agent
 	 */
 	public List<String> getAgentBeanNames();
+
+	/**
+	 * Gets the date when this managed resource will be started automatically.
+	 * @return the date in msec since 1/1/1970 0am or null if no automatically start will take place.
+	 * @throws InstanceNotFoundException if the agent node timer is not available.
+	 */
+	public Long getStartTime() throws InstanceNotFoundException;
+
+	/**
+	 * Sets the date when this managed resource will be started automatically.
+	 * @param startTime the date in msec since 1/1/1970 0am or null if no automatically start should take place.
+	 * @throws InstanceNotFoundException if the agent node timer is not available.
+	 */
+	public void setStartTime(Long startTime) throws InstanceNotFoundException;
+
+	/**
+	 * Gets the date when this managed resource will be stopped automatically.
+	 * @return the date in msec since 1/1/1970 0am or null if no automatically stop will take place.
+	 * @throws InstanceNotFoundException if the agent node timer is not available.
+	 */
+	public Long getStopTime() throws InstanceNotFoundException;
+
+	/**
+	 * Sets the date when this managed resource will be stopped automatically.
+	 * @param stopTime the date in msec since 1/1/1970 0am or null if no automatically stop should take place.
+	 * @throws InstanceNotFoundException if the agent node timer is not available.
+	 */
+	public void setStopTime(Long stopTime) throws InstanceNotFoundException;
 
 }

@@ -205,6 +205,17 @@ public class JmxManagementClient {
 	}
 
 	/**
+	 * Gets a client for the management of an agent node timer within the managed JVM.
+	 * @param agentNodeName The name of the agent node.
+	 * @return A management client for the agent node timer.
+	 * @throws MalformedObjectNameException The name of the agent node contains an illegal character or does not follow the rules for quoting.
+	 * @see JmxAgentNodeTimerManagementClient#JmxAgentNodeTimerManagementClient(MBeanServerConnection, String)
+	 */
+	public JmxAgentNodeTimerManagementClient getAgentNodeTimerManagementClient(String agentNodeName) throws MalformedObjectNameException {
+		return new JmxAgentNodeTimerManagementClient(mbsc, agentNodeName);
+	}
+
+	/**
 	 * Gets a client for the management of an agent within the managed JVM.
 	 * @param agentNodeName The name of the agent node where the agent resides on.
 	 * @param agentID The global unique ID of the agent.

@@ -348,4 +348,58 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
       	invokeOperation("remove", new Object[]{}, new String[]{});
 	}
 
+	/**
+	 * Gets the date and time for automatically start of the managed agent.
+	 * @return the date in msec since 1/1/1970 0am or null if no automatically start will take place.
+	 * @throws InstanceNotFoundException The agent or the agent node timer does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
+	 * @throws SecurityException if the agent's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.AgentMBean#getStartTime()
+	 */
+	public Long getStartTime() throws IOException, InstanceNotFoundException {
+		return (Long) getAttribute("StartTime");
+	}
+
+	/**
+	 * Sets the date and time for automatically start of the managed agent.
+	 * @param startTime the date in msec since 1/1/1970 0am or null if no automatically start should take place.
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
+	 * @throws InstanceNotFoundException The agent or the agent node timer does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when setting the attribute value of the remote agent.
+	 * @throws SecurityException if the agent's attribute cannot be changed for security reasons.
+	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
+	 * @see de.dailab.jiactng.agentcore.AgentMBean#setStartTime(Long)
+	 */
+	public void setStartTime(Long startTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+		this.setAttribute("StartTime", startTime);
+	}
+
+	/**
+	 * Gets the date and time for automatically stop of the managed agent.
+	 * @return the date in msec since 1/1/1970 0am or null if no automatically stop will take place.
+	 * @throws InstanceNotFoundException The agent or the agent node timer does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
+	 * @throws SecurityException if the agent's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.AgentMBean#getStopTime()
+	 */
+	public Long getStopTime() throws IOException, InstanceNotFoundException {
+		return (Long) getAttribute("StopTime");
+	}
+
+	/**
+	 * Sets the date and time for automatically stop of the managed agent.
+	 * @param stopTime the date in msec since 1/1/1970 0am or null if no automatically stop should take place.
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
+	 * @throws InstanceNotFoundException The agent or the agent node timer does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when setting the attribute value of the remote agent.
+	 * @throws SecurityException if the agent's attribute cannot be changed for security reasons.
+	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
+	 * @see de.dailab.jiactng.agentcore.AgentMBean#setStopTime(Long)
+	 */
+	public void setStopTime(Long stopTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+		this.setAttribute("StopTime", stopTime);
+	}
+
 }

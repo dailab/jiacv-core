@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
+import javax.management.timer.Timer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -79,6 +80,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Optional: DirectoryAgentNodeBean to add local Agents to */
 	private DirectoryAgentNodeBean _directory = null;
 
+	/** A timer for being informed about dates */
+	private Timer _timer = null;
+
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
 		public void run() {
@@ -117,6 +121,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		setLog(LogFactory.getLog(_uuid));
 		_agentNodeBeans = new ArrayList<IAgentNodeBean>();
 		_agents = new ArrayList<IAgent>();
+
+		// start timer
+		_timer = new Timer();
+		_timer.start();
 	}
 
 	/**
@@ -498,6 +506,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		_agentNodeBeans.clear();
 
+		// stop timer
+		if (_timer != null) {
+			_timer.stop();
+			_timer = null;
+		}
+
 		if (log != null) {
 			log.info("AgentNode " + getName() + " has been closed.");
 		}
@@ -826,6 +840,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			System.err.println(e.getMessage());
 		}
 
+		// register agent node timer for management
+		try {
+			manager.registerAgentNodeResource(_name, "Timer", _timer);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("WARNING: Unable to register timer of agent node " + this.getName() + " as JMX resource.");
+			System.err.println(e.getMessage());
+		}
+
 		// register agent node beans for management
 		if (_agentNodeBeans != null) {
 			for (IAgentNodeBean anb : this._agentNodeBeans) {
@@ -868,6 +892,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// deregister agent node beans from management
 		for (IAgentNodeBean anb : this._agentNodeBeans) {
 			anb.disableManagement();
+		}
+
+		// deregister agent node timer from management
+		try {
+			_manager.unregisterAgentNodeResource(_name, "Timer");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("WARNING: Unable to deregister timer of agent node " + this.getName() + " as JMX resource.");
+			System.err.println(e.getMessage());
 		}
 
 		// deregister agent node from management

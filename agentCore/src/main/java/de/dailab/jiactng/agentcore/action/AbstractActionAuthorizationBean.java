@@ -167,7 +167,7 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean
 		}
 		else {
 			// start authorization
-			String sessionId = invoke(authorizationAction, doAction.getSession(), new Serializable[] {doAction.getOwner()}, this);
+			String sessionId = invoke(authorizationAction, doAction.getSession(), new Serializable[] {doAction.getOwner(), doAction.getAction()}, this);
 			_doActionAuthorizations.put(sessionId, doAction);
 		}
 	}

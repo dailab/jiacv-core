@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
+import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -43,6 +44,31 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	public TabularData getActionList() throws IOException, InstanceNotFoundException, AttributeNotFoundException {
 		try {
 			return (TabularData) getAttribute("ActionList");
+		}
+		catch (RuntimeException e) {
+			if ((e.getCause() != null) && (e.getCause() instanceof AttributeNotFoundException)) {
+				throw ((AttributeNotFoundException) e.getCause());
+			}
+			else {
+				throw e;
+			}
+		}
+	}
+
+	/**
+	 * Sets the name of the action used to authorize action users by the managed <code>AbstractActionAuthorizationBean</code>.
+	 * @param authorizationActionName the name of the authorization action.
+	 * @throws InstanceNotFoundException The agent bean does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent bean.
+	 * @throws AttributeNotFoundException if the specified agent bean is not an <code>AbstractActionAuthorizationBean</code>.
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
+	 * @throws SecurityException if the agent bean's attribute cannot be changed for security reasons.
+	 * @see MBeanServerConnection#setAttribute(ObjectName, javax.management.Attribute)
+	 * @see de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBeanMBean#setAuthorizationActionName(String)
+	 */
+	public void setAuthorizationActionName(String authorizationActionName) throws IOException, InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException {
+		try {
+			setAttribute("AuthorizationActionName", authorizationActionName);
 		}
 		catch (RuntimeException e) {
 			if ((e.getCause() != null) && (e.getCause() instanceof AttributeNotFoundException)) {

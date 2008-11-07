@@ -75,6 +75,66 @@ public class JmxAgentNodeTimerManagementClient extends
 	}
 
 	/**
+	 * Adds a timer notification to the managed agent node timer.
+	 * @param type The timer notification type.
+	 * @param message The timer notification detailed message.
+	 * @param userDate The timer notification user data object.
+	 * @param date The date when the notification occurs.
+	 * @param period The period of the timer notification (in milliseconds).
+	 * @return The identifier of the new created timer notification.
+	 * @throws IllegalArgumentException The date is null or the period is negative.
+	 * @throws InstanceNotFoundException The agent node timer does not exist. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node timer.
+	 * @throws SecurityException if the operation cannot be invoked for security reasons.
+	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
+	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
+	 */
+	public Integer addNotification(String type, String message, Object userDate, Date date, long period) throws IOException, InstanceNotFoundException {
+		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long"});
+	}
+
+	/**
+	 * Adds a timer notification to the managed agent node timer.
+	 * @param type The timer notification type.
+	 * @param message The timer notification detailed message.
+	 * @param userDate The timer notification user data object.
+	 * @param date The date when the notification occurs.
+	 * @param period The period of the timer notification (in milliseconds).
+	 * @param nbOccurences The total number the timer notification will be emitted.
+	 * @return The identifier of the new created timer notification.
+	 * @throws IllegalArgumentException The date is null or the period or the number of occurrences is negative.
+	 * @throws InstanceNotFoundException The agent node timer does not exist. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node timer.
+	 * @throws SecurityException if the operation cannot be invoked for security reasons.
+	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
+	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
+	 */
+	public Integer addNotification(String type, String message, Object userDate, Date date, long period, long nbOccurences) throws IOException, InstanceNotFoundException {
+		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period, nbOccurences}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long", "long"});
+	}
+
+	/**
+	 * Adds a timer notification to the managed agent node timer.
+	 * @param type The timer notification type.
+	 * @param message The timer notification detailed message.
+	 * @param userDate The timer notification user data object.
+	 * @param date The date when the notification occurs.
+	 * @param period The period of the timer notification (in milliseconds).
+	 * @param nbOccurences The total number the timer notification will be emitted.
+	 * @param fixedRate If <code>true</code>, the notification is scheduled with a fixed-rate execution scheme. If <code>false</code>, the notification is scheduled with a fixed-delay execution scheme.
+	 * @return The identifier of the new created timer notification.
+	 * @throws IllegalArgumentException The date is null or the period or the number of occurrences is negative.
+	 * @throws InstanceNotFoundException The agent node timer does not exist. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node timer.
+	 * @throws SecurityException if the operation cannot be invoked for security reasons.
+	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
+	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
+	 */
+	public Integer addNotification(String type, String message, Object userDate, Date date, long period, long nbOccurences, boolean fixedRate) throws IOException, InstanceNotFoundException {
+		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period, nbOccurences, fixedRate}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long", "long", "boolean"});
+	}
+
+	/**
 	 * Removes the timer notification corresponding to the specified identifier from the managed agent node timer.
 	 * @param id The timer notification identifier.
 	 * @throws InstanceNotFoundException A timer notification with the given id or the agent node timer does not exist. 

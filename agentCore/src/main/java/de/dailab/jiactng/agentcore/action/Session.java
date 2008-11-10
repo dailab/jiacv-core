@@ -45,9 +45,9 @@ public class Session implements IFact {
   private Long                     timeToLive       = Long.valueOf(60000);
 
   /**
-   * The id of the user that originally triggered this session.
+   * The token of the user that originally triggered this session.
    */
-  private String                   originalUser     = null;
+  private String                   userToken     = null;
 
   /**
    * The id of the provider that offeres the top-level service that was invoked
@@ -349,22 +349,22 @@ public class Session implements IFact {
   }
 
   /**
-   * Getter for the user that originally invoked this session.
+   * Getter for the token of the user that originally invoked this session.
    * 
-   * @return The user-id of the original user.
+   * @return The token of the original user.
    */
-  public String getOriginalUser() {
-    return this.originalUser;
+  public String getUserToken() {
+    return this.userToken;
   }
 
   /**
-   * Setter for the user that originally invoked this session.
+   * Setter for the token of the user that originally invoked this session.
    * 
-   * @param originalUser
-   *          The user-id of the original user.
+   * @param userToken
+   *          The token of the original user.
    */
-  public void setOriginalUser(String originalUser) {
-    this.originalUser = originalUser;
+  public void setUserToken(String userToken) {
+    this.userToken = userToken;
   }
 
   /**

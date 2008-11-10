@@ -972,7 +972,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 							remoteDoAction = foundAction.createDoAction(params, this);
 							// add session related information. TODO: maybe think of a better session transfer
 							remoteDoAction.getSession().setOriginalService(doAction.getSession().getOriginalService());
-							remoteDoAction.getSession().setOriginalUser(doAction.getSession().getOriginalUser());
+							remoteDoAction.getSession().setUserToken(doAction.getSession().getUserToken());
 							remoteDoAction.getSession().setOriginalProvider(doAction.getSession().getOriginalProvider());
 							synchronized (openSessionsFromClients) {
 								openSessionsFromClients.put(remoteDoAction.getSessionId(), new SessionData(doAction, message.getSender()));	

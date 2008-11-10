@@ -165,6 +165,10 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean
 			// authorization action not found
 			returnFailure(doAction, "Unable to authorize");
 		}
+		else if ((doAction.getSession() == null) || (doAction.getSession().getUserToken() == null)) {
+			// token of original user unknown
+			returnFailure(doAction, "Unknown user token");
+		}
 		else {
 			// start authorization
 			String sessionId = invoke(authorizationAction, doAction.getSession(), new Serializable[] {doAction.getSession().getUserToken(), doAction.getAction()}, this);

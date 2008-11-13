@@ -1,7 +1,6 @@
 package de.dailab.jiactng.agentcore.management.jmx;
 
 import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -702,89 +701,59 @@ public class JmxManager implements Manager {
 				env.put(JMXConnectorServer.AUTHENTICATOR, authenticator);
 			}
 
-			// construct server URLs
-			JMXServiceURL[] jurls = null;
-			if (path.contains("localhost")) {
-				InetAddress[] addresses = null;
-				try {
-					addresses = InetAddress.getAllByName(InetAddress.getLocalHost().getHostName());
-				}
-				catch (Exception e) {
-					System.err.println("WARNING: Unable to construct URL of JMX connector server.");
-					System.err.println("It is not possible to find the local host name.");
-					System.err.println(e.getMessage());
-					continue;
-				}
-				jurls = new JMXServiceURL[addresses.length];
-				for (int i=0; i<addresses.length; i++) {
-					String address = addresses[i].getHostAddress();
-					String changedPath = path.replace("localhost", address) + "@" + address;
-					try {
-						jurls[i] = new JMXServiceURL(protocol, address, port, changedPath);
-					}
-					catch (Exception e) {
-						System.err.println("WARNING: Unable to construct URL of JMX connector server.");
-						System.err.println("The address " + address + ", the protocol " + protocol + ", port " + port + " or path " + changedPath + " is incorrect.");
-						System.err.println(e.getMessage());
-					}
-				}
+			// construct server URL
+			JMXServiceURL jurl = null;
+			try {
+				jurl = new JMXServiceURL(protocol, null, port, path);
 			}
-			if (jurls == null) {
-				try {
-					jurls = new JMXServiceURL[] { new JMXServiceURL(protocol, null, port, path) };
-				}
-				catch (Exception e) {
-					System.err.println("WARNING: Unable to construct URL of JMX connector server.");
-					System.err.println("It is not possible to find the local host name, or the protocol " + protocol + ", port " + port + " or path " + path + " is incorrect.");
-					System.err.println(e.getMessage());
-					continue;
-				}
+			catch (Exception e) {
+				System.err.println("WARNING: Unable to construct URL of JMX connector server.");
+				System.err.println("It is not possible to find the local host name, or the protocol " + protocol + ", port " + port + " or path " + path + " is incorrect.");
+				System.err.println(e.getMessage());
+				continue;
 			}
 			
-			// create connector servers
-			for (int i=0; i<jurls.length; i++) {
-				JMXServiceURL jurl = jurls[i];
-				System.out.println("Creating JMX connector server: " + jurl);
-				JMXConnectorServer cs = null;
-				try {
-					cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, env, mbs);
-				}
-				catch (MalformedURLException e) {
-					System.err.println("WARNING: Unable to create JMX connector server for " + jurl);
-					System.err.println("Missing provider implementation for the specified protocol.");
-					System.err.println(e.getMessage());
-					continue;
-				}
-				catch (Exception e) {
-					System.err.println("WARNING: Unable to create JMX connector server for " + jurl);
-					System.err.println("Communication problem, or the found provider implementation for the specified protocol can not be used.");
-					System.err.println(e.getMessage());
-					continue;
-				}
+			// create connector server
+			System.out.println("Creating JMX connector server: " + jurl);
+			JMXConnectorServer cs = null;
+			try {
+				cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, env, mbs);
+			}
+			catch (MalformedURLException e) {
+				System.err.println("WARNING: Unable to create JMX connector server for " + jurl);
+				System.err.println("Missing provider implementation for the specified protocol.");
+				System.err.println(e.getMessage());
+				continue;
+			}
+			catch (Exception e) {
+				System.err.println("WARNING: Unable to create JMX connector server for " + jurl);
+				System.err.println("Communication problem, or the found provider implementation for the specified protocol can not be used.");
+				System.err.println(e.getMessage());
+				continue;
+			}
 
-				// start connector server
-				try {
-					cs.start();
+			// start connector server
+			try {
+				cs.start();
+			}
+			catch (Exception e) {
+				System.err.println("WARNING: Start of JMX connector server failed for " + jurl);
+				if ((path != null) && path.startsWith("/jndi/rmi://")) {
+					System.err.println("Please ensure that a rmi registry is started on " + path.substring(12, path.length() - nodeId.length() - 1));
 				}
-				catch (Exception e) {
-					System.err.println("WARNING: Start of JMX connector server failed for " + jurl);
-					if ((path != null) && path.startsWith("/jndi/rmi://")) {
-						System.err.println("Please ensure that a rmi registry is started on " + path.substring(12, path.length() - nodeId.length() - 1));
-					}
-					System.err.println(e.getMessage());
-					continue;
-				}
-				System.out.println("JMX connector server successfully started: " + cs.getAddress());
-				_connectorServer.add(cs);
+				System.err.println(e.getMessage());
+				continue;
+			}
+			System.out.println("JMX connector server successfully started: " + cs.getAddress());
+			_connectorServer.add(cs);
 
-				// register connector server as JMX resource
-				try {
-					this.registerAgentNodeResource(nodeName, "JMXConnectorServer", "\"" + cs.getAddress() + "\"", cs);
-				}
-				catch (Exception e) {
-					System.err.println("WARNING: Unable to register JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");
-					System.err.println(e.getMessage());
-				}
+			// register connector server as JMX resource
+			try {
+				this.registerAgentNodeResource(nodeName, "JMXConnectorServer", "\"" + cs.getAddress() + "\"", cs);
+			}
+			catch (Exception e) {
+				System.err.println("WARNING: Unable to register JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");
+				System.err.println(e.getMessage());
 			}
 		}
 

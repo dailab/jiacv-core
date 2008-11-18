@@ -503,7 +503,7 @@
 
 	<ciManagement>
 		<system>Continuum</system>
-		<url>http://10.0.130.1:8765/continuum/</url>
+		<url>http://130.149.154.198:8765/continuum/</url>
 		<notifiers>
 			<notifier>
 				<type>mail</type>

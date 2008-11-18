@@ -7,6 +7,7 @@
 package de.dailab.jiactng.agentcore;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.action.Action;
@@ -43,6 +44,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   private long      nextExecutionTime = 0;
 
+  private HashMap<String, DoAction> searchToInvokeMap = new HashMap<String,DoAction>();
+  
   /**
    * Creates an agent bean that uses lifecycle support in loose mode
    */
@@ -464,4 +467,66 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 
 	throw new RuntimeException("Got neigther results nor failure");
   }
+  
+  protected String invokeRemote(Action template, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
+    if(parent == null) {
+      parent = new Session(receiver);
+    }
+    
+    Action a = memory.read(template);
+    if(a != null) {
+      log.warn("Found in memory... invoking");
+      return invoke(a, parent, inputParams, receiver);
+    } else {
+      DoAction doAct = new DoAction(parent,template, receiver, inputParams);
+//      searchToInvokeMap.put(parent.getSessionId(),doAct);
+//      invokeActionSearch(template,true,1000,this);
+      Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
+      if (requestSearchAction == null) {
+        throw new RuntimeException("DirectoryAccessBean not available");
+      }
+      Serializable[] params = {template, new Boolean(true), new Long(5000)};
+      log.warn("invoking requestSerach with: "+template+" / "+parent.getSessionId() );
+//      invoke(requestSearchAction,parent,params, new SearchResultHandler());
+      
+      DoAction readAction = requestSearchAction.createDoAction(params, new SearchResultHandler());
+      searchToInvokeMap.put(readAction.getSessionId(),doAct);
+      memory.write(readAction);      
+      
+      
+      return parent.getSessionId();
+    }
+  }
+
+  
+  private class SearchResultHandler implements ResultReceiver {
+
+    /* (non-Javadoc)
+     * @see de.dailab.jiactng.agentcore.environment.ResultReceiver#receiveResult(de.dailab.jiactng.agentcore.action.ActionResult)
+     */
+    @Override
+    public void receiveResult(ActionResult result) {
+      String readSession = result.getSessionId();
+      log.warn("Receveid result for: "+readSession);
+      DoAction doAct = searchToInvokeMap.get(readSession);
+      if((doAct != null) &&  (result.getFailure() == null)) {
+        Serializable[] res = result.getResults();
+        List<Action> actList = (List<Action>)res[0];
+        for(Action a : actList) {
+          memory.write(a);
+        }
+        if(actList.size()>0) {
+          Action myAct = actList.get(0);
+          doAct.setAction(myAct);
+          memory.write(doAct);
+        } else {
+          log.error("No Actions found for: "+readSession);
+        }
+      } else {
+        log.error("Encountered problem with: "+readSession);
+      }
+    }
+    
+  }
+  
 }

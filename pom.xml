@@ -216,11 +216,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>target/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-				</configuration>
 				<executions>
 					<execution>
 						<goals>
@@ -285,41 +280,6 @@
 					<projectNameTemplate>[groupId] - [artifactId]</projectNameTemplate>
 					<downloadSources>true</downloadSources>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<version>1.4.0</version>
-				<configuration>
-					<manifestLocation>target/META-INF</manifestLocation>
-					<instructions>
-						<Export-Package>*</Export-Package>
-						<!--Private-Package></Private-Package-->
-						<Import-Package>*</Import-Package>
-						<!-- 
-							add ,plugin.xml if it's present i.e.
-							src/main/resources,plugin.xml
-						-->
-						<Include-Resource>src/main/resources</Include-Resource>
-					</instructions>
-				</configuration>
-			</plugin>
-
-			<!-- generate manifest automatically once the classes are processed -->
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>bundle-manifest</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>manifest</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -72,10 +72,20 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean
 		this.authorizationActionName = authorizationActionName;
 		authorizationAction = null;
 
-		// search for authorization action
-		if ((authorizationActionName != null) && getState().equals(LifecycleStates.STARTED)) {
-			invokeActionSearch(new Action(authorizationActionName), false, 0, this);
-		}
+//		// search for authorization action
+//		if ((authorizationActionName != null) && getState().equals(LifecycleStates.STARTED)) {
+//			invokeActionSearch(authorizationActionName, false, 0, this);
+//		}
+		
+	   Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
+     if (requestSearchAction == null) {
+	     throw new RuntimeException("DirectoryAccessBean not available");
+	   }
+	   Serializable[] params = { new Action(authorizationActionName), new Boolean(true), new Long(1000) };
+
+	   DoAction readAction = requestSearchAction.createDoAction(params, this);
+	   memory.write(readAction);		
+		
 	}
 
 	/**

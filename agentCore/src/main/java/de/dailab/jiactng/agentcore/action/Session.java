@@ -50,12 +50,17 @@ public class Session implements IFact {
   private String                   userToken     = null;
 
   /**
+   * The id of the user that originally triggered this session.
+   */
+  private String                   originalUser = null;
+
+  /**
    * The id of the provider that offeres the top-level service that was invoked
    * for this session. This field should always hold this top-level provider and
    * not be changed by sub-service invocations.
    */
   private String                   originalProvider = null;
-
+  
   /**
    * The top level service that was invoked for this session. This field should
    * always hold this top-level service and not be changed by sub-service
@@ -405,5 +410,13 @@ public class Session implements IFact {
    */
   public void setOriginalService(String originalService) {
     this.originalService = originalService;
+  }
+
+  public String getOriginalUser() {
+    return this.originalUser;
+  }
+
+  public void setOriginalUser(String originalUser) {
+    this.originalUser = originalUser;
   }
 }

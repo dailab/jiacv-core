@@ -34,9 +34,9 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 		IEffector providerBean = ((Action) act.getAction()).getProviderBean();
 		if (providerBean != null) {
 			try {
-				if (act.getAction().getResultTypes()!=null){
+//				if (act.getAction().getResultTypes()!=null){
 					memory.write(act.getSession());
-				}
+//				}
 				if (providerBean instanceof AbstractActionAuthorizationBean) {
 					((AbstractActionAuthorizationBean)providerBean).authorize(act);
 				}
@@ -62,7 +62,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 
 		// remove session from memory
 		if (memory.remove(doAct.getSession()) == null){
-			log.warn("ActionResult for Action" + actionResult.getAction().getName() + " written with non existing Session.");
+			log.warn("ActionResult for Action " + actionResult.getAction().getName() + " written with non existing Session.");
 		} else {
 			log.debug("Session removed for action " + doAct.getAction().getName());
 		}

@@ -1059,17 +1059,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 			} else if (message.getProtocol().equalsIgnoreCase(REFRESH_PROTOCOL_ID)){
 				if (message.getPayload() instanceof IActionDescription){
 					IActionDescription actDesc = (IActionDescription) message.getPayload();
+					
+					ActionData messageData = new ActionData();
+					messageData.setActionDescription(actDesc);
+					
 					ActionData refreshData = new ActionData();
 					refreshData.setActionDescription(actDesc);
+					refreshData.setCreationTime(_currentLogicTime + 1);
+					
 					synchronized(space){
-						//let's remove the old one
-						refreshData = space.remove(refreshData);
-
-
-						// put the new version into it
-						refreshData.setCreationTime(_currentLogicTime + 1);
-
-						space.write(refreshData);
+						//let's simply update the entry
+						space.update(messageData, refreshData);
 					}
 				} else if (message.getPayload() instanceof FactSet){
 					FactSet FS = (FactSet) message.getPayload();
@@ -1078,13 +1078,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						for (IFact fact : FS.getFacts()){
 							if (fact instanceof IActionDescription){
 								IActionDescription actDesc = (IActionDescription) fact;
+								
+								ActionData oldDat = new ActionData();
+								oldDat.setActionDescription(actDesc);
+								
 								ActionData actDat = new ActionData();
 								actDat.setActionDescription(actDesc);
+								actDat.setCreationTime(_currentLogicTime + 1);
+								
+								space.update(oldDat, actDat);
 
-								if ((actDat = space.remove(actDat)) != null){
-									actDat.setCreationTime(_currentLogicTime + 1);
-									space.write(actDat);
-								}
+//								if ((actDat = space.remove(actDat)) != null){
+//									actDat.setCreationTime(_currentLogicTime + 1);
+//									space.write(actDat);
+//								}
 							}
 						}
 					}

@@ -384,10 +384,15 @@ public class Action implements IActionDescription {
 		prettyPrintArray(builder, _inputTypeNames);
 		builder.append("\n results=");
 		prettyPrintArray(builder, _resultTypeNames);
+		
+		builder.append("\n provider =");
 		if (_providerDescription != null) {
-			builder.append("\n provider =");
 			builder.append(_providerDescription.getName());
+		} else {
+		  builder.append(_providerDescription);
 		}
+		builder.append("\n");
+		
 		return builder.toString();
 	}
 

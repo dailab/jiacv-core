@@ -392,7 +392,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   protected Action retrieveAction(String actionName) {
     Action retAct = memory.read(new Action(actionName));
     if (retAct == null) {
-      log.warn("Could not find \'" + actionName + "\'.");
+      log.warn("Local memory does not contain \'" + actionName + "\'.");
     }
     return retAct;
   }
@@ -412,7 +412,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 
     Action retAct = memory.read(template);
     if (retAct == null) {
-      log.warn("Could not find \'" + actionName + "\'.");
+      log.warn("Local memory does not contain \'" + actionName + "\' with provider "+provider+".");
     }
     return retAct;
   }

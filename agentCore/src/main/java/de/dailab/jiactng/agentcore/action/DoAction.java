@@ -169,8 +169,12 @@ public class DoAction extends SessionEvent {
 	public String toString() {
 	    StringBuilder sb = new StringBuilder("DoAction(");
 	    sb.append("owner="+owner+", ");
-        sb.append("action="+getAction().getName()+", ");
-        sb.append("action_provider="+((getAction().getProviderDescription()!=null)?getAction().getProviderDescription().getName():null)+", ");
+      if(getAction() != null) {
+ 	      sb.append("action="+getAction().getName()+", ");
+	      sb.append("action_provider="+((getAction().getProviderDescription()!=null)?getAction().getProviderDescription().getName():null)+", ");
+      } else {
+        sb.append("action="+getAction()+", ");
+      }
 	    sb.append("params="+Arrays.asList(params));
 	    sb.append(")");
 	    return sb.toString();

@@ -82,6 +82,8 @@ public class Session implements IFact {
    */
   private ArrayList<SessionEvent>  history;
 
+  private Integer currentCallDepth = null;
+  
   /**
    * Constructor for a new session. Can be called with any kind of object as
    * source, usually the class, that initiated the session.
@@ -418,5 +420,13 @@ public class Session implements IFact {
 
   public void setOriginalUser(String originalUser) {
     this.originalUser = originalUser;
+  }
+
+  public Integer getCurrentCallDepth() {
+    return this.currentCallDepth;
+  }
+
+  public void setCurrentCallDepth(int currentCallDepth) {
+    this.currentCallDepth = currentCallDepth;
   }
 }

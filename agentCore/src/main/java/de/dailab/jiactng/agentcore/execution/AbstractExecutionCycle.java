@@ -11,6 +11,7 @@ import de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
@@ -34,9 +35,15 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 		IEffector providerBean = ((Action) act.getAction()).getProviderBean();
 		if (providerBean != null) {
 			try {
-//				if (act.getAction().getResultTypes()!=null){
-					memory.write(act.getSession());
-//				}
+				if (act.getAction().getResultTypes()!=null){
+					Session session = act.getSession();
+					if(session.getCurrentCallDepth() == null) {
+					  session.setCurrentCallDepth(1);
+					} else {
+					  session.setCurrentCallDepth(session.getCurrentCallDepth()+1);
+					}
+			    memory.write(act.getSession());
+				}
 				if (providerBean instanceof AbstractActionAuthorizationBean) {
 					((AbstractActionAuthorizationBean)providerBean).authorize(act);
 				}
@@ -60,12 +67,21 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 	protected void processResult(ActionResult actionResult) {
 		DoAction doAct = (DoAction) actionResult.getSource();
 
-		// remove session from memory
-		if (memory.remove(doAct.getSession()) == null){
-			log.warn("ActionResult for Action " + actionResult.getAction().getName() + " written with non existing Session.");
-		} else {
-			log.debug("Session removed for action " + doAct.getAction().getName());
+		Session session = doAct.getSession();
+		session.setCurrentCallDepth(session.getCurrentCallDepth()-1);
+		if((session.getCurrentCallDepth()<0) || (memory.read(session) == null) ) {
+		  log.warn("ActionResult for Action " + actionResult.getAction().getName() + " written with non existing Session.");
+		} else if(session.getCurrentCallDepth()==0) {
+		  memory.remove(session);
+		  log.debug("Session removed for action " + doAct.getAction().getName());
 		}
+		
+		// remove session from memory
+//		if (memory.remove(doAct.getSession()) == null){
+//			log.warn("ActionResult for Action " + actionResult.getAction().getName() + " written with non existing Session.");
+//		} else {
+//			log.debug("Session removed for action " + doAct.getAction().getName());
+//		}
 		//Session template= new
 		//Session(doAct.getSessionId(),doAct.getSession().getCreationTime(),null,null);
 		//memory.remove(template);

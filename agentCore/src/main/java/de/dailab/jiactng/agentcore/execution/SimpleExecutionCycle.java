@@ -164,10 +164,12 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
 
                   Action action = (Action) doAction.getAction();
                   log.debug("canceling DoAction " + doAction);
-                  
+
                   ActionResult result = null;
-                  if ((action == null) || (action.getProviderBean() == null)) {
-                    log.warn("Found doAction with missing action or providerBean: " + action);
+                  if ((action == null)) {
+                    log.warn("Found doAction with missing action:" + doAction);
+                  } else if (action.getProviderBean() == null) {
+                    log.warn("Found doAction with missing providerBean:" + action);
                   } else {
                     result = action.getProviderBean().cancelAction(doAction);
                   }

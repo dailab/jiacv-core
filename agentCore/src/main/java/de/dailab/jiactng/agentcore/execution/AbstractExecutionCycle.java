@@ -35,7 +35,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 		IEffector providerBean = ((Action) act.getAction()).getProviderBean();
 		if (providerBean != null) {
 			try {
-				if (act.getAction().getResultTypes()!=null){
+				if ((act.getAction().getResultTypes()!=null) && (act.getAction().getResultTypes().size()>0)) {
 					Session session = act.getSession();
 					if(session.getCurrentCallDepth() == null) {
 					  session.setCurrentCallDepth(1);
@@ -68,10 +68,15 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 		DoAction doAct = (DoAction) actionResult.getSource();
 
 		Session session = doAct.getSession();
+		if(session.getCurrentCallDepth()==null) {
+		  session.setCurrentCallDepth(1);
+		}
 		session.setCurrentCallDepth(session.getCurrentCallDepth()-1);
-		if((session.getCurrentCallDepth()<0) || (memory.read(session) == null) ) {
-		  log.warn("ActionResult for Action " + actionResult.getAction().getName() + " written with non existing Session.");
-		} else if(session.getCurrentCallDepth()==0) {
+		if(memory.read(session) == null ) {
+		  if((doAct.getAction().getResultTypeNames()!=null) && doAct.getAction().getResultTypeNames().size()>0) {
+		    log.warn("ActionResult for Action " + actionResult.getAction().getName() + " written with non existing Session.");
+		  }
+		} else if(session.getCurrentCallDepth()<=0) {
 		  memory.remove(session);
 		  log.debug("Session removed for action " + doAct.getAction().getName());
 		}

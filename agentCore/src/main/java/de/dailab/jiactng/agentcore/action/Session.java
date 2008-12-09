@@ -82,7 +82,7 @@ public class Session implements IFact {
    */
   private ArrayList<SessionEvent>  history;
 
-  private Integer currentCallDepth = null;
+  private transient Integer currentCallDepth = null;
   
   /**
    * Constructor for a new session. Can be called with any kind of object as

@@ -384,6 +384,8 @@ public class Action implements IActionDescription {
 		prettyPrintArray(builder, _inputTypeNames);
 		builder.append("\n results=");
 		prettyPrintArray(builder, _resultTypeNames);
+    builder.append("\n bean=");
+    builder.append(this.providerBean);
 		
 		builder.append("\n provider =");
 		if (_providerDescription != null) {

@@ -132,9 +132,10 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean
 			if (results != null) {
 				if (results.length == 1) {
 					try {
-						if ((Boolean) results[0]) {
+						if ((String) results[0] !=null) {
 							// authorization successful => invoke service
 							try {
+							  doAction.getSession().setOriginalUser((String) results[0]);
 								doAction(doAction);
 							}
 							catch (Exception e) {

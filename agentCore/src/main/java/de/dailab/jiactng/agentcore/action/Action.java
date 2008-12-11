@@ -389,7 +389,7 @@ public class Action implements IActionDescription {
 		
 		builder.append("\n provider =");
 		if (_providerDescription != null) {
-			builder.append(_providerDescription.getName());
+			builder.append(_providerDescription.getName()+"("+_providerDescription.getAid()+")");
 		} else {
 		  builder.append(_providerDescription);
 		}

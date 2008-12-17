@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+	- Application context for the messaging test 
+-->
+<beans>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+
+	<bean name="SingleBrokerPlatform" parent="Platform">
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="StandardJMSBroker"/>
+			</list>
+		</property>
+	</bean>
+</beans>

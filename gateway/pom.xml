@@ -1,0 +1,21 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>jiactng</artifactId>
+    <groupId>de.dailab</groupId>
+    <version>5.0.4-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.dailab.jiac.net</groupId>
+  <artifactId>gateway</artifactId>
+  <name>gateway</name>
+  <version>0.1-SNAPSHOT</version>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

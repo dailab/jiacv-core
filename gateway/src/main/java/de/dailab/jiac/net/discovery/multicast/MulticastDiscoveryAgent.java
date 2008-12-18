@@ -39,7 +39,8 @@ import org.apache.commons.logging.LogFactory;
 public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
     private static final Log log=LogFactory.getLog(MulticastDiscoveryAgent.class);
     public static final String DEFAULT_DISCOVERY_URI_STRING="multicast://239.255.2.3:6155";
-    private static final String TYPE_SUFFIX="JIAC_NETGW-0.";
+//    private static final String TYPE_SUFFIX="JIAC_NETGW-0.";
+    private static final String TYPE_SUFFIX= "ActiveMQ-4.";
     private static final String ALIVE="alive.";
     private static final String DEAD="dead.";
     private static final String DELIMITER = "%";

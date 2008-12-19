@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
 import org.apache.activemq.network.DiscoveryNetworkConnector;
 import org.apache.activemq.network.NetworkConnector;
@@ -85,12 +86,12 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
         try {
             for (ActiveMQTransportConnector amtc : _connectors) {
                 log.debug("embedded broker initializing transport:: " + amtc.toString());
-                _broker.addConnector(new URI(amtc.getTransportURI()));
+                TransportConnector connector= _broker.addConnector(new URI(amtc.getTransportURI()));
                 if (amtc.getDiscoveryURI() != null) {
                     URI uri = new URI(amtc.getDiscoveryURI());
-//                    URI discoveryURI= new URI(amtc.getDiscoveryURI());
-//                    connector.setDiscoveryUri(discoveryURI);
-//                    connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
+                    URI discoveryURI= new URI(amtc.getDiscoveryURI());
+                    connector.setDiscoveryUri(discoveryURI);
+                    connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
                     NetworkConnector networkConnector= uri.getScheme().equals(SourceAwareMulticastDiscoveryAgent.SCHEME) ?
                             new SourceAwareDiscoveryNetworkConnector(uri) :
                             new DiscoveryNetworkConnector(uri);

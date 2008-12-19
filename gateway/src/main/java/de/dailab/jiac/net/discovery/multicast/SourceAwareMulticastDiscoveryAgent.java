@@ -39,6 +39,8 @@ import de.dailab.jiac.net.discovery.SourceAwareDiscoveryEvent;
  * @version $Revision$
  */
 public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
+    public static final String SCHEME= "smartmulticast";
+    
     private static final Log log=LogFactory.getLog(SourceAwareMulticastDiscoveryAgent.class);
     public static final String DEFAULT_DISCOVERY_URI_STRING="multicast://239.255.2.3:6155";
 //    private static final String TYPE_SUFFIX="JIAC_NETGW-0.";

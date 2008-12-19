@@ -500,6 +500,7 @@
 
 	<modules>
 		<!--module>ModuleTemplate</module--><!-- This is a template for new modules and testing; usually not required -->
+		<module>gateway</module>
 		<module>agentCore</module>
 		<module>bdiAgent</module>
 		<module>jiacSecurity</module>
@@ -509,6 +510,5 @@
 		<module>util/ui</module>
 		<module>WebserviceInterface</module>
 		<module>tools</module>
-    <module>gateway</module>
   </modules>
 </project>

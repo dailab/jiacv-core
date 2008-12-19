@@ -92,7 +92,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                 }
                 
                 if(useSource) {
-                    log.info("Could not resolve remote host:" + connectUri);
+                    log.info("Could not resolve remote host: " + connectUri);
                     try {
                         connectUri= new URI(
                             uri.getScheme(),

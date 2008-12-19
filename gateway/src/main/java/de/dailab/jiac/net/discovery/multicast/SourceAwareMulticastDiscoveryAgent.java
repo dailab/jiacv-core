@@ -36,7 +36,7 @@ import de.dailab.jiac.net.discovery.SourceAwareDiscoveryEvent;
  * {@link org.apache.activemq.transport.discovery.multicast.MulticastDiscoveryAgent}!
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
     private static final Log log=LogFactory.getLog(SourceAwareMulticastDiscoveryAgent.class);

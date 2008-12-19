@@ -33,7 +33,7 @@ import de.dailab.jiac.net.discovery.multicast.SourceAwareMulticastDiscoveryAgent
  * This class is mainly a clone of {@link DiscoveryNetworkConnector}!
  * 
  * @author Marcel Patzlaff
- * @version $Revision:$
+ * @version $Revision$
  */
 public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector implements DiscoveryListener {
 
@@ -184,7 +184,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
         }
     }
 
-    public DiscoveryAgent getDiscoveryAgent() {
+    public SourceAwareMulticastDiscoveryAgent getDiscoveryAgent() {
         return discoveryAgent;
     }
 

@@ -53,7 +53,7 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
         	List<NetworkConnector> netcons = _broker.getNetworkConnectors();
             for (NetworkConnector net : netcons){
             	_broker.removeNetworkConnector(net);
-            	net.setNetworkTTL(_networkTTL);
+            	net.setNetworkTTL(networkTTL);
             	_broker.addNetworkConnector(net);
             }
         }

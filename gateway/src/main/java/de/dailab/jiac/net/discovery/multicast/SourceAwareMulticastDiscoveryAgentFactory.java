@@ -20,13 +20,13 @@ import org.apache.activemq.util.URISupport;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class MulticastDiscoveryAgentFactory extends DiscoveryAgentFactory {
+public class SourceAwareMulticastDiscoveryAgentFactory extends DiscoveryAgentFactory {
 
     @SuppressWarnings("unchecked")
     protected DiscoveryAgent doCreateDiscoveryAgent(URI uri) throws IOException {
         try {
             Map options = URISupport.parseParamters(uri);
-            MulticastDiscoveryAgent rc = new MulticastDiscoveryAgent();
+            SourceAwareMulticastDiscoveryAgent rc = new SourceAwareMulticastDiscoveryAgent();
             rc.setGroup(uri.getHost());
             IntrospectionSupport.setProperties(rc, options);
             return rc;

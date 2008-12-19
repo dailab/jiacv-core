@@ -29,6 +29,8 @@ import org.apache.activemq.transport.discovery.DiscoveryListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.dailab.jiac.net.discovery.SourceAwareDiscoveryEvent;
+
 /**
  * This class is mainly a clone of
  * {@link org.apache.activemq.transport.discovery.multicast.MulticastDiscoveryAgent}!
@@ -36,8 +38,8 @@ import org.apache.commons.logging.LogFactory;
  * @author Marcel Patzlaff
  * @version $Revision:$
  */
-public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
-    private static final Log log=LogFactory.getLog(MulticastDiscoveryAgent.class);
+public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
+    private static final Log log=LogFactory.getLog(SourceAwareMulticastDiscoveryAgent.class);
     public static final String DEFAULT_DISCOVERY_URI_STRING="multicast://239.255.2.3:6155";
 //    private static final String TYPE_SUFFIX="JIAC_NETGW-0.";
     private static final String TYPE_SUFFIX= "ActiveMQ-4.";
@@ -59,7 +61,9 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
     private URI _discoveryURI;
     private InetAddress _inetAddress;
     private SocketAddress _sockAddress;
+    
     private String _selfService;
+//    private URI _selfServiceURI;
     
     private MulticastSocket _mcast;
     private Thread _runner;
@@ -88,7 +92,7 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
     /**
      * register a service
      */
-    public void registerService(String name) {//throws IOException {
+    public void registerService(String name) {
         _selfService= name;
         if (_started.get()){
             doAdvertizeSelf();
@@ -183,7 +187,7 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
     }
 
     public void setKeepAliveInterval(long keepAliveInterval){
-        this._keepAliveInterval=keepAliveInterval;
+        _keepAliveInterval=keepAliveInterval;
     }
 
     /**
@@ -271,31 +275,31 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
                     String brokerName= getBrokerName(payload.substring(ALIVE.length()));
                     String service= payload.substring(ALIVE.length() + brokerName.length() + 2);
                     
-                    // use the address of the datagram instead
-                    try {
-                        URI serviceURI= new URI(service);
-                        service= new URI(serviceURI.getScheme(), serviceURI.getUserInfo(), source.getHostAddress(), serviceURI.getPort(), serviceURI.getPath(), serviceURI.getQuery(), serviceURI.getFragment()).toString();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    
+//                    // use the address of the datagram instead
+//                    try {
+//                        URI serviceURI= new URI(service);
+//                        service= new URI(serviceURI.getScheme(), serviceURI.getUserInfo(), source.getHostAddress(), serviceURI.getPort(), serviceURI.getPath(), serviceURI.getQuery(), serviceURI.getFragment()).toString();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    
                     if(!brokerName.equals(_brokerName)){
-                        processAlive(brokerName,service);
+                        processAlive(brokerName, service, source);
                     }
                 } else{
                     String brokerName= getBrokerName(payload.substring(DEAD.length()));
                     String service= payload.substring(DEAD.length() + brokerName.length()+2);
-                    
-                    // use the address of the datagram instead
-                    try {
-                        URI serviceURI= new URI(service);
-                        service= new URI(serviceURI.getScheme(), serviceURI.getUserInfo(), source.getHostAddress(), serviceURI.getPort(), serviceURI.getPath(), serviceURI.getQuery(), serviceURI.getFragment()).toString();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//                    
+//                    // use the address of the datagram instead
+//                    try {
+//                        URI serviceURI= new URI(service);
+//                        service= new URI(serviceURI.getScheme(), serviceURI.getUserInfo(), source.getHostAddress(), serviceURI.getPort(), serviceURI.getPath(), serviceURI.getQuery(), serviceURI.getFragment()).toString();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                     
                     if(!brokerName.equals(_brokerName)){
-                        processDead(brokerName,service);
+                        processDead(brokerName, service, source);
                     }
                 }
             }
@@ -337,14 +341,58 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
             }
         }
     }
+    
+//    private boolean isSelfService(String service) {
+//System.out.println(_selfService);
+//        if(_selfService == null) {
+//            return false;
+//        }
+//
+//System.out.println(_selfService + " == " + service);
+//        if(_selfService.equals(service)) {
+//            return true;
+//        }
+//        
+//        try {
+//            URI serviceURI= new URI(service);
+//
+//            if(_selfServiceURI.equals(serviceURI)) {
+//                return true;
+//            }
+//            
+//            Enumeration<NetworkInterface> nis= NetworkInterface.getNetworkInterfaces();
+//            while(nis.hasMoreElements()) {
+//                NetworkInterface ni= nis.nextElement();
+//                Enumeration<InetAddress> ias= ni.getInetAddresses();
+//                
+//                while(ias.hasMoreElements()) {
+//                    InetAddress ia= ias.nextElement();
+//System.out.println(ia.getHostAddress() + " == " + serviceURI.getHost());
+//                    if(ia.getHostAddress().equals(serviceURI.getHost())) {
+//                        if(_selfServiceURI.getPort() == serviceURI.getPort()) {
+//                            _selfServiceURI= serviceURI;
+//                            _selfService= _selfServiceURI.toString();
+//System.err.println(_selfService);
+//                            return true;
+//                        }
+//                    }
+//                }
+//            }
+//            
+//            return false;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
 
-    private void processAlive(String brokerName,String service){
+    private void processAlive(String brokerName, String service, InetAddress source){
         if(_selfService == null || !service.equals(_selfService)){
             AtomicLong lastKeepAlive= _services.get(service);
             if(lastKeepAlive == null){
                 _brokers.put(service, brokerName);
                 if(discoveryListener != null){
-                    final DiscoveryEvent event= new DiscoveryEvent(service);
+                    final DiscoveryEvent event= new SourceAwareDiscoveryEvent(service, source);
                     event.setBrokerName(brokerName);
                     
                     // Have the listener process the event async so that 
@@ -352,7 +400,7 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
                     // processing of events.
                     executor.execute(new Runnable() {
                         public void run() {
-                            DiscoveryListener dl= MulticastDiscoveryAgent.this.discoveryListener;
+                            DiscoveryListener dl= SourceAwareMulticastDiscoveryAgent.this.discoveryListener;
                             if(dl != null){
                                 dl.onServiceAdd(event);
                             }
@@ -367,13 +415,13 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
             lastKeepAlive.set(System.currentTimeMillis());
         }
     }
-
-    private void processDead(String brokerName,String service){
-        if(!service.equals(_selfService)){
+    
+    private void processDead(String brokerName, String service, InetAddress source){
+        if(!service.equals(_selfService)) {
             if(_services.remove(service) != null){
                 _brokers.remove(service);
                 if(discoveryListener != null){
-                    final DiscoveryEvent event= new DiscoveryEvent(service);
+                    final DiscoveryEvent event= new SourceAwareDiscoveryEvent(service, source);
                     event.setBrokerName(brokerName);
                     
                     // Have the listener process the event async so that 
@@ -381,7 +429,7 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
                     // processing of events.
                     executor.execute(new Runnable() {
                         public void run() {
-                            DiscoveryListener dl= MulticastDiscoveryAgent.this.discoveryListener;
+                            DiscoveryListener dl= SourceAwareMulticastDiscoveryAgent.this.discoveryListener;
                             if(dl != null){
                                 dl.onServiceRemove(event);
                             }
@@ -399,7 +447,7 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
             AtomicLong lastHeartBeat= entry.getValue();
             if(lastHeartBeat.get() < expireTime){
                 String brokerName= _brokers.get(entry.getKey());
-                processDead(brokerName,entry.getKey().toString());
+                processDead(brokerName,entry.getKey().toString(), null);
             }
         }
     }
@@ -415,6 +463,6 @@ public class MulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
     }
 
     public void serviceFailed(DiscoveryEvent event) {//throws IOException {
-        processDead(event.getBrokerName(), event.getServiceName());
+        processDead(event.getBrokerName(), event.getServiceName(), null);
     }
 }

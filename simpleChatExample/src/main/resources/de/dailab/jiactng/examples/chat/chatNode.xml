@@ -25,7 +25,7 @@
 	</bean>
 
 	<bean name="FanzyConnector" parent="ActiveMQTransportConnector" singleton="true">
-		<property name="transportURI" value="tcp://10.0.4.76:0" />
-		<property name="discoveryURI" value="multicast://simplechat" />
+		<property name="transportURI" value="tcp://localhost:0" />
+		<property name="discoveryURI" value="smartmulticast://simplechat" />
 	</bean>
 </beans>

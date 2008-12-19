@@ -43,6 +43,12 @@
 			<artifactId>activemq-core</artifactId>
 			<version>4.1.1</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>de.dailab.jiac.net</groupId>
+			<artifactId>gateway</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 
 <!-- only necessary for JMX-Webservice connector, will only be needed in Projects -->
 		<!--dependency> 

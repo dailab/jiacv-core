@@ -61,7 +61,7 @@
 	-->
 	<bean name="StandardTCPConnector" parent="ActiveMQTransportConnector" singleton="true">
 		<property name="transportURI" value="tcp://localhost:0" />
-		<property name="discoveryURI" value="multicast://jiac-tng" />
+		<property name="discoveryURI" value="smartmulticast://jiac-tng" />
 	</bean>
 
 	<!-- 
@@ -70,7 +70,7 @@
 	-->
 	<bean name="StandardTCPConnectorFixedPort" parent="ActiveMQTransportConnector" singleton="true">
 		<property name="transportURI" value="tcp://localhost:61616" />
-		<property name="discoveryURI" value="multicast://jiac-tng" />
+		<property name="discoveryURI" value="smartmulticast://jiac-tng" />
 	</bean>
 
 	<!-- 

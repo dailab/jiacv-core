@@ -7,10 +7,12 @@ import java.util.Set;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
-import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
+import org.apache.activemq.network.DiscoveryNetworkConnector;
 import org.apache.activemq.network.NetworkConnector;
 
+import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
+import de.dailab.jiac.net.discovery.multicast.SourceAwareMulticastDiscoveryAgent;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 
 /**
@@ -45,14 +47,18 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
         }
     }
 
-    public void setNetworkTTL(int networkTTL) throws Exception{
-    	_networkTTL = networkTTL;
-    	List<NetworkConnector> netcons = _broker.getNetworkConnectors();
-        for (NetworkConnector net : netcons){
-        	_broker.removeNetworkConnector(net);
-        	net.setNetworkTTL(_networkTTL);
-        	_broker.addNetworkConnector(net);
+    @SuppressWarnings("unchecked")
+    public void setNetworkTTL(int networkTTL) throws Exception {
+        if(_networkTTL != networkTTL && _broker != null) {
+        	List<NetworkConnector> netcons = _broker.getNetworkConnectors();
+            for (NetworkConnector net : netcons){
+            	_broker.removeNetworkConnector(net);
+            	net.setNetworkTTL(_networkTTL);
+            	_broker.addNetworkConnector(net);
+            }
         }
+        
+        _networkTTL= networkTTL;
     }
     
     // Lifecyclemethods:
@@ -79,13 +85,17 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
         try {
             for (ActiveMQTransportConnector amtc : _connectors) {
                 log.debug("embedded broker initializing transport:: " + amtc.toString());
-                TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
+                _broker.addConnector(new URI(amtc.getTransportURI()));
                 if (amtc.getDiscoveryURI() != null) {
                     URI uri = new URI(amtc.getDiscoveryURI());
-                    URI discoveryURI= new URI(amtc.getDiscoveryURI());
-                    connector.setDiscoveryUri(discoveryURI);
-                    connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
-                    _broker.addNetworkConnector(uri);
+//                    URI discoveryURI= new URI(amtc.getDiscoveryURI());
+//                    connector.setDiscoveryUri(discoveryURI);
+//                    connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
+                    NetworkConnector networkConnector= uri.getScheme().equals(SourceAwareMulticastDiscoveryAgent.SCHEME) ?
+                            new SourceAwareDiscoveryNetworkConnector(uri) :
+                            new DiscoveryNetworkConnector(uri);
+                    networkConnector.setNetworkTTL(_networkTTL);
+                    _broker.addNetworkConnector(networkConnector);
                 }
             }
 
@@ -95,13 +105,6 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
 
         _broker.start();
         log.debug("started broker");
-
-        List<NetworkConnector> netcons = _broker.getNetworkConnectors();
-        for (NetworkConnector net : netcons){
-        	_broker.removeNetworkConnector(net);
-        	net.setNetworkTTL(_networkTTL);
-        	_broker.addNetworkConnector(net);
-        }
     }
 
     public void doCleanup() throws Exception {

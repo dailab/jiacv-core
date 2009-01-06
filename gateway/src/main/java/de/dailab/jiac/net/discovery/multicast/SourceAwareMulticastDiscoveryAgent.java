@@ -39,11 +39,8 @@ import de.dailab.jiac.net.discovery.SourceAwareDiscoveryEvent;
  * @version $Revision$
  */
 public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent,Runnable{
-    public static final String SCHEME= "smartmulticast";
-    
-    private static final Log log=LogFactory.getLog(SourceAwareMulticastDiscoveryAgent.class);
+    private static final Log log= LogFactory.getLog(SourceAwareMulticastDiscoveryAgent.class);
     public static final String DEFAULT_DISCOVERY_URI_STRING="multicast://239.255.2.3:6155";
-//    private static final String TYPE_SUFFIX="JIAC_NETGW-0.";
     private static final String TYPE_SUFFIX= "ActiveMQ-4.";
     private static final String ALIVE="alive.";
     private static final String DEAD="dead.";
@@ -65,7 +62,6 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent,Runnab
     private SocketAddress _sockAddress;
     
     private String _selfService;
-//    private URI _selfServiceURI;
     
     private MulticastSocket _mcast;
     private Thread _runner;
@@ -276,29 +272,13 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent,Runnab
                 if(payload.startsWith(ALIVE)){
                     String brokerName= getBrokerName(payload.substring(ALIVE.length()));
                     String service= payload.substring(ALIVE.length() + brokerName.length() + 2);
-                    
-//                    // use the address of the datagram instead
-//                    try {
-//                        URI serviceURI= new URI(service);
-//                        service= new URI(serviceURI.getScheme(), serviceURI.getUserInfo(), source.getHostAddress(), serviceURI.getPort(), serviceURI.getPath(), serviceURI.getQuery(), serviceURI.getFragment()).toString();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                    
+
                     if(!brokerName.equals(_brokerName)){
                         processAlive(brokerName, service, source);
                     }
                 } else{
                     String brokerName= getBrokerName(payload.substring(DEAD.length()));
                     String service= payload.substring(DEAD.length() + brokerName.length()+2);
-//                    
-//                    // use the address of the datagram instead
-//                    try {
-//                        URI serviceURI= new URI(service);
-//                        service= new URI(serviceURI.getScheme(), serviceURI.getUserInfo(), source.getHostAddress(), serviceURI.getPort(), serviceURI.getPath(), serviceURI.getQuery(), serviceURI.getFragment()).toString();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
                     
                     if(!brokerName.equals(_brokerName)){
                         processDead(brokerName, service, source);
@@ -344,50 +324,6 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent,Runnab
         }
     }
     
-//    private boolean isSelfService(String service) {
-//System.out.println(_selfService);
-//        if(_selfService == null) {
-//            return false;
-//        }
-//
-//System.out.println(_selfService + " == " + service);
-//        if(_selfService.equals(service)) {
-//            return true;
-//        }
-//        
-//        try {
-//            URI serviceURI= new URI(service);
-//
-//            if(_selfServiceURI.equals(serviceURI)) {
-//                return true;
-//            }
-//            
-//            Enumeration<NetworkInterface> nis= NetworkInterface.getNetworkInterfaces();
-//            while(nis.hasMoreElements()) {
-//                NetworkInterface ni= nis.nextElement();
-//                Enumeration<InetAddress> ias= ni.getInetAddresses();
-//                
-//                while(ias.hasMoreElements()) {
-//                    InetAddress ia= ias.nextElement();
-//System.out.println(ia.getHostAddress() + " == " + serviceURI.getHost());
-//                    if(ia.getHostAddress().equals(serviceURI.getHost())) {
-//                        if(_selfServiceURI.getPort() == serviceURI.getPort()) {
-//                            _selfServiceURI= serviceURI;
-//                            _selfService= _selfServiceURI.toString();
-//System.err.println(_selfService);
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
-//            
-//            return false;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//    }
-
     private void processAlive(String brokerName, String service, InetAddress source){
         if(_selfService == null || !service.equals(_selfService)){
             AtomicLong lastKeepAlive= _services.get(service);
@@ -465,6 +401,7 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent,Runnab
     }
 
     public void serviceFailed(DiscoveryEvent event) {//throws IOException {
-        processDead(event.getBrokerName(), event.getServiceName(), null);
+        final InetAddress source= (event instanceof SourceAwareDiscoveryEvent) ? ((SourceAwareDiscoveryEvent)event).getSource() : null;
+        processDead(event.getBrokerName(), event.getServiceName(), source);
     }
 }

@@ -27,7 +27,6 @@ import org.apache.activemq.util.ServiceStopper;
 import org.apache.activemq.util.ServiceSupport;
 
 import de.dailab.jiac.net.discovery.SourceAwareDiscoveryEvent;
-import de.dailab.jiac.net.discovery.multicast.SourceAwareMulticastDiscoveryAgent;
 
 /**
  * This class is mainly a clone of {@link DiscoveryNetworkConnector}!
@@ -36,8 +35,7 @@ import de.dailab.jiac.net.discovery.multicast.SourceAwareMulticastDiscoveryAgent
  * @version $Revision$
  */
 public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector implements DiscoveryListener {
-
-    protected SourceAwareMulticastDiscoveryAgent discoveryAgent;
+    protected DiscoveryAgent discoveryAgent;
     private ConcurrentHashMap<URI,Bridge> _bridges = new ConcurrentHashMap<URI,Bridge>();
     
     public SourceAwareDiscoveryNetworkConnector(URI discoveryURI) throws IOException {
@@ -45,20 +43,10 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     }
 
     public void setUri(URI discoveryURI) throws IOException {
-        DiscoveryAgent agent= DiscoveryAgentFactory.createDiscoveryAgent(discoveryURI);
-        
-        if(!(agent instanceof SourceAwareMulticastDiscoveryAgent)) {
-            throw new IOException("unsupported discoveryURI: " + discoveryURI);
-        }
-        
-        setDiscoveryAgent((SourceAwareMulticastDiscoveryAgent) agent);
+        setDiscoveryAgent(DiscoveryAgentFactory.createDiscoveryAgent(discoveryURI));
     }
 
     public void onServiceAdd(DiscoveryEvent event) {
-        internalOnServiceAdd((SourceAwareDiscoveryEvent) event);
-    }
-    
-    private void internalOnServiceAdd(SourceAwareDiscoveryEvent event) {
         // Ignore events once we start stopping.
         if( isStopped() || isStopping() )
             return;
@@ -81,8 +69,8 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
             }
             
             URI connectUri= uri;
-            
-            if(event.getSource() != null) {
+            final InetAddress source= (event instanceof SourceAwareDiscoveryEvent) ? ((SourceAwareDiscoveryEvent)event).getSource() : null;
+            if(source != null) {
                 boolean useSource= false;
                 try {
                     InetAddress[] addresses= InetAddress.getAllByName(connectUri.getHost());
@@ -97,7 +85,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                         connectUri= new URI(
                             uri.getScheme(),
                             uri.getUserInfo(),
-                            event.getSource().getHostAddress(),
+                            source.getHostAddress(),
                             uri.getPort(),
                             uri.getPath(),
                             uri.getQuery(),
@@ -154,17 +142,17 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                 log.warn("Could not start network bridge between: " + localURI + " and: " + uri + "(" + connectUri + ")"+ " due to: " + e);
                 log.debug("Start failure exception: "+ e, e);
                 
-                discoveryAgent.serviceFailed(event);
+                try {
+                    discoveryAgent.serviceFailed(event);
+                } catch (IOException ioe) {
+                    
+                }
                 return;
             }
         }
     }
 
     public void onServiceRemove(DiscoveryEvent event) {
-        internalOnServiceRemove((SourceAwareDiscoveryEvent) event);
-    }
-    
-    private void internalOnServiceRemove(SourceAwareDiscoveryEvent event) {
         String url = event.getServiceName();
         if (url != null) {
             URI uri;
@@ -184,11 +172,11 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
         }
     }
 
-    public SourceAwareMulticastDiscoveryAgent getDiscoveryAgent() {
+    public DiscoveryAgent getDiscoveryAgent() {
         return discoveryAgent;
     }
 
-    public void setDiscoveryAgent(SourceAwareMulticastDiscoveryAgent discoveryAgent) {
+    public void setDiscoveryAgent(DiscoveryAgent discoveryAgent) {
         this.discoveryAgent = discoveryAgent;
         if (discoveryAgent != null) {
             this.discoveryAgent.setDiscoveryListener(this);
@@ -232,7 +220,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
         super.doStop(stopper);
     }
 
-    protected Bridge createBridge(Transport localTransport, Transport remoteTransport, final SourceAwareDiscoveryEvent event) {
+    protected Bridge createBridge(Transport localTransport, Transport remoteTransport, final DiscoveryEvent event) {
         DemandForwardingBridge result = null;
         if (conduitSubscriptions) {
             if (dynamicOnly) {
@@ -253,7 +241,10 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                     }
                     public void fireServiceFailed() {
                         if( !isStopped() ) {
-                            discoveryAgent.serviceFailed(event);
+                            try {
+                                discoveryAgent.serviceFailed(event);
+                            } catch (IOException e) {
+                            }
                         }
                     }
                 };
@@ -276,7 +267,10 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                     }
                     public void fireServiceFailed() {
                         if( !isStopped() ) {
-                            discoveryAgent.serviceFailed(event);
+                            try {
+                                discoveryAgent.serviceFailed(event);
+                            } catch (IOException e) {
+                            }
                         }
                     }
                 };
@@ -300,7 +294,10 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                 }
                 public void fireServiceFailed() {
                     if( !isStopped() ) {
-                        discoveryAgent.serviceFailed(event);
+                        try {
+                            discoveryAgent.serviceFailed(event);
+                        } catch (IOException e) {
+                        }
                     }
                 }
             };

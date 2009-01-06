@@ -58,9 +58,12 @@ public class ActionPerformedNotification extends Notification {
 			long timeStamp, String msg, DoAction action, long duration, boolean success) {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		_actionName = action.getAction().getName();
-		if(((Action)action.getAction()).getProviderBean() == null)
-		System.err.println("\n-- "+((Action)action.getAction()).getName()+" / "+((Action)action.getAction()).getProviderBean());
-		_agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();
+		if(((Action)action.getAction()).getProviderBean() == null) {
+		  System.err.println("\n-- "+((Action)action.getAction()).getName()+" / "+((Action)action.getAction()).getProviderBean());
+		  _agentbeanName = "null";
+		} else {
+		  _agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();
+		}
 		_sessionId = action.getSessionId();
 		_owner = action.getOwner();
 		_actionType = action.getAction().getClass().getSimpleName();

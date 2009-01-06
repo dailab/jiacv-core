@@ -1265,7 +1265,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				// get all local agents from the directory
 				AgentDescription localAgentDescription = new AgentDescription();
 				localAgentDescription.setAgentNodeUUID(agentNode.getUUID());
-				agentsFromDirectory = space.removeAll(localAgentDescription);
+				agentsFromDirectory = space.readAll(localAgentDescription);
 
 				// get all local agents from the agentnode and pickup their descriptions
 				List<IAgent> foundAgents = agentNode.findAgents();
@@ -1289,54 +1289,58 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 					AgentDescription agentDesc = afdIterator.next();
 					if (agentsFromNode.remove(agentDesc)){
-						space.write(agentDesc);
+						AgentDescription agentToUpdate = new AgentDescription();
+						agentToUpdate.setName(agentDesc.getName());
+						space.update(agentToUpdate, agentDesc);
 						afdIterator.remove();
 					}
 				}
 
-			}
-			/*
-			 * At this point 
-			 * agentsFromNode is holding agents that somehow didn't got listed in the directory (should be empty)
-			 * agentsFromDirectory is holding agents that are no longer listed on the agentnode
-			 */
+				/*
+				 * At this point 
+				 * agentsFromNode is holding agents that somehow didn't got listed in the directory (should be empty)
+				 * agentsFromDirectory is holding agents that are no longer listed on the agentnode
+				 */
 
-			if (agentsFromNode != null){
-				if (!agentsFromNode.isEmpty()){
-					log.warn("There are " + agentsFromNode.size() + " agents on the Node that aren't listed within the Directory!");
-					synchronized(_bufferlock){
+				if (agentsFromNode != null){
+					if (!agentsFromNode.isEmpty()){
+						log.warn("There are " + agentsFromNode.size() + " agents on the Node that aren't listed within the Directory!");
+						synchronized(_bufferlock){
 
-						for (AgentDescription forgottenAgent : agentsFromNode){
-							log.warn("Adding agent " + forgottenAgent.getName() + " to the Directory");
-							space.write(forgottenAgent);
-							_additionBuffer.add(forgottenAgent);
+							for (AgentDescription forgottenAgent : agentsFromNode){
+								log.warn("Adding agent " + forgottenAgent.getName() + " to the Directory");
+								space.write(forgottenAgent);
+								_additionBuffer.add(forgottenAgent);
+							}
+
+							if (_instantPropagation){
+								sendMessageOfChange(_additionBuffer, null, false, false);
+								_additionBuffer.clear();
+							}
 						}
-						
-						if (_instantPropagation){
-							sendMessageOfChange(_additionBuffer, null, false, false);
-							_additionBuffer.clear();
+					}
+				}
+
+				if (agentsFromDirectory != null){
+					if (!agentsFromDirectory.isEmpty()){
+						synchronized(_bufferlock){
+							for (AgentDescription timeoutAgent : agentsFromDirectory){
+								log.warn("Agent " + timeoutAgent.getName() + " doesn't seem to be present anymore on this AgentNode, thus removing it from the Directory");
+								AgentDescription agentToRemove = new AgentDescription();
+								agentToRemove.setName(timeoutAgent.getName());
+								space.remove(agentToRemove);
+								_removalBuffer.add(timeoutAgent);
+
+							}
+
+							if (_instantPropagation){
+								sendMessageOfChange(null, _removalBuffer, false, false);
+								_removalBuffer.clear();
+							}
 						}
 					}
 				}
 			}
-
-			if (agentsFromDirectory != null){
-				if (!agentsFromDirectory.isEmpty()){
-					synchronized(_bufferlock){
-						for (AgentDescription timeoutAgent : agentsFromDirectory){
-							log.warn("Agent " + timeoutAgent.getName() + " doesn't seem to be present anymore on this AgentNode, thus removing it from the Directory");
-							_removalBuffer.add(timeoutAgent);
-
-						}
-						
-						if (_instantPropagation){
-							sendMessageOfChange(null, _removalBuffer, false, false);
-							_removalBuffer.clear();
-						}
-					}
-				}
-			}
-
 		}
 	}
 

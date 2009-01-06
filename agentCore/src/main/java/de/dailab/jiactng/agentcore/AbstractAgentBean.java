@@ -505,8 +505,15 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 
     Action a = memory.read(template);
     if (a != null) {
+      if(log.isInfoEnabled()) {
+        log.info("Found action locally - invoking... "+a);
+      }
       return invoke(a, parent, inputParams, receiver);
     } else {
+      if(log.isInfoEnabled()) {
+        log.info("Initiating search for action... "+template);
+      }
+
       DoAction doAct = new DoAction(parent, template, receiver, inputParams);
       Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
       if (requestSearchAction == null) {
@@ -541,6 +548,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
         }
         if (actList.size() > 0) {
           Action myAct = actList.get(0);
+          if(log.isInfoEnabled()) {
+            log.info("Search successful! Invoking: "+myAct);
+          }
           doAct.setAction(myAct);
           memory.write(doAct);
         } else {
@@ -548,7 +558,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
           returnFailure(doAct, "Could not find Action: " + doAct.getAction());
         }
       } else if ((doAct != null) && (result.getFailure() != null)) {
+        log.info("Search failed: "+result.getFailure());
         returnFailure(doAct, result.getFailure());
+      } else if(doAct == null){
+        log.error("Received result without pending doAct: "+result);
+      } else {
+        log.error("SHOULD NOT HAPPEN!!!");
       }
     }
 

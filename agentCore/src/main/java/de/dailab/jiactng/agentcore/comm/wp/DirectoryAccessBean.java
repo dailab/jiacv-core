@@ -604,11 +604,14 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 	private synchronized void checkActionPresence(){
 		for (IActionDescription action : _offeredActions){
 			// if action isn't present anymore...
-			if (memory.read(action) == null){
-				// remove it and discard it from the directory
-				_offeredActions.remove(action);
-				_actionRequestHandler.removeActionFromDirectory(action);
-			}
+		  Action actTemplate = new Action(action.getName());
+		  Action memoryAct = memory.read(actTemplate);
+		  if(memoryAct == null) {
+		    // remove it and discard it from the directory
+		    log.warn("Could no longer find Action in memory - removing it from directory! Action is: "+action+"");
+		    _offeredActions.remove(action);
+		    _actionRequestHandler.removeActionFromDirectory(action);
+		  } 
 		}
 	}
 

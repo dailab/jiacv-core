@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+    "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+    
+    <!--
+        
+        Checkstyle configuration for MASP module releases.
+        This is a subset of the Sun Checkstyle configuration.
+        
+    -->
+    <module name="Checker">
+        
+        <!-- Checks that a package.html file exists for each package.     -->
+        <!-- See http://checkstyle.sf.net/config_javadoc.html#PackageHtml -->
+        <module name="PackageHtml">
+            <property name="severity" value="info"/>
+        </module>
+        
+        <module name="TreeWalker">
+            
+            <!-- Checks for Javadoc comments.                     -->
+            <!-- See http://checkstyle.sf.net/config_javadoc.html -->
+            <module name="JavadocMethod">
+                <property name="scope" value="public"/>
+                <property name="allowUndeclaredRTE" value="true"/>
+            </module>
+            <module name="JavadocType">
+                <property name="scope" value="public"/>
+            </module>
+            <module name="JavadocVariable">
+                <property name="scope" value="public"/>
+            </module>
+            <module name="JavadocStyle">
+                <property name="scope" value="public"/>
+                <property name="checkFirstSentence" value="false"/>
+                <property name="severity" value="info"/>
+            </module>
+            
+            <!-- Checks for Naming Conventions.                  -->
+            <!-- See http://checkstyle.sf.net/config_naming.html -->
+            <module name="ConstantName">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="LocalFinalVariableName">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="LocalVariableName">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="MemberName">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="MethodName">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="ParameterName">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="StaticVariableName">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="TypeName"/>
+            <module name="PackageName"/>
+            
+            
+            <!-- Checks for imports                              -->
+            <!-- See http://checkstyle.sf.net/config_import.html -->
+            <module name="AvoidStarImport"/>
+            <module name="IllegalImport"/><!-- defaults to sun.* packages -->
+            <module name="RedundantImport"/>
+            <module name="UnusedImports"/>
+            
+            
+            <!-- Checks for Size Violations.                    -->
+            <!-- See http://checkstyle.sf.net/config_sizes.html -->
+            <module name="FileLength">
+                <property name="severity" value="info"/>
+            </module>
+            <module name="MethodLength">
+                <property name="severity" value="info"/>
+            </module>
+            <module name="ParameterNumber">
+                <property name="severity" value="info"/>
+            </module>
+            
+            
+            <!-- Modifier Checks                                    -->
+            <!-- See http://checkstyle.sf.net/config_modifiers.html -->
+            <module name="ModifierOrder">
+                <property name="severity" value="info"/>
+            </module>
+            <module name="RedundantModifier">
+                <property name="severity" value="info"/>
+            </module>
+            
+            
+            <!-- Checks for blocks. You know, those {}'s         -->
+            <!-- See http://checkstyle.sf.net/config_blocks.html -->
+            <module name="AvoidNestedBlocks">
+                <property name="allowInSwitchCase" value="true"/>
+            </module>
+            <module name="EmptyBlock">
+	            <property name="option" value="text"/>
+            </module>
+            <module name="NeedBraces"/>
+            
+            
+            <!-- Checks for common coding problems               -->
+            <!-- See http://checkstyle.sf.net/config_coding.html -->
+            <module name="DoubleCheckedLocking"/>
+            <module name="EmptyStatement"/>
+            <module name="IllegalInstantiation"/>
+            <module name="InnerAssignment"/>
+            <module name="DefaultComesLast"/>
+            <module name="CovariantEquals">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="FinalLocalVariable">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="EqualsHashCode">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="HiddenField">
+                <property name="severity" value="warning"/>
+	            <property name="ignoreConstructorParameter" value="true"/>
+            </module>
+            <module name="MagicNumber">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="MissingSwitchDefault">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="RedundantThrows">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="SimplifyBooleanExpression">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="SimplifyBooleanReturn"/>
+            
+            
+            <!-- Checks for class design                         -->
+            <!-- See http://checkstyle.sf.net/config_design.html -->
+            <module name="DesignForExtension">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="FinalClass">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="HideUtilityClassConstructor">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="InterfaceIsType">
+                <property name="severity" value="info"/>
+            </module>
+            <module name="VisibilityModifier">
+                <property name="protectedAllowed" value="true"/>
+                <property name="packageAllowed" value="true"/>
+                <property name="severity" value="info"/>
+            </module>
+            
+            
+            <!-- Metrics -->
+            <!-- See http://checkstyle.sourceforge.net/config_metrics.html -->
+            <module name="CyclomaticComplexity">
+                <property name="severity" value="info"/>
+            </module>
+            <module name="ClassFanOutComplexity">
+                <property name="severity" value="info"/>
+                <property name="max" value="30"/>
+            </module>
+            <module name="NPathComplexity">
+                <property name="severity" value="info"/>
+            </module>
+            <module name="JavaNCSS">
+                <property name="severity" value="info"/>
+            </module>
+            
+            
+            <!-- Miscellaneous other checks.                   -->
+            <!-- See http://checkstyle.sf.net/config_misc.html -->
+            <module name="TodoComment">
+                <property name="severity" value="warning"/>
+            </module>
+            <module name="UpperEll">
+                <property name="severity" value="warning"/>
+            </module>
+            
+        </module>
+    </module>
+    

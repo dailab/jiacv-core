@@ -9,11 +9,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
-import org.apache.activemq.network.DiscoveryNetworkConnector;
 import org.apache.activemq.network.NetworkConnector;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
-import de.dailab.jiac.net.discovery.multicast.SourceAwareMulticastDiscoveryAgent;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 
 /**
@@ -92,9 +90,7 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
                     URI discoveryURI= new URI(amtc.getDiscoveryURI());
                     connector.setDiscoveryUri(discoveryURI);
                     connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
-                    NetworkConnector networkConnector= uri.getScheme().equals(SourceAwareMulticastDiscoveryAgent.SCHEME) ?
-                            new SourceAwareDiscoveryNetworkConnector(uri) :
-                            new DiscoveryNetworkConnector(uri);
+                    NetworkConnector networkConnector= new SourceAwareDiscoveryNetworkConnector(uri);
                     networkConnector.setNetworkTTL(_networkTTL);
                     _broker.addNetworkConnector(networkConnector);
                 }

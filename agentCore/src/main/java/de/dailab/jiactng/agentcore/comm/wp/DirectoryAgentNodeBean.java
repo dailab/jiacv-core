@@ -278,11 +278,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 	 */
 	public <T extends IActionDescription> void addAction(T action){
 		if (action != null){
-			ActionData actionData = new ActionData(_currentLogicTime);
-			actionData.setActionDescription(action);
-			actionData.setProviderDescription(action.getProviderDescription());
-			actionData.setIsLocal(true);
-			synchronized (space) {
+      synchronized (space) {
+        ActionData actionData = new ActionData(_currentLogicTime);
+        actionData.setActionDescription(action);
+        actionData.setProviderDescription(action.getProviderDescription());
+			  actionData.setIsLocal(true);
+
 				space.write(actionData);
 				synchronized(_bufferlock){
 					_additionBuffer.add(actionData);
@@ -1062,12 +1063,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 					
 					ActionData messageData = new ActionData();
 					messageData.setActionDescription(actDesc);
+
+					synchronized(space){					
+					  ActionData refreshData = new ActionData();
+					  refreshData.setActionDescription(actDesc);
+					  refreshData.setCreationTime(_currentLogicTime + 1);
 					
-					ActionData refreshData = new ActionData();
-					refreshData.setActionDescription(actDesc);
-					refreshData.setCreationTime(_currentLogicTime + 1);
-					
-					synchronized(space){
+
 						//let's simply update the entry
 						space.update(messageData, refreshData);
 					}
@@ -1172,14 +1174,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 								if (moc.getAdditions() != null){
 									FactSet additions = moc.getAdditions();
 									for (IFact fact : additions.getFacts()){
-										if (fact instanceof IAgentDescription){
-											space.write(fact);
-										} else if (fact instanceof ActionData){
-											ActionData actDat = (ActionData) fact;
-											actDat.setIsLocal(false);
-											actDat.setCreationTime(_currentLogicTime + 1);
-											space.write(actDat);
-										}
+									  synchronized(space){
+  									  if (fact instanceof IAgentDescription){
+  											space.write(fact);
+  										} else if (fact instanceof ActionData){
+  
+  										  ActionData actDat = (ActionData) fact;
+  											actDat.setIsLocal(false);
+  											actDat.setCreationTime(_currentLogicTime + 1);
+  											space.write(actDat);
+  										}
+									  }
 									}
 								}
 							}
@@ -1408,10 +1413,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						sendMessage(refreshMessage, refreshAddress);
 					}
 				}
+	      _currentLogicTime++;
 			}		
 
 			// finally after processing all timeouts let's give the clock a little nudge
-			_currentLogicTime++;
+
 			log.debug("Finished refreshment of stored actions");
 		}
 	}

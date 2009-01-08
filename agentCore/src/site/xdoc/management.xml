@@ -22,6 +22,12 @@
 	       the executable operations (all other public methods) of these resources.
 	    </p>
 
+      <p>		         
+         <a href="images/Management.png">
+	      <img src="images/Management.png"/>
+	     </a>
+	  </p>
+     
 	    <p>This documentation of the management interface consists of four sections.
 	       The first section describes the management client API which allows the 
 	       easy management of JIAC TNG resources without knowledge about the manageable 

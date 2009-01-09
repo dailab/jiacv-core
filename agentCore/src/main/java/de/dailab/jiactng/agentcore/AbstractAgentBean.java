@@ -42,7 +42,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   private long                      nextExecutionTime = 0;
 
-  private HashMap<String, DoAction> searchToInvokeMap = new HashMap<String, DoAction>();
+  private HashMap<String, Serializable[]> searchToInvokeMap = new HashMap<String, Serializable[]>();
 
   /**
    * Creates an agent bean that uses lifecycle support in loose mode
@@ -499,6 +499,10 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   }
 
   protected String invokeRemote(Action template, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
+    return invokeRemote(template, parent, inputParams, receiver, true);
+  }
+  
+  protected String invokeRemote(Action template, Session parent, Serializable[] inputParams, ResultReceiver receiver, boolean caching) {
     if (parent == null) {
       parent = new Session(receiver);
     }
@@ -522,7 +526,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
       Serializable[] params = { template, new Boolean(true), new Long(2000) };
 
       DoAction readAction = requestSearchAction.createDoAction(params, new SearchResultHandler());
-      searchToInvokeMap.put(readAction.getSessionId(), doAct);
+      searchToInvokeMap.put(readAction.getSessionId(), new Serializable[] {doAct,caching});
       memory.write(readAction);
 
       return parent.getSessionId();
@@ -539,12 +543,17 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
     @Override
     public void receiveResult(ActionResult result) {
       String readSession = result.getSessionId();
-      DoAction doAct = searchToInvokeMap.get(readSession);
-      if ((doAct != null) && (result.getFailure() == null)) {
+      Serializable[] s = searchToInvokeMap.get(readSession);
+       
+      if ((s != null) && (result.getFailure() == null)) {
+        DoAction doAct = (DoAction)s[0];
+        boolean caching = (Boolean)s[1];
         Serializable[] res = result.getResults();
         List<Action> actList = (List<Action>) res[0];
-        for (Action a : actList) {
-          memory.write(a);
+        if(caching) {
+          for (Action a : actList) {
+            memory.write(a);
+          }
         }
         if (actList.size() > 0) {
           Action myAct = actList.get(0);
@@ -557,10 +566,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
           log.warn("No Actions found for: " + doAct.getAction());
           returnFailure(doAct, "Could not find Action: " + doAct.getAction());
         }
-      } else if ((doAct != null) && (result.getFailure() != null)) {
+      } else if ((s != null) && (result.getFailure() != null)) {
         log.info("Search failed: "+result.getFailure());
+        DoAction doAct = (DoAction)s[0];
         returnFailure(doAct, result.getFailure());
-      } else if(doAct == null){
+      } else if(s == null){
         log.error("Received result without pending doAct: "+result);
       } else {
         log.error("SHOULD NOT HAPPEN!!!");

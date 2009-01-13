@@ -16,6 +16,7 @@ import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
+import de.dailab.jiactng.agentcore.management.jmx.DoActionState;
 
 public abstract class AbstractExecutionCycle extends AbstractAgentBean
 		implements IExecutionCycle, AbstractExecutionCycleMBean {
@@ -29,9 +30,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 	private LinkedBlockingQueue[] queues = {new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize)};
 
 	protected void performDoAction(DoAction act) {
-		long start = System.nanoTime();
-		boolean success = false;
-
+		actionPerformed(act, DoActionState.invoked);
 		IEffector providerBean = ((Action) act.getAction()).getProviderBean();
 		if (providerBean != null) {
 			try {
@@ -50,22 +49,21 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 				else {
 					providerBean.doAction(act);
 				}
-				success = true;
+				actionPerformed(act, DoActionState.started);
 			} catch (Throwable t) {
 			    memory.write(new ActionResult(act, t));
 				log.error("--- action failed: " + act.getAction().getName(),t);
 			}
 		} else {
+			actionPerformed(act, DoActionState.failed);
 			log.error("--- found action without bean: "
 					+ act.getAction().getName());
 		}
-
-		long end = System.nanoTime();
-		actionPerformed(act, end - start, success);
 	}
 
 	protected void processResult(ActionResult actionResult) {
 		DoAction doAct = (DoAction) actionResult.getSource();
+		actionPerformed(doAct, (actionResult.getFailure()==null)? DoActionState.success : DoActionState.failed);
 
 		Session session = doAct.getSession();
 		if(session.getCurrentCallDepth()==null) {
@@ -177,13 +175,13 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 	 * 
 	 * @param action
 	 *            the performed action.
-	 * @param duration
-	 *            the duration of the execution.
+	 * @param state
+	 *            the state of the execution.
 	 */
-	public void actionPerformed(DoAction action, long duration, boolean success) {
+	public void actionPerformed(DoAction action, DoActionState state) {
 		Notification n = new ActionPerformedNotification(this,
 				sequenceNumber++, System.currentTimeMillis(),
-				"Action performed", action, duration, success);
+				"Action performed", action, state);
 
 		sendNotification(n);
 	}

@@ -38,11 +38,8 @@ public class ActionPerformedNotification extends Notification {
 	/** The description of the action parameters. */
 	private Object[] _actionParameters;
 
-	/** The duration of action execution in nanoseconds. */
-	private long _duration;
-
-	/** The success of action execution. */
-	private boolean _success;
+	/** The state of action execution. */
+	private DoActionState _state;
 
 	/**
 	 * Constructs a notification about a performed action by an agent.
@@ -51,11 +48,10 @@ public class ActionPerformedNotification extends Notification {
 	 * @param timeStamp The date at which the notification is being sent.
 	 * @param msg A String containing the message of the notification.
 	 * @param action The performed action.
-	 * @param duration The duration of action execution in nanoseconds.
-	 * @param success The success of the action execution.
+	 * @param state The state of the action execution.
 	 */
 	public ActionPerformedNotification(Object source, long sequenceNumber,
-			long timeStamp, String msg, DoAction action, long duration, boolean success) {
+			long timeStamp, String msg, DoAction action, DoActionState state) {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		_actionName = action.getAction().getName();
 		if(((Action)action.getAction()).getProviderBean() == null) {
@@ -68,8 +64,7 @@ public class ActionPerformedNotification extends Notification {
 		_owner = action.getOwner();
 		_actionType = action.getAction().getClass().getSimpleName();
 		_action = action.toString();
-		_duration = duration;
-		_success = success;
+		_state = state;
 		
 		// extract parameters
 		Object[] params = action.getParams();
@@ -146,19 +141,11 @@ public class ActionPerformedNotification extends Notification {
 	}
 
 	/**
-	 * Gets the duration of the action execution.
-	 * @return The duration of action execution in nanoseconds.
+	 * Gets the state of the action execution.
+	 * @return The state of action execution.
 	 */
-	public long getDuration() {
-		return _duration;
-	}
-
-	/**
-	 * Gets the success of the action execution.
-	 * @return The success of action execution.
-	 */
-	public boolean getSuccess() {
-		return _success;
+	public DoActionState getState() {
+		return _state;
 	}
 
 }

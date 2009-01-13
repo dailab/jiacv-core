@@ -9,11 +9,11 @@ import javax.management.NotificationFilter;
  * This class implements the <code>NotificationFilter</code> interface for the 
  * <code>ActionPerformedNotification</code>. The filtering is performed on the 
  * name of the performed action, the name of the executing agent bean and the
- * success of the executed action.
+ * state of the action execution.
  *
  * It manages a list of enabled action names and agent bean names. Methods allow 
  * users to enable/disable as many action names and agent bean names as required
- * as well as all successful and failed actions. 
+ * as well as all invoked, started, successful and failed actions. 
  *  
  * @author Jan Keiser
  */
@@ -33,10 +33,16 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	/** The names of enabled or disabled agent beans. */
 	private Vector<String> _agentbeans = new Vector<String>();
 
-	/** Indicates if the agent bean list contains the enabled or disabled agent beans. */
+	/** Indicates if notifications will be sent for invoked actions. */
+	private boolean _invokedEnabled = true;
+
+	/** Indicates if notifications will be sent for started actions. */
+	private boolean _startedEnabled = true;
+
+	/** Indicates if notifications will be sent for successful actions. */
 	private boolean _successEnabled = true;
 
-	/** Indicates if the agent bean list contains the enabled or disabled agent beans. */
+	/** Indicates if notifications will be sent for failed actions. */
 	private boolean _failedEnabled = true;
 
 	/**
@@ -44,8 +50,8 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * This filter compares the action name and agent bean name of the specified 
 	 * action performed notification with each enabled action name and agent bean 
 	 * name. If the action name equals one of the enabled action names, the 
-	 * agent bean name equals one of the enabled agent bean names and the success
-	 * type of the executed action is enabled, then the notification 
+	 * agent bean name equals one of the enabled agent bean names and the state
+	 * type of the action execution is enabled, then the notification 
 	 * must be sent to the listener and this method returns <code>true</code>.
 	 * @param notification The action performed notification to be sent.
 	 * @return <code>true</code> if the notification has to be sent to the listener, 
@@ -58,11 +64,18 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 			return false;
 		}
 
-		// check success of action
-		if (!_successEnabled && ((ActionPerformedNotification) notification).getSuccess()) {
+		// check state of action
+		DoActionState state = ((ActionPerformedNotification) notification).getState();
+		if (state.equals(DoActionState.invoked) && !_invokedEnabled) {
 			return false;
 		}
-		if (!_failedEnabled && !((ActionPerformedNotification) notification).getSuccess()) {
+		if (state.equals(DoActionState.started) && !_startedEnabled) {
+			return false;
+		}
+		if (state.equals(DoActionState.success) && !_successEnabled) {
+			return false;
+		}
+		if (state.equals(DoActionState.failed) && !_failedEnabled) {
 			return false;
 		}
 
@@ -214,6 +227,20 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	public void disableAllAgentbeans() {
 		_agentbeansEnabled = true;
 		_agentbeans.removeAllElements();
+	}
+
+	/**
+	 * Disables all invoked action executions.
+	 */
+	public void disableInvokedActions() {
+		_invokedEnabled = false;
+	}
+
+	/**
+	 * Disables all started action executions.
+	 */
+	public void disableStartedActions() {
+		_startedEnabled = false;
 	}
 
 	/**

@@ -215,4 +215,63 @@ public class ActionPerformedNotification extends Notification {
 		return _originalService;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		// check type
+		if ((obj == null) || !(obj instanceof ActionPerformedNotification)) {
+			return false;
+		}
+		ActionPerformedNotification n = (ActionPerformedNotification) obj;
+
+		// check agent
+		if (((source == null) && (n.source != null)) ||
+				((source != null) && !source.equals(n.source))) {
+			return false;
+		}
+
+		// check actionName
+		if (((_actionName == null) && (n._actionName != null)) ||
+				((_actionName != null) && !_actionName.equals(n._actionName))) {
+			return false;
+		}
+
+		// check agentbeanName
+		if (((_agentbeanName == null) && (n._agentbeanName != null)) ||
+				((_agentbeanName != null) && !_agentbeanName.equals(n._agentbeanName))) {
+			return false;
+		}
+
+		// check sessionId
+		if (((_sessionId == null) && (n._sessionId != null)) ||
+				((_sessionId != null) && !_sessionId.equals(n._sessionId))) {
+			return false;
+		}
+
+		// check owner
+		if (((_owner == null) && (n._owner != null)) ||
+				((_owner != null) && !_owner.equals(n._owner))) {
+			return false;
+		}
+
+		// check actionType
+		if (((_actionType == null) && (n._actionType != null)) ||
+				((_actionType != null) && !_actionType.equals(n._actionType))) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int prim = 31;
+		int hash = prim + (source == null ? 0 : source.hashCode());
+		hash = prim * hash + (_actionName == null ? 0 : _actionName.hashCode());
+		hash = prim * hash + (_agentbeanName == null ? 0 : _agentbeanName.hashCode());
+		hash = prim * hash + (_sessionId == null ? 0 : _sessionId.hashCode());
+		hash = prim * hash + (_owner == null ? 0 : _owner.hashCode());
+		hash = prim * hash + (_actionType == null ? 0 : _actionType.hashCode());
+		return hash;
+	}
+
 }

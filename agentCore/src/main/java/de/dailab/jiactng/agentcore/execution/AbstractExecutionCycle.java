@@ -18,6 +18,10 @@ import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
 import de.dailab.jiactng.agentcore.management.jmx.DoActionState;
 
+/**
+ * Super class for all implementations of JIAC TNG agent execution cycles.
+ * @author Jan Keiser
+ */
 public abstract class AbstractExecutionCycle extends AbstractAgentBean
 		implements IExecutionCycle, AbstractExecutionCycleMBean {
 
@@ -29,8 +33,15 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 	private int queueSize = 100;
 	private LinkedBlockingQueue[] queues = {new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize)};
 
+	/**
+	 * Performs an action request.
+	 * @param act The action invocation.
+	 * @see AbstractActionAuthorizationBean#authorize(DoAction)
+	 * @see IEffector#doAction(DoAction)
+	 * @see #actionPerformed(DoAction, DoActionState, Object[])
+	 */
 	protected void performDoAction(DoAction act) {
-		actionPerformed(act, DoActionState.invoked);
+		actionPerformed(act, DoActionState.invoked, null);
 		IEffector providerBean = ((Action) act.getAction()).getProviderBean();
 		if (providerBean != null) {
 			try {
@@ -49,21 +60,29 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 				else {
 					providerBean.doAction(act);
 				}
-				actionPerformed(act, DoActionState.started);
+				actionPerformed(act, DoActionState.started, null);
 			} catch (Throwable t) {
 			    memory.write(new ActionResult(act, t));
 				log.error("--- action failed: " + act.getAction().getName(),t);
 			}
 		} else {
-			actionPerformed(act, DoActionState.failed);
+			actionPerformed(act, DoActionState.failed, new Object[] {"Action without provider bean"});
 			log.error("--- found action without bean: "
 					+ act.getAction().getName());
 		}
 	}
 
+	/**
+	 * Processes the result of an action request.
+	 * @param actionResult The result of the action invocation.
+	 * @see ResultReceiver#receiveResult(ActionResult)
+	 * @see #actionPerformed(DoAction, DoActionState, Object[])
+	 */
 	protected void processResult(ActionResult actionResult) {
 		DoAction doAct = (DoAction) actionResult.getSource();
-		actionPerformed(doAct, (actionResult.getFailure()==null)? DoActionState.success : DoActionState.failed);
+		actionPerformed(doAct, 
+				(actionResult.getFailure()==null)? DoActionState.success : DoActionState.failed,
+				(actionResult.getFailure()==null)? actionResult.getResults() : new Object[] {actionResult.getFailure()});
 
 		Session session = doAct.getSession();
 		if(session.getCurrentCallDepth()==null) {
@@ -173,15 +192,14 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean
 	 * Uses JMX to send notifications that an action was performed by the
 	 * managed execution cycle of an agent.
 	 * 
-	 * @param action
-	 *            the performed action.
-	 * @param state
-	 *            the state of the execution.
+	 * @param action The performed action.
+	 * @param state The state of the execution.
+	 * @param result The result or failure of the action execution or <code>null</code> if the execution is not yet finished.
 	 */
-	public void actionPerformed(DoAction action, DoActionState state) {
+	public void actionPerformed(DoAction action, DoActionState state, Object[] result) {
 		Notification n = new ActionPerformedNotification(this,
 				sequenceNumber++, System.currentTimeMillis(),
-				"Action performed", action, state);
+				"Action performed", action, state, result);
 
 		sendNotification(n);
 	}

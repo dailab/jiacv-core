@@ -38,8 +38,20 @@ public class ActionPerformedNotification extends Notification {
 	/** The description of the action parameters. */
 	private Object[] _actionParameters;
 
+	/** The description of the action result. */
+	private Object[] _actionResult;
+
 	/** The state of action execution. */
 	private DoActionState _state;
+
+	/** The id of the user that originally triggered the session of this action execution. */
+	private String _originalUser;
+
+	/** The id of the provider that offers the top-level service that was invoked for the session of this action execution. */
+	private String _originalProvider;
+
+	/** The top-level service that was invoked for the session of this action execution. */
+	private String _originalService;
 
 	/**
 	 * Constructs a notification about a performed action by an agent.
@@ -49,9 +61,10 @@ public class ActionPerformedNotification extends Notification {
 	 * @param msg A String containing the message of the notification.
 	 * @param action The performed action.
 	 * @param state The state of the action execution.
+	 * @param result The result or failure of the action or <code>null</code> if the execution is not yet finished.
 	 */
 	public ActionPerformedNotification(Object source, long sequenceNumber,
-			long timeStamp, String msg, DoAction action, DoActionState state) {
+			long timeStamp, String msg, DoAction action, DoActionState state, Object[] result) {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		_actionName = action.getAction().getName();
 		if(((Action)action.getAction()).getProviderBean() == null) {
@@ -65,16 +78,34 @@ public class ActionPerformedNotification extends Notification {
 		_actionType = action.getAction().getClass().getSimpleName();
 		_action = action.toString();
 		_state = state;
-		
+		if (action.getSession() != null) {
+			_originalUser = action.getSession().getOriginalUser();
+			_originalProvider = action.getSession().getOriginalProvider();
+			_originalService = action.getSession().getOriginalService();
+		}
+
 		// extract parameters
 		Object[] params = action.getParams();
-		int size = params.length;
-		_actionParameters = new Object[size];
-		for (int i=0; i<size; i++) {
+		int paramSize = params.length;
+		_actionParameters = new Object[paramSize];
+		for (int i=0; i<paramSize; i++) {
 			try {
 				_actionParameters[i] = ((JmxDescriptionSupport)params[i]).getDescription();
 			} catch (Exception e) {
 				_actionParameters[i] = params[i].toString();
+			}
+		}
+
+		// extract result
+		if (result != null) {
+			int resultSize = result.length;
+			_actionResult = new Object[resultSize];
+			for (int i=0; i<resultSize; i++) {
+				try {
+					_actionResult[i] = ((JmxDescriptionSupport)result[i]).getDescription();
+				} catch (Exception e) {
+					_actionResult[i] = result[i].toString();
+				}
 			}
 		}
 	}
@@ -141,11 +172,47 @@ public class ActionPerformedNotification extends Notification {
 	}
 
 	/**
+	 * Gets a description of the action result or failure.
+	 * @return The array of action result descriptions or <code>null</code> if the action is not yet finished. 
+	 * The representation of each result is either a string or based on JMX open types.
+	 * @see Object#toString()
+	 * @see JmxDescriptionSupport#getDescription()
+	 */
+	public Object[] getActionResult() {
+		return _actionResult;
+	}
+
+	/**
 	 * Gets the state of the action execution.
 	 * @return The state of action execution.
 	 */
 	public DoActionState getState() {
 		return _state;
+	}
+
+	/**
+	 * Gets the id of the user that originally triggered the session of this action execution.
+	 * @return The user id or <code>null</code>.
+	 */
+	public String getOriginalUser() {
+		return _originalUser;
+	}
+
+	/**
+	 * Gets the id of the provider that offers the top-level service that was invoked for the 
+	 * session of this action execution.
+	 * @return The provider id or <code>null</code>.
+	 */
+	public String getOriginalProvider() {
+		return _originalProvider;
+	}
+
+	/**
+	 * Gets the top-level service that was invoked for the session of this action execution.
+	 * @return The service id or <code>null</code>.
+	 */
+	public String getOriginalService() {
+		return _originalService;
 	}
 
 }

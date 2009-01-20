@@ -106,14 +106,6 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
         actionPerformed = true;
         synchronized (this) {
           performDoAction(act);
-          if(log.isInfoEnabled()) {
-            log.info("Processing doAction: "+act);
-            ArrayList<Serializable> output = new ArrayList<Serializable>();
-            for(Serializable s : act.getParams()) {
-              output.add(s);
-            }
-            log.info("with parameters: "+output);
-          }
         }
       }
       updateWorkload(DO_ACTION, actionPerformed);
@@ -135,20 +127,6 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
         synchronized (this) {
           ActionResult actionResult = pendingResults.iterator().next();
           processResult(actionResult);
-          if(log.isInfoEnabled()) {
-            log.info("Processing result: "+actionResult);
-            ArrayList<Serializable> output = new ArrayList<Serializable>();
-            if(actionResult.getFailure()!=null) {
-              output.add("Failure: ");
-              output.add(actionResult.getFailure());
-            } else {
-              for(Serializable s : actionResult.getResults()) {
-                output.add(s);
-              }
-            }
-            log.info("with values: "+output);
-          }          
-          
           pendingResults.remove(actionResult);
         }
       }

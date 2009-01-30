@@ -92,7 +92,7 @@ public class ActionPerformedNotification extends Notification {
 			try {
 				_actionParameters[i] = ((JmxDescriptionSupport)params[i]).getDescription();
 			} catch (Exception e) {
-				_actionParameters[i] = params[i].toString();
+				_actionParameters[i] = "" + params[i];
 			}
 		}
 

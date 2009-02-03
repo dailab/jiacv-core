@@ -3,18 +3,24 @@
 
 <beans>
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
-
-
+	
+	
 	<bean name="LoadReporterAgent" parent="NonBlockingAgent">
 		<property name="agentBeans">
 			<list>
-				<ref bean="LoadReporterMethodExposingBean" />
-				<ref bean="SchedulerMethodExposingBean" />
-				<ref bean="SchedulerTestBean" />
-				<ref bean="DirectoryAccessBean" />
-				<ref bean="CommunicationBean" />
+				<!-- <ref bean="LoadReporterMethodExposingBean" /> -->
 				</list>
 			</property>
 		</bean>
-
-</beans>
+	
+	<!--
+	<bean name="LoadReporterMethodExposingBean" class="de.dailab.ccact.loadreporter.LoadReporterMethodExposingBean" singleton="false">
+		<property name="logLevel" value="DEBUG"/>
+		<property name="registeredActions">
+			<set>
+				<value>relativeLoadAction</value>
+				</set>
+			</property>
+		</bean>
+		-->
+	</beans>

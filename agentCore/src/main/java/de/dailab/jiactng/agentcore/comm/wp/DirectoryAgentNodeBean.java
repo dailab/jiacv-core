@@ -1290,7 +1290,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 					AgentDescription agentDesc = afdIterator.next();
 					if (agentsFromNode.remove(agentDesc)){
 						AgentDescription agentToUpdate = new AgentDescription();
-						agentToUpdate.setName(agentDesc.getName());
+						agentToUpdate.setAid(agentDesc.getAid());
 						space.update(agentToUpdate, agentDesc);
 						afdIterator.remove();
 					}
@@ -1327,7 +1327,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 							for (AgentDescription timeoutAgent : agentsFromDirectory){
 								log.warn("Agent " + timeoutAgent.getName() + " doesn't seem to be present anymore on this AgentNode, thus removing it from the Directory");
 								AgentDescription agentToRemove = new AgentDescription();
-								agentToRemove.setName(timeoutAgent.getName());
+								agentToRemove.setAid(timeoutAgent.getAid());
 								space.remove(agentToRemove);
 								_removalBuffer.add(timeoutAgent);
 

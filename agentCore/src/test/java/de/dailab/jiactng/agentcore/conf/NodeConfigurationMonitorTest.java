@@ -191,13 +191,7 @@ public class NodeConfigurationMonitorTest extends TestCase {
 		} catch (Exception e){
 			e.printStackTrace();	
 		}
-		// Give the node some time to start up
-		try {
-			Thread.sleep(30000);
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-		
+
 		// no errors so far -> success
 		logger.debug("Test testSaveAndReloadSingleDeployment successful.");
 		assert true;

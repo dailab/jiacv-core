@@ -104,7 +104,7 @@ public class ActionPerformedNotification extends Notification {
 				try {
 					_actionResult[i] = ((JmxDescriptionSupport)result[i]).getDescription();
 				} catch (Exception e) {
-					_actionResult[i] = result[i].toString();
+					_actionResult[i] = String.valueOf(result[i]);
 				}
 			}
 		}

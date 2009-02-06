@@ -41,7 +41,7 @@ import java.util.List;
  *
  * @author Silvan Kaiser
  */
-public class NodeConfigurationMonitorTest extends TestCase {
+public class NodeConfigurationMonitorBeanTest extends TestCase {
 	
 	
 	// constants
@@ -83,6 +83,9 @@ public class NodeConfigurationMonitorTest extends TestCase {
 	
 	private JmxManagementClient jmxclient = null;
 	private JmxAgentNodeManagementClient nodeclient = null;
+	private JmxAgentManagementClient agentclient = null;
+	
+	String deployedagent = null; // stores the agentID of the agent to be deployed on the tests agent node.
 	
 	
 	/**
@@ -147,6 +150,13 @@ public class NodeConfigurationMonitorTest extends TestCase {
 		context = new ClassPathXmlApplicationContext(configfile);
 		logger.debug("Agent Node has been created in context: " + context.toString());
 		nodeRef = (SimpleAgentNode) context.getBean(nodeName);
+		try {
+			// connect to local JMX interface
+			jmxclient = new JmxManagementClient();
+			nodeclient = jmxclient.getAgentNodeManagementClient(nodeName);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -166,11 +176,37 @@ public class NodeConfigurationMonitorTest extends TestCase {
 		nodeRef = null;
 	}
 	
+	
+	// Testing Methods
+	
+	/**
+	 * Tests wether or not the NodeConfigurationMonitorBean of the tests Agent Node
+	 * has initialized and started up.
+	 **/
+	
+	public void testNodeConfigurationMonitorBeanStartup(){
+		testcount--; // This is a test, reduce count
+		
+		try {
+			String ncmbstate = nodeclient.getAgentNodeState();
+			logger.debug("ncmbstate is " + ncmbstate);
+			if (ncmbstate.compareTo("STARTED") == 0) {
+				assert true;
+			} else {
+				assert false;
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+			assert false;
+		}
+	}
+	
+	
 	/**
 	 * Deploys an Agent on the test node, shuts down the node and reloads the autosave configuration. Checks
 	 * wether or not the new deployed agent is still active on the node afterwards.
 	 **/
-	public void testSaveAndReloadSingleDeployment(){
+	public void DEACTIVATEDtestSaveAndReloadSingleDeployment(){
 		testcount--; // This is a test, reduce count
 		
 		String result = this.deployTestAgent();
@@ -187,14 +223,28 @@ public class NodeConfigurationMonitorTest extends TestCase {
 		// restart the node in order to load the autosaved configuration
 		logger.debug("Restarting agent node as second instance.");
 		try {
-			this.startAgentNode(NODE_SPRINGCONFIGFILE); // TODO: Hier muss im Test statt der Konstante der autosave-Filename....
+			this.startAgentNode(nodeName + "_autosave.xml");
 		} catch (Exception e){
 			e.printStackTrace();	
+			assert false;
 		}
-
-		// no errors so far -> success
-		logger.debug("Test testSaveAndReloadSingleDeployment successful.");
-		assert true;
+		
+		try {
+			// connect to local JMX interface
+			jmxclient = new JmxManagementClient();
+			agentclient = jmxclient.getAgentManagementClient(nodeName, deployedagent);
+			
+			// check if agent is up and running
+			if (agentclient.getAgentState().compareTo("ACTIVE") == 0){
+				logger.debug("Test testSaveAndReloadSingleDeployment successful.");
+				assert true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		// deployed agent could not be found on the 2nd instance of the tests agent node, therefore we fail
+		assert false;
 	}
 	
 	/**
@@ -204,9 +254,6 @@ public class NodeConfigurationMonitorTest extends TestCase {
 	 **/ 
 	public String deployTestAgent(){
 		try {
-			// connect to local JMX interface
-			jmxclient = new JmxManagementClient();
-			nodeclient = jmxclient.getAgentNodeManagementClient(nodeName);
 			
 			// Prepare Data for test agent
 			// Spring Konfiguration einlesen			
@@ -250,7 +297,8 @@ public class NodeConfigurationMonitorTest extends TestCase {
 			if (l.isEmpty()){
 				return null;
 			} else {
-				return l.get(0);
+				deployedagent = l.get(0);
+				return deployedagent;
 			}
 			
 		} catch (Exception e) {

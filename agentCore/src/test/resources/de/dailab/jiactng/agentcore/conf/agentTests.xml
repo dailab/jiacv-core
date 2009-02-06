@@ -12,6 +12,16 @@
 				</list>
 			</property>
 		
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="willi"/>
+				</list>
+			</property>
+		
+		</bean>
+	
+	<bean name="willi" class="de.dailab.jiactng.agentcore.conf.NodeConfigurationMonitorBean" singleton="false">
+		<property name="logLevel" value="DEBUG"/>
 		</bean>
 	
 	</beans>

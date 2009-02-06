@@ -1,5 +1,8 @@
 package de.dailab.jiactng.agentcore.conf;
 
+// imports
+import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
+
 
 /**
  * The NodeConfigurationMonitor saves the current Spring configuration of the Agent Node
@@ -7,6 +10,6 @@ package de.dailab.jiactng.agentcore.conf;
  *
  * @author Silvan Kaiser
  */
-public class NodeConfigurationMonitor {
+public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean {
 	
 }

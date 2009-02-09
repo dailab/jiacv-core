@@ -107,6 +107,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public static void main(String[] args) {
 	  System.setProperty("log4j.configuration", "jiactng_log4j.properties");
+		System.setProperty("spring.rootconfigfile", args[0]);
 		new ClassPathXmlApplicationContext(args[0]);
 	}
 

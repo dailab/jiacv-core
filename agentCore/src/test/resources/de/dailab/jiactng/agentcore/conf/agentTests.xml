@@ -14,13 +14,13 @@
 		
 		<property name="agentNodeBeans">
 			<list>
-				<ref bean="willi"/>
+				<ref bean="NodeConfigurationMonitorBean"/>
 				</list>
 			</property>
 		
 		</bean>
 	
-	<bean name="willi" class="de.dailab.jiactng.agentcore.conf.NodeConfigurationMonitorBean" singleton="false">
+	<bean name="NodeConfigurationMonitorBean" class="de.dailab.jiactng.agentcore.conf.NodeConfigurationMonitorBean" singleton="false">
 		<property name="logLevel" value="DEBUG"/>
 		</bean>
 	

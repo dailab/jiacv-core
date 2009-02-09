@@ -146,6 +146,9 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	 * @param configfile The path to the configuration file to use for the agent node.
 	 **/
 	protected void startAgentNode(String configfile){
+		// Init properties
+		System.setProperty("spring.rootconfigfile", configfile);
+
 		// start application
 		context = new ClassPathXmlApplicationContext(configfile);
 		logger.debug("Agent Node has been created in context: " + context.toString());

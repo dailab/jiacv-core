@@ -401,5 +401,19 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	public void setStopTime(Long stopTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		this.setAttribute("StopTime", stopTime);
 	}
-
+	
+  public void setAutoExecutionServices(List<String> actionIds) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+    this.setAttribute("AutoExecutionServices", actionIds);
+  }
+  
+  public List<String> getAutoExecutionServices() throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+    return (List<String>) getAttribute("AutoExecutionServices");
+  }
+  
+  public void setAutoExecutionType(boolean continous)throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+    this.setAttribute("AutoExecutionType", continous);
+  }
+  public boolean getAutoExecutionType()throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+    return (Boolean) getAttribute("AutoExecutionType");
+  }
 }

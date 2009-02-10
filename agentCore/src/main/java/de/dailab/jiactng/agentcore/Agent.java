@@ -51,6 +51,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
+
 /**
  * Agentclass implementing the IAgent interface and therby realizing the basic
  * JIAC-TNG agent. The Agent currently holds a Memory-Component, an
@@ -137,7 +138,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	 * Client for accessing the agent node timer.
 	 */
 	private JmxAgentNodeTimerManagementClient timerClient = null;
-
+ 	
 	/**
 	 * Public default constructor, creating the agent identifier.
 	 */
@@ -391,7 +392,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 		}
 
 		this.memory.start();
-		this.execution.start();
 
 		if (log != null && log.isInfoEnabled()) {
 			log.info("Memory and executioncycle switched to state "
@@ -407,10 +407,13 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 			}
 		}
 
+    this.execution.start();
+		
 		synchronized (this) {
 			active = true;
 		}
 		updateState(LifecycleStates.STARTED);
+
 	}
 
 	/**
@@ -431,8 +434,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 
 		}
 
-		this.memory.stop();
-		this.execution.stop();
+  	this.execution.stop();
 
 		if (log != null && log.isInfoEnabled()) {
 			log.info("Memory and executioncycle switched to state "
@@ -447,7 +449,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 				handleBeanException(a, e, LifecycleStates.STOPPED);
 			}
 		}
-
+    
+		this.memory.stop();
+		
 		updateState(LifecycleStates.STOPPED);
 	}
 
@@ -1072,6 +1076,50 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 			}
 		}
 	}
+
+  /* (non-Javadoc)
+   * @see de.dailab.jiactng.agentcore.AgentMBean#getAutoExecutionServices()
+   */
+  @Override
+  public List<String> getAutoExecutionServices() {
+    if(this.execution!= null){
+      return this.execution.getAutoExecutionServices();
+    } else {
+      return null;
+    }
+  }
+
+  /* (non-Javadoc)
+   * @see de.dailab.jiactng.agentcore.AgentMBean#getAutoExecutionType()
+   */
+  @Override
+  public boolean getAutoExecutionType() {
+    if(this.execution!= null){
+      return this.execution.getAutoExecutionType();
+    } else {
+      return false;
+    }
+  }
+
+  /* (non-Javadoc)
+   * @see de.dailab.jiactng.agentcore.AgentMBean#setAutoExecutionServices(java.util.List)
+   */
+  @Override
+  public void setAutoExecutionServices(List<String> actionIds) {
+    if(this.execution!= null){
+      this.execution.setAutoExecutionServices(actionIds);
+    } 
+  }
+
+  /* (non-Javadoc)
+   * @see de.dailab.jiactng.agentcore.AgentMBean#setAutoExecutionType(boolean)
+   */
+  @Override
+  public void setAutoExecutionType(boolean continous) {
+    if(this.execution!= null){
+      this.execution.setAutoExecutionType(continous);
+    } 
+  }
 
 	// ///////////////////////////////////
 	// TODO

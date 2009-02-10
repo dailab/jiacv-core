@@ -117,4 +117,12 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	 */
 	public void setStopTime(Long stopTime) throws InstanceNotFoundException;
 
+	public void setAutoExecutionServices(List<String> actionIds);
+	
+	public List<String> getAutoExecutionServices();
+	
+	public void setAutoExecutionType(boolean continous);
+	
+	public boolean getAutoExecutionType();
+	
 }

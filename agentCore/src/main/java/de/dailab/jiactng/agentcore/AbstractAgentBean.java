@@ -521,6 +521,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
       DoAction doAct = new DoAction(parent, template, receiver, inputParams);
       Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
       if (requestSearchAction == null) {
+        log.error("DirectoryAccessBean not available");
         throw new RuntimeException("DirectoryAccessBean not available");
       }
       Serializable[] params = { template, new Boolean(true), new Long(2000) };

@@ -6,6 +6,8 @@
  */
 package de.dailab.jiactng.agentcore.execution;
 
+import java.util.List;
+
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -30,4 +32,13 @@ public interface IExecutionCycle extends ILifecycle, Runnable {
 
   public void setThisAgent(IAgent agent);
   public void setMemory(IMemory memory);
+  
+  public void setAutoExecutionServices(List<String> actionIds);
+  
+  public List<String> getAutoExecutionServices();
+  
+  public void setAutoExecutionType(boolean continous);
+  
+  public boolean getAutoExecutionType();
+  
 }

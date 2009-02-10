@@ -56,7 +56,14 @@
 			<artifactId>jmxws</artifactId>
 			<version>20060512</version>
 		</dependency-->
-
+		
+		<!-- needed for NodeConfigurationMonitorBean -->
+		<dependency>
+			<groupId>jdom</groupId>
+			<artifactId>jdom</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>

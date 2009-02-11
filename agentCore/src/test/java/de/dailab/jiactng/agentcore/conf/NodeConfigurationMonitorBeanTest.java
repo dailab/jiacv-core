@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.lang.management.ManagementFactory;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.File;
 import java.util.List;
 
 
@@ -68,7 +69,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	 * The file specified by this string is used as spring configuration for the new agent
 	 * to be deployed in this test.
 	 **/
-	public static String NODE_SPRINGCONFIGFILE = "de/dailab/jiactng/agentcore/conf/agentTests.xml";
+	public static String NODE_SPRINGCONFIGFILE = "de/dailab/jiactng/agentcore/conf/agentTests.xml"; // 
 	
 	/**
 	 * The file specified by this string is used as spring configuration for the new agent
@@ -147,8 +148,8 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	 **/
 	protected void startAgentNode(String configfile){
 		// Init properties
-		System.setProperty("spring.rootconfigfile", configfile);
-
+		System.setProperty("jiactng.rootconfigfile", configfile);
+			
 		// start application
 		context = new ClassPathXmlApplicationContext(configfile);
 		logger.debug("Agent Node has been created in context: " + context.toString());
@@ -194,7 +195,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			String ncmbstate = nodeclient.getAgentNodeState();
 			logger.debug("ncmbstate is " + ncmbstate);
 			if (ncmbstate.compareTo("STARTED") == 0) {
-				assert true;
+				logger.debug("NodeConfigurationMonitorBean started successfully. Test passed.");
 			} else {
 				assert false;
 			}

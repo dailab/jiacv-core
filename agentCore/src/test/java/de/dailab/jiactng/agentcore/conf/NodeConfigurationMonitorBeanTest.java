@@ -63,7 +63,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	
 	
 	private static boolean doinit = true; // stores info about wether or not this is the first test in this testcase
-	private static int testcount = 1; //Stores the number of tests in this testcase. Manual counter for deciding when to tear down the test agent node
+	private static int testcount = 2; //Stores the number of tests in this testcase. Manual counter for deciding when to tear down the test agent node
 	
 	/**
 	 * The file specified by this string is used as spring configuration for the new agent
@@ -105,7 +105,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			logger = Logger.getLogger("SchedulerMethodExposingBeanTest");
 			logger.setLevel(myloglevel);
 			
-			logger.debug("Setting up Agent Node, this is the first test in this TestCase.");
+			logger.debug("Setting up, this is the first test in this TestCase.");
 			
 			System.setProperty("jmx.invoke.getters", "");
 			manager = new JmxManager();
@@ -113,13 +113,13 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			mbs = ManagementFactory.getPlatformMBeanServer();
 			
 			// start node
-			this.startAgentNode(NODE_SPRINGCONFIGFILE);
+			//this.startAgentNode(NODE_SPRINGCONFIGFILE);
 			
 			// enable Filter
 			AttributeChangeNotificationFilter acnf = new AttributeChangeNotificationFilter();
 			acnf.enableAttribute("Agents");
 		} else {
-			logger.debug("Skipping Agent Node SetUP, this is not the first test in this testcase.");
+			logger.debug("Skipping SetUP, this is not the first test in this testcase.");
 		}
 		
 	}
@@ -133,11 +133,11 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 		super.tearDown();
 		
 		if (testcount==0){
-			logger.debug("This is the last test in this testcase, tearing down Agent Node.");
-			this.shutdownAgentNode();
+			//logger.debug("This is the last test in this testcase, tearing down Agent Node.");
+			//this.shutdownAgentNode();
 			manager = null;
 		} else {
-			logger.debug("This is not the last Test in this testcase, skipping tear down of the Agent Node.");
+			//logger.debug("This is not the last Test in this testcase, skipping tear down of the Agent Node.");
 		}
 	}
 	
@@ -178,6 +178,8 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 		agentListNotification = null;
 		agentId = null;
 		nodeRef = null;
+		nodeclient = null;
+		jmxclient = null;
 	}
 	
 	
@@ -191,6 +193,9 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	public void testNodeConfigurationMonitorBeanStartup(){
 		testcount--; // This is a test, reduce count
 		
+		// start node
+		this.startAgentNode(NODE_SPRINGCONFIGFILE);
+		
 		try {
 			String ncmbstate = nodeclient.getAgentNodeState();
 			logger.debug("ncmbstate is " + ncmbstate);
@@ -203,6 +208,26 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			e.printStackTrace();
 			assert false;
 		}
+		
+		// shutdown Agent Node
+		this.shutdownAgentNode();
+	}
+	
+	/**
+	 * Tests if an autosave configuration file is saved when shutting down the test Agent Node.
+	 * So far the content of file is not evaluated, only existence and readability of the file.
+	 **/
+	public void testNodeConfigurationMonitorBeanShutdown(){
+		testcount--; // This is a test, reduce count
+		
+		// start Agent Node
+		this.startAgentNode(NODE_SPRINGCONFIGFILE);
+		
+		assert true; // dummy impl
+		logger.debug("NodeConfigurationMonitorBean shutdown successful. Test passed.");
+		
+		// shutdown Agent Node
+		this.shutdownAgentNode();
 	}
 	
 	

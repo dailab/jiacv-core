@@ -5,9 +5,12 @@ import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 
 import java.io.IOException;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 import org.jdom.Document; 
 
 
@@ -22,6 +25,9 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean {
 	// variables
 	boolean initsuccess = true;
 	Document configdocument = null;
+	String configfilename = null; // stores the filename of the configuration to be monitored.
+	String autoconfigfilename = null; // stores the filename of the autosave configuration to be saved.
+	boolean shuttingdown = false;
 	
 	
 	/**
@@ -34,7 +40,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean {
 		super.doInit(); // Call parent method
 		
 		// find config file
-		String configfilename = System.getProperty("jiactng.rootconfigfile");
+		configfilename = System.getProperty("jiactng.rootconfigfile");
 		log.debug("Configuration file is: " + configfilename);
 		URL url =  ClassLoader.getSystemResource(configfilename);
 		File myconfigfilehandle = null; // declare filehandle var
@@ -52,7 +58,37 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean {
 		// create XML document from config file
 		SAXBuilder saxb = new SAXBuilder();
 		configdocument = saxb.build(myconfigfilehandle);
-		log.debug("configuration file read for monitoring starts:\n" + configdocument.getRootElement().toString() + "\n with " + configdocument.getRootElement().getContentSize() + " XML children elements.");
+		log.debug("configuration file "+ configfilename + " read for monitoring starts:\n" + configdocument.getRootElement().toString() + "\n with " + configdocument.getRootElement().getContentSize() + " XML children elements.");
+	}
+	
+	/**
+	 * This Method first stops the monitoring process in this Bean and afterwards saves the current
+	 * configuration in the autosave configuration file.
+	 **/
+	public void doStop() throws Exception {
+		// create file name
+		File myconfigfilehandle = new File(configfilename);
+		//autoconfigfilename = myconfigfilehandle.getAbsolutePath().substring(0,myconfigfilehandle.getAbsolutePath().indexOf(".xml"));
+		autoconfigfilename = myconfigfilehandle.getName().substring(0,myconfigfilehandle.getName().indexOf(".xml")) + "_autosave.xml" ;
+		log.debug("autoconfigfilename generated: " + autoconfigfilename);
+		File autoconfigfile = new File(autoconfigfilename);
+		if (autoconfigfile.exists()){
+			autoconfigfile.delete();
+		}
+		if (autoconfigfile.createNewFile()){
+			log.debug("Writing to: " + autoconfigfile.getPath());
+		} else {
+			throw new IOException("Unable to create autosave configuration file: " + autoconfigfilename);
+		}
+		
+		FileOutputStream fos = new FileOutputStream(autoconfigfile);
+		//OutputStreamWriter osw = new OutputStreamWriter(fos);
+		XMLOutputter xop = new XMLOutputter();
+		xop.output(configdocument, fos);
+		fos.close();
+		
+		// finally call parent method
+		super.doStop();
 	}
 	
 }

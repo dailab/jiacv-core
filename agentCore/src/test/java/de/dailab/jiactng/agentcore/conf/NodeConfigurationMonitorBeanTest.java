@@ -2,7 +2,6 @@ package de.dailab.jiactng.agentcore.conf;
 
 import junit.framework.TestCase;
 
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -29,12 +28,11 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXServiceURL;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.lang.management.ManagementFactory;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
-import java.util.List;
-
 
 
 /**
@@ -223,11 +221,21 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 		// start Agent Node
 		this.startAgentNode(NODE_SPRINGCONFIGFILE);
 		
-		assert true; // dummy impl
-		logger.debug("NodeConfigurationMonitorBean shutdown successful. Test passed.");
-		
+		// execute test
 		// shutdown Agent Node
 		this.shutdownAgentNode();
+		// try to find test Agent Nodes autosave config file
+		String autofilename = NODE_SPRINGCONFIGFILE;
+		autofilename = autofilename.substring(0,autofilename.indexOf(".xml"));
+		logger.debug("autofilename truncated to: " + autofilename);
+		File autoconfigfile = new File(autofilename + "_autosave.xml");
+		autoconfigfile = new File(autoconfigfile.getName()); // Weird construction to get a handle without path, only the pure file name.
+		logger.debug("Searching for: " + autoconfigfile.getPath());
+		assert autoconfigfile.exists();
+		assert autoconfigfile.canRead();
+		
+		logger.debug("NodeConfigurationMonitorBean shutdown successful. Test passed.");
+		
 	}
 	
 	

@@ -68,11 +68,12 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean {
 	public void doStop() throws Exception {
 		// create file name
 		File myconfigfilehandle = new File(configfilename);
-		//autoconfigfilename = myconfigfilehandle.getAbsolutePath().substring(0,myconfigfilehandle.getAbsolutePath().indexOf(".xml"));
-		autoconfigfilename = myconfigfilehandle.getName().substring(0,myconfigfilehandle.getName().indexOf(".xml")) + "_autosave.xml" ;
+		autoconfigfilename = produceAutosaveConfigurationFileName(myconfigfilehandle.getName());
 		log.debug("autoconfigfilename generated: " + autoconfigfilename);
 		File autoconfigfile = new File(autoconfigfilename);
 		if (autoconfigfile.exists()){
+			// TODO: Here some archiving mechanism should move the old file to a new name
+			// For the Proof of Concept we simply delete the old file
 			autoconfigfile.delete();
 		}
 		if (autoconfigfile.createNewFile()){
@@ -90,5 +91,21 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean {
 		// finally call parent method
 		super.doStop();
 	}
+	
+	
+	
+	/**
+	 * Constructs the autosaved file name for a given configuration file name.
+	 * Performs no checks whatsoever about the validity of the file name in the local file system.
+	 *
+	 * @param configfile The configuration file name used for startin the autosaving Agent Node.
+	 * @return The name of autosave configuration file written in the current working directory if the Agent Node is shutdown.
+	 **/
+	public static String produceAutosaveConfigurationFileName(String configfilename){
+		String autofilename = configfilename.substring(0,configfilename.indexOf(".xml"));
+		File autoconfigfile = new File(autofilename + "_autosave.xml");
+		return autoconfigfile.getName(); // Weird construction to get a handle without path, only the pure file name.
+	}
+	
 	
 }

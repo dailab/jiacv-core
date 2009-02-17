@@ -99,10 +99,15 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean {
 	 * Performs no checks whatsoever about the validity of the file name in the local file system.
 	 *
 	 * @param configfile The configuration file name used for startin the autosaving Agent Node.
-	 * @return The name of autosave configuration file written in the current working directory if the Agent Node is shutdown.
+	 * @return The name of autosave configuration file written in the current working directory if the Agent Node is shutdown. Returns the original configfile parameter if it ends with _autosave.xml .
 	 **/
 	public static String produceAutosaveConfigurationFileName(String configfilename){
-		String autofilename = configfilename.substring(0,configfilename.indexOf(".xml"));
+		String autofilename = null;
+		if (configfilename.endsWith("_autosave.xml")) {
+			return configfilename; // The file is already a autosave file, no change needed.
+		} else {
+			autofilename = configfilename.substring(0,configfilename.indexOf(".xml"));
+		}
 		File autoconfigfile = new File(autofilename + "_autosave.xml");
 		return autoconfigfile.getName(); // Weird construction to get a handle without path, only the pure file name.
 	}

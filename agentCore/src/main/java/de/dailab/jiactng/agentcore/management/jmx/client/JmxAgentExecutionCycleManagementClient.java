@@ -21,6 +21,14 @@ import de.dailab.jiactng.agentcore.management.jmx.client.JmxAbstractManagementCl
  */
 public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagementClient {
 
+	private static final AttributeChangeNotificationFilter workloadNotificationFilter = new AttributeChangeNotificationFilter();
+
+	static {
+		workloadNotificationFilter.enableAttribute("ExecutionWorkload");
+		workloadNotificationFilter.enableAttribute("DoActionWorkload");
+		workloadNotificationFilter.enableAttribute("ActionResultWorkload");
+	}
+
 	/**
 	 * Creates a client for the management of an agent execution cycle.
 	 * @param mbsc The JMX connection used for the agent execution cycle management.
@@ -81,11 +89,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
 	public void addWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
-		AttributeChangeNotificationFilter filter = new AttributeChangeNotificationFilter();
-		filter.enableAttribute("ExecutionWorkload");
-		filter.enableAttribute("DoActionWorkload");
-		filter.enableAttribute("ActionResultWorkload");
-		addNotificationListener(listener, filter);
+		addNotificationListener(listener, workloadNotificationFilter);
 	}
 
 	/**
@@ -98,11 +102,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
 	public void removeWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
-		AttributeChangeNotificationFilter filter = new AttributeChangeNotificationFilter();
-		filter.enableAttribute("ExecutionWorkload");
-		filter.enableAttribute("DoActionWorkload");
-		filter.enableAttribute("ActionResultWorkload");
-		removeNotificationListener(listener, filter);
+		removeNotificationListener(listener, workloadNotificationFilter);
 	}
 
 	/**

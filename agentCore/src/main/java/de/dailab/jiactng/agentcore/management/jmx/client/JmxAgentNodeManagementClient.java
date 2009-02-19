@@ -1,7 +1,6 @@
 package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.management.Attribute;
@@ -25,6 +24,14 @@ import de.dailab.jiactng.agentcore.util.jar.JARMemory;
  * @author Jan Keiser
  */
 public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
+
+	private static final AttributeChangeNotificationFilter agentsNotificationFilter = new AttributeChangeNotificationFilter();
+	private static final AttributeChangeNotificationFilter lifecycleNotificationFilter = new AttributeChangeNotificationFilter();
+
+	static {
+		agentsNotificationFilter.enableAttribute("Agents");
+		lifecycleNotificationFilter.enableAttribute("LifecycleState");
+	}
 
 	/**
 	 * Creates a client for the management of an agent node.
@@ -60,9 +67,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#stateChanged(de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates, de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates)
 	 */
 	public void addLifecycleStateListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
-		AttributeChangeNotificationFilter filter = new AttributeChangeNotificationFilter();
-		filter.enableAttribute("LifecycleState");
-		addNotificationListener(listener, filter);
+		addNotificationListener(listener, lifecycleNotificationFilter);
 	}
 
 	/**
@@ -76,9 +81,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle#stateChanged(de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates, de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates)
 	 */
 	public void removeLifecycleStateListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
-		AttributeChangeNotificationFilter filter = new AttributeChangeNotificationFilter();
-		filter.enableAttribute("LifecycleState");
-		removeNotificationListener(listener, filter);
+		removeNotificationListener(listener, lifecycleNotificationFilter);
 	}
 
 	/**
@@ -236,9 +239,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
 	public void addAgentsListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
-		AttributeChangeNotificationFilter filter = new AttributeChangeNotificationFilter();
-		filter.enableAttribute("Agents");
-		addNotificationListener(listener, filter);
+		addNotificationListener(listener, agentsNotificationFilter);
 	}
 
 	/**
@@ -251,9 +252,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
 	public void removeAgentsListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
-		AttributeChangeNotificationFilter filter = new AttributeChangeNotificationFilter();
-		filter.enableAttribute("Agents");
-		removeNotificationListener(listener, filter);
+		removeNotificationListener(listener, agentsNotificationFilter);
 	}
 
 	/**

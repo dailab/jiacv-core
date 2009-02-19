@@ -13,11 +13,114 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @version $Revision$
  */
 public interface ICommunicationBean {
+	
+	/**
+	 * Action to join a Group, which means start receiving all messages that are send to it.
+	 * 
+	 * <br />
+	 * <b>InputParameter</b> <br /> 
+	 * 	IGroupAddress	-  The Groupaddress you want to listen to. Must not be null<br />
+	 *
+	 * <br />
+	 * <b>Result Types:</b> <br />
+	 * 	none <br />
+	 * 
+	 * <b>Exceptions:</b> <br />
+	 * 	CommunicationException is thrown if Address is null or there is a problem with the transport <br />
+	 */
     String ACTION_JOIN_GROUP= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#joinGroup";
+    
+    /**
+	 * Action to join a Group, which means start receiving all messages that are send to it.
+	 * 
+	 * <br />
+	 * <b>InputParameter</b> <br /> 
+	 * 	IGroupAddress	-  The Groupaddress you want to listen to. Must not be null<br />
+	 *
+	 * <br />
+	 * <b>Result Types:</b> <br />
+	 * 	none <br />
+	 * 
+	 * <b>Exceptions:</b> <br />
+	 * 	CommunicationException is thrown if Address is null or there is a problem with the transport <br />
+	 */
     String ACTION_LEAVE_GROUP= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#leaveGroup";
+    
+    /**
+	 * Action that checks whether the provided address references an agent that is
+     * local, thus on the same agentnode as the agent this bean belongs to.
+	 * 
+	 * <br />
+	 * <b>InputParameter</b> <br /> 
+	 * 	IMessageBoxAddress	-  the address to check<br />
+	 *
+	 * <br />
+	 * <b>Result Types:</b> <br />
+	 * 	boolean -  <code>true</code> if the address references a local
+     *                      agent and <code>false</code> otherwise.<br />
+	 * 
+	 * <b>Exceptions:</b> <br />
+	 * 	none <br />
+	 */
     String ACTION_IS_LOCAL= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#isLocal";
+    
+    /**
+     * This method provides access to the message bus.
+     * It delivers the message to the specified address.
+     * 
+     * <br />
+	 * <b>InputParameter</b> <br /> 
+	 * 	IJiacMessage	-  the message to send<br />
+	 *  ICommunicationAddress - the address to send the message to<br />
+	 *
+	 * <br />
+	 * <b>Result Types:</b> <br />
+	 * 	boolean -  <code>true</code> if the address references a local
+     *                      agent and <code>false</code> otherwise.<br />
+	 * 
+	 * <b>Exceptions:</b> <br />
+	 * 	CommunicationException -  if an error occurs on the message bus <br />
+     */
     String ACTION_SEND= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#send";
+    
+    /**
+	 * Action to start receiving messages that are send to a given address.
+	 * It is possible to limit the kind of messages that are received by adding a template
+	 * It is possible to register multiple times for an address using different templates to
+	 * thus receive only messages that are matching to some profiles.
+	 * 
+	 * <br />
+	 * <b>InputParameter</b> <br /> 
+	 * 	ICommunicationAddress	-  	The address you want to listen to. Must not be null.<br />
+	 * 	IJiacMessage			-  	A template to filter messages, set to null if you don't want to use it. 
+	 * 								For informations how to use it see the communication site in the xdocs
+	 * <br />
+	 * <b>Result Types:</b> <br />
+	 * 	none <br />
+	 * 
+	 * <b>Exceptions:</b> <br />
+	 * 	CommunicationException is thrown if Address is null or there is a problem with the transport <br />
+	 */
     String ACTION_REGISTER = "de.dailab.jiactng.agentcore.comm.ICommunicationBean#register";
+    
+    /**
+	 * Action to stop receiving messages that are send to a given address.
+	 * If you used a template registering to this address you have to use it again to unregister.
+	 * Only the combination of address and template will be unregistered. So if you registered multiple
+	 * times the other registrations will not be touched and left active.
+	 * 
+	 * <br />
+	 * <b>InputParameter</b> <br /> 
+	 * 	ICommunicationAddress	-  	The address you want to listen to. Must not be null.<br />
+	 * 	IJiacMessage			-  	A template to filter messages, set to null if you don't want to use it. 
+	 * 								For informations how to use it see the communication site in the xdocs
+	 * <br />
+	 * <b>Result Types:</b> <br />
+	 * 	none <br />
+	 * 
+	 * <b>Exceptions:</b> <br />
+	 * 	CommunicationException is thrown if Address is null or there is a problem with the transport <br />
+	 */
     String ACTION_UNREGISTER = "de.dailab.jiactng.agentcore.comm.ICommunicationBean#unregister";
     
     /**
@@ -40,13 +143,14 @@ public interface ICommunicationBean {
     @Expose(name = ACTION_LEAVE_GROUP)
     void leaveGroup(IGroupAddress group) throws CommunicationException;
     
+    
     /**
      * Checks whether the provided address references an agent that is
      * local to the agent this bean belongs to.
      * 
      * @param messageBox    the address to check
      * @return              <code>true</code> if the address references a local
-     *                      agent and <code>false/<code> otherwise.
+     *                      agent and <code>false</code> otherwise.
      */
     @Expose(name = ACTION_IS_LOCAL)
     boolean isLocal(IMessageBoxAddress messageBox);

@@ -163,6 +163,29 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	
 	
 	/**
+	 * Starts up the autosaved agent node config used for these tests.
+	 *
+	 * @param configfile The path to the configuration file to use for the agent node.
+	 **/
+	protected void startAgentNode(){
+		// construct file name
+		String configfile = NodeConfigurationMonitorBean.produceAutosaveConfigurationFileName(NODE_SPRINGCONFIGFILE);
+
+		// start application
+		context = new ClassPathXmlApplicationContext(configfile);
+		logger.debug("Agent Node has been created in context: " + context.toString());
+		nodeRef = (SimpleAgentNode) context.getBean(nodeName);
+		try {
+			// connect to local JMX interface
+			jmxclient = new JmxManagementClient();
+			nodeclient = jmxclient.getAgentNodeManagementClient(nodeName);
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	
+	/**
 	 * Closes down the agent node used for these tests.
 	 **/
 	protected void shutdownAgentNode(){
@@ -179,7 +202,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 		nodeclient = null;
 		jmxclient = null;
 	}
-	
+		
 	
 	// Testing Methods
 	
@@ -246,6 +269,9 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	public void DEACTIVATEDtestSaveAndReloadSingleDeployment(){
 		testcount--; // This is a test, reduce count
 		
+		// start Agent Node
+		this.startAgentNode(NODE_SPRINGCONFIGFILE);
+		
 		String result = this.deployTestAgent();
 		if (result != null){
 			logger.debug("Test-Agent deployed successfully: " + result);
@@ -260,7 +286,11 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 		// restart the node in order to load the autosaved configuration
 		logger.debug("Restarting agent node as second instance.");
 		try {
-			this.startAgentNode(nodeName + "_autosave.xml");
+			// try to find test Agent Nodes autosave config file
+			String autofilename = NODE_SPRINGCONFIGFILE;
+			autofilename = autofilename.substring(0,autofilename.indexOf(".xml"));
+			File autoconfigfile = new File(autofilename + "_autosave.xml");
+			this.startAgentNode(autoconfigfile.getName()); // Weird construction to get a name without path, only the pure file name.
 		} catch (Exception e){
 			e.printStackTrace();	
 			assert false;
@@ -270,18 +300,23 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			// connect to local JMX interface
 			jmxclient = new JmxManagementClient();
 			agentclient = jmxclient.getAgentManagementClient(nodeName, deployedagent);
-			
+			if (agentclient == null){
+				logger.error("Unable to find added agent in restarted Agent Node, test failed.");
+			} else {
+				logger.debug("Connected to agentclient " + agentclient + " for testing agent state.");
+			}
 			// check if agent is up and running
 			if (agentclient.getAgentState().compareTo("ACTIVE") == 0){
 				logger.debug("Test testSaveAndReloadSingleDeployment successful.");
 				assert true;
+			} else {
+				logger.warn("Deployed agent could not be found active on the 2nd instance of the tests agent node, therefore test fails.");
+				assert false;	
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			assert false;
 		}
-		
-		// deployed agent could not be found on the 2nd instance of the tests agent node, therefore we fail
-		assert false;
 	}
 	
 	/**

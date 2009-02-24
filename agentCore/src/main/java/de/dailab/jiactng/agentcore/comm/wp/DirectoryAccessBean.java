@@ -605,6 +605,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 		for (IActionDescription action : _offeredActions){
 			// if action isn't present anymore...
 		  Action actTemplate = new Action(action.getName());
+		  actTemplate.setProviderDescription(action.getProviderDescription());
 		  Action memoryAct = memory.read(actTemplate);
 		  if(memoryAct == null) {
 		    // remove it and discard it from the directory

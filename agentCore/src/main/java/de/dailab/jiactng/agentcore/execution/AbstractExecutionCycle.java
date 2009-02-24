@@ -42,37 +42,14 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   private boolean               continousAutoExecution = false;
 
-  private boolean               singleExecutionsDone   = false;
-
   @Override
   public void doStart() throws Exception {
     super.doStart();
-    if (autoExecutionServices != null) {
-      if (!continousAutoExecution) {
-        for (String serviceName : autoExecutionServices) {
-          Action service = memory.read(new Action(serviceName));
-          if (service != null) {
-            if(log.isInfoEnabled()) {
-              log.info("Autoexecuting action: "+service);
-            }
-            DoAction doAct = service.createDoAction(new Serializable[0], null);
-            memory.write(doAct);
-          } else {
-            log.warn("Could not find action for autoExecution: "+serviceName);
-          }
-        }
-        singleExecutionsDone = true;
-      }
-    }
-
   }
 
   @Override
   public void doStop() throws Exception {
     super.doStop();
-    if (autoExecutionServices != null) {
-      singleExecutionsDone = false;
-    }
   }
 
   /**
@@ -98,7 +75,11 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
           }
           memory.write(act.getSession());
         }
-        if (providerBean instanceof AbstractActionAuthorizationBean) {
+        Session session = act.getSession();
+        if ((session.getUserToken() == null) && (session.getOriginalProvider() != null)
+            && (session.getOriginalUser() != null) && session.getOriginalUser().equals(session.getOriginalProvider())) {
+          providerBean.doAction(act);
+        } else if (providerBean instanceof AbstractActionAuthorizationBean) {
           ((AbstractActionAuthorizationBean) providerBean).authorize(act);
         } else {
           providerBean.doAction(act);

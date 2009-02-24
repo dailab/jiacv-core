@@ -7,6 +7,7 @@
 package de.dailab.jiactng.agentcore;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -34,6 +35,7 @@ import javax.management.timer.TimerNotification;
 import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
@@ -113,7 +115,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	/**
 	 * Be nice timer for calling the executionCycle.
 	 */
-	private int executionInterval = 50;
+	private int executionInterval = 5;
 
 	/**
 	 * Timeout after which the execution of a bean will be stopped and the agent
@@ -138,7 +140,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	 * Client for accessing the agent node timer.
 	 */
 	private JmxAgentNodeTimerManagementClient timerClient = null;
- 	
+
+	private Integer autoExecTimeId = null;
+	
+	private boolean singleExecutionsDone = false;
+	
 	/**
 	 * Public default constructor, creating the agent identifier.
 	 */
@@ -386,11 +392,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	 */
 	@Override
 	public void doStart() throws LifecycleException {
-
 		if (log != null && log.isInfoEnabled()) {
 			log.info("Trying to start memory and executioncycle");
 		}
-
+		
 		this.memory.start();
 
 		if (log != null && log.isInfoEnabled()) {
@@ -408,7 +413,39 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 		}
 
     this.execution.start();
-		
+
+    singleExecutionsDone = false;
+    if(execution.getAutoExecutionServices()!=null) {
+      try {
+      // add listener if needed
+      if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null)) {
+        try {
+          timerClient.addTimerNotificationListener(this);
+        } 
+        catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+
+      // remove old timer notification
+      if (autoExecTimeId != null) {
+        try {
+          timerClient.removeNotification(autoExecTimeId);
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }     
+      }
+
+      // add new timer notification
+      autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()+3000));
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (InstanceNotFoundException e) {
+        e.printStackTrace();
+      }     
+    }
+    
 		synchronized (this) {
 			active = true;
 		}
@@ -421,26 +458,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	 */
 	@Override
 	public void doStop() throws LifecycleException {
-
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Trying to stop memory and executioncycle");
-		}
-
-		synchronized (this) {
-			active = false;
-			if (executionFuture != null) {
-				executionFuture.cancel(false);
-			}
-
-		}
-
-  	this.execution.stop();
-
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Memory and executioncycle switched to state "
-					+ LifecycleStates.STOPPED);
-		}
-
 		// call stop for all agentbeans
 		for (IAgentBean a : this.agentBeans) {
 			try {
@@ -449,7 +466,26 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 				handleBeanException(a, e, LifecycleStates.STOPPED);
 			}
 		}
-    
+
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Trying to stop memory and executioncycle");
+    }
+
+    synchronized (this) {
+      active = false;
+      if (executionFuture != null) {
+        executionFuture.cancel(false);
+      }
+
+    }
+
+    this.execution.stop();
+
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Memory and executioncycle switched to state "
+          + LifecycleStates.STOPPED);
+    }
+		
 		this.memory.stop();
 		
 		updateState(LifecycleStates.STOPPED);
@@ -943,7 +979,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	 */
 	public void setStartTime(Long startTime) throws InstanceNotFoundException {
 		// add listener if needed
-		if ((startTimeId == null) && (stopTimeId == null) && (startTime != null)) {
+	  if((startTime!=null) && (startTime<=(System.currentTimeMillis()+3000))) {
+	    startTime = System.currentTimeMillis()+3000;
+	  }
+	  
+		if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (startTime != null)) {
 			try {
 				timerClient.addTimerNotificationListener(this);
 			} 
@@ -963,7 +1003,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 		}
 
 		// remove listener if no longer needed
-		if ((startTimeId != null) && (stopTimeId == null) && (startTime == null)) {
+		if ((startTimeId != null) && (stopTimeId == null) && (autoExecTimeId == null) && (startTime == null)) {
 			try {
 				timerClient.removeTimerNotificationListener(this);
 			} 
@@ -1007,7 +1047,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	 */
 	public void setStopTime(Long stopTime) throws InstanceNotFoundException {
 		// add listener if needed
-		if ((startTimeId == null) && (stopTimeId == null) && (stopTime != null)) {
+		if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (stopTime != null)) {
 			try {
 				timerClient.addTimerNotificationListener(this);
 			} 
@@ -1027,7 +1067,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 		}
 
 		// remove listener if no longer needed
-		if ((startTimeId == null) && (stopTimeId != null) && (stopTime == null)) {
+		if ((startTimeId == null) && (stopTimeId != null) && (autoExecTimeId == null) && (stopTime == null)) {
 			try {
 				timerClient.removeTimerNotificationListener(this);
 			} 
@@ -1058,7 +1098,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	public void handleNotification(Notification notification, Object handback) {
 		if (notification instanceof TimerNotification) {
 			Integer id = ((TimerNotification) notification).getNotificationID();
-			if (id.equals(startTimeId)) {
+			if (id.equals(startTimeId) && !getAgentState().equals(LifecycleStates.STARTED) && !getAgentState().equals(LifecycleStates.STARTING)) {
 				try {
 					start();
 				}
@@ -1066,13 +1106,57 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 					e.printStackTrace();
 				}
 			}
-			if (id.equals(stopTimeId)) {
+			if (id.equals(stopTimeId) && !getAgentState().equals(LifecycleStates.STOPPED) && !getAgentState().equals(LifecycleStates.STOPPING)) {
 				try {
 					stop();
 				}
 				catch (LifecycleException e) {
 					e.printStackTrace();
 				}
+			}
+			
+			// check autoExec timer
+			if (id.equals(autoExecTimeId) && getAgentState().equals(LifecycleStates.STARTED)) {
+  	    
+			  // if not continous and one execution was done - continue;
+			  if(!execution.getAutoExecutionType() && singleExecutionsDone) {
+  	      return;
+  	    }
+			  
+			  if (execution.getAutoExecutionServices() != null) {
+  	        for (String serviceName : execution.getAutoExecutionServices()) {
+  	          Action service = memory.read(new Action(serviceName));
+  	          if (service != null) {
+  	            if(log.isInfoEnabled()) {
+  	              log.info("Autoexecuting action: "+service);
+  	            }
+  	            DoAction doAct = service.createDoAction(new Serializable[0], null);
+  	            doAct.getSession().setOriginalService(serviceName);
+  	            doAct.getSession().setOriginalProvider(this.getOwner());            
+  	            doAct.getSession().setOriginalUser(this.getOwner());
+  	            memory.write(doAct);
+  	          } else {
+  	            log.warn("Could not find action for autoExecution: "+serviceName);
+  	          }
+  	        }
+  	        singleExecutionsDone = true;
+  	      }
+        if (execution.getAutoExecutionType()) {
+          // set new timer for contiunous execution
+          // remove old timer notification
+          try {
+            if (autoExecTimeId != null) {
+                timerClient.removeNotification(autoExecTimeId);
+            }
+            // add new timer notification
+            autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()+(30*1000)));
+
+          } catch (IOException e) {
+            e.printStackTrace();
+          } catch (InstanceNotFoundException e) {
+            e.printStackTrace();
+          }               
+        }
 			}
 		}
 	}

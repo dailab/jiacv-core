@@ -530,7 +530,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
         log.error("DirectoryAccessBean not available");
         throw new RuntimeException("DirectoryAccessBean not available");
       }
-      Serializable[] params = { template, new Boolean(false)};
+      Serializable[] params = { template, new Boolean(true), new Long(500)};
 
       DoAction readAction = requestSearchAction.createDoAction(params, new SearchResultHandler());
       searchToInvokeMap.put(readAction.getSessionId(), new Serializable[] {doAct,caching});

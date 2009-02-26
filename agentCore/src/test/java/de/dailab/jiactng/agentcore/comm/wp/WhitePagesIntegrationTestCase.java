@@ -1,10 +1,12 @@
 package de.dailab.jiactng.agentcore.comm.wp;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.Agent;
 import de.dailab.jiactng.agentcore.IAgent;
@@ -12,16 +14,13 @@ import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.SimpleAgentNodeMBean;
+import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.action.ActionResult;
+import de.dailab.jiactng.agentcore.comm.wp.exceptions.TimeoutException;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
-import de.dailab.jiactng.agentcore.action.Action;
-import de.dailab.jiactng.agentcore.action.ActionResult;
-import de.dailab.jiactng.agentcore.comm.wp.WhitePagesTestBean;
-import de.dailab.jiactng.agentcore.comm.wp.exceptions.TimeoutException;
-
-import junit.framework.TestCase;
 
 public class WhitePagesIntegrationTestCase extends TestCase {
 

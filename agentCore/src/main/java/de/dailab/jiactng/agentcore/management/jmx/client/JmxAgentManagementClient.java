@@ -416,4 +416,8 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
   public boolean getAutoExecutionType()throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
     return (Boolean) getAttribute("AutoExecutionType");
   }
+  
+  public byte[] getSpringConfigXml() throws IOException, InstanceNotFoundException {
+	  return (byte[]) getAttribute("SpringConfigXml");
+  }
 }

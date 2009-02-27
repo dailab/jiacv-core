@@ -135,6 +135,12 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	 * The id of the stop time notification.
 	 */
 	private Integer stopTimeId = null;
+	
+	/**
+	 * The spring configuration XML snippet for this agent.
+	 * Currently only written if agents are added by SimpleAgentNode.addAgent()
+	 */
+	private byte[] springConfigXml = null;
 
 	/**
 	 * Client for accessing the agent node timer.
@@ -1203,6 +1209,23 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
     if(this.execution!= null){
       this.execution.setAutoExecutionType(continous);
     } 
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public byte[] getSpringConfigXml() {
+  	return springConfigXml;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setSpringConfigXml(byte[] springConfig) {
+  	this.springConfigXml = springConfig;
+  	
   }
 
 	// ///////////////////////////////////

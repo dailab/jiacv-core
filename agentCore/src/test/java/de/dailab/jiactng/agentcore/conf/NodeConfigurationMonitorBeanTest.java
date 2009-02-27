@@ -29,6 +29,7 @@ import javax.management.remote.JMXServiceURL;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.lang.management.ManagementFactory;
 import java.io.InputStream;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	
 	
 	private static boolean doinit = true; // stores info about wether or not this is the first test in this testcase
-	private static int testcount = 2; //Stores the number of tests in this testcase. Manual counter for deciding when to tear down the test agent node
+	private static int testcount = 3; //Stores the number of tests in this testcase. Manual counter for deciding when to tear down the test agent node
 	
 	/**
 	 * The file specified by this string is used as spring configuration for the new agent
@@ -266,17 +267,25 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	 * Deploys an Agent on the test node, shuts down the node and reloads the autosave configuration. Checks
 	 * wether or not the new deployed agent is still active on the node afterwards.
 	 **/
-	public void DEACTIVATEDtestSaveAndReloadSingleDeployment(){
+	public void testSaveAndReloadSingleDeployment(){
 		testcount--; // This is a test, reduce count
 		
 		// start Agent Node
 		this.startAgentNode(NODE_SPRINGCONFIGFILE);
 		
 		String result = this.deployTestAgent();
-		if (result != null){
-			logger.debug("Test-Agent deployed successfully: " + result);
-		} else {
-			logger.debug("Unable to deploy Test-Agent.");
+		String testAgentName = null;
+		try {
+			if (result != null){
+				logger.debug("Test-Agent deployed successfully: " + result);
+				agentclient = jmxclient.getAgentManagementClient(nodeName, deployedagent);
+				testAgentName = agentclient.getAgentName();
+			} else {
+				logger.debug("Unable to deploy Test-Agent.");
+				assert false;
+			}
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
 			assert false;
 		}
 		// shutdown the node to trigger autosave for the configuration
@@ -299,24 +308,100 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 		try {
 			// connect to local JMX interface
 			jmxclient = new JmxManagementClient();
-			agentclient = jmxclient.getAgentManagementClient(nodeName, deployedagent);
+			
+			List<String> agentIds = nodeclient.getAgents();
+			for (String id: agentIds) {
+				logger.debug("Found agent: "+id);
+				agentclient = jmxclient.getAgentManagementClient(nodeName, id);
+				if (agentclient.getAgentName().equals(testAgentName)) {
+					break;
+				}
+			}
+			
 			if (agentclient == null){
 				logger.error("Unable to find added agent in restarted Agent Node, test failed.");
 			} else {
 				logger.debug("Connected to agentclient " + agentclient + " for testing agent state.");
 			}
+			logger.debug("Agent state is: "+agentclient.getAgentState());
 			// check if agent is up and running
-			if (agentclient.getAgentState().compareTo("ACTIVE") == 0){
+			if (agentclient.getAgentState().compareTo("STARTED") == 0){
 				logger.debug("Test testSaveAndReloadSingleDeployment successful.");
 				assert true;
 			} else {
 				logger.warn("Deployed agent could not be found active on the 2nd instance of the tests agent node, therefore test fails.");
 				assert false;	
 			}
+			this.shutdownAgentNode();
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Exception", e);
 			assert false;
 		}
+	}
+	
+	/**
+	 * Deploys a new agent on the node, removes it, saves and restarts the node. Checks if
+	 * the new agent is not on the node anymore.
+	 */
+	public void testAddAndRemoveAgentFromNode() {
+		testcount--;
+		// start the node
+		this.startAgentNode(NODE_SPRINGCONFIGFILE);
+		
+		//add a new agent
+		
+		
+		String result = this.deployTestAgent();
+		String testAgentName = null;
+		
+		try {
+			if (result != null){
+				logger.debug("Test-Agent deployed successfully: " + result);
+				agentclient = jmxclient.getAgentManagementClient(nodeName, deployedagent);
+				testAgentName = agentclient.getAgentName();
+			} else {
+				logger.debug("Unable to deploy Test-Agent.");
+				assert false;
+			}
+		} catch (Exception e) {
+			logger.error("Exception: ", e);
+			assert false;
+		} 
+		
+		try {
+			logger.debug("Removing agent ... ");
+			agentclient.removeAgent();
+		} catch (Exception e) {
+			logger.error("Agent Removal failed, ", e);
+			assert false;
+		}
+		
+		this.shutdownAgentNode();
+		logger.debug("First instance of the agent node has been shut down.");
+			
+		// restart the node in order to load the autosaved configuration
+		logger.debug("Restarting agent node as second instance.");
+		this.startAgentNode();
+		
+		try {
+			jmxclient = new JmxManagementClient();
+			List<String> agentIDs = nodeclient.getAgents();
+			// the removed agent should not be there anymore
+			for (String id: agentIDs) {
+				agentclient = jmxclient.getAgentManagementClient(nodeName, id);
+				if (agentclient.getAgentName().equals(testAgentName)) {
+					logger.error("Failure: Agent \"" +testAgentName +"\" still exists!");
+					assert false;
+				}
+			}
+			
+		} catch (Exception e) {
+			logger.error ("Exception: ", e);
+		}
+		logger.debug("Test AddAndRemoveAgentFromNode successful.");
+		
+		this.shutdownAgentNode();
+		
 	}
 	
 	/**

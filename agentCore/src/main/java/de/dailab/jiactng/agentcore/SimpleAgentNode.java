@@ -207,7 +207,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			_agents.add(agent);
 		}
 		agent.addLifecycleListener(this.lifecycle.createLifecycleListener());
-		agentListChanged(oldAgentList, getAgents());
+		
 
 		if (_directory != null){
 			agent.addLifecycleListener(_directory);
@@ -215,6 +215,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// register agent for management
 		agent.enableManagement(_manager);
 		
+		agentListChanged(oldAgentList, getAgents());
 	}
 
 	/**
@@ -380,6 +381,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		for (Object a : newAgents) {
 			IAgent agent = (IAgent) a;
 			agent.setOwner(owner);
+			agent.setSpringConfigXml(configuration);
+
 			addAgent(agent);
 			agentIds.add(agent.getAgentId());
 			/*

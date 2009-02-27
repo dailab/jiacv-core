@@ -189,5 +189,19 @@ public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
    * @return the timeout in milliseconds
    */
   public long getBeanExecutionTimeout();
+  
+  /**
+   * Gets the Spring configuration xml snippet for this agent.
+   * 
+   * @return bytearray of the xml spring source
+   */
+  public byte[] getSpringConfigXml();
+  
+  /**
+   * Stores the Spring configuration xml snippet. Note: this function only stores a
+   * xml code snippet, it will NOT configure the agent.
+   * @param springConfig Spring Configuration xml source
+   */
+  public void setSpringConfigXml(byte[] springConfig);
 
 }

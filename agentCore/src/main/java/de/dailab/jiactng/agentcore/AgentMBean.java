@@ -125,4 +125,6 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	
 	public boolean getAutoExecutionType();
 	
+	public byte[] getSpringConfigXml();
+	
 }

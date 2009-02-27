@@ -2,15 +2,20 @@ package de.dailab.jiactng.agentcore.conf;
 
 // imports
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
+import de.dailab.jiactng.agentcore.management.jmx.client.JmxAgentManagementClient;
 import de.dailab.jiactng.agentcore.management.jmx.client.JmxManagementClient;
 import de.dailab.jiactng.agentcore.management.jmx.client.JmxAgentNodeManagementClient;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.List;
 import java.util.LinkedList;
@@ -21,7 +26,11 @@ import javax.management.AttributeChangeNotification;
 
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.jdom.Content;
+import org.jdom.DefaultJDOMFactory;
 import org.jdom.Document; 
+import org.jdom.Element;
+import org.jdom.JDOMFactory;
 
 
 /**
@@ -40,6 +49,8 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	boolean shuttingdown = false;
 	JmxManagementClient jmclient = null;
 	JmxAgentNodeManagementClient nodeclient = null;
+	
+	HashMap<String, String> agentIDtoName = null;
 	
 	
 	/**
@@ -88,6 +99,21 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		// add this Bean as notification listener for adding or removing agents to and from the Agent Node.
 		nodeclient.addAgentsListener(this);
 		
+		// build up agent id to name mapping
+		agentIDtoName = new HashMap<String, String>();
+		for (String id: nodeclient.getAgents()) {
+			JmxAgentManagementClient agentClient = jmclient.getAgentManagementClient(
+					(String)((nodenames.toArray())[0]), id);
+			try {
+				String name = agentClient.getAgentName();
+				if (name != null) {
+					agentIDtoName.put(id, name);
+				}
+			} catch (Exception e) {
+				continue;
+			}
+		}
+		
 		/**
 		 * The following code was for testing purposes only
 		 log.debug("Accessing JMX node client, node state is: " + nodeclient.getAgentNodeState());
@@ -125,6 +151,8 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		
 		// deregister for Agent Node events and JMX interface
 		// nodeclient.removeAgentsListener(this); // remove currently does not work, probably because of a bug in the management interface?
+		
+		agentIDtoName = null;
 		nodeclient = null;
 		jmclient.close();
 		jmclient = null;
@@ -198,6 +226,79 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		}
 	}
 	
+	/**
+	 * Adds new imports to the node configuration.
+	 * @param agentConfig the new agent's spring configuration skript
+	 */
+	private void addMissingImports(Document agentConfig) {
+		List<Element> agentImports = agentConfig.getRootElement().getChildren("import");
+		List<Element> nodeImports = configdocument.getRootElement().getChildren("import");
+		List<Content> importsToAdd = new ArrayList<Content>();
+		for (Element imp: agentImports) {
+			String importPath = imp.getAttribute("resource").getValue();
+			boolean found = false;
+			for (Element nodeimp: nodeImports) {
+				if (nodeimp.getAttribute("resource").getValue().equals(importPath)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				importsToAdd.add(((Element)imp.clone()).detach());
+			}
+		}
+		if (importsToAdd.size() > 0) {
+			agentConfig.getRootElement().addContent(nodeImports.size(), importsToAdd);
+		}
+	}
+	
+	/**
+	 * Returns the JDOM element that contains the agent list in the node spring configuration
+	 * @return Agent list JDOM element
+	 */
+	private Element getNodeAgentList() {
+		for (Object e: configdocument.getRootElement().getChildren("bean")) {
+			for (Object prop : ((Element)e).getChildren("property")) {
+				if (((Element)prop).getAttribute("name").getValue().equals("agents")) {
+					return ((Element)prop).getChild("list");
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Adds the agent name to the agent node's configuration list.
+	 * @param agentName the agent name to add
+	 */
+	private void addAgentToConfigurationList(String agentName) {
+		Element xmlagentlist = getNodeAgentList();
+		if (xmlagentlist != null) {
+			JDOMFactory jdomfactory = new DefaultJDOMFactory();
+			Element newAgentEntry = jdomfactory.element("ref");
+			newAgentEntry.setAttribute("bean", agentName);
+			xmlagentlist.addContent(newAgentEntry);
+		}
+	}
+	
+	/**
+	 * Removes an agent's name from the node's configuration list.
+	 * @param agentName agentName to remove
+	 */
+	private boolean removeAgentFromConfigurationList(String agentName) {
+		List<Element> xmlagentlist = getNodeAgentList().getChildren("ref");
+		if (xmlagentlist != null) {
+			for (Iterator<Element> entry = xmlagentlist.iterator(); entry.hasNext();) {
+				Element current = entry.next();
+				if (current.getAttribute("bean").getValue().equals(agentName)) {
+					entry.remove();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	
 	/**
 	 * Adds the configuration for the given agent to the current configuration document.
@@ -206,6 +307,48 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	 **/
 	public void addAgentConfiguration(String agentid){
 		log.debug("Adding agent configuration for new agent " + agentid);
+		try {
+			Set<String> nodeNames = jmclient.getAgentNodeNames();
+			
+			// connect to agent
+			JmxAgentManagementClient agentClient = 
+				jmclient.getAgentManagementClient((String)((nodeNames.toArray())[0]), agentid);
+			if (agentClient == null) {
+				log.error ("Client is null!");
+				return;
+			}
+			// fetch configuration
+			byte[] configuration = agentClient.getSpringConfigXml().clone();
+			String agentName = agentClient.getAgentName();
+			if (configuration != null) {
+				log.debug("Got configuration for agent: \""+agentName+"\"");
+				// create document from spring configuration
+				SAXBuilder saxb = new SAXBuilder();
+				Document agentConfig = saxb.build(new ByteArrayInputStream(configuration));
+				// check and add missing imports
+				addMissingImports(agentConfig);
+				// get agent definitions
+				List<Element> beans = agentConfig.getRootElement().getChildren("bean");
+				// add definitions to spring configuration
+				for (Iterator<Element> it = beans.iterator(); it.hasNext();) {
+					Element agentbean = (Element)it.next().clone();
+					agentbean.detach();
+					configdocument.getRootElement().addContent(agentbean);
+				}
+				// add agent name to agent node's agent list
+				addAgentToConfigurationList(agentName);
+				agentIDtoName.put(agentid, agentName);
+				
+//				// debug output
+//				XMLOutputter testxop = new XMLOutputter();
+//				testxop.output(configdocument, System.out);
+				
+			} else {
+				log.error("Spring Configuration was null, agent was NOT added to configuration.");
+			}	
+		} catch (Exception e) {
+			log.error("An Exception occured: ", e);
+		}
 	}
 	
 	
@@ -216,6 +359,35 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	 **/
 	public void removeAgentConfiguration(String agentid){
 		log.debug("Removing agent configuration of old agent " + agentid);
+		
+		String agentName = agentIDtoName.get(agentid);
+		if (agentName != null) {
+			log.debug("Agent name is "+agentName);
+			// remove agent from node's agent list
+			if (!removeAgentFromConfigurationList(agentName)) {
+				log.error("Could not remove agent from agent list.");
+			}
+			// remove agent's spring configuration
+			List<Element> beans = configdocument.getRootElement().getChildren("bean");
+			for (Iterator<Element> it = beans.iterator(); it.hasNext();) {
+				Element agent = it.next();
+				if (agent.getAttribute("name").getValue().equals(agentName)) {
+					
+					it.remove();
+					// TODO: referenced agentbeans should be removed as well
+				}
+			}
+			agentIDtoName.remove(agentid);
+			
+//			// debug output
+//			try {
+//				XMLOutputter testxop = new XMLOutputter();
+//				testxop.output(configdocument, System.out);
+//			} catch (Exception e) {
+//				log.error("An Exception occured: ", e);
+//			}	
+		} else {
+			log.error("Agent name for \"" + agentid + "\" could not be resolved!");
+		}
 	}
-	
 }

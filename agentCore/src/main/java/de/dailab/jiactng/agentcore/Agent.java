@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -33,6 +34,7 @@ import javax.management.openmbean.SimpleType;
 import javax.management.timer.TimerNotification;
 
 import org.apache.commons.logging.Log;
+import org.jdom.Element;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
@@ -157,7 +159,17 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	public Agent() {
 		agentId = IdFactory.createAgentId(this.hashCode());
 	}
-
+	
+	/**
+	 * Constructor for spring-based agentnode persistency, creates an agent with a given ID.
+	 * Note: You should not try to assign agentIds yourself, but always use the {@link Agent#Agent() Agent()}
+	 * constructor to create a new agent.
+	 * @param agentID AgentID to assign.
+	 */
+	public Agent(String agentID) {
+		this.agentId = agentID;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -1227,7 +1239,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
   	this.springConfigXml = springConfig;
   	
   }
-
+  
 	// ///////////////////////////////////
 	// TODO
 	// ///////////////////////////////////

@@ -9,6 +9,7 @@
 		
 		<property name="agents">
 			<list>
+					<ref bean="PersistencyTestAgent"/>
 				</list>
 			</property>
 		
@@ -22,6 +23,13 @@
 	
 	<bean name="NodeConfigurationMonitorBean" class="de.dailab.jiactng.agentcore.conf.NodeConfigurationMonitorBean" singleton="false">
 		<property name="logLevel" value="DEBUG"/>
+		</bean>
+		
+	<bean name="PersistencyTestAgent" parent="NonBlockingAgent">
+		<property name="agentBeans">
+			<list>
+				</list>
+			</property>
 		</bean>
 	
 	</beans>

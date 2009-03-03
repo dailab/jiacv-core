@@ -28,6 +28,7 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXServiceURL;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.lang.management.ManagementFactory;
@@ -62,7 +63,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	
 	
 	private static boolean doinit = true; // stores info about wether or not this is the first test in this testcase
-	private static int testcount = 3; //Stores the number of tests in this testcase. Manual counter for deciding when to tear down the test agent node
+	private static int testcount = 4; //Stores the number of tests in this testcase. Manual counter for deciding when to tear down the test agent node
 	
 	/**
 	 * The file specified by this string is used as spring configuration for the new agent
@@ -262,6 +263,61 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 		
 	}
 	
+	/**
+	 * Starts up the test node, retrieves the IDs and names of running agents, shuts down and reloads the
+	 * autosave config, the checks if all IDs and names still match.
+	 */
+	public void testPreExistingAgentIDPersistency() {
+		testcount--;
+		
+		this.startAgentNode(NODE_SPRINGCONFIGFILE);
+		HashMap<String, String> id2Name = new HashMap<String, String>();
+		try {
+			for (String id : nodeclient.getAgents()) {
+				JmxAgentManagementClient agentClient = jmxclient.getAgentManagementClient(nodeName, id);
+				if (agentClient.getAgentName() != null) {
+					id2Name.put(id, agentClient.getAgentName());
+				}
+				agentClient = null;
+			}
+		} catch (Exception e) {
+			logger.debug("Exception", e);
+			assert false;
+		}
+		
+		logger.debug("First instance of the agent node has been shut down.");
+		this.shutdownAgentNode();
+		
+		logger.debug("Restarting agent node as second instance.");
+		try {
+			// try to find test Agent Nodes autosave config file
+			String autofilename = NODE_SPRINGCONFIGFILE;
+			autofilename = autofilename.substring(0,autofilename.indexOf(".xml"));
+			File autoconfigfile = new File(autofilename + "_autosave.xml");
+			this.startAgentNode(autoconfigfile.getName()); // Weird construction to get a name without path, only the pure file name.
+		} catch (Exception e){
+			logger.debug("Exception", e);	
+			assert false;
+		}
+		
+		try {
+			// connect to local JMX interface
+			jmxclient = new JmxManagementClient();
+			//check all agents in hashmap
+			logger.debug("Checking Agent IDs and names");
+			for (String id: id2Name.keySet()) {
+				JmxAgentManagementClient agentClient = jmxclient.getAgentManagementClient(nodeName, id);
+				logger.debug ("Connected to Agent "+id);
+				assert agentClient.getAgentName().equals(id2Name.get(id));
+			}
+		} catch (Exception e){
+			logger.debug("Exception", e);	
+			assert false;
+		}
+		
+		logger.debug("Test PreExistingAgentIDPersistency successful");
+		this.shutdownAgentNode();
+	}
 	
 	/**
 	 * Deploys an Agent on the test node, shuts down the node and reloads the autosave configuration. Checks
@@ -310,13 +366,14 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			jmxclient = new JmxManagementClient();
 			
 			List<String> agentIds = nodeclient.getAgents();
-			for (String id: agentIds) {
-				logger.debug("Found agent: "+id);
-				agentclient = jmxclient.getAgentManagementClient(nodeName, id);
-				if (agentclient.getAgentName().equals(testAgentName)) {
-					break;
-				}
+			
+			logger.debug("Looking for agent with name \""+testAgentName+"\" and id "+deployedagent);
+			agentclient = jmxclient.getAgentManagementClient(nodeName, deployedagent);
+			
+			if (agentclient.getAgentName().equals(testAgentName)) {
+				logger.debug("Agent name \""+agentclient.getAgentName()+"\" of agent "+deployedagent+" matches.");
 			}
+			
 			
 			if (agentclient == null){
 				logger.error("Unable to find added agent in restarted Agent Node, test failed.");
@@ -387,21 +444,28 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			jmxclient = new JmxManagementClient();
 			List<String> agentIDs = nodeclient.getAgents();
 			// the removed agent should not be there anymore
+			assert !(agentIDs.contains(deployedagent));
+			
+			boolean found = false;
 			for (String id: agentIDs) {
 				agentclient = jmxclient.getAgentManagementClient(nodeName, id);
 				if (agentclient.getAgentName().equals(testAgentName)) {
 					logger.error("Failure: Agent \"" +testAgentName +"\" still exists!");
+					found = true;
 					assert false;
 				}
+			}
+			if (!found) {
+				logger.debug("Removed Agent not found on node.");
+				logger.debug("Test AddAndRemoveAgentFromNode successful.");
 			}
 			
 		} catch (Exception e) {
 			logger.error ("Exception: ", e);
+			assert false;
 		}
-		logger.debug("Test AddAndRemoveAgentFromNode successful.");
 		
 		this.shutdownAgentNode();
-		
 	}
 	
 	/**

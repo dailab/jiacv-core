@@ -121,12 +121,42 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		 **/
 	}
 	
+	/**
+	 * Adds missing agent IDs to the configuration document. After completion of this method,
+	 * all agents defined in spring should have their agentIds.
+	 */
+	private void addMissingIDs() {
+		List<Element> agents = configdocument.getRootElement().getChildren("bean");
+		for (Element agent : agents) {
+			if (agent.getChild("constructor-arg") != null) {
+				// already got an agent id, nothing to do
+				continue;
+			} else {
+				String name = agent.getAttributeValue("name");
+				if (agentIDtoName.containsValue(name)) {
+					for (String key : agentIDtoName.keySet()) {
+						if (agentIDtoName.get(key).equals(name)) {
+							// id found, write into spring config
+							JDOMFactory jdomfactory = new DefaultJDOMFactory();
+							Element idProp = jdomfactory.element("constructor-arg");
+							idProp.setAttribute("value", key);				
+							agent.addContent(idProp);
+							break;
+						}
+					}
+				}	
+			}
+		}
+	}
+	
 	
 	/**
 	 * This Method first stops the monitoring process in this Bean and afterwards saves the current
 	 * configuration in the autosave configuration file.
 	 **/
 	public void doStop() throws Exception {
+		// add missing agent ids
+		addMissingIDs();
 		// create file name
 		File myconfigfilehandle = new File(configfilename);
 		autoconfigfilename = produceAutosaveConfigurationFileName(myconfigfilehandle.getName());
@@ -143,10 +173,13 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 			throw new IOException("Unable to create autosave configuration file: " + autoconfigfilename);
 		}
 		
+		
 		FileOutputStream fos = new FileOutputStream(autoconfigfile);
 		//OutputStreamWriter osw = new OutputStreamWriter(fos);
 		XMLOutputter xop = new XMLOutputter();
 		xop.output(configdocument, fos);
+		//debug output
+//		xop.output(configdocument, System.out);
 		fos.close();
 		
 		// deregister for Agent Node events and JMX interface
@@ -231,6 +264,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	 * @param agentConfig the new agent's spring configuration skript
 	 */
 	private void addMissingImports(Document agentConfig) {
+		// TODO: not tested yet
 		List<Element> agentImports = agentConfig.getRootElement().getChildren("import");
 		List<Element> nodeImports = configdocument.getRootElement().getChildren("import");
 		List<Content> importsToAdd = new ArrayList<Content>();
@@ -333,6 +367,12 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 				for (Iterator<Element> it = beans.iterator(); it.hasNext();) {
 					Element agentbean = (Element)it.next().clone();
 					agentbean.detach();
+					//write agent id
+					JDOMFactory jdomfactory = new DefaultJDOMFactory();
+					Element idProp = jdomfactory.element("constructor-arg");
+					idProp.setAttribute("value", agentid);				
+					agentbean.addContent(idProp);
+					
 					configdocument.getRootElement().addContent(agentbean);
 				}
 				// add agent name to agent node's agent list
@@ -372,9 +412,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 			for (Iterator<Element> it = beans.iterator(); it.hasNext();) {
 				Element agent = it.next();
 				if (agent.getAttribute("name").getValue().equals(agentName)) {
-					
 					it.remove();
-					// TODO: referenced agentbeans should be removed as well
 				}
 			}
 			agentIDtoName.remove(agentid);

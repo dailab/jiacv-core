@@ -63,7 +63,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	
 	
 	private static boolean doinit = true; // stores info about wether or not this is the first test in this testcase
-	private static int testcount = 4; //Stores the number of tests in this testcase. Manual counter for deciding when to tear down the test agent node
+	private static int testcount = 5; //Stores the number of tests in this testcase. Manual counter for deciding when to tear down the test agent node
 	
 	/**
 	 * The file specified by this string is used as spring configuration for the new agent
@@ -158,6 +158,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			// connect to local JMX interface
 			jmxclient = new JmxManagementClient();
 			nodeclient = jmxclient.getAgentNodeManagementClient(nodeName);
+			logger.debug("Running agents on node: "+nodeclient.getAgents().size());
 		} catch (Exception e){
 			e.printStackTrace();
 		}
@@ -277,6 +278,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 				JmxAgentManagementClient agentClient = jmxclient.getAgentManagementClient(nodeName, id);
 				if (agentClient.getAgentName() != null) {
 					id2Name.put(id, agentClient.getAgentName());
+					logger.debug(id+": "+agentClient.getAgentName());
 				}
 				agentClient = null;
 			}
@@ -466,6 +468,79 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 		}
 		
 		this.shutdownAgentNode();
+	}
+	
+	/** 
+	 * Tests adding of multiple instances of the same agent to one node, they should be renamed.
+	 */
+	public void testAddingDuplicateAgents() {
+		testcount--; // This is a test, reduce count
+		
+		// start Agent Node
+		this.startAgentNode(NODE_SPRINGCONFIGFILE);
+		
+		// add 3 agents with the same agent name
+		for (int i=0; i<3; i++) {
+			String result = this.deployTestAgent();
+			String testAgentName = null;
+			try {
+				if (result != null){
+					logger.debug("Test-Agent deployed successfully: " + result);
+					agentclient = jmxclient.getAgentManagementClient(nodeName, deployedagent);
+				} else {
+					logger.debug("Unable to deploy Test-Agent.");
+					assert false;
+				}
+			} catch (Exception e) {
+				logger.error("Exception: ", e);
+				assert false;
+			}
+		}
+		// shutdown the node to trigger autosave for the configuration
+		this.shutdownAgentNode();
+		logger.debug("First instance of the agent node has been shut down.");
+		
+		// restart the node in order to load the autosaved configuration
+		logger.debug("Restarting agent node as second instance.");
+		try {
+			// try to find test Agent Nodes autosave config file
+			String autofilename = NODE_SPRINGCONFIGFILE;
+			autofilename = autofilename.substring(0,autofilename.indexOf(".xml"));
+			File autoconfigfile = new File(autofilename + "_autosave.xml");
+			this.startAgentNode(autoconfigfile.getName()); // Weird construction to get a name without path, only the pure file name.
+		} catch (Exception e){
+			e.printStackTrace();	
+			assert false;
+		}
+		
+		try {
+			// connect to local JMX interface
+			jmxclient = new JmxManagementClient();
+			
+			List<String> agentIds = nodeclient.getAgents();
+			List<String> tempList = new ArrayList<String>();
+			tempList.addAll(agentIds);
+			//check for duplicate agent ids
+			while (tempList.size() > 0) {
+				String id = tempList.remove(0);
+				assert !(tempList.contains(id));
+			}
+			
+			//check for duplicate agent names
+			List<String> agentNames = new ArrayList<String>();
+			for (String id : agentIds) {
+				JmxAgentManagementClient agentClient = jmxclient.getAgentManagementClient(nodeName, id);
+				assert !(agentNames.contains(agentClient.getAgentName()));
+				logger.debug("Agent "+id+" has name \""+agentClient.getAgentName()+ "\"");
+			}
+			
+			logger.debug("Test AddingDuplicateAgents finished successfully");
+			
+			this.shutdownAgentNode();
+		} catch (Exception e) {
+			logger.error("Exception", e);
+			assert false;
+		}
 	}
 	
 	/**

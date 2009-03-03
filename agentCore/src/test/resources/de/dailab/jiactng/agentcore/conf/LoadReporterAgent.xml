@@ -9,7 +9,7 @@
 		<property name="agentBeans">
 			<list>
 				<!-- <ref bean="LoadReporterMethodExposingBean" /> -->
-				</list>
+					</list>
 			</property>
 		</bean>
 	

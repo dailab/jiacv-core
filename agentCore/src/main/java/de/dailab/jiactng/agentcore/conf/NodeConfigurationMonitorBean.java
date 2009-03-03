@@ -51,6 +51,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	JmxAgentNodeManagementClient nodeclient = null;
 	
 	HashMap<String, String> agentIDtoName = null;
+	List<String> agentBeanConfs = null;
 	
 	
 	/**
@@ -86,6 +87,16 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		log.debug("NodeConfigurationMonitorBean has initialized.");
 	}
 	
+	private void buildAgentBeanConfList() {
+		agentBeanConfs = new ArrayList<String>();
+		for (Object bean : configdocument.getRootElement().getChildren("bean")) {
+			if (((Element)bean).getAttribute("class") != null) {
+				//we've got an agent bean and not an agent or a node
+				agentBeanConfs.add(((Element)bean).getAttributeValue("name"));
+			}
+		}
+	}
+	
 	
 	/**
 	 * Opens a JMX connection to the first local Agent Node found and registers
@@ -114,6 +125,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 			}
 		}
 		
+		buildAgentBeanConfList();
 		/**
 		 * The following code was for testing purposes only
 		 log.debug("Accessing JMX node client, node state is: " + nodeclient.getAgentNodeState());
@@ -186,6 +198,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		// nodeclient.removeAgentsListener(this); // remove currently does not work, probably because of a bug in the management interface?
 		
 		agentIDtoName = null;
+		agentBeanConfs = null;
 		nodeclient = null;
 		jmclient.close();
 		jmclient = null;
@@ -333,6 +346,47 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		return false;
 	}
 	
+	/**
+	 * Checks if a configuration is an Agent configuration.
+	 * @param bean agent configuration element
+	 * @return true if the configuration is an agent configuration
+	 */
+	private boolean isAgent(Element bean) {
+		List<Element> properties = bean.getChildren("property");
+		if (properties != null) {
+			for (Element property : properties) {
+				String propName = property.getAttributeValue("name");
+				if (propName.equals("agentBeans")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Retrieve the agentbean property from a configuration
+	 * @param bean agent configuration element
+	 * @return agentbean property (null if not found)
+	 */
+	private Element getAgentBeanProperty(String agentName) {
+		List<Element> agents = configdocument.getRootElement().getChildren("bean");
+		for (Element bean: agents) {
+			if (bean.getAttributeValue("name").equals(agentName)) {
+				List<Element> properties = bean.getChildren("property");
+				if (properties != null) {
+					for (Element property : properties) {
+						String propName = property.getAttributeValue("name");
+						if (propName.equals("agentBeans")) {
+							return (Element)property.getChild("list");
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
 	
 	/**
 	 * Adds the configuration for the given agent to the current configuration document.
@@ -354,6 +408,16 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 			// fetch configuration
 			byte[] configuration = agentClient.getSpringConfigXml().clone();
 			String agentName = agentClient.getAgentName();
+			//check for duplicate agent names
+			String newAgentName = agentName;
+			long count = 0;
+			while (agentIDtoName.containsValue(newAgentName)) {
+				//find unused agentname
+				newAgentName = agentName + "_" + Long.toString(count);
+				count++; 
+			}
+			agentName = newAgentName;
+			
 			if (configuration != null) {
 				log.debug("Got configuration for agent: \""+agentName+"\"");
 				// create document from spring configuration
@@ -363,17 +427,58 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 				addMissingImports(agentConfig);
 				// get agent definitions
 				List<Element> beans = agentConfig.getRootElement().getChildren("bean");
-				// add definitions to spring configuration
+				Element agentBeanList = null;
+				// handle agent definition
+				for (Iterator<Element> it = beans.iterator(); it.hasNext();) {
+					Element agent = (Element)it.next().clone();
+					
+					if (isAgent(agent)) {
+						agent.detach();
+						// set new agent name
+						agent.setAttribute("name", agentName);
+						//write agent id
+						JDOMFactory jdomfactory = new DefaultJDOMFactory();
+						Element idProp = jdomfactory.element("constructor-arg");
+						idProp.setAttribute("value", agentid);				
+						agent.addContent(idProp);
+						configdocument.getRootElement().addContent(agent);
+						agentBeanList = getAgentBeanProperty(agentName);
+						it.remove();
+					}
+				}
+				// handle agentbean definitions - TODO: EXPERIMENTAL
 				for (Iterator<Element> it = beans.iterator(); it.hasNext();) {
 					Element agentbean = (Element)it.next().clone();
 					agentbean.detach();
-					//write agent id
-					JDOMFactory jdomfactory = new DefaultJDOMFactory();
-					Element idProp = jdomfactory.element("constructor-arg");
-					idProp.setAttribute("value", agentid);				
-					agentbean.addContent(idProp);
-					
-					configdocument.getRootElement().addContent(agentbean);
+					if (!isAgent(agentbean)) {
+						//agent bean
+						String name = agentbean.getAttributeValue("name");
+						// only add agent bean configuration if it isn't added yet
+						if (agentBeanConfs.contains(name)) {
+							//get unique agentbean name
+							long i = 0;
+							String newName = name + "_" + i;
+							while (agentBeanConfs.contains(newName)) {
+								i++;
+								newName = name + "_" + i;
+							}
+							// set new name
+							agentbean.setAttribute("name", newName);
+							// write new name to reference list
+							for (Object ref : agentBeanList.getChildren("ref")) {
+								Element refElement = (Element)ref;
+								if (refElement.getAttributeValue("bean").equals(name)) {
+									refElement.setAttribute("bean", newName);
+									break;
+								}
+							}
+							configdocument.getRootElement().addContent(agentbean);
+							agentBeanConfs.add(newName);
+						} else {
+							configdocument.getRootElement().addContent(agentbean);
+							agentBeanConfs.add(name);
+						}
+					}
 				}
 				// add agent name to agent node's agent list
 				addAgentToConfigurationList(agentName);

@@ -156,10 +156,29 @@ public class DoAction extends SessionEvent {
 		}
 
 		for (int i = 0; i < types.size(); ++i) {
-			if (!types.get(i).isInstance(params[i])) {
-				return "param" + i + " '" + params[i] + "' mismatch the type '"
-						+ types.get(i) + "'";
-			}
+		    Class<?> cit= types.get(i);
+		    
+		    if(cit.isPrimitive()) {
+		        if(params[i] == null) {
+                    return "param" + i + " '" + params[i] + "' mismatch the type '" + cit + "'";
+                }
+                
+                Class<?> cpt= params[i].getClass();
+                if(
+                        (cit == boolean.class && cpt != Boolean.class) ||
+                        (cit == byte.class && cpt != Byte.class) ||
+                        (cit == char.class && cpt != Character.class) ||
+                        (cit == double.class && cpt != Double.class) ||
+                        (cit == float.class && cpt != Float.class) ||
+                        (cit == int.class && cpt != Integer.class) ||
+                        (cit == long.class && cpt != Long.class) ||
+                        (cit == short.class && cpt != Short.class)
+                ) {
+                    return "param" + i + " '" + params[i] + "' mismatch the type '" + cit + "'";
+                }
+		    } else if(!cit.isInstance(params[i])){
+	            return "param" + i + " '" + params[i] + "' mismatch the type '" + cit + "'";
+		    }
 		}
 
 		return null;

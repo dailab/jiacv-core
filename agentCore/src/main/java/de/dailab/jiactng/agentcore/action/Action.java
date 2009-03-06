@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import de.dailab.jiactng.agentcore.action.scope.ActionScope;
+import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
@@ -44,7 +46,10 @@ public class Action implements IActionDescription {
 	private List<String> _resultTypeNames;
 
 	private IAgentDescription _providerDescription;
-
+	
+	/** The scope of the action, i.e. which agent will it know or can it use.*/
+	private ActionScope scope = ActionScope.AGENT;
+	
 	/**
 	 * This constructor is used to create an action template
 	 */
@@ -446,5 +451,25 @@ public class Action implements IActionDescription {
 		else {
 			return Class.forName(type);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public ActionScope getScope() {
+		return scope;
+	}
+
+	/**
+	 * Sets the scope of this action. Usually, when the scope has been
+	 * changed, it is not a bad idea to notify the directory about the
+	 * change.
+	 * 
+	 * @param scope
+	 * @see ActionScope
+	 * @see IDirectory#modifyAction(IActionDescription)
+	 */
+	public void setScope(ActionScope scope) {
+		this.scope = scope;
 	}
 }

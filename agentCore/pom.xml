@@ -126,7 +126,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<additionalClasspathElements>
-						<additionalClasspathElement>.</additionalClasspathElement>
+						<additionalClasspathElement>${basedir}</additionalClasspathElement>
 						</additionalClasspathElements>
 					</configuration>
 				</plugin>

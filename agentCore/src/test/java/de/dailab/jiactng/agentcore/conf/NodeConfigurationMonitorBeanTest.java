@@ -6,7 +6,11 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.IAgent;
@@ -32,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.lang.management.ManagementFactory;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
@@ -52,7 +57,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	private static String agentId = null;
 	private static ObjectName node = null;
 	private static MBeanServer mbs = null;
-	private static ClassPathXmlApplicationContext context = null;
+	private static AbstractXmlApplicationContext context = null;
 	private static ArrayList<String> agentListNotification = null;
 	private static SimpleAgentNode nodeRef = null;
 	private static JmxManager manager = null;
@@ -152,6 +157,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			
 		// start application
 		context = new ClassPathXmlApplicationContext(configfile);
+		
 		logger.debug("Agent Node has been created in context: " + context.toString());
 		nodeRef = (SimpleAgentNode) context.getBean(nodeName);
 		try {
@@ -163,7 +169,6 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	/**
 	 * Starts up the autosaved agent node config used for these tests.

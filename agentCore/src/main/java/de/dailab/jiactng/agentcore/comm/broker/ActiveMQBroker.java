@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.broker;
 
 import java.net.URI;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,8 +65,7 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
     public void doInit() throws Exception {
         log.debug("initializing embedded broker");
         
-        // TODO: ensure that there are no dots, underscores and so on!
-        _brokerName= agentNode.getName() + getBeanName() + hashCode();
+        _brokerName= agentNode.getName() + getBeanName() + SecureRandom.getInstance("SHA1PRNG").nextLong();
         _broker = new BrokerService();
         _broker.setBrokerName(getBrokerName());
         
@@ -87,11 +87,16 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
                 TransportConnector connector= _broker.addConnector(new URI(amtc.getTransportURI()));
                 if (amtc.getDiscoveryURI() != null) {
                     URI uri = new URI(amtc.getDiscoveryURI());
+                    System.out.println("\n" + uri.toString());
                     URI discoveryURI= new URI(amtc.getDiscoveryURI());
                     connector.setDiscoveryUri(discoveryURI);
                     connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
+                    System.out.println(_broker.getBrokerName());
                     NetworkConnector networkConnector= new SourceAwareDiscoveryNetworkConnector(uri);
                     networkConnector.setNetworkTTL(_networkTTL);
+                    
+                    System.out.println("networkTTL=" + _networkTTL + "\n");
+                    
                     _broker.addNetworkConnector(networkConnector);
                 }
             }

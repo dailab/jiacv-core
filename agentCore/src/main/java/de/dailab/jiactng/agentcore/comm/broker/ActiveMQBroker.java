@@ -87,16 +87,11 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
                 TransportConnector connector= _broker.addConnector(new URI(amtc.getTransportURI()));
                 if (amtc.getDiscoveryURI() != null) {
                     URI uri = new URI(amtc.getDiscoveryURI());
-                    System.out.println("\n" + uri.toString());
                     URI discoveryURI= new URI(amtc.getDiscoveryURI());
                     connector.setDiscoveryUri(discoveryURI);
                     connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
-                    System.out.println(_broker.getBrokerName());
                     NetworkConnector networkConnector= new SourceAwareDiscoveryNetworkConnector(uri);
                     networkConnector.setNetworkTTL(_networkTTL);
-                    
-                    System.out.println("networkTTL=" + _networkTTL + "\n");
-                    
                     _broker.addNetworkConnector(networkConnector);
                 }
             }

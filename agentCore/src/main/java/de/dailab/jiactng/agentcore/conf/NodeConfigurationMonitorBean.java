@@ -53,6 +53,8 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	HashMap<String, String> agentIDtoName = null;
 	List<String> agentBeanConfs = null;
 	
+	JDOMFactory jdomFactory = null;
+	
 	
 	/**
 	 * Adds th Initialization of the DOM object for the Agent Nodes configuration
@@ -62,6 +64,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	 **/
 	public void doInit() throws Exception {
 		super.doInit(); // Call parent method
+		
 		
 		// find config file
 		configfilename = System.getProperty("jiactng.rootconfigfile");
@@ -82,6 +85,9 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		// create XML document from config file
 		SAXBuilder saxb = new SAXBuilder();
 		configdocument = saxb.build(myconfigfilehandle);
+		//Create jdom factory for further usage
+		jdomFactory = new DefaultJDOMFactory();
+		
 		log.debug("configuration file "+ configfilename + " read for monitoring starts:\n" + configdocument.getRootElement().toString() + "\n with " + configdocument.getRootElement().getContentSize() + " XML children elements.");
 		
 		log.debug("NodeConfigurationMonitorBean has initialized.");
@@ -149,8 +155,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 					for (String key : agentIDtoName.keySet()) {
 						if (agentIDtoName.get(key).equals(name)) {
 							// id found, write into spring config
-							JDOMFactory jdomfactory = new DefaultJDOMFactory();
-							Element idProp = jdomfactory.element("constructor-arg");
+							Element idProp = jdomFactory.element("constructor-arg");
 							idProp.setAttribute("value", key);				
 							agent.addContent(idProp);
 							break;
@@ -161,6 +166,141 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		}
 	}
 	
+	/**
+	 * Returns the spring configuration for an agent with the given id.
+	 * Note: this method is only usable after the agent IDs have been written into the 
+	 * configuration JDOM document.
+	 * @param agentID the agent's ID
+	 * @return JDOM Element of the agent's configuration, null if no agent with this id found
+	 */
+	private Element getAgentConfiguration (String agentID) {
+		List<Element> beans = configdocument.getRootElement().getChildren("bean");
+		for (Element bean : beans) {
+			Element idArg = bean.getChild("constructor-arg");
+			if (idArg != null) {
+				String assignedID = idArg.getAttributeValue("value");
+				if (assignedID.equals(agentID)) {
+					return bean;
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Retrieves a property with the given name from an agent configuration.
+	 * @param agentConf agent spring configuration (JDOM element)
+	 * @param property name of the property
+	 * @return Property JDOM Element, null if no property with that name is available
+	 */
+	private Element getAgentProperty (Element agentConf, String property) {
+		for (Object propObject : agentConf.getChildren("property")) {
+			Element prop = (Element)propObject;
+			if (prop.getAttributeValue("name").equals(property)) {
+				return prop;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Creates a property with given name and value if it does not exist yet, or adapts the value if
+	 * a property with the given name already exists.
+	 * @param config Spring configuration (JDOM Element)
+	 * @param name the property's name
+	 * @param value the property's value
+	 */
+	private void createProperty (Element config, String name, String value) {
+		Element property = getAgentProperty(config, name);
+		if (property == null) {
+			//property was not available, create a new one
+			property = jdomFactory.element("property");
+			property.setAttribute("name", name);
+			property.setAttribute("value", value );
+			config.addContent(0, property);
+		} else {
+			property.setAttribute("value", value);
+		}
+	}
+	
+	/**
+	 * Creates a property that contains a list of strings. If the property already exists, the old content
+	 * is removed and the new list is inserted.
+	 * @param config agent configuration
+	 * @param name property name
+	 * @param values value list
+	 */
+	private void createListProperty (Element config, String name, List<String> values) {
+		Element property = getAgentProperty(config, name);
+		Element valueList = null;
+		if (property == null) {
+			property = jdomFactory.element("property");
+			property.setAttribute("name", name);
+			valueList = jdomFactory.element("list");
+			property.addContent(valueList);
+			
+		} else {
+			valueList = property.getChild("list");
+			valueList.removeContent(); //clear old list
+		}
+		for (String value : values) {
+			Element entry = jdomFactory.element("value");
+			entry.setText(value);
+			valueList.addContent(entry);
+		}
+	}
+	
+	
+	/**
+	 * Adds properties to the autosave configuration that were not passed in the original spring
+	 * configuration document.
+	 * Currently added properties are:<br>
+	 * <i>StartTime<br>
+	 * StopTime<br>
+	 * AutoExecutionType<br>
+	 * AutoExecutionList<br>
+	 * Owner<br></i>
+	 */
+	private void addAdditionalProperties() {
+		for (String agentID : agentIDtoName.keySet()) {
+			Element agentConfig = getAgentConfiguration(agentID);
+			try {
+				Set<String> nodeNames = jmclient.getAgentNodeNames();
+				// connect to agent
+				JmxAgentManagementClient agentClient = 
+					jmclient.getAgentManagementClient((String)((nodeNames.toArray())[0]), agentID);
+			
+				if (agentClient == null) {
+					log.error ("Client is null!");
+					continue;
+				}
+				// retrieve properties that should be made persistent from jmxagentmanagement
+				// and write them into the spring configuration
+				Long startTime = agentClient.getStartTime();
+				if (startTime != null) {
+					createProperty(agentConfig, "startTime", startTime.toString());
+				}
+				Long stopTime = agentClient.getStopTime();
+				if (stopTime != null) {
+					createProperty(agentConfig, "stopTime", stopTime.toString());
+				}
+				createProperty(agentConfig, "autoExecutionType", Boolean.toString(
+						agentClient.getAutoExecutionType()));
+				List<String> autoExecServices = agentClient.getAutoExecutionServices();
+				if (autoExecServices != null) {
+					createListProperty(agentConfig, "autoExecutionServices", autoExecServices);
+				}
+				String owner = agentClient.getOwner();
+				if (owner != null) {
+					createProperty(agentConfig, "owner", owner);
+				}
+				
+				agentClient = null;
+			} catch (Exception e) {
+				log.error("An Exception occured", e);
+			}
+		}
+	}
 	
 	/**
 	 * This Method first stops the monitoring process in this Bean and afterwards saves the current
@@ -168,7 +308,9 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	 **/
 	public void doStop() throws Exception {
 		// add missing agent ids
-		addMissingIDs();
+		addMissingIDs(); 
+		// add additional properties
+		addAdditionalProperties();
 		// create file name
 		File myconfigfilehandle = new File(configfilename);
 		autoconfigfilename = produceAutosaveConfigurationFileName(myconfigfilehandle.getName());
@@ -191,7 +333,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		XMLOutputter xop = new XMLOutputter();
 		xop.output(configdocument, fos);
 		//debug output
-//		xop.output(configdocument, System.out);
+		xop.output(configdocument, System.out);
 		fos.close();
 		
 		// deregister for Agent Node events and JMX interface
@@ -202,6 +344,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		nodeclient = null;
 		jmclient.close();
 		jmclient = null;
+		jdomFactory = null;
 		
 		// finally call parent method
 		super.doStop();
@@ -321,8 +464,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 	private void addAgentToConfigurationList(String agentName) {
 		Element xmlagentlist = getNodeAgentList();
 		if (xmlagentlist != null) {
-			JDOMFactory jdomfactory = new DefaultJDOMFactory();
-			Element newAgentEntry = jdomfactory.element("ref");
+			Element newAgentEntry = jdomFactory.element("ref");
 			newAgentEntry.setAttribute("bean", agentName);
 			xmlagentlist.addContent(newAgentEntry);
 		}
@@ -437,8 +579,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 						// set new agent name
 						agent.setAttribute("name", agentName);
 						//write agent id
-						JDOMFactory jdomfactory = new DefaultJDOMFactory();
-						Element idProp = jdomfactory.element("constructor-arg");
+						Element idProp = jdomFactory.element("constructor-arg");
 						idProp.setAttribute("value", agentid);				
 						agent.addContent(idProp);
 						configdocument.getRootElement().addContent(agent);

@@ -52,6 +52,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 	
 	// constants
 	private static final String nodeName = "NodeConfigurationMonitorTestPlatform";
+	private static final String testOwner = "NodeConfigurationTester";
 	
 	// variables
 	private static String agentId = null;
@@ -343,6 +344,7 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 				logger.debug("Test-Agent deployed successfully: " + result);
 				agentclient = jmxclient.getAgentManagementClient(nodeName, deployedagent);
 				testAgentName = agentclient.getAgentName();
+				agentclient.setOwner(testOwner);
 			} else {
 				logger.debug("Unable to deploy Test-Agent.");
 				assert false;
@@ -379,6 +381,15 @@ public class NodeConfigurationMonitorBeanTest extends TestCase {
 			
 			if (agentclient.getAgentName().equals(testAgentName)) {
 				logger.debug("Agent name \""+agentclient.getAgentName()+"\" of agent "+deployedagent+" matches.");
+			}
+			
+			logger.debug("Agent owner is: "+agentclient.getOwner());
+			if (agentclient.getOwner().equals(testOwner)) {
+				logger.debug ("Owner name property was restored successfully.");
+				assert true;
+			} else {
+				logger.debug("Owner name was not restored! Test failed!");
+				assert false;
 			}
 			
 			

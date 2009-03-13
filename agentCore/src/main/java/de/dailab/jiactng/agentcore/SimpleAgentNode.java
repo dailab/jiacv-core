@@ -149,7 +149,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// owner of agent node is also owner of the initially created agents
 		String owner = getOwner();
 		for (IAgent agent : agents) {
-			agent.setOwner(owner);
+			if (agent.getOwner() == null) {
+				agent.setOwner(owner);
+			}
 			if (_directory != null){
 				agent.addLifecycleListener(_directory);
 			}

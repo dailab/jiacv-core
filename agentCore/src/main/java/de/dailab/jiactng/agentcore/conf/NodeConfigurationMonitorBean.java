@@ -333,7 +333,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		XMLOutputter xop = new XMLOutputter();
 		xop.output(configdocument, fos);
 		//debug output
-		xop.output(configdocument, System.out);
+//		xop.output(configdocument, System.out);
 		fos.close();
 		
 		// deregister for Agent Node events and JMX interface

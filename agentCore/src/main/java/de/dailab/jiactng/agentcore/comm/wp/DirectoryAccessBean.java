@@ -19,6 +19,7 @@ import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
@@ -729,6 +730,10 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 		 * @param actionDesc	implements IActionDescription
 		 */
 		public void addActionToDirectory(IActionDescription actionDesc){
+//			if (actionDesc instanceof Action) {
+//				Action action = (Action)actionDesc;
+//				action.setScope(ActionScope.GLOBAL);
+//			}
 			JiacMessage message = new JiacMessage(actionDesc);
 			message.setProtocol(DirectoryAgentNodeBean.ADD_ACTION_PROTOCOL_ID);
 			Serializable[] params = {message, directoryAddress};
@@ -739,6 +744,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 			synchronized(_offeredActions){
 				_offeredActions.add(actionDesc);
 			}
+			
+			thisAgent.registerAction(actionDesc);
 		}
 
 		/**
@@ -757,6 +764,8 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 			synchronized(_offeredActions){
 				_offeredActions.remove(actionDesc);
 			}
+			
+			thisAgent.deregisterAction(actionDesc);
 		}
 
 		/**

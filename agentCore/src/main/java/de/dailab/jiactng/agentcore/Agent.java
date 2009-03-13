@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -34,11 +33,11 @@ import javax.management.openmbean.SimpleType;
 import javax.management.timer.TimerNotification;
 
 import org.apache.commons.logging.Log;
-import org.jdom.Element;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
+import de.dailab.jiactng.agentcore.directory.IDirectoryAccess;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
@@ -51,6 +50,7 @@ import de.dailab.jiactng.agentcore.management.jmx.client.JmxAgentNodeTimerManage
 import de.dailab.jiactng.agentcore.management.jmx.client.JmxManagementClient;
 import de.dailab.jiactng.agentcore.ontology.AgentBeanDescription;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
@@ -64,7 +64,8 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.IAgent
  */
-public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, NotificationListener {
+public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
+		NotificationListener {
 
 	/**
 	 * The AID (agent identifier). This property is generated and assigned
@@ -92,6 +93,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	 * Comment for <code>memory</code>
 	 */
 	protected IMemory memory = null;
+	
+	/** Reference to directory, if any. */
+	private IDirectoryAccess directory;
 
 	/**
 	 * The list of agentbeans of this agent.
@@ -275,8 +279,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
 	/**
 	 * {@inheritDoc}
 	 */
-	public void onEvent(@SuppressWarnings("unused")
-	LifecycleEvent evt) {
+	public void onEvent(LifecycleEvent evt) {
 		// TODO Auto-generated method stub
 
 	}
@@ -1239,6 +1242,56 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Noti
   	this.springConfigXml = springConfig;
   	
   }
+
+  	/***********************************************
+  	 *           DirectoryAccess                   *
+  	 ***********************************************/
+  
+	public IDirectoryAccess getDirectory() {
+		return directory;
+	}
+	
+	public void setDirectory(IDirectoryAccess directory) {
+		this.directory = directory;
+	}
+	
+	@Override
+	public void deregisterAction(IActionDescription actionDescription) {
+		if (directory != null) {
+			directory.deregisterAction(actionDescription);
+		}
+	}
+	
+	@Override
+	public void modifyAction(IActionDescription oldDescription,
+			IActionDescription newDescription) {
+		if (directory != null) {
+			modifyAction(oldDescription, newDescription);
+		}
+	}
+	
+	@Override
+	public void registerAction(IActionDescription actionDescription) {
+		if (directory != null) {
+			directory.registerAction(actionDescription);
+		}
+	}
+	
+	@Override
+	public IActionDescription searchAction(IActionDescription template) {
+		if (directory != null) {
+			return directory.searchAction(template);
+		}
+		return null;
+	}
+	
+	@Override
+	public List<IActionDescription> searchAllActions(IActionDescription template) {
+		if (directory != null) {
+			return directory.searchAllActions(template);
+		}
+		return new ArrayList<IActionDescription>();
+	}
   
 	// ///////////////////////////////////
 	// TODO

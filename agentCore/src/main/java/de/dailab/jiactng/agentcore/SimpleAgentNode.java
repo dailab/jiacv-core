@@ -32,6 +32,7 @@ import org.springframework.util.Log4jConfigurer;
 import de.dailab.jiactng.Version;
 import de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean;
 import de.dailab.jiactng.agentcore.conf.GenericAgentProperties;
+import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
@@ -79,6 +80,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** Optional: DirectoryAgentNodeBean to add local Agents to */
 	private DirectoryAgentNodeBean _directory = null;
+	
+	/** Optional: IDirectory that manages white and yellow pages.*/
+	private IDirectory directory = null;
 
 	/** A timer for being informed about dates */
 	private Timer _timer = null;
@@ -149,6 +153,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			if (_directory != null){
 				agent.addLifecycleListener(_directory);
 			}
+			if (directory != null) {
+				agent.addLifecycleListener(directory);
+			}
 		}
 		
 		// refresh agent list
@@ -212,6 +219,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		if (_directory != null){
 			agent.addLifecycleListener(_directory);
 		}
+		if (directory != null) {
+			agent.addLifecycleListener(directory);
+		}
+		
 		// register agent for management
 		agent.enableManagement(_manager);
 		
@@ -559,6 +570,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 						}
 					}
 				}
+				
+				if (directory == null) {
+					for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
+						if (agentNodeBean instanceof IDirectory) {
+							directory = (IDirectory)agentNodeBean;
+							break;
+						}
+					}
+				}
 			}
 		}
 
@@ -568,6 +588,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 				
 				if (_directory != null){
 					a.addLifecycleListener(_directory);
+				}
+				if (directory != null) {
+					a.addLifecycleListener(directory);
+					if (a instanceof Agent) {
+						((Agent)a).setDirectory(directory);
+					}
 				}
 				
 				log.info("Initializing agent: " + a.getAgentName());
@@ -822,6 +848,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			return null;
 		}
 		return _directory.getBeanName();
+//TODO umstellen auf IDirectory
+//		if (directory == null) {
+//			return null;
+//		}
+//		return directory.getBeanName();
 	}
 
 	/**

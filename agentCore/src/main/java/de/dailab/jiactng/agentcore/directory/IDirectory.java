@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.directory;
 
 import java.util.List;
 
+import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 
@@ -10,7 +11,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * 
  * @author axle
  */
-public interface IDirectory extends IDirectoryAccess {
+public interface IDirectory extends IDirectoryAccess, ILifecycleListener {
 	/**
 	 * Registers an agent in the directory. If the given agent
 	 * has already been registered the registered agent will be modified.

@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.ontology;
 
+import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
@@ -10,9 +11,15 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 public interface IAgentNodeDescription extends IFact {
 	
 	/**
-	 * Returns the unique identifier of the agentnode.
-	 * 
-	 * @return the UUID of the agentnode
+	 * Returns the messageBox address of the agentnode.
+	 * @return the messageBox address of the agentnode
+	 * @see ICommunicationAddress
 	 */
-	public String getUUID();
+	public ICommunicationAddress getAddress();
+	
+	/**
+	 * Returns the last time the agentnode has sent a sign of life.
+	 * @return the last time the agentnode has sent a sign of life
+	 */
+	public long getAlive();
 }

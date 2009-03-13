@@ -23,6 +23,7 @@
 			<list>
 				<ref bean="WhitePagesPlatformJMSBroker" />
 				<ref bean="DirectoryAgentNodeBean"/>
+				<ref bean="IDirectory"/>
 			</list>
 		</property>
 	</bean>
@@ -38,6 +39,7 @@
 		<property name="agentNodeBeans">
 			<list>
 				<ref bean="DirectoryAgentNodeBean" />
+				<ref bean="IDirectory" />
 			</list>
 		</property>
 	</bean>

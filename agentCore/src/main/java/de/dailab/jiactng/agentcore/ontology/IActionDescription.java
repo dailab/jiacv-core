@@ -6,6 +6,7 @@ package de.dailab.jiactng.agentcore.ontology;
 import java.util.Collections;
 import java.util.List;
 
+import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 
 /**
@@ -79,4 +80,12 @@ public interface IActionDescription extends IFact {
      *              or <code>null</code> if not set
      */
     IAgentDescription getProviderDescription();
+    
+    /**
+     * Return the scope of the action.
+     * 
+     * @return the scope of the action
+     * @see ActionScope
+     */
+    ActionScope getScope();
 }

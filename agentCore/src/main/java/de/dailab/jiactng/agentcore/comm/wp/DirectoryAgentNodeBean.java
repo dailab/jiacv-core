@@ -1522,7 +1522,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 							try {
 								if (_broker != null)
 									// set it a little bit higher than necessary to find new agentNodes that are connecting too.
-									_broker.setNetworkTTL(registeredAgentNodes + 3);
+//									_broker.setNetworkTTL(registeredAgentNodes + 3);
+									;
 								else
 									log.warn("No Broker identified by DirectoryAgentNodeBean so far");
 							} catch (Exception e) {

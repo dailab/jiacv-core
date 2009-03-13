@@ -25,6 +25,7 @@ import javax.management.Notification;
 import javax.management.AttributeChangeNotification;
 
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.Content;
 import org.jdom.DefaultJDOMFactory;
@@ -248,6 +249,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 			entry.setText(value);
 			valueList.addContent(entry);
 		}
+		config.addContent(property);
 	}
 	
 	
@@ -311,6 +313,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		addMissingIDs(); 
 		// add additional properties
 		addAdditionalProperties();
+		
 		// create file name
 		File myconfigfilehandle = new File(configfilename);
 		autoconfigfilename = produceAutosaveConfigurationFileName(myconfigfilehandle.getName());
@@ -331,6 +334,7 @@ public class NodeConfigurationMonitorBean extends AbstractAgentNodeBean implemen
 		FileOutputStream fos = new FileOutputStream(autoconfigfile);
 		//OutputStreamWriter osw = new OutputStreamWriter(fos);
 		XMLOutputter xop = new XMLOutputter();
+		xop.setFormat(Format.getPrettyFormat());
 		xop.output(configdocument, fos);
 		//debug output
 //		xop.output(configdocument, System.out);

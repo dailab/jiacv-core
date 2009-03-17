@@ -6,7 +6,6 @@
  */
 package de.dailab.jiactng.agentcore.execution;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +16,6 @@ import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.action.SessionEvent;
-import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 
 /**
@@ -35,32 +33,6 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 public class SimpleExecutionCycle extends AbstractExecutionCycle {
 
   private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
-
-  /** Class for handling remote agent actions.*/
-  private RemoteExecutor remoteExecutor;
-  
-  /** If true, RemoteExecutor will be used, if false something different.*/
-  private boolean useRemoteExecutor = false;
-  
-  
-  @Override
-  public void doStart() throws Exception {
-	  super.doStart();
-	  if (useRemoteExecutor) {
-		  remoteExecutor = new RemoteExecutor(memory);
-	  }
-  }
-
-  @Override
-  public void doStop() throws Exception {
-	  super.doStop();
-	  if (useRemoteExecutor) {
-		  remoteExecutor.cleanup();
-		  remoteExecutor = null;
-	  }
-  }
-
-
 
 /**
    * Run-method for the execution cycle. The method iterates over the list of agentbeans and calls the execute method of
@@ -132,17 +104,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
       if (act != null) {
         actionPerformed = true;
         synchronized (this) {
-        	
-        	if (useRemoteExecutor) {
-	        	if (act.getAction().getProviderDescription() != null && 
-	        			!act.getAction().getProviderDescription().getAid().equals(thisAgent.getAgentId())) {
-	        		remoteExecutor.executeRemote(act);
-	        	} else {
-	            	performDoAction(act);
-	        	}
-        	} else { 
-        		performDoAction(act);
-        	}
+        	performDoAction(act);
         }
       }
       updateWorkload(DO_ACTION, actionPerformed);

@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore.execution;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -42,14 +41,28 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   private boolean               continousAutoExecution = false;
 
+  /** Class for handling remote agent actions.*/
+  private RemoteExecutor remoteExecutor;
+  
+  /** If true, RemoteExecutor will be used, if false something different.*/
+  private boolean useRemoteExecutor = false;
+  
+  
   @Override
   public void doStart() throws Exception {
-    super.doStart();
+	  super.doStart();
+	  if (useRemoteExecutor) {
+		  remoteExecutor = new RemoteExecutor(memory);
+	  }
   }
 
   @Override
   public void doStop() throws Exception {
-    super.doStop();
+	  super.doStop();
+	  if (useRemoteExecutor) {
+		  remoteExecutor.cleanup();
+		  remoteExecutor = null;
+	  }
   }
 
   /**
@@ -63,6 +76,16 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    */
   protected void performDoAction(DoAction act) {
     actionPerformed(act, DoActionState.invoked, null);
+    
+	//fishing out delegations
+    if (useRemoteExecutor) {
+    	if (act.getAction().getProviderDescription() != null && 
+    			!act.getAction().getProviderDescription().getAid().equals(thisAgent.getAgentId())) {
+    		remoteExecutor.executeRemote(act);
+    		return;
+    	}
+	}
+	
     IEffector providerBean = ((Action) act.getAction()).getProviderBean();
     if (providerBean != null) {
       try {

@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.action.Action;
-import de.dailab.jiactng.agentcore.directory.IDirectoryAccess;
+import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -23,7 +23,7 @@ import de.dailab.jiactng.agentcore.ontology.AgentDescription;
  * @author Thomas Konnerth
  */
 public interface IAgent extends BeanNameAware, ILifecycleListener, Runnable,
-    ILifecycle, IDirectoryAccess {
+    ILifecycle, IDirectory {
 
   /**
    * Setter for the agentnode that hosts this agent. Called by the agentnode,

@@ -113,7 +113,7 @@ public class AgentDescription implements IAgentDescription {
         }
         
         AgentDescription other= (AgentDescription) obj;
-        return EqualityChecker.equals(aid, other.aid);
+        return EqualityChecker.equalsOrNull(aid, other.aid);
     }
     
     @Override

@@ -14,12 +14,10 @@ import org.apache.commons.logging.LogFactory;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.Agent;
 import de.dailab.jiactng.agentcore.IAgentBean;
-import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
-import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
@@ -188,7 +186,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		} else {
 			remoteAgents.put(agentDescription.getAid(), agentDescription);
 		}
-		dump("registerAgent " + agentDescription.getAid());
+//		dump("registerAgent " + agentDescription.getAid());
 	}
 
 	@Override
@@ -239,6 +237,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	@Override
 	public List<IAgentDescription> searchAllAgents(IAgentDescription template) {
+		if (template == null) {
+			
+		}
 		List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
 		for (String key:localAgents.keySet()) {
 			IAgentDescription agentDescription = localAgents.get(key);
@@ -532,6 +533,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			Set<IActionDescription> actions = ((Advertisement)message.getPayload()).getActions();
 			System.out.println("receive ADVERTISE: " + actions.size());
 			remoteActions.put(senderAddress.getName(), actions);
+			
+			Hashtable<String, IAgentDescription> agents = ((Advertisement)message.getPayload()).getAgents();
+			for (String agent:agents.keySet()) {
+				registerAgent(agents.get(agent));
+			}
+			
 			dump("ADVERTISE " + senderAddress.getName());
 		}
 		
@@ -621,11 +628,16 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		adMessage.setHeader("UUID", this.agentNode.getUUID());
 		adMessage.setProtocol(ADVERTISE);
 		//TODO filter global actions
-		adMessage.setPayload(new Advertisement(localActions));
+		
+		Advertisement ad = new Advertisement(localAgents, localActions);
+		adMessage.setPayload(ad);
 		
 		//debug
-		Set<IActionDescription> payloadActions = ((Advertisement)adMessage.getPayload()).getActions();
-		System.out.println("sendAdvertisement: " + payloadActions.size());
+		Advertisement payload = (Advertisement)adMessage.getPayload();
+		System.out.println("sendAdvertisement: agents="
+				+ payload.getAgents().size()
+				+ " actions="
+				+ payload.getActions().size());
 		
 		try {
 			messageTransport.send(adMessage, destination);
@@ -682,6 +694,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		for (String key:remoteActions.keySet()) {
 			actions += remoteActions.get(key).size();
 		}
+		System.out.println("Registered remote agents:  " + remoteAgents.size());
 		System.out.println("Registered remote actions: " + actions);
 		System.out.println("Known agentnodes:          " + nodes.size());
 		System.out.println("####End dump\n");

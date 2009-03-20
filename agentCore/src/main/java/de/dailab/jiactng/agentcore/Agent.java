@@ -37,6 +37,7 @@ import org.apache.commons.logging.Log;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
+import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.directory.IDirectoryAccess;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
@@ -95,7 +96,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	protected IMemory memory = null;
 	
 	/** Reference to directory, if any. */
-	private IDirectoryAccess directory;
+	private IDirectory directory;
 
 	/**
 	 * The list of agentbeans of this agent.
@@ -1247,11 +1248,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
   	 *           DirectoryAccess                   *
   	 ***********************************************/
   
-	public IDirectoryAccess getDirectory() {
+	public IDirectory getDirectory() {
 		return directory;
 	}
 	
-	public void setDirectory(IDirectoryAccess directory) {
+	public void setDirectory(IDirectory directory) {
 		this.directory = directory;
 	}
 	
@@ -1291,6 +1292,43 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			return directory.searchAllActions(template);
 		}
 		return new ArrayList<IActionDescription>();
+	}
+
+	@Override
+	public void deregisterAgent(String aid) {
+		if (directory != null) {
+			directory.deregisterAgent(aid);
+		}
+	}
+
+	@Override
+	public void modifyAgent(IAgentDescription agentDescription) {
+		if (directory != null) {
+			directory.modifyAgent(agentDescription);
+		}
+	}
+
+	@Override
+	public void registerAgent(IAgentDescription agentDescription) {
+		if (directory != null) {
+			directory.registerAgent(agentDescription);
+		}
+	}
+
+	@Override
+	public IAgentDescription searchAgent(IAgentDescription template) {
+		if (directory != null) {
+			return directory.searchAgent(template);
+		}
+		return null;
+	}
+
+	@Override
+	public List<IAgentDescription> searchAllAgents(IAgentDescription template) {
+		if (directory != null) {
+			return directory.searchAllAgents(template);
+		}
+		return null;
 	}
   
 	// ///////////////////////////////////

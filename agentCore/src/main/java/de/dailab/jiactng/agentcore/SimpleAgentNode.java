@@ -643,10 +643,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			if (_agents != null) {
 				for (IAgent a : _agents) {
 					try {
-						if (log != null) {
-							log.info("Trying to start agent: " + a.getAgentName());
+					  if(((Agent)a).getStartTime()==null) {
+					    if (log != null) {
+					      log.info("Trying to start agent: " + a.getAgentName());
+					    }
+						  a.start();
+						} else {
+              if (log != null) {
+                log.info("Agent has a startTime and is not started now: " + a.getAgentName());
+              }
 						}
-						a.start();
 					} catch (Exception ex) {
 						// TODO
 						ex.printStackTrace();

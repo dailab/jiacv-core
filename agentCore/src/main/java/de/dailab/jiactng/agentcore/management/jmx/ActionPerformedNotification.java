@@ -68,7 +68,7 @@ public class ActionPerformedNotification extends Notification {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		_actionName = action.getAction().getName();
 		if(((Action)action.getAction()).getProviderBean() == null) {
-//		  System.err.println("\n-- "+((Action)action.getAction()).getName()+" / "+((Action)action.getAction()).getProviderBean() + " / " + state);
+		  System.err.println("\n-- "+((Action)action.getAction()).getName()+" / "+((Action)action.getAction()).getProviderBean() + " / " + state);
 		  _agentbeanName = "null";
 		} else {
 		  _agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();

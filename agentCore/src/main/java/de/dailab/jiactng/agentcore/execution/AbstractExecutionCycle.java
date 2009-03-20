@@ -45,7 +45,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
   private RemoteExecutor remoteExecutor;
   
   /** If true, RemoteExecutor will be used, if false something different.*/
-  private boolean useRemoteExecutor = false;
+  private boolean useRemoteExecutor = true;
   
   
   @Override
@@ -75,8 +75,6 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    * @see #actionPerformed(DoAction, DoActionState, Object[])
    */
   protected void performDoAction(DoAction act) {
-    actionPerformed(act, DoActionState.invoked, null);
-    
 	//fishing out delegations
     if (useRemoteExecutor) {
     	if (act.getAction().getProviderDescription() != null && 
@@ -85,7 +83,9 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     		return;
     	}
 	}
-	
+
+    actionPerformed(act, DoActionState.invoked, null);
+    
     IEffector providerBean = ((Action) act.getAction()).getProviderBean();
     if (providerBean != null) {
       try {

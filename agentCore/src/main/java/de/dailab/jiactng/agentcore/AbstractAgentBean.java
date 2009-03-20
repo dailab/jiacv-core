@@ -271,8 +271,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   /**
    * {@inheritDoc}
    */
-  public void handleLifecycleException(LifecycleException e, @SuppressWarnings("unused")
-  LifecycleStates state) {
+  public void handleLifecycleException(LifecycleException e, LifecycleStates state) {
     throw new RuntimeException(e);
   }
 

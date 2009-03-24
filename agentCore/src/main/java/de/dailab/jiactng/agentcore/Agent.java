@@ -138,9 +138,19 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	private Integer startTimeId = null;
 
 	/**
+	 * start time property cache required to make start time spring-configurable
+	 */
+	private Long _startTime = null;
+	
+	/**
 	 * The id of the stop time notification.
 	 */
 	private Integer stopTimeId = null;
+	
+	/**
+	 * start time property cache required to make start time spring-configurable
+	 */
+	private Long _stopTime = null;
 	
 	/**
 	 * The spring configuration XML snippet for this agent.
@@ -406,6 +416,15 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 
 		updateState(LifecycleStates.INITIALIZED);
+		
+		if ((_startTime != null) && (_stopTime != null)) {
+			try {
+				registerStartTime(_startTime);
+				registerStopTime(_stopTime);
+			} catch (InstanceNotFoundException e) {
+				throw new LifecycleException("Error when initializing start/stoptime", e);
+			}
+		}
 	}
 
 	/**
@@ -993,18 +1012,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			e.printStackTrace();
 			return null;
 		}
+		catch (NullPointerException e) {
+			return _startTime;
+		}
 	}
-
-    /**
-	 * {@inheritDoc}
+	
+	/**
+	 * Adds the start time listener and notifications for start time.
+	 * Required to enable spring configuration of start/stoptime.
+	 * @param startTime the designated start time
 	 */
-	public void setStartTime(Long startTime) throws InstanceNotFoundException {
-		// add listener if needed
-	  if((startTime!=null) && (startTime<=(System.currentTimeMillis()+3000))) {
-	    startTime = System.currentTimeMillis()+3000;
-	  }
-	  
-		if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (startTime != null)) {
+    private void registerStartTime(Long startTime) throws InstanceNotFoundException {
+    	if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (startTime != null)) {
 			try {
 				timerClient.addTimerNotificationListener(this);
 			} 
@@ -1045,6 +1064,24 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 				e.printStackTrace();
 			}			
 		}
+    }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setStartTime(Long startTime) throws InstanceNotFoundException {
+		// add listener if needed
+	  if((startTime!=null) && (startTime<=(System.currentTimeMillis()+3000))) {
+	    startTime = System.currentTimeMillis()+3000;
+	  }
+	  _startTime = startTime;
+	  
+	  if (this.memory.getState() != LifecycleStates.UNDEFINED) {
+		  if (this.getAgentState() != LifecycleStates.UNDEFINED) {
+			  registerStartTime(startTime);
+		  }
+	  }
+		
 	}
 
     /**
@@ -1061,13 +1098,12 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			e.printStackTrace();
 			return null;
 		}
+		catch (NullPointerException e) {
+			return _stopTime;
+		}
 	}
-
-    /**
-	 * {@inheritDoc}
-	 */
-	public void setStopTime(Long stopTime) throws InstanceNotFoundException {
-		// add listener if needed
+	
+	private void registerStopTime(Long stopTime) throws InstanceNotFoundException {
 		if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (stopTime != null)) {
 			try {
 				timerClient.addTimerNotificationListener(this);
@@ -1109,6 +1145,20 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 				e.printStackTrace();
 			}			
 		}
+	}
+	
+    /**
+	 * {@inheritDoc}
+	 */
+	public void setStopTime(Long stopTime) throws InstanceNotFoundException {
+		// add listener if needed
+		_stopTime = stopTime;
+		if (this.memory.getState() != LifecycleStates.UNDEFINED) {
+			if (this.getAgentState() != LifecycleStates.UNDEFINED) {
+				registerStopTime(stopTime);
+			}
+		}
+		
 	}
 
 	/**

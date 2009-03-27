@@ -502,7 +502,7 @@
 		<module>gateway</module>
 		<module>agentCore</module>
 		<module>bdiAgent</module>
-		<module>jiacSecurity</module>
+		<!--module>jiacSecurity</module-->
 		<module>ruleEngine</module>
 		<module>basicServices</module>
 		<module>examples</module>

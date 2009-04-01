@@ -30,6 +30,7 @@ import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
+import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
@@ -58,6 +59,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
     public static @interface Expose {
         String name() default "";
         Class<?>[] returnTypes() default {};
+        ActionScope scope() default ActionScope.AGENT;
     }
     
     static String getName(Method method) {
@@ -68,6 +70,12 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         }
         
         return name;
+    }
+    
+    static ActionScope getScope(Method method) {
+      ActionScope scope = method.getAnnotation(Expose.class).scope();
+            
+      return scope;
     }
     
     static Class<?>[] getReturnTypes(Method method) {
@@ -195,6 +203,9 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 		}
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setRegisteredActions(Set<String> actions) {
 		_registeredActions = actions;
 	}
@@ -227,16 +238,17 @@ log.debug("typechecking is '" + doAction.typeCheck() + "'");
             // check for Expose annotation
             Class<?>[] returnTypes= getReturnTypes(method);
             String name= getName(method);
-            
+            ActionScope scope = getScope(method);
             // build the action object
-            actions.add(
-                new Action(
-                    name,
-                    this,
-                    method.getParameterTypes(),
-                    returnTypes
-                )
+            Action act =                 new Action(
+                name,
+                this,
+                method.getParameterTypes(),
+                returnTypes
             );
+            act.setScope(scope);
+
+            actions.add(act);
         }
         
         // add further actions

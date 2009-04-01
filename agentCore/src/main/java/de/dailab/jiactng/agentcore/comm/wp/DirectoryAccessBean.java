@@ -765,7 +765,7 @@ public class DirectoryAccessBean extends AbstractAgentBean implements IEffector,
 				_offeredActions.remove(actionDesc);
 			}
 			
-			thisAgent.deregisterAction(actionDesc);
+			//thisAgent.deregisterAction(actionDesc);
 		}
 
 		/**

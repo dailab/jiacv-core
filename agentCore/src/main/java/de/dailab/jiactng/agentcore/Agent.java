@@ -36,6 +36,7 @@ import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
@@ -330,6 +331,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 				handleBeanException(a, e, LifecycleStates.CLEANED_UP);
 			}
 		}
+
 		if (log != null && log.isInfoEnabled()) {
 			log.info("Trying to cleanup memory and executioncycle");
 		}
@@ -414,6 +416,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 				}
 			}
 		}
+
 
 		updateState(LifecycleStates.INITIALIZED);
 		
@@ -835,7 +838,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * {@inheritDoc}
 	 */
 	public List<Action> getActionList() {
-		return Collections.unmodifiableList(actionList);
+		ArrayList<Action> tempList = new ArrayList<Action>();
+	  for(IAgentBean iab : agentBeans) {
+		  if(iab instanceof IEffector) {
+		    tempList.addAll(((IEffector)iab).getActions());
+		  }
+		}
+	  
+	  for(Action a: tempList) {
+	    a.setProviderDescription(getAgentDescription());
+	  }
+	  actionList = tempList;
+	  return Collections.unmodifiableList(actionList);
 	}
 
 	/**
@@ -1324,6 +1338,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	public void registerAction(IActionDescription actionDescription) {
 		if (directory != null) {
 			directory.registerAction(actionDescription);
+		} else {
+		  log.warn("Agent has no reference to directory.");
 		}
 	}
 	
@@ -1340,6 +1356,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		if (directory != null) {
 			return directory.searchAllActions(template);
 		}
+		log.warn("no directory found, returning empty list...");
 		return new ArrayList<IActionDescription>();
 	}
 

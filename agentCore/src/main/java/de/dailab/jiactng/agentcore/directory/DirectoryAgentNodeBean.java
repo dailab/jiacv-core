@@ -461,7 +461,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 							if (actions != null && !actions.isEmpty()) {
 								for (Action action:actions) {
 									if (action.getScope().contains(ActionScope.NODE)) {
-										registerAction(action);
+									  action.setProviderDescription(agent.getAgentDescription());
+									  registerAction(action);
 									}
 								}
 							} else {

@@ -21,6 +21,7 @@ import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
@@ -521,6 +522,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
     } else {
       if(log.isInfoEnabled()) {
         log.info("Initiating search for action... "+template);
+      }
+      
+      List<IActionDescription> foundActs = thisAgent.searchAllActions(template);
+      if((foundActs!=null) && (foundActs.size()>0)) {
+        log.info("Found action with new Search, invoking... "+(Action)foundActs.get(0));
+        return invoke((Action)foundActs.get(0), parent, inputParams, receiver);
       }
 
       DoAction doAct = new DoAction(parent, template, receiver, inputParams);

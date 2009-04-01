@@ -223,6 +223,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 		if (directory != null) {
 			agent.addLifecycleListener(directory);
+			((Agent)agent).setDirectory(directory);
 		}
 		
 		// register agent for management

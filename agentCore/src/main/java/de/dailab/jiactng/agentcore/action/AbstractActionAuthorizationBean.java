@@ -8,6 +8,7 @@ import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * Abstract class of all agentbeans, which are able to authorize action invocations. 
@@ -42,10 +43,13 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean
 	public void doStart() throws Exception {
 		super.doStart();
 
-		// search for authorization action
-		if (authorizationActionName != null) {
-			invokeActionSearch(new Action(authorizationActionName), false, 0, this);
-		}
+    List<IActionDescription> foundActs = thisAgent.searchAllActions(new Action(authorizationActionName));
+    if((foundActs != null)&& (foundActs.size()>=1)) {
+      authorizationAction = (Action)foundActs.get(0);
+    } else {
+      invokeActionSearch(new Action(authorizationActionName), false, 0, this);
+    }
+		
 	}
 
 	/**
@@ -78,7 +82,13 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean
 //		}
 		
 		if((thisAgent!=null)&& (LifecycleStates.STARTED.equals(thisAgent.getState()))) {
-		  invokeActionSearch(new Action(authorizationActionName), false, 0, this);
+		  List<IActionDescription> foundActs = thisAgent.searchAllActions(new Action(authorizationActionName));
+		  log.error("FOUND: "+foundActs);
+		  if((foundActs != null)&& (foundActs.size()>=1)) {
+		    authorizationAction = (Action)foundActs.get(0);
+		  } else {
+		    invokeActionSearch(new Action(authorizationActionName), false, 0, this);
+		  }
 		}
 		
 	}

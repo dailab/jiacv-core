@@ -345,7 +345,7 @@ public class Action implements IActionDescription {
 	@Override
 	public int hashCode() {
 		int hash = Action.class.hashCode();
-		hash ^= _name != null ? _name.hashCode() : 0;
+		// hash ^= _name != null ? _name.hashCode() : 0;
 		return hash;
 	}
 

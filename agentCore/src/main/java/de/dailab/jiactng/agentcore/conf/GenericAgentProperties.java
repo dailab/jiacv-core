@@ -7,7 +7,7 @@ package de.dailab.jiactng.agentcore.conf;
  * your tng configuration files. See the JUnit test GenericAgentPropertiesInjection for an example.
  * 
  * Please note that the agent bean definition must be put in a separate file (given with setAgentConfig) 
- * and that the file containing the agentNode definiton must not contain any (spring) reference to this file. 
+ * and that the file containing the agentNode definition must not contain any (spring) reference to this file. 
  * otherwise you will get an infinite loop.
  * 
  * @author thiele

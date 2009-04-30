@@ -548,6 +548,26 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 	}
 	
+	/**
+	 * this returns an ICommunicationAddress of an node that is known or <code>null</code>, 
+	 * if it is unknown. 
+	 * @param uuidOfNode
+	 * @return
+	 */
+	public ICommunicationAddress getCommunicationAddressOfANode(String uuidOfNode) {
+		
+		if (uuidOfNode == null || uuidOfNode.equals("")) return null;
+		
+		ICommunicationAddress ret = null;
+		if (nodes.containsKey(uuidOfNode)) {
+			AgentNodeDescription nodeDescription = nodes.get(uuidOfNode);
+			ret = nodeDescription.getAddress();
+		}
+		
+		return ret;
+		
+	}
+	
 	private void refreshAgentNode(ICommunicationAddress node) {
 		String uuid = node.getName();
 		if (nodes.containsKey(uuid)) {

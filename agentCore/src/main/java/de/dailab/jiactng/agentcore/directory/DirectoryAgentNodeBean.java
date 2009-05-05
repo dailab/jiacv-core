@@ -550,7 +550,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	
 	/**
 	 * this returns an ICommunicationAddress of an node that is known or <code>null</code>, 
-	 * if it is unknown. 
+	 * if it is unknown. <br> 
+	 * insert for agent migration (hate mails to mib)
 	 * @param uuidOfNode
 	 * @return
 	 */
@@ -565,6 +566,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 		
 		return ret;
+		
+	}
+	
+	/**
+	 * this returns all known and reachable agent nodes. <br> 
+	 * insert for agent migration (hate mails to mib).
+	 * @return
+	 */
+	public Set<String> getAllKnownAgentNodes() {
+		
+		return nodes.keySet();
 		
 	}
 	

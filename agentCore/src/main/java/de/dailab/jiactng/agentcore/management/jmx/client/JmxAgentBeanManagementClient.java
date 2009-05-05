@@ -54,7 +54,17 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 			}
 		}
 	}
-
+	
+	/**
+	 * Checks if the managed bean is an instance of <code>AbstractActionAuthorizationBean</code>.
+	 * @return true if it is an instance of AbstractActionAuthorizationBean
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent bean.
+	 * @throws InstanceNotFoundException The agent bean does not exist on the managed agent node.
+	 */
+	public boolean isActionAuthorizationBean() throws IOException, InstanceNotFoundException {
+		return isInstanceOf("de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBean");
+	}
+	
 	/**
 	 * Sets the name of the action used to authorize action users by the managed <code>AbstractActionAuthorizationBean</code>.
 	 * @param authorizationActionName the name of the authorization action.
@@ -78,6 +88,17 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 				throw e;
 			}
 		}
+	}
+	
+	/**
+	 * Gets the name of the action used to authorize action users by the managed <code>AbstractActionAuthorizationBean</code>.
+	 * @return the name of the authorization action
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent bean.
+	 * @throws InstanceNotFoundException The agent bean does not exist on the managed agent node.
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
+	 */
+	public String getAuthorizationActionName() throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+		return (String) getAttribute("AuthorizationActionName");
 	}
 
 }

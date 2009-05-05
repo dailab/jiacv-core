@@ -146,7 +146,18 @@ public abstract class JmxAbstractManagementClient {
 			throw new RuntimeException(e);
 		}
 	}
-
+	
+	/**
+	 * Checks if the managed resource is an instance of a class.
+	 * @param className name of the class
+	 * @return true if the managed resource is an instance of this class.
+	 * @throws IOException A communication problem occurred when invoking the operation of the remote resource.
+	 * @throws InstanceNotFoundException The resource does not exist in the JVM.
+	 */
+	protected boolean isInstanceOf(String className) throws IOException, InstanceNotFoundException {
+		return mbsc.isInstanceOf(resource, className);
+	}
+	
 	/**
 	 * Adds a listener to the managed resource.
 	 * @param listener The listener object which will handle the notifications emitted by the managed resource.

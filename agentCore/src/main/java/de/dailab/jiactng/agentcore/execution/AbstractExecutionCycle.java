@@ -45,7 +45,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
   private RemoteExecutor remoteExecutor;
   
   /** If true, RemoteExecutor will be used, if false something different.*/
-  private boolean useRemoteExecutor = false;
+  private boolean useRemoteExecutor = true;
   
   
   @Override
@@ -349,6 +349,14 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   public boolean getAutoExecutionType() {
     return this.continousAutoExecution;
+  }
+
+  public boolean isUseRemoteExecutor() {
+    return this.useRemoteExecutor;
+  }
+
+  public void setUseRemoteExecutor(boolean useRemoteExecutor) {
+    this.useRemoteExecutor = useRemoteExecutor;
   }
 
 }

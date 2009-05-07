@@ -3,13 +3,15 @@ package de.dailab.jiactng.agentcore.action.scope;
 public enum ActionScope {
 	AGENT {
 		public boolean contains(ActionScope scope) {
-			return scope == AGENT;
+			return scope == AGENT
+			|| scope == null;
 		}
 	},
 	NODE {
 		public boolean contains(ActionScope scope) {
 			return scope == AGENT 
-				|| scope == NODE;
+				|| scope == NODE
+				|| scope == null;
 		}
 		
 	},
@@ -17,7 +19,8 @@ public enum ActionScope {
 		public boolean contains(ActionScope scope) {
 			return scope == AGENT 
 				|| scope == NODE 
-				|| scope == GLOBAL;
+				|| scope == GLOBAL
+				|| scope == null;
 		}
 		
 	},
@@ -26,7 +29,8 @@ public enum ActionScope {
 			return scope == AGENT 
 				|| scope == NODE 
 				|| scope == GLOBAL 
-				|| scope == WEBSERVICE;
+				|| scope == WEBSERVICE
+				|| scope == null;
 		}
 	};
 	

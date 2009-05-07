@@ -460,7 +460,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 							List<? extends Action> actions = effector.getActions();
 							if (actions != null && !actions.isEmpty()) {
 								for (Action action:actions) {
-									if (action.getScope().contains(ActionScope.NODE)) {
+									if ((action.getScope()!=null) && action.getScope().contains(ActionScope.NODE)) {
 									  action.setProviderDescription(agent.getAgentDescription());
 									  registerAction(action);
 									}

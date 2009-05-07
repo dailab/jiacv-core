@@ -235,6 +235,29 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		return null;
 	}
 
+	/**
+	 * this is inserted for search local agents only. <br>
+	 * reason: a (IAgentDescription) tamplate with a agentnodeuuid didn't work. But I need 
+	 * in this case just local agents. used tamplate: <br>
+	 * <code>new AgentDescription(null, null, null, null, thisAgent.getAgentNode().getUUID())</code> 
+	 * hate mail to mib
+	 * @param template
+	 * @return
+	 */
+	public List<IAgentDescription> searchAllLocalAgents(IAgentDescription template) {
+		if (template == null) {
+			
+		}
+		List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
+		for (String key:localAgents.keySet()) {
+			IAgentDescription agentDescription = localAgents.get(key);
+			if (agentDescription.equals(template)) {
+				agents.add(agentDescription);
+			}
+		}
+		return agents;
+	}
+	
 	@Override
 	public List<IAgentDescription> searchAllAgents(IAgentDescription template) {
 		if (template == null) {
@@ -570,7 +593,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 	
 	/**
-	 * this returns all known and reachable agent nodes. <br> 
+	 * this returns all known and reachable agent nodes. this returns a list of UUIDs of all known nodes. <br> 
 	 * insert for agent migration (hate mails to mib).
 	 * @return
 	 */
@@ -579,6 +602,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		return nodes.keySet();
 		
 	}
+	
+
 	
 	private void refreshAgentNode(ICommunicationAddress node) {
 		String uuid = node.getName();

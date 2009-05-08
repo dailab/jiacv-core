@@ -529,9 +529,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		ICommunicationAddress senderAddress = message.getSender();
 		
 		//own message, do nothing
-		if (senderAddress.equals(myAddress)) {
+		if (senderAddress == null || senderAddress.equals(myAddress)) {
 			return;
 		}
+		
+		System.out.println("");
 		
 		String protocol = message.getProtocol();
 		System.out.println("sender=" + senderAddress + " protocol=" + protocol);

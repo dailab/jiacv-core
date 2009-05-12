@@ -49,6 +49,11 @@ public class JMSMessageTransport extends MessageTransport {
 	 */
 	@Override
 	public synchronized void doInit() throws Exception {
+		
+		if (log == null) {
+			throw new Exception("logging was not set!");
+		}
+		
 		if (log.isDebugEnabled()) {
 			log.debug("JMSMessageTransport initializing...");
 		}

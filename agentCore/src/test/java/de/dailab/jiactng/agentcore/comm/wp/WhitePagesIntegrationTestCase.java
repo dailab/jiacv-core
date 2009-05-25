@@ -28,7 +28,7 @@ public class WhitePagesIntegrationTestCase extends TestCase {
 	private static boolean _setup = true;
 	private static boolean _lastTestDone = false;
 	private static boolean _debug = false;
-	private static boolean _deactivateTests = false;
+	private static boolean _deactivateTests = true;
 
 	private static IAgentNode _agentNode;
 	private static IAgentNode _otherNode;

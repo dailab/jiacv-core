@@ -437,12 +437,12 @@
 		<repository>
 			<id>dai-releases</id>
 			<name>dai-releases</name>
-			<url>http://repositories/nexus/content/repositories/dai-releases/</url>
+			<url>http://repositories.dai-lab.de/nexus/content/repositories/dai-releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>dai-snapshots</id>
 			<name>dai-snapshots</name>
-			<url>http://repositories/nexus/content/repositories/dai-snapshots/</url>
+			<url>http://repositories.dai-lab.de/nexus/content/repositories/dai-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 

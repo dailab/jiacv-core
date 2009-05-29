@@ -75,7 +75,12 @@ public abstract class MessageTransport implements MessageTransportMBean {
      */
     public final void setDefaultDelegate(IMessageTransportDelegate delegate) {
         _delegate = delegate;
+        
+        if (_delegate.getLog(_transportIdentifier) == null) {
+      	  log.error("IMessageTransportDelegate.getLog() returned null! This can cause exceptions! ");
+        }
         log = _delegate.getLog(_transportIdentifier);
+        
     }
     
     /**

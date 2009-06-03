@@ -402,6 +402,17 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
+		<repository>
+			<id>thirdparty</id>
+			<name>thirdparty</name>
+			<url>http://repositories/nexus/content/repositories/thirdparty/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>

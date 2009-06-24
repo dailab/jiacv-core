@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.Agent;
 import de.dailab.jiactng.agentcore.IAgentBean;
+import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
@@ -27,6 +28,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.ontology.AgentNodeDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
+import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		IDirectory, IMessageTransportDelegate {
@@ -52,6 +54,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	
 	/** Interval to send alive message to group. In milliseconds. Default is 2000.*/
 	private long aliveInterval = 2000;
+	
+	/** reference to the service Matcher if it exists */
+	private IServiceMatcher serviceMatcher = null; 
+	
+  /** reference to the ontology storage if it exists */
+  private IOntologyStorage ontologyStorage = null; 
+
 	
 	/** 
 	 * Interval to send advertise message to group. In milliseconds.
@@ -122,6 +131,28 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		// find serviceMatcherBean and ontologystorage
+		for(IAgentNodeBean ianb : this.agentNode.getAgentNodeBeans()) {
+		  if(ianb instanceof IServiceMatcher) {
+		    this.serviceMatcher = (IServiceMatcher)ianb;
+		    
+		  } else if(ianb instanceof IOntologyStorage) {
+		    this.ontologyStorage = (IOntologyStorage)ianb;
+		  }
+		}
+		
+		if(this.serviceMatcher != null) {
+		  log.info("Found a ServiceMatcher for this agentnode");
+		} else {
+		  log.info("No ServiceMatcher was found on this agentode, complex matching will not be possible!");
+		}
+		
+    if(this.ontologyStorage != null) {
+      log.info("Found an OntologyStorage for this agentnode");
+    } else {
+      log.info("No OntologyStorage was found on this agentode, ontology-handling will not be possible!");
+    }
 	}
 
 	@Override
@@ -146,6 +177,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	@Override
 	public void doCleanup() throws Exception {
 		super.doCleanup();
+		
+		this.serviceMatcher = null;
+		this.ontologyStorage = null;
 		
 		try {
 			messageTransport.stopListen(myAddress, null);
@@ -411,6 +445,24 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return null;
 		}
 		
+    // use Matcher for matching if possible
+    if (template instanceof IServiceDescription) {
+      if (this.serviceMatcher != null) {
+        ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
+        IServiceDescription matcherResult = this.serviceMatcher.findBestMatch((IServiceDescription) template,
+            serviceDescList);
+
+        if ((matcherResult != null)) {
+          return matcherResult;
+        } else {
+          log.warn("Matcher found no result, trying normal template matching...");
+        }
+
+      } else {
+        log.error("This agentnode has no servicematcher - no complex matching possible!");
+      }
+    }
+		
 		if (localActions.contains(template)) {
 			for (IActionDescription ad:localActions) {
 				if (ad.equals(template)) {
@@ -440,6 +492,24 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error("Cannot find action: null!");
 			return actions;
 		}
+		
+		// use Matcher for matching if possible
+    if (template instanceof IServiceDescription) {
+      if (this.serviceMatcher != null) {
+        ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
+        ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher.findAllMatches(
+            (IServiceDescription) template, serviceDescList);
+
+        if ((matcherResults != null) && (matcherResults.size() > 0)) {
+          actions.addAll(matcherResults);
+        } else {
+          log.warn("Matcher found no result, trying normal template matching...");
+        }
+
+      } else {
+        log.error("This agentnode has no servicematcher - no complex matching possible!");
+      }
+    }
 
 		if (localActions.contains(template)) {
 			for (IActionDescription actionDescription:localActions) {
@@ -558,7 +628,41 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			refreshAgentNode(senderAddress);
 			Set<IActionDescription> actions = ((Advertisement)message.getPayload()).getActions();
 			System.out.println("receive ADVERTISE: " + actions.size());
-			remoteActions.put(senderAddress.getName(), actions);
+			
+			Set<IActionDescription> receivedActions = new HashSet<IActionDescription>();
+      for (IActionDescription iad : actions) {
+        
+        if (iad instanceof IServiceDescription) {
+          // special handling for service descriptions
+          IServiceDescription isd = (IServiceDescription) iad;
+          if (isd.getOntologySource() != null) {
+            IServiceDescription tempService = null;
+            try {
+              tempService = ontologyStorage.deserializeServiceDescription(isd.getOntologySource());
+
+              if (tempService != null) {
+                // these fields are not filled by the ontologyStorage, so do it by hand
+                ((Action)tempService).setInputTypes(isd.getInputTypes());
+                ((Action)tempService).setResultTypes(isd.getResultTypes());
+                ((Action)tempService).setProviderDescription(isd.getProviderDescription());
+                ((Action)tempService).setScope(isd.getScope());
+              }
+            } catch (Exception ex) {
+              log.error("Caught exception when reading service description: ", ex);
+            }
+
+            if (tempService != null) {
+              receivedActions.add(tempService);
+            }
+          }
+
+        } else {
+          // simply add normal actions
+          receivedActions.add(iad);
+        }
+      }
+			
+			remoteActions.put(senderAddress.getName(), receivedActions);
 			
 			Hashtable<String, IAgentDescription> agents = ((Advertisement)message.getPayload()).getAgents();
 			for (String agent:agents.keySet()) {
@@ -665,6 +769,36 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		this.aliveInterval = interval;
 	}
 	
+	
+	/**
+   * Collects all complex services, i.e. entries with an IServiceDescription, from both, the local and the remote
+   * services list.
+   * 
+   * @return a list of all IServiceDescriptions from this directory, containint both, local and remote entries.
+   */
+  private ArrayList<IServiceDescription> findAllComplexServices() {
+    ArrayList<IServiceDescription> ret = new ArrayList<IServiceDescription>();
+
+    // find serviceDescriptions in local actions
+    for (IActionDescription localAct : localActions) {
+      if (localAct instanceof IServiceDescription) {
+        ret.add((IServiceDescription) localAct);
+      }
+    }
+
+    // find serviceDescriptions in remote Actions
+    for (String key : remoteActions.keySet()) {
+      Set<IActionDescription> remoteActSet = remoteActions.get(key);
+      for (IActionDescription remoteAct : remoteActSet) {
+        if (remoteAct instanceof IServiceDescription) {
+          ret.add((IServiceDescription) remoteAct);
+        }
+      }
+    }
+
+    return ret;
+  }
+	
 //#########################################
 // Communication	
 //#########################################
@@ -689,7 +823,19 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		adMessage.setProtocol(ADVERTISE);
 		//TODO filter global actions
 		
-		Advertisement ad = new Advertisement(localAgents, localActions);
+		
+		// find OWL-S ServiceDescriptions and deserialize them by hand 
+		Set<IActionDescription> advActions = new HashSet<IActionDescription>();
+		for(IActionDescription iad : localActions) {
+		  if(iad instanceof IServiceDescription) {
+		    IServiceDescription isd = (IServiceDescription)iad;
+		    isd.setOntologySource(ontologyStorage.serializeServiceDescription(isd));
+		  } 
+		  advActions.add(iad);
+		}
+		
+		
+		Advertisement ad = new Advertisement(localAgents, advActions);
 		adMessage.setPayload(ad);
 		
 		//debug

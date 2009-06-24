@@ -98,15 +98,23 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
           }
           memory.write(act.getSession());
         }
+        
+        // test for authorization if applicable
         Session session = act.getSession();
         if ((session.getUserToken() == null) && (session.getOriginalProvider() != null)
             && (session.getOriginalUser() != null) && session.getOriginalUser().equals(session.getOriginalProvider())) {
+          // no user token, and user is equal to provider - invoke is allowed 
           providerBean.doAction(act);
+
         } else if (providerBean instanceof AbstractActionAuthorizationBean) {
+          // use authorizationAction
           ((AbstractActionAuthorizationBean) providerBean).authorize(act);
+        
         } else {
+          // no authorization required
           providerBean.doAction(act);
         }
+        
         actionPerformed(act, DoActionState.started, null);
       } catch (Throwable t) {
         memory.write(new ActionResult(act, t));

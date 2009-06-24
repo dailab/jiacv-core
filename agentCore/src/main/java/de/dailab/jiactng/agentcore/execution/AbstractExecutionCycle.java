@@ -45,7 +45,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
   private RemoteExecutor remoteExecutor;
   
   /** If true, RemoteExecutor will be used, if false something different.*/
-  private boolean useRemoteExecutor = false;
+  private boolean useRemoteExecutor = true;
   
   
   @Override

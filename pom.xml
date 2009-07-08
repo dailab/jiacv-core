@@ -508,8 +508,8 @@
       <!--module>ModuleTemplate</module--><!-- This is a template for new modules and testing; usually not required -->
       <module>gateway</module>
       <module>agentCore</module>
+      <module>jiacSecurity</module>
       <module>bdiAgent</module>
-      <!--module>jiacSecurity</module-->
       <module>ruleEngine</module>
       <module>basicServices</module>
       <module>examples</module>

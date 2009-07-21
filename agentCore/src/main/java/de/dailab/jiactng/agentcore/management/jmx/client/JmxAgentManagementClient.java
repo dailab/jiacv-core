@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.management.Attribute;
+import javax.management.AttributeChangeNotification;
 import javax.management.AttributeChangeNotificationFilter;
 import javax.management.InstanceNotFoundException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
+import javax.management.Notification;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
@@ -26,10 +28,33 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 
 	private static final AttributeChangeNotificationFilter agentnameNotificationFilter = new AttributeChangeNotificationFilter();
 	private static final AttributeChangeNotificationFilter lifecycleNotificationFilter = new AttributeChangeNotificationFilter();
-
+	private static final DisableLifeCycleAttributeFilter   propertyNotificationFilter  = new DisableLifeCycleAttributeFilter();
+	
 	static {
 		agentnameNotificationFilter.enableAttribute("AgentName");
 		lifecycleNotificationFilter.enableAttribute("LifecycleState");
+	}
+	
+	/**
+	 * This AttributeChangeNotificationFilter disables the lifecyclestate attribute, but
+	 * lets everything else pass.
+	 * @author jakob
+	 *
+	 */
+	public static class DisableLifeCycleAttributeFilter implements NotificationFilter {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean isNotificationEnabled(Notification notification) {
+			if (notification instanceof AttributeChangeNotification) {
+				AttributeChangeNotification acn = (AttributeChangeNotification)notification;
+				if (acn.getAttributeName().equals("LifecycleState")) {
+					return false;
+				}
+				return true;
+			}
+			return true;
+		}
 	}
 
 	/**
@@ -229,6 +254,34 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	public void removeAgentNameListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, agentnameNotificationFilter);
 	}
+	
+	/**
+	 * Adds a listener for changes on the name of the managed agent.
+	 * @param listener The listener object which will handle the notifications emitted by the managed agent.
+	 * @throws IOException A communication problem occurred when adding the listener to the remote agent.
+	 * @throws InstanceNotFoundException The agent does not exist in the JVM.
+	 * @throws SecurityException if the listener can not be added to the agent for security reasons.
+	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
+	 * @see de.dailab.jiactng.agentcore.Agent#setAgentName(String)
+	 */
+	public void addAgentPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+		addNotificationListener(listener, propertyNotificationFilter);
+	}
+
+	/**
+	 * Removes a listener for changes on the name of the managed agent.
+	 * @param listener The listener object which will no longer handle the notifications from the managed agent.
+	 * @throws IOException A communication problem occurred when removing the listener from the remote agent.
+	 * @throws InstanceNotFoundException The agent does not exist in the JVM.
+	 * @throws ListenerNotFoundException The listener is not registered in the managed agent.
+	 * @throws SecurityException if the listener can not be removed from the agent for security reasons.
+	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
+	 * @see de.dailab.jiactng.agentcore.Agent#setAgentName(String)
+	 */
+	public void removeAgentPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+		removeNotificationListener(listener, propertyNotificationFilter);
+	}
+
 
 	/**
 	 * Gets the owner of the managed agent.

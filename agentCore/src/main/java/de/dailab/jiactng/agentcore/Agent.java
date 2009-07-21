@@ -666,7 +666,22 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		return LifecycleStates.valueOf(this.memory.read(
 				new AgentBeanDescription(beanName, null)).getState());
 	}
-
+	
+	/**
+	 * Sends an attribute change notification to JMX listeners.
+	 * @param attributeName Attribute Name
+	 * @param attributeType Attribute Type
+	 * @param oldValue old value (before change)
+	 * @param newValue new value (after change)
+	 */
+	protected void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
+		Notification n = new AttributeChangeNotification(this, 
+				sequenceNumber++, System.currentTimeMillis(),
+				attributeName+ " changed", attributeName, attributeType,
+				oldValue, newValue);
+		sendNotification(n);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -687,11 +702,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		this.agentName = agentname;
 
 		// send notification
-		Notification n = new AttributeChangeNotification(this,
-				sequenceNumber++, System.currentTimeMillis(),
-				"Name of agent changed", "AgentName", "java.lang.String",
-				oldName, agentname);
-		sendNotification(n);
+//		Notification n = new AttributeChangeNotification(this,
+//				sequenceNumber++, System.currentTimeMillis(),
+//				"Name of agent changed", "AgentName", "java.lang.String",
+//				oldName, agentname);
+//		sendNotification(n);
+		
+		sendAttributeChangeNotification("AgentName", "java.lang.String", oldName, agentname);
+		
 	}
 
 	/**
@@ -765,7 +783,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * {@inheritDoc}
 	 */
 	public void setOwner(String owner) {
+		String oldOwner = this.owner;
 		this.owner = owner;
+		sendAttributeChangeNotification("owner", "java.lang.String", oldOwner, this.owner);
 	}
 
 	/**
@@ -1009,7 +1029,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 *            the be nice timer between to calls to the executionCycle
 	 */
 	public void setExecutionInterval(int executionInterval) {
+		int oldInterval = this.executionInterval;
 		this.executionInterval = executionInterval;
+		sendAttributeChangeNotification("executionInterval", "java.lang.int", 
+				oldInterval, executionInterval);
 	}
 
     /**
@@ -1089,10 +1112,12 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	    startTime = System.currentTimeMillis()+3000;
 	  }
 	  _startTime = startTime;
+	  Long oldStartTime = this.getStartTime();
 	  
 	  if (this.memory.getState() != LifecycleStates.UNDEFINED) {
 		  if (this.getAgentState() != LifecycleStates.UNDEFINED) {
 			  registerStartTime(startTime);
+			  sendAttributeChangeNotification("startTime", "java.lang.Long", oldStartTime, this.getStartTime());
 		  }
 	  }
 		
@@ -1167,9 +1192,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	public void setStopTime(Long stopTime) throws InstanceNotFoundException {
 		// add listener if needed
 		_stopTime = stopTime;
+		Long oldStopTime = this.getStopTime();
 		if (this.memory.getState() != LifecycleStates.UNDEFINED) {
 			if (this.getAgentState() != LifecycleStates.UNDEFINED) {
 				registerStopTime(stopTime);
+				sendAttributeChangeNotification("stopTime", "java.lang.Long", oldStopTime, this.getStopTime());	
 			}
 		}
 		
@@ -1276,7 +1303,15 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
   @Override
   public void setAutoExecutionServices(List<String> actionIds) {
     if(this.execution!= null){
-      this.execution.setAutoExecutionServices(actionIds);
+    	List<String> oldActionIds = null;
+    	if (this.execution.getAutoExecutionServices() != null) {
+    		oldActionIds = new ArrayList<String>();
+    		oldActionIds.addAll(this.execution.getAutoExecutionServices());
+    	}
+    	this.execution.setAutoExecutionServices(actionIds);
+    	sendAttributeChangeNotification("autoExecutionServices", "java.util.ArrayList<java.lang.String>", 
+    			oldActionIds, actionIds);
+    	
     } 
   }
 
@@ -1286,7 +1321,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
   @Override
   public void setAutoExecutionType(boolean continous) {
     if(this.execution!= null){
-      this.execution.setAutoExecutionType(continous);
+    	boolean oldValue = this.execution.getAutoExecutionType();
+    	this.execution.setAutoExecutionType(continous);
+    	sendAttributeChangeNotification("autoExecutionType", "java.lang.boolean", 
+    			oldValue, continous);
     } 
   }
 
@@ -1303,8 +1341,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    */
   @Override
   public void setSpringConfigXml(byte[] springConfig) {
-  	this.springConfigXml = springConfig;
-  	
+	  this.springConfigXml = springConfig;
   }
 
   	/***********************************************

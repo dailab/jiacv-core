@@ -71,7 +71,8 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
     * {@inheritDoc}
     */
    public void setAuthorizationActionName(String authorizationActionName) {
-      this.authorizationActionName = authorizationActionName;
+      String oldName = this.authorizationActionName;
+	  this.authorizationActionName = authorizationActionName;
       authorizationAction = null;
 
       // // search for authorization action
@@ -88,7 +89,8 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
             invokeActionSearch(new Action(authorizationActionName), false, 0, this);
          }
       }
-
+      // Notify attribute change listeners
+      sendAttributeChangeNotification("authorizationActionName", "java.lang.String", oldName, this.authorizationActionName);
    }
 
    /**

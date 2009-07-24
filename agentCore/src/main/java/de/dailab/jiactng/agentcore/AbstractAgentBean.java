@@ -10,6 +10,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.management.AttributeChangeNotification;
+import javax.management.Notification;
+
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.ActionResultListener;
@@ -591,5 +594,20 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
     }
 
   }
+  
+  /**
+	 * Sends an attribute change notification to JMX listeners.
+	 * @param attributeName Attribute Name
+	 * @param attributeType Attribute Type
+	 * @param oldValue old value (before change)
+	 * @param newValue new value (after change)
+	 */
+	protected void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
+		Notification n = new AttributeChangeNotification(this, 
+				sequenceNumber++, System.currentTimeMillis(),
+				"AgentBean Property "+attributeName+ " changed", 
+				attributeName, attributeType, oldValue, newValue);
+		sendNotification(n);
+	}
 
 }

@@ -36,7 +36,6 @@ import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
-import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
@@ -677,8 +676,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	protected void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
 		Notification n = new AttributeChangeNotification(this, 
 				sequenceNumber++, System.currentTimeMillis(),
-				attributeName+ " changed", attributeName, attributeType,
-				oldValue, newValue);
+				"Agent property "+attributeName+ " changed", 
+				attributeName, attributeType, oldValue, newValue);
 		sendNotification(n);
 	}
 	

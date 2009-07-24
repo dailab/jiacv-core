@@ -2,14 +2,20 @@ package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
 
+import javax.management.AttributeChangeNotification;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.InvalidAttributeValueException;
+import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
+import javax.management.Notification;
+import javax.management.NotificationFilter;
+import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.openmbean.TabularData;
 
+import de.dailab.jiactng.agentcore.management.jmx.DisableLifeCycleAttributeFilter;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
 
 /**
@@ -17,7 +23,8 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
  * @author Jan Keiser
  */
 public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
-
+	private static final DisableLifeCycleAttributeFilter propertyFilter = new DisableLifeCycleAttributeFilter();
+	
 	/**
 	 * Creates a client for the management of an agent bean.
 	 * @param mbsc The JMX connection used for the agent management.
@@ -30,7 +37,32 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	protected JmxAgentBeanManagementClient(MBeanServerConnection mbsc, String agentNodeName, String agentID, String agentBeanName) throws MalformedObjectNameException {
 		super(mbsc, new JmxManager().getMgmtNameOfAgentBean(agentNodeName, agentID, agentBeanName));
 	}
-
+	
+	/**
+	 * Adds a listener for changes of properties of the managed agent bean.
+	 * @param listener The listener object which will handle the notifications emitted by the managed agent bean.
+	 * @throws IOException A communication problem occurred when adding the listener to the remote agent bean.
+	 * @throws InstanceNotFoundException The agent bean does not exist in the JVM.
+	 * @throws SecurityException if the listener can not be added to the agent bean for security reasons.
+	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
+	 */
+	public void addBeanPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+		addNotificationListener(listener, propertyFilter);
+	}
+	
+	/**
+	 * Removes a listener for changes of properties of the managed agent bean.
+	 * @param listener The listener object which will no longer handle the notifications from the managed agent bean.
+	 * @throws IOException A communication problem occurred when removing the listener from the remote agent bean.
+	 * @throws InstanceNotFoundException The agent bean does not exist in the JVM.
+	 * @throws ListenerNotFoundException The listener is not registered in the managed agent bean. 
+	 * @throws SecurityException if the listener can not be removed from the agent for security reasons.
+	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
+	 */
+	public void removeBeanPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+		removeNotificationListener(listener, propertyFilter);
+	}
+	
 	/**
 	 * Gets detailed information about all actions provided by the managed <code>AbstractMethodExposingBean</code>.
 	 * @return Information about the provided actions.

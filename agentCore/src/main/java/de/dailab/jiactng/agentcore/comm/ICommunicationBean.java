@@ -31,11 +31,11 @@ public interface ICommunicationBean {
     String ACTION_JOIN_GROUP= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#joinGroup";
     
     /**
-	 * Action to join a Group, which means start receiving all messages that are send to it.
+	 * Action to leave a Group, which means stop receiving any messages that are send to it.
 	 * 
 	 * <br />
 	 * <b>InputParameter</b> <br /> 
-	 * 	IGroupAddress	-  The Groupaddress you want to listen to. Must not be null<br />
+	 * 	IGroupAddress	-  The Groupaddress you stop want to listen to. Must not be null<br />
 	 *
 	 * <br />
 	 * <b>Result Types:</b> <br />

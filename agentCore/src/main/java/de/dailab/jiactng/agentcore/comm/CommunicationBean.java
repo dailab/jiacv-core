@@ -391,6 +391,10 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             log.debug("received message ' " + message + "' at '" + at + "'");
         }
         
+    	// insert by mib
+    	// need a header field for information: send-to address
+    	message.setHeader("send-to", at.getName());
+    	
         memory.write(message);
 
     }

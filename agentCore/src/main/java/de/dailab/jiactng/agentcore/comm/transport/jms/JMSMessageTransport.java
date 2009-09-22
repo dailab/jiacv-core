@@ -170,7 +170,7 @@ public class JMSMessageTransport extends MessageTransport {
 	 */
 	public void send(IJiacMessage message, ICommunicationAddress commAdd) throws CommunicationException {
         if (log.isDebugEnabled()){
-        	log.debug("JMSMessageTransport sends Message to address '" + commAdd.toUnboundAddress());
+        	log.debug("JMSMessageTransport sends Message to address '" + commAdd.toUnboundAddress() + "'");
         }
 		
 		try {

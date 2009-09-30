@@ -41,4 +41,6 @@ public interface IAgentDescription extends IFact {
     String getAgentNodeUUID();
     
     void setAgentNodeUUID(String UUID);
+    
+    Boolean isMobile();
 }

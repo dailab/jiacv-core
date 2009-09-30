@@ -27,20 +27,33 @@ public class AgentDescription implements IAgentDescription {
 	/** UUID of the AgentNode that holds this agent */
 	private String agentNodeUUID;
 	
+	/** Flag, if it is set <code>true</code>, it is a mobile agent */
+	private Boolean isMobile = new Boolean(false);
+	
 //	public AgentDescription(String aid, String name, String state) {
 //        this(aid, name, state, name != null ? CommunicationAddressFactory.createMessageBoxAddress(aid) : null);
 //	}
     
 	public AgentDescription() {
-	    this(null, null, null, null, null);
+	    this(null, null, null, null, null, null);
 	}
 	
     public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
+//        this.aid=aid;
+//        this.name=name;
+//        this.state=state;
+//        this.messageBoxAddress= messageBoxAddress;
+//        this.agentNodeUUID = agentNodeUUID;
+    	this( aid,  name,  state,  messageBoxAddress,  agentNodeUUID, new Boolean(false));
+    }
+    
+    public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID, Boolean mobile) {
         this.aid=aid;
         this.name=name;
         this.state=state;
         this.messageBoxAddress= messageBoxAddress;
         this.agentNodeUUID = agentNodeUUID;
+        this.isMobile = mobile;
     }
     
     
@@ -156,6 +169,14 @@ public class AgentDescription implements IAgentDescription {
         } else {
         	builder.append("\n messageBoxAddress=null");
         }
+        
+        // mobile
+        if (isMobile != null) {
+        	builder.append("\n mobile=").append(isMobile.toString());
+        }
+        else {
+        	builder.append("\n mobile=null");
+        }
 
         builder.append('\n');
         return builder.toString();
@@ -174,5 +195,19 @@ public class AgentDescription implements IAgentDescription {
 	 */
 	public void setAgentNodeUUID(String UUID){
 		agentNodeUUID = UUID;
+	}
+	
+	
+	public void setMobile(Boolean mobile) {
+		
+		if (mobile == null) {
+			return;
+		}
+		
+		isMobile = mobile;
+	}
+	
+	public Boolean isMobile() {
+		return isMobile;
 	}
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+  <properties>
+    <title>Documentation</title>
+    <author email="marcel.patzlaff@dai-labor.de">Marcel Patzlaff</author>
+    <author email="claus.schenk@dai-labor.de">Claus Schenk</author>
+  </properties>
+  <body>
+    <section name="Gateway Agent - Agent Gateway - Documentation"> 
+      <p>
+		short introduction
+      </p>
+
+      <subsection name="Overview">
+        <p>
+			overview
+        </p>
+      </subsection>
+
+      <subsection name="Motivation">
+        <p>
+        	motivation
+        </p>
+      </subsection>
+
+      <subsection name="Reliable host name resolution">
+        <p>
+			reliable host name resolution for agent discovery and inter-agent communication
+        </p>        
+      </subsection>
+
+    </section>
+  </body>
+</document>

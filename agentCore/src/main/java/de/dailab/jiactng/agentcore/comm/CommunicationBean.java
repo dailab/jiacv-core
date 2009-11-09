@@ -393,7 +393,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         
     	// insert by mib
     	// need a header field for information: send-to address
-    	message.setHeader("send-to", at.getName());
+    	message.setHeader(IJiacMessage.Header.SEND_TO, at.getName());
     	
         memory.write(message);
 

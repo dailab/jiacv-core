@@ -22,6 +22,7 @@ public interface IJiacMessage extends IFact {
         String SENDER= "JiacTNGSenderAddress";
         String PROTOCOL= "JiacTNGProtocolID";
         String REPLY_TO= "JiacTNGReplyToAddress";
+        String SEND_TO = "JiacTNGSendToAddress";
     }
     
 	/**

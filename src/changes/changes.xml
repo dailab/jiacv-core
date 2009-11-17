@@ -1,0 +1,19 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://www.cs.tu-berlin.de/%7Esmarqoo/maven-changes.xsd">
+	<properties>
+		<title>Changes</title>
+		<author email="axle.hessler@dai-labor.de">axle</author>
+	</properties>
+	<body>
+		<release version="1.0" date="t.b.a" desc="First release">
+			<action dev="axle" type="add">Additionally to the normal source and test code structure
+				a site will be created which provides basic information about the module on the one
+				hand, and information about the quality of the module on the other.
+			</action>
+			<action dev="axle" type="add">You may now log your changes in a ChangeLog using
+				this changes.xml. A report will be generated automatically and integrated
+				in the site.
+			</action>
+		</release>
+	</body>
+</document>

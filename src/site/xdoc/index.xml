@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+  <properties>
+    <title>ModuleTemplate Documentation</title>
+    <author email="axel.hessler@dai-labor.de">axle</author>
+  </properties>
+  <body>
+    <section name="ModuleTemplate Documentation"> 
+      <p>This section provides an overview about ModuleTemplate.</p>
+    </section>
+  </body>
+</document>

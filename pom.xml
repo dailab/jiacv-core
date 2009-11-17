@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  	<modelVersion>4.0.0</modelVersion>
+  	
+  	<parent>
+        <groupId>de.dailab.jiactng</groupId>
+        <artifactId>tools</artifactId>
+        <version>5.0.5-SNAPSHOT</version>
+    </parent>
+  	
+  	<groupId>de.dailab.jiactng.tools</groupId>
+  	<artifactId>AgentUnit</artifactId>  	
+  	<packaging>jar</packaging>  	
+  	<name>${project.artifactId}</name>   	
+	
+	<dependencies>
+		
+		<dependency>
+  			<groupId>de.dailab.jiactng</groupId>
+  			<artifactId>agentCore</artifactId>
+  			<version>${project.version}</version>
+		</dependency>  	
+		
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!--					<skipTests>true</skipTests> -->
+				</configuration>
+			</plugin>
+			<!-- This is how an assembly is created -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>
+							${basedir}/standalone.assembly
+						</descriptor>
+					</descriptors>
+					<outputDirectory>
+						${project.build.directory}
+					</outputDirectory>
+					<workDirectory>
+						${project.build.directory}/assembly/work
+					</workDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>attached</goal>
+						</goals>
+					</execution>  					
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

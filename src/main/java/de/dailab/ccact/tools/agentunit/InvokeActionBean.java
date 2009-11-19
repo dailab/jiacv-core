@@ -14,7 +14,9 @@ import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
+import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 //import de.dailab.jiactng.jadl.*;
 
@@ -38,13 +40,6 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 	@Override
 	public void doInit() throws Exception {
 		super.doInit();
-
-/*		for (IAgentBean bean : thisAgent.getAgentBeans()) {
-			if (bean.getClass().equals(JadlInterpreterAgentBean.class)) {
-				interpreter = (JadlInterpreterAgentBean) bean;
-			}
-		}
-*/
 	}
 
 
@@ -84,10 +79,15 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 
 	public synchronized Serializable[] invokeAction(final String serviceName, Serializable[] input) throws Exception {
 
+		log.debug("Invoking action " + serviceName + " with input " + input);
+		
 		Action tpl = new Action(serviceName);
-		tpl.setScope(null);
+		tpl.setScope(ActionScope.GLOBAL);
 
-		Action action = memory.read(tpl);
+		// fetch action from directory
+		IActionDescription tpldesc = thisAgent.searchAction(tpl);
+		Action action = (Action)tpldesc;
+		// Action action = memory.read(tpl); // old version, fetches action from local memory
 		
 		if (action == null) {
 			log.error("action '" + serviceName + "' not found; try again later.");

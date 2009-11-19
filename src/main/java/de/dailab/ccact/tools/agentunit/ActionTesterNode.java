@@ -5,10 +5,11 @@ package de.dailab.ccact.tools.agentunit;
 
 import java.io.File;
 import java.io.Serializable;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +21,8 @@ import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
+import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
 import de.dailab.ccact.tools.agentunit.InvokeActionBean;
 
@@ -76,10 +79,15 @@ public class ActionTesterNode {
 
 		// Add InvokeActionAgent to AgentNode
 		try {
-			FileInputStream cfis = new FileInputStream(new File(INVOKE_ACTION_AGENT_CONFIGURATION_FILE));
+			JARClassLoader jcl = new JARClassLoader();
+			// get content of agent configuration file
+			InputStream cfis = jcl.getResourceAsStream(INVOKE_ACTION_AGENT_CONFIGURATION_FILE);
+			log.debug("Reading INVOKE_ACTION_AGENT_CONFIGURATION_FILE with up to " + cfis.available() + " bytes.");
 			byte[] byteconfig = new byte[cfis.available()];
-			cfis.read(byteconfig);
-			List<String> createdagents = agentNode.addAgents(byteconfig, null,agentNode.getOwner());
+			int bytesread = cfis.read(byteconfig, 0, cfis.available());
+			log.debug("Read " + bytesread + " bytes. The byteconfig content is:" + byteconfig.toString());
+			// add InvokeActionAgent
+			List<String> createdagents = agentNode.addAgents(byteconfig, new ArrayList<JARMemory>(),agentNode.getOwner());
 			String invokeactionagentid = createdagents.get(0); // Only one agent added, therefore no search implemented
 
 			// fetch ServiceDeployAgentBean
@@ -89,16 +97,20 @@ public class ActionTesterNode {
 			while (ialit.hasNext()){
 				invokeactionagent = ialit.next();
 				if (invokeactionagent.getAgentId().equalsIgnoreCase(invokeactionagentid)){
+					invokeactionagent.init();
+					invokeactionagent.start();
 					List<IAgentBean> beanList = invokeactionagent.getAgentBeans();
 					for (IAgentBean iab : beanList) {
 						if (iab instanceof InvokeActionBean) {
 							invokeactionbean = (InvokeActionBean) iab;
+							log.debug("Located Bean: " + invokeactionbean);
 						}
 					}
 				}
 			}
 		} catch (Exception e){
 			log.error("ActionTesterNode cannot be initalized!", e);
+			assert false;
 		}
 
 	}
@@ -109,9 +121,12 @@ public class ActionTesterNode {
 	public Serializable[] invoke(String jadlServiceName, Serializable[] serviceParameter) {
 
 		try {
+			log.debug("Bean is: " + invokeactionbean.toString());	
 			return invokeactionbean.invokeAction(jadlServiceName, serviceParameter);
 		}
 		catch (Exception e) {
+			log.error(e);
+			assert false;
 			return new Serializable[]{};
 		}
 

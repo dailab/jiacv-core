@@ -30,12 +30,12 @@ import de.dailab.ccact.tools.agentunit.InvokeActionBean;
 /**
  * This class is designed to create a testable environment for JUnit tests. 
  * The constructor receives a configuration file parameter where the Agent Node configuration
- * to be used in the tests is specified. An Agent Node of that typ is instantiated and
- * a special agent added to it. A bean in that agent provides direct synchronous access to 
+ * to be used in the tests is specified. An Agent Node of that type is instantiated and
+ * an ActionInvokeAgent added to it. A bean in that agent provides direct synchronous access to 
  * the actions available on the Agent Node with the method: 
  * <code>invoke({@link String}, {@link Serializable}[])</code>. <br>
  * Finally a <code>stop()</code> method can be called 
- * to shut down the Agent Node previously instantiated.
+ * to shut down the Agent Node after the test has been finished.
  * 
  * Usage:<br>
  * Apply this class as a helper in your JUnit tests by instantiating in your test case,

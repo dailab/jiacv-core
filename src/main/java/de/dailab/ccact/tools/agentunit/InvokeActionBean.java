@@ -82,7 +82,7 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 		log.debug("Invoking action " + serviceName + " with input " + input);
 		
 		Action tpl = new Action(serviceName);
-		tpl.setScope(ActionScope.GLOBAL);
+		tpl.setScope(ActionScope.NODE);
 
 		// fetch action from directory
 		IActionDescription tpldesc = thisAgent.searchAction(tpl);

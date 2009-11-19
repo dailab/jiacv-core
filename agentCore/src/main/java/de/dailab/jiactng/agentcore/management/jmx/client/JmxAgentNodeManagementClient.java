@@ -351,6 +351,16 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
+	 * Gets the agent node's UUID.
+	 * @return UUID as string.
+	 * @throws InstanceNotFoundException
+	 * @throws IOException
+	 */
+	public String getUUID() throws InstanceNotFoundException, IOException {
+		return (String) getAttribute("UUID");
+	}
+	
+	/**
 	 * Shuts down the managed agent node.
 	 * @throws InstanceNotFoundException The agent node does not exist. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.

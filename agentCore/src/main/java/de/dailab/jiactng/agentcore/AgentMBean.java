@@ -7,6 +7,7 @@ import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 /**
  * JMX compliant management interface of agents to get information
@@ -117,14 +118,41 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	 */
 	public void setStopTime(Long stopTime) throws InstanceNotFoundException;
 
+	/**
+	 * Sets the auto Execution service ID list.
+	 * @param actionIds
+	 */
 	public void setAutoExecutionServices(List<String> actionIds);
 	
+	/**
+	 * Returns the auto execution service ID list.
+	 * @return auto execution service list
+	 */
 	public List<String> getAutoExecutionServices();
 	
+	/**
+	 * Sets the auto execution type.
+	 * @param continous
+	 */
 	public void setAutoExecutionType(boolean continous);
 	
+	/**
+	 * Gets the auto execution type.
+	 * @return
+	 */
 	public boolean getAutoExecutionType();
 	
+	/**
+	 * Gets the Spring configuration XML snippet.
+	 * @return Spring config as byte array
+	 */
 	public byte[] getSpringConfigXml();
+	
+	/**
+	 * Gets the Agent Description for this agent.
+	 * @return Agent Description
+	 */
+	public AgentDescription getAgentDescription();
+
 	
 }

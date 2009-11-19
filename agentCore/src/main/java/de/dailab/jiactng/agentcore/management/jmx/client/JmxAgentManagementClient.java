@@ -20,6 +20,7 @@ import javax.management.openmbean.CompositeData;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.jmx.DisableLifeCycleAttributeFilter;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
+import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * This JMX client enables the remote management of JIAC TNG agents.
@@ -432,22 +433,69 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 		this.setAttribute("StopTime", stopTime);
 	}
 	
+	/**
+	 * Sets the auto execution service list for the connected agent.
+	 * @param actionIds
+	 * @throws IOException
+	 * @throws InstanceNotFoundException
+	 * @throws InvalidAttributeValueException
+	 */
   public void setAutoExecutionServices(List<String> actionIds) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
     this.setAttribute("AutoExecutionServices", actionIds);
   }
   
+  /**
+   * Gets the auto execution service list for the connected agent.
+   * @return auto execution service id list
+   * @throws IOException
+   * @throws InstanceNotFoundException
+   * @throws InvalidAttributeValueException
+   */
   public List<String> getAutoExecutionServices() throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
     return (List<String>) getAttribute("AutoExecutionServices");
   }
   
+  /**
+   * Sets the auto execution type for the connected agent.
+   * @param continous
+   * @throws IOException
+   * @throws InstanceNotFoundException
+   * @throws InvalidAttributeValueException
+   */
   public void setAutoExecutionType(boolean continous)throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
     this.setAttribute("AutoExecutionType", continous);
   }
+  
+  /**
+   * Gets the auto execution type for the connected agent.
+   * @return auto execution type
+   * @throws IOException
+   * @throws InstanceNotFoundException
+   * @throws InvalidAttributeValueException
+   */
   public boolean getAutoExecutionType()throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
     return (Boolean) getAttribute("AutoExecutionType");
   }
   
+  /**
+   * Gets the spring config xml snippet for the connected agent.
+   * @return Spring Config XML snippet
+   * @throws IOException
+   * @throws InstanceNotFoundException
+   */
   public byte[] getSpringConfigXml() throws IOException, InstanceNotFoundException {
 	  return (byte[]) getAttribute("SpringConfigXml");
   }
+  
+  /**
+   * Gets the Agent description for the connected agent.
+   * @return Agent Description
+   * @throws InstanceNotFoundException
+   * @throws IOException
+   */
+  public IAgentDescription getAgentDescription() throws InstanceNotFoundException, IOException {
+	  return (IAgentDescription) getAttribute("AgentDescription");
+  }
+  
+  
 }

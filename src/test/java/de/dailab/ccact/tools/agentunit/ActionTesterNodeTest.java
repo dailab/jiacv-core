@@ -21,13 +21,13 @@ public class ActionTesterNodeTest {
 	static ActionTesterNode atn = new ActionTesterNode(ACTIONTESTERNODECONFIG, "ActionTesterNodeTestPlatform");
 	
 	/**
-	 * Checks wether or not the <code>relativeLoadAction</code> Action is available through the <code>invoke</code> method
+	 * Checks wether or not the <code>testAction</code> Action is available through the <code>invoke</code> method
 	 * of the ActionTesterNode.
 	 *  
 	 */
 	@Test
 	public void ActionAccess(){
-		Serializable[] results = atn.invoke("relativeLoadAction",null);
+		Serializable[] results = atn.invoke("testAction",null);
 		System.out.println("Test result for action access: " + results[0].toString());
 	}
 	

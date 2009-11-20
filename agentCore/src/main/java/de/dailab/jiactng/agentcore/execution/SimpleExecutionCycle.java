@@ -32,9 +32,15 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  */
 public class SimpleExecutionCycle extends AbstractExecutionCycle {
 
+  private static final Session SESSION_TEMPLATE = new Session();
+  
+  private static final ActionResult ACTIONRESULT_TEMPLATE = new ActionResult(null, null);
+  
+  private static final DoAction DOACTION_TEMPLATE = new DoAction(null, null, null, null);
+  
   private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
 
-/**
+  /**
    * Run-method for the execution cycle. The method iterates over the list of agentbeans and calls the execute method of
    * each <i>active</i> agentbean.
    * 
@@ -98,7 +104,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
 
       // process one doAction
       // TODO: check if read can be used
-      DoAction act = memory.remove(new DoAction(null, null, null, null));
+      DoAction act = memory.remove(DOACTION_TEMPLATE);
 
       boolean actionPerformed = false;
       if (act != null) {
@@ -111,7 +117,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
 
       // process one actionResult
       // TODO: check if read can be used
-      Set<ActionResult> resultSet = memory.removeAll(new ActionResult(null, null));
+      Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
       int countNew = 0;
       for (ActionResult ar : resultSet) {
         synchronized (this) {
@@ -131,8 +137,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
       }
       updateWorkload(ACTION_RESULT, resultProcessed);
 
-      // ActionResult actionResult = memory.remove(new ActionResult(null,
-      // null));
+      // ActionResult actionResult = memory.remove(ACTIONRESULT_TEMPLATE);
       // if (actionResult != null) {
       // synchronized (this) {
       // processResult(actionResult);
@@ -145,7 +150,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
        * If Session has a timeout
        */
       synchronized (memory) {
-        Set<Session> sessions = memory.readAll(new Session());
+        Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
         for (Session session : sessions) {
           if (session.isTimeout()) {
             // session has timeout

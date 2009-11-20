@@ -9,7 +9,7 @@
 
 		<property name="agents">
 			<list>
-				<ref bean="LoadReporter" />
+				<ref bean="TestAgent" />
 			</list>
 		</property>
 
@@ -32,22 +32,22 @@
 	</bean>
 
 
-	<bean name="LoadReporter" parent="NonBlockingAgent">
+	<bean name="TestAgent" parent="NonBlockingAgent">
 		<property name="agentBeans">
 			<list>
-				<ref bean="LoadReporterMethodExposingBean" />
+				<ref bean="TestMethodExposingBean" />
 				<ref bean="CommunicationBean" />
 			</list>
 		</property>
 	</bean>
 
-	<bean name="LoadReporterMethodExposingBean"
-		class="de.dailab.ccact.loadreporter.LoadReporterMethodExposingBean"
+	<bean name="TestMethodExposingBean"
+		class="de.dailab.ccact.tools.agentunit.TestMethodExposingBean"
 		singleton="false">
 		<property name="logLevel" value="WARN" />
 		<property name="registeredActions">
 			<set>
-				<value>relativeLoadAction</value>
+				<value>testAction</value>
 			</set>
 		</property>
 	</bean>

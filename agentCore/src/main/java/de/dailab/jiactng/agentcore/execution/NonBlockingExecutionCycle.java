@@ -30,6 +30,10 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 public class NonBlockingExecutionCycle extends AbstractExecutionCycle 
 	implements NonBlockingExecutionCycleMBean {
 
+	private static final Session SESSION_TEMPLATE = new Session();
+	private static final ActionResult ACTIONRESULT_TEMPLATE = new ActionResult(
+						null, null);
+	private static final DoAction DOACTION_TEMPLATE = new DoAction(null, null, null, null);
 	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
 	private TreeMap<Long,Future<?>> futures = new TreeMap<Long,Future<?>>();
 
@@ -117,7 +121,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// process one doAction
 			// TODO: check if read can be used
-			DoAction act = memory.remove(new DoAction(null, null, null, null));
+			DoAction act = memory.remove(DOACTION_TEMPLATE);
 
 			boolean actionPerformed = false;
 			if (act != null) {
@@ -132,8 +136,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// process one actionResult
 			// TODO: check if read can be used
-			Set<ActionResult> resultSet = memory.removeAll(new ActionResult(
-					null, null));
+			Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
 			int countNew = 0;
 			for (ActionResult ar : resultSet) {
 				synchronized (this) {
@@ -158,7 +161,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// Session-Cleanup, if Session has a timeout
 			synchronized (memory) {
-				Set<Session> sessions = memory.readAll(new Session());
+				Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
 				for (Session session : sessions){
 					if (session.isTimeout()){
 						// session has timeout

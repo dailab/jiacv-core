@@ -1,9 +1,5 @@
 package de.dailab.ccact.tools.agentunit;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,14 +7,12 @@ import java.util.List;
 import java.util.TreeMap;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
-import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
-//import de.dailab.jiactng.jadl.*;
 
 /**
  * This is a helping agent bean. It is designed for usage in JUnit-4 tests. Async JIAC 
@@ -27,12 +21,10 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  */
 public class InvokeActionBean extends AbstractAgentBean implements ResultReceiver {
 
-	public final static List<String> NIL = new ArrayList<String>();
-
 	private TreeMap<String, List<Serializable>> invokes = new TreeMap<String, List<Serializable>>();
 
 	/**
-	 * 200 ms
+	 * SLEEP_TIME = 200 ms
 	 */
 	public static final Integer SLEEP_TIME = 200;
 
@@ -66,11 +58,10 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 
 		if (invokes.containsKey(actionName)) {
 			log.debug("ping");
-			// synchronized (this) {
+
 			invokes.put(actionName, ( results != null ? Arrays.asList(results)
 					: new ArrayList<Serializable>() ) );
 			log.debug("pong");
-			// }
 		}
 
 	}

@@ -10,7 +10,8 @@ package de.dailab.jiactng.agentcore.comm.broker;
  */
 public class ActiveMQTransportConnector {
     private String _transportURI= null;
-    private String _discoveryURI= null;
+    private String _networkURI = null;
+	private String _discoveryURI= null;
     
     /**
      * The URI where remote connections are accepted. Examples are:
@@ -46,8 +47,16 @@ public class ActiveMQTransportConnector {
         return _discoveryURI;
     }
 
+    public String getNetworkURI() {
+		return _networkURI;
+	}
+
+	public void setNetworkURI(String networkURI) {
+		_networkURI = networkURI;
+	}
+
     @Override
     public String toString() {
-        return "transportURI='" + getTransportURI() + "'; discoverURI='" + getDiscoveryURI() + "'";
+        return "transportURI='" + getTransportURI() + "'; discoverURI='" + getDiscoveryURI() + "'" + "'; networkURI='" + getNetworkURI() + "'";
     }
 }

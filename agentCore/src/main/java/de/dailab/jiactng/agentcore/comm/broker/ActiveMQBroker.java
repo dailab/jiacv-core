@@ -20,8 +20,8 @@ import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
  * @author Marcel Patzlaff
  * 
  */
-public final class ActiveMQBroker extends AbstractAgentNodeBean {
-    private static ActiveMQBroker INSTANCE= null;
+public class ActiveMQBroker extends AbstractAgentNodeBean {
+    protected static ActiveMQBroker INSTANCE= null;
     
     /*package*/ static void initialiseProxy(ConnectionFactoryProxy proxy) {
         if(INSTANCE == null) {
@@ -31,11 +31,11 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
         proxy.connectionFactory= new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName());
     }
     
-    private String _brokerName= null;
-    private BrokerService _broker= null;
-    private Set<ActiveMQTransportConnector> _connectors= new HashSet<ActiveMQTransportConnector>();
-    private boolean _persistent = false;
-    private int _networkTTL = 1;
+    protected String _brokerName= null;
+    protected BrokerService _broker= null;
+    protected Set<ActiveMQTransportConnector> _connectors= new HashSet<ActiveMQTransportConnector>();
+    protected boolean _persistent = false;
+    protected int _networkTTL = 1;
 
     public ActiveMQBroker() {
         synchronized (ActiveMQBroker.class) {
@@ -138,7 +138,7 @@ public final class ActiveMQBroker extends AbstractAgentNodeBean {
         _connectors = connectors;
     }
 
-    private String getBrokerName() {
+    protected String getBrokerName() {
         if(_brokerName == null) {
             throw new IllegalStateException("broker is not initialised");
         }

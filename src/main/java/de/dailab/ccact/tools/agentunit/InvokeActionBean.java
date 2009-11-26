@@ -65,6 +65,16 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 		}
 
 	}
+	
+	
+	public List<IActionDescription> getFoundActions() {
+		
+		Action tpl = new Action();
+		tpl.setScope(ActionScope.NODE);
+		
+		return thisAgent.searchAllActions(tpl);
+		
+	}
 
 
 

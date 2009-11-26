@@ -4,12 +4,11 @@ package de.dailab.ccact.tools.agentunit;
 
 
 import java.io.File;
-import java.io.Serializable;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,8 +22,6 @@ import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
 import de.dailab.jiactng.agentcore.util.jar.JARMemory;
-
-import de.dailab.ccact.tools.agentunit.InvokeActionBean;
 
 
 /**
@@ -55,10 +52,22 @@ public class ActionTesterNode {
 	// var
 	private String spring_config;
 
-	private ClassPathXmlApplicationContext context;
-	private SimpleAgentNode agentNode;
-	private InvokeActionBean invokeactionbean;
-	private Log log;
+	/**
+	 * The application context of this node. 
+	 */
+	protected ClassPathXmlApplicationContext context;
+	
+	/**
+	 * the agent node
+	 */
+	protected SimpleAgentNode agentNode;
+//	protected IAgent invokeactionagent;
+	protected InvokeActionBean invokeactionbean;
+	
+	/**
+	 * default agent node logger
+	 */
+	protected Log log;
 
 	/**
 	 * Creates an ActionTesterNode from the given configuration file
@@ -114,7 +123,6 @@ public class ActionTesterNode {
 		}
 
 	}
-
 
 
 

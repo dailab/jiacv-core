@@ -329,7 +329,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		try {
 			uuid = actionDescription.getProviderDescription().getAgentNodeUUID(); 
 		} catch (Exception e) {
-			log.error("Cannot register action!\n" + actionDescription.toString());
+			log.error("("+e.getClass().getSimpleName()+") Cannot register action!\n" + actionDescription.toString());
 			return;
 		}
 		if (uuid == null) {

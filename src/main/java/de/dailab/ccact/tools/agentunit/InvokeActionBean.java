@@ -38,7 +38,7 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 	
 	public void receiveResult(ActionResult result) {
 
-		// ((Log4JLogger) log).getLogger().setLevel(Level.DEBUG);
+		//((Log4JLogger) log).getLogger().setLevel(Level.DEBUG);
 
 		if (log != null) {
 			log.info(result.getAction().getName());
@@ -78,6 +78,14 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 
 
 
+	/**
+	 * Invokes the action requested from the service directory, if available.
+	 * 
+	 * @param serviceName
+	 * @param input
+	 * @return null it the action could not be found, the results of the operation otherwise.
+	 * @throws Exception
+	 */
 	public synchronized Serializable[] invokeAction(final String serviceName, Serializable[] input) throws Exception {
 
 		log.debug("Invoking action " + serviceName + " with input " + input);
@@ -91,8 +99,9 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 		// Action action = memory.read(tpl); // old version, fetches action from local memory
 		
 		if (action == null) {
-			log.error("action '" + serviceName + "' not found; try again later.");
-			throw new Exception("action '" + serviceName + "' not found; try again later.");
+			log.warn("action '" + serviceName + "' not found; try again later.");
+			// throw new Exception("action '" + serviceName + "' not found; try again later.");
+			return null;
 		}
 
 		

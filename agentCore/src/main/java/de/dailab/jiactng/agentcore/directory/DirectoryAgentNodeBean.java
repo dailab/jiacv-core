@@ -386,7 +386,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		
 		if (uuid.equals(myAgentNode)) {
 			if (!localActions.remove(actionDescription)) {
-				log.warn("Cannot deregister action! Unknown action!");
+				log.warn("Cannot deregister action! Unknown action '"+actionDescription.getName()+"'!");
 			}
 		} else {
 			Set<IActionDescription> ad = remoteActions.get(uuid);

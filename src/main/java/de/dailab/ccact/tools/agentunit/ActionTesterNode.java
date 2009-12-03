@@ -91,10 +91,18 @@ public class ActionTesterNode {
 			JARClassLoader jcl = new JARClassLoader();
 			// get content of agent configuration file
 			InputStream cfis = jcl.getResourceAsStream(INVOKE_ACTION_AGENT_CONFIGURATION_FILE);
-			log.debug("Reading INVOKE_ACTION_AGENT_CONFIGURATION_FILE with up to " + cfis.available() + " bytes.");
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Reading INVOKE_ACTION_AGENT_CONFIGURATION_FILE with up to " + cfis.available() + " bytes.");
+			}
+
 			byte[] byteconfig = new byte[cfis.available()];
 			int bytesread = cfis.read(byteconfig, 0, cfis.available());
-			log.debug("Read " + bytesread + " bytes. The byteconfig content is:" + byteconfig.toString());
+			
+			if (log.isDebugEnabled()) {
+				log.debug("Read " + bytesread + " bytes. The byteconfig content is:" + byteconfig.toString());
+			}
+
 			// add InvokeActionAgent
 			List<String> createdagents = agentNode.addAgents(byteconfig, new ArrayList<JARMemory>(),agentNode.getOwner());
 			String invokeactionagentid = createdagents.get(0); // Only one agent added, therefore no search implemented
@@ -117,9 +125,9 @@ public class ActionTesterNode {
 					}
 				}
 			}
-		} catch (Exception e){
+		} 
+		catch (Exception e){
 			log.error("ActionTesterNode cannot be initalized!", e);
-			assert false;
 		}
 
 	}
@@ -129,12 +137,13 @@ public class ActionTesterNode {
 	public Serializable[] invoke(String jadlServiceName, Serializable[] serviceParameter) {
 
 		try {
-			log.debug("Bean is: " + invokeactionbean.toString());	
+			if (log.isDebugEnabled()) {
+				log.debug("Bean is: " + invokeactionbean.toString());	
+			}
 			return invokeactionbean.invokeAction(jadlServiceName, serviceParameter);
 		}
 		catch (Exception e) {
 			log.error(e);
-			assert false;
 			return new Serializable[]{};
 		}
 

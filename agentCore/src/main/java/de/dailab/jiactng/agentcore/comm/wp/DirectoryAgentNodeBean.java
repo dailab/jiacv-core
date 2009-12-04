@@ -1258,7 +1258,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 				this.cancel();
 
 			Set<AgentDescription> agentsFromDirectory;
-			Set<AgentDescription> agentsFromNode;
+			Set<IAgentDescription> agentsFromNode;
 
 			synchronized(space){
 
@@ -1269,7 +1269,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 
 				// get all local agents from the agentnode and pickup their descriptions
 				List<IAgent> foundAgents = agentNode.findAgents();
-				agentsFromNode = new HashSet<AgentDescription>();
+				agentsFromNode = new HashSet<IAgentDescription>();
 
 				for (IAgent agent : foundAgents){
 					switch(agent.getState()){
@@ -1307,7 +1307,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMe
 						log.warn("There are " + agentsFromNode.size() + " agents on the Node that aren't listed within the Directory!");
 						synchronized(_bufferlock){
 
-							for (AgentDescription forgottenAgent : agentsFromNode){
+							for (IAgentDescription forgottenAgent : agentsFromNode){
 								log.warn("Adding agent " + forgottenAgent.getName() + " to the Directory");
 								space.write(forgottenAgent);
 								_additionBuffer.add(forgottenAgent);

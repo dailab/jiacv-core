@@ -506,6 +506,7 @@
 
    <modules>
       <!--module>ModuleTemplate</module--><!-- This is a template for new modules and testing; usually not required -->
+      <module>agentCoreAPI</module>
       <module>gateway</module>
       <module>agentCore</module>
       <module>jiacSecurity</module>

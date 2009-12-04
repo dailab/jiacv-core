@@ -68,29 +68,8 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  *
  */
 
-public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IMessageTransportDelegate, ILifecycleListener, DirectoryAgentNodeBeanMBean {
+public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDirectoryAgentNodeBean, IMessageTransportDelegate, ILifecycleListener, DirectoryAgentNodeBeanMBean {
 
-	/** suffix for address-creation purposes. Will be added to the UUID of AgentNode to create Beanaddress */
-	public final static String SEARCHREQUESTSUFFIX = "DirectoryAgentNodeBean";
-
-	/** Protocol for search Requests */
-	public final static String SEARCH_REQUEST_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#SearchRequest";
-
-	/** Protocol for adding of actions to the Directory */
-	public final static String ADD_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#AddAction";
-
-	/** Protocol for removing of actions to the Directory */
-	public final static String REMOVE_ACTION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#RemoveAction";
-
-	/** Protocol for refreshing of Actions */
-	public final static String REFRESH_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ActionRefresh";
-
-	/** Protocol for propagating changes on an AgentNode-Directory and to communicate all what is stored within it when a new AgentNode shows up */
-	public final static String CHANGE_PROPAGATION_PROTOCOL_ID = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#ChangePropagation";
-
-	/** Address of AgentNodeGroup. Is used to communicate between AgentNodes for purposes like global searches. */
-	public final static String AGENTNODESGROUP = "de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean#GroupAddress";
-	
 	/** broker on this agentNode. This reference will be used to dynamicly set networkTTL on the broker to realy get all other nodes that
 	 * are connected with this broker through a network of brokers
 	 */ 

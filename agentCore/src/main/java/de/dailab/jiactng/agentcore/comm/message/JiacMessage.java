@@ -35,9 +35,6 @@ public final class JiacMessage implements IJiacMessage, JmxDescriptionSupport {
     
     
     
-   public static final String ITEMNAME_HEADERS = "headers";
-   public static final String ITEMNAME_PAYLOAD = "payload";
-
    private IFact _payload;
 
    private Map<String, String> _headers;

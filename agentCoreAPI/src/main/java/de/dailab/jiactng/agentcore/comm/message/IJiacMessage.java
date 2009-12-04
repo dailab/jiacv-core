@@ -18,13 +18,19 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author Marcel Patzlaff
  */
 public interface IJiacMessage extends IFact {
+
+   public static final String ITEMNAME_HEADERS = "headers";
+   public static final String ITEMNAME_PAYLOAD = "payload";
+
+
     public interface Header {
         String SENDER= "JiacTNGSenderAddress";
         String PROTOCOL= "JiacTNGProtocolID";
         String REPLY_TO= "JiacTNGReplyToAddress";
         String SEND_TO = "JiacTNGSendToAddress";
     }
-    
+
+
 	/**
 	 * Returns the payload of this message. There are several different payload
      * types available.

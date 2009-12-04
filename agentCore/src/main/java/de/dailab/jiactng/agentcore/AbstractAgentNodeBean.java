@@ -3,6 +3,8 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import org.springframework.beans.factory.BeanNameAware;
+
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.management.Manager;
 
@@ -10,7 +12,7 @@ import de.dailab.jiactng.agentcore.management.Manager;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements IAgentNodeBean, AbstractAgentNodeBeanMBean {
+public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements IAgentNodeBean, AbstractAgentNodeBeanMBean, BeanNameAware {
     protected IAgentNode agentNode;
     
     private String _beanName;

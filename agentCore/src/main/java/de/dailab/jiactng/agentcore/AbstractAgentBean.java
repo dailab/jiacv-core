@@ -13,6 +13,8 @@ import java.util.List;
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
 
+import org.springframework.beans.factory.BeanNameAware;
+
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.ActionResultListener;
@@ -33,7 +35,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * 
  * @author Thomas Konnerth
  */
-public abstract class AbstractAgentBean extends AbstractLifecycle implements IAgentBean, AbstractAgentBeanMBean {
+public abstract class AbstractAgentBean extends AbstractLifecycle implements IAgentBean, AbstractAgentBeanMBean, BeanNameAware {
 
   /**
    * Interval by which the execute()-method of the bean is called. If negative, the execute-method is never called.

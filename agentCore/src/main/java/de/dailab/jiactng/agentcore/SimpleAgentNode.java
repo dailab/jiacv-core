@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.log4j.net.SocketAppender;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -49,7 +50,7 @@ import de.dailab.jiactng.agentcore.util.jar.JARMemory;
  * @author Joachim Fuchs
  * @author Thomas Konnerth
  */
-public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, InitializingBean, SimpleAgentNodeMBean {
+public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, InitializingBean, BeanNameAware, SimpleAgentNodeMBean {
 
 	/** The threadPool object */
 	private ExecutorService _threadPool = null;

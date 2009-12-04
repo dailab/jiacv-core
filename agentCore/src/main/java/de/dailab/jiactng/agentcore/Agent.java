@@ -33,6 +33,7 @@ import javax.management.openmbean.SimpleType;
 import javax.management.timer.TimerNotification;
 
 import org.apache.commons.logging.Log;
+import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
@@ -65,7 +66,7 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  * @see de.dailab.jiactng.agentcore.IAgent
  */
 public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
-		NotificationListener {
+		BeanNameAware, NotificationListener {
 
 	/**
 	 * The AID (agent identifier). This property is generated and assigned

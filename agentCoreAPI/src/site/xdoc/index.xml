@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+  <properties>
+    <title>Overview</title>
+    <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
+  </properties>
+  <body>
+    <section name="AgentCore API - Overview"> 
+      <p>This section provides an overview about the agentCore API.</p>
+    </section>
+  </body>
+</document>

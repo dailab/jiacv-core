@@ -4,10 +4,6 @@
 package de.dailab.jiactng.agentcore.action;
 
 import java.io.Serializable;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -36,31 +32,14 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * An abstract Bean which exposes accessible methods which are marked with the
- * {@link Expose} annotation.
+ * {@link IMethodExposingBean.Expose} annotation.
  * 
- * @see Expose
+ * @see IMethodExposingBean.Expose
  * 
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public abstract class AbstractMethodExposingBean extends AbstractActionAuthorizationBean implements AbstractMethodExposingBeanMBean {
-    /**
-     * This annotation can be used to mark methods in a bean inherited from {@link AbstractMethodExposingBean}
-     * as actions. So marked methods will be exposed automatically.
-     * 
-     * Make sure that the visibility of these methods is <code>public</code>
-     * because otherwise this annotation will be ignored.
-     * 
-     * If the annotated method returns an array of objects, you can provide
-     * additional type informations.
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public static @interface Expose {
-        String name() default "";
-        Class<?>[] returnTypes() default {};
-        ActionScope scope() default ActionScope.AGENT;
-    }
+public abstract class AbstractMethodExposingBean extends AbstractActionAuthorizationBean implements IMethodExposingBean, AbstractMethodExposingBeanMBean {
     
     static String getName(Method method) {
         String name= method.getAnnotation(Expose.class).name();

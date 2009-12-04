@@ -276,7 +276,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * <code>new AgentDescription(null, null, null, null, thisAgent.getAgentNode().getUUID())</code> 
 	 * hate mail to mib
 	 * @param template
-	 * @return
+	 * @return description of all local agents, which are equal to the template
 	 */
 	public List<IAgentDescription> searchAllLocalAgents(IAgentDescription template) {
 		if (template == null) {
@@ -682,7 +682,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * if it is unknown. <br> 
 	 * insert for agent migration (hate mails to mib)
 	 * @param uuidOfNode
-	 * @return
+	 * @return the communication address of the given node, or <code>null</code> if the node is unknown
 	 */
 	public ICommunicationAddress getCommunicationAddressOfANode(String uuidOfNode) {
 		
@@ -701,7 +701,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	/**
 	 * this returns all known and reachable agent nodes. this returns a list of UUIDs of all known nodes. <br> 
 	 * insert for agent migration (hate mails to mib).
-	 * @return
+	 * @return the UUID of all known agent nodes
 	 */
 	public Set<String> getAllKnownAgentNodes() {
 		

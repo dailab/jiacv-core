@@ -7,7 +7,61 @@
   </properties>
   <body>
     <section name="AgentCore API - Overview"> 
-      <p>This section provides an overview about the agentCore API.</p>
+      <p>
+         This section provides an overview about the agentCore API. This module defines the programming interface and management interface 
+         of JIAC implementations. Corresponding to the management interface it additionally provides a management client for easy management
+         of remote JIAC applications.
+      </p>
+
+      <subsection name="Programming Interface">
+        <p>
+          The next figure gives an overview about the hierarchy of the programming interfaces of JIAC. It shows all methods and their result 
+          types specified by these interfaces. Input parameters are ignored in this view. You can see that the most elements of JIAC are 
+          manageable and lifecycle-aware, e.g. agent node, agent node beans, agent, agent beans, agent execution cycle and agent memory. 
+          Agents additionally extend interfaces for accessing directory of agents and actions.
+        </p>
+
+        <p>
+          <a href="images/ProgrammingInterfaces.png">
+	    <img src="images/ProgrammingInterfaces.png"/>
+	  </a>
+        </p
+      </subsection>
+
+      <subsection name="Management Interface">
+        <p>
+          The next figure gives an overview about the hierarchy of the management interfaces of JIAC. It shows all methods and their result 
+          types specified by these interfaces. Input parameters are ignored in this view. You can see that all manageable elements of JIAC 
+          are lifecycle-aware, e.g. agent node, agent node beans, agent, agent beans and agent memory. The management interfaces follow the 
+          MBean-concept of JMX, i.e. getter and setter methods specify the readable and changeable attributes and all other methods the 
+          invocable operations of these elements.
+        </p>
+
+        <p>
+          <a href="images/ManagementInterfaces.png">
+	    <img src="images/ManagementInterfaces.png"/>
+	  </a>
+        </p
+      </subsection>
+
+      <subsection name="Management Client">
+        <p>
+          The next figure gives an overview about the structure of the JMX-based management client API. It shows all attributes, methods and 
+          their result types implemented by its classes. Input parameters are ignored in this view. The character before the name of attributes 
+          and methods describes their visibility (-private, #protected, +public). You can see that the entry point for using the management 
+          client is the class <a href="apidocs/de/dailab/jiactng/agentcore/management/jmx/client/JmxManagementClient.html">JmxManagementClient</a>.
+          This class establishes a connection to the JVM of an agent node and provides specific management clients for its JIAC elements, e.g.
+          agent node, agent node timer, agent node directory, agents, agent beans, agent execution cycle, agent memory and agent communication.
+          All these specific clients provide methods corresponding to the MBean-interfaces of the remote resources. The implementation of these
+          methods uses JMX operations provided by methods of the abstract management client.
+        </p>
+
+        <p>
+          <a href="images/ManagementClient.png">
+	    <img src="images/ManagementClient.png"/>
+	  </a>
+        </p
+      </subsection>
     </section>
   </body>
 </document>

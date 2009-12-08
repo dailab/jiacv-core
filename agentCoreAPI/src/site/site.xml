@@ -2,7 +2,11 @@
 <project>
    <body>
       <menu name="${project.name}">
-         <item name="Overview" href="index.html" />
+         <item name="Overview" href="index.html">
+            <item name="Programming Interface" href="index.html#Programming Interface" />
+            <item name="Management Interface" href="index.html#Management Interface" />
+            <item name="Management Client" href="index.html#Management Client" />
+         </item>
          <!--item name="FAQ" href="faq.html" /-->
       </menu>
    </body>

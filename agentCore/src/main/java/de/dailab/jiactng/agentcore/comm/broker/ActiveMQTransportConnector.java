@@ -12,6 +12,8 @@ public class ActiveMQTransportConnector {
     private String _transportURI= null;
     private String _networkURI = null;
 	private String _discoveryURI= null;
+	private boolean duplex = true;
+	private int networkTTL = 20;
     
     /**
      * The URI where remote connections are accepted. Examples are:
@@ -55,8 +57,33 @@ public class ActiveMQTransportConnector {
 		_networkURI = networkURI;
 	}
 
-    @Override
+    public boolean isDuplex() {
+		return duplex;
+	}
+
+	public void setDuplex(boolean duplex) {
+		this.duplex = duplex;
+	}
+
+	public int getNetworkTTL() {
+		return networkTTL;
+	}
+	public void setNetworkTTL(int networkTTL) {
+		this.networkTTL = networkTTL;
+	}
+
+	@Override
     public String toString() {
-        return "transportURI='" + getTransportURI() + "'; discoverURI='" + getDiscoveryURI() + "'" + "'; networkURI='" + getNetworkURI() + "'";
+        return "transportURI='" 
+        	+ getTransportURI() 
+        	+ "'; discoverURI='" 
+        	+ getDiscoveryURI() 
+        	+ "'; networkURI='" 
+        	+ getNetworkURI() 
+        	+ "'; networkTTL='"
+        	+ networkTTL
+        	+ "'; duplex='"
+        	+ duplex
+        	+ "'";
     }
 }

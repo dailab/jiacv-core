@@ -2,7 +2,7 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
   <properties>
-    <title>agentCore Documentation</title>
+    <title>Management interface</title>
     <author email="axel.hessler@dai-labor.de">axle</author>
     <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
   </properties>

@@ -2,13 +2,15 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
   <properties>
-    <title>agentCore Documentation</title>
+    <title>Overview</title>
     <author email="axel.hessler@dai-labor.de">axle</author>
     <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
   </properties>
   <body>
-    <section name="AgentCore Documentation"> 
-      <p>This section provides an overview about agentCore.</p>
+  <section name="AgentCore - Overview"> 
+    <p>This section provides an overview about agentCore.</p>
+
+    <subsection name="Static Structure">
       <p>The next figure gives an overview about the hierarchy of
          classes and interfaces related to all lifecycle-aware and
          manageable elements (agent nodes, agents and agent beans) of JIAC TNG.
@@ -23,9 +25,11 @@
       <p>		         
          <a href="images/StaticStructure.png">
 	      <img src="images/StaticStructure.png"/>
-	     </a>
-	  </p>
-     
+	 </a>
+      </p>
+    </subsection>
+
+    <subsection name="Startup Procedure">     
       <p>The next figure shows the startup procedure of a JIAC TNG
          application. Firstly the spring framework creates the agent node,
          agents and agent beans and sets the properties of these elements
@@ -36,10 +40,11 @@
       <p>
          <a href="images/Startup.png">
 	      <img src="images/Startup.png"/>
-	     </a>
+	 </a>
       </p>
+    </subsection>
 
-	  <subsection name="Agent Lifecycle">
+    <subsection name="Agent Lifecycle">
         <p>The following graph shows the possible lifecycle states and state
            transitions of agent nodes, agents and agent beans. Each transition
            is triggered by the corresponding method of interface
@@ -53,28 +58,28 @@
            resource will be changed back to the original state.</p>
 
         <p>
-          <a href="images/Lifecycle.png">
+           <a href="images/Lifecycle.png">
 	        <img src="images/Lifecycle.png"/>
-	      </a>
+	   </a>
         </p>
 
         <p>During each state transition of an agent node, the same transition is
            automatically executed by all agents and other resources of this agent
            node. The state transition of an agent in turn executes the same
-           transition on all agent beans and other resources of this agent.</p>
-	  </subsection>
+           transition on all agent beans and other resources of this agent.
+        </p>
+    </subsection>
 
-	  <subsection name="Measurement data">
-	    <p>The data below are measured by using the test class 
-	       <code>SetupMeasurement</code> with the following environment:
+    <subsection name="Measurement data">
+        <p>The data below are measured by using the test class <code>SetupMeasurement</code> with the following environment:
 	      <ul>
 	        <li>Processor: Intel Centrino Duo 2.00GHz</li>
 	        <li>Memory: 1.00GB RAM</li>
 	        <li>Operating system: Windows XP Professional 2002 SP2</li>
 	        <li>Java version: JRE 1.6.0_03</li>
 	      </ul>
-	    </p>
-	    <table>
+        </p>
+	<table>
 	      <tr>
 	        <td>Scenario</td>
 	        <td>Setup time (ms)</td>
@@ -83,7 +88,7 @@
 	        <td>Number of live threads</td>
 	        <td>Number of loaded classes</td>
 	      </tr>
-          <tr>
+              <tr>
 	        <td>JVM without any application</td>
 	        <td>-</td>
 	        <td>262</td>
@@ -97,7 +102,7 @@
 	        <td>1290</td>
 	        <td>15990</td>
 	        <td>5</td>
-            <td>1313</td>
+                <td>1313</td>
 	      </tr>
 	      <tr>
 	        <td>Agent node only with one small agent</td>
@@ -105,7 +110,7 @@
 	        <td>1373</td>
 	        <td>16326</td>
 	        <td>7</td>
-            <td>1392</td>
+                <td>1392</td>
 	      </tr>
 	      <tr>
 	        <td>Agent node only with RMI connector</td>
@@ -113,7 +118,7 @@
 	        <td>933</td>
 	        <td>16649</td>
 	        <td>9</td>
-            <td>1550</td>
+                <td>1550</td>
 	      </tr>
 	      <tr>
 	        <td>Agent node only with communication</td>
@@ -123,8 +128,9 @@
 	        <td>9</td>
 	        <td>1632</td>
 	      </tr>
-	    </table>
-	  </subsection>
+	</table>
+    </subsection>
+
     </section>
   </body>
 </document>

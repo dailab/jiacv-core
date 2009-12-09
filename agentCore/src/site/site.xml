@@ -2,12 +2,46 @@
 <project>
    <body>
       <menu name="${project.name}">
-         <item name="Overview" href="index.html" />
-         <item name="Management Interface" href="management.html" />
-         <item name="AgentBeans" href="agentbeans.html" />
-         <item name="Communication" href="communication.html" />
-         <item name="Action Handling in Agents" href="actions.html" />
-         <item name="Service Directory" href="DirectoryOfServices.html" />
+         <item name="Overview" href="index.html">
+            <item name="Static Structure" href="index.html#Static Structure" />
+            <item name="Startup Procedure" href="index.html#Startup Procedure" />
+            <item name="Agent Lifecycle" href="index.html#Agent Lifecycle" />
+            <item name="Measurement data" href="index.html#Measurement data" />
+         </item> 
+         <item name="Management Interface" href="management.html">
+            <item name="Management Client" href="management.html#Management Client" />
+            <item name="Local Management" href="management.html#Local Management" />
+            <item name="Remote Management" href="management.html#Remote Management" />
+            <item name="Security" href="management.html#Security" />
+         </item>
+         <item name="AgentBeans" href="agentbeans.html">
+            <item name="Lifecycle Handling" href="agentbeans.html#Lifecycle Handling in AgentBeans" />
+            <item name="Activities" href="agentbeans.html#Activity in AgentBeans" />
+            <item name="Spring Configurations" href="agentbeans.html#Pre-defined Spring Configurations" />
+         </item>
+         <item name="Communication" href="communication.html">
+            <item name="CommunicationBean" href="communication.html#Using the CommunicationBean" />
+            <item name="Configuration" href="communication.html#Configuring the Communication" />
+            <item name="Using addresses" href="communication.html#Using addresses" />
+            <item name="Types of addresses" href="communication.html#Types of addresses" />
+            <item name="Register addresses" href="communication.html#Registering new addresses" />
+            <item name="Unregister addresses" href="communication.html#Unregistering old addresses" />
+            <item name="Using Selectors" href="communication.html#Using Selectors" />
+            <item name="Send Messages" href="communication.html#How to send Messages" />
+            <item name="Receive Messages" href="communication.html#How to receive Messages" />
+         </item>
+         <item name="Action Handling in Agents" href="actions.html">
+            <item name="Loose Coupling" href="actions.html#Loose Coupling of Agent Beans" />
+            <item name="Providing Actions" href="actions.html#Providing Actions" />
+            <item name="Simple Method" href="actions.html#A simple Method for Actions" />
+            <item name="Calling Actions" href="actions.html#Calling Actions" />
+            <item name="Invoke Method" href="actions.html#Calling Actions using the invoke method" />
+         </item>
+         <item name="Service Directory" href="DirectoryOfServices.html">
+            <item name="Introduction" href="DirectoryOfServices.html#Introduction" />
+            <item name="Getting started" href="DirectoryOfServices.html#Getting started" />
+            <item name="How to use" href="DirectoryOfServices.html#Usage - How to..." />
+         </item>
          <item name="FAQ" href="faq.html" />
       </menu>
    </body>

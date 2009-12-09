@@ -25,7 +25,7 @@
           <a href="images/ProgrammingInterfaces.png">
 	    <img src="images/ProgrammingInterfaces.png"/>
 	  </a>
-        </p
+        </p>
       </subsection>
 
       <subsection name="Management Interface">
@@ -41,7 +41,7 @@
           <a href="images/ManagementInterfaces.png">
 	    <img src="images/ManagementInterfaces.png"/>
 	  </a>
-        </p
+        </p>
       </subsection>
 
       <subsection name="Management Client">
@@ -60,7 +60,7 @@
           <a href="images/ManagementClient.png">
 	    <img src="images/ManagementClient.png"/>
 	  </a>
-        </p
+        </p>
       </subsection>
     </section>
   </body>

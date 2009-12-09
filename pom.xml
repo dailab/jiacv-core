@@ -10,7 +10,7 @@
   	<groupId>de.dailab.jiactng.tools</groupId>
   	<artifactId>AgentUnit</artifactId>  	
   	<packaging>jar</packaging>  	
-  	<name>${project.artifactId}</name>   	
+  	<name>Agent Unit</name>   	
 	
 	<dependencies>
 		

@@ -4,7 +4,6 @@
     <menu name="${project.name}">
       <item name="Documentation" href="index.html"/>
       <item name="FAQ" href="faq.html"/>
-      <item name="Download" href="downloads/"/>
     </menu>
   </body>
 </project>

@@ -10,7 +10,7 @@
 	<groupId>de.dailab.jiactng</groupId>
 	<artifactId>agentCoreAPI</artifactId>
 	<packaging>jar</packaging>
-	<name>${project.artifactId}</name>
+	<name>Agent Core API</name>
 	
 	
 	<dependencies>

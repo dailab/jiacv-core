@@ -2,8 +2,8 @@
 <project>
   <body>
     <menu name="${project.name}">
-      <item name="Overview" href="index.html"/>
-      <item name="FAQ" href="faq.html"/>
+      <item name="Documentation" href="index.html"/>
+      <!--item name="FAQ" href="faq.html"/-->
     </menu>
   </body>
 </project>

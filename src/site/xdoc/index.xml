@@ -2,12 +2,65 @@
 <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
   <properties>
-    <title>ModuleTemplate Documentation</title>
+    <title>Documentation</title>
     <author email="axel.hessler@dai-labor.de">axle</author>
   </properties>
   <body>
-    <section name="ModuleTemplate Documentation"> 
-      <p>This section provides an overview about ModuleTemplate.</p>
+    <section name="Agent Unit - Documentation"> 
+      <p>
+         Agent Unit provides an easy-to-use API for JUnit-based testing of agent actions by invocation from another agent. 
+         Only few lines of code are needed to start a node, invoke the actions, and stop the node.
+      </p>
+
+      <subsection name="Usage of Agent Unit">
+        <p>
+           To use Agent Unit within an own project you have to add the following dependency to the POM of your project:
+        </p>
+        <source>&lt;dependency&gt;
+    &lt;groupId&gt;de.dailab.jiactng.tools&lt;/groupId&gt;
+    &lt;artifactId&gt;AgentUnit&lt;/artifactId&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</source>
+      </subsection>
+
+      <subsection name="Implementation of a test"> 
+        <p>
+           For automatic testing of an action you have to implement a test class similar to the following example code.
+           You have to ensure that the node configuration contains a node with the given node name and an agent providing
+           the action with the given action name. The scope of the action must be NODE, GLOBAL or WEBSERVICE.
+        </p>
+        <source>import org.junit.Assert.assertArrayEquals;
+import org.junit.Assert.assertNotNull;
+import org.junit.AfterClass;
+import org.junit.Test;
+
+import java.io.Serializable;
+
+import de.dailab.ccact.tools.agentunit.ActionTesterNode;
+
+public class MyActionTest {
+    static final String MY_ACTION_NAME = "myAction";
+    static final String MY_ACTION_TEST_PARAMETERS = new Serializable[] {param1, ..., paramN};
+    static final Serializable EXPECTED_TEST_RESULT = ...;
+    static final String MY_ACTION_TEST_NODE_CONFIG = "de/dailab/.../MyActionTestNode.xml";
+    static final String MY_ACTION_TEST_NODE_NAME = "MyActionTestNode";
+
+    static ActionTesterNode atn = new ActionTesterNode(MY_ACTION_TEST_NODE_CONFIG, MY_ACTION_TEST_NODE_NAME);
+
+    @Test
+    public void testMyAction(){
+        Serializable[] result = atn.invoke(MY_ACTION_NAME, MY_ACTION_TEST_PARAMETERS);
+        assertNotNull(result);
+        assertArrayEquals(new Serializable[] {EXPECTED_TEST_RESULT}, result);
+    }
+
+    @AfterClass
+    public static void shutdownTest(){
+        atn.stop();
+    }	
+}</source>
+      </subsection>
+
     </section>
   </body>
 </document>

@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab.jiac.net</groupId>
 	<artifactId>gateway</artifactId>
-	<name>Playground for the network gateway development</name>
+	<name>Network Gateway</name>
 	<version>5.1.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>

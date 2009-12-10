@@ -85,7 +85,6 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
                 if (amtc.getNetworkURI() != null) {
                 	URI networkUri = new URI(amtc.getNetworkURI());
                     NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
-                    networkConnector.setNetworkTTL(_networkTTL);
                     networkConnector.setDuplex(amtc.isDuplex());
                     networkConnector.setNetworkTTL(amtc.getNetworkTTL());
                 }

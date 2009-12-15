@@ -109,6 +109,22 @@ public class HelloUserBean extends AbstractAgentBean {
 &lt;/beans&gt;</source>
 
     </subsection>
+
+    <subsection name="Running the example">
+       <p>
+          The Maven assembly process provides a standalone version that comes with easy-to-use 
+          start skripts. But if you simply start this example by using the 
+          <a href="jnlp/helloworld.jnlp">webstart link</a> instead, the agent node is running
+          without a console. In this case, you can shutdown the running agent node by using
+          the <a href="../../tools/nodemonitor/">agent node monitor</a>. By using this tool
+          you can also
+       </p>
+       <ul>
+          <li>get information about the executed actions,</li>
+          <li>stop and restart agents to trigger action invocations, and</li>
+          <li>view log messages with LogFactor5.</li>
+       </ul>
+    </subsection>
   </section>
   </body>
 </document>

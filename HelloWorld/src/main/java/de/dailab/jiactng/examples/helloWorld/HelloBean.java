@@ -3,8 +3,6 @@
  */
 package de.dailab.jiactng.examples.helloWorld;
 
-import java.util.List;
-
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.action.Action;
 
@@ -24,16 +22,6 @@ public class HelloBean extends AbstractMethodExposingBean {
 	@Expose(name = "helloWorld")
 	public void helloWorld() {
 		log.info("Hello World");
-/*
-		try {
-			List<Action> actions = retrieveActionsFromDirectory(new Action("helloWorld"), false, 10000);
-			log.info("Got actions:");
-			for (Action a : actions) {
-				System.out.println(a);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
 	}
 
 }

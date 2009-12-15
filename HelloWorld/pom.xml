@@ -50,6 +50,61 @@
   					</workDirectory>
   				</configuration>
   			</plugin>
+  			<plugin>
+  				<groupId>org.codehaus.mojo.webstart</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+  				<executions>
+  					<execution>
+  						<phase>package</phase>
+  						<goals>
+  							<goal>jnlp</goal>
+  						</goals>
+  					</execution>
+  				</executions>
+  				<configuration>
+					<jnlp>
+						<outputFile>helloworld.jnlp</outputFile>
+						<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
+						<spec>6.0</spec>
+						<j2seVersion>1.6</j2seVersion>
+					</jnlp>
+					<sign>
+						<keystore>${basedir}/src/main/jnlp/.keystore</keystore>
+						<keypass>jiactng</keypass>
+						<storepass>jiactng</storepass>
+						<alias>alias</alias>
+						<validity>180</validity>
+						<dnameCn>JIAC</dnameCn>
+						<dnameOu>DAI-Labor</dnameOu>
+						<dnameO>TU-Berlin</dnameO>
+						<dnameL>Berlin</dnameL>
+						<dnameSt>Berlin</dnameSt>
+						<dnameC>DE</dnameC>
+						<verify>true</verify>
+					</sign>
+					<unsignAlreadySignedJars>true</unsignAlreadySignedJars>
+					<verbose>false</verbose>
+  				</configuration>
+  			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>site</phase>
+						<configuration>
+							<tasks>
+								<copy todir="${basedir}/target/site/jnlp/">
+									<fileset file="${basedir}/target/jnlp/*.*" />
+								</copy>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
   		</plugins>
   	</build>
 </project>

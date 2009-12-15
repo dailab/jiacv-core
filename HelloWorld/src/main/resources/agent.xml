@@ -8,9 +8,12 @@
 
   <import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
 
+  <!--bean name="HelloWorldAgent" parent="NonBlockingAgent" singleton="false"-->
   <bean name="HelloWorldAgent" parent="SimpleAgent" singleton="false">
     <property name="agentBeans">
       <list>
+        <ref bean="CommunicationBean" />
+        <ref bean="DirectoryAccessBean" />
         <ref bean="helloBean"/>
       </list>
     </property>
@@ -18,6 +21,11 @@
 
   <bean name="helloBean" class="de.dailab.jiactng.examples.helloWorld.HelloBean" singleton="false">
     <property name="logLevel" value="INFO"/>
+    <property name="registeredActions">
+        <set>
+            <value>helloWorld</value>
+        </set>
+    </property>
   </bean>
 
 </beans>

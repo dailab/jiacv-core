@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+    spec="$jnlpspec"
+    codebase="$project.Url/jnlp"
+    href="$outputFile">
+  <information>
+    <title>$project.Name</title>
+    <vendor>$project.Organization.Name</vendor>
+    <homepage href="$project.Organization.Url"/>
+    <description>$project.Description</description>
+    <offline-allowed/>
+  </information>
+  <security>
+     <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="$j2seVersion"/>
+     $dependencies
+  </resources>
+  <application-desc main-class="$mainClass">
+    <argument>classpath:helloWorld.xml</argument>
+  </application-desc>
+</jnlp>
+

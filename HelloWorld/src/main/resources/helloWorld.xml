@@ -10,6 +10,17 @@
   <import resource="classpath:agent.xml" />
 
   <bean name="myPlatform" parent="PlatformWithJMX">
+      <!--property name="jmxConnectors">
+         <set>
+            <map>
+               <entry key="protocol" value="rmi" />
+               <entry key="registryPort" value="1099" />
+               <entry key="authenticator">
+                  <ref bean="UMAuthenticator"/>
+               </entry>
+            </map>
+         </set>
+      </property-->
     <property name="agents">
       <list>
         <ref bean="HelloWorldAgent"/>
@@ -18,5 +29,9 @@
       </list>
     </property>
   </bean>
+
+   <!--bean name="UMAuthenticator" class="de.dailab.jiactng.agentcore.management.jmx.UMAuthenticator" singleton="false">
+      <property name="url" value="http://mams02-dev:8080/umws-0.0.2/services" />
+   </bean-->
 
 </beans>

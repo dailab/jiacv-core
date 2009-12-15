@@ -13,10 +13,10 @@
       </includes>
     </fileSet>
     <fileSet>    
-      <directory>${basedir}/src/main/conf</directory>
+      <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>conf</outputDirectory>
       <includes>
-      	<include>**/*.*</include>      	
+      	<include>**/*.xml</include>      	
       </includes>      
     </fileSet>
     <fileSet>    

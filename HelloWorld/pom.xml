@@ -94,7 +94,7 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-						<phase>post-site</phase>
+						<phase>site</phase>
 						<configuration>
 							<tasks>
 								<copy todir="${basedir}/target/site/jnlp/">

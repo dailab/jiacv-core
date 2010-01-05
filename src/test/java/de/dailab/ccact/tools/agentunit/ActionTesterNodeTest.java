@@ -1,13 +1,10 @@
 package de.dailab.ccact.tools.agentunit;
 
 // imports
-import org.junit.*;
-import org.junit.Test;
-import static org.junit.Assert.*;
-
-import de.dailab.ccact.tools.agentunit.ActionTesterNode;
-
 import java.io.Serializable;
+
+import org.junit.AfterClass;
+import org.junit.Test;
 
 /**
 * JUnit 4 tester class for ActionTesterNode implementation. 

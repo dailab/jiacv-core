@@ -134,6 +134,15 @@ public class ActionTesterNode {
 
 
 
+	/**
+	 * @return the agentNode
+	 */
+	public SimpleAgentNode getAgentNode() {
+		return agentNode;
+	}
+
+
+
 	public Serializable[] invoke(String jadlServiceName, Serializable[] serviceParameter) {
 
 		try {

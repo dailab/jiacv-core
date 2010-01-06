@@ -34,7 +34,9 @@ public class ActionResult extends SessionEvent {
 	public ActionResult(Action action, Session session, Serializable[] results,
 			DoAction source) {
 		super(session, action, source);
-		this._results = results;
+		if (results != null) {
+			this._results = Arrays.copyOf(results, results.length);
+		}
 		if (session != null)
 			session.addToSessionHistory(this);
 		if ((source!=null) && (source.getMetaData() != null))
@@ -43,7 +45,9 @@ public class ActionResult extends SessionEvent {
 
 	public ActionResult(DoAction source, Serializable[] results) {
 		super(source);
-		this._results = results;
+		if (results != null) {
+			this._results = Arrays.copyOf(results, results.length);
+		}
 		if (getSession() != null)
 			getSession().addToSessionHistory(this);
 		if ((source != null) && (source.getMetaData() != null))
@@ -77,7 +81,10 @@ public class ActionResult extends SessionEvent {
 	 * @return the results
 	 */
 	public Serializable[] getResults() {
-		return _results;
+		if (_results != null) {
+			return Arrays.copyOf(_results, _results.length);
+		}
+		return null;
 	}
 
 	/**
@@ -85,7 +92,12 @@ public class ActionResult extends SessionEvent {
 	 *            the results to set
 	 */
 	public void setResults(Serializable[] results) {
-		this._results = results;
+		if (results != null) {
+			this._results = Arrays.copyOf(results, results.length);
+		}
+		else {
+			this._results = null;
+		}
 	}
 
 	public Serializable getFailure(){

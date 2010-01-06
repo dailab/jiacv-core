@@ -119,7 +119,7 @@ public abstract class MessageTransport implements MessageTransportMBean {
      */
     @Override
     public final boolean equals(Object obj) {
-        return getTransportIdentifier().equals(obj);
+        return getTransportIdentifier().equals(obj.getTransportIdentifier());
     }
 
     /**

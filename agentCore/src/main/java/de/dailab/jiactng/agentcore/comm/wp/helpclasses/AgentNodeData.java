@@ -93,6 +93,15 @@ public class AgentNodeData implements Comparable<AgentNodeData>{
 	}
 	
 	/**
+	 * Returns the hashcode of the node data, which is the hashcode of its UUID.
+	 * @return the hashcode of the node's UUID
+	 */
+	@Override
+	public int hashCode() {
+		return _UUID.hashCode();
+	}
+	
+	/**
 	 * Returns a String describing all stored informations within this instance
 	 */
 	@Override

@@ -1367,7 +1367,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	public void modifyAction(IActionDescription oldDescription,
 			IActionDescription newDescription) {
 		if (directory != null) {
-			modifyAction(oldDescription, newDescription);
+			directory.modifyAction(oldDescription, newDescription);
 		}
 	}
 	

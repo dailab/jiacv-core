@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.management.jmx;
 
+import java.util.Arrays;
+
 import javax.management.Notification;
 
 import de.dailab.jiactng.agentcore.action.Action;
@@ -168,7 +170,7 @@ public class ActionPerformedNotification extends Notification {
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
 	public Object[] getActionParameters() {
-		return _actionParameters;
+		return Arrays.copyOf(_actionParameters, _actionParameters.length);
 	}
 
 	/**
@@ -179,7 +181,10 @@ public class ActionPerformedNotification extends Notification {
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
 	public Object[] getActionResult() {
-		return _actionResult;
+		if (_actionResult != null) {
+			return Arrays.copyOf(_actionResult, _actionResult.length);
+		}
+		return null;
 	}
 
 	/**

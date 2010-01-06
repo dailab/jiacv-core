@@ -15,7 +15,7 @@ public class ActionPerformedNotification extends Notification {
 	private static final long serialVersionUID = 1L;
 
 	/** Notification type which indicates that an action was performed. */
-	public static String ACTION_PERFORMED = "jiactng.action.perform";
+	public static final String ACTION_PERFORMED = "jiactng.action.perform";
 
 	/** The name of the performed action. */
 	private String _actionName;

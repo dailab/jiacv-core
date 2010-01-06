@@ -16,7 +16,7 @@ public class MessageExchangeNotification extends Notification {
 	private static final long serialVersionUID = 1L;
 
 	/** Notification type which indicates that a message was exchanged. */
-	public static String MESSAGE_EXCHANGE = "jiactng.message.exchange";
+	public static final String MESSAGE_EXCHANGE = "jiactng.message.exchange";
 
 	/** Indicates if the message was sent or received. */
 	private MessageExchangeAction _action;

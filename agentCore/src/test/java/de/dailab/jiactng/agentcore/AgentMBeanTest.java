@@ -2,6 +2,8 @@ package de.dailab.jiactng.agentcore;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.AttributeChangeNotificationFilter;
@@ -11,6 +13,7 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import javax.management.openmbean.CompositeData;
 import javax.management.relation.MBeanServerNotificationFilter;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -152,20 +155,93 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		// check notification
 		checkAgentListNotification(new ArrayList<String>());
 	}
-	
+
 	/**
 	 * Tests if you get the name "TestAgent" of the agent by using the JMX interface.
 	 */
 	public void testGetName() {
-		String name = "";
 		try {
-			name = (String) manager.getAttributeOfAgent(nodeName, agentId, "AgentName");
+			String name = (String) manager.getAttributeOfAgent(nodeName, agentId, "AgentName");
+			assertEquals("AgentMBean.getAgentName is wrong", agentName, name);
 		} catch (Exception e) {
 			fail("Error while getting agent's name");
 		}
-		assertEquals("AgentMBean.getAgentName is wrong", agentName, name);
 	}
-	
+
+	/**
+	 * Tests if you get the name "dummyBean" for the agent bean of the agent by using the JMX interface.
+	 */
+	public void testGetAgentBeanNames() {
+		try {
+			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeName, agentId, "AgentBeanNames");
+			assertEquals("AgentMBean.getAgentBeanNames is wrong", Arrays.asList(new String[] {"dummyBean"}), names);
+		} catch (Exception e) {
+			fail("Error while getting names of agent beans of the agent");
+		}
+	}
+
+	/**
+	 * Tests if you get an empty list as names of actions of the agent by using the JMX interface.
+	 */
+	public void testGetActionNames() {
+		try {
+			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeName, agentId, "ActionNames");
+			assertEquals("AgentMBean.getActionNames is wrong", new ArrayList<String>(), names);
+		} catch (Exception e) {
+			fail("Error while getting names of actions of the agent");
+		}
+	}
+
+	/**
+	 * Tests if you get "de.dailab.jiactng.agentcore.knowledge.Memory" as class, "org.sercho.masp.space.ReflectiveObjectMatcher" as matcher, and "org.sercho.masp.space.ReflectiveObjectUpdater" as updater of the agent's memory by using the JMX interface.
+	 */
+	public void testGetMemoryData() {
+		try {
+			CompositeData data = (CompositeData) manager.getAttributeOfAgent(nodeName, agentId, "MemoryData");
+			assertEquals("AgentMBean.getMemoryData returns wrong class item", "de.dailab.jiactng.agentcore.knowledge.Memory", data.get("class"));
+			assertEquals("AgentMBean.getMemoryData returns wrong matcher item", "org.sercho.masp.space.ReflectiveObjectMatcher", data.get("matcher"));
+			assertEquals("AgentMBean.getMemoryData returns wrong updater item", "org.sercho.masp.space.ReflectiveObjectUpdater", data.get("updater"));
+		} catch (Exception e) {
+			fail("Error while getting agent's memory data");
+		}
+	}
+
+	/**
+	 * Tests if you get "de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle" as class name of the agent's execution cycle by using the JMX interface.
+	 */
+	public void testGetExecutionCycleClass() {
+		try {
+			String name = (String) manager.getAttributeOfAgent(nodeName, agentId, "ExecutionCycleClass");
+			assertEquals("AgentMBean.getExecutionCycleClass is wrong", "de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle", name);
+		} catch (Exception e) {
+			fail("Error while getting class of agent's execution cycle");
+		}
+	}
+
+	/**
+	 * Tests if you get <code>null</code> for the names of automatic executed services of the agent by using the JMX interface.
+	 */
+	public void testGetAutoExecutionServices() {
+		try {
+			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeName, agentId, "AutoExecutionServices");
+			assertNull("AgentMBean.getAutoExecutionServices is wrong", names);
+		} catch (Exception e) {
+			fail("Error while getting names of automatic executed services of the agent");
+		}
+	}
+
+	/**
+	 * Tests if you get <code>false</code> as type of automatic executed services of the agent by using the JMX interface.
+	 */
+	public void testGetAutoExecutionType() {
+		try {
+			Boolean type = (Boolean) manager.getAttributeOfAgent(nodeName, agentId, "AutoExecutionType");
+			assertEquals("AgentMBean.getAutoExecutionType is wrong", new Boolean(false), type);
+		} catch (Exception e) {
+			fail("Error while getting type of automatic executed services of the agent");
+		}
+	}
+
 	/**
 	 * Tests if the agent can change its lifecycle state by using the JMX interface 
 	 * (stop, cleanup, init, start) and notifications are sent to the listener.

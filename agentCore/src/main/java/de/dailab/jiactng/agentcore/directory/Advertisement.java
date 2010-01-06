@@ -24,8 +24,12 @@ public class Advertisement implements IFact {
 	}
 
 	public Advertisement(Hashtable<String, IAgentDescription> agents, Set<IActionDescription> actions) {
-		this.agents.putAll(agents);
-		this.actions.addAll(actions);
+		if (agents != null) {
+			this.agents.putAll(agents);
+		}
+		if (actions != null) {
+			this.actions.addAll(actions);
+		}
 	}
 	
 	public Set<IActionDescription> getActions() {

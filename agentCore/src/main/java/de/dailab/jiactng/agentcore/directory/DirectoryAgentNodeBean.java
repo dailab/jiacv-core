@@ -33,86 +33,86 @@ import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		IDirectory, IMessageTransportDelegate {
 
-	/** 
-	 * Name for address-creation purposes. Will be added to the UUID
-	 * of AgentNode to create the message box for the directory.
-	 * Example: "df@agentnode"  
+	/**
+	 * Name for address-creation purposes. Will be added to the UUID of
+	 * AgentNode to create the message box for the directory. Example:
+	 * "df@agentnode"
 	 */
 	public final static String ADDRESS_NAME = "df";
-	
+
 	/** Protocol for saying hello and still there to other agentnodes. */
 	public final static String ALIVE = ADDRESS_NAME + ":alive";
-	
+
 	/** Protocol to stop being present. */
 	public final static String BYE = ADDRESS_NAME + ":bye";
-	
+
 	/** Protocol to announce my actions. */
 	public final static String ADVERTISE = ADDRESS_NAME + ":advertise";
-	
+
 	/** Protocol to request actions of other agentnodes. */
 	public final static String ALL = ADDRESS_NAME + ":all";
-	
-	/** Interval to send alive message to group. In milliseconds. Default is 2000.*/
-	private long aliveInterval = 2000;
-	
-	/** reference to the service Matcher if it exists */
-	private IServiceMatcher serviceMatcher = null; 
-	
-  /** reference to the ontology storage if it exists */
-  private IOntologyStorage ontologyStorage = null; 
 
-	
-	/** 
-	 * Interval to send advertise message to group. In milliseconds.
-	 * Should be greater than aliveInterval to avoid spamming around. 
-	 * Default is 3 minutes.
+	/**
+	 * Interval to send alive message to group. In milliseconds. Default is
+	 * 2000.
 	 */
-	private long advertiseInterval = 10800; 
-	
+	private long aliveInterval = 2000;
+
+	/** reference to the service Matcher if it exists */
+	private IServiceMatcher serviceMatcher = null;
+
+	/** reference to the ontology storage if it exists */
+	private IOntologyStorage ontologyStorage = null;
+
+	/**
+	 * Interval to send advertise message to group. In milliseconds. Should be
+	 * greater than aliveInterval to avoid spamming around. Default is 3
+	 * minutes.
+	 */
+	private long advertiseInterval = 10800;
+
 	/** The UUID of this agentnode. */
 	private String myAgentNode;
-	
+
 	/** The inbox of this bean. */
 	ICommunicationAddress myAddress;
-	
+
 	/** The group address of all directories. */
 	ICommunicationAddress groupAddress;
-	
-	/** The communication handling for sending and receiving messages.*/
+
+	/** The communication handling for sending and receiving messages. */
 	private MessageTransport messageTransport;
-	
-	/** Stores (node-)local actions.*/
+
+	/** Stores (node-)local actions. */
 	private Set<IActionDescription> localActions = new HashSet<IActionDescription>();
-	
-	/** 
-	 * Stores remote actions. Key is the UUID of the node. 
-	 * Value is a set of action that are provided on that node.
+
+	/**
+	 * Stores remote actions. Key is the UUID of the node. Value is a set of
+	 * action that are provided on that node.
 	 */
 	private Hashtable<String, Set<IActionDescription>> remoteActions = new Hashtable<String, Set<IActionDescription>>();
-	
+
 	/** Stores (node-)local agents. Key is the agent identifier. */
 	private Hashtable<String, IAgentDescription> localAgents = new Hashtable<String, IAgentDescription>();
-	
-	/** Store remote agents. Key is the agent identifier.*/
+
+	/** Store remote agents. Key is the agent identifier. */
 	private Hashtable<String, IAgentDescription> remoteAgents = new Hashtable<String, IAgentDescription>();
-	
-	/** Stores all known agentnodes. Key is the UUID of the node.*/
+
+	/** Stores all known agentnodes. Key is the UUID of the node. */
 	private Hashtable<String, AgentNodeDescription> nodes = new Hashtable<String, AgentNodeDescription>();
-	
-	
+
 	/** Timer that schedules alive pings and advertisements. */
 	private Timer timer;
 
-	
-//######################################
-//		AbstractLifecycle 
-//######################################	
-		
+	// ######################################
+	// AbstractLifecycle
+	// ######################################
+
 	@Override
 	public void doInit() throws Exception {
 		super.doInit();
-		myAgentNode  = this.agentNode.getUUID();
-		
+		myAgentNode = this.agentNode.getUUID();
+
 		messageTransport.setDefaultDelegate(this);
 		try {
 			messageTransport.doInit();
@@ -120,39 +120,43 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			e.printStackTrace();
 		}
 
-		myAddress = CommunicationAddressFactory.createMessageBoxAddress(ADDRESS_NAME + "@" + myAgentNode);
+		myAddress = CommunicationAddressFactory
+				.createMessageBoxAddress(ADDRESS_NAME + "@" + myAgentNode);
 		System.out.println("myAddress=" + myAddress);
-		groupAddress = CommunicationAddressFactory.createGroupAddress(ADDRESS_NAME + "@dfgroup");
+		groupAddress = CommunicationAddressFactory
+				.createGroupAddress(ADDRESS_NAME + "@dfgroup");
 		System.out.println("groupAddress=" + groupAddress);
-		
+
 		try {
 			messageTransport.listen(myAddress, null);
 			messageTransport.listen(groupAddress, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		// find serviceMatcherBean and ontologystorage
-		for(IAgentNodeBean ianb : this.agentNode.getAgentNodeBeans()) {
-		  if(ianb instanceof IServiceMatcher) {
-		    this.serviceMatcher = (IServiceMatcher)ianb;
-		    
-		  } else if(ianb instanceof IOntologyStorage) {
-		    this.ontologyStorage = (IOntologyStorage)ianb;
-		  }
+		for (IAgentNodeBean ianb : this.agentNode.getAgentNodeBeans()) {
+			if (ianb instanceof IServiceMatcher) {
+				this.serviceMatcher = (IServiceMatcher) ianb;
+
+			} else if (ianb instanceof IOntologyStorage) {
+				this.ontologyStorage = (IOntologyStorage) ianb;
+			}
 		}
-		
-		if(this.serviceMatcher != null) {
-		  log.info("Found a ServiceMatcher for this agentnode");
+
+		if (this.serviceMatcher != null) {
+			log.info("Found a ServiceMatcher for this agentnode");
 		} else {
-		  log.info("No ServiceMatcher was found on this agentode, complex matching will not be possible!");
+			log
+					.info("No ServiceMatcher was found on this agentode, complex matching will not be possible!");
 		}
-		
-    if(this.ontologyStorage != null) {
-      log.info("Found an OntologyStorage for this agentnode");
-    } else {
-      log.info("No OntologyStorage was found on this agentode, ontology-handling will not be possible!");
-    }
+
+		if (this.ontologyStorage != null) {
+			log.info("Found an OntologyStorage for this agentnode");
+		} else {
+			log
+					.info("No OntologyStorage was found on this agentode, ontology-handling will not be possible!");
+		}
 	}
 
 	@Override
@@ -177,10 +181,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	@Override
 	public void doCleanup() throws Exception {
 		super.doCleanup();
-		
+
 		this.serviceMatcher = null;
 		this.ontologyStorage = null;
-		
+
 		try {
 			messageTransport.stopListen(myAddress, null);
 			messageTransport.stopListen(groupAddress, null);
@@ -191,21 +195,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	}
 
-//######################################
-//		WHITE PAGES 
-//######################################	
+	// ######################################
+	// WHITE PAGES
+	// ######################################
 
-	
 	@Override
 	public void registerAgent(IAgentDescription agentDescription) {
 		if (agentDescription == null) {
 			log.error("Cannot register agent: null!");
 			return;
 		}
-		
+
 		String uuid = null;
 		try {
-			uuid = agentDescription.getAgentNodeUUID(); 
+			uuid = agentDescription.getAgentNodeUUID();
 		} catch (Exception e) {
 			log.error("Cannot register agent! No UUID!");
 			return;
@@ -214,13 +217,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error("Cannot register agent! No UUID!");
 			return;
 		}
-		
+
 		if (uuid.equals(myAgentNode)) {
 			localAgents.put(agentDescription.getAid(), agentDescription);
 		} else {
 			remoteAgents.put(agentDescription.getAid(), agentDescription);
 		}
-//		dump("registerAgent " + agentDescription.getAid());
+		// dump("registerAgent " + agentDescription.getAid());
 	}
 
 	@Override
@@ -229,11 +232,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error("Cannot deregister agent: null!");
 			return;
 		}
-		
+
 		Object agent = localAgents.remove(aid);
 		if (agent == null) {
 			remoteAgents.remove(aid);
-			//TODO deregister actions
+			// TODO deregister actions
 		}
 		dump("deregisterAgent " + aid);
 	}
@@ -253,13 +256,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error("Cannot find agent: null!");
 			return null;
 		}
-		for (String key:localAgents.keySet()) {
+		for (String key : localAgents.keySet()) {
 			IAgentDescription agentDescription = localAgents.get(key);
 			if (agentDescription.equals(template)) {
 				return agentDescription;
 			}
 		}
-		for (String key:remoteAgents.keySet()) {
+		for (String key : remoteAgents.keySet()) {
 			IAgentDescription agentDescription = remoteAgents.get(key);
 			if (agentDescription.equals(template)) {
 				return agentDescription;
@@ -271,19 +274,21 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	/**
 	 * this is inserted for search local agents only. <br>
-	 * reason: a (IAgentDescription) tamplate with a agentnodeuuid didn't work. But I need 
-	 * in this case just local agents. used tamplate: <br>
-	 * <code>new AgentDescription(null, null, null, null, thisAgent.getAgentNode().getUUID())</code> 
+	 * reason: a (IAgentDescription) tamplate with a agentnodeuuid didn't work.
+	 * But I need in this case just local agents. used tamplate: <br>
+	 * <code>new AgentDescription(null, null, null, null, thisAgent.getAgentNode().getUUID())</code>
 	 * hate mail to mib
+	 * 
 	 * @param template
 	 * @return description of all local agents, which are equal to the template
 	 */
-	public List<IAgentDescription> searchAllLocalAgents(IAgentDescription template) {
+	public List<IAgentDescription> searchAllLocalAgents(
+			IAgentDescription template) {
 		if (template == null) {
-			
+
 		}
 		List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
-		for (String key:localAgents.keySet()) {
+		for (String key : localAgents.keySet()) {
 			IAgentDescription agentDescription = localAgents.get(key);
 			if (agentDescription.equals(template)) {
 				agents.add(agentDescription);
@@ -291,20 +296,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 		return agents;
 	}
-	
+
 	@Override
 	public List<IAgentDescription> searchAllAgents(IAgentDescription template) {
 		if (template == null) {
-			
+
 		}
 		List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
-		for (String key:localAgents.keySet()) {
+		for (String key : localAgents.keySet()) {
 			IAgentDescription agentDescription = localAgents.get(key);
 			if (agentDescription.equals(template)) {
 				agents.add(agentDescription);
 			}
 		}
-		for (String key:remoteAgents.keySet()) {
+		for (String key : remoteAgents.keySet()) {
 			IAgentDescription agentDescription = remoteAgents.get(key);
 			if (agentDescription.equals(template)) {
 				agents.add(agentDescription);
@@ -313,10 +318,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		return agents;
 	}
 
-
-//######################################
-//	YELLOW PAGES 
-//######################################	
+	// ######################################
+	// YELLOW PAGES
+	// ######################################
 
 	@Override
 	public void registerAction(IActionDescription actionDescription) {
@@ -324,45 +328,55 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error("Cannot register action: null!");
 			return;
 		}
-		
+
 		String uuid = null;
 		try {
-			uuid = actionDescription.getProviderDescription().getAgentNodeUUID(); 
+			uuid = actionDescription.getProviderDescription()
+					.getAgentNodeUUID();
 		} catch (Exception e) {
-			log.error("("+e.getClass().getSimpleName()+") Cannot register action!\n" + actionDescription.toString());
+			log.error("(" + e.getClass().getSimpleName()
+					+ ") Cannot register action!\n"
+					+ actionDescription.toString());
 			return;
 		}
 		if (uuid == null) {
-			log.error("Provider information incomplete. Missing UUID. Cannot register action!\n" + actionDescription.toString());
+			log
+					.error("Provider information incomplete. Missing UUID. Cannot register action!\n"
+							+ actionDescription.toString());
 			return;
 		}
-		
+
 		if (myAgentNode.equals(uuid)) {
 			boolean success = localActions.add(actionDescription);
 			if (!success) {
-				log.warn("Action to register already registered. Substituting with new action:\n" + actionDescription.toString());
+				log
+						.warn("Action to register already registered. Substituting with new action:\n"
+								+ actionDescription.toString());
 				localActions.remove(actionDescription);
 				localActions.add(actionDescription);
 			}
-		} 
-		
+		}
+
 		else {
 			if (!remoteActions.containsKey(uuid)) {
-				log.error("UUID unknown. Cannot register action!\n" + actionDescription.toString());
+				log.error("UUID unknown. Cannot register action!\n"
+						+ actionDescription.toString());
 				return;
 			}
 			Set<IActionDescription> actions = remoteActions.get(uuid);
 			boolean success = actions.add(actionDescription);
 			if (!success) {
-				log.warn("Action to register already registered. Substituting with new action:\n" + actionDescription.toString());
+				log
+						.warn("Action to register already registered. Substituting with new action:\n"
+								+ actionDescription.toString());
 				actions.remove(actionDescription);
 				actions.add(actionDescription);
 			}
 		}
 		log.info("Registered action:\n" + actionDescription.toString());
 		dump("registerAction " + actionDescription.getName());
-		
-		//TODO register agents that provides this action
+
+		// TODO register agents that provides this action
 	}
 
 	@Override
@@ -374,19 +388,24 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		String uuid = null;
 		try {
-			uuid = actionDescription.getProviderDescription().getAgentNodeUUID(); 
+			uuid = actionDescription.getProviderDescription()
+					.getAgentNodeUUID();
 		} catch (Exception e) {
-			log.error("Cannot deregister action!\n" + actionDescription.toString());
+			log.error("Cannot deregister action!\n"
+					+ actionDescription.toString());
 			return;
 		}
 		if (uuid == null) {
-			log.error("Provider information incomplete. Missing UUID. Cannot deregister action!\n" + actionDescription.toString());
+			log
+					.error("Provider information incomplete. Missing UUID. Cannot deregister action!\n"
+							+ actionDescription.toString());
 			return;
 		}
-		
+
 		if (uuid.equals(myAgentNode)) {
 			if (!localActions.remove(actionDescription)) {
-				log.warn("Cannot deregister action! Unknown action '"+actionDescription.getName()+"'!");
+				log.warn("Cannot deregister action! Unknown action '"
+						+ actionDescription.getName() + "'!");
 			}
 		} else {
 			Set<IActionDescription> ad = remoteActions.get(uuid);
@@ -395,34 +414,40 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				return;
 			}
 			if (!ad.remove(actionDescription)) {
-				log.warn("Cannot deregister action! Unknown action:\n" + actionDescription.toString());
+				log.warn("Cannot deregister action! Unknown action:\n"
+						+ actionDescription.toString());
 			}
 		}
 		dump("deregisterAction " + actionDescription.toString());
 	}
 
 	@Override
-	public void modifyAction(IActionDescription oldDescription, IActionDescription newDescription) {
+	public void modifyAction(IActionDescription oldDescription,
+			IActionDescription newDescription) {
 		if (oldDescription == null || newDescription == null) {
-			log.error("Cannot modify action (old:\n" + oldDescription + "\nnew:\n" + newDescription);
+			log.error("Cannot modify action (old:\n" + oldDescription
+					+ "\nnew:\n" + newDescription);
 			return;
 		}
 
 		String uuid = null;
 		try {
-			uuid = oldDescription.getProviderDescription().getAgentNodeUUID(); 
+			uuid = oldDescription.getProviderDescription().getAgentNodeUUID();
 		} catch (Exception e) {
 			log.error("Cannot modify action!\n" + oldDescription.toString());
 			return;
 		}
 		if (uuid == null) {
-			log.error("Provider information incomplete. Missing UUID. Cannot modify action!\n" + oldDescription.toString());
+			log
+					.error("Provider information incomplete. Missing UUID. Cannot modify action!\n"
+							+ oldDescription.toString());
 			return;
 		}
-		
+
 		if (uuid.equals(myAgentNode)) {
 			if (!localActions.remove(oldDescription)) {
-				log.warn("Cannot deregister action:\n" + oldDescription.toString());
+				log.warn("Cannot deregister action:\n"
+						+ oldDescription.toString());
 			}
 		} else {
 			Set<IActionDescription> ad = remoteActions.get(uuid);
@@ -430,11 +455,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				log.warn("Cannot deregister action! Unknown UUID: " + uuid);
 			} else {
 				if (!ad.remove(oldDescription)) {
-					log.warn("Cannot deregister action! Unknown action:\n" + oldDescription.toString());
+					log.warn("Cannot deregister action! Unknown action:\n"
+							+ oldDescription.toString());
 				}
 			}
 		}
-		
+
 		registerAction(newDescription);
 	}
 
@@ -444,36 +470,39 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error("Cannot find action: null!");
 			return null;
 		}
-		
-    // use Matcher for matching if possible
-    if (template instanceof IServiceDescription) {
-      if (this.serviceMatcher != null) {
-        ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
-        IServiceDescription matcherResult = this.serviceMatcher.findBestMatch((IServiceDescription) template,
-            serviceDescList);
 
-        if ((matcherResult != null)) {
-          return matcherResult;
-        } else {
-          log.warn("Matcher found no result, trying normal template matching...");
-        }
+		// use Matcher for matching if possible
+		if (template instanceof IServiceDescription) {
+			if (this.serviceMatcher != null) {
+				ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
+				IServiceDescription matcherResult = this.serviceMatcher
+						.findBestMatch((IServiceDescription) template,
+								serviceDescList);
 
-      } else {
-        log.error("This agentnode has no servicematcher - no complex matching possible!");
-      }
-    }
-		
+				if ((matcherResult != null)) {
+					return matcherResult;
+				} else {
+					log
+							.warn("Matcher found no result, trying normal template matching...");
+				}
+
+			} else {
+				log
+						.error("This agentnode has no servicematcher - no complex matching possible!");
+			}
+		}
+
 		if (localActions.contains(template)) {
-			for (IActionDescription ad:localActions) {
+			for (IActionDescription ad : localActions) {
 				if (ad.equals(template)) {
 					return ad;
 				}
 			}
 		}
-		for (String key:remoteActions.keySet()) {
+		for (String key : remoteActions.keySet()) {
 			Set<IActionDescription> adset = remoteActions.get(key);
 			if (adset.contains(template)) {
-				for (IActionDescription ad:adset) {
+				for (IActionDescription ad : adset) {
 					if (ad.equals(template)) {
 						return ad;
 					}
@@ -492,36 +521,39 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error("Cannot find action: null!");
 			return actions;
 		}
-		
+
 		// use Matcher for matching if possible
-    if (template instanceof IServiceDescription) {
-      if (this.serviceMatcher != null) {
-        ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
-        ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher.findAllMatches(
-            (IServiceDescription) template, serviceDescList);
+		if (template instanceof IServiceDescription) {
+			if (this.serviceMatcher != null) {
+				ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
+				ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
+						.findAllMatches((IServiceDescription) template,
+								serviceDescList);
 
-        if ((matcherResults != null) && (matcherResults.size() > 0)) {
-          actions.addAll(matcherResults);
-        } else {
-          log.warn("Matcher found no result, trying normal template matching...");
-        }
+				if ((matcherResults != null) && (matcherResults.size() > 0)) {
+					actions.addAll(matcherResults);
+				} else {
+					log
+							.warn("Matcher found no result, trying normal template matching...");
+				}
 
-      } else {
-        log.error("This agentnode has no servicematcher - no complex matching possible!");
-      }
-    }
+			} else {
+				log
+						.error("This agentnode has no servicematcher - no complex matching possible!");
+			}
+		}
 
 		if (localActions.contains(template)) {
-			for (IActionDescription actionDescription:localActions) {
+			for (IActionDescription actionDescription : localActions) {
 				if (actionDescription.equals(template)) {
 					actions.add(actionDescription);
 				}
 			}
 		}
-		for (String key:remoteActions.keySet()) {
+		for (String key : remoteActions.keySet()) {
 			Set<IActionDescription> adset = remoteActions.get(key);
 			if (adset.contains(template)) {
-				for (IActionDescription ad:adset) {
+				for (IActionDescription ad : adset) {
 					if (ad.equals(template)) {
 						actions.add(ad);
 					}
@@ -531,80 +563,87 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		return actions;
 	}
 
-//######################################
-//	ILifeCycleListener
-//######################################	
+	// ######################################
+	// ILifeCycleListener
+	// ######################################
 
 	@Override
 	public void onEvent(LifecycleEvent event) {
-		log.debug(myAgentNode + "::" + event.getSource() + " State: " + event.getState());
-		
+		log.debug(myAgentNode + "::" + event.getSource() + " State: "
+				+ event.getState());
+
 		if (event.getState() == LifecycleStates.INITIALIZED) {
 			if (event.getSource() instanceof Agent) {
-				Agent agent = (Agent)event.getSource();
+				Agent agent = (Agent) event.getSource();
 				registerAgent(agent.getAgentDescription());
 
-				//register actions
+				// register actions
 				List<IAgentBean> beans = agent.getAgentBeans();
 				if (beans != null && !beans.isEmpty()) {
-					for (IAgentBean ab:beans) {
+					for (IAgentBean ab : beans) {
 						if (ab instanceof IEffector) {
-							IEffector effector = (IEffector)ab;
-							List<? extends Action> actions = effector.getActions();
+							IEffector effector = (IEffector) ab;
+							List<? extends Action> actions = effector
+									.getActions();
 							if (actions != null && !actions.isEmpty()) {
-								for (Action action:actions) {
-									if ((action.getScope()!=null) && action.getScope().contains(ActionScope.NODE)) {
-									  action.setProviderDescription(agent.getAgentDescription());
-									  registerAction(action);
+								for (Action action : actions) {
+									if ((action.getScope() != null)
+											&& action.getScope().contains(
+													ActionScope.NODE)) {
+										action.setProviderDescription(agent
+												.getAgentDescription());
+										registerAction(action);
 									}
 								}
 							} else {
-								log.warn("Effector: " + ab.getBeanName() + " has no Actions?!?");
+								log.warn("Effector: " + ab.getBeanName()
+										+ " has no Actions?!?");
 							}
 						}
 					}
 				} else {
-					log.warn("Agent: " + agent.getAgentId() + " has no AgentBeans?!?");
+					log.warn("Agent: " + agent.getAgentId()
+							+ " has no AgentBeans?!?");
 				}
 			}
 		}
-		
+
 		else if (event.getState() == LifecycleStates.STOPPING) {
 			if (event.getSource() instanceof Agent) {
-				String agent = ((Agent)event.getSource()).getAgentId();
-				
+				String agent = ((Agent) event.getSource()).getAgentId();
+
 				List<IActionDescription> actions = new ArrayList<IActionDescription>();
-				for (IActionDescription action:localActions) {
+				for (IActionDescription action : localActions) {
 					if (action.getProviderDescription().getAid().equals(agent)) {
 						actions.add(action);
 					}
 				}
-				for (IActionDescription action:actions) {
+				for (IActionDescription action : actions) {
 					localActions.remove(action);
 				}
-				
+
 				deregisterAgent(agent);
 			}
 		}
 	}
 
-//######################################
-//	IMessageTransportDelegate
-//######################################	
+	// ######################################
+	// IMessageTransportDelegate
+	// ######################################
 
 	@Override
 	public void onMessage(MessageTransport source, IJiacMessage message,
 			ICommunicationAddress at) {
-		
+
 		ICommunicationAddress senderAddress = message.getSender();
-		
-		//own message, do nothing
+
+		// own message, do nothing
 		if (senderAddress == null || senderAddress.equals(myAddress)) {
 			return;
 		}
-		
+
 		System.out.println("");
-		
+
 		String protocol = message.getProtocol();
 		System.out.println("sender=" + senderAddress + " protocol=" + protocol);
 
@@ -612,118 +651,136 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			refreshAgentNode(senderAddress);
 			return;
 		}
-		
+
 		else if (protocol.equals(BYE)) {
 			String uuid = senderAddress.getName();
 			if (nodes.containsKey(uuid)) {
-				//TODO remove its agents
+				removeRemoteAgentOfNode(uuid);
 				remoteActions.remove(uuid);
 				nodes.remove(uuid);
 			}
 			dump(uuid + " says bye");
 			return;
 		}
-		
+
 		else if (protocol.equals(ADVERTISE)) {
 			refreshAgentNode(senderAddress);
-			Set<IActionDescription> actions = ((Advertisement)message.getPayload()).getActions();
+			Set<IActionDescription> actions = ((Advertisement) message
+					.getPayload()).getActions();
 			System.out.println("receive ADVERTISE: " + actions.size());
-			
+
 			Set<IActionDescription> receivedActions = new HashSet<IActionDescription>();
-      for (IActionDescription iad : actions) {
-        
-        if (iad instanceof IServiceDescription) {
-          // special handling for service descriptions
-          IServiceDescription isd = (IServiceDescription) iad;
-          if (isd.getOntologySource() != null) {
-            IServiceDescription tempService = null;
-            try {
-              tempService = ontologyStorage.deserializeServiceDescription(isd.getOntologySource());
+			for (IActionDescription iad : actions) {
 
-              if (tempService != null) {
-                // these fields are not filled by the ontologyStorage, so do it by hand
-                ((Action)tempService).setInputTypes(isd.getInputTypes());
-                ((Action)tempService).setResultTypes(isd.getResultTypes());
-                ((Action)tempService).setProviderDescription(isd.getProviderDescription());
-                ((Action)tempService).setScope(isd.getScope());
-              }
-            } catch (Exception ex) {
-              log.error("Caught exception when reading service description: ", ex);
-            }
+				if (iad instanceof IServiceDescription) {
+					// special handling for service descriptions
+					IServiceDescription isd = (IServiceDescription) iad;
+					if (isd.getOntologySource() != null) {
+						IServiceDescription tempService = null;
+						try {
+							tempService = ontologyStorage
+									.deserializeServiceDescription(isd
+											.getOntologySource());
 
-            if (tempService != null) {
-              receivedActions.add(tempService);
-            }
-          }
+							if (tempService != null) {
+								// these fields are not filled by the
+								// ontologyStorage, so do it by hand
+								((Action) tempService).setInputTypes(isd
+										.getInputTypes());
+								((Action) tempService).setResultTypes(isd
+										.getResultTypes());
+								((Action) tempService)
+										.setProviderDescription(isd
+												.getProviderDescription());
+								((Action) tempService).setScope(isd.getScope());
+							}
+						} catch (Exception ex) {
+							log
+									.error(
+											"Caught exception when reading service description: ",
+											ex);
+						}
 
-        } else {
-          // simply add normal actions
-          receivedActions.add(iad);
-        }
-      }
-			
+						if (tempService != null) {
+							receivedActions.add(tempService);
+						}
+					}
+
+				} else {
+					// simply add normal actions
+					receivedActions.add(iad);
+				}
+			}
+
 			remoteActions.put(senderAddress.getName(), receivedActions);
-			
-			Hashtable<String, IAgentDescription> agents = ((Advertisement)message.getPayload()).getAgents();
-			for (String agent:agents.keySet()) {
+
+			Hashtable<String, IAgentDescription> agents = ((Advertisement) message
+					.getPayload()).getAgents();
+			for (String agent : agents.keySet()) {
 				registerAgent(agents.get(agent));
 			}
-			
+
 			dump("ADVERTISE " + senderAddress.getName());
 		}
-		
+
 		else if (protocol.equals(ALL)) {
 			sendAdvertisement(senderAddress);
 		}
 	}
-	
+
 	/**
-	 * this returns an ICommunicationAddress of an node that is known or <code>null</code>, 
-	 * if it is unknown. <br> 
+	 * this returns an ICommunicationAddress of an node that is known or
+	 * <code>null</code>, if it is unknown. <br>
 	 * insert for agent migration (hate mails to mib)
+	 * 
 	 * @param uuidOfNode
-	 * @return the communication address of the given node, or <code>null</code> if the node is unknown
+	 * @return the communication address of the given node, or <code>null</code>
+	 *         if the node is unknown
 	 */
-	public ICommunicationAddress getCommunicationAddressOfANode(String uuidOfNode) {
-		
-		if (uuidOfNode == null || uuidOfNode.equals("")) return null;
-		
+	public ICommunicationAddress getCommunicationAddressOfANode(
+			String uuidOfNode) {
+
+		if (uuidOfNode == null || uuidOfNode.equals(""))
+			return null;
+
 		ICommunicationAddress ret = null;
 		if (nodes.containsKey(uuidOfNode)) {
 			AgentNodeDescription nodeDescription = nodes.get(uuidOfNode);
 			ret = nodeDescription.getAddress();
 		}
-		
+
 		return ret;
-		
+
 	}
-	
+
 	/**
-	 * this returns all known and reachable agent nodes. this returns a list of UUIDs of all known nodes. <br> 
+	 * this returns all known and reachable agent nodes. this returns a list of
+	 * UUIDs of all known nodes. <br>
 	 * insert for agent migration (hate mails to mib).
+	 * 
 	 * @return the UUID of all known agent nodes
 	 */
 	public Set<String> getAllKnownAgentNodes() {
-		
-		return nodes.keySet();
-		
-	}
-	
 
-	
+		return nodes.keySet();
+
+	}
+
 	private void refreshAgentNode(ICommunicationAddress node) {
 		String uuid = node.getName();
 		if (nodes.containsKey(uuid)) {
 			nodes.get(uuid).setAlive(System.currentTimeMillis());
 		} else {
-			AgentNodeDescription description = new AgentNodeDescription(node, System.currentTimeMillis());
+			AgentNodeDescription description = new AgentNodeDescription(node,
+					System.currentTimeMillis());
 			nodes.put(uuid, description);
 		}
 	}
 
 	@Override
 	public Log getLog(String extension) {
-		// TODO Creating a method within the AgentNode to get a log for AgentNodeBeans and use it here
+		// TODO Creating a method within the AgentNode to get a log for
+		// AgentNodeBeans and use it here
 		return LogFactory.getLog(getClass().getName() + "." + extension);
 	}
 
@@ -732,13 +789,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		e.printStackTrace();
 	}
 
-//######################################
-//	Getter/Setter
-//######################################	
-
+	// ######################################
+	// Getter/Setter
+	// ######################################
 
 	/**
 	 * Returns the communication handler.
+	 * 
 	 * @return the communication handler
 	 */
 	public MessageTransport getMessageTransport() {
@@ -747,7 +804,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	/**
 	 * Sets the communication handler.
-	 * @param messageTransport the communication handler to set
+	 * 
+	 * @param messageTransport
+	 *            the communication handler to set
 	 */
 	public void setMessageTransport(MessageTransport messageTransport) {
 		this.messageTransport = messageTransport;
@@ -755,55 +814,58 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	/**
 	 * Returns the time between to pings.
+	 * 
 	 * @return the time between to pings
 	 */
 	public long getAliveInterval() {
 		return aliveInterval;
 	}
-	
+
 	/**
 	 * Set the time how often the directory will send a ping.
-	 * @param interval the time between pings
+	 * 
+	 * @param interval
+	 *            the time between pings
 	 */
 	public void setAliveInterval(long interval) {
 		this.aliveInterval = interval;
 	}
-	
-	
+
 	/**
-   * Collects all complex services, i.e. entries with an IServiceDescription, from both, the local and the remote
-   * services list.
-   * 
-   * @return a list of all IServiceDescriptions from this directory, containint both, local and remote entries.
-   */
-  private ArrayList<IServiceDescription> findAllComplexServices() {
-    ArrayList<IServiceDescription> ret = new ArrayList<IServiceDescription>();
+	 * Collects all complex services, i.e. entries with an IServiceDescription,
+	 * from both, the local and the remote services list.
+	 * 
+	 * @return a list of all IServiceDescriptions from this directory,
+	 *         containint both, local and remote entries.
+	 */
+	private ArrayList<IServiceDescription> findAllComplexServices() {
+		ArrayList<IServiceDescription> ret = new ArrayList<IServiceDescription>();
 
-    // find serviceDescriptions in local actions
-    for (IActionDescription localAct : localActions) {
-      if (localAct instanceof IServiceDescription) {
-        ret.add((IServiceDescription) localAct);
-      }
-    }
+		// find serviceDescriptions in local actions
+		for (IActionDescription localAct : localActions) {
+			if (localAct instanceof IServiceDescription) {
+				ret.add((IServiceDescription) localAct);
+			}
+		}
 
-    // find serviceDescriptions in remote Actions
-    for (String key : remoteActions.keySet()) {
-      Set<IActionDescription> remoteActSet = remoteActions.get(key);
-      for (IActionDescription remoteAct : remoteActSet) {
-        if (remoteAct instanceof IServiceDescription) {
-          ret.add((IServiceDescription) remoteAct);
-        }
-      }
-    }
+		// find serviceDescriptions in remote Actions
+		for (String key : remoteActions.keySet()) {
+			Set<IActionDescription> remoteActSet = remoteActions.get(key);
+			for (IActionDescription remoteAct : remoteActSet) {
+				if (remoteAct instanceof IServiceDescription) {
+					ret.add((IServiceDescription) remoteAct);
+				}
+			}
+		}
 
-    return ret;
-  }
-	
-//#########################################
-// Communication	
-//#########################################
+		return ret;
+	}
 
-	private void sendMessage(JiacMessage message, ICommunicationAddress address){
+	// #########################################
+	// Communication
+	// #########################################
+
+	private void sendMessage(JiacMessage message, ICommunicationAddress address) {
 		message.setSender(myAddress);
 		message.setHeader("UUID", this.agentNode.getUUID());
 		try {
@@ -812,7 +874,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error("sendMessage failed. Message:\n" + message.toString(), e);
 		}
 	}
-	
+
 	/**
 	 * Send all actions this node is providing.
 	 */
@@ -821,40 +883,39 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		adMessage.setSender(myAddress);
 		adMessage.setHeader("UUID", this.agentNode.getUUID());
 		adMessage.setProtocol(ADVERTISE);
-		//TODO filter global actions
-		
-		
-		// find OWL-S ServiceDescriptions and deserialize them by hand 
+		// TODO filter global actions
+
+		// find OWL-S ServiceDescriptions and deserialize them by hand
 		Set<IActionDescription> advActions = new HashSet<IActionDescription>();
-		for(IActionDescription iad : localActions) {
-		  if(iad instanceof IServiceDescription) {
-		    IServiceDescription isd = (IServiceDescription)iad;
-		    isd.setOntologySource(ontologyStorage.serializeServiceDescription(isd));
-		  } 
-		  advActions.add(iad);
+		for (IActionDescription iad : localActions) {
+			if (iad instanceof IServiceDescription) {
+				IServiceDescription isd = (IServiceDescription) iad;
+				isd.setOntologySource(ontologyStorage
+						.serializeServiceDescription(isd));
+			}
+			advActions.add(iad);
 		}
-		
-		
+
 		Advertisement ad = new Advertisement(localAgents, advActions);
 		adMessage.setPayload(ad);
-		
-		//debug
-		Advertisement payload = (Advertisement)adMessage.getPayload();
+
+		// debug
+		Advertisement payload = (Advertisement) adMessage.getPayload();
 		System.out.println("sendAdvertisement: agents="
-				+ payload.getAgents().size()
-				+ " actions="
+				+ payload.getAgents().size() + " actions="
 				+ payload.getActions().size());
-		
+
 		try {
 			messageTransport.send(adMessage, destination);
 		} catch (Exception e) {
-			log.error("sendMessage failed. Message:\n" + adMessage.toString(), e);
+			log.error("sendMessage failed. Message:\n" + adMessage.toString(),
+					e);
 		}
-		
+
 	}
-	
+
 	class AgentNodePinger extends TimerTask {
-		
+
 		private long counter = 0;
 
 		@Override
@@ -868,36 +929,49 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				counter = 0;
 				sendAdvertisement(groupAddress);
 			}
-			
-			//remove dead nodes
+
+			// remove dead nodes
 			Set<String> deadNodes = new HashSet<String>();
-			for (String key:nodes.keySet()) {
+			for (String key : nodes.keySet()) {
 				if (nodes.get(key).getAlive() < (System.currentTimeMillis() - 5 * aliveInterval)) {
 					deadNodes.add(key);
 				}
 			}
 			if (deadNodes.size() > 0) {
 				log.warn("removing node:\n");
-				for (String key:deadNodes) {
+				for (String key : deadNodes) {
 					log.warn("\t" + key);
 					remoteActions.remove(key);
-					//TODO remove agents
+					removeRemoteAgentOfNode(key);
 					nodes.remove(key);
 				}
 			}
 		}
 	}
 	
-//######################################
-//	Debug
-//######################################	
+	private void removeRemoteAgentOfNode(String nodeId) {
+		ArrayList<String> keysToRemove = new ArrayList<String>();
+		for (String key:remoteAgents.keySet()) {
+			IAgentDescription agent = remoteAgents.get(key);
+			if (nodeId.equals(agent.getAgentNodeUUID())) {
+				keysToRemove.add(key);
+			}
+		}
+		for (String key:keysToRemove) {
+			remoteAgents.remove(key);
+		}
+	}
+
+	// ######################################
+	// Debug
+	// ######################################
 
 	private void dump(String cause) {
 		System.out.println("\n####Dump " + myAgentNode + " " + cause);
 		System.out.println("Registered local agents:   " + localAgents.size());
 		System.out.println("Registered local actions:  " + localActions.size());
 		int actions = 0;
-		for (String key:remoteActions.keySet()) {
+		for (String key : remoteActions.keySet()) {
 			actions += remoteActions.get(key).size();
 		}
 		System.out.println("Registered remote agents:  " + remoteAgents.size());
@@ -907,7 +981,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 }
 /*
- * TODO remove* checken bzgl. ConcurrentModificationException
- * TODO advertise agents ist im Moment etwas stiefmuetterlich behandelt
- * TODO ausfuehrliches Logging einbauen?!?
+ * TODO remove* checken bzgl. ConcurrentModificationException TODO advertise
+ * agents ist im Moment etwas stiefmuetterlich behandelt TODO ausfuehrliches
+ * Logging einbauen?!?
  */

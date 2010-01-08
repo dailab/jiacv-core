@@ -31,7 +31,9 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
-		IDirectory, IMessageTransportDelegate {
+		IDirectory, IMessageTransportDelegate, DirectoryAgentNodeBeanMBean {
+	
+	private boolean dump = true;
 
 	/**
 	 * Name for address-creation purposes. Will be added to the UUID of
@@ -83,21 +85,26 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	/** The communication handling for sending and receiving messages. */
 	private MessageTransport messageTransport;
 
+	//TODO JMX
 	/** Stores (node-)local actions. */
 	private Set<IActionDescription> localActions = new HashSet<IActionDescription>();
 
+	//TODO JMX
 	/**
 	 * Stores remote actions. Key is the UUID of the node. Value is a set of
 	 * action that are provided on that node.
 	 */
 	private Hashtable<String, Set<IActionDescription>> remoteActions = new Hashtable<String, Set<IActionDescription>>();
 
+	//TODO JMX
 	/** Stores (node-)local agents. Key is the agent identifier. */
 	private Hashtable<String, IAgentDescription> localAgents = new Hashtable<String, IAgentDescription>();
 
+	//TODO JMX
 	/** Store remote agents. Key is the agent identifier. */
 	private Hashtable<String, IAgentDescription> remoteAgents = new Hashtable<String, IAgentDescription>();
 
+	//TODO JMX
 	/** Stores all known agentnodes. Key is the UUID of the node. */
 	private Hashtable<String, AgentNodeDescription> nodes = new Hashtable<String, AgentNodeDescription>();
 
@@ -831,6 +838,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		this.aliveInterval = interval;
 	}
 
+	public long getAdvertiseInterval() {
+		return advertiseInterval;
+	}
+
+	public void setAdvertiseInterval(long advertiseInterval) {
+		this.advertiseInterval = advertiseInterval;
+	}
+
 	/**
 	 * Collects all complex services, i.e. entries with an IServiceDescription,
 	 * from both, the local and the remote services list.
@@ -967,17 +982,27 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	// ######################################
 
 	private void dump(String cause) {
-		System.out.println("\n####Dump " + myAgentNode + " " + cause);
-		System.out.println("Registered local agents:   " + localAgents.size());
-		System.out.println("Registered local actions:  " + localActions.size());
-		int actions = 0;
-		for (String key : remoteActions.keySet()) {
-			actions += remoteActions.get(key).size();
+		if (dump) {
+			System.out.println("\n####Dump " + myAgentNode + " " + cause);
+			System.out.println("Registered local agents:   " + localAgents.size());
+			System.out.println("Registered local actions:  " + localActions.size());
+			int actions = 0;
+			for (String key : remoteActions.keySet()) {
+				actions += remoteActions.get(key).size();
+			}
+			System.out.println("Registered remote agents:  " + remoteAgents.size());
+			System.out.println("Registered remote actions: " + actions);
+			System.out.println("Known agentnodes:          " + nodes.size());
+			System.out.println("####End dump\n");
 		}
-		System.out.println("Registered remote agents:  " + remoteAgents.size());
-		System.out.println("Registered remote actions: " + actions);
-		System.out.println("Known agentnodes:          " + nodes.size());
-		System.out.println("####End dump\n");
+	}
+
+	public boolean isDump() {
+		return dump;
+	}
+
+	public void setDump(boolean dump) {
+		this.dump = dump;
 	}
 }
 /*

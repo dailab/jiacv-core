@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.management.openmbean.CompositeData;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -1003,6 +1005,36 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	public void setDump(boolean dump) {
 		this.dump = dump;
+	}
+
+	@Override
+	public CompositeData getKnownNodes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompositeData getLocalActions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompositeData getLocalAgents() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompositeData getRemoteActions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompositeData getRemoteAgents() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 /*

@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.directory;
 
+import javax.management.openmbean.CompositeData;
+
 /**
  * Interface for controlling directory via JMX.
  * @author axle
@@ -51,4 +53,39 @@ public interface DirectoryAgentNodeBeanMBean {
 	void setDump(boolean dump);
 	
 	//sonstige operations auf dem directory
+
+	/**
+	 * Returns all locally offered actions of this node 
+	 * 
+	 * @return the actions offered locally
+	 */
+	CompositeData getLocalActions();
+	
+	/**
+	 * Returns all agents residing on this node.
+	 * 
+	 * @return the agents residing on this node
+	 */
+	CompositeData getLocalAgents();
+
+	/**
+	 * Returns all actions offered by remote nodes.
+	 * 
+	 * @return the actions offered by remote nodes
+	 */
+	CompositeData getRemoteActions();
+	
+	/**
+	 * Returns all agents residing on remote nodes.
+	 * 
+	 * @return the agents residing on remote nodes
+	 */
+	CompositeData getRemoteAgents();
+	
+	/**
+	 * Return all (other) known agent nodes.
+	 * 
+	 * @return the known nodes
+	 */
+	CompositeData getKnownNodes();
 }

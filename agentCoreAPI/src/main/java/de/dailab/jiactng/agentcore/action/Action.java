@@ -404,6 +404,7 @@ public class Action implements IActionDescription {
 		} else {
 		  builder.append(_providerDescription);
 		}
+		builder.append("\n scope=").append(scope);
 		builder.append("\n");
 		
 		return builder.toString();

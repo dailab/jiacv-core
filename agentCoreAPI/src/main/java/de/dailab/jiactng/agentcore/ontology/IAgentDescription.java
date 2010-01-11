@@ -5,6 +5,7 @@ package de.dailab.jiactng.agentcore.ontology;
 
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
 
 /**
  * This interface represents a description of an agent.
@@ -12,8 +13,16 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author Marcel Patzlaff
  * @version $Revision: 24780 $
  */
-public interface IAgentDescription extends IFact {
-    /**
+public interface IAgentDescription extends IFact, JmxDescriptionSupport {
+
+    public static final String ITEMNAME_ID = "id";
+    public static final String ITEMNAME_NAME = "name";
+    public static final String ITEMNAME_NODE = "node UUID";
+    public static final String ITEMNAME_STATE = "state";
+    public static final String ITEMNAME_MOBILE = "mobile";
+    public static final String ITEMNAME_MESSAGEBOX = "message box address";
+
+	/**
      * This method returns the unique agent identifier (AID) of
      * the agent this description refers to.
      * 

@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
 
 /**
  * This interface specifies a generic action description.
@@ -15,8 +16,16 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author Marcel Patzlaff
  * @version $Revision: 22434 $
  */
-public interface IActionDescription extends IFact {
-    /**
+public interface IActionDescription extends IFact, JmxDescriptionSupport {
+
+    public static final String ITEMNAME_NAME = "name";
+    public static final String ITEMNAME_INPUTTYPES = "input types";
+    public static final String ITEMNAME_RESULTTYPES = "result types";
+    public static final String ITEMNAME_SCOPE = "scope";
+    public static final String ITEMNAME_BEAN = "bean";
+    public static final String ITEMNAME_AGENT = "agent";
+
+	/**
      * This method returns the name of the action this description
      * refers to.
      * 

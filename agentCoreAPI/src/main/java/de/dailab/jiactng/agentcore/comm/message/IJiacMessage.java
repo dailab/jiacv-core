@@ -4,6 +4,7 @@ import java.util.Set;
 
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
 
 /**
  * This interface defines the message type used for inter-agent-communication.
@@ -17,7 +18,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  * @author Martin Loeffelholz
  * @author Marcel Patzlaff
  */
-public interface IJiacMessage extends IFact {
+public interface IJiacMessage extends IFact, JmxDescriptionSupport {
 
    public static final String ITEMNAME_HEADERS = "headers";
    public static final String ITEMNAME_PAYLOAD = "payload";

@@ -13,8 +13,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
+
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
-import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
@@ -471,4 +477,62 @@ public class Action implements IActionDescription {
 	public void setScope(ActionScope scope) {
 		this.scope = scope;
 	}
+
+	private String[] getItemNames() {
+		return new String[] {
+	    		ITEMNAME_NAME, 
+	    		ITEMNAME_INPUTTYPES, 
+	    		ITEMNAME_RESULTTYPES, 
+	    		ITEMNAME_SCOPE, 
+	    		ITEMNAME_BEAN, 
+	    		ITEMNAME_AGENT
+	    };
+	}
+
+	   /**
+	    * Gets the type of JIAC action descriptions based on JMX open types.
+	    * 
+	    * @return A composite type containing action name, input types, result types, scope, provider bean, and provider agent.
+	    * @throws OpenDataException
+	    *             if an error occurs during the creation of the type.
+	    * @see javax.management.openmbean.CompositeType
+	    */
+	   public OpenType<?> getDescriptionType() throws OpenDataException {
+	      OpenType<?>[] itemTypes = new OpenType<?>[] {
+	    		  SimpleType.STRING, 
+	    		  new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
+	    		  new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
+	    		  SimpleType.STRING, 
+	    		  SimpleType.STRING,
+	    		  (_providerDescription != null)? _providerDescription.getDescriptionType():SimpleType.VOID,
+	      };
+
+	      // use names of action items as their description
+	      String[] itemDescriptions = getItemNames();
+
+	      // create and return open type of a JIAC action
+	      return new CompositeType(this.getClass().getName(), "standard JIAC-TNG action", getItemNames(), itemDescriptions, itemTypes);
+	   }
+
+	   /**
+	    * Gets the description of this JIAC action based on JMX open types.
+	    * 
+	    * @return Composite data containing action name, input types, result types, scope, provider bean, and provider agent.
+	    * @throws OpenDataException
+	    *             if an error occurs during the creation of the data.
+	    * @see javax.management.openmbean.CompositeData
+	    */
+	   public Object getDescription() throws OpenDataException {
+	      Object[] itemValues = new Object[] {
+	    		  _name,
+	    		  _inputTypeNames,
+	    		  _resultTypeNames,
+	    		  (scope != null)? scope.toString():null,
+	    		  (providerBean != null)? providerBean.getBeanName():null,
+	    		  (_providerDescription != null)? _providerDescription.getDescription():null
+	      };
+
+	      CompositeType type = (CompositeType) getDescriptionType();
+	      return new CompositeDataSupport(type, getItemNames(), itemValues);
+	   }
 }

@@ -25,7 +25,7 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
  * @author Marcel Patzlaff
  */
 @SuppressWarnings("serial")
-public final class JiacMessage implements IJiacMessage, JmxDescriptionSupport {
+public final class JiacMessage implements IJiacMessage {
     /*
      * TODO: changed JiacMessage to final to avoid unexpected subclassing
      *       We should consider the necessity for typed contents to force the

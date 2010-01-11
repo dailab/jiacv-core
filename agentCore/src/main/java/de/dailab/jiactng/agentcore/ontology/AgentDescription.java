@@ -1,5 +1,11 @@
 package de.dailab.jiactng.agentcore.ontology;
 
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
+
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
@@ -210,4 +216,62 @@ public class AgentDescription implements IAgentDescription {
 	public Boolean isMobile() {
 		return isMobile;
 	}
+
+	private String[] getItemNames() {
+		return new String[] {
+	    		ITEMNAME_ID,
+	    		ITEMNAME_NAME,
+	    		ITEMNAME_NODE,
+	    	    ITEMNAME_STATE,
+	    		ITEMNAME_MOBILE,
+	    		ITEMNAME_MESSAGEBOX
+	    };
+	}
+
+	   /**
+	    * Gets the type of JIAC agent descriptions based on JMX open types.
+	    * 
+	    * @return A composite type containing agent id, name, node's UUID, state, mobility, and message box address.
+	    * @throws OpenDataException
+	    *             if an error occurs during the creation of the type.
+	    * @see javax.management.openmbean.CompositeType
+	    */
+	   public OpenType<?> getDescriptionType() throws OpenDataException {
+	      OpenType<?>[] itemTypes = new OpenType<?>[] {
+	    		  SimpleType.STRING, 
+	    		  SimpleType.STRING, 
+	    		  SimpleType.STRING, 
+	    		  SimpleType.STRING, 
+	    		  SimpleType.BOOLEAN,
+	    		  SimpleType.STRING
+	      };
+
+	      // use names of agent description items as their description
+	      String[] itemDescriptions = getItemNames();
+
+	      // create and return open type of a JIAC agent description
+	      return new CompositeType(this.getClass().getName(), "standard JIAC-TNG agent description", getItemNames(), itemDescriptions, itemTypes);
+	   }
+
+	   /**
+	    * Gets the description of this JIAC agent description based on JMX open types.
+	    * 
+	    * @return Composite data containing agent id, name, node's UUID, state, mobility, and message box address.
+	    * @throws OpenDataException
+	    *             if an error occurs during the creation of the data.
+	    * @see javax.management.openmbean.CompositeData
+	    */
+	   public Object getDescription() throws OpenDataException {
+	      Object[] itemValues = new Object[] {
+	    		  aid,
+	    		  name,
+	    		  agentNodeUUID,
+	    		  state,
+	    		  isMobile,
+	    		  (messageBoxAddress != null)? messageBoxAddress.getName():null,
+	      };
+
+	      CompositeType type = (CompositeType) getDescriptionType();
+	      return new CompositeDataSupport(type, getItemNames(), itemValues);
+	   }
 }

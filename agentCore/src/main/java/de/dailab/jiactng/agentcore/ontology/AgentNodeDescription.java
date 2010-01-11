@@ -1,5 +1,13 @@
 package de.dailab.jiactng.agentcore.ontology;
 
+import java.util.Date;
+
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
+
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 
 /**
@@ -60,4 +68,49 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 		this.alive = alive;
 	}
 
+	private String[] getItemNames() {
+		return new String[] {
+				ITEMNAME_ADDRESS,
+				ITEMNAME_ALIVE
+	    };
+	}
+
+	   /**
+	    * Gets the type of JIAC agent node descriptions based on JMX open types.
+	    * 
+	    * @return A composite type containing agent node address and last time of alive.
+	    * @throws OpenDataException
+	    *             if an error occurs during the creation of the type.
+	    * @see javax.management.openmbean.CompositeType
+	    */
+	   public OpenType<?> getDescriptionType() throws OpenDataException {
+	      OpenType<?>[] itemTypes = new OpenType<?>[] {
+	    		  SimpleType.STRING, 
+	    		  SimpleType.STRING, 
+	      };
+
+	      // use names of agent node description items as their description
+	      String[] itemDescriptions = getItemNames();
+
+	      // create and return open type of a JIAC agent node description
+	      return new CompositeType(this.getClass().getName(), "standard JIAC-TNG agent node description", getItemNames(), itemDescriptions, itemTypes);
+	   }
+
+	   /**
+	    * Gets the description of this JIAC agent node description based on JMX open types.
+	    * 
+	    * @return Composite data containing agent node address and last time of alive.
+	    * @throws OpenDataException
+	    *             if an error occurs during the creation of the data.
+	    * @see javax.management.openmbean.CompositeData
+	    */
+	   public Object getDescription() throws OpenDataException {
+	      Object[] itemValues = new Object[] {
+	    		  (address != null)? address.getName():null,
+	    		  new Date(alive).toString()
+	      };
+
+	      CompositeType type = (CompositeType) getDescriptionType();
+	      return new CompositeDataSupport(type, getItemNames(), itemValues);
+	   }
 }

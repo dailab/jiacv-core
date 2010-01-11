@@ -4,11 +4,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
+import javax.management.openmbean.TabularData;
+import javax.management.openmbean.TabularDataSupport;
+import javax.management.openmbean.TabularType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1008,33 +1017,208 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	@Override
-	public CompositeData getKnownNodes() {
-		// TODO Auto-generated method stub
-		return null;
+	public TabularData getKnownNodes() {
+		if (nodes.isEmpty()) {
+			return null;
+		}
+
+		Set<Map.Entry<String,AgentNodeDescription>> entries = nodes.entrySet();
+		try {
+			String[] itemNames = new String[] {"UUID", "description"};
+			CompositeType nodeType = new CompositeType(
+				entries.iterator().next().getClass().getName(),
+				"agent node description corresponding to an agent node UUID",
+				itemNames,
+				itemNames,
+				new OpenType<?>[] {SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType()}
+			);
+			TabularType type = new TabularType(
+				nodes.getClass().getName(), 
+				"node descriptions stored in the directory", 
+				nodeType, 
+				new String[] {"UUID"} 
+			);
+			TabularData data = new TabularDataSupport(type);
+			for (Map.Entry<String,AgentNodeDescription> node : entries) {
+				CompositeData nodeData = new CompositeDataSupport(
+					nodeType, 
+					itemNames, 
+					new Object[] {node.getKey(), node.getValue().getDescription()}
+				);
+				data.put(nodeData);
+			}
+			return data;
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
-	public CompositeData getLocalActions() {
-		// TODO Auto-generated method stub
-		return null;
+	public TabularData getLocalActions() {
+		if (localActions.isEmpty()) {
+			return null;
+		}
+		
+		try {
+			TabularType type = new TabularType(
+				localActions.getClass().getName(), 
+				"local actions stored in the directory", 
+				(CompositeType) localActions.iterator().next().getDescriptionType(), 
+				new String[] {
+					IActionDescription.ITEMNAME_NAME, 
+					IActionDescription.ITEMNAME_INPUTTYPES, 
+					IActionDescription.ITEMNAME_RESULTTYPES, 
+					IActionDescription.ITEMNAME_AGENT
+				}
+			);
+			TabularData data = new TabularDataSupport(type);
+			for (IActionDescription action : localActions) {
+				data.put((CompositeData)action.getDescription());
+			}
+			return data;
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
-	public CompositeData getLocalAgents() {
-		// TODO Auto-generated method stub
-		return null;
+	public TabularData getLocalAgents() {
+		if (localAgents.isEmpty()) {
+			return null;
+		}
+
+		Set<Map.Entry<String,IAgentDescription>> entries = localAgents.entrySet();
+		try {
+			String[] itemNames = new String[] {"Agent ID", "description"};
+			CompositeType agentType = new CompositeType(
+				entries.iterator().next().getClass().getName(),
+				"local agent description corresponding to an agent id",
+				itemNames,
+				itemNames,
+				new OpenType<?>[] {SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType()}
+			);
+			TabularType type = new TabularType(
+				localAgents.getClass().getName(), 
+				"local agent descriptions stored in the directory", 
+				agentType, 
+				new String[] {"Agent ID"}
+			);
+			TabularData data = new TabularDataSupport(type);
+			for (Map.Entry<String,IAgentDescription> agent : entries) {
+				CompositeData agentData = new CompositeDataSupport(
+					agentType, 
+					itemNames, 
+					new Object[] {agent.getKey(), agent.getValue().getDescription()}
+				);
+				data.put(agentData);
+			}
+			return data;
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
-	public CompositeData getRemoteActions() {
-		// TODO Auto-generated method stub
-		return null;
+	public TabularData getRemoteActions() {
+		if (remoteActions.isEmpty()) {
+			return null;
+		}
+
+		Set<Map.Entry<String,Set<IActionDescription>>> entries = remoteActions.entrySet();
+		try {
+			TabularType actionType = new TabularType(
+				entries.iterator().next().getValue().getClass().getName(),
+				"remote action descriptions",
+				(CompositeType)entries.iterator().next().getValue().iterator().next().getDescriptionType(),
+				new String[] {
+					IActionDescription.ITEMNAME_NAME, 
+					IActionDescription.ITEMNAME_INPUTTYPES, 
+					IActionDescription.ITEMNAME_RESULTTYPES, 
+					IActionDescription.ITEMNAME_AGENT							
+				}
+			);
+			String[] itemNames = new String[] {"agent node UUID", "remote actions"};
+			CompositeType entryType = new CompositeType(
+				entries.iterator().next().getClass().getName(),
+				"remote action descriptions corresponding to an agent node UUID",
+				itemNames,
+				itemNames,
+				new OpenType<?>[] {
+					SimpleType.STRING,
+					actionType
+				}
+			);
+			TabularType type = new TabularType(
+				remoteActions.getClass().getName(), 
+				"remote action descriptions stored in the directory", 
+				entryType, 
+				new String[] {"agent node UUID"}
+			);
+
+			TabularData data = new TabularDataSupport(type);
+			for (Map.Entry<String,Set<IActionDescription>> entry : entries) {
+				TabularData actionData = new TabularDataSupport(actionType);
+				for (IActionDescription action: entry.getValue()) {
+					actionData.put((CompositeData)action.getDescription());
+				}
+				CompositeData entryData = new CompositeDataSupport(
+					entryType, 
+					itemNames, 
+					new Object[] {entry.getKey(), actionData}
+				);
+				data.put(entryData);
+			}
+			return data;
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
-	public CompositeData getRemoteAgents() {
-		// TODO Auto-generated method stub
-		return null;
+	public TabularData getRemoteAgents() {
+		if (remoteAgents.isEmpty()) {
+			return null;
+		}
+
+		Set<Map.Entry<String,IAgentDescription>> entries = remoteAgents.entrySet();
+		try {
+			String[] itemNames = new String[] {"Agent ID", "description"};
+			CompositeType agentType = new CompositeType(
+				entries.iterator().next().getClass().getName(),
+				"remote agent description corresponding to an agent id",
+				itemNames,
+				itemNames,
+				new OpenType<?>[] {SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType()}
+			);
+			TabularType type = new TabularType(
+				remoteAgents.getClass().getName(), 
+				"remote agent descriptions stored in the directory", 
+				agentType, 
+				new String[] {"Agent ID"}
+			);
+			TabularData data = new TabularDataSupport(type);
+			for (Map.Entry<String,IAgentDescription> agent : entries) {
+				CompositeData agentData = new CompositeDataSupport(
+					agentType, 
+					itemNames, 
+					new Object[] {agent.getKey(), agent.getValue().getDescription()}
+				);
+				data.put(agentData);
+			}
+			return data;
+		}
+		catch (OpenDataException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
 /*

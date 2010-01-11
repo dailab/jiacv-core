@@ -526,8 +526,8 @@ public class Action implements IActionDescription {
 	   public Object getDescription() throws OpenDataException {
 	      Object[] itemValues = new Object[] {
 	    		  _name,
-	    		  _inputTypeNames,
-	    		  _resultTypeNames,
+	    		  _inputTypeNames.toArray(new String[_resultTypeNames.size()]),
+	    		  _resultTypeNames.toArray(new String[_resultTypeNames.size()]),
 	    		  (scope != null)? scope.toString():null,
 	    		  (providerBean != null)? providerBean.getBeanName():null,
 	    		  (_providerDescription != null)? _providerDescription.getDescription():null

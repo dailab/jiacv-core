@@ -10,7 +10,7 @@ import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
  *
  * TODO: remove inheritance from {@link AgentDescription}.
  */
-public class OtherAgentDescription extends AgentDescription implements IAgentDescription {
+public class OtherAgentDescription extends AgentDescription {
     private static final long serialVersionUID = -7568071559906302487L;
 
     /**

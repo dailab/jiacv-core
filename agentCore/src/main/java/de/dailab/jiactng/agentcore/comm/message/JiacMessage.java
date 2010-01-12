@@ -221,7 +221,7 @@ public final class JiacMessage implements IJiacMessage {
       // create open type of message headers
       if (_headers != null) {
          itemNames.add(ITEMNAME_HEADERS);
-         String[] headerNames = getHeaderKeys().toArray(new String[0]);
+         String[] headerNames = getHeaderKeys().toArray(new String[getHeaderKeys().size()]);
          int headerSize = headerNames.length;
          OpenType<?>[] headerTypes = new OpenType<?>[headerSize];
          for (int i = 0; i < headerSize; i++) {
@@ -269,7 +269,7 @@ public final class JiacMessage implements IJiacMessage {
 
       // create open data of message headers
       if (_headers != null) {
-         String[] headerNames = getHeaderKeys().toArray(new String[0]);
+         String[] headerNames = getHeaderKeys().toArray(new String[getHeaderKeys().size()]);
          int headerSize = headerNames.length;
          Object[] headerValues = new Object[headerSize];
          for (int i = 0; i < headerSize; i++) {

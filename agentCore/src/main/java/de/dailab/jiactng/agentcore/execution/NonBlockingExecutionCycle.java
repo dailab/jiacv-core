@@ -63,7 +63,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 			}
 		}
 		// remove futures which are already done or canceled
-		Long[] keys = futures.keySet().toArray(new Long[0]);
+		Long[] keys = futures.keySet().toArray(new Long[futures.keySet().size()]);
 		for (int i=0; i<keys.length; i++) {
 			Future<?> future = futures.get(keys[i]);
 			if (future.isCancelled() || future.isDone()) {

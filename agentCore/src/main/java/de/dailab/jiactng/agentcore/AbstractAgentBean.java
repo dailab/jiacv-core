@@ -444,10 +444,10 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
     }
     
     if(timeout<=0) {
-      Serializable[] params = { template, new Boolean(isGlobal)};
+      Serializable[] params = { template, Boolean.valueOf(isGlobal)};
       return invoke(requestSearchAction, params, receiver);
     } else {
-      Serializable[] params = { template, new Boolean(isGlobal), new Long(timeout) };
+      Serializable[] params = { template, Boolean.valueOf(isGlobal), Long.valueOf(timeout) };
       return invoke(requestSearchAction, params, receiver);
     }
   }
@@ -541,7 +541,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
         log.error("DirectoryAccessBean not available");
         throw new RuntimeException("DirectoryAccessBean not available");
       }
-      Serializable[] params = { template, new Boolean(false), new Long(100)};
+      Serializable[] params = { template, Boolean.valueOf(false), Long.valueOf(100)};
 
       DoAction readAction = requestSearchAction.createDoAction(params, new SearchResultHandler());
       searchToInvokeMap.put(readAction.getSessionId(), new Serializable[] {doAct,caching});

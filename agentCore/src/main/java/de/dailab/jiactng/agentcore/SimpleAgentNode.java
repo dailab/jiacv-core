@@ -531,9 +531,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			_timer = null;
 		}
 
-		if (log != null) {
-			log.info("AgentNode " + getName() + " has been closed.");
-		}
+		log.info("AgentNode " + getName() + " has been closed.");
 	}
 
 	/**
@@ -549,18 +547,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		if (_agentNodeBeans != null) {
 			for (IAgentNodeBean anb : _agentNodeBeans) {
 				try {
-					if (log != null && log.isInfoEnabled()) {
-						log.info("Trying to initialize agentnodebean: " + anb.getBeanName());
-					}
+					log.info("Trying to initialize agentnodebean: " + anb.getBeanName());
 					anb.init();
 				} catch (LifecycleException lce) {
 					// TODO
-					if(log != null) {
-						log.error("Failure when initializing agentnodebean: "+anb.getBeanName(),lce);
-					} else {
-						System.err.println("Failure when initializing agentnodebean: "+anb.getBeanName());
-						lce.printStackTrace();
-					}
+					log.error("Failure when initializing agentnodebean: "+anb.getBeanName(),lce);
 				}
 				
 				if (_directory == null){
@@ -587,34 +578,25 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// call init and set references for all agents if any
-		if (_agents != null) {
-			for (IAgent a : _agents) {
+		for (IAgent a : _agents) {
 				
-				if (_directory != null){
-					a.addLifecycleListener(_directory);
+			if (_directory != null){
+				a.addLifecycleListener(_directory);
+			}
+			if (directory != null) {
+				a.addLifecycleListener(directory);
+				if (a instanceof Agent) {
+					((Agent)a).setDirectory(directory);
 				}
-				if (directory != null) {
-					a.addLifecycleListener(directory);
-					if (a instanceof Agent) {
-						((Agent)a).setDirectory(directory);
-					}
-				}
+			}
 				
-				log.info("Initializing agent: " + a.getAgentName());
-				try {
-					if (log != null && log.isInfoEnabled()) {
-						log.info("Trying to initialize agent: " + a.getAgentName());
-					}
-					a.init();				
-				} catch (LifecycleException e) {
-					// TODO:
-					if(log != null) {
-						log.error("Failure when initializing agent: "+a.getAgentName(),e);
-					} else {
-						System.err.println("Failure when initializing agent: "+a.getAgentName());
-						e.printStackTrace();
-					}
-				}
+			log.info("Initializing agent: " + a.getAgentName());
+			try {
+				log.info("Trying to initialize agent: " + a.getAgentName());
+				a.init();				
+			} catch (LifecycleException e) {
+				// TODO:
+				log.error("Failure when initializing agent: "+a.getAgentName(),e);
 			}
 		}
 	}
@@ -629,9 +611,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		if (_agentNodeBeans != null) {
 			for (IAgentNodeBean anb : _agentNodeBeans) {
 				try {
-					if (log != null) {
-						log.info("Trying to start agentnodebean: " + anb.getBeanName());
-					}
+					log.info("Trying to start agentnodebean: " + anb.getBeanName());
 					anb.start();
 				} catch (LifecycleException lce) {
 					// TODO
@@ -642,28 +622,22 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		synchronized(_agents) {
 			// call start() and instantiate Threads for all agents if any
-			if (_agents != null) {
-				for (IAgent a : _agents) {
-					try {
-					  if(((Agent)a).getStartTime()==null) {
-					    if (log != null) {
-					      log.info("Trying to start agent: " + a.getAgentName());
-					    }
-						  a.start();
-						} else {
-              if (log != null) {
-                log.info("Agent has a startTime and is not started now: " + a.getAgentName());
-              }
-						}
-					} catch (Exception ex) {
-						// TODO
-						ex.printStackTrace();
+			for (IAgent a : _agents) {
+				try {
+					if(((Agent)a).getStartTime()==null) {
+						log.info("Trying to start agent: " + a.getAgentName());
+						a.start();
+					} else {
+						log.info("Agent has a startTime and is not started now: " + a.getAgentName());
 					}
+				} catch (Exception ex) {
+					// TODO
+					ex.printStackTrace();
 				}
 			}
 		}
 
-		log.info("AgentNode " + getName() + " started with " + (_agents != null ? _agents.size() : "0") + " agents");
+		log.info("AgentNode " + getName() + " started with " + _agents.size() + " agents");
 	}
 
 	/**
@@ -672,17 +646,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	public void doStop() {
 		// call stop() for all agents if any
-		if (_agents != null) {
-			for (IAgent a : _agents) {
-				try {
-					if (log != null) {
-						log.info("Trying to stop agent: " + a.getAgentName());
-					}
-					a.stop();
-				} catch (LifecycleException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		for (IAgent a : _agents) {
+			try {
+				log.info("Trying to stop agent: " + a.getAgentName());
+				a.stop();
+			} catch (LifecycleException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
@@ -692,9 +662,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			for (int i=_agentNodeBeans.size()-1; i>=0; i--) {
 				IAgentNodeBean anb = _agentNodeBeans.get(i);
 				try {
-					if (log != null) {
-						log.info("Trying to stop agentnodebean: " + anb.getBeanName());
-					}
+					log.info("Trying to stop agentnodebean: " + anb.getBeanName());
 					anb.stop();
 				} catch (LifecycleException lce) {
 					// TODO
@@ -709,17 +677,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void doCleanup() {
 		// call cleanup for all agents if any
-		if (_agents != null) {
-			for (IAgent a : _agents) {
-				try {
-					if (log != null) {
-						log.info("Trying to cleanup agent: " + a.getAgentName());
-					}
-					a.cleanup();
-				} catch (LifecycleException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		for (IAgent a : _agents) {
+			try {
+				log.info("Trying to cleanup agent: " + a.getAgentName());
+				a.cleanup();
+			} catch (LifecycleException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
@@ -729,9 +693,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			for (int i=_agentNodeBeans.size()-1; i>=0; i--) {
 				IAgentNodeBean anb = _agentNodeBeans.get(i);
 				try {
-					if (log != null) {
-						log.info("Trying to cleanup agentnodebean: " + anb.getBeanName());
-					}
+					log.info("Trying to cleanup agentnodebean: " + anb.getBeanName());
 					anb.cleanup();
 				} catch (LifecycleException lce) {
 					// TODO
@@ -903,10 +865,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// register agents for management
-		if (_agents != null) {
-			for (IAgent a : this._agents) {
-				a.enableManagement(manager);
-			}
+		for (IAgent a : this._agents) {
+			a.enableManagement(manager);
 		}
 
 		// enable remote management

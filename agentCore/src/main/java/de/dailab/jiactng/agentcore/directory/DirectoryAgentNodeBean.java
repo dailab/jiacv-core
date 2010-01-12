@@ -302,9 +302,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 */
 	public List<IAgentDescription> searchAllLocalAgents(
 			IAgentDescription template) {
-		if (template == null) {
-
-		}
 		List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
 		for (String key : localAgents.keySet()) {
 			IAgentDescription agentDescription = localAgents.get(key);
@@ -317,9 +314,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	@Override
 	public List<IAgentDescription> searchAllAgents(IAgentDescription template) {
-		if (template == null) {
-
-		}
 		List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
 		for (String key : localAgents.keySet()) {
 			IAgentDescription agentDescription = localAgents.get(key);
@@ -734,8 +728,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 			Hashtable<String, IAgentDescription> agents = ((Advertisement) message
 					.getPayload()).getAgents();
-			for (String agent : agents.keySet()) {
-				registerAgent(agents.get(agent));
+			for (IAgentDescription agent : agents.values()) {
+				registerAgent(agent);
 			}
 
 			dump("ADVERTISE " + senderAddress.getName());

@@ -34,7 +34,7 @@ public class AgentDescription implements IAgentDescription {
 	private String agentNodeUUID;
 	
 	/** Flag, if it is set <code>true</code>, it is a mobile agent */
-	private Boolean isMobile = new Boolean(false);
+	private Boolean isMobile = Boolean.valueOf(false);
 	
 //	public AgentDescription(String aid, String name, String state) {
 //        this(aid, name, state, name != null ? CommunicationAddressFactory.createMessageBoxAddress(aid) : null);
@@ -50,7 +50,7 @@ public class AgentDescription implements IAgentDescription {
 //        this.state=state;
 //        this.messageBoxAddress= messageBoxAddress;
 //        this.agentNodeUUID = agentNodeUUID;
-    	this( aid,  name,  state,  messageBoxAddress,  agentNodeUUID, new Boolean(false));
+    	this( aid,  name,  state,  messageBoxAddress,  agentNodeUUID, Boolean.valueOf(false));
     }
     
     public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID, Boolean mobile) {

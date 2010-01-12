@@ -230,7 +230,7 @@ class JMSReceiver implements MessageListener {
      */
     private MessageConsumer initialiseConsumer(ICommunicationAddress address, String selector) throws JMSException {
 
-    	MessageConsumer consumer;
+    	MessageConsumer consumer = null;
     	
         try {
             if (log.isDebugEnabled()) {
@@ -246,8 +246,8 @@ class JMSReceiver implements MessageListener {
                 log.error("Listener couldn't be initialized cause of '" + e.getCause() + "'");
                 log.error("Listener will be destroyed");
             }
-            consumer = null;
             destroyConsumer(consumer);
+            consumer = null;
             throw e;
         }
         return consumer;

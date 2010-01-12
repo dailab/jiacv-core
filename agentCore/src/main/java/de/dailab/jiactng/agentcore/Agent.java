@@ -9,6 +9,7 @@ package de.dailab.jiactng.agentcore;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -1333,7 +1334,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    */
   @Override
   public byte[] getSpringConfigXml() {
-  	return springConfigXml;
+	if (springConfigXml != null) {
+		return Arrays.copyOf(springConfigXml, springConfigXml.length);
+	}
+	return springConfigXml;
   }
   
   /**
@@ -1341,7 +1345,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    */
   @Override
   public void setSpringConfigXml(byte[] springConfig) {
-	  this.springConfigXml = springConfig;
+	  if (springConfig != null) {
+		  this.springConfigXml = Arrays.copyOf(springConfig, springConfig.length);
+	  } else {
+		  this.springConfigXml = springConfig;
+	  }
   }
 
   	/***********************************************

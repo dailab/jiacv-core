@@ -24,8 +24,8 @@ public class MemoryDebugger {
             if (notification.getType().equals(MemoryNotificationInfo.MEMORY_THRESHOLD_EXCEEDED)) {
                 Map<Thread,StackTraceElement[]> map= Thread.getAllStackTraces();
                 
-                for(Thread thread : map.keySet()) {
-                    printStackTrace(thread.getName(), map.get(thread));
+                for(Map.Entry<Thread,StackTraceElement[]> entry : map.entrySet()) {
+                    printStackTrace(entry.getKey().getName(), entry.getValue());
                 }
             }
         }

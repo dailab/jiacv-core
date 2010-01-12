@@ -41,7 +41,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
 
         // deregister node bean from management
         try {
-            _manager.unregisterAgentNodeResource(agentNode.getName(), "agentNodeBean", getBeanName());
+            _manager.unregisterAgentNodeBean(this, agentNode);
         } catch (Exception e) {
             System.err.println("WARNING: Unable to deregister node bean " + _beanName + " of node "
                     + agentNode.getName() + " as JMX resource.");
@@ -65,7 +65,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
 
         // register agentNode bean for management
         try {
-            manager.registerAgentNodeResource(agentNode.getName(), "agentNodeBean", getBeanName(), this);
+            manager.registerAgentNodeBean(this, agentNode);
         } catch (Exception e) {
             System.err.println("WARNING: Unable to register node bean " + _beanName + " of node " + agentNode.getName()
                     + " as JMX resource.");

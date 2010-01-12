@@ -28,7 +28,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see ObjectName#ObjectName(String)
 	 */
 	protected JmxAgentNodeDirectoryManagementClient(MBeanServerConnection mbsc, String agentNodeName, String directoryBeanName) throws MalformedObjectNameException {
-		super(mbsc, new JmxManager().getMgmtNameOfAgentNodeResource(agentNodeName, "agentNodeBean", directoryBeanName));
+		super(mbsc, new JmxManager().getMgmtNameOfAgentNodeBean(agentNodeName, directoryBeanName));
 	}
 
 	/**

@@ -30,6 +30,7 @@ import javax.management.remote.JMXServiceURL;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
+import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
@@ -58,6 +59,20 @@ public class JmxManager implements Manager {
 	public ObjectName getMgmtNameOfAgentNode(String nodeName) throws MalformedObjectNameException, NullPointerException {
 		return new ObjectName(DOMAIN + 
 				":category1=AgentNode,agentnode=" + nodeName);
+	}
+
+	/**
+	 * Constructs a JMX compliant name for the management of an agent node bean.
+	 * @param nodeName the name of the agent node
+	 * @param beanName the name of the agent node bean
+	 * @return the JMX compliant name of the agent node bean
+	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
+	 * @throws NullPointerException One of the parameters is null.
+	 */
+	public ObjectName getMgmtNameOfAgentNodeBean(String nodeName, String beanName) throws MalformedObjectNameException, NullPointerException {
+		return new ObjectName(DOMAIN + 
+				":category1=AgentNode,agentnode=" + nodeName + 
+				",category2=agentNodeBean,agentnodebean=" + beanName);
 	}
 
 	/**
@@ -212,6 +227,23 @@ public class JmxManager implements Manager {
 	}
 
 	/**
+	 * Registers an agent node bean as JMX resource.
+	 * @param agentNodeBean the agent node bean to be registered
+	 * @param agentNode the agent node which contains the agent node bean
+	 * @throws MalformedObjectNameException The name of the agent node bean or agent node contains an illegal character or does not follow the rules for quoting.
+	 * @throws NullPointerException The name of the agent node bean or agent node is unknown
+	 * @throws InstanceAlreadyExistsException The agent node bean is already under the control of the MBean server.
+	 * @throws MBeanRegistrationException The preRegister (MBeanRegistration  interface) method of the agent node bean has thrown an exception. The agent node bean will not be registered.
+	 * @throws NotCompliantMBeanException The agent node bean is not a JMX compliant MBean.
+	 * @see #getMgmtNameOfAgentNodeBean(String, String)
+	 * @see MBeanServer#registerMBean(Object, ObjectName)
+	 */
+	public void registerAgentNodeBean(IAgentNodeBean agentNodeBean, IAgentNode agentNode) throws MalformedObjectNameException, NullPointerException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
+		ObjectName name = getMgmtNameOfAgentNodeBean(agentNode.getName(), agentNodeBean.getBeanName());
+		mbs.registerMBean(agentNodeBean, name);
+	}
+
+	/**
 	 * Registers an agent node resource as JMX resource. The agent node contains only
 	 * one resource of the specified type.
 	 * @param nodeName the name of the agent node
@@ -359,6 +391,22 @@ public class JmxManager implements Manager {
 	}
 
 	/**
+	 * Unregisters an agent node bean as JMX resource.
+	 * @param agentNodeBean the agent node bean to be unregistered
+	 * @param agentNode the agent node which contains the agent node bean
+	 * @throws MalformedObjectNameException The name of the agent node bean or agent node contains an illegal character or does not follow the rules for quoting.
+	 * @throws NullPointerException The name of the agent node bean or agent node is unknown
+	 * @throws InstanceNotFoundException The agent node bean is not registered in the MBean server.
+	 * @throws MBeanRegistrationException The preDeregister ((MBeanRegistration interface) method of the agent node bean has thrown an exception.
+	 * @see #getMgmtNameOfAgentNodeBean(String, String)
+	 * @see MBeanServer#unregisterMBean(ObjectName)
+	 */
+	public void unregisterAgentNodeBean(IAgentNodeBean agentNodeBean, IAgentNode agentNode) throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanRegistrationException {
+		ObjectName name = getMgmtNameOfAgentNodeBean(agentNode.getName(), agentNodeBean.getBeanName());
+		mbs.unregisterMBean(name);
+	}
+
+	/**
 	 * Unregisters an agent node resource as JMX resource. The agent node contains only
 	 * one resource of the specified type.
 	 * @param nodeName the name of the agent node
@@ -497,6 +545,25 @@ public class JmxManager implements Manager {
 	}
 
 	/**
+	 * Gets the value of an attribute of an agent node bean.
+	 * @param nodeName the name of the agent node
+	 * @param beanName the name of the agent node bean
+	 * @param attributeName the name of the attribute
+	 * @return the value of the attribute
+	 * @throws MalformedObjectNameException The name of agent node or agent node bean contains an illegal character or does not follow the rules for quoting.
+	 * @throws NullPointerException The name of agent node or agent node bean is null.
+	 * @throws AttributeNotFoundException The attribute specified is not accessible in the agent node bean. 
+	 * @throws MBeanException Wraps an exception thrown by the agent node bean's getter. 
+	 * @throws InstanceNotFoundException The agent node bean specified is not registered in the MBean server. 
+	 * @throws ReflectionException Wraps a java.lang.Exception thrown when trying to invoke the getter of the agent node bean. 
+	 * @throws RuntimeOperationsException Wraps a java.lang.IllegalArgumentException: The name of attribute is null.
+	 */
+	public Object getAttributeOfAgentNodeBean(String nodeName, String beanName, String attributeName) throws MalformedObjectNameException, NullPointerException, AttributeNotFoundException, MBeanException, InstanceNotFoundException, ReflectionException, RuntimeOperationsException {
+		ObjectName name = getMgmtNameOfAgentNodeBean(nodeName, beanName);
+		return mbs.getAttribute(name, attributeName);
+	}
+
+	/**
 	 * Gets the value of an attribute of an agent.
 	 * @param nodeName the name of the agent node where the agent is residing on
 	 * @param agentId the unique identifier of the agent
@@ -554,6 +621,25 @@ public class JmxManager implements Manager {
 	}
 
 	/**
+	 * Sets the value of an attribute of an agent node bean.
+	 * @param nodeName the name of the agent node which contains the agent node bean
+	 * @param beanName the name of the agent node bean
+	 * @param attributeName the name of the attribute
+	 * @param attributeValue the new value of the attribute
+	 * @throws MalformedObjectNameException The name of agent node or agent node bean contains an illegal character or does not follow the rules for quoting.
+	 * @throws NullPointerException The name of agent node or agent node bean is null.
+	 * @throws AttributeNotFoundException The attribute specified is not accessible in the agent node bean. 
+	 * @throws MBeanException Wraps an exception thrown by the agent node bean's setter. 
+	 * @throws InstanceNotFoundException The agent node bean specified is not registered in the MBean server. 
+	 * @throws ReflectionException Wraps a java.lang.Exception thrown when trying to invoke the setter of the agent node bean. 
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
+	 */
+	public void setAttributeOfAgentNodeBean(String nodeName, String beanName, String attributeName, Object attributeValue) throws MalformedObjectNameException, NullPointerException, AttributeNotFoundException, MBeanException, InstanceNotFoundException, ReflectionException, InvalidAttributeValueException {
+		ObjectName name = getMgmtNameOfAgentNodeBean(nodeName, beanName);
+		mbs.setAttribute(name, new Attribute(attributeName, attributeValue));
+	}
+
+	/**
 	 * Sets the value of an attribute of an agent.
 	 * @param nodeName the name of the agent node where the agent is residing on
 	 * @param agentId the unique identifier of the agent
@@ -607,6 +693,25 @@ public class JmxManager implements Manager {
 	 */
 	public Object invokeAgentNode(String nodeName, String operationName, Object[] params, String[] signature) throws MalformedObjectNameException, NullPointerException, MBeanException, InstanceNotFoundException, ReflectionException {
 		ObjectName name = getMgmtNameOfAgentNode(nodeName);
+		return mbs.invoke(name, operationName, params, signature);
+	}
+
+	/**
+	 * Invokes an operation on an agent node bean.
+	 * @param nodeName The name of the agent node which contains the agent node bean.
+	 * @param beanName The name of the agent node bean.
+	 * @param operationName The name of the operation to be invoked.
+	 * @param params An array containing the parameters to be set when the operation is invoked.
+	 * @param signature An array containing the signature of the operation.
+	 * @return The object returned by the operation.
+	 * @throws MalformedObjectNameException The name of agent node or agent node bean contains an illegal character or does not follow the rules for quoting.
+	 * @throws NullPointerException The name of agent node or agent node bean is null.
+	 * @throws MBeanException Wraps an exception thrown by the agent node bean's invoked method. 
+	 * @throws InstanceNotFoundException The agent node bean specified is not registered in the MBean server. 
+	 * @throws ReflectionException Wraps a java.lang.Exception thrown when trying to invoke the method of the agent node bean. 
+	 */
+	public Object invokeAgentNodeBean(String nodeName, String beanName, String operationName, Object[] params, String[] signature) throws MalformedObjectNameException, NullPointerException, MBeanException, InstanceNotFoundException, ReflectionException {
+		ObjectName name = getMgmtNameOfAgentNodeBean(nodeName, beanName);
 		return mbs.invoke(name, operationName, params, signature);
 	}
 

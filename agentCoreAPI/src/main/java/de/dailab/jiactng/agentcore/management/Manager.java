@@ -6,6 +6,7 @@ import java.util.Set;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
+import de.dailab.jiactng.agentcore.IAgentNodeBean;
 
 /**
  * Interface for all managers which are able to register and deregister
@@ -24,6 +25,15 @@ public interface Manager {
 	 * @throws Exception If the parameter is incorrect.
 	 */
 	public Object getMgmtNameOfAgentNode(String nodeName) throws Exception;
+
+	/**
+	 * Constructs a unique name for the management of an agent node bean.
+	 * @param nodeName the name of the agent node which contains the agent node bean
+	 * @param beanName the name of the agent node bean
+	 * @return unique name of the agent node bean
+	 * @throws Exception If one of the parameters is incorrect.
+	 */
+	public Object getMgmtNameOfAgentNodeBean(String nodeName, String beanName) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent node resource. The
@@ -121,6 +131,14 @@ public interface Manager {
 	public void registerAgentNode(IAgentNode agentNode) throws Exception;
 
 	/**
+	 * Registers an agent node bean for management.
+	 * @param agentNodeBean the agent node bean to be registered
+	 * @param agentNode the agent node which contains the agent node bean
+	 * @throws Exception The name of the agent node bean or agent node is incorrect or the agent node bean is already registered.
+	 */
+	public void registerAgentNodeBean(IAgentNodeBean agentNodeBean, IAgentNode agentNode) throws Exception;
+
+	/**
 	 * Registers an agent node resource for management. The agent node contains only
 	 * one resource of the specified type.
 	 * @param nodeName the name of the agent node
@@ -197,6 +215,14 @@ public interface Manager {
 	public void unregisterAgentNode(IAgentNode agentNode) throws Exception;
 
 	/**
+	 * Unregisters an agent node bean from management.
+	 * @param agentNodeBean the agent node bean to be unregistered
+	 * @param agentNode the agent node which contains the agent node bean
+	 * @throws Exception The name of the agent node bean or agent node is incorrect or the agent node bean is not registered.
+	 */
+	public void unregisterAgentNodeBean(IAgentNodeBean agentNodeBean, IAgentNode agentNode) throws Exception;
+
+	/**
 	 * Unregisters an agent node resource from management. The agent node contains only
 	 * one resource of the specified type.
 	 * @param nodeName the name of the agent node
@@ -270,6 +296,16 @@ public interface Manager {
 	public Object getAttributeOfAgentNode(String nodeName, String attributeName) throws Exception;
 
 	/**
+	 * Gets the value of an attribute of an agent node bean.
+	 * @param nodeName the name of the agent node which contains the agent node bean
+	 * @param beanName the name of the agent node bean
+	 * @param attributeName the name of the attribute
+	 * @return the value of the attribute
+	 * @throws Exception If one of the parameters is incorrect.
+	 */
+	public Object getAttributeOfAgentNodeBean(String nodeName, String beanName, String attributeName) throws Exception;
+
+	/**
 	 * Gets the value of an attribute of an agent.
 	 * @param nodeName the name of the agent node where the agent is residing on
 	 * @param agentId the unique identifier of the agent
@@ -298,6 +334,16 @@ public interface Manager {
 	 * @throws Exception If one of the parameter is incorrect.
 	 */
 	public void setAttributeOfAgentNode(String nodeName, String attributeName, Object attributeValue) throws Exception;
+
+	/**
+	 * Sets the value of an attribute of an agent node bean.
+	 * @param nodeName the name of the agent node which contains the agent node bean
+	 * @param beanName the name of the agent node bean
+	 * @param attributeName the name of the attribute
+	 * @param attributeValue the new value of the attribute
+	 * @throws Exception If one of the parameters is incorrect.
+	 */
+	public void setAttributeOfAgentNodeBean(String nodeName, String beanName, String attributeName, Object attributeValue) throws Exception;
 
 	/**
 	 * Sets the value of an attribute of an agent.
@@ -330,6 +376,18 @@ public interface Manager {
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
 	public Object invokeAgentNode(String nodeName, String operationName, Object[] params, String[] signature) throws Exception;
+
+	/**
+	 * Invokes an operation on an agent node bean.
+	 * @param nodeName The name of the agent node which contains the agent node bean.
+	 * @param beanName The name of the agent node bean.
+	 * @param operationName The name of the operation to be invoked.
+	 * @param params An array containing the parameters to be set when the operation is invoked.
+	 * @param signature An array containing the signature of the operation.
+	 * @return The object returned by the operation.
+	 * @throws Exception If one of the parameters is incorrect.
+	 */
+	public Object invokeAgentNodeBean(String nodeName, String beanName, String operationName, Object[] params, String[] signature) throws Exception;
 
 	/**
 	 * Invokes an operation on an agent.

@@ -45,11 +45,11 @@
 		class="de.dailab.ccact.tools.agentunit.TestMethodExposingBean"
 		singleton="false">
 		<property name="logLevel" value="WARN" />
-		<property name="registeredActions">
+		<!-- property name="registeredActions">
 			<set>
 				<value>testAction</value>
 			</set>
-		</property>
+		</property-->
 	</bean>
 
 	<bean name="iDirectory"

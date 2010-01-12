@@ -84,7 +84,7 @@ public class ActionResult extends SessionEvent {
 		if (_results != null) {
 			return Arrays.copyOf(_results, _results.length);
 		}
-		return null;
+		return _results;
 	}
 
 	/**

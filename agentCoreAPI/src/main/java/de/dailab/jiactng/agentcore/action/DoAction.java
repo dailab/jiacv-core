@@ -102,10 +102,7 @@ public class DoAction extends SessionEvent {
 	 * @return an array containing the parameters for the action-call.
 	 */
 	public Serializable[] getParams() {
-		if (params != null) {
-			return Arrays.copyOf(params, params.length);
-		}
-		return null;
+		return Arrays.copyOf(params, params.length);
 	}
 
 	/**

@@ -184,7 +184,7 @@ public class ActionPerformedNotification extends Notification {
 		if (_actionResult != null) {
 			return Arrays.copyOf(_actionResult, _actionResult.length);
 		}
-		return null;
+		return _actionResult;
 	}
 
 	/**

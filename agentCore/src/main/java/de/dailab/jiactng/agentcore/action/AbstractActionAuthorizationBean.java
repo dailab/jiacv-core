@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
-import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
@@ -45,7 +44,7 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
          if ((foundActs != null) && (foundActs.size() >= 1)) {
             authorizationAction = (Action) foundActs.get(0);
          } else {
-            invokeActionSearch(new Action(authorizationActionName), false, 0, this);
+            log.error("Authorization action not found: " + authorizationActionName);
          }
       }
    }
@@ -82,11 +81,13 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
 
       if ((thisAgent != null) && (LifecycleStates.STARTED.equals(thisAgent.getState()))) {
          List<IActionDescription> foundActs = thisAgent.searchAllActions(new Action(authorizationActionName));
-         log.error("FOUND: " + foundActs);
+         if (log.isDebugEnabled()) {
+        	 log.debug("FOUND: " + foundActs);
+         }
          if ((foundActs != null) && (foundActs.size() >= 1)) {
             authorizationAction = (Action) foundActs.get(0);
          } else {
-            invokeActionSearch(new Action(authorizationActionName), false, 0, this);
+             log.error("Authorization action not found: " + authorizationActionName);
          }
       }
       // Notify attribute change listeners
@@ -106,29 +107,6 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
     * {@inheritDoc}
     */
    public void receiveResult(ActionResult result) {
-      // handle result of search for authorization action
-      if (result.getAction().getName().equals(DirectoryAccessBean.ACTION_REQUEST_SEARCH)) {
-         Serializable[] results = result.getResults();
-         if (results != null) {
-            if (results.length == 1) {
-               try {
-                  List<Action> actions = (List<Action>) results[0];
-                  if (actions.isEmpty()) {
-                     log.warn("Found no action");
-                  } else if (actions.get(0).getName().equals(authorizationActionName)) {
-                     authorizationAction = actions.get(0);
-                  }
-               } catch (ClassCastException e) {
-                  log.error("Got wrong type of search results");
-               }
-            } else {
-               log.error("Got wrong number of search results");
-            }
-         } else {
-            log.error("Search for action failed");
-         }
-      }
-
       // handle result of authorization
       DoAction doAction = _doActionAuthorizations.remove(result.getSessionId());
       if (doAction != null) {

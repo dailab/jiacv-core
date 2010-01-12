@@ -7,8 +7,6 @@
 package de.dailab.jiactng.agentcore;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
@@ -20,13 +18,11 @@ import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.ActionResultListener;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
-import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
-import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
@@ -47,8 +43,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * than 0.
    */
   private long                      nextExecutionTime = 0;
-
-  private HashMap<String, Serializable[]> searchToInvokeMap = new HashMap<String, Serializable[]>();
 
   /**
    * Creates an agent bean that uses lifecycle support in loose mode
@@ -422,181 +416,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
     return retAct;
   }
 
-  /**
-   * Invokes an action for the search of actions in the service directory.
-   * 
-   * @param template
-   *          The template for searching actions.
-   * @param isGlobal
-   *          <code>true</code> for a global search and <code>false</code> for an agent node internal search.
-   * @param timeout
-   *          The maximum duration of the global search. This value will be ignored by local search.
-   * @param receiver
-   *          the receiver to be informed about the found actions.
-   * @return the session id of the action invocation.
-   * @throws RuntimeException
-   *           if the agent has no directory access bean.
-   */
-  protected String invokeActionSearch(Action template, boolean isGlobal, long timeout, ResultReceiver receiver) {
-    Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
-    if (requestSearchAction == null) {
-      throw new RuntimeException("DirectoryAccessBean not available");
-    }
-    
-    if(timeout<=0) {
-      Serializable[] params = { template, Boolean.valueOf(isGlobal)};
-      return invoke(requestSearchAction, params, receiver);
-    } else {
-      Serializable[] params = { template, Boolean.valueOf(isGlobal), Long.valueOf(timeout) };
-      return invoke(requestSearchAction, params, receiver);
-    }
-  }
-
-  /**
-   * Gets from the service directory a list of actions which match the given template. NOTE: This method MUST NOT be
-   * used with a blocking execution cycle (e.g. SimpleExecutionCycle).
-   * 
-   * @param template
-   *          The template for matching actions.
-   * @param isGlobal
-   *          <code>true</code> for a global search and <code>false</code> for an agent node internal search.
-   * @param timeout
-   *          The maximum duration of the global search. This value will be ignored by local search.
-   * @throws RuntimeException
-   *           if the search failed or was not possible.
-   * @return The list of found actions.
-   */
-  protected List<Action> retrieveActionsFromDirectory(Action template, boolean isGlobal, long timeout) {
-    // get search action
-    Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
-    if (requestSearchAction == null) {
-      throw new RuntimeException("DirectoryAccessBean not available");
-    }
-
-    // invoke search action
-    Serializable[] params = { template, Boolean.valueOf(isGlobal), Long.valueOf(timeout) };
-    ActionResult result = invokeAndWaitForResult(requestSearchAction, params);
-    if (result == null) {
-      throw new RuntimeException("Got no result");
-    }
-
-    // get result
-    Serializable[] results = result.getResults();
-    if (results != null) {
-      if (results.length == 1) {
-        try {
-          return (List<Action>) results[0];
-        } catch (ClassCastException e) {
-          throw new RuntimeException("Got wrong type of results");
-        }
-      } else {
-        throw new RuntimeException("Got wrong number of results");
-      }
-    }
-
-    // search failed
-    Serializable failure = result.getFailure();
-    if (failure != null) {
-      if (failure instanceof Throwable) {
-        throw new RuntimeException((Throwable) failure);
-      } else if (failure instanceof String) {
-        throw new RuntimeException((String) failure);
-      } else {
-        throw new RuntimeException("Search for actions failed");
-      }
-    }
-
-    throw new RuntimeException("Got neigther results nor failure");
-  }
-
-  protected String invokeRemote(Action template, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
-    return invokeRemote(template, parent, inputParams, receiver, true);
-  }
-  
-  protected String invokeRemote(Action template, Session parent, Serializable[] inputParams, ResultReceiver receiver, boolean caching) {
-    if (parent == null) {
-      parent = new Session(receiver);
-    }
-
-    Action a = memory.read(template);
-    if (a != null) {
-      if(log.isInfoEnabled()) {
-        log.info("Found action locally - invoking... "+a);
-      }
-      return invoke(a, parent, inputParams, receiver);
-    } else {
-      if(log.isInfoEnabled()) {
-        log.info("Initiating search for action... "+template);
-      }
-      
-      List<IActionDescription> foundActs = thisAgent.searchAllActions(template);
-      if((foundActs!=null) && (foundActs.size()>0)) {
-        log.info("Found action with new Search, invoking... "+(Action)foundActs.get(0));
-        return invoke((Action)foundActs.get(0), parent, inputParams, receiver);
-      }
-
-      DoAction doAct = new DoAction(parent, template, receiver, inputParams);
-      Action requestSearchAction = memory.read(new Action(DirectoryAccessBean.ACTION_REQUEST_SEARCH));
-      if (requestSearchAction == null) {
-        log.error("DirectoryAccessBean not available");
-        throw new RuntimeException("DirectoryAccessBean not available");
-      }
-      Serializable[] params = { template, Boolean.valueOf(false), Long.valueOf(100)};
-
-      DoAction readAction = requestSearchAction.createDoAction(params, new SearchResultHandler());
-      searchToInvokeMap.put(readAction.getSessionId(), new Serializable[] {doAct,caching});
-      memory.write(readAction);
-
-      return parent.getSessionId();
-    }
-  }
-
-  private class SearchResultHandler implements ResultReceiver {
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.dailab.jiactng.agentcore.environment.ResultReceiver#receiveResult(de.dailab.jiactng.agentcore.action.ActionResult)
-     */
-    @Override
-    public void receiveResult(ActionResult result) {
-      String readSession = result.getSessionId();
-      Serializable[] s = searchToInvokeMap.get(readSession);
-       
-      if ((s != null) && (result.getFailure() == null)) {
-        DoAction doAct = (DoAction)s[0];
-        boolean caching = (Boolean)s[1];
-        Serializable[] res = result.getResults();
-        List<Action> actList = (List<Action>) res[0];
-        if(caching) {
-          for (Action a : actList) {
-            memory.write(a);
-          }
-        }
-        if (actList.size() > 0) {
-          Action myAct = actList.get(0);
-          if(log.isInfoEnabled()) {
-            log.info("Search successful! Invoking: "+myAct);
-          }
-          doAct.setAction(myAct);
-          memory.write(doAct);
-        } else {
-          log.warn("No Actions found for: " + doAct.getAction());
-          returnFailure(doAct, "Could not find Action: " + doAct.getAction());
-        }
-      } else if ((s != null) && (result.getFailure() != null)) {
-        log.info("Search failed: "+result.getFailure());
-        DoAction doAct = (DoAction)s[0];
-        returnFailure(doAct, result.getFailure());
-      } else if(s == null){
-        log.error("Received result without pending doAct: "+result);
-      } else {
-        log.error("SHOULD NOT HAPPEN!!!");
-      }
-    }
-
-  }
-  
   /**
 	 * Sends an attribute change notification to JMX listeners.
 	 * @param attributeName Attribute Name

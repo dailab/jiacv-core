@@ -109,7 +109,6 @@
 		<property name="agentNodeBeans">
 			<list>
 				<ref bean="StandardJMSBroker"/>
-				<ref bean="DirectoryAgentNodeBean"/>
 				<ref bean="IDirectory"/>
 			</list>
 		</property>
@@ -125,18 +124,12 @@
    </bean>
 
 	<!-- 
-		##############################################################################################
-		# Bean providing white pages directory functionality for agents with the DirectoryAccessBean #
-		##############################################################################################
+		##################################################################
+		# Bean providing yellow and white pages functionality for agents #
+		##################################################################
 	 -->
 
-	 <bean name="DirectoryAgentNodeBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean" singleton="false"> 
-		<property name="messageTransport">
-			<ref bean="StandardJMSMessageTransport" />
-		</property>
-	</bean>
-
-	 <bean name="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" singleton="false"> 
+	<bean name="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" singleton="false"> 
 		<property name="messageTransport">
 			<ref bean="StandardJMSMessageTransport" />
 		</property>

@@ -21,18 +21,12 @@
     <property name="agentBeans">
       <list>
         <ref bean="CommunicationBean" />
-        <ref bean="DirectoryAccessBean" />
         <ref bean="TestBean"/>
       </list>
     </property>
   </bean>
 
   <bean name="TestBean" class="de.dailab.jiactng.agentcore.execution.TestBean" singleton="false">
-    <property name="registeredActions">
-        <set>
-            <value>test</value>
-        </set>
-    </property>
   </bean>
 
 </beans>

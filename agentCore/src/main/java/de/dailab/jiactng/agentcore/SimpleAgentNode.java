@@ -31,8 +31,8 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
-import de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBean;
 import de.dailab.jiactng.agentcore.conf.GenericAgentProperties;
+import de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -79,9 +79,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Configuration of a set of JMX connector server. */
 	private Set<Map<String, Object>> _jmxConnectors = null;
 
-	/** Optional: DirectoryAgentNodeBean to add local Agents to */
-	private DirectoryAgentNodeBean _directory = null;
-	
 	/** Optional: IDirectory that manages white and yellow pages.*/
 	private IDirectory directory = null;
 
@@ -153,9 +150,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			if (agent.getOwner() == null) {
 				agent.setOwner(owner);
 			}
-			if (_directory != null){
-				agent.addLifecycleListener(_directory);
-			}
 			if (directory != null) {
 				agent.addLifecycleListener(directory);
 			}
@@ -217,11 +211,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			_agents.add(agent);
 		}
 		agent.addLifecycleListener(this.lifecycle.createLifecycleListener());
-		
 
-		if (_directory != null){
-			agent.addLifecycleListener(_directory);
-		}
 		if (directory != null) {
 			agent.addLifecycleListener(directory);
 			((Agent)agent).setDirectory(directory);
@@ -554,18 +544,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					log.error("Failure when initializing agentnodebean: "+anb.getBeanName(),lce);
 				}
 				
-				if (_directory == null){
-					
-					// Check if White Pages bean is present
-					for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
-						if (agentNodeBean instanceof DirectoryAgentNodeBean) {
-							// directory is present so add agentdescription to it.
-							_directory = (DirectoryAgentNodeBean) agentNodeBean;
-							break;// we found what we were looking for so we can stop searching
-						}
-					}
-				}
-				
 				if (directory == null) {
 					for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
 						if (agentNodeBean instanceof IDirectory) {
@@ -580,9 +558,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// call init and set references for all agents if any
 		for (IAgent a : _agents) {
 				
-			if (_directory != null){
-				a.addLifecycleListener(_directory);
-			}
 			if (directory != null) {
 				a.addLifecycleListener(directory);
 				if (a instanceof Agent) {
@@ -816,15 +791,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 	public String getDirectoryName() {
-		if (_directory == null) {
-			return null;
+		if (directory != null && directory instanceof AbstractAgentNodeBean) {
+			return ((AbstractAgentNodeBean)directory).getBeanName();
 		}
-		return _directory.getBeanName();
-//TODO umstellen auf IDirectory
-//		if (directory == null) {
-//			return null;
-//		}
-//		return directory.getBeanName();
+		return null;
 	}
 
 	/**

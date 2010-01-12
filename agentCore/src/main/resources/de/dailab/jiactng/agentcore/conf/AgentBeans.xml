@@ -51,14 +51,5 @@
 	</bean>
 	
 	
-	<!-- 
-		######################################################################
-		# The Bean for accessing the white pages directory provided by the	 #
-		#              DirectoryAgentNodeBean within the agentnode			 #	
-		######################################################################
-
- 	-->
-	
-	<bean name="DirectoryAccessBean" class="de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean" singleton="false"/> 
 </beans>
 

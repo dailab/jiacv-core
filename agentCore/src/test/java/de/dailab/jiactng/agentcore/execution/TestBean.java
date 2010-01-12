@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * This bean tests the synchronously invocation of actions from an execution cycle.
@@ -28,12 +29,12 @@ public class TestBean extends AbstractMethodExposingBean {
 	/**
 	 * This test action retrieves synchronously test action descriptions from the directory.
 	 * @return The list of found test actions registered in the directory.
-	 * @see de.dailab.jiactng.agentcore.AbstractAgentBean#retrieveActionsFromDirectory(Action,boolean,long)
+	 * @see de.dailab.jiactng.agentcore.IAgent#searchAllActions(IActionDescription)
 	 */
 	@Expose(name = "test")
-	public List<Action> test() {
+	public List<IActionDescription> test() {
 		try {
-			return retrieveActionsFromDirectory(new Action("test"), false, 10000);
+			return thisAgent.searchAllActions(new Action("test"));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

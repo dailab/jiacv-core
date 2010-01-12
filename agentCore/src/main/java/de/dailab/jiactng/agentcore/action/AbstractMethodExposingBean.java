@@ -27,8 +27,6 @@ import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
-import de.dailab.jiactng.agentcore.comm.wp.DirectoryAccessBean;
-import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * An abstract Bean which exposes accessible methods which are marked with the
@@ -158,45 +156,18 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
     private static final Class<?>[] EMPTY_CLASSES= new Class[0];
     protected static final char METHOD_SEPARATING_CHAR= '#';
 
-    private Set<String> _registeredActions = Collections.emptySet();
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void doStart() throws Exception {
-		super.doStart();
-
-		// register actions in directory
-		Action registerActionAction = memory.read(new Action(DirectoryAccessBean.ACTION_ADD_ACTION_TO_DIRECTORY));
-		if (registerActionAction != null) {
-			IAgentDescription agentDescription= thisAgent.getAgentDescription();
-			for (Action act : getActions()) {
-				if (_registeredActions.contains(act.getName())) {
-					act.setProviderDescription(agentDescription);
-					Serializable[] params = {act};
-					DoAction action = registerActionAction.createDoAction(params, null);
-					memory.write(action);
-				}
-			}
-		}
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public void setRegisteredActions(Set<String> actions) {
-		_registeredActions = actions;
-	}
-
-    public final void doAction(DoAction doAction) throws Exception {
-log.debug("typechecking is '" + doAction.typeCheck() + "'");
+	public final void doAction(DoAction doAction) throws Exception {
+    	if (log.isDebugEnabled()) {
+    		log.debug("typechecking is '" + doAction.typeCheck() + "'");
+    	}
         
         Action action= (Action)doAction.getAction();
         Method method= searchMethod(action.getName(), action.getInputTypes());
         if(method != null) {
             Serializable result= (Serializable)method.invoke(this, (Object[]) doAction.getParams());
-            log.debug("action processed and about to write result...");
+        	if (log.isDebugEnabled()) {
+        		log.debug("action processed and about to write result...");
+        	}
             if(method.getReturnType() != void.class) {
                 memory.write(action.createActionResult(doAction, new Serializable[] { result }));
             } else {

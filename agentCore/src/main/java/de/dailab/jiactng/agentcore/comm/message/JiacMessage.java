@@ -242,7 +242,12 @@ public final class JiacMessage implements IJiacMessage {
       }
 
       // create and return open type of a JIAC message
-      return new CompositeType(this.getClass().getName(), "standard JIAC-TNG message", itemNames.toArray(new String[0]), itemDescriptions.toArray(new String[0]), itemTypesArray);
+      return new CompositeType(
+    		  this.getClass().getName(), 
+    		  "standard JIAC-TNG message", 
+    		  itemNames.toArray(new String[itemNames.size()]), 
+    		  itemDescriptions.toArray(new String[itemDescriptions.size()]), 
+    		  itemTypesArray);
    }
 
    /**

@@ -247,7 +247,6 @@ class JMSReceiver implements MessageListener {
                 log.error("Listener will be destroyed");
             }
             destroyConsumer(consumer);
-            consumer = null;
             throw e;
         }
         return consumer;

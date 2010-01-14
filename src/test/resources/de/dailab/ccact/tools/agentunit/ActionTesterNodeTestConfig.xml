@@ -5,7 +5,7 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
 
-	<bean name="ActionTesterNodeTestPlatform" parent="Platform">
+	<bean name="ActionTesterNodeTestNode" parent="Node">
 
 		<property name="agents">
 			<list>

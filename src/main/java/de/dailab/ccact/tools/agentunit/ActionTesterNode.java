@@ -164,7 +164,7 @@ public class ActionTesterNode {
 			agentNode.shutdown();
 		}
 		catch (LifecycleException e) {
-			log.error("exception shutting down platform", e);
+			log.error("exception shutting down Node.", e);
 		}
 
 		context.stop();

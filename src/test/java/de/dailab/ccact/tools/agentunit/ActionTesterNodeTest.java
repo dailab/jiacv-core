@@ -15,7 +15,7 @@ public class ActionTesterNodeTest {
 	static final String ACTIONTESTERNODECONFIG = "de/dailab/ccact/tools/agentunit/ActionTesterNodeTestConfig.xml";
 	
 	// vars
-	static ActionTesterNode atn = new ActionTesterNode(ACTIONTESTERNODECONFIG, "ActionTesterNodeTestPlatform");
+	static ActionTesterNode atn = new ActionTesterNode(ACTIONTESTERNODECONFIG, "ActionTesterNodeTestNode");
 	
 	/**
 	 * Checks wether or not the <code>testAction</code> Action is available through the <code>invoke</code> method

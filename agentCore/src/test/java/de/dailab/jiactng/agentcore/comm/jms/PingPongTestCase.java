@@ -30,7 +30,7 @@ public class PingPongTestCase extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/jms/agentTests.xml");
-        _node = (IAgentNode) newContext.getBean("PingPongPlatform");
+        _node = (IAgentNode) newContext.getBean("PingPongNode");
         
         IGroupAddress address= CommunicationAddressFactory.createGroupAddress(DUMMY_ADDRESS);
         for(IAgent agent : _node.findAgents()) {

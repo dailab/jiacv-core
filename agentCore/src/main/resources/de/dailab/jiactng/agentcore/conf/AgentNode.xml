@@ -16,7 +16,7 @@
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
    -->
-   <bean name="PlatformWithJMX" parent="PlatformWithDirectory" abstract="true">
+   <bean name="NodeWithJMX" parent="NodeWithDirectory" abstract="true">
       <property name="jmxConnectors">
          <set>
             <map>
@@ -38,7 +38,7 @@
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
    -->
-   <bean name="PlatformWithSecuredJMX" parent="PlatformWithDirectory" abstract="true">
+   <bean name="NodeWithSecuredJMX" parent="NodeWithDirectory" abstract="true">
       <property name="jmxConnectors">
          <set>
             <map>
@@ -88,7 +88,7 @@
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
    -->
-   <bean name="PlatformWithRegistry" parent="PlatformWithDirectory" abstract="true">
+   <bean name="NodeWithRegistry" parent="NodeWithDirectory" abstract="true">
       <property name="jmxConnectors">
          <set>
             <map>
@@ -105,7 +105,7 @@
       # the platform bean may be set as parent in any other platfom definitions 
       
    -->
-   <bean name="PlatformWithDirectory" parent="Platform" abstract="true">
+   <bean name="NodeWithDirectory" parent="Node" abstract="true">
 		<property name="agentNodeBeans">
 			<list>
 				<ref bean="StandardJMSBroker"/>
@@ -120,7 +120,7 @@
       # the platform bean may be set as parent in any other platfom definitions 
       
    -->
-   <bean name="Platform" class="de.dailab.jiactng.agentcore.SimpleAgentNode" abstract="true">
+   <bean name="Node" class="de.dailab.jiactng.agentcore.SimpleAgentNode" abstract="true">
    </bean>
 
 	<!-- 

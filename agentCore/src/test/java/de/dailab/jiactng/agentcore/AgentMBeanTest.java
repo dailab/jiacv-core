@@ -29,7 +29,7 @@ import junit.framework.TestCase;
  */
 public class AgentMBeanTest extends TestCase implements NotificationListener {
 
-	private final String nodeName = "myPlatform";
+	private final String nodeName = "myNode";
 	private final String agentName = "TestAgent";
 	private ObjectName node = null;
 	private ObjectName agent = null;
@@ -45,7 +45,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 
 	/**
 	 * Sets up the test environment. It enables the JMX interface, registers as listener
-	 * for agent's (de)registration, starts the application (platform "myPlatform" with 
+	 * for agent's (de)registration, starts the application (platform "myNode" with 
 	 * one agent "TestAgent") defined in "agentTests.xml" and registers as listener for
 	 * changes of the agent's lifecycle state and agent node's agent list.
 	 */

@@ -7,7 +7,7 @@
 <beans>
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 
-	<bean name="SingleBrokerPlatform" parent="Platform">
+	<bean name="SingleBrokerNode" parent="Node">
 		<property name="agentNodeBeans">
 			<list>
 				<ref bean="StandardJMSBroker"/>

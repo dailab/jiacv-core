@@ -8,7 +8,7 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/>
 <!--	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />-->
 
-	<bean name="PerformanceTestNode" parent="Platform">
+	<bean name="PerformanceTestNode" parent="Node">
 <!--		<property name="agentNodeBeans">-->
 <!--			<list>-->
 <!--				<ref bean="StandardJMSBroker"/>-->

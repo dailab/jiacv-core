@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationListener {
 
-	private final String nodeName = "myPlatform";
+	private final String nodeName = "myNode";
 	private final String agentName = "TestAgent";
 	private final String newAgentName = "NewAgent";
 	private MBeanServer mbs = null;
@@ -41,7 +41,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 
 	/**
 	 * Sets up the test environment. It enables the JMX interface, registers as listener
-	 * for agent node's (de)registration, starts the application (agent node "myPlatform" 
+	 * for agent node's (de)registration, starts the application (agent node "myNode" 
 	 * with one agent "TestAgent") defined in "agentTests.xml" and registers as listener 
 	 * for changes of the agent node's lifecycle state.
 	 */
@@ -128,7 +128,7 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 */
 	
 	/**
-	 * Tests if you get the name "myPlatform" of the agent node by using the JMX interface.
+	 * Tests if you get the name "myNode" of the agent node by using the JMX interface.
 	 */
 	public void testGetName() {
 		String name = "";

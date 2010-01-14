@@ -10,7 +10,7 @@ public class LoggingTest extends TestCase {
 		"de/dailab/jiactng/agentcore/loggingTest.xml");
 		
 		// shutdown agent node
-		SimpleAgentNode nodeRef = (SimpleAgentNode) context.getBean("myPlatform");
+		SimpleAgentNode nodeRef = (SimpleAgentNode) context.getBean("myNode");
 		try {
 			nodeRef.shutdown();
 		} catch (Exception e) {

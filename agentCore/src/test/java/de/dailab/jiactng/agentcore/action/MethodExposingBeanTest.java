@@ -27,7 +27,7 @@ public class MethodExposingBeanTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/action/agentTests.xml");
-        _node = (IAgentNode) newContext.getBean("myPlatform");
+        _node = (IAgentNode) newContext.getBean("myNode");
         _agent = _node.findAgents().get(0);
         _testBean = (ExampleExposingBean)_agent.getAgentBeans().get(0);
     }

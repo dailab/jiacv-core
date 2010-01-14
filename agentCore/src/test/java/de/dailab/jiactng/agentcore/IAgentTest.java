@@ -25,7 +25,7 @@ public class IAgentTest extends TestCase {
     super.setUp();
     ClassPathXmlApplicationContext newContext = new ClassPathXmlApplicationContext(
         "de/dailab/jiactng/agentcore/agentTests.xml");
-    node = (IAgentNode) newContext.getBean("myPlatform");
+    node = (IAgentNode) newContext.getBean("myNode");
     agent = node.findAgents().get(0);
     bean = agent.getAgentBeans().get(0);
   }

@@ -14,7 +14,7 @@ public class GenericAgentPropertiesInjection extends TestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 		newContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/conf/genericAgentPropertiesTest.xml");
-		node = (IAgentNode) newContext.getBean("myPlatform");
+		node = (IAgentNode) newContext.getBean("myNode");
 	}
 
 	@Override

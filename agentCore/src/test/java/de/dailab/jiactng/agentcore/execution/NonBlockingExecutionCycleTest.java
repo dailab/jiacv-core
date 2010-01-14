@@ -15,13 +15,13 @@ import junit.framework.TestCase;
  */
 public class NonBlockingExecutionCycleTest extends TestCase {
 
-	private final String nodeName = "myPlatform";
+	private final String nodeName = "myNode";
 	private ClassPathXmlApplicationContext context = null;
 	private SimpleAgentNode nodeRef = null;
 	private TestBean beanRef = null;
 
 	/**
-	 * Sets up the test environment. It starts the application (agent node "myPlatform" 
+	 * Sets up the test environment. It starts the application (agent node "myNode" 
 	 * with one agent "TestAgent") defined in "test.xml".
 	 * @see ClassPathXmlApplicationContext#ClassPathXmlApplicationContext(String)
 	 */

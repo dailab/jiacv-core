@@ -16,6 +16,6 @@
 		# An Empty Platform with JMX #
 		##############################
 	-->
-	<bean name="myPlatformWithJMX" parent="PlatformWithJMX"></bean>
+	<bean name="myNodeWithJMX" parent="NodeWithJMX"></bean>
 </beans>
 

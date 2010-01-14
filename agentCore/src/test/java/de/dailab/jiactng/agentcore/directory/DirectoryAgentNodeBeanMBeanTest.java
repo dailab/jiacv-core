@@ -16,7 +16,7 @@ import junit.framework.TestCase;
  */
 public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 
-	private final String nodeName = "myPlatform";
+	private final String nodeName = "myNode";
 	private final String beanName = "IDirectory";
 	private ClassPathXmlApplicationContext context = null;
 	private SimpleAgentNode nodeRef = null;
@@ -24,7 +24,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 
 	/**
 	 * Sets up the test environment. It enables the JMX interface and starts the application 
-	 * (platform "myPlatform" with one agent "TestAgent") defined in "agentTests.xml".
+	 * (platform "myNode" with one agent "TestAgent") defined in "agentTests.xml".
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();

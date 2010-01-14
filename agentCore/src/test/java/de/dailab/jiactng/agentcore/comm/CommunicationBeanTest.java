@@ -58,7 +58,7 @@ public class CommunicationBeanTest extends TestCase {
 			
 			// agentplatformcreation
 			ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/comm/communicationTestContext.xml");
-			_communicationPlatform = (IAgentNode) xmlContext.getBean("CommunicationPlatform");
+			_communicationPlatform = (IAgentNode) xmlContext.getBean("CommunicationNode");
 			
 			// get a list of all agents on the platform. There should be exactly one...
 			List<IAgent> beanlist = _communicationPlatform.findAgents(); 

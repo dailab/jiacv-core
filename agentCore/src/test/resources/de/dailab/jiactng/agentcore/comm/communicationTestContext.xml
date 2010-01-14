@@ -9,7 +9,7 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/>
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
 
-	<bean name="CommunicationPlatform" parent="Platform">
+	<bean name="CommunicationNode" parent="Node">
 		<property name="loggingConfig" value="classpath:de/dailab/jiactng/agentcore/comm/communicationTestLog4j.properties"/>
 		<property name="agentNodeBeans">
 			<list>

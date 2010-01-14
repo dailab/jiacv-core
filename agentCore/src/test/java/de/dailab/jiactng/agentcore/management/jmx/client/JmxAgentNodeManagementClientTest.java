@@ -26,7 +26,7 @@ import junit.framework.TestCase;
  */
 public class JmxAgentNodeManagementClientTest extends TestCase implements NotificationListener {
 
-	private final String nodeName = "myPlatform";
+	private final String nodeName = "myNode";
 	private final String agentName = "TestAgent";
 	private final String newAgentName = "NewAgent";
 	private ClassPathXmlApplicationContext context = null;
@@ -38,7 +38,7 @@ public class JmxAgentNodeManagementClientTest extends TestCase implements Notifi
 	private String agentId = null;
 
 	/**
-	 * Sets up the test environment. It starts the application (agent node "myPlatform" 
+	 * Sets up the test environment. It starts the application (agent node "myNode" 
 	 * with one agent "TestAgent") defined in "agentTests.xml" and registers as listener 
 	 * for changes of the agent node's lifecycle state by using the management client.
 	 * @see ClassPathXmlApplicationContext#ClassPathXmlApplicationContext(String)

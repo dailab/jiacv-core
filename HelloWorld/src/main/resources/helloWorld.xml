@@ -9,7 +9,7 @@
   <import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
   <import resource="classpath:agent.xml" />
 
-  <bean name="myPlatform" parent="PlatformWithJMX">
+  <bean name="HelloWorldNode" parent="NodeWithJMX">
       <!--property name="jmxConnectors">
          <set>
             <map>

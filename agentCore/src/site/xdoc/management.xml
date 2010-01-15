@@ -69,9 +69,9 @@
     // create agents
     JMXServiceURL url = JmxManagementClient.getURLsFromMulticast().get(0);
     JmxManagementClient client = new JmxManagementClient(url, username, password);
-    Set&lt;String&gt; nodeNames = client.getAgentNodeNames();
-    String nodeName = nodeNames.toArray(new String[nodeNames.size()])[0];
-    JmxAgentNodeManagementClient nodeClient = client.getAgentNodeManagementClient(nodeName);
+    Set&lt;String&gt; nodeIDs = client.getAgentNodeUUIDs();
+    String nodeID = nodeIDs.toArray(new String[nodeIDs.size()])[0];
+    JmxAgentNodeManagementClient nodeClient = client.getAgentNodeManagementClient(nodeID);
     List&lt;String&gt; newAgentIds = nodeClient.addAgents(configuration, libraries, owner);
 }
 catch (FileNotFoundException e) {
@@ -103,9 +103,9 @@ System.setProperty("jmx.invoke.getters", "");
 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 JmxManager manager = new JmxManager();
 try {
-    ObjectName node = manager.getMgmtNameOfAgentNode("<i>myAgentNodeName</i>");
-    ObjectName agent = manager.getMgmtNameOfAgent("<i>myAgentNodeName</i>", "<i>myAgentId</i>");
-    ObjectName bean = manager.getMgmtNameOfAgentBean("<i>myAgentNodeName</i>", "<i>myAgentId</i>", "<i>myAgentBeanName</i>");
+    ObjectName node = manager.getMgmtNameOfAgentNode("<i>myAgentNodeId</i>");
+    ObjectName agent = manager.getMgmtNameOfAgent("<i>myAgentNodeId</i>", "<i>myAgentId</i>");
+    ObjectName bean = manager.getMgmtNameOfAgentBean("<i>myAgentNodeId</i>", "<i>myAgentId</i>", "<i>myAgentBeanName</i>");
 } catch (Exception e) {
     System.err.println("Wrong parameter format for construction of the object name of resources");
 }</source>

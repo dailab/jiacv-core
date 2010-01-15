@@ -278,8 +278,9 @@
         <faq id="management-tools">
             <question>Which management tools are available?</question>
             <answer><p>
-                With the user-friendly <a href="../tools/nodemonitor/index.html">agent node monitor</a> only an 
-                incomplete graphical management tool for JIAC TNG applications exists, but you can use the generic 
+                With the user-friendly <a href="../tools/nodemonitor/index.html">agent node monitor</a> or
+                <a href="../tools/asgardviewer/index.html">ASGARD</a> only 
+                incomplete graphical management tools for JIAC TNG applications exists, but you can use the generic 
                 JMX clients <a href="http://java.sun.com/j2se/1.5.0/docs/guide/management/jconsole.html">"jConsole"</a> 
                 or <a href="http://www.jmanage.org/">"jManage"</a> to completely manage a JIAC TNG application. 
                 The first one is a desktop application of JDK1.5+ (Java Development Kit, version 1.5 or higher) 

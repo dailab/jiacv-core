@@ -355,10 +355,24 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
 	 * @throws SecurityException if the agent node's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#getUUID()
+	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#getName()
 	 */
 	public String getAgentNodeName() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("Name");
+	}
+
+	/**
+	 * Changes the name of the managed agent node.
+	 * @param name The agent node's new name.
+	 * @throws InstanceNotFoundException The agent node does not exist. 
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
+	 * @throws SecurityException if the agent node's attribute cannot be changed for security reasons.
+	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
+	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#setName(String)
+	 */
+	public void setAgentNodeName(String name) throws IOException, InvalidAttributeValueException, InstanceNotFoundException {
+		setAttribute("Name", name);
 	}
 
 	/**

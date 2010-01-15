@@ -21,6 +21,12 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	public String getName();
 
 	/**
+	 * Setter for attribute "Name" of the managed agent node.
+	 * @param name the new name of this agent node
+	 */
+	public void setName(String name);
+
+	/**
 	 * Getter for attribute "UUID" of the managed agent node.
 	 * @return the UUID of this agent node
 	 */

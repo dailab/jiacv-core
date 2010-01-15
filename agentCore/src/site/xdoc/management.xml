@@ -236,10 +236,10 @@ catch (IOException) {
 }</source>
 	       Condition for the remote management is that the agent node has created
 	       at least one JMX connector server. You can achieve this for example by 
-	       using "PlatformWithJMX" or "PlatformWithRegistry" instead of "Platform" 
+	       using "NodeWithJMX" or "NodeWithRegistry" instead of "Node" 
 	       as parent of agent node's spring configuration.
 	       <source>
-&lt;bean name="<i>myPlatform</i>" parent="PlatformWithJMX"&gt;
+&lt;bean name="<i>myAgentNode</i>" parent="NodeWithJMX"&gt;
 &lt;/bean&gt;</source>
            The first configuration creates a RMI connector server which URL is
            announced via multicast on port 9999 and group "226.6.6.7". The second
@@ -251,13 +251,13 @@ catch (IOException) {
     <subsection name="Security">
 	    <p>
 	       To restrict the access to remote management functions you may add authentication and 
-	       authorization to the agent node. For authentication you can use "PlatformWithSecuredJMX"
+	       authorization to the agent node. For authentication you can use "NodeWithSecuredJMX"
 	       as parent of agent node's spring configuration which contains a JAAS-based authenticator
 	       for an active directory. Instead of this configuration you may use any other authenticators
            (e.g. of module <a href="../basicServices/userManagement/">userManagement</a>) which implement the interface 
            <a href="http://java.sun.com/javase/6/docs/api/javax/management/remote/JMXAuthenticator.html">JMXAuthenticator</a>.
 	       <source>
-&lt;bean name="<i>myPlatform</i>" parent="PlatformWithSecuredJMX"&gt;
+&lt;bean name="<i>myAgentNode</i>" parent="NodeWithSecuredJMX"&gt;
   &lt;property name="authorizationPolicyFilename" value="<i>myJavaPolicyFile</i>"/&gt;
 &lt;/bean&gt;</source>
            For authorization you can specify the name of a Java policy file which defines the

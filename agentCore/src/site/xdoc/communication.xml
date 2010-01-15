@@ -119,7 +119,7 @@
 	&lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/&gt;
 	&lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/&gt;
 	
-	&lt;bean name="PingPongPlatform" parent="Platform"&gt;
+	&lt;bean name="PingPongNode" parent="Node"&gt;
 		&lt;property name="agentNodeBeans"&gt;
 			&lt;list&gt;
 				&lt;ref bean="StandardJMSBroker"/&gt;

@@ -1,17 +1,14 @@
 package de.dailab.jiactng.agentcore.management;
 
-import java.util.Map;
-import java.util.Set;
-
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.IAgentNodeBean;
 
 /**
- * Interface for all managers which are able to register and deregister
- * agent nodes, agent node resources, agents, agent resources, agent beans
- * and agent bean resources. The manager enables local objects or remote
+ * Interface for all managers which are able to register and deregister agent
+ * nodes, agent node beans, agent node resources, agents, agent resources, agent
+ * beans and agent bean resources. The manager enables local objects or remote
  * applications to get or set attributes of registered resources or to
  * invoke methods of these resources.
  * @author Jan Keiser
@@ -20,100 +17,100 @@ public interface Manager {
 
 	/**
 	 * Constructs a unique name for the management of an agent node.
-	 * @param nodeName the name of the agent node
+	 * @param nodeId the UUID of the agent node
 	 * @return unique name of the agent node
 	 * @throws Exception If the parameter is incorrect.
 	 */
-	public Object getMgmtNameOfAgentNode(String nodeName) throws Exception;
+	public Object getMgmtNameOfAgentNode(String nodeId) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent node bean.
-	 * @param nodeName the name of the agent node which contains the agent node bean
+	 * @param nodeId the UUID of the agent node which contains the agent node bean
 	 * @param beanName the name of the agent node bean
 	 * @return unique name of the agent node bean
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgentNodeBean(String nodeName, String beanName) throws Exception;
+	public Object getMgmtNameOfAgentNodeBean(String nodeId, String beanName) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent node resource. The
 	 * agent node always contains only one resource of the specified type.
-	 * @param nodeName the name of the agent node
+	 * @param nodeId the UUID of the agent node
 	 * @param resourceType the type of the agent node resource
 	 * @return unique name of the agent node resource
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgentNodeResource(String nodeName, String resourceType) throws Exception;
+	public Object getMgmtNameOfAgentNodeResource(String nodeId, String resourceType) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent node resource. The
 	 * agent node may contain more than one resource of the specified type.
-	 * @param nodeName the name of the agent node
+	 * @param nodeId the UUID of the agent node
 	 * @param resourceType the type of the agent node resource
 	 * @param resourceName the name of the agent node resource
 	 * @return the unique name of the agent node resource
 	 * @throws Exception One of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgentNodeResource(String nodeName, String resourceType, String resourceName) throws Exception;
+	public Object getMgmtNameOfAgentNodeResource(String nodeId, String resourceType, String resourceName) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent.
-	 * @param nodeName the name of the agent node where the agent is residing on
+	 * @param nodeId the UUID of the agent node where the agent is residing on
 	 * @param agentName the name of the agent
 	 * @return unique name of the agent
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgent(String nodeName, String agentName) throws Exception;
+	public Object getMgmtNameOfAgent(String nodeId, String agentName) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent resource. The
 	 * agent always contains only one resource of the specified type.
-	 * @param nodeName the name of the agent node where the agent is residing on
+	 * @param nodeId the UUID of the agent node where the agent is residing on
 	 * @param agentName the name of the agent
 	 * @param resourceType the type of the agent resource
 	 * @return unique name of the agent resource
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgentResource(String nodeName, String agentName, String resourceType) throws Exception;
+	public Object getMgmtNameOfAgentResource(String nodeId, String agentName, String resourceType) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent resource. The
 	 * agent may contain more than one resource of the specified type.
-	 * @param nodeName the name of the agent node where the agent is residing on
+	 * @param nodeId the UUID of the agent node where the agent is residing on
 	 * @param agentName the name of the agent
 	 * @param resourceType the type of the agent resource
 	 * @param resourceName the name of the agent resource
 	 * @return unique name of the agent resource
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgentResource(String nodeName, String agentName, String resourceType, String resourceName) throws Exception;
+	public Object getMgmtNameOfAgentResource(String nodeId, String agentName, String resourceType, String resourceName) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent bean.
-	 * @param nodeName the name of the agent node where the agent is residing on which contains the agent bean
+	 * @param nodeId the UUID of the agent node where the agent is residing on which contains the agent bean
 	 * @param agentName the name of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @return unique name of the agent bean
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgentBean(String nodeName, String agentName, String beanName) throws Exception;
+	public Object getMgmtNameOfAgentBean(String nodeId, String agentName, String beanName) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent bean resource. The
 	 * agent bean always contains only one resource of the specified type.
-	 * @param nodeName the name of the agent node where the agent is residing on which contains the agent bean
+	 * @param nodeId the UUID of the agent node where the agent is residing on which contains the agent bean
 	 * @param agentName the name of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @param resourceType the type of the resource
 	 * @return unique name of the agent bean resource
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgentBeanResource(String nodeName, String agentName, String beanName, String resourceType) throws Exception;
+	public Object getMgmtNameOfAgentBeanResource(String nodeId, String agentName, String beanName, String resourceType) throws Exception;
 
 	/**
 	 * Constructs a unique name for the management of an agent bean resource. The
 	 * agent bean may contain more than one resource of the specified type.
-	 * @param nodeName the name of the agent node where the agent is residing on which contains the agent bean
+	 * @param nodeId the UUID of the agent node where the agent is residing on which contains the agent bean
 	 * @param agentName the name of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @param resourceType the type of the resource
@@ -121,7 +118,7 @@ public interface Manager {
 	 * @return unique name of the agent bean resource
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getMgmtNameOfAgentBeanResource(String nodeName, String agentName, String beanName, String resourceType, String resourceName) throws Exception;
+	public Object getMgmtNameOfAgentBeanResource(String nodeId, String agentName, String beanName, String resourceType, String resourceName) throws Exception;
 	
 	/**
 	 * Registers an agent node for management.
@@ -141,23 +138,23 @@ public interface Manager {
 	/**
 	 * Registers an agent node resource for management. The agent node contains only
 	 * one resource of the specified type.
-	 * @param nodeName the name of the agent node
+	 * @param node the agent node
 	 * @param resourceType the type of the agent node resource
 	 * @param resource the agent node resource to be registered
-	 * @throws Exception The name of the agent node or the type of the resource is incorrect or the agent node resource is already registered.
+	 * @throws Exception The UUID of the agent node or the type of the resource is incorrect or the agent node resource is already registered.
 	 */
-	public void registerAgentNodeResource(String nodeName, String resourceType, Object resource) throws Exception;
+	public void registerAgentNodeResource(IAgentNode node, String resourceType, Object resource) throws Exception;
 
 	/**
 	 * Registers an agent node resource for management. The agent node may contain more
 	 * than one resource of the specified type.
-	 * @param nodeName the name of the agent node
+	 * @param node the agent node
 	 * @param resourceType the type of the agent node resource
 	 * @param resourceName the name of the agent node resource
 	 * @param resource the agent node resource to be registered
-	 * @throws Exception The name of the agent node or the type or name of the resource is incorrect or the agent node resource is already registered.
+	 * @throws Exception The UUID of the agent node or the type or name of the resource is incorrect or the agent node resource is already registered.
 	 */
-	public void registerAgentNodeResource(String nodeName, String resourceType, String resourceName, Object resource) throws Exception;
+	public void registerAgentNodeResource(IAgentNode node, String resourceType, String resourceName, Object resource) throws Exception;
 
 	/**
 	 * Registers an agent for management.
@@ -225,21 +222,21 @@ public interface Manager {
 	/**
 	 * Unregisters an agent node resource from management. The agent node contains only
 	 * one resource of the specified type.
-	 * @param nodeName the name of the agent node
+	 * @param node the agent node
 	 * @param resourceType the type of the agent node resource
 	 * @throws Exception One of the parameters is incorrect or the agent node resource is not registered.
 	 */
-	public void unregisterAgentNodeResource(String nodeName, String resourceType) throws Exception;
+	public void unregisterAgentNodeResource(IAgentNode node, String resourceType) throws Exception;
 
 	/**
 	 * Unregisters an agent node resource from management. The agent node may contain more
 	 * than one resource of the specified type.
-	 * @param nodeName the name of the agent node
+	 * @param node the agent node
 	 * @param resourceType the type of the agent node resource
 	 * @param resourceName the name of the agent node resource
 	 * @throws Exception One of the parameters is incorrect or the agent node resource is not registered.
 	 */
-	public void unregisterAgentNodeResource(String nodeName, String resourceType, String resourceName) throws Exception;
+	public void unregisterAgentNodeResource(IAgentNode node, String resourceType, String resourceName) throws Exception;
 
 	/**
 	 * Unregisters an agent from management.
@@ -288,98 +285,98 @@ public interface Manager {
 
 	/**
 	 * Gets the value of an attribute of an agent node.
-	 * @param nodeName the name of the agent node
+	 * @param nodeId the UUID of the agent node
 	 * @param attributeName the name of the attribute
 	 * @return the value of the attribute
 	 * @throws Exception If one of the parameter is incorrect.
 	 */
-	public Object getAttributeOfAgentNode(String nodeName, String attributeName) throws Exception;
+	public Object getAttributeOfAgentNode(String nodeId, String attributeName) throws Exception;
 
 	/**
 	 * Gets the value of an attribute of an agent node bean.
-	 * @param nodeName the name of the agent node which contains the agent node bean
+	 * @param nodeId the UUID of the agent node which contains the agent node bean
 	 * @param beanName the name of the agent node bean
 	 * @param attributeName the name of the attribute
 	 * @return the value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getAttributeOfAgentNodeBean(String nodeName, String beanName, String attributeName) throws Exception;
+	public Object getAttributeOfAgentNodeBean(String nodeId, String beanName, String attributeName) throws Exception;
 
 	/**
 	 * Gets the value of an attribute of an agent.
-	 * @param nodeName the name of the agent node where the agent is residing on
+	 * @param nodeId the UUID of the agent node where the agent is residing on
 	 * @param agentId the unique identifier of the agent
 	 * @param attributeName the name of the attribute
 	 * @return the value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getAttributeOfAgent(String nodeName, String agentId, String attributeName) throws Exception;
+	public Object getAttributeOfAgent(String nodeId, String agentId, String attributeName) throws Exception;
 
 	/**
 	 * Gets the value of an attribute of an agent bean.
-	 * @param nodeName the name of the agent node where the agent is residing on which contains the agent bean
+	 * @param nodeId the UUID of the agent node where the agent is residing on which contains the agent bean
 	 * @param agentId the unique identifier of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @param attributeName the name of the attribute
 	 * @return the value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object getAttributeOfAgentBean(String nodeName, String agentId, String beanName, String attributeName) throws Exception;
+	public Object getAttributeOfAgentBean(String nodeId, String agentId, String beanName, String attributeName) throws Exception;
 
 	/**
 	 * Sets the value of an attribute of an agent node.
-	 * @param nodeName the name of the agent node
+	 * @param nodeId the UUID of the agent node
 	 * @param attributeName the name of the attribute
 	 * @param attributeValue the new value of the attribute
 	 * @throws Exception If one of the parameter is incorrect.
 	 */
-	public void setAttributeOfAgentNode(String nodeName, String attributeName, Object attributeValue) throws Exception;
+	public void setAttributeOfAgentNode(String nodeId, String attributeName, Object attributeValue) throws Exception;
 
 	/**
 	 * Sets the value of an attribute of an agent node bean.
-	 * @param nodeName the name of the agent node which contains the agent node bean
+	 * @param nodeId the UUID of the agent node which contains the agent node bean
 	 * @param beanName the name of the agent node bean
 	 * @param attributeName the name of the attribute
 	 * @param attributeValue the new value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public void setAttributeOfAgentNodeBean(String nodeName, String beanName, String attributeName, Object attributeValue) throws Exception;
+	public void setAttributeOfAgentNodeBean(String nodeId, String beanName, String attributeName, Object attributeValue) throws Exception;
 
 	/**
 	 * Sets the value of an attribute of an agent.
-	 * @param nodeName the name of the agent node where the agent is residing on
+	 * @param nodeId the UUID of the agent node where the agent is residing on
 	 * @param agentId the unique identifier of the agent
 	 * @param attributeName the name of the attribute
 	 * @param attributeValue the new value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public void setAttributeOfAgent(String nodeName, String agentId, String attributeName, Object attributeValue) throws Exception;
+	public void setAttributeOfAgent(String nodeId, String agentId, String attributeName, Object attributeValue) throws Exception;
 
 	/**
 	 * Sets the value of an attribute of an agent bean.
-	 * @param nodeName the name of the agent node where the agent is residing on which contains the agent bean
+	 * @param nodeId the UUID of the agent node where the agent is residing on which contains the agent bean
 	 * @param agentId the unique identifier of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @param attributeName the name of the attribute
 	 * @param attributeValue the new value of the attribute
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public void setAttributeOfAgentBean(String nodeName, String agentId, String beanName, String attributeName, Object attributeValue) throws Exception;
+	public void setAttributeOfAgentBean(String nodeId, String agentId, String beanName, String attributeName, Object attributeValue) throws Exception;
 
 	/**
 	 * Invokes an operation on an agent node.
-	 * @param nodeName The name of the agent node.
+	 * @param nodeId The UUID of the agent node.
 	 * @param operationName The name of the operation to be invoked.
 	 * @param params An array containing the parameters to be set when the operation is invoked.
 	 * @param signature An array containing the signature of the operation.
 	 * @return The object returned by the operation.
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object invokeAgentNode(String nodeName, String operationName, Object[] params, String[] signature) throws Exception;
+	public Object invokeAgentNode(String nodeId, String operationName, Object[] params, String[] signature) throws Exception;
 
 	/**
 	 * Invokes an operation on an agent node bean.
-	 * @param nodeName The name of the agent node which contains the agent node bean.
+	 * @param nodeId The UUID of the agent node which contains the agent node bean.
 	 * @param beanName The name of the agent node bean.
 	 * @param operationName The name of the operation to be invoked.
 	 * @param params An array containing the parameters to be set when the operation is invoked.
@@ -387,11 +384,11 @@ public interface Manager {
 	 * @return The object returned by the operation.
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object invokeAgentNodeBean(String nodeName, String beanName, String operationName, Object[] params, String[] signature) throws Exception;
+	public Object invokeAgentNodeBean(String nodeId, String beanName, String operationName, Object[] params, String[] signature) throws Exception;
 
 	/**
 	 * Invokes an operation on an agent.
-	 * @param nodeName The name of the agent node where the agent is residing on.
+	 * @param nodeId The UUID of the agent node where the agent is residing on.
 	 * @param agentId The unique identifier of the agent.
 	 * @param operationName The name of the operation to be invoked.
 	 * @param params An array containing the parameters to be set when the operation is invoked.
@@ -399,11 +396,11 @@ public interface Manager {
 	 * @return The object returned by the operation.
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object invokeAgent(String nodeName, String agentId, String operationName, Object[] params, String[] signature) throws Exception;
+	public Object invokeAgent(String nodeId, String agentId, String operationName, Object[] params, String[] signature) throws Exception;
 
 	/**
 	 * Invokes an operation on an agent bean.
-	 * @param nodeName The name of the agent node where the agent is residing on which contains the agent bean.
+	 * @param nodeId The UUID of the agent node where the agent is residing on which contains the agent bean.
 	 * @param agentId The unique identifier of the agent which contains the agent bean.
 	 * @param beanName The name of the agent bean.
 	 * @param operationName The name of the operation to be invoked.
@@ -412,20 +409,18 @@ public interface Manager {
 	 * @return The object returned by the operation.
 	 * @throws Exception If one of the parameters is incorrect.
 	 */
-	public Object invokeAgentBean(String nodeName, String agentId, String beanName, String operationName, Object[] params, String[] signature) throws Exception;
+	public Object invokeAgentBean(String nodeId, String agentId, String beanName, String operationName, Object[] params, String[] signature) throws Exception;
 
 	/**
 	 * Creates all specified connector server for remote management.
-	 * @param nodeId the unique identifier of the agent node
-	 * @param nodeName the name of the agent node
-	 * @param connectors a set of connector configurations
+	 * @param node the agent node
 	 */
-	public void enableRemoteManagement(String nodeId, String nodeName, Set<Map<String,Object>> connectors);
+	public void enableRemoteManagement(IAgentNode node);
 
 	/**
 	 * Stops all connector servers.
-	 * @param nodeName the name of the agent node
+	 * @param node the agent node
 	 */
-	public void disableRemoteManagement(String nodeName);
+	public void disableRemoteManagement(IAgentNode node);
 	
 }

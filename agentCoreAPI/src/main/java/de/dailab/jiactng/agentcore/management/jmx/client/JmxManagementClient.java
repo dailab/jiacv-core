@@ -173,20 +173,20 @@ public class JmxManagementClient {
 	}
 
 	/**
-	 * Gets the name of all agent nodes of the managed JVM.
-	 * @return The name of the found agent nodes.
+	 * Gets the UUID of all agent nodes of the managed JVM.
+	 * @return The UUID of the found agent nodes.
 	 * @throws IOException A communication problem occurred when searching for agent nodes.
 	 * @throws SecurityException if the agent node query cannot be made for security reasons.
 	 * @see MBeanServerConnection#queryNames(ObjectName, javax.management.QueryExp)
 	 */
-	public Set<String> getAgentNodeNames() throws IOException {
+	public Set<String> getAgentNodeUUIDs() throws IOException {
 		try {
 			Set<ObjectName> agentNodes = mbsc.queryNames(new JmxManager().getMgmtNameOfAgentNode("*"), null);
-			HashSet<String> agentNodeNames = new HashSet<String>();
+			HashSet<String> agentNodeUUIDs = new HashSet<String>();
 			for (ObjectName agentNode : agentNodes) {
-				agentNodeNames.add(agentNode.getKeyProperty("agentnode"));
+				agentNodeUUIDs.add(agentNode.getKeyProperty("agentnode"));
 			}
-			return agentNodeNames;
+			return agentNodeUUIDs;
 		}
 		catch (MalformedObjectNameException e) {
 			throw new RuntimeException(e);
@@ -195,105 +195,105 @@ public class JmxManagementClient {
 
 	/**
 	 * Gets a client for the management of an agent node within the managed JVM.
-	 * @param agentNodeName The name of the agent node.
+	 * @param agentNodeID The UUID of the agent node.
 	 * @return A management client for the agent node.
-	 * @throws MalformedObjectNameException The name of the agent node contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The UUID of the agent node contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentNodeManagementClient#JmxAgentNodeManagementClient(MBeanServerConnection, String)
 	 */
-	public JmxAgentNodeManagementClient getAgentNodeManagementClient(String agentNodeName) throws MalformedObjectNameException {
-		return new JmxAgentNodeManagementClient(mbsc, agentNodeName);
+	public JmxAgentNodeManagementClient getAgentNodeManagementClient(String agentNodeID) throws MalformedObjectNameException {
+		return new JmxAgentNodeManagementClient(mbsc, agentNodeID);
 	}
 
 	/**
 	 * Gets a client for the management of an agent node timer within the managed JVM.
-	 * @param agentNodeName The name of the agent node.
+	 * @param agentNodeID The UUID of the agent node.
 	 * @return A management client for the agent node timer.
-	 * @throws MalformedObjectNameException The name of the agent node contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The UUID of the agent node contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentNodeTimerManagementClient#JmxAgentNodeTimerManagementClient(MBeanServerConnection, String)
 	 */
-	public JmxAgentNodeTimerManagementClient getAgentNodeTimerManagementClient(String agentNodeName) throws MalformedObjectNameException {
-		return new JmxAgentNodeTimerManagementClient(mbsc, agentNodeName);
+	public JmxAgentNodeTimerManagementClient getAgentNodeTimerManagementClient(String agentNodeID) throws MalformedObjectNameException {
+		return new JmxAgentNodeTimerManagementClient(mbsc, agentNodeID);
 	}
 
 	/**
 	 * Gets a client for the management of an agent within the managed JVM.
-	 * @param agentNodeName The name of the agent node where the agent resides on.
+	 * @param agentNodeID The UUID of the agent node where the agent resides on.
 	 * @param agentID The global unique ID of the agent.
 	 * @return A management client for the agent.
-	 * @throws MalformedObjectNameException The name of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The UUID of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentManagementClient#JmxAgentManagementClient(MBeanServerConnection, String, String)
 	 */
-	public JmxAgentManagementClient getAgentManagementClient(String agentNodeName, String agentID) throws MalformedObjectNameException {
-		return new JmxAgentManagementClient(mbsc, agentNodeName, agentID);
+	public JmxAgentManagementClient getAgentManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
+		return new JmxAgentManagementClient(mbsc, agentNodeID, agentID);
 	}
 
 	/**
 	 * Gets a client for the management of an agent bean within the managed JVM.
-	 * @param agentNodeName The name of the agent node where the agent of the agent bean resides on.
+	 * @param agentNodeID The UUID of the agent node where the agent of the agent bean resides on.
 	 * @param agentID The global unique ID of the agent which contains the agent bean.
 	 * @param agentBeanName the name of the agent bean.
 	 * @return A management client for the agent bean.
-	 * @throws MalformedObjectNameException The name of the agent node or agent bean or the agent identifier contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The UUID of the agent node or agent bean or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentBeanManagementClient#JmxAgentBeanManagementClient(MBeanServerConnection, String, String, String)
 	 */
-	public JmxAgentBeanManagementClient getAgentBeanManagementClient(String agentNodeName, String agentID, String agentBeanName) throws MalformedObjectNameException {
-		return new JmxAgentBeanManagementClient(mbsc, agentNodeName, agentID, agentBeanName);
+	public JmxAgentBeanManagementClient getAgentBeanManagementClient(String agentNodeID, String agentID, String agentBeanName) throws MalformedObjectNameException {
+		return new JmxAgentBeanManagementClient(mbsc, agentNodeID, agentID, agentBeanName);
 	}
 
 	/**
 	 * Gets a client for the management of an agent node directory within the managed JVM.
-	 * @param agentNodeName The name of the agent node of the directory.
+	 * @param agentNodeID The UUID of the agent node of the directory.
 	 * @return A management client for the agent node directory.
-	 * @throws MalformedObjectNameException The name of the agent node contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The UUID of the agent node contains an illegal character or does not follow the rules for quoting.
 	 * @throws InstanceNotFoundException The agent node does not exist. 
 	 * @throws IOException A communication problem occurred when querying the name of the <code>DirectoryAgentNodeBean</code> from the remote agent node.
 	 * @throws SecurityException if the name of the <code>DirectoryAgentNodeBean</code> can not be queried for security reasons.
 	 * @see JmxAgentNodeDirectoryManagementClient#JmxAgentNodeDirectoryManagementClient(MBeanServerConnection, String, String)
 	 * @see JmxAgentNodeManagementClient#getDirectoryName()
 	 */
-	public JmxAgentNodeDirectoryManagementClient getDirectoryManagementClient(String agentNodeName) throws MalformedObjectNameException, InstanceNotFoundException, IOException {
-		String directoryBeanName = getAgentNodeManagementClient(agentNodeName).getDirectoryName();
-		return new JmxAgentNodeDirectoryManagementClient(mbsc, agentNodeName, directoryBeanName);
+	public JmxAgentNodeDirectoryManagementClient getDirectoryManagementClient(String agentNodeID) throws MalformedObjectNameException, InstanceNotFoundException, IOException {
+		String directoryBeanName = getAgentNodeManagementClient(agentNodeID).getDirectoryName();
+		return new JmxAgentNodeDirectoryManagementClient(mbsc, agentNodeID, directoryBeanName);
 	}
 
 	/**
 	 * Gets a client for the management of an agent memory within the managed JVM.
-	 * @param agentNodeName The name of the agent node where the agent of the agent memory resides on.
+	 * @param agentNodeID The UUID of the agent node where the agent of the agent memory resides on.
 	 * @param agentID The global unique ID of the agent which contains the agent memory.
 	 * @return A management client for the agent memory.
-	 * @throws MalformedObjectNameException The name of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The UUID of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentMemoryManagementClient#JmxAgentMemoryManagementClient(MBeanServerConnection, String, String)
 	 */
-	public JmxAgentMemoryManagementClient getAgentMemoryManagementClient(String agentNodeName, String agentID) throws MalformedObjectNameException {
-		return new JmxAgentMemoryManagementClient(mbsc, agentNodeName, agentID);
+	public JmxAgentMemoryManagementClient getAgentMemoryManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
+		return new JmxAgentMemoryManagementClient(mbsc, agentNodeID, agentID);
 	}
 
 	/**
 	 * Gets a client for the management of an agent execution cycle within the managed JVM.
-	 * @param agentNodeName The name of the agent node where the agent of the agent execution cycle resides on.
+	 * @param agentNodeID The UUID of the agent node where the agent of the agent execution cycle resides on.
 	 * @param agentID The global unique ID of the agent which contains the agent execution cycle.
 	 * @return A management client for the agent execution cycle.
-	 * @throws MalformedObjectNameException The name of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The UUID of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentExecutionCycleManagementClient#JmxAgentExecutionCycleManagementClient(MBeanServerConnection, String, String)
 	 */
-	public JmxAgentExecutionCycleManagementClient getAgentExecutionCycleManagementClient(String agentNodeName, String agentID) throws MalformedObjectNameException {
-		return new JmxAgentExecutionCycleManagementClient(mbsc, agentNodeName, agentID);
+	public JmxAgentExecutionCycleManagementClient getAgentExecutionCycleManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
+		return new JmxAgentExecutionCycleManagementClient(mbsc, agentNodeID, agentID);
 	}
 
 	/**
 	 * Gets the clients for the management of the communication beans of an agent within the managed JVM.
-	 * @param agentNodeName The name of the agent node where the agent of the agent communication bean resides on.
+	 * @param agentNodeID The UUID of the agent node where the agent of the agent communication bean resides on.
 	 * @param agentID The global unique ID of the agent which contains the agent communication bean.
 	 * @return The management clients for the instances of <code>CommunicationBean</code>.
-	 * @throws MalformedObjectNameException The name of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The UUID of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @throws IOException A communication problem occurred when searching for a communication bean of the remote agent.
 	 * @throws SecurityException if the search cannot be made for security reasons.
 	 * @see MBeanServerConnection#queryMBeans(ObjectName, javax.management.QueryExp)
 	 * @see JmxAgentCommunicationManagementClient#JmxAgentCommunicationManagementClient(MBeanServerConnection, ObjectName)
 	 */
-	public Set<JmxAgentCommunicationManagementClient> getAgentCommunicationManagementClients(String agentNodeName, String agentID) throws MalformedObjectNameException, IOException {
+	public Set<JmxAgentCommunicationManagementClient> getAgentCommunicationManagementClients(String agentNodeID, String agentID) throws MalformedObjectNameException, IOException {
 		Set<JmxAgentCommunicationManagementClient> clients = new HashSet<JmxAgentCommunicationManagementClient>();
-		Set<ObjectInstance> beans = mbsc.queryMBeans(new JmxManager().getMgmtNameOfAgentBean(agentNodeName, agentID, "*"), null);
+		Set<ObjectInstance> beans = mbsc.queryMBeans(new JmxManager().getMgmtNameOfAgentBean(agentNodeID, agentID, "*"), null);
 		for (ObjectInstance bean : beans) {
 			try {
 				if (mbsc.isInstanceOf(bean.getObjectName(), CommunicationBeanMBean.class.getName())) {

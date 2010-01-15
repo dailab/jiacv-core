@@ -53,7 +53,6 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		super.setUp();
 		System.setProperty("jmx.invoke.getters", "");
 		manager = new JmxManager();
-		node = manager.getMgmtNameOfAgentNode(nodeName);
 		mbs = ManagementFactory.getPlatformMBeanServer();
 
 		// add listener for (de)registration of the agent
@@ -65,8 +64,9 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		context = new ClassPathXmlApplicationContext(
 			"de/dailab/jiactng/agentcore/agentTests.xml");
 		nodeRef = (SimpleAgentNode) context.getBean(nodeName);
+		node = manager.getMgmtNameOfAgentNode(nodeRef.getUUID());
 		agentId = ((IAgent) context.getBean(agentName)).getAgentId();
-		agent = manager.getMgmtNameOfAgent(nodeName, agentId);
+		agent = manager.getMgmtNameOfAgent(nodeRef.getUUID(), agentId);
 		ArrayList<String> agentList = new ArrayList<String>();
 		agentList.add(agentId);
 		agentListNotification = agentList;
@@ -161,7 +161,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	public void testGetName() {
 		try {
-			String name = (String) manager.getAttributeOfAgent(nodeName, agentId, "AgentName");
+			String name = (String) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "AgentName");
 			assertEquals("AgentMBean.getAgentName is wrong", agentName, name);
 		} catch (Exception e) {
 			fail("Error while getting agent's name");
@@ -173,7 +173,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	public void testGetAgentBeanNames() {
 		try {
-			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeName, agentId, "AgentBeanNames");
+			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "AgentBeanNames");
 			assertEquals("AgentMBean.getAgentBeanNames is wrong", Arrays.asList(new String[] {"dummyBean"}), names);
 		} catch (Exception e) {
 			fail("Error while getting names of agent beans of the agent");
@@ -185,7 +185,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	public void testGetActionNames() {
 		try {
-			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeName, agentId, "ActionNames");
+			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "ActionNames");
 			assertEquals("AgentMBean.getActionNames is wrong", new ArrayList<String>(), names);
 		} catch (Exception e) {
 			fail("Error while getting names of actions of the agent");
@@ -197,7 +197,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	public void testGetMemoryData() {
 		try {
-			CompositeData data = (CompositeData) manager.getAttributeOfAgent(nodeName, agentId, "MemoryData");
+			CompositeData data = (CompositeData) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "MemoryData");
 			assertEquals("AgentMBean.getMemoryData returns wrong class item", "de.dailab.jiactng.agentcore.knowledge.Memory", data.get("class"));
 			assertEquals("AgentMBean.getMemoryData returns wrong matcher item", "org.sercho.masp.space.ReflectiveObjectMatcher", data.get("matcher"));
 			assertEquals("AgentMBean.getMemoryData returns wrong updater item", "org.sercho.masp.space.ReflectiveObjectUpdater", data.get("updater"));
@@ -211,7 +211,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	public void testGetExecutionCycleClass() {
 		try {
-			String name = (String) manager.getAttributeOfAgent(nodeName, agentId, "ExecutionCycleClass");
+			String name = (String) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "ExecutionCycleClass");
 			assertEquals("AgentMBean.getExecutionCycleClass is wrong", "de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle", name);
 		} catch (Exception e) {
 			fail("Error while getting class of agent's execution cycle");
@@ -223,7 +223,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	public void testGetAutoExecutionServices() {
 		try {
-			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeName, agentId, "AutoExecutionServices");
+			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "AutoExecutionServices");
 			assertNull("AgentMBean.getAutoExecutionServices is wrong", names);
 		} catch (Exception e) {
 			fail("Error while getting names of automatic executed services of the agent");
@@ -235,7 +235,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	public void testGetAutoExecutionType() {
 		try {
-			Boolean type = (Boolean) manager.getAttributeOfAgent(nodeName, agentId, "AutoExecutionType");
+			Boolean type = (Boolean) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "AutoExecutionType");
 			assertEquals("AgentMBean.getAutoExecutionType is wrong", new Boolean(false), type);
 		} catch (Exception e) {
 			fail("Error while getting type of automatic executed services of the agent");
@@ -282,7 +282,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	 */
 	protected void doAction(String action) {
 		try {
-			manager.invokeAgent(nodeName, agentId, action, new Object[] {}, new String[] {});
+			manager.invokeAgent(nodeRef.getUUID(), agentId, action, new Object[] {}, new String[] {});
 		} catch (Exception e) {
 			fail("Error while " + action + " agent");
 		}
@@ -300,7 +300,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 		// check JMX interface
 		state = "";
 		try {
-			state = (String) manager.getAttributeOfAgent(nodeName, agentId, "LifecycleState");
+			state = (String) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "LifecycleState");
 		} catch (Exception e) {
 			fail("Error while getting agent's state");
 		}

@@ -22,13 +22,13 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	/**
 	 * Creates a client for the management of an agent node directory.
 	 * @param mbsc The JMX connection used for the agent node directory management.
-	 * @param agentNodeName The name of the agent node.
+	 * @param agentNodeID The UUID of the agent node.
 	 * @param directoryBeanName The name of the agent node directory bean.
-	 * @throws MalformedObjectNameException The agent node name or agent identifier contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The agent node UUID or agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see ObjectName#ObjectName(String)
 	 */
-	protected JmxAgentNodeDirectoryManagementClient(MBeanServerConnection mbsc, String agentNodeName, String directoryBeanName) throws MalformedObjectNameException {
-		super(mbsc, new JmxManager().getMgmtNameOfAgentNodeBean(agentNodeName, directoryBeanName));
+	protected JmxAgentNodeDirectoryManagementClient(MBeanServerConnection mbsc, String agentNodeID, String directoryBeanName) throws MalformedObjectNameException {
+		super(mbsc, new JmxManager().getMgmtNameOfAgentNodeBean(agentNodeID, directoryBeanName));
 	}
 
 	/**

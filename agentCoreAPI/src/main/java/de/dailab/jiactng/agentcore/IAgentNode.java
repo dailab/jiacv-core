@@ -2,6 +2,8 @@ package de.dailab.jiactng.agentcore;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.logging.Log;
@@ -167,4 +169,20 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @see Collections#unmodifiableList(List)
    */
   public List<IAgentNodeBean> getAgentNodeBeans();
+
+	/**
+	 * Sets the configuration of the JMX connector servers used for remote management.
+	 * 
+	 * @param jmxConnectors
+	 *            the set of connectors.
+	 */
+	public void setJmxConnectors(Set<Map<String, Object>> jmxConnectors);
+
+	/**
+	 * Gets the configuration of the JMX connector servers used for remote management.
+	 * 
+	 * @return the set of connectors.
+	 */
+	public Set<Map<String, Object>> getJmxConnectors();
+
 }

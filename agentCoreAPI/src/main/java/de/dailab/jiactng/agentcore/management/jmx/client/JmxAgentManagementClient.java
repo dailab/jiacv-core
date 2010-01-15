@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.management.Attribute;
-import javax.management.AttributeChangeNotification;
 import javax.management.AttributeChangeNotificationFilter;
 import javax.management.InstanceNotFoundException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
-import javax.management.Notification;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
@@ -40,13 +38,13 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	/**
 	 * Creates a client for the management of an agent.
 	 * @param mbsc The JMX connection used for the agent management.
-	 * @param agentNodeName The name of the managed agent node.
+	 * @param agentNodeID The UUID of the managed agent node.
 	 * @param agentID The global unique identifier of the agent.
-	 * @throws MalformedObjectNameException The agent node name or agent identifier contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The agent node UUID or agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see ObjectName#ObjectName(String)
 	 */
-	protected JmxAgentManagementClient(MBeanServerConnection mbsc, String agentNodeName, String agentID) throws MalformedObjectNameException {
-		super(mbsc, new JmxManager().getMgmtNameOfAgent(agentNodeName, agentID));
+	protected JmxAgentManagementClient(MBeanServerConnection mbsc, String agentNodeID, String agentID) throws MalformedObjectNameException {
+		super(mbsc, new JmxManager().getMgmtNameOfAgent(agentNodeID, agentID));
 	}
 
 	/**

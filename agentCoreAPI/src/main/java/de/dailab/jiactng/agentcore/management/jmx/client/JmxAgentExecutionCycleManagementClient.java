@@ -32,13 +32,13 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	/**
 	 * Creates a client for the management of an agent execution cycle.
 	 * @param mbsc The JMX connection used for the agent execution cycle management.
-	 * @param agentNodeName The name of the managed agent node.
+	 * @param agentNodeID The UUID of the managed agent node.
 	 * @param agentID The global unique identifier of the agent.
-	 * @throws MalformedObjectNameException The agent node name or agent identifier contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The agent node UUID or agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see ObjectName#ObjectName(String)
 	 */
-	protected JmxAgentExecutionCycleManagementClient(MBeanServerConnection mbsc, String agentNodeName, String agentID) throws MalformedObjectNameException {
-		super(mbsc, new JmxManager().getMgmtNameOfAgentResource(agentNodeName, agentID, "ExecutionCycle"));
+	protected JmxAgentExecutionCycleManagementClient(MBeanServerConnection mbsc, String agentNodeID, String agentID) throws MalformedObjectNameException {
+		super(mbsc, new JmxManager().getMgmtNameOfAgentResource(agentNodeID, agentID, "ExecutionCycle"));
 	}
 
 	/**

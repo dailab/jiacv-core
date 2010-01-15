@@ -32,7 +32,6 @@ import org.springframework.util.Log4jConfigurer;
 
 import de.dailab.jiactng.Version;
 import de.dailab.jiactng.agentcore.conf.GenericAgentProperties;
-import de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -131,13 +130,22 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
-	 * Configuration of a set of JMX connector server.
+	 * Configuration of a set of JMX connector server used for remote management.
 	 * 
 	 * @param jmxConnectors
 	 *            the set of connectors.
 	 */
 	public void setJmxConnectors(Set<Map<String, Object>> jmxConnectors) {
 		this._jmxConnectors = jmxConnectors;
+	}
+
+	/**
+	 * Gets the configuration of the JMX connector servers used for remote management.
+	 * 
+	 * @return the set of connectors.
+	 */
+	public Set<Map<String, Object>> getJmxConnectors() {
+		return _jmxConnectors;
 	}
 
 	/**
@@ -409,14 +417,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 
 	public void setBeanName(String name) {
-		if (isManagementEnabled()) {
-			Manager manager = _manager;
-			disableManagement();
-			_name = name;
-			enableManagement(manager);
-		} else {
-			_name = name;
-		}
+		_name = name;
 	}
 
 	/**
@@ -813,17 +814,17 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			manager.registerAgentNode(this);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("WARNING: Unable to register agent node " + this.getName() + " as JMX resource.");
+			System.err.println("WARNING: Unable to register agent node " + getName() + " as JMX resource.");
 			System.err.println(e.getMessage());
 		}
 
 		// register agent node timer for management
 		try {
-			manager.registerAgentNodeResource(_name, "Timer", _timer);
+			manager.registerAgentNodeResource(this, "Timer", _timer);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("WARNING: Unable to register timer of agent node " + this.getName() + " as JMX resource.");
+			System.err.println("WARNING: Unable to register timer of agent node " + getName() + " as JMX resource.");
 			System.err.println(e.getMessage());
 		}
 
@@ -841,7 +842,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// enable remote management
 		if (_jmxConnectors != null) {
-			manager.enableRemoteManagement(_uuid, _name, _jmxConnectors);
+			manager.enableRemoteManagement(this);
 		}
 
 		super.enableManagement(manager);
@@ -857,7 +858,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// disable remote management
-		_manager.disableRemoteManagement(_name);
+		_manager.disableRemoteManagement(this);
 
 		// deregister agents from management
 		for (IAgent a : this._agents) {
@@ -871,11 +872,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// deregister agent node timer from management
 		try {
-			_manager.unregisterAgentNodeResource(_name, "Timer");
+			_manager.unregisterAgentNodeResource(this, "Timer");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("WARNING: Unable to deregister timer of agent node " + this.getName() + " as JMX resource.");
+			System.err.println("WARNING: Unable to deregister timer of agent node " + getName() + " as JMX resource.");
 			System.err.println(e.getMessage());
 		}
 
@@ -883,7 +884,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		try {
 			_manager.unregisterAgentNode(this);
 		} catch (Exception e) {
-			System.err.println("WARNING: Unable to deregister agent node " + this.getName() + " as JMX resource.");
+			System.err.println("WARNING: Unable to deregister agent node " + getName() + " as JMX resource.");
 			System.err.println(e.getMessage());
 		}
 

@@ -56,7 +56,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	 */
 	public void testGetAliveInterval() {
 		try {
-			Long interval = (Long) manager.getAttributeOfAgentNodeBean(nodeName, beanName, "AliveInterval");
+			Long interval = (Long) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "AliveInterval");
 			assertEquals("AgentMBean.getAliveInterval is wrong", Long.valueOf(2000), interval);
 		} catch (Exception e) {
 			fail("Error while getting alive interval: "+e.getLocalizedMessage());
@@ -68,7 +68,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	 */
 	public void testGetAdvertiseInterval() {
 		try {
-			Long interval = (Long) manager.getAttributeOfAgentNodeBean(nodeName, beanName, "AdvertiseInterval");
+			Long interval = (Long) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "AdvertiseInterval");
 			assertEquals("AgentMBean.getAdvertiseInterval is wrong", Long.valueOf(10800), interval);
 		} catch (Exception e) {
 			fail("Error while getting advertise interval: "+e.getLocalizedMessage());
@@ -80,7 +80,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	 */
 	public void testGetDump() {
 		try {
-			Boolean dump = (Boolean) manager.getAttributeOfAgentNodeBean(nodeName, beanName, "Dump");
+			Boolean dump = (Boolean) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "Dump");
 			assertEquals("AgentMBean.isDump is wrong", Boolean.valueOf(true), dump);
 		} catch (Exception e) {
 			fail("Error while getting dump state: "+e.getLocalizedMessage());
@@ -92,7 +92,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	 */
 	public void testGetLocalActions() {
 		try {
-			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeName, beanName, "LocalActions");
+			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "LocalActions");
 			assertNull("AgentMBean.getLocalActions is wrong", data);
 		} catch (Exception e) {
 			fail("Error while getting local actions: "+e.getLocalizedMessage());
@@ -104,7 +104,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	 */
 	public void testGetLocalAgents() {
 		try {
-			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeName, beanName, "LocalAgents");
+			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "LocalAgents");
 			assertEquals("AgentMBean.getLocalAgents returns wrong number of agents", 1, data.size());
 		} catch (Exception e) {
 			fail("Error while getting local agents: "+e.getLocalizedMessage());
@@ -116,7 +116,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	 */
 	public void testGetRemoteActions() {
 		try {
-			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeName, beanName, "RemoteActions");
+			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "RemoteActions");
 		} catch (Exception e) {
 			fail("Error while getting remote actions: "+e.getLocalizedMessage());
 		}
@@ -127,7 +127,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	 */
 	public void testGetRemoteAgents() {
 		try {
-			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeName, beanName, "RemoteAgents");
+			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "RemoteAgents");
 		} catch (Exception e) {
 			fail("Error while getting remote agents: "+e.getLocalizedMessage());
 		}
@@ -138,7 +138,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	 */
 	public void testGetKnownNodes() {
 		try {
-			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeName, beanName, "KnownNodes");
+			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "KnownNodes");
 		} catch (Exception e) {
 			fail("Error while getting known nodes: "+e.getLocalizedMessage());
 		}

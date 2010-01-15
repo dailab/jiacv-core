@@ -36,12 +36,12 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	/**
 	 * Creates a client for the management of an agent node.
 	 * @param mbsc The JMX connection used for the agent node management.
-	 * @param agentNodeName The name of the managed agent node.
-	 * @throws MalformedObjectNameException The name of the agent node contains an illegal character or does not follow the rules for quoting.
+	 * @param agentNodeID The UUID of the managed agent node.
+	 * @throws MalformedObjectNameException The UUID of the agent node contains an illegal character or does not follow the rules for quoting.
 	 * @see ObjectName#ObjectName(String)
 	 */
-	protected JmxAgentNodeManagementClient(MBeanServerConnection mbsc, String agentNodeName) throws MalformedObjectNameException {
-		super(mbsc, new JmxManager().getMgmtNameOfAgentNode(agentNodeName));
+	protected JmxAgentNodeManagementClient(MBeanServerConnection mbsc, String agentNodeID) throws MalformedObjectNameException {
+		super(mbsc, new JmxManager().getMgmtNameOfAgentNode(agentNodeID));
 	}
 
 	/**
@@ -349,15 +349,18 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
-	 * Gets the agent node's UUID.
-	 * @return UUID as string.
-	 * @throws InstanceNotFoundException
-	 * @throws IOException
+	 * Gets the name of the managed agent node.
+	 * @return The agent node's name.
+	 * @throws InstanceNotFoundException The agent node does not exist. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
+	 * @throws SecurityException if the agent node's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#getUUID()
 	 */
-	public String getUUID() throws InstanceNotFoundException, IOException {
-		return (String) getAttribute("UUID");
+	public String getAgentNodeName() throws IOException, InstanceNotFoundException {
+		return (String) getAttribute("Name");
 	}
-	
+
 	/**
 	 * Shuts down the managed agent node.
 	 * @throws InstanceNotFoundException The agent node does not exist. 

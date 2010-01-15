@@ -360,7 +360,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	public void doInit() throws LifecycleException {
 		// initialize timer client
 		try {
-			timerClient = new JmxManagementClient().getAgentNodeTimerManagementClient(agentNode.getName());
+			timerClient = new JmxManagementClient().getAgentNodeTimerManagementClient(agentNode.getUUID());
 		}
 		catch (MalformedObjectNameException e) {
 			throw new LifecycleException("Error when initializing timer client", e);

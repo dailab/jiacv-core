@@ -2,14 +2,12 @@ package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
 
-import javax.management.AttributeChangeNotification;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
-import javax.management.Notification;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
@@ -28,14 +26,14 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	/**
 	 * Creates a client for the management of an agent bean.
 	 * @param mbsc The JMX connection used for the agent management.
-	 * @param agentNodeName The name of the agent node where the agent of the agent bean resides on.
+	 * @param agentNodeID The UUID of the agent node where the agent of the agent bean resides on.
 	 * @param agentID The global unique identifier of the agent which contains the agent bean.
 	 * @param agentBeanName The name of the agent bean.
-	 * @throws MalformedObjectNameException The agent node name, agent identifier or agent bean name contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The agent node UUID, agent identifier or agent bean name contains an illegal character or does not follow the rules for quoting.
 	 * @see ObjectName#ObjectName(String)
 	 */
-	protected JmxAgentBeanManagementClient(MBeanServerConnection mbsc, String agentNodeName, String agentID, String agentBeanName) throws MalformedObjectNameException {
-		super(mbsc, new JmxManager().getMgmtNameOfAgentBean(agentNodeName, agentID, agentBeanName));
+	protected JmxAgentBeanManagementClient(MBeanServerConnection mbsc, String agentNodeID, String agentID, String agentBeanName) throws MalformedObjectNameException {
+		super(mbsc, new JmxManager().getMgmtNameOfAgentBean(agentNodeID, agentID, agentBeanName));
 	}
 	
 	/**

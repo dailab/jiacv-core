@@ -23,12 +23,12 @@ public class JmxAgentNodeTimerManagementClient extends
 	/**
 	 * Creates a client for the management of an agent node timer.
 	 * @param mbsc The JMX connection used for the agent node timer management.
-	 * @param agentNodeName The name of the managed agent node.
-	 * @throws MalformedObjectNameException The name of the agent node contains an illegal character or does not follow the rules for quoting.
+	 * @param agentNodeID The UUID of the managed agent node.
+	 * @throws MalformedObjectNameException The UUID of the agent node contains an illegal character or does not follow the rules for quoting.
 	 * @see ObjectName#ObjectName(String)
 	 */
-	protected JmxAgentNodeTimerManagementClient(MBeanServerConnection mbsc, String agentNodeName) throws MalformedObjectNameException {
-		super(mbsc, new JmxManager().getMgmtNameOfAgentNodeResource(agentNodeName, "Timer"));
+	protected JmxAgentNodeTimerManagementClient(MBeanServerConnection mbsc, String agentNodeID) throws MalformedObjectNameException {
+		super(mbsc, new JmxManager().getMgmtNameOfAgentNodeResource(agentNodeID, "Timer"));
 	}
 
 	/**

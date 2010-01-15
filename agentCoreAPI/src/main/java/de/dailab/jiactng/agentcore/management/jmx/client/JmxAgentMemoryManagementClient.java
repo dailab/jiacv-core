@@ -19,13 +19,13 @@ public class JmxAgentMemoryManagementClient extends JmxAbstractManagementClient 
 	/**
 	 * Creates a client for the management of an agent memory.
 	 * @param mbsc The JMX connection used for the agent memory management.
-	 * @param agentNodeName The name of the agent node where the agent of the memory resides on.
+	 * @param agentNodeID The UUID of the agent node where the agent of the memory resides on.
 	 * @param agentID The global unique identifier of the agent which contains the memory.
-	 * @throws MalformedObjectNameException The agent node name, agent identifier or agent bean name contains an illegal character or does not follow the rules for quoting.
+	 * @throws MalformedObjectNameException The agent node UUID, agent identifier or agent bean name contains an illegal character or does not follow the rules for quoting.
 	 * @see ObjectName#ObjectName(String)
 	 */
-	protected JmxAgentMemoryManagementClient(MBeanServerConnection mbsc, String agentNodeName, String agentID) throws MalformedObjectNameException {
-		super(mbsc, new JmxManager().getMgmtNameOfAgentResource(agentNodeName, agentID, "Memory"));
+	protected JmxAgentMemoryManagementClient(MBeanServerConnection mbsc, String agentNodeID, String agentID) throws MalformedObjectNameException {
+		super(mbsc, new JmxManager().getMgmtNameOfAgentResource(agentNodeID, agentID, "Memory"));
 	}
 
 	/**

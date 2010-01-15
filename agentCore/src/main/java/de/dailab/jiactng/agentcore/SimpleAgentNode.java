@@ -337,6 +337,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+
+	public void setName(String name) {
+		_name = name;
+	}
+
+	/**
 	 * Returns the name of localhost.
 	 * 
 	 * @return name of localhost
@@ -417,7 +425,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 
 	public void setBeanName(String name) {
-		_name = name;
+		setName(name);
 	}
 
 	/**

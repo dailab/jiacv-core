@@ -10,20 +10,23 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
  * @author axle
  */
 public interface IAgentNodeDescription extends IFact, JmxDescriptionSupport {
-	
-    public static final String ITEMNAME_ADDRESS = "address";
-    public static final String ITEMNAME_ALIVE = "alive";
+
+	/** Item name which can be used to get the address of the agent node. */
+    static final String ITEMNAME_ADDRESS = "address";
+
+	/** Item name which can be used to get the time of last alive of the agent node. */
+    static final String ITEMNAME_ALIVE = "alive";
 
     /**
 	 * Returns the messageBox address of the agentnode.
 	 * @return the messageBox address of the agentnode
 	 * @see ICommunicationAddress
 	 */
-	public ICommunicationAddress getAddress();
+	ICommunicationAddress getAddress();
 	
 	/**
 	 * Returns the last time the agentnode has sent a sign of life.
 	 * @return the last time the agentnode has sent a sign of life
 	 */
-	public long getAlive();
+	long getAlive();
 }

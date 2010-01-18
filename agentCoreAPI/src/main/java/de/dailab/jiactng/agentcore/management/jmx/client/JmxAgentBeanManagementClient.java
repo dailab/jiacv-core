@@ -8,9 +8,7 @@ import javax.management.InvalidAttributeValueException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
-import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
-import javax.management.ObjectName;
 import javax.management.openmbean.TabularData;
 
 import de.dailab.jiactng.agentcore.management.jmx.DisableLifeCycleAttributeFilter;

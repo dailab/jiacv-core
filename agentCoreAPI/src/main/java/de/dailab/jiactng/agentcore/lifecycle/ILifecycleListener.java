@@ -14,6 +14,6 @@ public interface ILifecycleListener {
      *
      * @param evt the event to deliver
      */
-    public void onEvent(LifecycleEvent evt);
+    void onEvent(LifecycleEvent evt);
     
 }

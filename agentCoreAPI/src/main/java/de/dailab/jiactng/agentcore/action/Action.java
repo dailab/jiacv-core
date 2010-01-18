@@ -66,6 +66,7 @@ public class Action implements IActionDescription {
 	/**
 	 * This constructor is used to create an action template with only the name
 	 * specified.
+	 * @param name the name of the action template
 	 */
 	public Action(String name) {
 		this(name, null, (List<Class<?>>) null, (List<Class<?>>) null);
@@ -89,6 +90,13 @@ public class Action implements IActionDescription {
 				: null, resultTypes != null ? Arrays.asList(resultTypes) : null);
 	}
 
+	/**
+	 * Constructor. Creates a new action-declaration.
+	 * @param name the name of the action
+	 * @param providerBean the component that holds the functionality of this action
+	 * @param inputTypes the classes of the input-parameters of this action
+	 * @param resultTypes the classes of the results of this action
+	 */
 	public Action(String name, IEffector providerBean,
 			List<Class<?>> inputTypes, List<Class<?>> resultTypes) {
 		setName(name);
@@ -139,6 +147,7 @@ public class Action implements IActionDescription {
 	 *            action.
 	 * @param source
 	 *            the caller of the action.
+	 * @param timeToLive
 	 * @return a new DoAction-object that can be used (by writing it to the
 	 *         memory) to call the action.
 	 */
@@ -152,6 +161,7 @@ public class Action implements IActionDescription {
    * be written to the memory to trigger the action.
    * 
    * @see de.dailab.jiactng.agentcore.action.DoAction
+   * @param parent the session which creates this doAction.
    * @param newParams
    *            the input-parameters that should be used when executing the
    *            action.
@@ -179,7 +189,7 @@ public class Action implements IActionDescription {
 	 *         memory) to return the results of the action.
 	 */
 	public ActionResult createActionResult(DoAction source, Serializable[] results) {
-		ActionResult ret = new ActionResult(source, results);
+		final ActionResult ret = new ActionResult(source, results);
 		ret.setMetaData(source.getMetaData());
 		return ret;
 	}
@@ -212,7 +222,7 @@ public class Action implements IActionDescription {
 	 */
 	public final List<Class<?>> getInputTypes() throws ClassNotFoundException {
 		if (_inputTypeNames != null) {
-			List<Class<?>> list = new ArrayList<Class<?>>();
+			final List<Class<?>> list = new ArrayList<Class<?>>();
 			for (String type : _inputTypeNames) {
 				list.add(getClassForName(type));
 			}
@@ -231,6 +241,11 @@ public class Action implements IActionDescription {
 		return providerBean;
 	}
 
+	/**
+	 * Getter for the description of the agent, which provides this action.
+	 * 
+	 * @return the description of the providing agent.
+	 */
 	public final IAgentDescription getProviderDescription() {
 		return _providerDescription;
 	}
@@ -254,7 +269,7 @@ public class Action implements IActionDescription {
 	 */
 	public final List<Class<?>> getResultTypes() throws ClassNotFoundException {
 		if (_resultTypeNames != null) {
-			List<Class<?>> list = new ArrayList<Class<?>>();
+			final List<Class<?>> list = new ArrayList<Class<?>>();
 			for (String type : _resultTypeNames) {
 				list.add(getClassForName(type));
 			}
@@ -278,7 +293,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setInputTypeNames(List<String> inputTypeNames) {
 		if (inputTypeNames != null) {
-			List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<String>();
 			copy.addAll(inputTypeNames);
 			_inputTypeNames = Collections.unmodifiableList(copy);
 		} else {
@@ -292,7 +307,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setInputTypes(List<Class<?>> inputTypes) {
 		if (inputTypes != null) {
-			List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<String>();
 			for (Class<?> type : inputTypes) {
 				copy.add(type.getName());
 			}
@@ -303,6 +318,7 @@ public class Action implements IActionDescription {
 	}
 
 	/**
+	 * Sets the agent bean which provides this action.
 	 * @param providerBean
 	 *            the providerBean to set
 	 */
@@ -310,6 +326,10 @@ public class Action implements IActionDescription {
 		this.providerBean = providerBean;
 	}
 
+	/**
+	 * Sets the description of the agent which provides this action.
+	 * @param providerDescription
+	 */
 	public final void setProviderDescription(
 			IAgentDescription providerDescription) {
 		_providerDescription = providerDescription;
@@ -321,7 +341,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setResultTypeNames(List<String> resultTypeNames) {
 		if (resultTypeNames != null) {
-			List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<String>();
 			copy.addAll(resultTypeNames);
 			_resultTypeNames = Collections.unmodifiableList(copy);
 		} else {
@@ -335,7 +355,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setResultTypes(List<Class<?>> resultTypes) {
 		if (resultTypes != null) {
-			List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<String>();
 			for (Class<?> type : resultTypes) {
 				copy.add(type.getName());
 			}
@@ -350,7 +370,7 @@ public class Action implements IActionDescription {
 	 */
 	@Override
 	public int hashCode() {
-		int hash = Action.class.hashCode();
+		final int hash = Action.class.hashCode();
 		// hash ^= _name != null ? _name.hashCode() : 0;
 		return hash;
 	}
@@ -368,10 +388,10 @@ public class Action implements IActionDescription {
 			return true;
 		}
 		
-		Action other = (Action) obj;
+		final Action other = (Action) obj;
 		
-		IAgentDescription myAgent = this.getProviderDescription();
-		IAgentDescription otherAgent = other.getProviderDescription();
+		final IAgentDescription myAgent = this.getProviderDescription();
+		final IAgentDescription otherAgent = other.getProviderDescription();
 
 		if((myAgent!=null) && (otherAgent != null)) {
 			if(!EqualityChecker.equalsOrNull(myAgent.getAid(), otherAgent.getAid())) {
@@ -389,7 +409,7 @@ public class Action implements IActionDescription {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Action:\n name='").append(_name).append("'");
 		builder.append("\n parameters=");
 		prettyPrintArray(builder, _inputTypeNames);
@@ -418,7 +438,7 @@ public class Action implements IActionDescription {
 			builder.append("null");
 		} else {
 			builder.append('[');
-			for (Iterator<String> iter = list.iterator(); iter.hasNext();) {
+			for (final Iterator<String> iter = list.iterator(); iter.hasNext();) {
 				builder.append(iter.next());
 	
 				if (iter.hasNext()) {
@@ -472,7 +492,7 @@ public class Action implements IActionDescription {
 	 * changed, it is not a bad idea to notify the directory about the
 	 * change.
 	 * 
-	 * @param scope
+	 * @param scope the scope of this action.
 	 * @see ActionScope
 	 */
 	public void setScope(ActionScope scope) {
@@ -499,7 +519,7 @@ public class Action implements IActionDescription {
 	    * @see javax.management.openmbean.CompositeType
 	    */
 	   public OpenType<?> getDescriptionType() throws OpenDataException {
-	      OpenType<?>[] itemTypes = new OpenType<?>[] {
+	      final OpenType<?>[] itemTypes = new OpenType<?>[] {
 	    		  SimpleType.STRING, 
 	    		  new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
 	    		  new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
@@ -509,7 +529,7 @@ public class Action implements IActionDescription {
 	      };
 
 	      // use names of action items as their description
-	      String[] itemDescriptions = getItemNames();
+	      final String[] itemDescriptions = getItemNames();
 
 	      // create and return open type of a JIAC action
 	      return new CompositeType(this.getClass().getName(), "standard JIAC-TNG action", getItemNames(), itemDescriptions, itemTypes);
@@ -524,7 +544,7 @@ public class Action implements IActionDescription {
 	    * @see javax.management.openmbean.CompositeData
 	    */
 	   public Object getDescription() throws OpenDataException {
-	      Object[] itemValues = new Object[] {
+	      final Object[] itemValues = new Object[] {
 	    		  _name,
 	    		  _inputTypeNames.toArray(new String[_resultTypeNames.size()]),
 	    		  _resultTypeNames.toArray(new String[_resultTypeNames.size()]),
@@ -533,7 +553,7 @@ public class Action implements IActionDescription {
 	    		  (_providerDescription != null)? _providerDescription.getDescription():null
 	      };
 
-	      CompositeType type = (CompositeType) getDescriptionType();
+	      final CompositeType type = (CompositeType) getDescriptionType();
 	      return new CompositeDataSupport(type, getItemNames(), itemValues);
 	   }
 }

@@ -19,14 +19,14 @@ public interface IDirectory extends IDirectoryAccess, ILifecycleListener {
 	 * @param agentDescription the agent to be registered
 	 * @see #modifyAgent(IAgentDescription)
 	 */
-	public void registerAgent(IAgentDescription agentDescription);
+	void registerAgent(IAgentDescription agentDescription);
 	
 	/**
 	 * Unregisters the given agent from the directory.
 	 * 
 	 * @param aid agent identifier of the agent to remove
 	 */
-	public void deregisterAgent(String aid);
+	void deregisterAgent(String aid);
 	
 	/**
 	 * Modifies an agent in the directory. If the agent has not yet been
@@ -35,7 +35,7 @@ public interface IDirectory extends IDirectoryAccess, ILifecycleListener {
 	 * @param agentDescription the agent to modify
 	 * @see #registerAgent(IAgentDescription)
 	 */
-	public void modifyAgent(IAgentDescription agentDescription);
+	void modifyAgent(IAgentDescription agentDescription);
 	
 	/**
 	 * Searches for an agent that matches the given template. Returns
@@ -45,7 +45,7 @@ public interface IDirectory extends IDirectoryAccess, ILifecycleListener {
 	 * @return the first match that matches the given template
 	 *         or <code>null</code> if no match found. 
 	 */
-	public IAgentDescription searchAgent(IAgentDescription template);
+	IAgentDescription searchAgent(IAgentDescription template);
 
 	/**
 	 * Searches for agents that match the given template. Returns
@@ -56,5 +56,5 @@ public interface IDirectory extends IDirectoryAccess, ILifecycleListener {
 	 *         or an empty set if no match found.
 	 * @see List
 	 */
-	public List<IAgentDescription> searchAllAgents(IAgentDescription template);
+	List<IAgentDescription> searchAllAgents(IAgentDescription template);
 }

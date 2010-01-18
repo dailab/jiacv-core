@@ -87,8 +87,8 @@ public class ActionPerformedNotification extends Notification {
 		}
 
 		// extract parameters
-		Object[] params = action.getParams();
-		int paramSize = params.length;
+		final Object[] params = action.getParams();
+		final int paramSize = params.length;
 		_actionParameters = new Object[paramSize];
 		for (int i=0; i<paramSize; i++) {
 			try {
@@ -100,7 +100,7 @@ public class ActionPerformedNotification extends Notification {
 
 		// extract result
 		if (result != null) {
-			int resultSize = result.length;
+			final int resultSize = result.length;
 			_actionResult = new Object[resultSize];
 			for (int i=0; i<resultSize; i++) {
 				try {
@@ -220,13 +220,16 @@ public class ActionPerformedNotification extends Notification {
 		return _originalService;
 	}
 
+	  /**
+	   * {@inheritDoc}
+	   */
 	@Override
 	public boolean equals(Object obj) {
 		// check type
 		if ((obj == null) || !(obj instanceof ActionPerformedNotification)) {
 			return false;
 		}
-		ActionPerformedNotification n = (ActionPerformedNotification) obj;
+		final ActionPerformedNotification n = (ActionPerformedNotification) obj;
 
 		// check agent
 		if (((source == null) && (n.source != null)) ||
@@ -267,9 +270,12 @@ public class ActionPerformedNotification extends Notification {
 		return true;
 	}
 
+	  /**
+	   * {@inheritDoc}
+	   */
 	@Override
 	public int hashCode() {
-		int prim = 31;
+		final int prim = 31;
 		int hash = prim + (source == null ? 0 : source.hashCode());
 		hash = prim * hash + (_actionName == null ? 0 : _actionName.hashCode());
 		hash = prim * hash + (_agentbeanName == null ? 0 : _agentbeanName.hashCode());

@@ -18,14 +18,14 @@ public interface ISensor extends IAgentBean {
 	 * 
 	 * @return the environment with which this Sensor is associated.
 	 */
-	public IAdaptor getEnvironment();
+	IAdaptor getEnvironment();
 
 	/**
 	 * Reads the current data from this sensor
 	 * 
 	 * @return a fact describing the sensors current data.
 	 */
-	public IFact readSensor();
+	IFact readSensor();
 
 	/**
 	 * Getter for the type of the Sensor.
@@ -33,6 +33,6 @@ public interface ISensor extends IAgentBean {
 	 * @return true, if this sensor actively creates data, false if the sensor
 	 *         has to be polled.
 	 */
-	public boolean isActive();
+	boolean isActive();
 
 }

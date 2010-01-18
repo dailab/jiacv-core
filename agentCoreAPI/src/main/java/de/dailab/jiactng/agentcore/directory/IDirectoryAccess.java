@@ -15,25 +15,25 @@ public interface IDirectoryAccess {
 	/**
 	 * Registers an action within the directory.
 	 * 
-	 * @param actionDescription
+	 * @param actionDescription the description of the action
 	 */
-	public void registerAction(IActionDescription actionDescription);
+	void registerAction(IActionDescription actionDescription);
 	
 	/**
 	 * Removes an action from the directory
 	 * 
-	 * @param actionDescription
+	 * @param actionDescription the description of the action
 	 */
-	public void deregisterAction(IActionDescription actionDescription);
+	void deregisterAction(IActionDescription actionDescription);
 	
 	/**
 	 * Modifies an action description stored in the directory and
 	 * characterized with the first argument with the second argument.
 	 * 
-	 * @param oldDescription
-	 * @param newDescription
+	 * @param oldDescription the old description of the action
+	 * @param newDescription the new description of the action
 	 */
-	public void modifyAction(IActionDescription oldDescription, IActionDescription newDescription);
+	void modifyAction(IActionDescription oldDescription, IActionDescription newDescription);
 	
 	/**
 	 * Returns an action that matches the given action description.
@@ -45,7 +45,7 @@ public interface IDirectoryAccess {
 	 * @return the action that matches the template or <code>null</code>
 	 *         if none could be found
 	 */
-	public IActionDescription searchAction(IActionDescription template);
+	IActionDescription searchAction(IActionDescription template);
 
 	/**
 	 * Returns all actions that match the given action description.
@@ -55,5 +55,5 @@ public interface IDirectoryAccess {
 	 * @return all actions that match the template or an empty list
 	 *         if none could be found
 	 */
-	public List<IActionDescription> searchAllActions(IActionDescription template);
+	List<IActionDescription> searchAllActions(IActionDescription template);
 }

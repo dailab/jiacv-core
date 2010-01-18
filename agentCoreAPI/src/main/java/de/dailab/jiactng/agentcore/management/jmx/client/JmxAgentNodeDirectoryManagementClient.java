@@ -3,12 +3,10 @@ package de.dailab.jiactng.agentcore.management.jmx.client;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.management.Attribute;
 import javax.management.InstanceNotFoundException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;

@@ -16,7 +16,7 @@ public interface IServiceDescription extends IActionDescription {
    * 
    * @return A String containing the RDF-Representation of the ServiceDescriptions ontology.
    */
-  public String getOntologySource();
+  String getOntologySource();
 
   /**
    * Setter for the raw sourcecode of the ontology in which the servicedescription is defined. This is usually an
@@ -25,6 +25,6 @@ public interface IServiceDescription extends IActionDescription {
    * @param ontologySource
    *          A String containing the RDF-Representation of the ServiceDescriptions ontology.
    */
-  public void setOntologySource(String ontologySource);
+  void setOntologySource(String ontologySource);
 
 }

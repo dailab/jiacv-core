@@ -48,10 +48,10 @@ public class JmxManagementClient {
 	 * @see JMXServiceURL#JMXServiceURL(String, String, int, String)
 	 */
 	public static List<JMXServiceURL> getURLsFromRegistry(String host, int port) throws RemoteException {
-		List<JMXServiceURL> urls = new ArrayList<JMXServiceURL>();
-		Iterator<String> nodeIdIterator = Arrays.asList(LocateRegistry.getRegistry(host, port).list()).iterator();
+		final List<JMXServiceURL> urls = new ArrayList<JMXServiceURL>();
+		final Iterator<String> nodeIdIterator = Arrays.asList(LocateRegistry.getRegistry(host, port).list()).iterator();
 		while (nodeIdIterator.hasNext()) {
-			String nodeId = nodeIdIterator.next();
+			final String nodeId = nodeIdIterator.next();
 			if (nodeId.startsWith(IdFactory.IdPrefix.Node.toString())) {
 				try {
 					urls.add(new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + host + ":" + port + "/" + nodeId));
@@ -71,15 +71,15 @@ public class JmxManagementClient {
 	 * @see MulticastSocket#receive(DatagramPacket)
 	 */
 	public static List<JMXServiceURL> getURLsFromMulticast() throws IOException {
-		List<JMXServiceURL> urls = new ArrayList<JMXServiceURL>();
+		final List<JMXServiceURL> urls = new ArrayList<JMXServiceURL>();
 		byte[] buffer = new byte[1000];
-		long endTime = System.currentTimeMillis() + 5000;
+		final long endTime = System.currentTimeMillis() + 5000;
 
 		// activate multicast socket
-		InetAddress group = InetAddress.getByName("226.6.6.7");
-		MulticastSocket socket = new MulticastSocket(9999);
+		final InetAddress group = InetAddress.getByName("226.6.6.7");
+		final MulticastSocket socket = new MulticastSocket(9999);
 		socket.setTimeToLive(1);
-		DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+		final DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
 		socket.joinGroup(group);
 
 		// read multicast packets
@@ -88,7 +88,7 @@ public class JmxManagementClient {
 			dp.setLength(1000);
 			socket.receive(dp);
 			buffer = dp.getData();
-			String message = new String(buffer, 0, dp.getLength());
+			final String message = new String(buffer, 0, dp.getLength());
 
 			// add converted message to list of URLs
 			try {
@@ -145,7 +145,7 @@ public class JmxManagementClient {
 	 * @see JMXConnector#getMBeanServerConnection()
 	 */
 	public JmxManagementClient(JMXServiceURL url, String username, String password) throws IOException, SecurityException {
-		HashMap<String,Object> env = new HashMap<String,Object>();
+		final HashMap<String,Object> env = new HashMap<String,Object>();
 	    env.put(JMXConnector.CREDENTIALS, new String[] {username, password});
 		jmxc = JMXConnectorFactory.connect(url, env);
 		mbsc = jmxc.getMBeanServerConnection();
@@ -181,8 +181,8 @@ public class JmxManagementClient {
 	 */
 	public Set<String> getAgentNodeUUIDs() throws IOException {
 		try {
-			Set<ObjectName> agentNodes = mbsc.queryNames(new JmxManager().getMgmtNameOfAgentNode("*"), null);
-			HashSet<String> agentNodeUUIDs = new HashSet<String>();
+			final Set<ObjectName> agentNodes = mbsc.queryNames(new JmxManager().getMgmtNameOfAgentNode("*"), null);
+			final HashSet<String> agentNodeUUIDs = new HashSet<String>();
 			for (ObjectName agentNode : agentNodes) {
 				agentNodeUUIDs.add(agentNode.getKeyProperty("agentnode"));
 			}
@@ -252,7 +252,7 @@ public class JmxManagementClient {
 	 * @see JmxAgentNodeManagementClient#getDirectoryName()
 	 */
 	public JmxAgentNodeDirectoryManagementClient getDirectoryManagementClient(String agentNodeID) throws MalformedObjectNameException, InstanceNotFoundException, IOException {
-		String directoryBeanName = getAgentNodeManagementClient(agentNodeID).getDirectoryName();
+		final String directoryBeanName = getAgentNodeManagementClient(agentNodeID).getDirectoryName();
 		return new JmxAgentNodeDirectoryManagementClient(mbsc, agentNodeID, directoryBeanName);
 	}
 
@@ -292,8 +292,8 @@ public class JmxManagementClient {
 	 * @see JmxAgentCommunicationManagementClient#JmxAgentCommunicationManagementClient(MBeanServerConnection, ObjectName)
 	 */
 	public Set<JmxAgentCommunicationManagementClient> getAgentCommunicationManagementClients(String agentNodeID, String agentID) throws MalformedObjectNameException, IOException {
-		Set<JmxAgentCommunicationManagementClient> clients = new HashSet<JmxAgentCommunicationManagementClient>();
-		Set<ObjectInstance> beans = mbsc.queryMBeans(new JmxManager().getMgmtNameOfAgentBean(agentNodeID, agentID, "*"), null);
+		final Set<JmxAgentCommunicationManagementClient> clients = new HashSet<JmxAgentCommunicationManagementClient>();
+		final Set<ObjectInstance> beans = mbsc.queryMBeans(new JmxManager().getMgmtNameOfAgentBean(agentNodeID, agentID, "*"), null);
 		for (ObjectInstance bean : beans) {
 			try {
 				if (mbsc.isInstanceOf(bean.getObjectName(), CommunicationBeanMBean.class.getName())) {

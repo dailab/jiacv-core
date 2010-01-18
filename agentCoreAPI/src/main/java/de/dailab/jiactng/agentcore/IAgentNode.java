@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,14 +26,14 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * 
    * @return a String containing the unique identifier for this agentnode.
    */
-  public String getUUID();
+  String getUUID();
 
   /**
    * The name of this agentnode, as set by Spring
    * 
    * @return the name of this agentnode.
    */
-  public String getName();
+  String getName();
 
   /**
    * Setter for the name of this agentnode.
@@ -42,7 +41,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @param name
    *          the name of this agentnode
    */
-  public void setBeanName(String name);
+  void setBeanName(String name);
 
   /**
    * Setter for the initial list of agents of this agentnode. Used by Spring
@@ -51,7 +50,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @param agents
    *          the list of agents that should be started with the agendnodes.
    */
-  public void setAgents(List<IAgent> agents);
+  void setAgents(List<IAgent> agents);
 
   /**
    * Adds an agent to the agentnode during runtime.
@@ -60,7 +59,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *          the instance if IAgent that shall be started on the agentnode.
    * @see de.dailab.jiactng.agentcore.IAgent
    */
-  public void addAgent(IAgent agent);
+  void addAgent(IAgent agent);
 
   /**
    * Removes an agent from the agentnode during runtime. The agents state is set
@@ -70,7 +69,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *          the instance if IAgent that shall be removed on the agentnode.
    * @see de.dailab.jiactng.agentcore.IAgent
    */
-  public void removeAgent(IAgent agent);
+  void removeAgent(IAgent agent);
 
   /**
    * Getter for a list of agents on the agentnode
@@ -80,7 +79,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * 
    * @see Collections#unmodifiableList(List)
    */
-  public List<IAgent> findAgents();
+  List<IAgent> findAgents();
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode, i.e
@@ -93,7 +92,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * 		 node bean.
    * @see org.apache.commons.logging.Log
    */
-  public Log getLog(IAgentNodeBean nodeBean);
+  Log getLog(IAgentNodeBean nodeBean);
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode, i.e
@@ -105,7 +104,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @return a log-object that contains the UUID of the agentnode and the name of the agent.
    * @see org.apache.commons.logging.Log
    */
-  public Log getLog(IAgent agent);
+  Log getLog(IAgent agent);
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode and
@@ -122,7 +121,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *         and the name of the agent bean.
    * @see org.apache.commons.logging.Log
    */
-  public Log getLog(IAgent agent, IAgentBean bean);
+  Log getLog(IAgent agent, IAgentBean bean);
   
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode,
@@ -141,7 +140,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *         the name of the agent bean and the extension.
    * @see org.apache.commons.logging.Log
    */
-  public Log getLog(IAgent agent, IAgentBean bean, String extension);
+  Log getLog(IAgent agent, IAgentBean bean, String extension);
 
   /**
    * Getter for the global threadpool for this agentnode. All threads should be
@@ -150,7 +149,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @return a new ExecutorService
    * @see java.util.concurrent.ExecutorService
    */
-  public ExecutorService getThreadPool();
+  ExecutorService getThreadPool();
   
   /**
    * Setter for agentnode's beans. This is thought as generic port
@@ -159,7 +158,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * 
    * @param agentnodebeans the beans to set 
    */
-  public void setAgentNodeBeans(List<IAgentNodeBean> agentnodebeans);
+  void setAgentNodeBeans(List<IAgentNodeBean> agentnodebeans);
   
   /**
    * Getter for beans of the agentnode.
@@ -168,7 +167,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * 
    * @see Collections#unmodifiableList(List)
    */
-  public List<IAgentNodeBean> getAgentNodeBeans();
+  List<IAgentNodeBean> getAgentNodeBeans();
 
 	/**
 	 * Sets the configuration of the JMX connector servers used for remote management.
@@ -176,13 +175,13 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
 	 * @param jmxConnectors
 	 *            the set of connectors.
 	 */
-	public void setJmxConnectors(Set<Map<String, Object>> jmxConnectors);
+	void setJmxConnectors(Set<Map<String, Object>> jmxConnectors);
 
 	/**
 	 * Gets the configuration of the JMX connector servers used for remote management.
 	 * 
 	 * @return the set of connectors.
 	 */
-	public Set<Map<String, Object>> getJmxConnectors();
+	Set<Map<String, Object>> getJmxConnectors();
 
 }

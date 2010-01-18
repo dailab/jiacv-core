@@ -22,7 +22,7 @@ public interface IOntologyStorage extends IAgentNodeBean {
    *          the location of the RDF-Description of the Ontology. May also point to a local file.
    * @return A IServiceDescription object representing the OWL-S service description found in the ontology.
    */
-  public IServiceDescription loadServiceDescriptionFromOntology(URI ontURI);
+  IServiceDescription loadServiceDescriptionFromOntology(URI ontURI);
 
   /**
    * Serializes an IServiceDescription into its RDF-representation and returns this as a string.
@@ -31,7 +31,7 @@ public interface IOntologyStorage extends IAgentNodeBean {
    *          The ServiceDescription object.
    * @return A String containing the RDF-representation of the service description.
    */
-  public String serializeServiceDescription(IServiceDescription serviceDescription);
+  String serializeServiceDescription(IServiceDescription serviceDescription);
 
   /**
    * Deserializaes a RDF-String and creates a servicedescription object.
@@ -40,22 +40,22 @@ public interface IOntologyStorage extends IAgentNodeBean {
    *          A String containing the RDF-representation of the service description.
    * @return The ServiceDescription object.
    */
-  public IServiceDescription deserializeServiceDescription(String serviceString);
+  IServiceDescription deserializeServiceDescription(String serviceString);
 
   /**
    * TODO: java.lang.Object should be replaced with the Ontology-Class, once a definite Library has been found
    */
-  // public void addOntology(URI ontoURI);
+  // void addOntology(URI ontoURI);
   //
-  // public void removeOntology(URI ontoURI);
+  // void removeOntology(URI ontoURI);
   //
-  // public Object findOntology(URI ontoURI);
+  // Object findOntology(URI ontoURI);
   //
-  // public void addOntology(Object ont);
+  // void addOntology(Object ont);
   //  
-  // public void removeOntology(Object ont);
+  // void removeOntology(Object ont);
   //  
-  // public Object findOntology(Object ont);
+  // Object findOntology(Object ont);
   //  
-  // public IServiceDescription getServiceDescriptionFromOntology(Object ont);
+  // IServiceDescription getServiceDescriptionFromOntology(Object ont);
 }

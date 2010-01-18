@@ -24,7 +24,7 @@ public interface ResultReceiver {
 	 * 
 	 * @param result the result of an action
 	 */
-	public void receiveResult(ActionResult result);
+	void receiveResult(ActionResult result);
 
 //	/**
 //	 * Setter for the beanName. This method is called by Spring during
@@ -34,12 +34,12 @@ public interface ResultReceiver {
 //	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 //	 */
 //	
-//	public void setBeanName(String name);
+//	void setBeanName(String name);
 //
 //	/**
 //	 * Getter for the name of the agentbean.
 //	 * 
 //	 * @return a string representing the name of the agentbean.
 //	 */
-//	public String getBeanName();
+//	String getBeanName();
 }

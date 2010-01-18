@@ -29,5 +29,5 @@ public interface IMemory extends ILifecycle, EventedTupleSpace<IFact> {
 	 * Sets the reference to the agent which contains this memory.
 	 * @param agent the agent which contains this memory
 	 */
-	public void setThisAgent(IAgent agent);
+	void setThisAgent(IAgent agent);
 }

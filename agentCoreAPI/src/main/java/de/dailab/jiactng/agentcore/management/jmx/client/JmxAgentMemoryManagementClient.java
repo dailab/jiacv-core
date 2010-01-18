@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;

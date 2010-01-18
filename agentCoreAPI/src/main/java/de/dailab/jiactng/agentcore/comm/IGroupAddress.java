@@ -13,5 +13,9 @@ package de.dailab.jiactng.agentcore.comm;
  * @version $Revision: 16194 $
  */
 public interface IGroupAddress extends ICommunicationAddress {
+
+	/**
+	 * Gets the corresponding unbounded address.
+	 */
     IGroupAddress toUnboundAddress();
 }

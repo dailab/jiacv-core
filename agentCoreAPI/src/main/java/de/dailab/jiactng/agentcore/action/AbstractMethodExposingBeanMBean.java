@@ -12,5 +12,5 @@ public interface AbstractMethodExposingBeanMBean extends AbstractActionAuthoriza
 	 * Creates management information about the provided actions.
 	 * @return list of action descriptions
 	 */
-	public TabularData getActionList();
+	TabularData getActionList();
 }

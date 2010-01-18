@@ -99,6 +99,9 @@ public class Session implements IFact {
     this.timeToLive = Long.valueOf(timeToLive);
   }
 
+  /**
+   * Constructs an empty session.
+   */
   public Session() {
     this.sessionId = null;
     this.creationTime = null;
@@ -181,19 +184,24 @@ public class Session implements IFact {
 
   /**
    * Sets an optional timeout attribute. If not set the default value is 60.000
-   * milliseconds Used only when session is written into agents memory
+   * milliseconds. Used only when session is written into agents memory.
    * 
-   * @param timeout
+   * @param timeout the timeout value
    */
   public void setTimeToLive(Long timeout) {
     timeToLive = timeout;
   }
 
+  /**
+   * Gets the timeout attribute. The default value is 60.000 milliseconds.
+   * @return the timeout value
+   */
   public Long getTimeToLive() {
     return timeToLive;
   }
 
   /**
+   * Sets the unique Id of this session.
    * @param id
    *          the sessionId to set
    */
@@ -202,6 +210,7 @@ public class Session implements IFact {
   }
 
   /**
+   * Gets the receiver of the session result.
    * @return the source
    */
   public ResultReceiver getSource() {
@@ -209,6 +218,7 @@ public class Session implements IFact {
   }
 
   /**
+   * Sets the receiver of the session result.
    * @param source
    *          the source to set
    */
@@ -217,17 +227,23 @@ public class Session implements IFact {
   }
 
   /**
+   * Gets the time when the session was created.
    * @return the creationTime
    */
   public Long getCreationTime() {
     return creationTime;
   }
 
+  /**
+   * Checks if the session has timed out.
+   * @return <code>true</code> if the timeout was reached.
+   */
   public boolean isTimeout() {
     return (System.currentTimeMillis() > (creationTime.longValue() + timeToLive.longValue()));
   }
 
   /**
+   * Sets the time when the session was created.
    * @param creationTime
    *          the creationTime to set
    */
@@ -241,7 +257,7 @@ public class Session implements IFact {
    * @return an Arraylist containing the history.
    */
   public ArrayList<SessionEvent> getHistory() {
-    ArrayList<SessionEvent> copy = new ArrayList<SessionEvent>();
+    final ArrayList<SessionEvent> copy = new ArrayList<SessionEvent>();
     copy.addAll(history);
     return copy;
   }
@@ -294,7 +310,7 @@ public class Session implements IFact {
    */
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
+    final StringBuilder builder = new StringBuilder();
 
     // sessionId
     builder.append("Session:\n sessionId=");
@@ -305,7 +321,7 @@ public class Session implements IFact {
     }
 
     // time
-    Calendar calendar = Calendar.getInstance();
+    final Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(creationTime);
     builder.append("\n created='").append(calendar.getTime().toString()).append("'");
 
@@ -329,18 +345,28 @@ public class Session implements IFact {
     return builder.toString();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public int hashCode() {
     return this.sessionId.hashCode();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public boolean equals(Object obj) {
-    if (obj == null || !(obj instanceof Session))
+    if (obj == null || !(obj instanceof Session)) {
       return false;
-    Session other = (Session) obj;
-    if (this.sessionId == null || other.sessionId == null)
+    }
+    final Session other = (Session) obj;
+    if (this.sessionId == null || other.sessionId == null) {
       return true;
-    else
+    } else {
       return this.sessionId.equals(other.sessionId);
+    }
   }
 
   /**
@@ -402,18 +428,34 @@ public class Session implements IFact {
     this.originalService = originalService;
   }
 
+  /**
+   * Gets the user which creates the root session of the parent hierarchy.
+   * @return the original user of this session.
+   */
   public String getOriginalUser() {
     return this.originalUser;
   }
 
+  /**
+   * Sets the user which creates the root session of the parent hierarchy.
+   * @param originalUser the original user of this session.
+   */
   public void setOriginalUser(String originalUser) {
     this.originalUser = originalUser;
   }
 
+  /**
+   * Gets the depth of the parent hierarchy.
+   * @return the session call depth.
+   */
   public Integer getCurrentCallDepth() {
     return this.currentCallDepth;
   }
 
+  /**
+   * Sets the depth of the parent hierarchy.
+   * @param currentCallDepth the session call depth.
+   */
   public void setCurrentCallDepth(int currentCallDepth) {
     this.currentCallDepth = currentCallDepth;
   }

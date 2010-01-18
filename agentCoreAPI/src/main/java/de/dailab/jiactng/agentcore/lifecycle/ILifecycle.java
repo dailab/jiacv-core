@@ -66,7 +66,7 @@ public interface ILifecycle extends Manageable {
      * previous states (depending on mode) or an error occurs during change of 
      * the state.
      */
-    public void init() throws LifecycleException;
+    void init() throws LifecycleException;
 
     /**
      * Start your object, get ready for business. Acquire any resources.
@@ -75,7 +75,7 @@ public interface ILifecycle extends Manageable {
      * previous states (depending on mode) or an error occurs during change of 
      * the state.
      */
-    public void start() throws LifecycleException;
+    void start() throws LifecycleException;
 
     /**
      * Stop your object. Release resources.
@@ -84,7 +84,7 @@ public interface ILifecycle extends Manageable {
      * previous states (depending on mode) or an error occurs during change of 
      * the state.
      */
-    public void stop() throws LifecycleException;
+    void stop() throws LifecycleException;
 
     /**
      * Prepare for the object's removal.
@@ -93,7 +93,7 @@ public interface ILifecycle extends Manageable {
      * previous states (depending on mode) or an error occurs during change of 
      * the state.
      */
-    public void cleanup() throws LifecycleException;
+    void cleanup() throws LifecycleException;
 
     /**
      * Add a <code>LifecycleListener</code> that is interested in
@@ -101,21 +101,21 @@ public interface ILifecycle extends Manageable {
      *
      * @param listener the <code>LifecycleListener</code> to add
      */
-    public void addLifecycleListener(ILifecycleListener listener);
+    void addLifecycleListener(ILifecycleListener listener);
 
     /**
      * Remove the specified <code>LifecycleListener</code>
      *
      * @param listener the <code>LifecycleListener</code> to remove
      */
-    public void removeLifecycleListener(ILifecycleListener listener);
+    void removeLifecycleListener(ILifecycleListener listener);
 
     /**
      * Returns the current lifecycle state.
      *
      * @return the <code>Lifecycle</code>'s state
      */
-    public LifecycleStates getState();
+    LifecycleStates getState();
 
     /**
      * Called when the lifecycle state has been changed.
@@ -123,5 +123,5 @@ public interface ILifecycle extends Manageable {
      * @param oldState the old lifecycle state
      * @param newState the new lifecycle state
      */
-    public void stateChanged(LifecycleStates oldState, LifecycleStates newState);
+    void stateChanged(LifecycleStates oldState, LifecycleStates newState);
 }

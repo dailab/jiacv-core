@@ -45,15 +45,15 @@ public class JmxMulticastSender extends TimerTask {
 	@Override
 	public void run() {
 		for (int i=0; i<jmxURLs.length; i++) {
-			String message = jmxURLs[i];
+			final String message = jmxURLs[i];
 			try {
 				socket.joinGroup(group);
 				if (!connected) {
 					System.out.println("Network connection established to send on multicast socket.");
 					connected = true;
 				}
-				byte[] buffer = message.getBytes();
-				DatagramPacket dp = new DatagramPacket(buffer, buffer.length, group, multicastPort);
+				final byte[] buffer = message.getBytes();
+				final DatagramPacket dp = new DatagramPacket(buffer, buffer.length, group, multicastPort);
 	      
 				socket.send(dp);
 				socket.leaveGroup(group);

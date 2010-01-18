@@ -23,7 +23,7 @@ public interface IAgentBean extends ILifecycle {
 	 * @param agent
 	 *            the agent-class that controls this bean.
 	 */
-	public void setThisAgent(IAgent agent);
+	void setThisAgent(IAgent agent);
 
 	/**
 	 * Setter for the memory of the agent that holds this bean.
@@ -31,7 +31,7 @@ public interface IAgentBean extends ILifecycle {
 	 * @param mem
 	 *            the IMemory instance of the agent.
 	 */
-	public void setMemory(IMemory mem);
+	void setMemory(IMemory mem);
 
 	/**
 	 * Setter for the beanName.
@@ -39,14 +39,14 @@ public interface IAgentBean extends ILifecycle {
 	 * @param name
 	 *            the unqualified name of the bean.
 	 */
-	public void setBeanName(String name);
+	void setBeanName(String name);
 
 	/**
 	 * Getter for the name of the agentbean
 	 * 
 	 * @return a string representing the name of the agentbean.
 	 */
-	public String getBeanName();
+	String getBeanName();
 
 	/**
 	 * Getter for Interval by which the execute()-method of the bean is called.
@@ -54,7 +54,7 @@ public interface IAgentBean extends ILifecycle {
 	 * 
 	 * @return the time interval between two calls of the execute()-method.
 	 */
-	public int getExecuteInterval();
+	int getExecuteInterval();
 
 	/**
 	 * Setter for Interval by which the execute()-method of the bean is called.
@@ -64,14 +64,14 @@ public interface IAgentBean extends ILifecycle {
 	 *            the time interval between two calls of the execute()-method.
 	 *            If negative, the method is never called.
 	 */
-	public void setExecuteInterval(int executeInterval);
+	void setExecuteInterval(int executeInterval);
 
 	/**
 	 * The stub for the execute method, that should be implemented by all beans.
 	 * Note: this stub is likely to change, when the Sensor/Effector structure
 	 * is implemented.
 	 */
-	public void execute();
+	void execute();
 
 	/**
 	 * This method will be used by the execution cycle. If <code>getExecuteInterval</code>
@@ -105,7 +105,7 @@ public interface IAgentBean extends ILifecycle {
 	 * @param state
 	 *            the state to which the bean should change.
 	 */
-	public void handleLifecycleException(LifecycleException e,
+	void handleLifecycleException(LifecycleException e,
 			LifecycleStates state);
 
 }

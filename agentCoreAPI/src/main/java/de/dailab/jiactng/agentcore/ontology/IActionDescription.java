@@ -3,7 +3,6 @@
  */
 package de.dailab.jiactng.agentcore.ontology;
 
-import java.util.Collections;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
@@ -18,12 +17,23 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
  */
 public interface IActionDescription extends IFact, JmxDescriptionSupport {
 
-    public static final String ITEMNAME_NAME = "name";
-    public static final String ITEMNAME_INPUTTYPES = "input types";
-    public static final String ITEMNAME_RESULTTYPES = "result types";
-    public static final String ITEMNAME_SCOPE = "scope";
-    public static final String ITEMNAME_BEAN = "bean";
-    public static final String ITEMNAME_AGENT = "agent";
+	/** Item name which can be used to get the name of the JMX-based action description. */
+    static final String ITEMNAME_NAME = "name";
+
+	/** Item name which can be used to get the input types of the JMX-based action description. */
+    static final String ITEMNAME_INPUTTYPES = "input types";
+
+	/** Item name which can be used to get the result types of the JMX-based action description. */
+    static final String ITEMNAME_RESULTTYPES = "result types";
+
+	/** Item name which can be used to get the scope of the JMX-based action description. */
+    static final String ITEMNAME_SCOPE = "scope";
+
+	/** Item name which can be used to get the providing agent bean of the JMX-based action description. */
+    static final String ITEMNAME_BEAN = "bean";
+
+	/** Item name which can be used to get the providing agent of the JMX-based action description. */
+    static final String ITEMNAME_AGENT = "agent";
 
 	/**
      * This method returns the name of the action this description

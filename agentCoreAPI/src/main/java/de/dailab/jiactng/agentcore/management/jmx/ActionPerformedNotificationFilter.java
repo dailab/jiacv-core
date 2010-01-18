@@ -65,7 +65,7 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 		}
 
 		// check state of action
-		DoActionState state = ((ActionPerformedNotification) notification).getState();
+		final DoActionState state = ((ActionPerformedNotification) notification).getState();
 		if (state.equals(DoActionState.invoked) && !_invokedEnabled) {
 			return false;
 		}
@@ -83,7 +83,7 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 		String actionName;
 		String agentbeanName;
 		try {
-			ActionPerformedNotification n = (ActionPerformedNotification) notification;
+			final ActionPerformedNotification n = (ActionPerformedNotification) notification;
 			actionName = n.getActionName();
 			agentbeanName = n.getAgentbeanName();
 		}

@@ -20,14 +20,28 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
  */
 public interface IJiacMessage extends IFact, JmxDescriptionSupport {
 
-   public static final String ITEMNAME_HEADERS = "headers";
-   public static final String ITEMNAME_PAYLOAD = "payload";
+	/** The item name which can be used to get the headers of an JMX-based message description. */
+   static final String ITEMNAME_HEADERS = "headers";
+
+	/** The item name which can be used to get the payload of an JMX-based message description. */
+   static final String ITEMNAME_PAYLOAD = "payload";
 
 
+   /**
+    * This interface defines the keys of the message header fields.
+    */
     public interface Header {
+
+    	/** Key of the message header field which defines the sender of the message. */
         String SENDER= "JiacTNGSenderAddress";
+
+        /** Key of the message header field which defines the protocol of the message. */
         String PROTOCOL= "JiacTNGProtocolID";
+
+        /** Key of the message header field which defines the reply address of the message. */
         String REPLY_TO= "JiacTNGReplyToAddress";
+
+        /** Key of the message header field which defines the receiver address of the message. */
         String SEND_TO = "JiacTNGSendToAddress";
     }
 
@@ -43,12 +57,20 @@ public interface IJiacMessage extends IFact, JmxDescriptionSupport {
 	/**
 	 * Who did sent me this Message?
 	 * 
-	 * @return ICommunicationAddress	the address from where the Message is sent.
+	 * @return the address from where the Message is sent.
 	 */
 	ICommunicationAddress getSender();
-    
+
+	/**
+	 * Gets the address to which replies should be send.
+	 * @return the reply address
+	 */
     ICommunicationAddress getReplyToAddress();
-    
+
+    /**
+     * Gets the protocol of this message.
+     * @return the protocol
+     */
     String getProtocol();
     
     /**
@@ -67,6 +89,7 @@ public interface IJiacMessage extends IFact, JmxDescriptionSupport {
     
     /**
      * Returns all header keys for this message.
+     * @return the header keys
      */
     Set<String> getHeaderKeys();
 }

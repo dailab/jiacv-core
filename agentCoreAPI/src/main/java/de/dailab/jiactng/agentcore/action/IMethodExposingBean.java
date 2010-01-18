@@ -3,7 +3,6 @@
  */
 package de.dailab.jiactng.agentcore.action;
 
-import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -34,9 +33,16 @@ public interface IMethodExposingBean {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     public static @interface Expose {
+
+    	/** The action name to be used for the exposed method. */
         String name() default "";
+
+        /** The action result types to be used for the exposed method. */
         Class<?>[] returnTypes() default {};
+
+        /** The action scope to be used for the exposed method. */
         ActionScope scope() default ActionScope.AGENT;
+
     }
     
 }

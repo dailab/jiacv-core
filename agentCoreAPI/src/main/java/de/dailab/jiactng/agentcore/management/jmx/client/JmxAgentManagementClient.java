@@ -3,16 +3,13 @@ package de.dailab.jiactng.agentcore.management.jmx.client;
 import java.io.IOException;
 import java.util.List;
 
-import javax.management.Attribute;
 import javax.management.AttributeChangeNotificationFilter;
 import javax.management.InstanceNotFoundException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
-import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
-import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
@@ -431,10 +428,10 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	
 	/**
 	 * Sets the auto execution service list for the connected agent.
-	 * @param actionIds
-	 * @throws IOException
-	 * @throws InstanceNotFoundException
-	 * @throws InvalidAttributeValueException
+	 * @param actionIds the list of action names.
+	 * @throws IOException A communication problem occurred when setting the attribute value of the remote agent.
+	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 */
   public void setAutoExecutionServices(List<String> actionIds) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
     this.setAttribute("AutoExecutionServices", actionIds);
@@ -443,20 +440,19 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
   /**
    * Gets the auto execution service list for the connected agent.
    * @return auto execution service id list
-   * @throws IOException
-   * @throws InstanceNotFoundException
-   * @throws InvalidAttributeValueException
+   * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
+   * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
    */
-  public List<String> getAutoExecutionServices() throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+  public List<String> getAutoExecutionServices() throws IOException, InstanceNotFoundException {
     return (List<String>) getAttribute("AutoExecutionServices");
   }
   
   /**
    * Sets the auto execution type for the connected agent.
-   * @param continous
-   * @throws IOException
-   * @throws InstanceNotFoundException
-   * @throws InvalidAttributeValueException
+   * @param continous <code>true</code> if the automatic actions will be continuously executed.
+   * @throws IOException A communication problem occurred when setting the attribute value of the remote agent.
+   * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
+   * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
    */
   public void setAutoExecutionType(boolean continous)throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
     this.setAttribute("AutoExecutionType", continous);
@@ -464,9 +460,9 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
   
   /**
    * Gets the auto execution type for the connected agent.
-   * @return auto execution type
-   * @throws IOException
-   * @throws InstanceNotFoundException
+   * @return <code>true</code> if the automatic actions will be continuously executed.
+   * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
+   * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
    * @throws InvalidAttributeValueException
    */
   public boolean getAutoExecutionType()throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
@@ -476,8 +472,8 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
   /**
    * Gets the spring config xml snippet for the connected agent.
    * @return Spring Config XML snippet
-   * @throws IOException
-   * @throws InstanceNotFoundException
+   * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
+   * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
    */
   public byte[] getSpringConfigXml() throws IOException, InstanceNotFoundException {
 	  return (byte[]) getAttribute("SpringConfigXml");
@@ -486,8 +482,8 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
   /**
    * Gets the Agent description for the connected agent.
    * @return Agent Description
-   * @throws InstanceNotFoundException
-   * @throws IOException
+   * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
+   * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
    */
   public IAgentDescription getAgentDescription() throws InstanceNotFoundException, IOException {
 	  return (IAgentDescription) getAttribute("AgentDescription");

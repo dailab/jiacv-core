@@ -25,20 +25,45 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
  */
 public interface IExecutionCycle extends ILifecycle, Runnable {
 
-  /**
+  /*
    * This method triggers the execution of the next agentbean in the list.
    */
-//  public void doStep();
+//  void doStep();
 
-  public void setThisAgent(IAgent agent);
-  public void setMemory(IMemory memory);
+	/**
+	 * Sets the agent of this execution cycle.
+	 * @param agent the agent
+	 */
+  void setThisAgent(IAgent agent);
+
+	/**
+	 * Sets the memory to be used by this execution cycle.
+	 * @param memory the agent memory
+	 */
+  void setMemory(IMemory memory);
   
-  public void setAutoExecutionServices(List<String> actionIds);
+	/**
+	 * Sets the actions which will be automatically executed.
+	 * @param actionIds the list of action names
+	 */
+  void setAutoExecutionServices(List<String> actionIds);
   
-  public List<String> getAutoExecutionServices();
+	/**
+	 * Gets the actions which are automatically executed.
+	 * @return the list of action names
+	 */
+  List<String> getAutoExecutionServices();
   
-  public void setAutoExecutionType(boolean continous);
+	/**
+	 * Sets the execution type of the automatic actions.
+	 * @param continous <code>true</code> if the actions will be continuously executed.
+	 */
+  void setAutoExecutionType(boolean continous);
   
-  public boolean getAutoExecutionType();
+	/**
+	 * Gets the execution type of the automatic actions.
+	 * @return <code>true</code> if the actions are continuously executed.
+	 */
+  boolean getAutoExecutionType();
   
 }

@@ -14,5 +14,5 @@ public interface MemoryMBean extends AbstractLifecycleMBean {
 	 * Information about the facts stored in the memory.
 	 * @return information about facts stored in memory
 	 */
-	public CompositeData getSpace();	
+	CompositeData getSpace();	
 }

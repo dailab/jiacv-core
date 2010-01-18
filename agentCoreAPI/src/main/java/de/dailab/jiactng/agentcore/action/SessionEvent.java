@@ -51,7 +51,12 @@ public class SessionEvent implements IFact {
 		this.action = action;
 		this.source = source;
 	}
-	
+
+	/**
+	 * Constructor to set the session and action of a session event
+	 * corresponding to an action request.
+	 * @param source the action request.
+	 */
 	public SessionEvent(DoAction source) {
 		this(null, null, source);
 		if (source != null) {
@@ -64,6 +69,7 @@ public class SessionEvent implements IFact {
 	}
 
 	/**
+	 * Gets the action description for this session event.
 	 * @return the action
 	 */
 	public IActionDescription getAction() {
@@ -71,6 +77,7 @@ public class SessionEvent implements IFact {
 	}
 
 	/**
+	 * Sets the action description for this session event.
 	 * @param action
 	 *            the action to set
 	 */
@@ -79,6 +86,7 @@ public class SessionEvent implements IFact {
 	}
 
 	/**
+	 * Gets the object which creates this session event.
 	 * @return the source
 	 */
 	public Object getSource() {
@@ -86,6 +94,7 @@ public class SessionEvent implements IFact {
 	}
 
 	/**
+	 * Sets the object which creates this session event.
 	 * @param source
 	 *            the source to set
 	 */
@@ -94,6 +103,7 @@ public class SessionEvent implements IFact {
 	}
 
 	/**
+	 * Gets the session of this session event.
 	 * @return the session
 	 */
 	public Session getSession() {
@@ -111,6 +121,7 @@ public class SessionEvent implements IFact {
 //	}
 
 	/**
+	 * Gets the session Id of this session event.
 	 * @return the session id of the session this event belongs to
 	 */
 	public String getSessionId() {
@@ -118,6 +129,7 @@ public class SessionEvent implements IFact {
 	}
 
 	/**
+	 * Sets the session Id of this session event.
 	 * @param id
 	 *            sets the id of the session
 	 */
@@ -125,10 +137,18 @@ public class SessionEvent implements IFact {
 		this.sessionId = id;
 	}
 
+	/**
+	 * Gets meta information about this session event.
+	 * @return the meta data
+	 */
 	public Object getMetaData() {
 		return metaData;
 	}
 
+	/**
+	 * Sets meta information about this session event.
+	 * @param metaData the meta data
+	 */
 	public void setMetaData(Object metaData) {
 		this.metaData = metaData;
 	}

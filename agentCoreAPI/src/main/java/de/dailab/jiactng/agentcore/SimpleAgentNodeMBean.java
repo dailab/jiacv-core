@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
+import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
 /**
@@ -18,32 +19,32 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * Getter for attribute "Name" of the managed agent node.
 	 * @return the name of this agent node
 	 */
-	public String getName();
+	String getName();
 
 	/**
 	 * Setter for attribute "Name" of the managed agent node.
 	 * @param name the new name of this agent node
 	 */
-	public void setName(String name);
+	void setName(String name);
 
 	/**
 	 * Getter for attribute "UUID" of the managed agent node.
 	 * @return the UUID of this agent node
 	 */
-	public String getUUID();
+	String getUUID();
 
 	/**
 	 * Getter for attribute "Host" of the managed agent node.
 	 * @throws UnknownHostException if no IP address for the host could be found.
 	 * @return the host where this agent node is running
 	 */
-	public String getHost() throws UnknownHostException;
+	String getHost() throws UnknownHostException;
 
 	/**
 	 * Getter for attribute "Agents" of the managed agent node.
 	 * @return the unique identifier of agents running on this agent node
 	 */
-	public List<String> getAgents();
+	List<String> getAgents();
 
 	/**
 	 * Deploys but does not initialize new agents on this agent node.
@@ -53,31 +54,31 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * @return the IDs of the created agents.
 	 * @throws Exception if the agents can not be created.
 	 */
-	public List<String> addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception;
+	List<String> addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception;
 
 	/**
 	 * Getter for attribute "Owner" of the managed agent node.
 	 * @return the owner of this agent node
 	 */
-	public String getOwner();
+	String getOwner();
 	
 	/**
 	 * Getter for attribute "JiacVersion" of the managed agent node.
 	 * @return the version of JIAC TNG used by this agent node
 	 */
-	public String getJiacVersion();
+	String getJiacVersion();
 	
 	/**
 	 * Getter for attribute "JiacVendor" of the managed agent node.
 	 * @return the vendor of JIAC TNG used by this agent node
 	 */
-	public String getJiacVendor();
+	String getJiacVendor();
 
 	/**
 	 * Getter for attribute "LoggingConfig" of the managed agent node.
 	 * @return the filename of the logging configuration
 	 */
-	public String getLoggingConfig();
+	String getLoggingConfig();
 
 	/**
 	 * Adds a socket appender to the logger of the agent node, all agent
@@ -86,7 +87,7 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * @param address The IP address of the logging server.
 	 * @param port The port of the logging port.
 	 */
-	public void addLog4JSocketAppender(String address, int port);
+	void addLog4JSocketAppender(String address, int port);
 
 	/**
 	 * Removes a socket appender from the logger of the agent node, all agent
@@ -95,23 +96,23 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * @param address The IP address of the logging server.
 	 * @param port The port of the logging port.
 	 */
-	public void removeLog4JSocketAppender(String address, int port);
+	void removeLog4JSocketAppender(String address, int port);
 
 	/**
 	 * Getter for attribute "AgentNodeBeanClasses" of the managed agent node.
 	 * @return the class of agent beans running in this agent node
 	 */
-	public List<String> getAgentNodeBeanClasses();
+	List<String> getAgentNodeBeanClasses();
 
 	/**
 	 * Getter for attribute "DirectoryName" of the managed agent node.
 	 * @return the name of the directory agent node bean or null if not exists
 	 */
-	public String getDirectoryName();
+	String getDirectoryName();
 
 	/**
 	 * Shuts down the managed agent node.
      * @throws LifecycleException if an error occurs during stop and cleanup of this agent node.
 	 */
-	public void shutdown() throws Exception;
+	void shutdown() throws LifecycleException;
 }

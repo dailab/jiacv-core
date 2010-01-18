@@ -17,7 +17,7 @@ public class DisableLifeCycleAttributeFilter implements NotificationFilter {
 	@Override
 	public boolean isNotificationEnabled(Notification notification) {
 		if (notification instanceof AttributeChangeNotification) {
-			AttributeChangeNotification acn = (AttributeChangeNotification)notification;
+			final AttributeChangeNotification acn = (AttributeChangeNotification)notification;
 			if (acn.getAttributeName().equals("LifecycleState")) {
 				return false;
 			}

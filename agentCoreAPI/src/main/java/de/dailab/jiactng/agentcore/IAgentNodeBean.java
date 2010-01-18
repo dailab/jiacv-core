@@ -28,12 +28,12 @@ public interface IAgentNodeBean extends ILifecycle {
      * @param name
      *            the unqualified name of the bean.
      */
-    public void setBeanName(String name);
+    void setBeanName(String name);
 
     /**
      * Getter for the name of this node bean
      * 
      * @return a string representing the name of this node bean.
      */
-    public String getBeanName();
+    String getBeanName();
 }

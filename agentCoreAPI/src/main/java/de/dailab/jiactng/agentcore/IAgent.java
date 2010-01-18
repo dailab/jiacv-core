@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
@@ -31,7 +30,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * @param agentNode
    *          the agentNode that hosts this agent.
    */
-  public void setAgentNode(IAgentNode agentNode);
+  void setAgentNode(IAgentNode agentNode);
 
   /**
    * Setter for the agent's memory-component. Used for dependency injection by
@@ -39,7 +38,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * 
    * @param memory the memory-component of this agent.
    */
-  public void setMemory(IMemory memory);
+  void setMemory(IMemory memory);
   
   
   /**
@@ -48,7 +47,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * 
    * @param execution the execution-cycle-component of this agent.
    */
-  public void setExecution(IExecutionCycle execution);
+  void setExecution(IExecutionCycle execution);
     
 
   /**
@@ -57,7 +56,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * 
    * @param agentbeans the agentbeans of this agent.
    */
-  public void setAgentBeans(List<IAgentBean> agentbeans);
+  void setAgentBeans(List<IAgentBean> agentbeans);
 
   /** TODO rename to setAgentName
    * Setter for the name of this agent. Used by Spring during initialisation.
@@ -66,49 +65,49 @@ public interface IAgent extends ILifecycleListener, Runnable,
    *          the name of this agent
    * @deprecated use #setAgentName(String) instead
    */
-  public void setBeanName(String name);
+  void setBeanName(String name);
 
   /**
    * Setter for the name of this agent. Used by Spring during initialisation.
    * 
    * @param name the name of this agent.
    */
-  public void setAgentName(String name);
+  void setAgentName(String name);
   
   /**
    * Getter for the name of this agent, as set by Spring.
    * 
    * @return the name of this agent.
    */
-  public String getAgentName();
+  String getAgentName();
 
   /**
    * Getter for the agent identifier.
    * 
    * @return the agent identifier of this agent.
    */
-  public String getAgentId();
+  String getAgentId();
 
   /**
    * Getter for the agentnode that hosts this agent.
    * 
    * @return a reference to the agentnode.
    */
-  public IAgentNode getAgentNode();
+  IAgentNode getAgentNode();
 
   /**
    * Getter for the owner of this agent.
    * 
    * @return the owner of this agent.
    */
-  public String getOwner();
+  String getOwner();
 
   /**
    * Setter for the owner of this agent.
    * 
    * @param owner the owner of this agent.
    */
-  public void setOwner(String owner);
+  void setOwner(String owner);
 
   /**
    * Getter for a list of agentbeans of this agent.
@@ -117,7 +116,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * 
    * @see Collections#unmodifiableList(List)
    */
-  public List<IAgentBean> getAgentBeans();
+  List<IAgentBean> getAgentBeans();
 
   /**
    * Getter for the global threadpool responsivle for this agent. All threads
@@ -130,7 +129,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * @see de.dailab.jiactng.agentcore.IAgentNode#getThreadPool()
    * @see java.util.concurrent.ExecutorService
    */
-  public abstract ExecutorService getThreadPool();
+  abstract ExecutorService getThreadPool();
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode and
@@ -145,7 +144,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    *         the beanname.
    * @see org.apache.commons.logging.Log
    */
-  public Log getLog(IAgentBean bean);
+  Log getLog(IAgentBean bean);
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode,
@@ -159,13 +158,13 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * @return a log-object that contains the agentnodes name, the agents name,
    *         the beanname and the extension or <code>null</code> if the agent node is unknown.
    */
-  public Log getLog(IAgentBean owner, String extension);
+  Log getLog(IAgentBean owner, String extension);
   
   /**
    * Returns the agent description of this agent.
    * @return the agent description of this agent
    */
-  public IAgentDescription getAgentDescription();
+  IAgentDescription getAgentDescription();
 
   /**
    * Gets the list of actions exposed by this agent.
@@ -174,33 +173,33 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * 
    * @see Collections#unmodifiableList(List)
    */
-  public List<Action> getActionList();
+  List<Action> getActionList();
 
   /**
    * Sets the list of actions to be exposed by this agent.
    * @param actionList the list of actions.
    */
-  public void setActionList(List<Action> actionList);
+  void setActionList(List<Action> actionList);
 
   /**
    * Gets the timeout after which the execution of a bean will be stopped.
    * 
    * @return the timeout in milliseconds
    */
-  public long getBeanExecutionTimeout();
+  long getBeanExecutionTimeout();
   
   /**
    * Gets the Spring configuration xml snippet for this agent.
    * 
    * @return bytearray of the xml spring source
    */
-  public byte[] getSpringConfigXml();
+  byte[] getSpringConfigXml();
   
   /**
    * Stores the Spring configuration xml snippet. Note: this function only stores a
    * xml code snippet, it will NOT configure the agent.
    * @param springConfig Spring Configuration xml source
    */
-  public void setSpringConfigXml(byte[] springConfig);
+  void setSpringConfigXml(byte[] springConfig);
 
 }

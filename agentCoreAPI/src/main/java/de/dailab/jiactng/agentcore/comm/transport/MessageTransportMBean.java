@@ -12,7 +12,7 @@ public interface MessageTransportMBean {
 	 * Getter for attribute "TransportIdentifier".
 	 * @return the ID of the message transport
 	 */
-    public String getTransportIdentifier();
+    String getTransportIdentifier();
 
     /**
      * Gets the connection entry point to this message transport,
@@ -20,5 +20,5 @@ public interface MessageTransportMBean {
      * then the URI might look like <code>tcp://192.168.3.42:4321</code>.
      * @return the connection entry point
      */
-    public URI getConnectorURI();
+    URI getConnectorURI();
 }

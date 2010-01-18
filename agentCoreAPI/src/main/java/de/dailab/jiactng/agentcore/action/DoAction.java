@@ -156,14 +156,14 @@ public class DoAction extends SessionEvent {
 		}
 
 		for (int i = 0; i < types.size(); ++i) {
-		    Class<?> cit= types.get(i);
+		    final Class<?> cit= types.get(i);
 		    
 		    if(cit.isPrimitive()) {
 		        if(params[i] == null) {
                     return "param" + i + " '" + params[i] + "' mismatch the type '" + cit + "'";
                 }
                 
-                Class<?> cpt= params[i].getClass();
+                final Class<?> cpt= params[i].getClass();
                 if(
                         (cit == boolean.class && cpt != Boolean.class) ||
                         (cit == byte.class && cpt != Byte.class) ||
@@ -184,9 +184,12 @@ public class DoAction extends SessionEvent {
 		return null;
 	}
 	
+	  /**
+	   * {@inheritDoc}
+	   */
 	@Override
 	public String toString() {
-	    StringBuilder sb = new StringBuilder("DoAction(");
+	    final StringBuilder sb = new StringBuilder("DoAction(");
 	    sb.append("owner="+owner+", ");
       if(getAction() != null) {
  	      sb.append("action="+getAction().getName()+", ");

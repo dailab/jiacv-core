@@ -14,7 +14,7 @@ public interface JmxDescriptionSupport {
 	 * @return the type definition of the description
 	 * @throws OpenDataException if an error occurs during construction of the type definition
 	 */
-	public OpenType<?> getDescriptionType() throws OpenDataException;
+	OpenType<?> getDescriptionType() throws OpenDataException;
 
 	/**
 	 * Gets a description of this object that is compliant to the type 
@@ -22,6 +22,6 @@ public interface JmxDescriptionSupport {
 	 * @return the description of this object
 	 * @throws OpenDataException if an error occurs during construction of the description
 	 */
-	public Object getDescription() throws OpenDataException;
+	Object getDescription() throws OpenDataException;
 	
 }

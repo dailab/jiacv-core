@@ -32,7 +32,7 @@ public interface IEffector extends IAgentBean {
 	 * @see de.dailab.jiactng.agentcore.action.Action
 	 * @return A List containing all actions from this component.
 	 */
-	public List<? extends Action> getActions();
+	List<? extends Action> getActions();
 
 	/**
 	 * Executes a selected action. This method should be implemented by the
@@ -46,7 +46,7 @@ public interface IEffector extends IAgentBean {
 	 *            as well as its parameters.
 	 * @throws Exception An exception during the execution of the action has been occurred.
 	 */
-	public void doAction(DoAction doAction) throws Exception;
+	void doAction(DoAction doAction) throws Exception;
 	
 	/**
 	 * Cancels a <code>DoAction</code> because it's <code>Session</code> had a timeout.
@@ -58,6 +58,6 @@ public interface IEffector extends IAgentBean {
 	 * @param doAction This is the DoAction that has to be canceled
 	 * @return may be null or an ActionResult, that has finaly to be delivered to the source of the action 
 	 */
-	public ActionResult cancelAction(DoAction doAction);
+	ActionResult cancelAction(DoAction doAction);
 
 }

@@ -15,12 +15,23 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
  */
 public interface IAgentDescription extends IFact, JmxDescriptionSupport {
 
-    public static final String ITEMNAME_ID = "id";
-    public static final String ITEMNAME_NAME = "name";
-    public static final String ITEMNAME_NODE = "node UUID";
-    public static final String ITEMNAME_STATE = "state";
-    public static final String ITEMNAME_MOBILE = "mobile";
-    public static final String ITEMNAME_MESSAGEBOX = "message box address";
+	/** Item name which can be used to get the Id of the JMX-based agent description. */
+    static final String ITEMNAME_ID = "id";
+
+	/** Item name which can be used to get the name of the JMX-based agent description. */
+    static final String ITEMNAME_NAME = "name";
+
+	/** Item name which can be used to get the node UUID of the JMX-based agent description. */
+    static final String ITEMNAME_NODE = "node UUID";
+
+	/** Item name which can be used to get the state of the JMX-based agent description. */
+    static final String ITEMNAME_STATE = "state";
+
+	/** Item name which can be used to get the mobility of the JMX-based agent description. */
+    static final String ITEMNAME_MOBILE = "mobile";
+
+	/** Item name which can be used to get the message box address of the JMX-based agent description. */
+    static final String ITEMNAME_MESSAGEBOX = "message box address";
 
 	/**
      * This method returns the unique agent identifier (AID) of
@@ -46,10 +57,22 @@ public interface IAgentDescription extends IFact, JmxDescriptionSupport {
      * @return      the communication address
      */
     IMessageBoxAddress getMessageBoxAddress();
-  
+
+    /**
+     * Gets the UUID of the agent node where the agent is located.
+     * @return the agent node UUID
+     */
     String getAgentNodeUUID();
-    
+
+    /**
+     * Sets the UUID of the agent node where the agent is located.
+     * @param UUID the agent node UUID
+     */
     void setAgentNodeUUID(String UUID);
-    
+
+    /**
+     * Gets the mobility of the agent.
+     * @return <code>true</code> if the agent is able to migrate to other agent nodes.
+     */
     Boolean isMobile();
 }

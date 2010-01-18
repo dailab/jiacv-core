@@ -22,7 +22,7 @@ public interface IServiceMatcher {
    *          The list of services (from the directory) that the matcher should use to find a match.
    * @return The serviceDescription that is the best match for the template.
    */
-  public IServiceDescription findBestMatch(IServiceDescription serviceTemplate,
+  IServiceDescription findBestMatch(IServiceDescription serviceTemplate,
       ArrayList<IServiceDescription> serviceDescList);
 
   /**
@@ -34,7 +34,7 @@ public interface IServiceMatcher {
    *          The list of services (from the directory) that the matcher should use to find a match.
    * @return A list of serviceDescriptions that match the template and are ordered by their quality.
    */
-  public ArrayList<IServiceDescription> findAllMatches(IServiceDescription serviceTemplate,
+  ArrayList<IServiceDescription> findAllMatches(IServiceDescription serviceTemplate,
       ArrayList<IServiceDescription> serviceDescList);
 
 }

@@ -42,11 +42,25 @@ import de.dailab.jiactng.agentcore.management.Manager;
  * @author Jan Keiser
  * @see MBeanServer
  */
-public class JmxManager implements Manager {
+public final class JmxManager implements Manager {
+
+	/** The delay for sending multicast messages is 1,000 milliseconds. */
+	public final static long MULTICAST_DELAY = 1000;
+
+	/** The period for sending multicast messages is 3,600 milliseconds. */
+	public final static long MULTICAST_PERIOD = 3600;
 	
-	private final static String DOMAIN = "de.dailab.jiactng";
+	/** The port for sending multicast messages is 9999. */
+	public final static int MULTICAST_PORT = 9999;
+	
+	/** The address for sending multicast messages is "226.6.6.7". */
+	public final static String MULTICAST_ADDRESS = "226.6.6.7";
+
+	/** The domain of JMX object names is "de.dailab.jiactng".*/
+	public final static String DOMAIN = "de.dailab.jiactng";
+
 	private MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-	private ArrayList<JMXConnectorServer> _connectorServer = new ArrayList<JMXConnectorServer>();
+	private ArrayList<JMXConnectorServer> connectorServer = new ArrayList<JMXConnectorServer>();
 	private Timer ti = null;
 
 	/**
@@ -843,14 +857,15 @@ public class JmxManager implements Manager {
 			}
 			catch (Exception e) {
 				System.err.println("WARNING: Start of JMX connector server failed for " + jurl);
-				if ((path != null) && path.startsWith("/jndi/rmi://")) {
-					System.err.println("Please ensure that a rmi registry is started on " + path.substring(12, path.length() - node.getUUID().length() - 1));
+				final String prefix = "/jndi/rmi://";
+				if ((path != null) && path.startsWith(prefix)) {
+					System.err.println("Please ensure that a rmi registry is started on " + path.substring(prefix.length(), path.length() - node.getUUID().length() - 1));
 				}
 				System.err.println(e.getMessage());
 				continue;
 			}
 			System.out.println("JMX connector server successfully started: " + cs.getAddress());
-			_connectorServer.add(cs);
+			connectorServer.add(cs);
 
 			// register connector server as JMX resource
 			try {
@@ -863,14 +878,14 @@ public class JmxManager implements Manager {
 		}
 
 		// send addresses of all connector servers via multicast periodically
-		final String[] jmxURLs = new String[_connectorServer.size()];
-		for (int i=0; i<_connectorServer.size(); i++) {
-			jmxURLs[i] = _connectorServer.get(i).getAddress().toString();
+		final String[] jmxURLs = new String[connectorServer.size()];
+		for (int i=0; i<connectorServer.size(); i++) {
+			jmxURLs[i] = connectorServer.get(i).getAddress().toString();
 		}
 		ti = new Timer();
-		final JmxMulticastSender multiSend = new JmxMulticastSender(9999, "226.6.6.7", 1, jmxURLs);
-		ti.schedule(multiSend, 1000, 3600);
-		System.out.println("Initiated multicast sender on port 9999 with group 226.6.6.7 and interval 3600");
+		final JmxMulticastSender multiSend = new JmxMulticastSender(MULTICAST_PORT, MULTICAST_ADDRESS, 1, jmxURLs);
+		ti.schedule(multiSend, MULTICAST_DELAY, MULTICAST_PERIOD);
+		System.out.println("Initiated multicast sender on port " + MULTICAST_PORT + " with group " + MULTICAST_ADDRESS + " and interval " + MULTICAST_PERIOD);
 	}
 
 	/**
@@ -886,7 +901,7 @@ public class JmxManager implements Manager {
 		}
 
 		// Deregister and stop all connector servers
-		final Iterator<JMXConnectorServer> i = this._connectorServer.iterator();
+		final Iterator<JMXConnectorServer> i = connectorServer.iterator();
 		while (i.hasNext()) {
 			final JMXConnectorServer cs = i.next();
 			

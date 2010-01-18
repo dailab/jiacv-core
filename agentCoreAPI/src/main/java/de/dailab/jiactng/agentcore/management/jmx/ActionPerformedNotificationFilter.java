@@ -22,28 +22,28 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	private static final long serialVersionUID = 1L;
 
 	/** Indicates if the action list contains the enabled or disabled actions. */
-	private boolean _actionsEnabled = false;
+	private boolean actionsEnabled = false;
 
 	/** The names of enabled or disabled actions. */
-	private Vector<String> _actions = new Vector<String>();
+	private Vector<String> actions = new Vector<String>();
 
 	/** Indicates if the agent bean list contains the enabled or disabled agent beans. */
-	private boolean _agentbeansEnabled = false;
+	private boolean agentbeansEnabled = false;
 
 	/** The names of enabled or disabled agent beans. */
-	private Vector<String> _agentbeans = new Vector<String>();
+	private Vector<String> agentbeans = new Vector<String>();
 
 	/** Indicates if notifications will be sent for invoked actions. */
-	private boolean _invokedEnabled = true;
+	private boolean invokedEnabled = true;
 
 	/** Indicates if notifications will be sent for started actions. */
-	private boolean _startedEnabled = true;
+	private boolean startedEnabled = true;
 
 	/** Indicates if notifications will be sent for successful actions. */
-	private boolean _successEnabled = true;
+	private boolean successEnabled = true;
 
 	/** Indicates if notifications will be sent for failed actions. */
-	private boolean _failedEnabled = true;
+	private boolean failedEnabled = true;
 
 	/**
 	 * Invoked before sending the specified notification to the listener.
@@ -66,16 +66,16 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 
 		// check state of action
 		final DoActionState state = ((ActionPerformedNotification) notification).getState();
-		if (state.equals(DoActionState.invoked) && !_invokedEnabled) {
+		if (state.equals(DoActionState.invoked) && !invokedEnabled) {
 			return false;
 		}
-		if (state.equals(DoActionState.started) && !_startedEnabled) {
+		if (state.equals(DoActionState.started) && !startedEnabled) {
 			return false;
 		}
-		if (state.equals(DoActionState.success) && !_successEnabled) {
+		if (state.equals(DoActionState.success) && !successEnabled) {
 			return false;
 		}
-		if (state.equals(DoActionState.failed) && !_failedEnabled) {
+		if (state.equals(DoActionState.failed) && !failedEnabled) {
 			return false;
 		}
 
@@ -95,25 +95,25 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 		}
 
 		// check action name
-		if (_actionsEnabled) {
-			if (!_actions.contains(actionName)) {
+		if (actionsEnabled) {
+			if (!actions.contains(actionName)) {
 				return false;
 			}
 		}
 		else {
-			if (_actions.contains(actionName)) {
+			if (actions.contains(actionName)) {
 				return false;
 			}
 		}
 		
 		// check agent bean name
-		if (_agentbeansEnabled) {
-			if (!_agentbeans.contains(agentbeanName)) {
+		if (agentbeansEnabled) {
+			if (!agentbeans.contains(agentbeanName)) {
 				return false;
 			}
 		}
 		else {
-			if (_agentbeans.contains(agentbeanName)) {
+			if (agentbeans.contains(agentbeanName)) {
 				return false;
 			}
 		}
@@ -128,19 +128,19 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * @param name The action name.
 	 * @throws IllegalArgumentException The action name parameter is null.
 	 */
-	public void enableAction(String name) throws IllegalArgumentException {
+	final public void enableAction(String name) throws IllegalArgumentException {
 		if (name == null) {
 			throw new IllegalArgumentException();
 		}
-		if (_actionsEnabled) {
+		if (actionsEnabled) {
 			// add to enabled actions
-			if (!_actions.contains(name)) {
-				_actions.add(name);
+			if (!actions.contains(name)) {
+				actions.add(name);
 			}
 		}
 		else {
 			// remove from disabled actions
-			_actions.remove(name);
+			actions.remove(name);
 		}
 	}
 
@@ -151,18 +151,18 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * has no effect.
 	 * @param name The action name.
 	 */
-	public void disableAction(String name) {
+	final public void disableAction(String name) {
 		if (name == null) {
 			return;
 		}
-		if (_actionsEnabled) {
+		if (actionsEnabled) {
 			// remove enabled actions
-			_actions.remove(name);
+			actions.remove(name);
 		}
 		else {
 			// add to disabled actions
-			if (!_actions.contains(name)) {
-				_actions.add(name);
+			if (!actions.contains(name)) {
+				actions.add(name);
 			}
 		}
 	}
@@ -170,9 +170,9 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	/**
 	 * Disables all the action names.
 	 */
-	public void disableAllActions() {
-		_actionsEnabled = true;
-		_actions.removeAllElements();
+	final public void disableAllActions() {
+		actionsEnabled = true;
+		actions.removeAllElements();
 	}
 
 	/**
@@ -182,19 +182,19 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * @param name The agent bean name.
 	 * @throws IllegalArgumentException The agent bean name parameter is null.
 	 */
-	public void enableAgentbean(String name) throws IllegalArgumentException {
+	final public void enableAgentbean(String name) throws IllegalArgumentException {
 		if (name == null) {
 			throw new IllegalArgumentException();
 		}
-		if (_agentbeansEnabled) {
+		if (agentbeansEnabled) {
 			// add to enabled agent beans
-			if (!_agentbeans.contains(name)) {
-				_agentbeans.add(name);
+			if (!agentbeans.contains(name)) {
+				agentbeans.add(name);
 			}
 		}
 		else {
 			// remove from disabled agent beans
-			_agentbeans.remove(name);
+			agentbeans.remove(name);
 		}
 	}
 
@@ -205,18 +205,18 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * has no effect.
 	 * @param name The agent bean name.
 	 */
-	public void disableAgentbean(String name) {
+	final public void disableAgentbean(String name) {
 		if (name == null) {
 			return;
 		}
-		if (_agentbeansEnabled) {
+		if (agentbeansEnabled) {
 			// remove enabled agent beans
-			_agentbeans.remove(name);
+			agentbeans.remove(name);
 		}
 		else {
 			// add to disabled agent beans
-			if (!_agentbeans.contains(name)) {
-				_agentbeans.add(name);
+			if (!agentbeans.contains(name)) {
+				agentbeans.add(name);
 			}
 		}
 	}
@@ -224,36 +224,36 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	/**
 	 * Disables all the agent bean names.
 	 */
-	public void disableAllAgentbeans() {
-		_agentbeansEnabled = true;
-		_agentbeans.removeAllElements();
+	final public void disableAllAgentbeans() {
+		agentbeansEnabled = true;
+		agentbeans.removeAllElements();
 	}
 
 	/**
 	 * Disables all invoked action executions.
 	 */
-	public void disableInvokedActions() {
-		_invokedEnabled = false;
+	final public void disableInvokedActions() {
+		invokedEnabled = false;
 	}
 
 	/**
 	 * Disables all started action executions.
 	 */
-	public void disableStartedActions() {
-		_startedEnabled = false;
+	final public void disableStartedActions() {
+		startedEnabled = false;
 	}
 
 	/**
 	 * Disables all successful action executions.
 	 */
-	public void disableSuccessfulActions() {
-		_successEnabled = false;
+	final public void disableSuccessfulActions() {
+		successEnabled = false;
 	}
 
 	/**
 	 * Disables all failed action executions.
 	 */
-	public void disableFailedActions() {
-		_failedEnabled = false;
+	final public void disableFailedActions() {
+		failedEnabled = false;
 	}
 }

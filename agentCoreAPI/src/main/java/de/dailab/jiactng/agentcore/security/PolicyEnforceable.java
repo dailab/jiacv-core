@@ -3,8 +3,6 @@
  */
 package de.dailab.jiactng.agentcore.security;
 
-import de.dailab.jiactng.agentcore.IAgentBean;
-
 /**
  * Indicates that an agent bean supports the enforcement of a (security) policy
  * through a policy enforcement point (PEP).

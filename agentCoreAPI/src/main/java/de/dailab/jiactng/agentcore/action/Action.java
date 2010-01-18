@@ -40,18 +40,18 @@ public class Action implements IActionDescription {
 	private static final long serialVersionUID = 2416102010976263587L;
 
 	/** the name of the action */
-	private String _name;
+	private String name;
 
 	/** The component that holds the funtionality for this action */
 	private transient IEffector providerBean;
 
 	/** The class names of the input-parameters of this action */
-	private List<String> _inputTypeNames;
+	private List<String> inputTypeNames;
 
 	/** The class names of the results of this action */
-	private List<String> _resultTypeNames;
+	private List<String> resultTypeNames;
 
-	private IAgentDescription _providerDescription;
+	private IAgentDescription providerDescription;
 	
 	/** The scope of the action, i.e. which agent will it know or can it use.*/
 	private ActionScope scope = null;
@@ -112,12 +112,12 @@ public class Action implements IActionDescription {
 	 *            the action to create an action from
 	 */
 	public Action(Action action) {
-		_name = action.getName();
+		name = action.getName();
 		providerBean = action.getProviderBean();
 
 		// we can exchange references here, because the lists are immutable
-		_inputTypeNames = action.getInputTypeNames();
-		_resultTypeNames = action.getResultTypeNames();
+		inputTypeNames = action.getInputTypeNames();
+		resultTypeNames = action.getResultTypeNames();
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class Action implements IActionDescription {
 	 * @return a new DoAction-object that can be used (by writing it to the
 	 *         memory) to call the action.
 	 */
-	public DoAction createDoAction(Serializable[] newParams, ResultReceiver source) {
+	final public DoAction createDoAction(Serializable[] newParams, ResultReceiver source) {
 		return new DoAction(this, source, newParams);
 	}
 
@@ -147,11 +147,11 @@ public class Action implements IActionDescription {
 	 *            action.
 	 * @param source
 	 *            the caller of the action.
-	 * @param timeToLive
+	 * @param timeToLive timeout of the action request in milliseconds.
 	 * @return a new DoAction-object that can be used (by writing it to the
 	 *         memory) to call the action.
 	 */
-	public DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
+	final public DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
 			Long timeToLive) {
 		return new DoAction(this, source, newParams, timeToLive);
 	}
@@ -170,7 +170,7 @@ public class Action implements IActionDescription {
    * @return a new DoAction-object that can be used (by writing it to the
    *         memory) to call the action.
    */
-  public DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source) {
+  final public DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source) {
     return new DoAction(parent, this, source, newParams);
   }
 	
@@ -188,7 +188,7 @@ public class Action implements IActionDescription {
 	 * @return a new ActionResult-object that can be used (by writing it to the
 	 *         memory) to return the results of the action.
 	 */
-	public ActionResult createActionResult(DoAction source, Serializable[] results) {
+	final public ActionResult createActionResult(DoAction source, Serializable[] results) {
 		final ActionResult ret = new ActionResult(source, results);
 		ret.setMetaData(source.getMetaData());
 		return ret;
@@ -200,7 +200,7 @@ public class Action implements IActionDescription {
 	 * @return a string representing the name of this action.
 	 */
 	public final String getName() {
-		return _name;
+		return name;
 	}
 
 	/**
@@ -210,7 +210,7 @@ public class Action implements IActionDescription {
 	 *         order.
 	 */
 	public final List<String> getInputTypeNames() {
-		return _inputTypeNames;
+		return inputTypeNames;
 	}
 
 	/**
@@ -221,9 +221,9 @@ public class Action implements IActionDescription {
 	 * @throws ClassNotFoundException if one of the classes is unknown.
 	 */
 	public final List<Class<?>> getInputTypes() throws ClassNotFoundException {
-		if (_inputTypeNames != null) {
+		if (inputTypeNames != null) {
 			final List<Class<?>> list = new ArrayList<Class<?>>();
-			for (String type : _inputTypeNames) {
+			for (String type : inputTypeNames) {
 				list.add(getClassForName(type));
 			}
 			return list;
@@ -247,7 +247,7 @@ public class Action implements IActionDescription {
 	 * @return the description of the providing agent.
 	 */
 	public final IAgentDescription getProviderDescription() {
-		return _providerDescription;
+		return providerDescription;
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class Action implements IActionDescription {
 	 *         order.
 	 */
 	public final List<String> getResultTypeNames() {
-		return _resultTypeNames;
+		return resultTypeNames;
 	}
 
 	/**
@@ -268,9 +268,9 @@ public class Action implements IActionDescription {
 	 * @throws ClassNotFoundException if one of the classes is unknown.
 	 */
 	public final List<Class<?>> getResultTypes() throws ClassNotFoundException {
-		if (_resultTypeNames != null) {
+		if (resultTypeNames != null) {
 			final List<Class<?>> list = new ArrayList<Class<?>>();
-			for (String type : _resultTypeNames) {
+			for (String type : resultTypeNames) {
 				list.add(getClassForName(type));
 			}
 			return list;
@@ -280,88 +280,93 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * @param name
+	 * Sets the name of this action.
+	 * @param newName
 	 *            the name to set
 	 */
-	public final void setName(String name) {
-		this._name = name;
+	public final void setName(String newName) {
+		name = newName;
 	}
 
 	/**
-	 * @param inputTypeNames
+	 * Sets the input types of this action.
+	 * @param newInputTypeNames
 	 *            the parameters to set
 	 */
-	public final void setInputTypeNames(List<String> inputTypeNames) {
-		if (inputTypeNames != null) {
+	public final void setInputTypeNames(List<String> newInputTypeNames) {
+		if (newInputTypeNames != null) {
 			final List<String> copy = new ArrayList<String>();
-			copy.addAll(inputTypeNames);
-			_inputTypeNames = Collections.unmodifiableList(copy);
+			copy.addAll(newInputTypeNames);
+			inputTypeNames = Collections.unmodifiableList(copy);
 		} else {
-			_inputTypeNames = null;
+			inputTypeNames = null;
 		}
 	}
 
 	/**
-	 * @param inputTypes
+	 * Sets the input types of this action.
+	 * @param newInputTypes
 	 *            the parameters to set
 	 */
-	public final void setInputTypes(List<Class<?>> inputTypes) {
-		if (inputTypes != null) {
+	public final void setInputTypes(List<Class<?>> newInputTypes) {
+		if (newInputTypes != null) {
 			final List<String> copy = new ArrayList<String>();
-			for (Class<?> type : inputTypes) {
+			for (Class<?> type : newInputTypes) {
 				copy.add(type.getName());
 			}
-			_inputTypeNames = Collections.unmodifiableList(copy);
+			inputTypeNames = Collections.unmodifiableList(copy);
 		} else {
-			_inputTypeNames = null;
+			inputTypeNames = null;
 		}
 	}
 
 	/**
 	 * Sets the agent bean which provides this action.
-	 * @param providerBean
+	 * @param newProviderBean
 	 *            the providerBean to set
 	 */
-	public final void setProviderBean(IEffector providerBean) {
-		this.providerBean = providerBean;
+	public final void setProviderBean(IEffector newProviderBean) {
+		providerBean = newProviderBean;
 	}
 
 	/**
 	 * Sets the description of the agent which provides this action.
-	 * @param providerDescription
+	 * @param newProviderDescription description of the providing agent
 	 */
 	public final void setProviderDescription(
-			IAgentDescription providerDescription) {
-		_providerDescription = providerDescription;
+			IAgentDescription newProviderDescription) {
+		providerDescription = newProviderDescription;
 	}
 
 	/**
-	 * @param resultTypeNames
+	 * Sets the result types of this action.
+	 * @param newResultTypeNames
 	 *            the results to set
 	 */
-	public final void setResultTypeNames(List<String> resultTypeNames) {
-		if (resultTypeNames != null) {
+	public final void setResultTypeNames(List<String> newResultTypeNames) {
+		if (newResultTypeNames != null) {
 			final List<String> copy = new ArrayList<String>();
-			copy.addAll(resultTypeNames);
-			_resultTypeNames = Collections.unmodifiableList(copy);
+			copy.addAll(newResultTypeNames);
+			resultTypeNames = Collections.unmodifiableList(copy);
 		} else {
-			_resultTypeNames = null;
+			resultTypeNames = null;
 		}
 	}
 
 	/**
+	 * Sets the result types of this action.
 	 * @param resultTypes
 	 *            the results to set
 	 */
-	public final void setResultTypes(List<Class<?>> resultTypes) {
-		if (resultTypes != null) {
+	public final void setResultTypes(List<Class<?>> newResultTypes) {
+		if (newResultTypes != null) {
 			final List<String> copy = new ArrayList<String>();
-			for (Class<?> type : resultTypes) {
+			for (Class<?> type : newResultTypes) {
 				copy.add(type.getName());
 			}
-			_resultTypeNames = Collections.unmodifiableList(copy);
+			resultTypeNames = Collections.unmodifiableList(copy);
 		} else {
-			_resultTypeNames = null;
+			resultTypeNames = null;
 		}
 	}
 
@@ -410,19 +415,19 @@ public class Action implements IActionDescription {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("Action:\n name='").append(_name).append("'");
+		builder.append("Action:\n name='").append(name).append("'");
 		builder.append("\n parameters=");
-		prettyPrintArray(builder, _inputTypeNames);
+		prettyPrintArray(builder, inputTypeNames);
 		builder.append("\n results=");
-		prettyPrintArray(builder, _resultTypeNames);
+		prettyPrintArray(builder, resultTypeNames);
     builder.append("\n bean=");
     builder.append(this.providerBean);
 		
 		builder.append("\n provider =");
-		if (_providerDescription != null) {
-			builder.append(_providerDescription.getName()+"("+_providerDescription.getAid()+")");
+		if (providerDescription != null) {
+			builder.append(providerDescription.getName()+"("+providerDescription.getAid()+")");
 		} else {
-		  builder.append(_providerDescription);
+		  builder.append(providerDescription);
 		}
 		builder.append("\n scope=").append(scope);
 		builder.append("\n");
@@ -483,7 +488,7 @@ public class Action implements IActionDescription {
 	/**
 	 * {@inheritDoc}
 	 */
-	public ActionScope getScope() {
+	final public ActionScope getScope() {
 		return scope;
 	}
 
@@ -495,7 +500,7 @@ public class Action implements IActionDescription {
 	 * @param scope the scope of this action.
 	 * @see ActionScope
 	 */
-	public void setScope(ActionScope scope) {
+	final public void setScope(ActionScope scope) {
 		this.scope = scope;
 	}
 
@@ -525,7 +530,7 @@ public class Action implements IActionDescription {
 	    		  new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
 	    		  SimpleType.STRING, 
 	    		  SimpleType.STRING,
-	    		  (_providerDescription != null)? _providerDescription.getDescriptionType():SimpleType.VOID,
+	    		  (providerDescription != null)? providerDescription.getDescriptionType():SimpleType.VOID,
 	      };
 
 	      // use names of action items as their description
@@ -545,12 +550,12 @@ public class Action implements IActionDescription {
 	    */
 	   public Object getDescription() throws OpenDataException {
 	      final Object[] itemValues = new Object[] {
-	    		  _name,
-	    		  _inputTypeNames.toArray(new String[_resultTypeNames.size()]),
-	    		  _resultTypeNames.toArray(new String[_resultTypeNames.size()]),
+	    		  name,
+	    		  inputTypeNames.toArray(new String[resultTypeNames.size()]),
+	    		  resultTypeNames.toArray(new String[resultTypeNames.size()]),
 	    		  (scope != null)? scope.toString():null,
 	    		  (providerBean != null)? providerBean.getBeanName():null,
-	    		  (_providerDescription != null)? _providerDescription.getDescription():null
+	    		  (providerDescription != null)? providerDescription.getDescription():null
 	      };
 
 	      final CompositeType type = (CompositeType) getDescriptionType();

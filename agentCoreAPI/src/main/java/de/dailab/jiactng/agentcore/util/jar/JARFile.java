@@ -32,7 +32,7 @@ public class JARFile extends JarFile implements JAR {
      * @return input stream to read jar entry
      */
     public InputStream getInputStream(String entryName) {
-        JarEntry entry = getJarEntry(entryName);
+        final JarEntry entry = getJarEntry(entryName);
 
         try {
             if (entry != null) {
@@ -62,6 +62,9 @@ public class JARFile extends JarFile implements JAR {
         return getJarEntry(resource) != null;
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof JAR)) {
@@ -71,11 +74,17 @@ public class JARFile extends JarFile implements JAR {
         return name.equals(((JAR) o).getJarName());
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public int hashCode() {
         return name.hashCode();
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public String toString() {
         return "JARFile :: " + getJarName();

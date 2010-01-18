@@ -34,6 +34,12 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  */
 public class JmxManagementClient {
 
+	/** The timeout for receiving multicast messages to collect agent node UUIDs is 5,000 milliseconds. */
+	public static final long MULTICAST_RECEIVER_TIMEOUT = 5000;
+
+	/** The maximum length of multicast messages is 1,000 bytes. */
+	public static final int MAX_MULTICAST_MESSAGE_LENGTH = 1000;
+
 	/** The connection to the MBeanServer of a JVM used to manage its resources. */
 	protected MBeanServerConnection mbsc = null;
 	private JMXConnector jmxc = null;
@@ -72,8 +78,8 @@ public class JmxManagementClient {
 	 */
 	public static List<JMXServiceURL> getURLsFromMulticast() throws IOException {
 		final List<JMXServiceURL> urls = new ArrayList<JMXServiceURL>();
-		byte[] buffer = new byte[1000];
-		final long endTime = System.currentTimeMillis() + 5000;
+		byte[] buffer = new byte[MAX_MULTICAST_MESSAGE_LENGTH];
+		final long endTime = System.currentTimeMillis() + MULTICAST_RECEIVER_TIMEOUT;
 
 		// activate multicast socket
 		final InetAddress group = InetAddress.getByName("226.6.6.7");
@@ -85,7 +91,7 @@ public class JmxManagementClient {
 		// read multicast packets
 		while (System.currentTimeMillis() < endTime) {
 			// read message
-			dp.setLength(1000);
+			dp.setLength(MAX_MULTICAST_MESSAGE_LENGTH);
 			socket.receive(dp);
 			buffer = dp.getData();
 			final String message = new String(buffer, 0, dp.getLength());
@@ -165,7 +171,7 @@ public class JmxManagementClient {
 	 * @throws IOException if the connection cannot be closed cleanly.
 	 * @see JMXConnector#close()
 	 */
-	public void close() throws IOException {
+	final public void close() throws IOException {
 		if (jmxc != null) {
 			jmxc.close();
 			jmxc = null;
@@ -179,7 +185,7 @@ public class JmxManagementClient {
 	 * @throws SecurityException if the agent node query cannot be made for security reasons.
 	 * @see MBeanServerConnection#queryNames(ObjectName, javax.management.QueryExp)
 	 */
-	public Set<String> getAgentNodeUUIDs() throws IOException {
+	final public Set<String> getAgentNodeUUIDs() throws IOException {
 		try {
 			final Set<ObjectName> agentNodes = mbsc.queryNames(new JmxManager().getMgmtNameOfAgentNode("*"), null);
 			final HashSet<String> agentNodeUUIDs = new HashSet<String>();
@@ -200,7 +206,7 @@ public class JmxManagementClient {
 	 * @throws MalformedObjectNameException The UUID of the agent node contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentNodeManagementClient#JmxAgentNodeManagementClient(MBeanServerConnection, String)
 	 */
-	public JmxAgentNodeManagementClient getAgentNodeManagementClient(String agentNodeID) throws MalformedObjectNameException {
+	final public JmxAgentNodeManagementClient getAgentNodeManagementClient(String agentNodeID) throws MalformedObjectNameException {
 		return new JmxAgentNodeManagementClient(mbsc, agentNodeID);
 	}
 
@@ -211,7 +217,7 @@ public class JmxManagementClient {
 	 * @throws MalformedObjectNameException The UUID of the agent node contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentNodeTimerManagementClient#JmxAgentNodeTimerManagementClient(MBeanServerConnection, String)
 	 */
-	public JmxAgentNodeTimerManagementClient getAgentNodeTimerManagementClient(String agentNodeID) throws MalformedObjectNameException {
+	final public JmxAgentNodeTimerManagementClient getAgentNodeTimerManagementClient(String agentNodeID) throws MalformedObjectNameException {
 		return new JmxAgentNodeTimerManagementClient(mbsc, agentNodeID);
 	}
 
@@ -223,7 +229,7 @@ public class JmxManagementClient {
 	 * @throws MalformedObjectNameException The UUID of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentManagementClient#JmxAgentManagementClient(MBeanServerConnection, String, String)
 	 */
-	public JmxAgentManagementClient getAgentManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
+	final public JmxAgentManagementClient getAgentManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
 		return new JmxAgentManagementClient(mbsc, agentNodeID, agentID);
 	}
 
@@ -236,7 +242,7 @@ public class JmxManagementClient {
 	 * @throws MalformedObjectNameException The UUID of the agent node or agent bean or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentBeanManagementClient#JmxAgentBeanManagementClient(MBeanServerConnection, String, String, String)
 	 */
-	public JmxAgentBeanManagementClient getAgentBeanManagementClient(String agentNodeID, String agentID, String agentBeanName) throws MalformedObjectNameException {
+	final public JmxAgentBeanManagementClient getAgentBeanManagementClient(String agentNodeID, String agentID, String agentBeanName) throws MalformedObjectNameException {
 		return new JmxAgentBeanManagementClient(mbsc, agentNodeID, agentID, agentBeanName);
 	}
 
@@ -251,7 +257,7 @@ public class JmxManagementClient {
 	 * @see JmxAgentNodeDirectoryManagementClient#JmxAgentNodeDirectoryManagementClient(MBeanServerConnection, String, String)
 	 * @see JmxAgentNodeManagementClient#getDirectoryName()
 	 */
-	public JmxAgentNodeDirectoryManagementClient getDirectoryManagementClient(String agentNodeID) throws MalformedObjectNameException, InstanceNotFoundException, IOException {
+	final public JmxAgentNodeDirectoryManagementClient getDirectoryManagementClient(String agentNodeID) throws MalformedObjectNameException, InstanceNotFoundException, IOException {
 		final String directoryBeanName = getAgentNodeManagementClient(agentNodeID).getDirectoryName();
 		return new JmxAgentNodeDirectoryManagementClient(mbsc, agentNodeID, directoryBeanName);
 	}
@@ -264,7 +270,7 @@ public class JmxManagementClient {
 	 * @throws MalformedObjectNameException The UUID of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentMemoryManagementClient#JmxAgentMemoryManagementClient(MBeanServerConnection, String, String)
 	 */
-	public JmxAgentMemoryManagementClient getAgentMemoryManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
+	final public JmxAgentMemoryManagementClient getAgentMemoryManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
 		return new JmxAgentMemoryManagementClient(mbsc, agentNodeID, agentID);
 	}
 
@@ -276,7 +282,7 @@ public class JmxManagementClient {
 	 * @throws MalformedObjectNameException The UUID of the agent node or the agent identifier contains an illegal character or does not follow the rules for quoting.
 	 * @see JmxAgentExecutionCycleManagementClient#JmxAgentExecutionCycleManagementClient(MBeanServerConnection, String, String)
 	 */
-	public JmxAgentExecutionCycleManagementClient getAgentExecutionCycleManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
+	final public JmxAgentExecutionCycleManagementClient getAgentExecutionCycleManagementClient(String agentNodeID, String agentID) throws MalformedObjectNameException {
 		return new JmxAgentExecutionCycleManagementClient(mbsc, agentNodeID, agentID);
 	}
 
@@ -291,7 +297,7 @@ public class JmxManagementClient {
 	 * @see MBeanServerConnection#queryMBeans(ObjectName, javax.management.QueryExp)
 	 * @see JmxAgentCommunicationManagementClient#JmxAgentCommunicationManagementClient(MBeanServerConnection, ObjectName)
 	 */
-	public Set<JmxAgentCommunicationManagementClient> getAgentCommunicationManagementClients(String agentNodeID, String agentID) throws MalformedObjectNameException, IOException {
+	final public Set<JmxAgentCommunicationManagementClient> getAgentCommunicationManagementClients(String agentNodeID, String agentID) throws MalformedObjectNameException, IOException {
 		final Set<JmxAgentCommunicationManagementClient> clients = new HashSet<JmxAgentCommunicationManagementClient>();
 		final Set<ObjectInstance> beans = mbsc.queryMBeans(new JmxManager().getMgmtNameOfAgentBean(agentNodeID, agentID, "*"), null);
 		for (ObjectInstance bean : beans) {

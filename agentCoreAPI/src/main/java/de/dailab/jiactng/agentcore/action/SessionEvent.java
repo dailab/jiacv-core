@@ -72,41 +72,41 @@ public class SessionEvent implements IFact {
 	 * Gets the action description for this session event.
 	 * @return the action
 	 */
-	public IActionDescription getAction() {
+	final public IActionDescription getAction() {
 		return action;
 	}
 
 	/**
 	 * Sets the action description for this session event.
-	 * @param action
+	 * @param newAction
 	 *            the action to set
 	 */
-	public void setAction(IActionDescription action) {
-		this.action = action;
+	final public void setAction(IActionDescription newAction) {
+		action = newAction;
 	}
 
 	/**
 	 * Gets the object which creates this session event.
 	 * @return the source
 	 */
-	public Object getSource() {
+	final public Object getSource() {
 		return source;
 	}
 
 	/**
 	 * Sets the object which creates this session event.
-	 * @param source
+	 * @param newSource
 	 *            the source to set
 	 */
-	public void setSource(Object source) {
-		this.source = source;
+	final public void setSource(Object newSource) {
+		source = newSource;
 	}
 
 	/**
 	 * Gets the session of this session event.
 	 * @return the session
 	 */
-	public Session getSession() {
+	final public Session getSession() {
 		return session;
 	}
 
@@ -114,7 +114,7 @@ public class SessionEvent implements IFact {
 //	 * @param session
 //	 *            the session to set
 //	 */
-//	public void setSession(Session session) {
+//	final public void setSession(Session session) {
 //		this.session = session;
 //		if (session != null)
 //			this.sessionId = session.getSessionId();
@@ -124,7 +124,7 @@ public class SessionEvent implements IFact {
 	 * Gets the session Id of this session event.
 	 * @return the session id of the session this event belongs to
 	 */
-	public String getSessionId() {
+	final public String getSessionId() {
 		return sessionId;
 	}
 
@@ -133,7 +133,7 @@ public class SessionEvent implements IFact {
 	 * @param id
 	 *            sets the id of the session
 	 */
-	public void setSessionId(String id) {
+	final public void setSessionId(String id) {
 		this.sessionId = id;
 	}
 
@@ -141,16 +141,16 @@ public class SessionEvent implements IFact {
 	 * Gets meta information about this session event.
 	 * @return the meta data
 	 */
-	public Object getMetaData() {
+	final public Object getMetaData() {
 		return metaData;
 	}
 
 	/**
 	 * Sets meta information about this session event.
-	 * @param metaData the meta data
+	 * @param newMetaData the meta data
 	 */
-	public void setMetaData(Object metaData) {
-		this.metaData = metaData;
+	final public void setMetaData(Object newMetaData) {
+		metaData = newMetaData;
 	}
 
 }

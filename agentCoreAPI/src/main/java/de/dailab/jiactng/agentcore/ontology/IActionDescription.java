@@ -18,22 +18,22 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
 public interface IActionDescription extends IFact, JmxDescriptionSupport {
 
 	/** Item name which can be used to get the name of the JMX-based action description. */
-    static final String ITEMNAME_NAME = "name";
+    final String ITEMNAME_NAME = "name";
 
 	/** Item name which can be used to get the input types of the JMX-based action description. */
-    static final String ITEMNAME_INPUTTYPES = "input types";
+    final String ITEMNAME_INPUTTYPES = "input types";
 
 	/** Item name which can be used to get the result types of the JMX-based action description. */
-    static final String ITEMNAME_RESULTTYPES = "result types";
+    final String ITEMNAME_RESULTTYPES = "result types";
 
 	/** Item name which can be used to get the scope of the JMX-based action description. */
-    static final String ITEMNAME_SCOPE = "scope";
+    final String ITEMNAME_SCOPE = "scope";
 
 	/** Item name which can be used to get the providing agent bean of the JMX-based action description. */
-    static final String ITEMNAME_BEAN = "bean";
+    final String ITEMNAME_BEAN = "bean";
 
 	/** Item name which can be used to get the providing agent of the JMX-based action description. */
-    static final String ITEMNAME_AGENT = "agent";
+    final String ITEMNAME_AGENT = "agent";
 
 	/**
      * This method returns the name of the action this description

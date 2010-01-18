@@ -18,12 +18,12 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
  */
 public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagementClient {
 
-	private static final AttributeChangeNotificationFilter workloadNotificationFilter = new AttributeChangeNotificationFilter();
+	private static final AttributeChangeNotificationFilter WORKLOAD_NOTIFICATION_FILTER = new AttributeChangeNotificationFilter();
 
 	static {
-		workloadNotificationFilter.enableAttribute("ExecutionWorkload");
-		workloadNotificationFilter.enableAttribute("DoActionWorkload");
-		workloadNotificationFilter.enableAttribute("ActionResultWorkload");
+		WORKLOAD_NOTIFICATION_FILTER.enableAttribute("ExecutionWorkload");
+		WORKLOAD_NOTIFICATION_FILTER.enableAttribute("DoActionWorkload");
+		WORKLOAD_NOTIFICATION_FILTER.enableAttribute("ActionResultWorkload");
 	}
 
 	/**
@@ -47,7 +47,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getExecutionWorkload()
 	 */
-	public int getExecutionWorkload() throws IOException, InstanceNotFoundException {
+	final public int getExecutionWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("ExecutionWorkload");
 	}
 
@@ -60,7 +60,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getDoActionWorkload()
 	 */
-	public int getDoActionWorkload() throws IOException, InstanceNotFoundException {
+	final public int getDoActionWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("DoActionWorkload");
 	}
 
@@ -73,7 +73,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getActionResultWorkload()
 	 */
-	public int getActionResultWorkload() throws IOException, InstanceNotFoundException {
+	final public int getActionResultWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("ActionResultWorkload");
 	}
 
@@ -85,8 +85,8 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws SecurityException if the listener can not be added to the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	public void addWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
-		addNotificationListener(listener, workloadNotificationFilter);
+	final public void addWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+		addNotificationListener(listener, WORKLOAD_NOTIFICATION_FILTER);
 	}
 
 	/**
@@ -98,8 +98,8 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws SecurityException if the listener can not be removed from the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	public void removeWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
-		removeNotificationListener(listener, workloadNotificationFilter);
+	final public void removeWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+		removeNotificationListener(listener, WORKLOAD_NOTIFICATION_FILTER);
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws SecurityException if the listener can not be added to the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	public void addActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException {
+	final public void addActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, filter);
 	}
 
@@ -125,7 +125,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws SecurityException if the listener can not be removed from the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	public void removeActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	final public void removeActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, filter);
 	}
 

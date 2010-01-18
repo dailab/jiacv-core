@@ -40,9 +40,9 @@ public class LifecycleEvent extends EventObject {
      *
      * @return the lifecycle state
      */
-    public LifecycleStates getState() {
+    final public LifecycleStates getState() {
      
-        return this.state;
+        return state;
         
     }
        

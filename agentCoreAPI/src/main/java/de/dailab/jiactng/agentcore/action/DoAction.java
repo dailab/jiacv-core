@@ -101,18 +101,18 @@ public class DoAction extends SessionEvent {
 	 * 
 	 * @return an array containing the parameters for the action-call.
 	 */
-	public Serializable[] getParams() {
+	final public Serializable[] getParams() {
 		return Arrays.copyOf(params, params.length);
 	}
 
 	/**
 	 * Setter for the parameters of the Trigger.
 	 * 
-	 * @param params
+	 * @param newParams
 	 *            the params to set
 	 */
-	public void setParams(Serializable[] params) {
-		this.params = params == null ? EMPTY_OBJECTS : params;
+	final public void setParams(Serializable[] newParams) {
+		params = newParams == null ? EMPTY_OBJECTS : newParams;
 	}
 
 	/**
@@ -120,18 +120,18 @@ public class DoAction extends SessionEvent {
 	 * 
 	 * @return the name of the owner
 	 */
-	public String getOwner() {
+	final public String getOwner() {
 		return owner;
 	}
 
 	/**
 	 * Setter for the owner of this action-invocation.
 	 * 
-	 * @param owner
+	 * @param newOwner
 	 *            the name of the user that initiated this action.
 	 */
-	public void setOwner(String owner) {
-		this.owner = owner;
+	final public void setOwner(String newOwner) {
+		owner = newOwner;
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class DoAction extends SessionEvent {
 	 *         parameters of this trigger are compatible, or a String describing
 	 *         the mismatch otherwise.
 	 */
-	public String typeCheck() {
+	final public String typeCheck() {
 		List<Class<?>> types;
 		try {
 			types = getAction().getInputTypes();

@@ -16,6 +16,7 @@ public interface IMessageBoxAddress extends ICommunicationAddress {
 
 	/**
 	 * Gets the corresponding unbounded address.
+	 * @return the unbound address
 	 */
     IMessageBoxAddress toUnboundAddress();
 }

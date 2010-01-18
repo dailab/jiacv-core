@@ -45,11 +45,11 @@ public class JARFileReader extends ClassLoader {
    * @return A collection of all jar-file entries.
   **/
   public Vector<JarEntry> getAllEntries() {
-    Vector<JarEntry> jarFileEntries = new Vector<JarEntry>();
-    Enumeration<JarEntry> enumList = jarFile.entries();
+    final Vector<JarEntry> jarFileEntries = new Vector<JarEntry>();
+    final Enumeration<JarEntry> enumList = jarFile.entries();
 
     while (enumList.hasMoreElements()) {  // get all file-entries
-      JarEntry entry = enumList.nextElement();
+      final JarEntry entry = enumList.nextElement();
       jarFileEntries.add(entry);
     }
 
@@ -69,41 +69,41 @@ public class JARFileReader extends ClassLoader {
   public void extractAll() {
 
     try {
-      byte[] buf = new byte[4096];
-      JarInputStream in = new JarInputStream(
+      final byte[] buf = new byte[4096];
+      final JarInputStream in = new JarInputStream(
                           new FileInputStream(jarFileName));
 
       // get operating system file separator
-      String fileSeparator = System.getProperty("file.separator");
+      final String fileSeparator = System.getProperty("file.separator");
       // create temporarily file with string tokenizer
-      StringTokenizer st = new StringTokenizer(jarFileName,fileSeparator);
+      final StringTokenizer st = new StringTokenizer(jarFileName,fileSeparator);
 
       File tempFile = null;
       while (st.hasMoreTokens()) {
-        String token = st.nextToken();
+        final String token = st.nextToken();
 
         if (token.endsWith(".jar")) {
-          String dirName = token.substring(0,token.length()-4);
+          final String dirName = token.substring(0,token.length()-4);
           tempFile = new File(dirName);
           tempFile.mkdir();
           break;
         }
       }
 
-      String pathToTmpFile = tempFile.getAbsolutePath();
+      final String pathToTmpFile = tempFile.getAbsolutePath();
       FileOutputStream out = null;
 
       while (true) {
 
-        JarEntry entry = (JarEntry) in.getNextEntry();
+        final JarEntry entry = (JarEntry) in.getNextEntry();
 
         if (entry == null) {    // no more entries
           break;
         }
 
         if (entry.isDirectory()) {    // entry is directory
-          String dirName = entry.getName();
-          File jarDir = new File(
+          final String dirName = entry.getName();
+          final File jarDir = new File(
               new StringBuffer()
               .append(pathToTmpFile)
               .append(fileSeparator)

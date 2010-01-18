@@ -68,8 +68,8 @@ public class JARMemory implements JAR, Serializable {
 
     /** Read jar from stream. * */
     private void readJAR(InputStream is) throws IOException {
-        ByteArrayOutputStream temp= new ByteArrayOutputStream(4096);
-        byte[] readBuffer= new byte[4096];
+        final ByteArrayOutputStream temp = new ByteArrayOutputStream(4096);
+        final byte[] readBuffer= new byte[4096];
         
         int numBytes;
 
@@ -90,10 +90,10 @@ public class JARMemory implements JAR, Serializable {
      */
     public InputStream getInputStream(String entryName) {
         try {
-            JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jar));
+            final JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jar));
 
             while (jis.available() != 0) {
-                JarEntry je = jis.getNextJarEntry();
+                final JarEntry je = jis.getNextJarEntry();
 
                 if ((je != null) && je.getName().equals(entryName)) {
                     return jis;
@@ -121,10 +121,10 @@ public class JARMemory implements JAR, Serializable {
      */
     public boolean constainsResource(String resource) {
         try {
-            JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jar));
+            final JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jar));
             
             while (jis.available() != 0) {
-                JarEntry je = jis.getNextJarEntry();
+                final JarEntry je = jis.getNextJarEntry();
 
                 if ((je != null) && je.getName().equals(resource)) {
                     return true;
@@ -137,6 +137,9 @@ public class JARMemory implements JAR, Serializable {
         return false;
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof JAR)) {
@@ -146,6 +149,9 @@ public class JARMemory implements JAR, Serializable {
         return name.equals(((JAR) o).getJarName());
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public int hashCode() {
         return name.hashCode();
@@ -156,11 +162,14 @@ public class JARMemory implements JAR, Serializable {
      * @return The complete content of JAR.
      */
     public byte[] getByteArray() {
-        byte[] result= new byte[jar.length];
+        final byte[] result= new byte[jar.length];
         System.arraycopy(jar, 0, result, 0, result.length);
         return result;
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     @Override
     public String toString() {
         return "JARMemory :: " + getJarName();

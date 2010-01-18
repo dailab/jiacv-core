@@ -10,17 +10,35 @@ import java.util.Set;
  * @author axle
  */
 public final class IdFactory {
-    public static enum IdPrefix {
-        Agent("a-"), Platform("p-"), Node("n-"), Session("s-");
 
-        private final String _value;
+	/**
+	 * Defines the prefixes of the different ID types. 
+	 */
+    public static enum IdPrefix {
+
+    	/** The prefix for agent IDs is "a-". */
+        Agent("a-"), 
+
+    	/** The prefix for platform IDs is "p-". */
+        Platform("p-"), 
+
+    	/** The prefix for agent node IDs is "n-". */
+        Node("n-"), 
+
+    	/** The prefix for session IDs is "s-". */
+        Session("s-");
+
+        private final String value;
 
         private IdPrefix(String value) {
-            _value = value;
+            this.value = value;
         }
 
+    	/**
+    	 * {@inheritDoc}
+    	 */
         public String toString() {
-            return _value;
+            return value;
         }
     }
 
@@ -44,7 +62,7 @@ public final class IdFactory {
      * each other regardless of the node they are running on.
      * 
      * @param hashcode
-     *            the hashcode of the agent platform object
+     *            the hash code of the agent platform object
      * @return the id of the agent platform
      */
     public static String createPlatformId(int hashcode) {
@@ -55,7 +73,7 @@ public final class IdFactory {
      * Creates a id for an agent node. Remember, agent node coresponds to the Java VM the agent is living in.
      * 
      * @param hashcode
-     *            the hashcode of the agent node object
+     *            the hash code of the agent node object
      * @return the id of the agent node
      */
     public static String createAgentNodeId(int hashcode) {
@@ -66,7 +84,7 @@ public final class IdFactory {
      * Creates a id for an agent.
      * 
      * @param hashcode
-     *            the hashcode of the agent object
+     *            the hash code of the agent object
      * @return the id of the agent
      */
     public static String createAgentId(int hashcode) {
@@ -77,13 +95,19 @@ public final class IdFactory {
      * Creates a id for a session.
      * 
      * @param hashcode
-     *            the hashcode of the action or service object.
+     *            the hash code of the action or service object.
      * @return the session id
      */
     public static String createSessionId(int hashcode) {
         return createId(IdPrefix.Session, hashcode);
     }
 
+    /**
+     * Creates an id.
+     * @param prefix the prefix of the id.
+     * @param hashcode the hash code to be used.
+     * @return the id
+     */
     public static String createId(IdPrefix prefix, int hashcode) {
         return new StringBuilder(prefix.toString()).append(Long.toHexString(System.nanoTime() + hashcode))
                 .toString();
@@ -99,10 +123,10 @@ public final class IdFactory {
      * @return a string representing a random and unique session id.
      */
     public static String generate(int length) {
-        StringBuilder buffer = new StringBuilder("");
+        final StringBuilder buffer = new StringBuilder("");
         String output = null;
 
-        Random random = new Random();
+        final Random random = new Random();
         int oneRandomInt = 0;
 
         for (int i = 0; i < length; i++) {

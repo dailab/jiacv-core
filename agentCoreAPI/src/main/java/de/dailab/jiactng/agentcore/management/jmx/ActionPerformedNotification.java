@@ -20,40 +20,40 @@ public class ActionPerformedNotification extends Notification {
 	public static final String ACTION_PERFORMED = "jiactng.action.perform";
 
 	/** The name of the performed action. */
-	private String _actionName;
+	private String actionName;
 
 	/** The name of the agent bean which has performed the action. */
-	private String _agentbeanName;
+	private String agentbeanName;
 
 	/** The session id of the action execution. */
-	private String _sessionId;
+	private String sessionId;
 
 	/** The name of the owner which has invoked the action. */
-	private String _owner;
+	private String owner;
 
 	/** The type of the performed action. */
-	private String _actionType;
+	private String actionType;
 
 	/** The description of the performed action. */
-	private String _action;
+	private String action;
 
 	/** The description of the action parameters. */
-	private Object[] _actionParameters;
+	private Object[] actionParameters;
 
 	/** The description of the action result. */
-	private Object[] _actionResult;
+	private Object[] actionResult;
 
 	/** The state of action execution. */
-	private DoActionState _state;
+	private DoActionState state;
 
 	/** The id of the user that originally triggered the session of this action execution. */
-	private String _originalUser;
+	private String originalUser;
 
 	/** The id of the provider that offers the top-level service that was invoked for the session of this action execution. */
-	private String _originalProvider;
+	private String originalProvider;
 
 	/** The top-level service that was invoked for the session of this action execution. */
-	private String _originalService;
+	private String originalService;
 
 	/**
 	 * Constructs a notification about a performed action by an agent.
@@ -68,45 +68,45 @@ public class ActionPerformedNotification extends Notification {
 	public ActionPerformedNotification(Object source, long sequenceNumber,
 			long timeStamp, String msg, DoAction action, DoActionState state, Object[] result) {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
-		_actionName = action.getAction().getName();
+		actionName = action.getAction().getName();
 		if(((Action)action.getAction()).getProviderBean() == null) {
 		  System.err.println("\n-- "+((Action)action.getAction()).getName()+" / "+((Action)action.getAction()).getProviderBean() + " / " + state);
-		  _agentbeanName = "null";
+		  agentbeanName = "null";
 		} else {
-		  _agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();
+		  agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();
 		}
-		_sessionId = action.getSessionId();
-		_owner = action.getOwner();
-		_actionType = action.getAction().getClass().getSimpleName();
-		_action = action.toString();
-		_state = state;
+		sessionId = action.getSessionId();
+		owner = action.getOwner();
+		actionType = action.getAction().getClass().getSimpleName();
+		this.action = action.toString();
+		this.state = state;
 		if (action.getSession() != null) {
-			_originalUser = action.getSession().getOriginalUser();
-			_originalProvider = action.getSession().getOriginalProvider();
-			_originalService = action.getSession().getOriginalService();
+			originalUser = action.getSession().getOriginalUser();
+			originalProvider = action.getSession().getOriginalProvider();
+			originalService = action.getSession().getOriginalService();
 		}
 
 		// extract parameters
 		final Object[] params = action.getParams();
 		final int paramSize = params.length;
-		_actionParameters = new Object[paramSize];
+		actionParameters = new Object[paramSize];
 		for (int i=0; i<paramSize; i++) {
 			try {
-				_actionParameters[i] = ((JmxDescriptionSupport)params[i]).getDescription();
+				actionParameters[i] = ((JmxDescriptionSupport)params[i]).getDescription();
 			} catch (Exception e) {
-				_actionParameters[i] = "" + params[i];
+				actionParameters[i] = "" + params[i];
 			}
 		}
 
 		// extract result
 		if (result != null) {
 			final int resultSize = result.length;
-			_actionResult = new Object[resultSize];
+			actionResult = new Object[resultSize];
 			for (int i=0; i<resultSize; i++) {
 				try {
-					_actionResult[i] = ((JmxDescriptionSupport)result[i]).getDescription();
+					actionResult[i] = ((JmxDescriptionSupport)result[i]).getDescription();
 				} catch (Exception e) {
-					_actionResult[i] = String.valueOf(result[i]);
+					actionResult[i] = String.valueOf(result[i]);
 				}
 			}
 		}
@@ -116,32 +116,32 @@ public class ActionPerformedNotification extends Notification {
 	 * Gets the name of the performed action.
 	 * @return The name of the performed action.
 	 */
-	public String getActionName() {
-		return _actionName;
+	final public String getActionName() {
+		return actionName;
 	}
 
 	/**
 	 * Gets the name of the agent bean which has performed the action.
 	 * @return The name of the agent bean.
 	 */
-	public String getAgentbeanName() {
-		return _agentbeanName;
+	final public String getAgentbeanName() {
+		return agentbeanName;
 	}
 
 	/**
 	 * Gets the session id of the action execution.
 	 * @return The session id of the action execution.
 	 */
-	public String getSessionId() {
-		return _sessionId;
+	final public String getSessionId() {
+		return sessionId;
 	}
 
 	/**
 	 * Gets the owner of the action-invocation.
 	 * @return The name of the owner.
 	 */
-	public String getOwner() {
-		return _owner;
+	final public String getOwner() {
+		return owner;
 	}
 
 	/**
@@ -149,8 +149,8 @@ public class ActionPerformedNotification extends Notification {
 	 * @return The simple class name of the action object.
 	 * @see Class#getSimpleName()
 	 */
-	public String getActionType() {
-		return _actionType;
+	final public String getActionType() {
+		return actionType;
 	}
 
 	/**
@@ -158,8 +158,8 @@ public class ActionPerformedNotification extends Notification {
 	 * @return The description of the performed action.
 	 * @see Object#toString()
 	 */
-	public String getAction() {
-		return _action;
+	final public String getAction() {
+		return action;
 	}
 
 	/**
@@ -169,8 +169,8 @@ public class ActionPerformedNotification extends Notification {
 	 * @see Object#toString()
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
-	public Object[] getActionParameters() {
-		return Arrays.copyOf(_actionParameters, _actionParameters.length);
+	final public Object[] getActionParameters() {
+		return Arrays.copyOf(actionParameters, actionParameters.length);
 	}
 
 	/**
@@ -180,27 +180,27 @@ public class ActionPerformedNotification extends Notification {
 	 * @see Object#toString()
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
-	public Object[] getActionResult() {
-		if (_actionResult != null) {
-			return Arrays.copyOf(_actionResult, _actionResult.length);
+	final public Object[] getActionResult() {
+		if (actionResult != null) {
+			return Arrays.copyOf(actionResult, actionResult.length);
 		}
-		return _actionResult;
+		return actionResult;
 	}
 
 	/**
 	 * Gets the state of the action execution.
 	 * @return The state of action execution.
 	 */
-	public DoActionState getState() {
-		return _state;
+	final public DoActionState getState() {
+		return state;
 	}
 
 	/**
 	 * Gets the id of the user that originally triggered the session of this action execution.
 	 * @return The user id or <code>null</code>.
 	 */
-	public String getOriginalUser() {
-		return _originalUser;
+	final public String getOriginalUser() {
+		return originalUser;
 	}
 
 	/**
@@ -208,16 +208,16 @@ public class ActionPerformedNotification extends Notification {
 	 * session of this action execution.
 	 * @return The provider id or <code>null</code>.
 	 */
-	public String getOriginalProvider() {
-		return _originalProvider;
+	final public String getOriginalProvider() {
+		return originalProvider;
 	}
 
 	/**
 	 * Gets the top-level service that was invoked for the session of this action execution.
 	 * @return The service id or <code>null</code>.
 	 */
-	public String getOriginalService() {
-		return _originalService;
+	final public String getOriginalService() {
+		return originalService;
 	}
 
 	  /**
@@ -238,32 +238,32 @@ public class ActionPerformedNotification extends Notification {
 		}
 
 		// check actionName
-		if (((_actionName == null) && (n._actionName != null)) ||
-				((_actionName != null) && !_actionName.equals(n._actionName))) {
+		if (((actionName == null) && (n.actionName != null)) ||
+				((actionName != null) && !actionName.equals(n.actionName))) {
 			return false;
 		}
 
 		// check agentbeanName
-		if (((_agentbeanName == null) && (n._agentbeanName != null)) ||
-				((_agentbeanName != null) && !_agentbeanName.equals(n._agentbeanName))) {
+		if (((agentbeanName == null) && (n.agentbeanName != null)) ||
+				((agentbeanName != null) && !agentbeanName.equals(n.agentbeanName))) {
 			return false;
 		}
 
 		// check sessionId
-		if (((_sessionId == null) && (n._sessionId != null)) ||
-				((_sessionId != null) && !_sessionId.equals(n._sessionId))) {
+		if (((sessionId == null) && (n.sessionId != null)) ||
+				((sessionId != null) && !sessionId.equals(n.sessionId))) {
 			return false;
 		}
 
 		// check owner
-		if (((_owner == null) && (n._owner != null)) ||
-				((_owner != null) && !_owner.equals(n._owner))) {
+		if (((owner == null) && (n.owner != null)) ||
+				((owner != null) && !owner.equals(n.owner))) {
 			return false;
 		}
 
 		// check actionType
-		if (((_actionType == null) && (n._actionType != null)) ||
-				((_actionType != null) && !_actionType.equals(n._actionType))) {
+		if (((actionType == null) && (n.actionType != null)) ||
+				((actionType != null) && !actionType.equals(n.actionType))) {
 			return false;
 		}
 
@@ -277,11 +277,11 @@ public class ActionPerformedNotification extends Notification {
 	public int hashCode() {
 		final int prim = 31;
 		int hash = prim + (source == null ? 0 : source.hashCode());
-		hash = prim * hash + (_actionName == null ? 0 : _actionName.hashCode());
-		hash = prim * hash + (_agentbeanName == null ? 0 : _agentbeanName.hashCode());
-		hash = prim * hash + (_sessionId == null ? 0 : _sessionId.hashCode());
-		hash = prim * hash + (_owner == null ? 0 : _owner.hashCode());
-		hash = prim * hash + (_actionType == null ? 0 : _actionType.hashCode());
+		hash = prim * hash + (actionName == null ? 0 : actionName.hashCode());
+		hash = prim * hash + (agentbeanName == null ? 0 : agentbeanName.hashCode());
+		hash = prim * hash + (sessionId == null ? 0 : sessionId.hashCode());
+		hash = prim * hash + (owner == null ? 0 : owner.hashCode());
+		hash = prim * hash + (actionType == null ? 0 : actionType.hashCode());
 		return hash;
 	}
 

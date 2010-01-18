@@ -14,12 +14,12 @@ public class ActionResult extends SessionEvent {
 	private static final long serialVersionUID = 7941825814785637285L;
 
 	/** The return values of the action. */
-	private Serializable[] _results;
+	private Serializable[] results;
 	
 	/**
 	 * A field for exceptions, strings or other kinds of failureresults
 	 */
-	private Serializable _failure = null;
+	private Serializable failure = null;
 	
 	/**
 	 * Creates an <code>ActionResult</code> which will be used as return object for a
@@ -38,7 +38,7 @@ public class ActionResult extends SessionEvent {
 			DoAction source) {
 		super(session, action, source);
 		if (results != null) {
-			this._results = Arrays.copyOf(results, results.length);
+			this.results = Arrays.copyOf(results, results.length);
 		}
 		if (session != null) {
 			session.addToSessionHistory(this);
@@ -57,7 +57,7 @@ public class ActionResult extends SessionEvent {
 	public ActionResult(DoAction source, Serializable[] results) {
 		super(source);
 		if (results != null) {
-			this._results = Arrays.copyOf(results, results.length);
+			this.results = Arrays.copyOf(results, results.length);
 		}
 		if (getSession() != null) {
 			getSession().addToSessionHistory(this);
@@ -81,7 +81,7 @@ public class ActionResult extends SessionEvent {
 		if ((source != null) && (source.getMetaData() != null)) {
 			super.setMetaData(source.getMetaData());
 		}
-		_failure = failure;
+		this.failure = failure;
 	}
 	
 	// /**
@@ -102,24 +102,24 @@ public class ActionResult extends SessionEvent {
 	 * Gets the successful results.
 	 * @return the results
 	 */
-	public Serializable[] getResults() {
-		if (_results != null) {
-			return Arrays.copyOf(_results, _results.length);
+	final public Serializable[] getResults() {
+		if (results != null) {
+			return Arrays.copyOf(results, results.length);
 		}
-		return _results;
+		return results;
 	}
 
 	/**
 	 * Sets the successful results.
-	 * @param results
+	 * @param newResults
 	 *            the results to set
 	 */
-	public void setResults(Serializable[] results) {
-		if (results != null) {
-			this._results = Arrays.copyOf(results, results.length);
+	final public void setResults(Serializable[] newResults) {
+		if (newResults != null) {
+			results = Arrays.copyOf(newResults, newResults.length);
 		}
 		else {
-			this._results = null;
+			results = null;
 		}
 	}
 
@@ -127,8 +127,8 @@ public class ActionResult extends SessionEvent {
 	 * Gets the failure.
 	 * @return the failure
 	 */
-	public Serializable getFailure(){
-		return this._failure;
+	final public Serializable getFailure(){
+		return failure;
 	}
 	
 	// /**
@@ -152,8 +152,8 @@ public class ActionResult extends SessionEvent {
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("ActionResult:\n results=");
-		if (_results != null) {
-			builder.append(Arrays.asList(_results).toString());
+		if (results != null) {
+			builder.append(Arrays.asList(results).toString());
 		} else {
 			builder.append("null");
 		}

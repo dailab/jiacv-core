@@ -129,7 +129,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * @see de.dailab.jiactng.agentcore.IAgentNode#getThreadPool()
    * @see java.util.concurrent.ExecutorService
    */
-  abstract ExecutorService getThreadPool();
+  ExecutorService getThreadPool();
 
   /**
    * Getter for a log-instance that heeds the hierarchie of the agentnode and

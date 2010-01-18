@@ -9,7 +9,7 @@ import java.util.TimerTask;
  * This class supports the periodically sending of multicast packets.
  * @author Jan Keiser
  */
-public class JmxMulticastSender extends TimerTask {
+public final class JmxMulticastSender extends TimerTask {
 
 	private int multicastPort;
 	private String groupAddress;

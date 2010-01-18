@@ -21,10 +21,10 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
 public interface IJiacMessage extends IFact, JmxDescriptionSupport {
 
 	/** The item name which can be used to get the headers of an JMX-based message description. */
-   static final String ITEMNAME_HEADERS = "headers";
+   final String ITEMNAME_HEADERS = "headers";
 
 	/** The item name which can be used to get the payload of an JMX-based message description. */
-   static final String ITEMNAME_PAYLOAD = "payload";
+   final String ITEMNAME_PAYLOAD = "payload";
 
 
    /**

@@ -37,7 +37,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @throws SecurityException if the listener can not be added to the agent node timer for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	public void addTimerNotificationListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+	final public void addTimerNotificationListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, null);
 	}
 
@@ -50,7 +50,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @throws SecurityException if the listener can not be removed from the agent node timer for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	public void removeTimerNotificationListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	final public void removeTimerNotificationListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, null);
 	}
 
@@ -68,7 +68,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
 	 */
-	public Integer addNotification(String type, String message, Object userDate, Date date) throws IOException, InstanceNotFoundException {
+	final public Integer addNotification(String type, String message, Object userDate, Date date) throws IOException, InstanceNotFoundException {
 		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date"});
 	}
 
@@ -87,7 +87,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
 	 */
-	public Integer addNotification(String type, String message, Object userDate, Date date, long period) throws IOException, InstanceNotFoundException {
+	final public Integer addNotification(String type, String message, Object userDate, Date date, long period) throws IOException, InstanceNotFoundException {
 		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long"});
 	}
 
@@ -107,7 +107,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
 	 */
-	public Integer addNotification(String type, String message, Object userDate, Date date, long period, long nbOccurences) throws IOException, InstanceNotFoundException {
+	final public Integer addNotification(String type, String message, Object userDate, Date date, long period, long nbOccurences) throws IOException, InstanceNotFoundException {
 		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period, nbOccurences}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long", "long"});
 	}
 
@@ -128,7 +128,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
 	 */
-	public Integer addNotification(String type, String message, Object userDate, Date date, long period, long nbOccurences, boolean fixedRate) throws IOException, InstanceNotFoundException {
+	final public Integer addNotification(String type, String message, Object userDate, Date date, long period, long nbOccurences, boolean fixedRate) throws IOException, InstanceNotFoundException {
 		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period, nbOccurences, fixedRate}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long", "long", "boolean"});
 	}
 
@@ -141,7 +141,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see javax.management.timer.TimerMBean#removeNotification(Integer)
 	 */
-	public void removeNotification(Integer id) throws IOException, InstanceNotFoundException {
+	final public void removeNotification(Integer id) throws IOException, InstanceNotFoundException {
 		invokeOperation("removeNotification", new Object[]{id}, new String[]{"java.lang.Integer"});
 	}
 
@@ -155,7 +155,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see javax.management.timer.TimerMBean#getDate(Integer)
 	 */
-	public Date getDate(Integer id) throws IOException, InstanceNotFoundException {
+	final public Date getDate(Integer id) throws IOException, InstanceNotFoundException {
 		return (Date) invokeOperation("getDate", new Object[]{id}, new String[]{"java.lang.Integer"});
 	}
 

@@ -38,7 +38,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getAgentPingInterval()
 	 */
-	public long getAgentPingInterval() throws IOException, InstanceNotFoundException {
+	final public long getAgentPingInterval() throws IOException, InstanceNotFoundException {
 		return (Long) getAttribute("AgentPingInterval");
 	}
 
@@ -51,7 +51,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getCacheIsActive()
 	 */
-	public boolean getCacheIsActive() throws IOException, InstanceNotFoundException {
+	final public boolean getCacheIsActive() throws IOException, InstanceNotFoundException {
 		return (Boolean) getAttribute("CacheIsActive");
 	}
 
@@ -64,7 +64,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getChangePropagateInterval()
 	 */
-	public long getChangePropagateInterval() throws IOException, InstanceNotFoundException {
+	final public long getChangePropagateInterval() throws IOException, InstanceNotFoundException {
 		return (Long) getAttribute("ChangePropagateInterval");
 	}
 
@@ -77,7 +77,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getFirstRefresh()
 	 */
-	public long getFirstRefresh() throws IOException, InstanceNotFoundException {
+	final public long getFirstRefresh() throws IOException, InstanceNotFoundException {
 		return (Long) getAttribute("FirstRefresh");
 	}
 
@@ -90,7 +90,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getInstantPropagation()
 	 */
-	public boolean getInstantPropagation() throws IOException, InstanceNotFoundException {
+	final public boolean getInstantPropagation() throws IOException, InstanceNotFoundException {
 		return (Boolean) getAttribute("InstantPropagation");
 	}
 
@@ -103,7 +103,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getMessageTransportIdentifier()
 	 */
-	public String getMessageTransportIdentifier() throws IOException, InstanceNotFoundException {
+	final public String getMessageTransportIdentifier() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("MessageTransportIdentifier");
 	}
 
@@ -116,7 +116,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getNodeGroup()
 	 */
-	public String getNodeGroup() throws IOException, InstanceNotFoundException {
+	final public String getNodeGroup() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("NodeGroup");
 	}
 
@@ -129,7 +129,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getNodeGroupAddressName()
 	 */
-	public String getNodeGroupAddress() throws IOException, InstanceNotFoundException {
+	final public String getNodeGroupAddress() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("NodeGroupAddressName");
 	}
 
@@ -142,7 +142,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getOtherNodes()
 	 */
-	public Set<String> getOtherNodes() throws IOException, InstanceNotFoundException {
+	final public Set<String> getOtherNodes() throws IOException, InstanceNotFoundException {
 		return (Set<String>) getAttribute("OtherNodes");
 	}
 
@@ -155,7 +155,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getRefreshingInterval()
 	 */
-	public long getRefreshingInterval() throws IOException, InstanceNotFoundException {
+	final public long getRefreshingInterval() throws IOException, InstanceNotFoundException {
 		return (Long) getAttribute("RefreshingInterval");
 	}
 
@@ -168,7 +168,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getSpace()
 	 */
-	public CompositeData getSpace() throws IOException, InstanceNotFoundException {
+	final public CompositeData getSpace() throws IOException, InstanceNotFoundException {
 		return (CompositeData) getAttribute("Space");
 	}
 
@@ -181,7 +181,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#isMessageTransportActive()
 	 */
-	public boolean isMessageTransportActive() throws IOException, InstanceNotFoundException {
+	final public boolean isMessageTransportActive() throws IOException, InstanceNotFoundException {
 		return (Boolean) getAttribute("MessageTransportActive");
 	}
 
@@ -195,7 +195,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setAgentPingInterval(long)
 	 */
-	public void setAgentPingInterval(long agentPingInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	final public void setAgentPingInterval(long agentPingInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("AgentPingInterval", agentPingInterval);
 	}
 
@@ -209,7 +209,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setCacheIsActive(boolean)
 	 */
-	public void setCacheIsActive(boolean isActive) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	final public void setCacheIsActive(boolean isActive) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("CacheIsActive", isActive);
 	}
 
@@ -223,7 +223,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setChangePropagateInterval(long)
 	 */
-	public void setChangePropagateInterval(long cpInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	final public void setChangePropagateInterval(long cpInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("ChangePropagateInterval", cpInterval);
 	}
 
@@ -237,7 +237,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setFirstRefresh(long)
 	 */
-	public void setFirstRefresh(long firstRefresh) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	final public void setFirstRefresh(long firstRefresh) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("FirstRefresh", firstRefresh);
 	}
 
@@ -251,7 +251,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setInstantPropagation(boolean)
 	 */
-	public void setInstantPropagation(boolean instantPropagation) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	final public void setInstantPropagation(boolean instantPropagation) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("InstantPropagation", instantPropagation);
 	}
 
@@ -265,7 +265,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setNodeGroup(String)
 	 */
-	public void setNodeGroup(String groupName) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	final public void setNodeGroup(String groupName) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("NodeGroup", groupName);
 	}
 
@@ -279,7 +279,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setRefreshingInterval(long)
 	 */
-	public void setRefreshingInterval(long interval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	final public void setRefreshingInterval(long interval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("RefreshingInterval", interval);
 	}
 

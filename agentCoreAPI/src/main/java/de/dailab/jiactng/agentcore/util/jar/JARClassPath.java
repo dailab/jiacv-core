@@ -17,7 +17,7 @@ import java.util.Set;
  * @author Marcel Patzlaff
  */
 class JARClassPath {
-    private final URLStreamHandler STREAM_HANDLER= new URLStreamHandler() {
+    private final URLStreamHandler streamHandler= new URLStreamHandler() {
         @Override
         protected URLConnection openConnection(final URL u) {
             return new JARConnection(u);
@@ -25,11 +25,11 @@ class JARClassPath {
     };
     
     private final class JARConnection extends URLConnection {
-        private boolean _connected= false;
-        private int _contentLength;
-        private long _contentTime;
-        private String _contentType;
-        private InputStream _sourceStream;
+        private boolean connected= false;
+        private int contentLength;
+        private long contentTime;
+        private String contentType;
+        private InputStream sourceStream;
         
         JARConnection(final URL url) {
             super(url);
@@ -37,39 +37,43 @@ class JARClassPath {
 
         @Override
         public void connect() throws IOException {
-            if(!_connected) {
-                String resource= url.getFile();
+            if(!connected) {
+                final String resource= url.getFile();
                 
-                if(resource == null || resource.length() <= 0)
+                if(resource == null || resource.length() <= 0) {
                     throw new IOException("Unable to find resource: " + url.toString());
+                }
                 
-                int index= resource.indexOf('!');
+                final int index= resource.indexOf('!');
                 
-                if(index <= 0 || index >= resource.length() - 1)
+                if(index <= 0 || index >= resource.length() - 1) {
                     throw new IOException("The URL is no valid resource location: " + url.toString());
+                }
                 
-                String containerName= resource.substring(0, index);
-                String fileName= resource.substring(index + 1);
+                final String containerName= resource.substring(0, index);
+                final String fileName= resource.substring(index + 1);
                 
-                JAR container= getJAR(containerName);
-                if(container == null)
+                final JAR container= getJAR(containerName);
+                if(container == null) {
                     throw new IOException("Unable to find container: " + containerName);
+                }
                 
-                _sourceStream= container.getInputStream(fileName);
+                sourceStream= container.getInputStream(fileName);
                 
-                if(_sourceStream == null)
+                if(sourceStream == null) {
                     throw new IOException("Unable to find content for: " + fileName);
+                }
                 
-                _contentLength= _sourceStream.available();
-                _contentTime= System.currentTimeMillis();
-                _contentType= guessContentTypeFromName(resource);
-                _connected= true;
+                contentLength= sourceStream.available();
+                contentTime= System.currentTimeMillis();
+                contentType= guessContentTypeFromName(resource);
+                connected= true;
             }
         }
 
         @Override
         public int getContentLength() {
-            if(!_connected) {
+            if(!connected) {
                 try {
                     connect();
                 } catch (IOException e) {
@@ -77,12 +81,12 @@ class JARClassPath {
                 }
             }
             
-            return _contentLength;
+            return contentLength;
         }
 
         @Override
         public String getContentType() {
-            if(!_connected) {
+            if(!connected) {
                 try {
                     connect();
                 } catch (IOException e) {
@@ -90,12 +94,12 @@ class JARClassPath {
                 }
             }
             
-            return _contentType;
+            return contentType;
         }
 
         @Override
         public long getDate() {
-            if(!_connected) {
+            if(!connected) {
                 try {
                     connect();
                 } catch (IOException e) {
@@ -103,18 +107,18 @@ class JARClassPath {
                 }
             }
             
-            return _contentTime;
+            return contentTime;
         }
 
         @Override
         public InputStream getInputStream() throws IOException {
             connect();
-            return _sourceStream;
+            return sourceStream;
         }
 
         @Override
         public long getLastModified() {
-            if(!_connected) {
+            if(!connected) {
                 try {
                     connect();
                 } catch (IOException e) {
@@ -122,7 +126,7 @@ class JARClassPath {
                 }
             }
             
-            return _contentTime;
+            return contentTime;
         }
     }
     
@@ -134,7 +138,7 @@ class JARClassPath {
             return file;
         }
 
-        URL url = JARClassLoader.getJVMClassLoader().getResource(resource);
+        final URL url = JARClassLoader.getJVMClassLoader().getResource(resource);
 
         if ((url == null) || !"file".equals(url.getProtocol())) {
             return null;
@@ -149,15 +153,15 @@ class JARClassPath {
         return null;
     }
 
-    private final Set<JAR> _jars= new HashSet<JAR>();
-    private final Map<String,URL> _urlCache= new HashMap<String, URL>();
+    private final Set<JAR> jars= new HashSet<JAR>();
+    private final Map<String,URL> urlCache= new HashMap<String, URL>();
 
     /**
      * Adds a JAR to the class path.
      * @param jar The JAR to add.
      */
     synchronized void addJAR(final JAR jar) {
-        _jars.add(jar);
+        jars.add(jar);
     }
 
     /**
@@ -168,18 +172,19 @@ class JARClassPath {
      */
     synchronized JAR addJAR(final String resource) throws IOException {
         JAR jar;
-        File file = fileFromName(resource);
+        final File file = fileFromName(resource);
 
         if (file != null) {
             jar = new JARFile(file);
         } else {
             try {
                 // test for url
-                URL url= new URL(resource);
-                if(!url.getProtocol().equals("file"))
+                final URL url= new URL(resource);
+                if(!url.getProtocol().equals("file")) {
                     jar= new JARMemory(resource, url.openStream());
-                else
+                } else {
                     jar= new JARMemory(new File(url.getFile()));
+                }
             } catch (MalformedURLException ioe) {
                 jar= new JARMemory(new File(resource));
             }
@@ -196,7 +201,7 @@ class JARClassPath {
      * @return The list of JARs.
      */
     synchronized JAR[] getJARs() {
-        return _jars.toArray(new JAR[_jars.size()]);
+        return jars.toArray(new JAR[jars.size()]);
     }
     
     /**
@@ -207,7 +212,7 @@ class JARClassPath {
      * @return The JAR which contains the entry or <code>null</code>.
      */
     synchronized JAR getContainer(final String entry) {
-        for(JAR jar : _jars) {
+        for(JAR jar : jars) {
             if(jar.constainsResource(entry)) {
                 return jar;
             }
@@ -236,18 +241,20 @@ class JARClassPath {
      * @see #getContainer(String)
      */
     synchronized URL getURL(final JAR container, final String entry) {
-        URL result= _urlCache.get(entry);
+        URL result= urlCache.get(entry);
         
-        if(result != null)
+        if(result != null) {
             return result;
+        }
         
-        if(container == null || !container.constainsResource(entry))
+        if(container == null || !container.constainsResource(entry)) {
             return null;
+        }
         
         try {
-            String location= container.getJarName() + "!" + entry;
-            result= new URL("jarcl", null, -1, location, STREAM_HANDLER);
-            _urlCache.put(entry, result);
+            final String location = container.getJarName() + "!" + entry;
+            result= new URL("jarcl", null, -1, location, streamHandler);
+            urlCache.put(entry, result);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             result= null;
@@ -262,9 +269,10 @@ class JARClassPath {
      * @return The JAR or <code>null</code>.
      */
     synchronized JAR getJAR(final String name) {
-        for(JAR jar : _jars) {
-            if(jar.getJarName().equals(name))
+        for(JAR jar : jars) {
+            if(jar.getJarName().equals(name)) {
                 return jar;
+            }
         }        
         return null;
     }

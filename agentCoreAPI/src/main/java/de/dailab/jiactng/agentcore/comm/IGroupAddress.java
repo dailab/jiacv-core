@@ -16,6 +16,7 @@ public interface IGroupAddress extends ICommunicationAddress {
 
 	/**
 	 * Gets the corresponding unbounded address.
+	 * return the unbound address
 	 */
     IGroupAddress toUnboundAddress();
 }

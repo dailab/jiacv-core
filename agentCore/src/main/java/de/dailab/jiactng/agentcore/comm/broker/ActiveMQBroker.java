@@ -39,11 +39,13 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
 
     public ActiveMQBroker() {
         synchronized (ActiveMQBroker.class) {
-            if(INSTANCE != null) {
-                throw new IllegalStateException("only on instance per VM is allowed");
-            }
-            
-            INSTANCE= this;
+//            if(INSTANCE != null) {
+//                throw new IllegalStateException("only on instance per VM is allowed");
+//            }
+//            
+        	if (INSTANCE == null) {
+        		INSTANCE = this;
+        	}
         }
     }
 

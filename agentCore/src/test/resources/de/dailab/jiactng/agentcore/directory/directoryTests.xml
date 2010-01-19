@@ -2,16 +2,17 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!--
-	- Application context definition for "example" DispatcherServlet.
+	- Application context definition for directory test
 -->
 <beans>
 
-	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
-
-	<bean name="myNode" parent="Node">
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	
+	<bean name="myNode" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
 		<property name="agentNodeBeans">
 			<list>
+				<ref bean="StandardJMSBroker"/>
 				<ref bean="IDirectory"/>
 			</list>
 		</property>
@@ -23,6 +24,21 @@
 	</bean>
 
 
-	<bean name="TestAgent" parent="SimpleAgent" />
+	<bean name="TestAgent" parent="SimpleAgent">
+		<property name="agentBeans">
+			<list>
+				<ref bean="CommunicationBean" />
+				<ref bean="AgentBeanWithActions"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean name="AgentBeanWithActions" class="de.dailab.jiactng.agentcore.directory.AgentBeanWithActions"/>
+
+	<bean name="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" singleton="true"> 
+		<property name="messageTransport">
+			<ref bean="StandardJMSMessageTransport" />
+		</property>
+	</bean>
 
 </beans>

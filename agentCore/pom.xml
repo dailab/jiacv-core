@@ -45,14 +45,14 @@
 		 <version>20060512</version>
 		 </dependency-->
 		
-		<!-- needed for NodeConfigurationMonitorBean -->
+		<!-- needed for NodeConfigurationMonitorBean --><!--
 		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom</artifactId>
 			<version>1.1</version>
 			</dependency>
 		
-		</dependencies>
+		--></dependencies>
 	
 	<build>
 		<!--		<resources>

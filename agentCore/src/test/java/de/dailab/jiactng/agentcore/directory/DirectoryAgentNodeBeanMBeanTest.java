@@ -93,7 +93,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	public void testGetLocalActions() {
 		try {
 			TabularData data = (TabularData) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "LocalActions");
-			assertNull("AgentMBean.getLocalActions is wrong", data);
+			assertEquals("AgentMBean.getLocalActions is wrong", 2, data.size());
 		} catch (Exception e) {
 			fail("Error while getting local actions: "+e.getLocalizedMessage());
 		}

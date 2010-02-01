@@ -31,7 +31,7 @@ public class JARMemory implements JAR, Serializable {
      * @throws FileNotFoundException if the JAR file does not exist.
      * @throws IOException if the JAR file is not readable.
      */
-    public JARMemory(JARFile file) throws FileNotFoundException, IOException {
+    public JARMemory(JARFile file) throws IOException {
         this(new File(file.getJarName()));
     }
 
@@ -41,7 +41,7 @@ public class JARMemory implements JAR, Serializable {
      * @throws FileNotFoundException if the JAR file does not exist.
      * @throws IOException if the JAR file is not readable.
      */
-    public JARMemory(String resource) throws FileNotFoundException, IOException {
+    public JARMemory(String resource) throws IOException {
         this(resource, JARClassLoader.getJVMClassLoader().getResourceAsStream(resource));
     }
 
@@ -51,7 +51,7 @@ public class JARMemory implements JAR, Serializable {
      * @throws FileNotFoundException if the JAR file does not exist.
      * @throws IOException if the JAR file is not readable.
      */
-    public JARMemory(File file) throws FileNotFoundException, IOException {
+    public JARMemory(File file) throws IOException {
         this(file.toString(), new FileInputStream(file));
     }
 
@@ -138,7 +138,10 @@ public class JARMemory implements JAR, Serializable {
     }
 
 	/**
-	 * {@inheritDoc}
+	 * Checks the equality of two JARs. 
+	 * The JARs are equal if their names are equal.
+	 * @param obj the other JAR
+	 * @return the result of the equality check
 	 */
     @Override
     public boolean equals(Object o) {
@@ -150,7 +153,8 @@ public class JARMemory implements JAR, Serializable {
     }
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the hash code of the name of the JAR memory.
+	 * @return the hash code of the JAR name
 	 */
     @Override
     public int hashCode() {
@@ -168,7 +172,8 @@ public class JARMemory implements JAR, Serializable {
     }
 
 	/**
-	 * {@inheritDoc}
+	 * Returns a single-line text which contains the JAR name of the memory.
+	 * @return a string representation of the JAR memory
 	 */
     @Override
     public String toString() {

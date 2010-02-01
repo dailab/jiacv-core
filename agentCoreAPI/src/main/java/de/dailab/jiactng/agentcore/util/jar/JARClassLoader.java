@@ -21,7 +21,7 @@ import java.util.List;
 public class JARClassLoader extends URLClassLoader {
 
 	/** The JVM class loader. * */
-    private final static JARClassLoader CLASSLOADER = new JARClassLoader();
+    private static final JARClassLoader CLASSLOADER = new JARClassLoader();
 
     /** 
      * Get JVM class loader.
@@ -86,7 +86,7 @@ public class JARClassLoader extends URLClassLoader {
      * @throws FileNotFoundException if the file does not exist.
      * @throws IOException if the resource is not readable.
      */
-    public synchronized JAR addJAR(String resource) throws FileNotFoundException, IOException {
+    public synchronized JAR addJAR(String resource) throws IOException {
         return jarCP.addJAR(resource);
     }
 
@@ -131,7 +131,9 @@ public class JARClassLoader extends URLClassLoader {
     }
 
 	/**
-	 * {@inheritDoc}
+	 * Returns a multiline text which contains the JARs and URLs 
+	 * of the class loader.
+	 * @return a string representation of the class loader
 	 */
     @Override
     public synchronized String toString() {

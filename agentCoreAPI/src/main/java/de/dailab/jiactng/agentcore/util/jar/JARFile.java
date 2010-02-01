@@ -63,7 +63,10 @@ public class JARFile extends JarFile implements JAR {
     }
 
 	/**
-	 * {@inheritDoc}
+	 * Checks the equality of two JARs. 
+	 * The JARs are equal if their names are equal.
+	 * @param obj the other JAR
+	 * @return the result of the equality check
 	 */
     @Override
     public boolean equals(Object o) {
@@ -75,7 +78,8 @@ public class JARFile extends JarFile implements JAR {
     }
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the hash code of the name of the JAR file.
+	 * @return the hash code of the JAR name
 	 */
     @Override
     public int hashCode() {
@@ -83,7 +87,8 @@ public class JARFile extends JarFile implements JAR {
     }
 
 	/**
-	 * {@inheritDoc}
+	 * Returns a single-line text which contains the JAR name of the file.
+	 * @return a string representation of the JAR file
 	 */
     @Override
     public String toString() {

@@ -42,7 +42,7 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	 * @throws SecurityException if the listener can not be added to the agent bean for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void addBeanPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+	public final void addBeanPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, PROPERTY_FILTER);
 	}
 	
@@ -55,7 +55,7 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	 * @throws SecurityException if the listener can not be removed from the agent for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void removeBeanPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	public final void removeBeanPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, PROPERTY_FILTER);
 	}
 	
@@ -69,7 +69,7 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.action.AbstractMethodExposingBeanMBean#getActionList()
 	 */
-	final public TabularData getActionList() throws IOException, InstanceNotFoundException, AttributeNotFoundException {
+	public final TabularData getActionList() throws IOException, InstanceNotFoundException, AttributeNotFoundException {
 		try {
 			return (TabularData) getAttribute("ActionList");
 		}
@@ -89,7 +89,7 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent bean.
 	 * @throws InstanceNotFoundException The agent bean does not exist on the managed agent node.
 	 */
-	final public boolean isActionAuthorizationBean() throws IOException, InstanceNotFoundException {
+	public final boolean isActionAuthorizationBean() throws IOException, InstanceNotFoundException {
 		return isInstanceOf("de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBean");
 	}
 	
@@ -104,7 +104,7 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#setAttribute(ObjectName, javax.management.Attribute)
 	 * @see de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBeanMBean#setAuthorizationActionName(String)
 	 */
-	final public void setAuthorizationActionName(String authorizationActionName) throws IOException, InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException {
+	public final void setAuthorizationActionName(String authorizationActionName) throws IOException, InstanceNotFoundException, AttributeNotFoundException, InvalidAttributeValueException {
 		try {
 			setAttribute("AuthorizationActionName", authorizationActionName);
 		}
@@ -125,7 +125,7 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The agent bean does not exist on the managed agent node.
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 */
-	final public String getAuthorizationActionName() throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final String getAuthorizationActionName() throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		return (String) getAttribute("AuthorizationActionName");
 	}
 

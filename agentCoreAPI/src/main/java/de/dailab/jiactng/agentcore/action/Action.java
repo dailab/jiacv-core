@@ -133,7 +133,7 @@ public class Action implements IActionDescription {
 	 * @return a new DoAction-object that can be used (by writing it to the
 	 *         memory) to call the action.
 	 */
-	final public DoAction createDoAction(Serializable[] newParams, ResultReceiver source) {
+	public final DoAction createDoAction(Serializable[] newParams, ResultReceiver source) {
 		return new DoAction(this, source, newParams);
 	}
 
@@ -151,7 +151,7 @@ public class Action implements IActionDescription {
 	 * @return a new DoAction-object that can be used (by writing it to the
 	 *         memory) to call the action.
 	 */
-	final public DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
+	public final DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
 			Long timeToLive) {
 		return new DoAction(this, source, newParams, timeToLive);
 	}
@@ -170,7 +170,7 @@ public class Action implements IActionDescription {
    * @return a new DoAction-object that can be used (by writing it to the
    *         memory) to call the action.
    */
-  final public DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source) {
+  public final DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source) {
     return new DoAction(parent, this, source, newParams);
   }
 	
@@ -188,7 +188,7 @@ public class Action implements IActionDescription {
 	 * @return a new ActionResult-object that can be used (by writing it to the
 	 *         memory) to return the results of the action.
 	 */
-	final public ActionResult createActionResult(DoAction source, Serializable[] results) {
+	public final ActionResult createActionResult(DoAction source, Serializable[] results) {
 		final ActionResult ret = new ActionResult(source, results);
 		ret.setMetaData(source.getMetaData());
 		return ret;
@@ -355,7 +355,7 @@ public class Action implements IActionDescription {
 
 	/**
 	 * Sets the result types of this action.
-	 * @param resultTypes
+	 * @param newResultTypes
 	 *            the results to set
 	 */
 	public final void setResultTypes(List<Class<?>> newResultTypes) {
@@ -371,7 +371,9 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the hash code of the action class, 
+	 * thus it is the same hash code for all actions.
+	 * @return the hash code of the action class
 	 */
 	@Override
 	public int hashCode() {
@@ -381,7 +383,12 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Checks the equality of two actions. The actions are equal
+	 * if their names, input types, and result types are equal or null.
+	 * The actions are not equal if they are provided by different agents.
+	 * @param obj the other action
+	 * @return the result of the equality check
+	 * @see EqualityChecker#equalsOrNull(Object, Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -410,7 +417,9 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns a multiline text which contains the name, input types,
+	 * result types, the provider bean, provider agent, and scope of the action.
+	 * @return a string representation of the action
 	 */
 	@Override
 	public String toString() {
@@ -488,7 +497,7 @@ public class Action implements IActionDescription {
 	/**
 	 * {@inheritDoc}
 	 */
-	final public ActionScope getScope() {
+	public final ActionScope getScope() {
 		return scope;
 	}
 
@@ -497,11 +506,11 @@ public class Action implements IActionDescription {
 	 * changed, it is not a bad idea to notify the directory about the
 	 * change.
 	 * 
-	 * @param scope the scope of this action.
+	 * @param newScope the scope of this action.
 	 * @see ActionScope
 	 */
-	final public void setScope(ActionScope scope) {
-		this.scope = scope;
+	public final void setScope(ActionScope newScope) {
+		scope = newScope;
 	}
 
 	private String[] getItemNames() {

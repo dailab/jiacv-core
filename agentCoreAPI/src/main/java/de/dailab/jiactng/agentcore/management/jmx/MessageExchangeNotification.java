@@ -19,22 +19,22 @@ public class MessageExchangeNotification extends Notification {
 	public static final String MESSAGE_EXCHANGE = "jiactng.message.exchange";
 
 	/** Indicates if the message was sent or received. */
-	private MessageExchangeAction _action;
+	private MessageExchangeAction action;
 
 	/** The address of the message sender. */
-	private String _sender;
+	private String sender;
 
 	/** The address of the message receiver. */
-	private String _receiver;
+	private String receiver;
 
 	/** The description of the exchanged message. */
-	private Object _message;
+	private Object message;
 
 	/** The used message transport mechanism. */
-	private String _transport;
+	private String transport;
 
 	/** Indicates if the message was sent to a group address. */
-	private boolean _groupMessage;
+	private boolean groupMessage;
 
 	
 	/**
@@ -67,40 +67,40 @@ public class MessageExchangeNotification extends Notification {
 			ICommunicationAddress receiver, 
 			IJiacMessage jiacMessage, String transport) {
 		super(MESSAGE_EXCHANGE, source, sequenceNumber, timeStamp, msg);
-		_action = action;
-		_sender = (jiacMessage.getSender()==null)? null:jiacMessage.getSender().getName();
-		_receiver = (receiver==null)? null:receiver.getName();
+		this.action = action;
+		this.sender = (jiacMessage.getSender()==null)? null:jiacMessage.getSender().getName();
+		this.receiver = (receiver==null)? null:receiver.getName();
 		try {
-			_message = ((JmxDescriptionSupport)jiacMessage).getDescription();
+			this.message = ((JmxDescriptionSupport)jiacMessage).getDescription();
 		} catch (Exception e) {
-			_message = jiacMessage.toString();
+			this.message = jiacMessage.toString();
 		}
-		_transport = transport;
-		_groupMessage = receiver instanceof IGroupAddress;
+		this.transport = transport;
+		this.groupMessage = receiver instanceof IGroupAddress;
 	}
 
 	/**
 	 * Gets the action that is related to the message exchange.
 	 * @return Whether the message was sent or received.
 	 */
-	public MessageExchangeAction getAction() {
-		return _action;
+	public final MessageExchangeAction getAction() {
+		return action;
 	}
 
 	/**
 	 * Gets the address of the message sender.
 	 * @return The address of the message sender.
 	 */
-	public String getSender() {
-		return _sender;
+	public final String getSender() {
+		return sender;
 	}
 
 	/**
 	 * Gets the address of the message receiver.
 	 * @return The address of the message receiver.
 	 */
-	public String getReceiver() {
-		return _receiver;
+	public final String getReceiver() {
+		return receiver;
 	}
 
 	/**
@@ -110,23 +110,23 @@ public class MessageExchangeNotification extends Notification {
 	 * @see Object#toString()
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
-	public Object getJiacMessage() {
-		return _message;
+	public final Object getJiacMessage() {
+		return message;
 	}
 
 	/**
 	 * Gets the used message transport mechanism.
 	 * @return The used message transport mechanism.
 	 */
-	public String getTransport() {
-		return _transport;
+	public final String getTransport() {
+		return transport;
 	}
 
 	/**
 	 * Checks if the message was sent to a group address.
 	 * @return <code>true</code> if the message was sent to a group address.
 	 */
-	public boolean isGroupMessage() {
-		return _groupMessage;
+	public final boolean isGroupMessage() {
+		return groupMessage;
 	}
 }

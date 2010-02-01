@@ -128,7 +128,7 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * @param name The action name.
 	 * @throws IllegalArgumentException The action name parameter is null.
 	 */
-	final public void enableAction(String name) throws IllegalArgumentException {
+	public final void enableAction(String name) throws IllegalArgumentException {
 		if (name == null) {
 			throw new IllegalArgumentException();
 		}
@@ -151,7 +151,7 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * has no effect.
 	 * @param name The action name.
 	 */
-	final public void disableAction(String name) {
+	public final void disableAction(String name) {
 		if (name == null) {
 			return;
 		}
@@ -170,7 +170,7 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	/**
 	 * Disables all the action names.
 	 */
-	final public void disableAllActions() {
+	public final void disableAllActions() {
 		actionsEnabled = true;
 		actions.removeAllElements();
 	}
@@ -182,7 +182,7 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * @param name The agent bean name.
 	 * @throws IllegalArgumentException The agent bean name parameter is null.
 	 */
-	final public void enableAgentbean(String name) throws IllegalArgumentException {
+	public final void enableAgentbean(String name) throws IllegalArgumentException {
 		if (name == null) {
 			throw new IllegalArgumentException();
 		}
@@ -205,7 +205,7 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 * has no effect.
 	 * @param name The agent bean name.
 	 */
-	final public void disableAgentbean(String name) {
+	public final void disableAgentbean(String name) {
 		if (name == null) {
 			return;
 		}
@@ -224,7 +224,7 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	/**
 	 * Disables all the agent bean names.
 	 */
-	final public void disableAllAgentbeans() {
+	public final void disableAllAgentbeans() {
 		agentbeansEnabled = true;
 		agentbeans.removeAllElements();
 	}
@@ -232,28 +232,28 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	/**
 	 * Disables all invoked action executions.
 	 */
-	final public void disableInvokedActions() {
+	public final void disableInvokedActions() {
 		invokedEnabled = false;
 	}
 
 	/**
 	 * Disables all started action executions.
 	 */
-	final public void disableStartedActions() {
+	public final void disableStartedActions() {
 		startedEnabled = false;
 	}
 
 	/**
 	 * Disables all successful action executions.
 	 */
-	final public void disableSuccessfulActions() {
+	public final void disableSuccessfulActions() {
 		successEnabled = false;
 	}
 
 	/**
 	 * Disables all failed action executions.
 	 */
-	final public void disableFailedActions() {
+	public final void disableFailedActions() {
 		failedEnabled = false;
 	}
 }

@@ -116,7 +116,7 @@ public class ActionPerformedNotification extends Notification {
 	 * Gets the name of the performed action.
 	 * @return The name of the performed action.
 	 */
-	final public String getActionName() {
+	public final String getActionName() {
 		return actionName;
 	}
 
@@ -124,7 +124,7 @@ public class ActionPerformedNotification extends Notification {
 	 * Gets the name of the agent bean which has performed the action.
 	 * @return The name of the agent bean.
 	 */
-	final public String getAgentbeanName() {
+	public final String getAgentbeanName() {
 		return agentbeanName;
 	}
 
@@ -132,7 +132,7 @@ public class ActionPerformedNotification extends Notification {
 	 * Gets the session id of the action execution.
 	 * @return The session id of the action execution.
 	 */
-	final public String getSessionId() {
+	public final String getSessionId() {
 		return sessionId;
 	}
 
@@ -140,7 +140,7 @@ public class ActionPerformedNotification extends Notification {
 	 * Gets the owner of the action-invocation.
 	 * @return The name of the owner.
 	 */
-	final public String getOwner() {
+	public final String getOwner() {
 		return owner;
 	}
 
@@ -149,7 +149,7 @@ public class ActionPerformedNotification extends Notification {
 	 * @return The simple class name of the action object.
 	 * @see Class#getSimpleName()
 	 */
-	final public String getActionType() {
+	public final String getActionType() {
 		return actionType;
 	}
 
@@ -158,7 +158,7 @@ public class ActionPerformedNotification extends Notification {
 	 * @return The description of the performed action.
 	 * @see Object#toString()
 	 */
-	final public String getAction() {
+	public final String getAction() {
 		return action;
 	}
 
@@ -169,7 +169,7 @@ public class ActionPerformedNotification extends Notification {
 	 * @see Object#toString()
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
-	final public Object[] getActionParameters() {
+	public final Object[] getActionParameters() {
 		return Arrays.copyOf(actionParameters, actionParameters.length);
 	}
 
@@ -180,7 +180,7 @@ public class ActionPerformedNotification extends Notification {
 	 * @see Object#toString()
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
-	final public Object[] getActionResult() {
+	public final Object[] getActionResult() {
 		if (actionResult != null) {
 			return Arrays.copyOf(actionResult, actionResult.length);
 		}
@@ -191,7 +191,7 @@ public class ActionPerformedNotification extends Notification {
 	 * Gets the state of the action execution.
 	 * @return The state of action execution.
 	 */
-	final public DoActionState getState() {
+	public final DoActionState getState() {
 		return state;
 	}
 
@@ -199,7 +199,7 @@ public class ActionPerformedNotification extends Notification {
 	 * Gets the id of the user that originally triggered the session of this action execution.
 	 * @return The user id or <code>null</code>.
 	 */
-	final public String getOriginalUser() {
+	public final String getOriginalUser() {
 		return originalUser;
 	}
 
@@ -208,7 +208,7 @@ public class ActionPerformedNotification extends Notification {
 	 * session of this action execution.
 	 * @return The provider id or <code>null</code>.
 	 */
-	final public String getOriginalProvider() {
+	public final String getOriginalProvider() {
 		return originalProvider;
 	}
 
@@ -216,12 +216,16 @@ public class ActionPerformedNotification extends Notification {
 	 * Gets the top-level service that was invoked for the session of this action execution.
 	 * @return The service id or <code>null</code>.
 	 */
-	final public String getOriginalService() {
+	public final String getOriginalService() {
 		return originalService;
 	}
 
 	  /**
-	   * {@inheritDoc}
+	   * Checks the equality of two ActionPerformedNotifications. 
+	   * The notifications are equal if their source, action name, 
+	   * agent bean name, session ID, owner, and action type are equal.
+	   * @param obj the other notification
+	   * @return the result of the equality check
 	   */
 	@Override
 	public boolean equals(Object obj) {
@@ -271,7 +275,9 @@ public class ActionPerformedNotification extends Notification {
 	}
 
 	  /**
-	   * {@inheritDoc}
+	   * Calculates the hash code of the notification with consideration of
+	   * source, action name, agent bean name, session ID, owner, and action type.
+	   * @return the hash code of the notification
 	   */
 	@Override
 	public int hashCode() {

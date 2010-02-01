@@ -47,7 +47,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getExecutionWorkload()
 	 */
-	final public int getExecutionWorkload() throws IOException, InstanceNotFoundException {
+	public final int getExecutionWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("ExecutionWorkload");
 	}
 
@@ -60,7 +60,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getDoActionWorkload()
 	 */
-	final public int getDoActionWorkload() throws IOException, InstanceNotFoundException {
+	public final int getDoActionWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("DoActionWorkload");
 	}
 
@@ -73,7 +73,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getActionResultWorkload()
 	 */
-	final public int getActionResultWorkload() throws IOException, InstanceNotFoundException {
+	public final int getActionResultWorkload() throws IOException, InstanceNotFoundException {
 		return (Integer) getAttribute("ActionResultWorkload");
 	}
 
@@ -85,7 +85,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws SecurityException if the listener can not be added to the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void addWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+	public final void addWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, WORKLOAD_NOTIFICATION_FILTER);
 	}
 
@@ -98,7 +98,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws SecurityException if the listener can not be removed from the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void removeWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	public final void removeWorkloadListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, WORKLOAD_NOTIFICATION_FILTER);
 	}
 
@@ -111,7 +111,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws SecurityException if the listener can not be added to the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void addActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException {
+	public final void addActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, filter);
 	}
 
@@ -125,7 +125,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @throws SecurityException if the listener can not be removed from the agent execution cycle for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void removeActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	public final void removeActionPerformedListener(NotificationListener listener, ActionPerformedNotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, filter);
 	}
 

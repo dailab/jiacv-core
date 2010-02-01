@@ -25,7 +25,7 @@ public class DoAction extends SessionEvent {
 	 */
 	private static final long serialVersionUID = -8741204284564770003L;
 
-	private final static Serializable[] EMPTY_OBJECTS = new Serializable[0];
+	private static final Serializable[] EMPTY_OBJECTS = new Serializable[0];
 
 	/** The input-parameters for the action-call */
 	private Serializable[] params;
@@ -101,7 +101,7 @@ public class DoAction extends SessionEvent {
 	 * 
 	 * @return an array containing the parameters for the action-call.
 	 */
-	final public Serializable[] getParams() {
+	public final Serializable[] getParams() {
 		return Arrays.copyOf(params, params.length);
 	}
 
@@ -111,7 +111,7 @@ public class DoAction extends SessionEvent {
 	 * @param newParams
 	 *            the params to set
 	 */
-	final public void setParams(Serializable[] newParams) {
+	public final void setParams(Serializable[] newParams) {
 		params = newParams == null ? EMPTY_OBJECTS : newParams;
 	}
 
@@ -120,7 +120,7 @@ public class DoAction extends SessionEvent {
 	 * 
 	 * @return the name of the owner
 	 */
-	final public String getOwner() {
+	public final String getOwner() {
 		return owner;
 	}
 
@@ -130,7 +130,7 @@ public class DoAction extends SessionEvent {
 	 * @param newOwner
 	 *            the name of the user that initiated this action.
 	 */
-	final public void setOwner(String newOwner) {
+	public final void setOwner(String newOwner) {
 		owner = newOwner;
 	}
 
@@ -141,7 +141,7 @@ public class DoAction extends SessionEvent {
 	 *         parameters of this trigger are compatible, or a String describing
 	 *         the mismatch otherwise.
 	 */
-	final public String typeCheck() {
+	public final String typeCheck() {
 		List<Class<?>> types;
 		try {
 			types = getAction().getInputTypes();
@@ -185,7 +185,9 @@ public class DoAction extends SessionEvent {
 	}
 	
 	  /**
-	   * {@inheritDoc}
+	   * Returns a single-line text which contains the owner, the action name and provider,
+	   * and the parameters of the action request.
+	   * @return a string representation of the action request
 	   */
 	@Override
 	public String toString() {

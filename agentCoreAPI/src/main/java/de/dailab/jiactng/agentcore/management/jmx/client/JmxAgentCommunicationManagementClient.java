@@ -34,7 +34,7 @@ public class JmxAgentCommunicationManagementClient extends JmxAbstractManagement
 	 * @throws SecurityException if the listener can not be added to the agent communication bean for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void addMessageExchangeListener(NotificationListener listener, MessageExchangeNotificationFilter filter) throws IOException, InstanceNotFoundException {
+	public final void addMessageExchangeListener(NotificationListener listener, MessageExchangeNotificationFilter filter) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, filter);
 	}
 
@@ -48,7 +48,7 @@ public class JmxAgentCommunicationManagementClient extends JmxAbstractManagement
 	 * @throws SecurityException if the listener can not be removed from the agent communication bean for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void removeMessageExchangeListener(NotificationListener listener, MessageExchangeNotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	public final void removeMessageExchangeListener(NotificationListener listener, MessageExchangeNotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, filter);
 	}
 

@@ -16,22 +16,22 @@ import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
 public interface IAgentDescription extends IFact, JmxDescriptionSupport {
 
 	/** Item name which can be used to get the Id of the JMX-based agent description. */
-    final String ITEMNAME_ID = "id";
+    String ITEMNAME_ID = "id";
 
 	/** Item name which can be used to get the name of the JMX-based agent description. */
-    final String ITEMNAME_NAME = "name";
+    String ITEMNAME_NAME = "name";
 
 	/** Item name which can be used to get the node UUID of the JMX-based agent description. */
-    final String ITEMNAME_NODE = "node UUID";
+    String ITEMNAME_NODE = "node UUID";
 
 	/** Item name which can be used to get the state of the JMX-based agent description. */
-    final String ITEMNAME_STATE = "state";
+    String ITEMNAME_STATE = "state";
 
 	/** Item name which can be used to get the mobility of the JMX-based agent description. */
-    final String ITEMNAME_MOBILE = "mobile";
+    String ITEMNAME_MOBILE = "mobile";
 
 	/** Item name which can be used to get the message box address of the JMX-based agent description. */
-    final String ITEMNAME_MESSAGEBOX = "message box address";
+    String ITEMNAME_MESSAGEBOX = "message box address";
 
 	/**
      * This method returns the unique agent identifier (AID) of

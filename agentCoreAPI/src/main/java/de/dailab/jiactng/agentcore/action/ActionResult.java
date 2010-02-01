@@ -102,7 +102,7 @@ public class ActionResult extends SessionEvent {
 	 * Gets the successful results.
 	 * @return the results
 	 */
-	final public Serializable[] getResults() {
+	public final Serializable[] getResults() {
 		if (results != null) {
 			return Arrays.copyOf(results, results.length);
 		}
@@ -114,7 +114,7 @@ public class ActionResult extends SessionEvent {
 	 * @param newResults
 	 *            the results to set
 	 */
-	final public void setResults(Serializable[] newResults) {
+	public final void setResults(Serializable[] newResults) {
 		if (newResults != null) {
 			results = Arrays.copyOf(newResults, newResults.length);
 		}
@@ -127,7 +127,7 @@ public class ActionResult extends SessionEvent {
 	 * Gets the failure.
 	 * @return the failure
 	 */
-	final public Serializable getFailure(){
+	public final Serializable getFailure(){
 		return failure;
 	}
 	
@@ -146,7 +146,8 @@ public class ActionResult extends SessionEvent {
 	// }
 
 	  /**
-	   * {@inheritDoc}
+	   * Returns a multiline text which contains the successful result of an action.
+	   * @return a string representation of the action result
 	   */
 	@Override
 	public String toString() {

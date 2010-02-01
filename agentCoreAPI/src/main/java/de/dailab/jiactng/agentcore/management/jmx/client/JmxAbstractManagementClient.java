@@ -43,7 +43,7 @@ public abstract class JmxAbstractManagementClient {
 	 * @throws LifecycleException if an error occurs during change of the resource's lifecycle.
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 */
-	final protected void changeState(String action) throws IOException, InstanceNotFoundException, LifecycleException {
+	protected final void changeState(String action) throws IOException, InstanceNotFoundException, LifecycleException {
 		try {
 			mbsc.invoke(resource, action, new Object[]{}, new String[]{});
 		}
@@ -71,7 +71,7 @@ public abstract class JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The resource does not exist in the JVM.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 */
-	final protected Object getAttribute(String attributeName) throws IOException, InstanceNotFoundException {
+	protected final Object getAttribute(String attributeName) throws IOException, InstanceNotFoundException {
       	try {
       		return mbsc.getAttribute(resource, attributeName);
       	}
@@ -100,7 +100,7 @@ public abstract class JmxAbstractManagementClient {
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 */
-	final protected void setAttribute(String attributeName, Object attributeValue) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	protected final void setAttribute(String attributeName, Object attributeValue) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
       	try {
       		mbsc.setAttribute(resource, new Attribute(attributeName, attributeValue));
       	}
@@ -130,7 +130,7 @@ public abstract class JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The resource does not exist in the JVM.
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 */
-	final protected Object invokeOperation(String operationName, Object[] params, String[] signature) throws IOException, InstanceNotFoundException {
+	protected final Object invokeOperation(String operationName, Object[] params, String[] signature) throws IOException, InstanceNotFoundException {
       	try {
       		return mbsc.invoke(resource, operationName, params, signature);
       	}
@@ -154,7 +154,7 @@ public abstract class JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when invoking the operation of the remote resource.
 	 * @throws InstanceNotFoundException The resource does not exist in the JVM.
 	 */
-	final protected boolean isInstanceOf(String className) throws IOException, InstanceNotFoundException {
+	protected final boolean isInstanceOf(String className) throws IOException, InstanceNotFoundException {
 		return mbsc.isInstanceOf(resource, className);
 	}
 	
@@ -166,7 +166,7 @@ public abstract class JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The resource does not exist in the JVM.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final protected void addNotificationListener(NotificationListener listener, NotificationFilter filter) throws IOException, InstanceNotFoundException {
+	protected final void addNotificationListener(NotificationListener listener, NotificationFilter filter) throws IOException, InstanceNotFoundException {
 		mbsc.addNotificationListener(resource, listener, filter, null);
 	}
 
@@ -179,7 +179,7 @@ public abstract class JmxAbstractManagementClient {
 	 * @throws ListenerNotFoundException The listener is not registered in the managed resource, or it is not registered with the given filter.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final protected void removeNotificationListener(NotificationListener listener, NotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	protected final void removeNotificationListener(NotificationListener listener, NotificationFilter filter) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		mbsc.removeNotificationListener(resource, listener, filter, null);
 	}
 }

@@ -36,7 +36,7 @@ public class JmxAgentMemoryManagementClient extends JmxAbstractManagementClient 
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.knowledge.MemoryMBean#getSpace()
 	 */
-	final public CompositeData getSpace() throws IOException, InstanceNotFoundException {
+	public final CompositeData getSpace() throws IOException, InstanceNotFoundException {
 		return (CompositeData) getAttribute("Space");
 	}
 

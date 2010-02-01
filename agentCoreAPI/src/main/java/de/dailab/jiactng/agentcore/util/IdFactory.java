@@ -45,9 +45,9 @@ public final class IdFactory {
     /**
      * The default length of a session id. Use generate(int) if you want another length.
      */
-    public final static int DEFAULT_LENGTH = 12;
+    public static final int DEFAULT_LENGTH = 12;
 
-    private final static int NANO_SLEEP = 5;
+    private static final int NANO_SLEEP = 5;
 
     private static Set<String> allocatedSessions = new HashSet<String>();
 

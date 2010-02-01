@@ -53,7 +53,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#getLifecycleState()
 	 */
-	final public String getAgentState() throws IOException, InstanceNotFoundException {
+	public final String getAgentState() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("LifecycleState");
 	}
 
@@ -65,7 +65,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws SecurityException if the listener can not be added to the agent for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void addLifecycleStateListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+	public final void addLifecycleStateListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, LIFECYCLE_NOTIFICATION_FILTER);
 	}
 
@@ -78,7 +78,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws SecurityException if the listener can not be removed from the agent for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void removeLifecycleStateListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	public final void removeLifecycleStateListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, LIFECYCLE_NOTIFICATION_FILTER);
 	}
 
@@ -91,7 +91,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#init()
 	 */
-	final public void initAgent() throws IOException, InstanceNotFoundException, LifecycleException {
+	public final void initAgent() throws IOException, InstanceNotFoundException, LifecycleException {
 		changeState("init");
 	}
 
@@ -104,7 +104,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#start()
 	 */
-	final public void startAgent() throws IOException, InstanceNotFoundException, LifecycleException {
+	public final void startAgent() throws IOException, InstanceNotFoundException, LifecycleException {
 		changeState("start");
 	}
 
@@ -117,7 +117,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#stop()
 	 */
-	final public void stopAgent() throws IOException, InstanceNotFoundException, LifecycleException {
+	public final void stopAgent() throws IOException, InstanceNotFoundException, LifecycleException {
 		changeState("stop");
 	}
 
@@ -130,7 +130,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#cleanup()
 	 */
-	final public void cleanupAgent() throws IOException, InstanceNotFoundException, LifecycleException {
+	public final void cleanupAgent() throws IOException, InstanceNotFoundException, LifecycleException {
 		changeState("cleanup");
 	}
 
@@ -143,7 +143,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#getLogLevel()
 	 */
-	final public String getAgentLogLevel() throws IOException, InstanceNotFoundException {
+	public final String getAgentLogLevel() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("LogLevel");
 	}
 
@@ -157,7 +157,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#setLogLevel(String)
 	 */
-	final public void setAgentLogLevel(String level) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final void setAgentLogLevel(String level) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("LogLevel", level);
 	}
 
@@ -170,7 +170,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#getLogger()
 	 */
-	final public CompositeData getAgentLogger() throws IOException, InstanceNotFoundException {
+	public final CompositeData getAgentLogger() throws IOException, InstanceNotFoundException {
 		return (CompositeData) getAttribute("Logger");
 	}
 
@@ -183,7 +183,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getAgentName()
 	 */
-	final public String getAgentName() throws IOException, InstanceNotFoundException {
+	public final String getAgentName() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("AgentName");
 	}
 
@@ -197,7 +197,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#setAgentName(String)
 	 */
-	final public void setAgentName(String agentname) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final void setAgentName(String agentname) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("AgentName", agentname);
 	}
 
@@ -210,7 +210,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 * @see de.dailab.jiactng.agentcore.IAgent#setAgentName(String)
 	 */
-	final public void addAgentNameListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+	public final void addAgentNameListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, AGENTNAME_NOTIFICATION_FILTER);
 	}
 
@@ -224,7 +224,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 * @see de.dailab.jiactng.agentcore.IAgent#setAgentName(String)
 	 */
-	final public void removeAgentNameListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	public final void removeAgentNameListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, AGENTNAME_NOTIFICATION_FILTER);
 	}
 	
@@ -236,7 +236,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws SecurityException if the listener can not be added to the agent for security reasons.
 	 * @see MBeanServerConnection#addNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void addAgentPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
+	public final void addAgentPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException {
 		addNotificationListener(listener, PROPERTY_NOTIFICATION_FILTER);
 	}
 
@@ -249,7 +249,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws SecurityException if the listener can not be removed from the agent for security reasons.
 	 * @see MBeanServerConnection#removeNotificationListener(ObjectName, NotificationListener, NotificationFilter, Object)
 	 */
-	final public void removeAgentPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
+	public final void removeAgentPropertyListener(NotificationListener listener) throws IOException, InstanceNotFoundException, ListenerNotFoundException {
 		removeNotificationListener(listener, PROPERTY_NOTIFICATION_FILTER);
 	}
 
@@ -263,7 +263,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getOwner()
 	 */
-	final public String getOwner() throws IOException, InstanceNotFoundException {
+	public final String getOwner() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("Owner");
 	}
 
@@ -277,7 +277,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#setOwner(String)
 	 */
-	final public void setOwner(String owner) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final void setOwner(String owner) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("Owner", owner);
 	}
 
@@ -290,7 +290,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getAgentBeanNames()
 	 */
-	final public List<String> getAgentBeanNames() throws IOException, InstanceNotFoundException {
+	public final List<String> getAgentBeanNames() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("AgentBeanNames");
 	}
 
@@ -303,7 +303,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getActionNames()
 	 */
-	final public List<String> getActionNames() throws IOException, InstanceNotFoundException {
+	public final List<String> getActionNames() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("ActionNames");
 	}
 
@@ -316,7 +316,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getBeanExecutionTimeout()
 	 */
-	final public long getBeanExecutionTimeout() throws IOException, InstanceNotFoundException {
+	public final long getBeanExecutionTimeout() throws IOException, InstanceNotFoundException {
 		return (Long) getAttribute("BeanExecutionTimeout");
 	}
 
@@ -330,7 +330,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#setBeanExecutionTimeout(long)
 	 */
-	final public void setBeanExecutionTimeout(long beanExecutionTimeout) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final void setBeanExecutionTimeout(long beanExecutionTimeout) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("BeanExecutionTimeout", beanExecutionTimeout);
 	}
 
@@ -343,7 +343,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getExecutionCycleClass()
 	 */
-	final public String getExecutionCycleClass() throws IOException, InstanceNotFoundException {
+	public final String getExecutionCycleClass() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("ExecutionCycleClass");
 	}
 
@@ -356,7 +356,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getMemoryData()
 	 */
-	final public CompositeData getMemoryData() throws IOException, InstanceNotFoundException {
+	public final CompositeData getMemoryData() throws IOException, InstanceNotFoundException {
 		return (CompositeData) getAttribute("MemoryData");
 	}
 
@@ -368,7 +368,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#remove()
 	 */
-	final public void removeAgent() throws IOException, InstanceNotFoundException {
+	public final void removeAgent() throws IOException, InstanceNotFoundException {
       	invokeOperation("remove", new Object[]{}, new String[]{});
 	}
 
@@ -381,7 +381,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getStartTime()
 	 */
-	final public Long getStartTime() throws IOException, InstanceNotFoundException {
+	public final Long getStartTime() throws IOException, InstanceNotFoundException {
 		return (Long) getAttribute("StartTime");
 	}
 
@@ -395,7 +395,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#setStartTime(Long)
 	 */
-	final public void setStartTime(Long startTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final void setStartTime(Long startTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		this.setAttribute("StartTime", startTime);
 	}
 
@@ -408,7 +408,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getStopTime()
 	 */
-	final public Long getStopTime() throws IOException, InstanceNotFoundException {
+	public final Long getStopTime() throws IOException, InstanceNotFoundException {
 		return (Long) getAttribute("StopTime");
 	}
 
@@ -422,7 +422,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#setStopTime(Long)
 	 */
-	final public void setStopTime(Long stopTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final void setStopTime(Long stopTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		this.setAttribute("StopTime", stopTime);
 	}
 	
@@ -433,7 +433,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 */
-	final public void setAutoExecutionServices(List<String> actionIds) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final void setAutoExecutionServices(List<String> actionIds) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		this.setAttribute("AutoExecutionServices", actionIds);
 	}
   
@@ -443,7 +443,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 */
-	final public List<String> getAutoExecutionServices() throws IOException, InstanceNotFoundException {
+	public final List<String> getAutoExecutionServices() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("AutoExecutionServices");
 	}
   
@@ -454,7 +454,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 */
-	final public void setAutoExecutionType(boolean continous)throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+	public final void setAutoExecutionType(boolean continous)throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		this.setAttribute("AutoExecutionType", continous);
 	}
   
@@ -464,7 +464,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 */
-	final public boolean getAutoExecutionType()throws IOException, InstanceNotFoundException {
+	public final boolean getAutoExecutionType()throws IOException, InstanceNotFoundException {
 		return (Boolean) getAttribute("AutoExecutionType");
 	}
   
@@ -474,7 +474,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 */
-	final public byte[] getSpringConfigXml() throws IOException, InstanceNotFoundException {
+	public final byte[] getSpringConfigXml() throws IOException, InstanceNotFoundException {
 		return (byte[]) getAttribute("SpringConfigXml");
 	}
   
@@ -484,7 +484,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
 	 */
-	final public IAgentDescription getAgentDescription() throws InstanceNotFoundException, IOException {
+	public final IAgentDescription getAgentDescription() throws InstanceNotFoundException, IOException {
 		return (IAgentDescription) getAttribute("AgentDescription");
 	}
   

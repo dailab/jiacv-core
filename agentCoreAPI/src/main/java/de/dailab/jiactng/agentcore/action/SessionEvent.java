@@ -72,7 +72,7 @@ public class SessionEvent implements IFact {
 	 * Gets the action description for this session event.
 	 * @return the action
 	 */
-	final public IActionDescription getAction() {
+	public final IActionDescription getAction() {
 		return action;
 	}
 
@@ -81,7 +81,7 @@ public class SessionEvent implements IFact {
 	 * @param newAction
 	 *            the action to set
 	 */
-	final public void setAction(IActionDescription newAction) {
+	public final void setAction(IActionDescription newAction) {
 		action = newAction;
 	}
 
@@ -89,7 +89,7 @@ public class SessionEvent implements IFact {
 	 * Gets the object which creates this session event.
 	 * @return the source
 	 */
-	final public Object getSource() {
+	public final Object getSource() {
 		return source;
 	}
 
@@ -98,7 +98,7 @@ public class SessionEvent implements IFact {
 	 * @param newSource
 	 *            the source to set
 	 */
-	final public void setSource(Object newSource) {
+	public final void setSource(Object newSource) {
 		source = newSource;
 	}
 
@@ -106,7 +106,7 @@ public class SessionEvent implements IFact {
 	 * Gets the session of this session event.
 	 * @return the session
 	 */
-	final public Session getSession() {
+	public final Session getSession() {
 		return session;
 	}
 
@@ -124,7 +124,7 @@ public class SessionEvent implements IFact {
 	 * Gets the session Id of this session event.
 	 * @return the session id of the session this event belongs to
 	 */
-	final public String getSessionId() {
+	public final String getSessionId() {
 		return sessionId;
 	}
 
@@ -133,7 +133,7 @@ public class SessionEvent implements IFact {
 	 * @param id
 	 *            sets the id of the session
 	 */
-	final public void setSessionId(String id) {
+	public final void setSessionId(String id) {
 		this.sessionId = id;
 	}
 
@@ -141,7 +141,7 @@ public class SessionEvent implements IFact {
 	 * Gets meta information about this session event.
 	 * @return the meta data
 	 */
-	final public Object getMetaData() {
+	public final Object getMetaData() {
 		return metaData;
 	}
 
@@ -149,7 +149,7 @@ public class SessionEvent implements IFact {
 	 * Sets meta information about this session event.
 	 * @param newMetaData the meta data
 	 */
-	final public void setMetaData(Object newMetaData) {
+	public final void setMetaData(Object newMetaData) {
 		metaData = newMetaData;
 	}
 

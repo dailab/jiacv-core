@@ -182,7 +182,7 @@ public class Session implements IFact {
    * 
    * @return a string representing the sessionId of this session.
    */
-  final public String getSessionId() {
+  public final String getSessionId() {
     return sessionId;
   }
 
@@ -192,7 +192,7 @@ public class Session implements IFact {
    * 
    * @param timeout the timeout value
    */
-  final public void setTimeToLive(Long timeout) {
+  public final void setTimeToLive(Long timeout) {
     timeToLive = timeout;
   }
 
@@ -200,7 +200,7 @@ public class Session implements IFact {
    * Gets the timeout attribute. The default value is 60.000 milliseconds.
    * @return the timeout value
    */
-  final public Long getTimeToLive() {
+  public final Long getTimeToLive() {
     return timeToLive;
   }
 
@@ -209,7 +209,7 @@ public class Session implements IFact {
    * @param id
    *          the sessionId to set
    */
-  final public void setSessionId(String id) {
+  public final void setSessionId(String id) {
     this.sessionId = id;
   }
 
@@ -217,7 +217,7 @@ public class Session implements IFact {
    * Gets the receiver of the session result.
    * @return the source
    */
-  final public ResultReceiver getSource() {
+  public final ResultReceiver getSource() {
     return source;
   }
 
@@ -226,7 +226,7 @@ public class Session implements IFact {
    * @param newSource
    *          the source to set
    */
-  final public void setSource(ResultReceiver newSource) {
+  public final void setSource(ResultReceiver newSource) {
     source = newSource;
   }
 
@@ -234,7 +234,7 @@ public class Session implements IFact {
    * Gets the time when the session was created.
    * @return the creationTime
    */
-  final public Long getCreationTime() {
+  public final Long getCreationTime() {
     return creationTime;
   }
 
@@ -242,7 +242,7 @@ public class Session implements IFact {
    * Checks if the session has timed out.
    * @return <code>true</code> if the timeout was reached.
    */
-  final public boolean isTimeout() {
+  public final boolean isTimeout() {
     return (System.currentTimeMillis() > (creationTime.longValue() + timeToLive.longValue()));
   }
 
@@ -251,7 +251,7 @@ public class Session implements IFact {
    * @param newCreationTime
    *          the creationTime to set
    */
-  final public void setCreationTime(long newCreationTime) {
+  public final void setCreationTime(long newCreationTime) {
     creationTime = Long.valueOf(newCreationTime);
   }
 
@@ -260,7 +260,7 @@ public class Session implements IFact {
    * 
    * @return a list containing the history.
    */
-  final public ArrayList<SessionEvent> getHistory() {
+  public final ArrayList<SessionEvent> getHistory() {
     final ArrayList<SessionEvent> copy = new ArrayList<SessionEvent>();
     copy.addAll(history);
     return copy;
@@ -280,7 +280,7 @@ public class Session implements IFact {
    * @param event
    *          the object to add to history
    */
-  final public void addToSessionHistory(SessionEvent event) {
+  public final void addToSessionHistory(SessionEvent event) {
     if (history == null) {
       history = new ArrayList<SessionEvent>();
     }
@@ -294,7 +294,7 @@ public class Session implements IFact {
    *          the index of the object to remove
    * @return the removed object
    */
-  final public SessionEvent removeFromSessionHistory(int index) {
+  public final SessionEvent removeFromSessionHistory(int index) {
     return history.remove(index);
   }
 
@@ -305,12 +305,14 @@ public class Session implements IFact {
    *          the object to remove
    * @return true, if history contained the given object
    */
-  final public boolean removeFromSessionHistory(SessionEvent o) {
+  public final boolean removeFromSessionHistory(SessionEvent o) {
     return history.remove(o);
   }
 
   /**
-   * {@inheritDoc}
+   * Returns a multiline text which contains the ID, the creation time, 
+   * the source, and the history of the session.
+   * @return a string representation of the session
    */
   @Override
   public String toString() {
@@ -350,15 +352,19 @@ public class Session implements IFact {
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the hash code of the session's ID.
+   * @return the hash code of the session ID
    */
   @Override
   public int hashCode() {
-    return this.sessionId.hashCode();
+    return sessionId.hashCode();
   }
 
   /**
-   * {@inheritDoc}
+   * Checks the equality of two sessions. The sessions are equal
+   * if their session IDs are equal or null.
+   * @param obj the other session
+   * @return the result of the equality check
    */
   @Override
   public boolean equals(Object obj) {
@@ -378,7 +384,7 @@ public class Session implements IFact {
    * 
    * @return The token of the original user.
    */
-  final public String getUserToken() {
+  public final String getUserToken() {
     return userToken;
   }
 
@@ -388,7 +394,7 @@ public class Session implements IFact {
    * @param newUserToken
    *          The token of the original user.
    */
-  final public void setUserToken(String newUserToken) {
+  public final void setUserToken(String newUserToken) {
     userToken = newUserToken;
   }
 
@@ -398,7 +404,7 @@ public class Session implements IFact {
    * 
    * @return The user-id of the provider.
    */
-  final public String getOriginalProvider() {
+  public final String getOriginalProvider() {
     return originalProvider;
   }
 
@@ -409,7 +415,7 @@ public class Session implements IFact {
    * @param newOriginalProvider
    *          The user-id of the provider.
    */
-  final public void setOriginalProvider(String newOriginalProvider) {
+  public final void setOriginalProvider(String newOriginalProvider) {
     originalProvider = newOriginalProvider;
   }
 
@@ -418,7 +424,7 @@ public class Session implements IFact {
    * 
    * @return The name of the original service.
    */
-  final public String getOriginalService() {
+  public final String getOriginalService() {
     return originalService;
   }
 
@@ -428,7 +434,7 @@ public class Session implements IFact {
    * @param newOriginalService
    *          The name of the original service.
    */
-  final public void setOriginalService(String newOriginalService) {
+  public final void setOriginalService(String newOriginalService) {
     originalService = newOriginalService;
   }
 
@@ -436,7 +442,7 @@ public class Session implements IFact {
    * Gets the user which creates the root session of the parent hierarchy.
    * @return the original user of this session.
    */
-  final public String getOriginalUser() {
+  public final String getOriginalUser() {
     return originalUser;
   }
 
@@ -444,7 +450,7 @@ public class Session implements IFact {
    * Sets the user which creates the root session of the parent hierarchy.
    * @param newOriginalUser the original user of this session.
    */
-  final public void setOriginalUser(String newOriginalUser) {
+  public final void setOriginalUser(String newOriginalUser) {
     originalUser = newOriginalUser;
   }
 
@@ -452,7 +458,7 @@ public class Session implements IFact {
    * Gets the depth of the parent hierarchy.
    * @return the session call depth.
    */
-  final public Integer getCurrentCallDepth() {
+  public final Integer getCurrentCallDepth() {
     return currentCallDepth;
   }
 
@@ -460,7 +466,7 @@ public class Session implements IFact {
    * Sets the depth of the parent hierarchy.
    * @param newCurrentCallDepth the session call depth.
    */
-  final public void setCurrentCallDepth(int newCurrentCallDepth) {
+  public final void setCurrentCallDepth(int newCurrentCallDepth) {
     currentCallDepth = newCurrentCallDepth;
   }
 }

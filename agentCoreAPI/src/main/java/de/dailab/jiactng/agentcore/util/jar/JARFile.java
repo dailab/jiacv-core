@@ -65,7 +65,7 @@ public class JARFile extends JarFile implements JAR {
 	/**
 	 * Checks the equality of two JARs. 
 	 * The JARs are equal if their names are equal.
-	 * @param obj the other JAR
+	 * @param o the other JAR
 	 * @return the result of the equality check
 	 */
     @Override

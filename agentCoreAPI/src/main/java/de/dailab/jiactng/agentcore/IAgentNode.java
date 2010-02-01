@@ -77,7 +77,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @return an unmodifiable list of IAgent-instances that are currently residing on this
    *         agentnode.
    * 
-   * @see Collections#unmodifiableList(List)
+   * @see java.util.Collections#unmodifiableList(List)
    */
   List<IAgent> findAgents();
 
@@ -165,7 +165,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * 
    * @return an unmodifiable list of agentnode beans
    * 
-   * @see Collections#unmodifiableList(List)
+   * @see java.util.Collections#unmodifiableList(List)
    */
   List<IAgentNodeBean> getAgentNodeBeans();
 

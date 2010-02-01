@@ -28,7 +28,7 @@ public class JmxAgentBeanManagementClient extends JmxAbstractManagementClient {
 	 * @param agentID The global unique identifier of the agent which contains the agent bean.
 	 * @param agentBeanName The name of the agent bean.
 	 * @throws MalformedObjectNameException The agent node UUID, agent identifier or agent bean name contains an illegal character or does not follow the rules for quoting.
-	 * @see ObjectName#ObjectName(String)
+	 * @see JmxManager#getMgmtNameOfAgentBean(String, String, String)
 	 */
 	protected JmxAgentBeanManagementClient(MBeanServerConnection mbsc, String agentNodeID, String agentID, String agentBeanName) throws MalformedObjectNameException {
 		super(mbsc, new JmxManager().getMgmtNameOfAgentBean(agentNodeID, agentID, agentBeanName));

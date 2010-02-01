@@ -35,7 +35,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @param mbsc The JMX connection used for the agent node management.
 	 * @param agentNodeID The UUID of the managed agent node.
 	 * @throws MalformedObjectNameException The UUID of the agent node contains an illegal character or does not follow the rules for quoting.
-	 * @see ObjectName#ObjectName(String)
+	 * @see JmxManager#getMgmtNameOfAgentNode(String)
 	 */
 	protected JmxAgentNodeManagementClient(MBeanServerConnection mbsc, String agentNodeID) throws MalformedObjectNameException {
 		super(mbsc, new JmxManager().getMgmtNameOfAgentNode(agentNodeID));

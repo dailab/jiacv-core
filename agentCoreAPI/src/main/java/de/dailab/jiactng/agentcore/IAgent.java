@@ -114,7 +114,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * 
    * @return the unmodifiable list of the agentbeans.
    * 
-   * @see Collections#unmodifiableList(List)
+   * @see java.util.Collections#unmodifiableList(List)
    */
   List<IAgentBean> getAgentBeans();
 
@@ -171,7 +171,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * 
    * @return unmodifiable list of actions.
    * 
-   * @see Collections#unmodifiableList(List)
+   * @see java.util.Collections#unmodifiableList(List)
    */
   List<Action> getActionList();
 

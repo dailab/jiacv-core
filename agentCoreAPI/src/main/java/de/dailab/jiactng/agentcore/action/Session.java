@@ -32,7 +32,7 @@ public class Session implements IFact {
   /**
    * Optional attribute for timeout conditions, it only is relevant when the
    * session is written into the memory. It is initialized with the default value.
-   * @see DEFAULT_TIMETOLIVE
+   * @see Session#DEFAULT_TIMETOLIVE
    */
   private Long                     timeToLive       = Long.valueOf(DEFAULT_TIMETOLIVE);
 

@@ -1,13 +1,12 @@
 package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
-import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
-import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.TabularData;
 
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
 
@@ -23,264 +22,156 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @param agentNodeID The UUID of the agent node.
 	 * @param directoryBeanName The name of the agent node directory bean.
 	 * @throws MalformedObjectNameException The agent node UUID or agent identifier contains an illegal character or does not follow the rules for quoting.
-	 * @see ObjectName#ObjectName(String)
+	 * @see JmxManager#getMgmtNameOfAgentNodeBean(String, String)
 	 */
 	protected JmxAgentNodeDirectoryManagementClient(MBeanServerConnection mbsc, String agentNodeID, String directoryBeanName) throws MalformedObjectNameException {
 		super(mbsc, new JmxManager().getMgmtNameOfAgentNodeBean(agentNodeID, directoryBeanName));
 	}
 
 	/**
-	 * Gets the agent ping interval of the managed directory.
-	 * @return The directory's agent ping interval.
+	 * Get the interval the node sends an alive message in milliseconds.
+	 * @return the time between two alive messages in milliseconds
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getAgentPingInterval()
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAliveInterval()
 	 */
-	public final long getAgentPingInterval() throws IOException, InstanceNotFoundException {
-		return (Long) getAttribute("AgentPingInterval");
+	public final long getAliveInterval() throws IOException, InstanceNotFoundException {
+		return (Long) getAttribute("AliveInterval");
 	}
 
 	/**
-	 * Checks whether the cache of the managed directory is activated or not.
-	 * @return <code>true</code> if the directory's cache is activated.
+	 * Get the interval the node sends an advertisement in milliseconds.
+	 * @return the time between two advertisements in milliseconds
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getCacheIsActive()
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAdvertiseInterval()
 	 */
-	public final boolean getCacheIsActive() throws IOException, InstanceNotFoundException {
-		return (Boolean) getAttribute("CacheIsActive");
+	public final long getAdvertiseInterval() throws IOException, InstanceNotFoundException {
+		return (Long) getAttribute("AdvertiseInterval");
 	}
 
 	/**
-	 * Gets the change propagate interval of the managed directory.
-	 * @return The directory's change propagate interval.
+	 * Checks whether a dump is printed to the console.
+	 * @return <code>true</code> if the dump is printed to the console
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getChangePropagateInterval()
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#isDump()
 	 */
-	public final long getChangePropagateInterval() throws IOException, InstanceNotFoundException {
-		return (Long) getAttribute("ChangePropagateInterval");
+	public final boolean isDump() throws IOException, InstanceNotFoundException {
+		return (Boolean) getAttribute("Dump");
 	}
 
 	/**
-	 * Gets the delay until first refresh of the managed directory.
-	 * @return The directory's delay for first refresh.
+	 * Returns all locally offered actions of this agent node.
+	 * @return information about the actions offered locally
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getFirstRefresh()
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getLocalActions()
 	 */
-	public final long getFirstRefresh() throws IOException, InstanceNotFoundException {
-		return (Long) getAttribute("FirstRefresh");
+	public final TabularData getLocalActions() throws IOException, InstanceNotFoundException {
+		return (TabularData) getAttribute("LocalActions");
 	}
 
 	/**
-	 * Checks whether the instant propagation of the managed directory is activated or not.
-	 * @return <code>true</code> if the instant propagation of the directory is activated.
+	 * Returns all agents residing on this agent node.
+	 * @return information about the agents residing on this agent node.
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getInstantPropagation()
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getLocalAgents()
 	 */
-	public final boolean getInstantPropagation() throws IOException, InstanceNotFoundException {
-		return (Boolean) getAttribute("InstantPropagation");
+	public final TabularData getLocalAgents() throws IOException, InstanceNotFoundException {
+		return (TabularData) getAttribute("LocalAgents");
 	}
 
 	/**
-	 * Gets the message transport identifier of the managed directory.
-	 * @return The directory's message transport identifier.
+	 * Returns all actions offered by remote agent nodes.
+	 * @return information about the actions offered by remote agent nodes
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getMessageTransportIdentifier()
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getRemoteActions()
 	 */
-	public final String getMessageTransportIdentifier() throws IOException, InstanceNotFoundException {
-		return (String) getAttribute("MessageTransportIdentifier");
+	public final TabularData getRemoteActions() throws IOException, InstanceNotFoundException {
+		return (TabularData) getAttribute("RemoteActions");
 	}
 
 	/**
-	 * Gets the node group of the managed directory.
-	 * @return The directory's node group.
+	 * Returns all agents residing on remote agent nodes.
+	 * @return information about the agents residing on remote agent nodes
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getNodeGroup()
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getRemoteAgents()
 	 */
-	public final String getNodeGroup() throws IOException, InstanceNotFoundException {
-		return (String) getAttribute("NodeGroup");
+	public final TabularData getRemoteAgents() throws IOException, InstanceNotFoundException {
+		return (TabularData) getAttribute("RemoteAgents");
 	}
 
 	/**
-	 * Gets the node group address of the managed directory.
-	 * @return The name of directory's node group address.
+	 * Return all (other) known agent nodes.
+	 * @return the known agent nodes
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getNodeGroupAddressName()
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getKnownNodes()
 	 */
-	public final String getNodeGroupAddress() throws IOException, InstanceNotFoundException {
-		return (String) getAttribute("NodeGroupAddressName");
+	public final TabularData getKnownNodes() throws IOException, InstanceNotFoundException {
+		return (TabularData) getAttribute("KnownNodes");
 	}
 
 	/**
-	 * Gets the identifier of the other agent nodes which are in federation with the managed directory.
-	 * @return The global unique identifier of the other agent nodes.
-	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
-	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
-	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
-	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getOtherNodes()
-	 */
-	public final Set<String> getOtherNodes() throws IOException, InstanceNotFoundException {
-		return (Set<String>) getAttribute("OtherNodes");
-	}
-
-	/**
-	 * Gets the refreshing interval of the managed directory.
-	 * @return The directory's refreshing interval.
-	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
-	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
-	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
-	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getRefreshingInterval()
-	 */
-	public final long getRefreshingInterval() throws IOException, InstanceNotFoundException {
-		return (Long) getAttribute("RefreshingInterval");
-	}
-
-	/**
-	 * Gets detailed information about the content of the managed directory.
-	 * @return Information about the directory's content.
-	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
-	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
-	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
-	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#getSpace()
-	 */
-	public final CompositeData getSpace() throws IOException, InstanceNotFoundException {
-		return (CompositeData) getAttribute("Space");
-	}
-
-	/**
-	 * Checks whether the message transport of the managed directory is active or not.
-	 * @return <code>true</code> if the directory's message transport is active.
-	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
-	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
-	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
-	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#isMessageTransportActive()
-	 */
-	public final boolean isMessageTransportActive() throws IOException, InstanceNotFoundException {
-		return (Boolean) getAttribute("MessageTransportActive");
-	}
-
-	/**
-	 * Sets the agent ping interval of the managed directory.
-	 * @param agentPingInterval The directory's new agent ping interval.
+	 * Set the interval the node sends an alive message in milliseconds.
+	 * @param aliveInterval the time between two alive messages in milliseconds
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setAgentPingInterval(long)
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#setAliveInterval(long)
 	 */
-	public final void setAgentPingInterval(long agentPingInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("AgentPingInterval", agentPingInterval);
+	public final void setAliveInterval(long aliveInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+		setAttribute("AliveInterval", aliveInterval);
 	}
 
 	/**
-	 * Activates or deactivates the cache of the managed directory.
-	 * @param isActive <code>true</code> for activation of the directory's cache.
+	 * Set the interval the node sends an advertisement in milliseconds.
+	 * @param advertiseInterval the time between two advertisements in milliseconds
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setCacheIsActive(boolean)
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#setAdvertiseInterval(long)
 	 */
-	public final void setCacheIsActive(boolean isActive) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("CacheIsActive", isActive);
+	public final void setAdvertiseInterval(long advertiseInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+		setAttribute("AdvertiseInterval", advertiseInterval);
 	}
 
 	/**
-	 * Sets the change propagate interval of the managed directory.
-	 * @param cpInterval The directory's new change propagate interval.
+	 * Set whether the dump should be printed to console.
+	 * @param dump if <code>true</code>, the dump will be printed to console
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
 	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setChangePropagateInterval(long)
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#setDump(boolean)
 	 */
-	public final void setChangePropagateInterval(long cpInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("ChangePropagateInterval", cpInterval);
-	}
-
-	/**
-	 * Sets the delay for first refresh of the managed directory.
-	 * @param firstRefresh The directory's new delay for first refresh.
-	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
-	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
-	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
-	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
-	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setFirstRefresh(long)
-	 */
-	public final void setFirstRefresh(long firstRefresh) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("FirstRefresh", firstRefresh);
-	}
-
-	/**
-	 * Activates or deactivates the instant propagation of the managed directory.
-	 * @param instantPropagation <code>true</code> for activation of the directory's instant propagation.
-	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
-	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
-	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
-	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
-	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setInstantPropagation(boolean)
-	 */
-	public final void setInstantPropagation(boolean instantPropagation) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("InstantPropagation", instantPropagation);
-	}
-
-	/**
-	 * Sets the node group name of the managed directory.
-	 * @param groupName The name of directory's new node group.
-	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
-	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
-	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
-	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
-	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setNodeGroup(String)
-	 */
-	public final void setNodeGroup(String groupName) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("NodeGroup", groupName);
-	}
-
-	/**
-	 * Sets the refreshing interval of the managed directory.
-	 * @param interval The directory's new refreshing interval.
-	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
-	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
-	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
-	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
-	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
-	 * @see de.dailab.jiactng.agentcore.comm.wp.DirectoryAgentNodeBeanMBean#setRefreshingInterval(long)
-	 */
-	public final void setRefreshingInterval(long interval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("RefreshingInterval", interval);
+	public final void setDump(boolean dump) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+		setAttribute("Dump", dump);
 	}
 
 }

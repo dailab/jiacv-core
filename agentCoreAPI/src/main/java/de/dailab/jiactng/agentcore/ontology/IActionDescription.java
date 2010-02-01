@@ -51,7 +51,7 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
      * The type list cannot be modified.
      * </p>
      *
-     * @see Collections#unmodifiableList(List)
+     * @see java.util.Collections#unmodifiableList(List)
      * @return      the unmodifiable list of input parameter type names
      *              or <code>null</code> if not set
      */
@@ -65,7 +65,7 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
      * The type list cannot be modified.
      * </p>
      * 
-     * @see Collections#unmodifiableList(List)
+     * @see java.util.Collections#unmodifiableList(List)
      * @return      the unmodifiable list of result type names or
      *              <code>null</code> if not set
      */

@@ -14,7 +14,7 @@ package de.dailab.jiactng.agentcore.security;
  * @see PolicyDecisionRequest
  * @see PolicyDecisionResult
  * @see PolicyEnforcementPoint
- * @see IAgentBean
+ * @see de.dailab.jiactng.agentcore.IAgentBean
  */
 public interface PolicyEnforceable {
 

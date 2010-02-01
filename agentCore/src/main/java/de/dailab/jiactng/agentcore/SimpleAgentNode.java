@@ -52,7 +52,7 @@ import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, InitializingBean, BeanNameAware, SimpleAgentNodeMBean {
 
 	/** The threadPool object */
-	private ExecutorService _threadPool = null;
+	private ExecutorService threadPool = null;
 
 	/**
 	 * A customized logging configuration will be used instead of the default
@@ -61,28 +61,28 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	private String loggingConfig;
 
 	/** this one's fake */
-	protected String _uuid = null;
+	protected String uuid = null;
 
 	/** The name of the agentnode. */
-	protected String _name = null;
+	protected String name = null;
 
 	/** The agentnodes one beans. */
-	private final ArrayList<IAgentNodeBean> _agentNodeBeans;
+	private final ArrayList<IAgentNodeBean> agentNodeBeans;
 
 	/** The list of agents. */
-	private final ArrayList<IAgent> _agents;
+	private final ArrayList<IAgent> agents;
 
 	/** Storage for the agentFutures. Used to stop/cancel agentthreads. */
 	private HashMap<String, Future<?>> agentFutures = null;
 
 	/** Configuration of a set of JMX connector server. */
-	private Set<Map<String, Object>> _jmxConnectors = null;
+	private Set<Map<String, Object>> jmxConnectors = null;
 
 	/** Optional: IDirectory that manages white and yellow pages.*/
 	private IDirectory directory = null;
 
 	/** A timer for being informed about dates */
-	private Timer _timer = null;
+	private Timer timer = null;
 
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
@@ -119,14 +119,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** Constructor. Creates the uuid for the agentnode. */
 	public SimpleAgentNode() {
-		_uuid = IdFactory.createAgentNodeId(this.hashCode());
-		setLog(LogFactory.getLog(_uuid));
-		_agentNodeBeans = new ArrayList<IAgentNodeBean>();
-		_agents = new ArrayList<IAgent>();
+		uuid = IdFactory.createAgentNodeId(this.hashCode());
+		setLog(LogFactory.getLog(uuid));
+		agentNodeBeans = new ArrayList<IAgentNodeBean>();
+		agents = new ArrayList<IAgent>();
 
 		// start timer
-		_timer = new Timer();
-		_timer.start();
+		timer = new Timer();
+		timer.start();
 	}
 
 	/**
@@ -135,8 +135,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @param jmxConnectors
 	 *            the set of connectors.
 	 */
-	public void setJmxConnectors(Set<Map<String, Object>> jmxConnectors) {
-		this._jmxConnectors = jmxConnectors;
+	public final void setJmxConnectors(Set<Map<String, Object>> jmxConnectors) {
+		this.jmxConnectors = jmxConnectors;
 	}
 
 	/**
@@ -144,16 +144,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * 
 	 * @return the set of connectors.
 	 */
-	public Set<Map<String, Object>> getJmxConnectors() {
-		return _jmxConnectors;
+	public final Set<Map<String, Object>> getJmxConnectors() {
+		return jmxConnectors;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgents(List<IAgent> agents) {
+	public final void setAgents(List<IAgent> agents) {
 		// owner of agent node is also owner of the initially created agents
-		String owner = getOwner();
+		final String owner = getOwner();
 		for (IAgent agent : agents) {
 			if (agent.getOwner() == null) {
 				agent.setOwner(owner);
@@ -164,8 +164,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 		
 		// refresh agent list
-		_agents.clear();// TODO is this really necessary???
-		_agents.addAll(agents);
+		this.agents.clear();// TODO is this really necessary???
+		this.agents.addAll(agents);
 	}
 
 	/**
@@ -181,26 +181,28 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 *  TODO maybe simplify this by adding some sort of cloning mechanism the the Agent class using reflection. having this, any agent could create a new instance of himself. 
 	 *   
 	 */
-	public void setGenericAgents(List<GenericAgentProperties> agentProps) {
+	public final void setGenericAgents(List<GenericAgentProperties> agentProps) {
 		//long start  = System.currentTimeMillis();		
 		if (agentProps != null && agentProps.size() > 0) {
-			ArrayList<IAgent> agents = new ArrayList<IAgent>();
+			final ArrayList<IAgent> agents = new ArrayList<IAgent>();
 			for (GenericAgentProperties gap : agentProps) {
-				ClassPathXmlApplicationContext cpxac = new ClassPathXmlApplicationContext(gap.getAgentConfig());
+				final ClassPathXmlApplicationContext cpxac = new ClassPathXmlApplicationContext(gap.getAgentConfig());
 				if (cpxac != null && cpxac.containsBeanDefinition(gap.getAgentBeanName())) {
 					for (int i = 1; i <= gap.getCount(); i++) {
-						IAgent newAgent = (IAgent) cpxac.getBean(gap.getAgentBeanName());
+						final IAgent newAgent = (IAgent) cpxac.getBean(gap.getAgentBeanName());
 						newAgent.setAgentName(gap.createAgentName(i));
 						//log does not work in this context somehow: using system instead
 						//System.out.println("adding agent: " + newAgent.getAgentName() + " with ID: " + newAgent.getAgentId());
 						agents.add(newAgent);
 					}
-				} else System.out.println(new StringBuffer("could not create xmlapplicationcontext from ")
-				.append(gap.getAgentConfig())
-				.append(" or agentbean definition does not exist, beanname is: ")
-				.append(gap.getAgentBeanName()));
+				} else {
+					System.out.println(new StringBuffer("could not create xmlapplicationcontext from ")
+						.append(gap.getAgentConfig())
+						.append(" or agentbean definition does not exist, beanname is: ")
+						.append(gap.getAgentBeanName()));
+				}
 			}
-			_agents.addAll(agents);
+			this.agents.addAll(agents);
 		} else {
 			System.out.println("nothing to do - GenericAgentProperties list is null or empty");
 		}
@@ -210,15 +212,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addAgent(IAgent agent) {
+	public final void addAgent(IAgent agent) {
 		agent.setAgentNode(this);
 
 		// TODO: statechanges?
-		List<String> oldAgentList = getAgents();
-		synchronized(_agents) {
-			_agents.add(agent);
+		final List<String> oldAgentList = getAgents();
+		synchronized(agents) {
+			agents.add(agent);
 		}
-		agent.addLifecycleListener(this.lifecycle.createLifecycleListener());
+		agent.addLifecycleListener(lifecycle.createLifecycleListener());
 
 		if (directory != null) {
 			agent.addLifecycleListener(directory);
@@ -235,15 +237,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
-	public void removeAgent(IAgent agent) {
+	public final void removeAgent(IAgent agent) {
 		// TODO: statechanges?
 
 		// deregister agent from management
 		agent.disableManagement();
 
 		// remove agent
-		List<String> oldAgentList = getAgents();
-		_agents.remove(agent);
+		final List<String> oldAgentList = getAgents();
+		agents.remove(agent);
 		agentListChanged(oldAgentList, getAgents());
 	}
 
@@ -257,7 +259,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 *            the new list of agent names
 	 */
 	private void agentListChanged(List<String> oldAgentList, List<String> newAgentList) {
-		Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(), "Agents changed", "Agents", "java.util.ArrayList<java.lang.String>", oldAgentList,
+		final Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(), "Agents changed", "Agents", "java.util.ArrayList<java.lang.String>", oldAgentList,
 				newAgentList);
 		sendNotification(n);
 	}
@@ -266,8 +268,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
-	public List<IAgent> findAgents() {
-		return Collections.unmodifiableList(_agents);
+	public final List<IAgent> findAgents() {
+		return Collections.unmodifiableList(agents);
 	}
 
 	/**
@@ -324,24 +326,24 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
-	public String getUUID() {
-		return this._uuid;
+	public final String getUUID() {
+		return uuid;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 
-	public String getName() {
-		return _name;
+	public final String getName() {
+		return name;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 
-	public void setName(String name) {
-		_name = name;
+	public final void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -352,7 +354,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 *             if no IP address for the local host could be found.
 	 * @see InetAddress#toString()
 	 */
-	public String getHost() throws UnknownHostException {
+	public final String getHost() throws UnknownHostException {
 		return InetAddress.getLocalHost().toString();
 	}
 
@@ -371,9 +373,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * 
 	 * @return list of unique agent identifiers
 	 */
-	public List<String> getAgents() {
-		ArrayList<String> result = new ArrayList<String>();
-		for (IAgent a : _agents) {
+	public final List<String> getAgents() {
+		final ArrayList<String> result = new ArrayList<String>();
+		for (IAgent a : agents) {
 			result.add(a.getAgentId());
 		}
 		return result;
@@ -382,25 +384,25 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<String> addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception {
+	public final List<String> addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception {
 		// create classloader for the new agents
-		JARClassLoader cl = new JARClassLoader();
+		final JARClassLoader cl = new JARClassLoader();
 		for (JARMemory jar: libraries) {
 			cl.addJAR(jar);
 		}
 
 		// create spring application context
-		GenericApplicationContext appContext = new GenericApplicationContext();
+		final GenericApplicationContext appContext = new GenericApplicationContext();
 		appContext.setClassLoader(cl);
-		XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(appContext);
+		final XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(appContext);
 		xmlReader.loadBeanDefinitions(new ByteArrayResource(configuration));
 		appContext.refresh();
 
 		// add and start all created agents
-		List<String> agentIds = new ArrayList<String>();
-		Collection<?> newAgents = appContext.getBeansOfType(IAgent.class).values();
+		final List<String> agentIds = new ArrayList<String>();
+		final Collection<?> newAgents = appContext.getBeansOfType(IAgent.class).values();
 		for (Object a : newAgents) {
-			IAgent agent = (IAgent) a;
+			final IAgent agent = (IAgent) a;
 			agent.setOwner(owner);
 			agent.setSpringConfigXml(configuration);
 
@@ -435,16 +437,16 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 *            the lifecycle event
 	 */
 	public void onEvent(LifecycleEvent evt) {
-		Object source = evt.getSource();
-		if (_agents.contains(source)) {
-			IAgent agent = (IAgent) source;
+		final Object source = evt.getSource();
+		if (agents.contains(source)) {
+			final IAgent agent = (IAgent) source;
 			switch (evt.getState()) {
 			case STARTED:
-				Future<?> f1 = _threadPool.submit(agent);
+				final Future<?> f1 = threadPool.submit(agent);
 				agentFutures.put(agent.getAgentName(), f1);
 				break;
 			case STOPPED:
-				Future<?> f2 = agentFutures.get(agent.getAgentName());
+				final Future<?> f2 = agentFutures.get(agent.getAgentName());
 				if (f2 == null) {
 					(new LifecycleException("Agentfuture not found")).printStackTrace();
 				} else {
@@ -477,12 +479,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// set references for all agents
 		addLifecycleListener(this);
-		for (IAgent a : _agents) {
+		for (IAgent a : agents) {
 			a.setAgentNode(this);
 			a.addLifecycleListener(this.lifecycle.createLifecycleListener());
 		}
 
-		for (IAgentNodeBean nodeBean : _agentNodeBeans) {
+		for (IAgentNodeBean nodeBean : agentNodeBeans) {
 			nodeBean.setAgentNode(this);
 			nodeBean.addLifecycleListener(this.lifecycle.createLifecycleListener());
 		}
@@ -515,19 +517,19 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		cleanup();
 
 		// remove agents
-		while (!_agents.isEmpty()) {
-			removeAgent(_agents.get(_agents.size()-1));
+		while (!agents.isEmpty()) {
+			removeAgent(agents.get(agents.size()-1));
 		}
 
 		// disable management of agent node and all its resources
 		disableManagement();
 
-		_agentNodeBeans.clear();
+		agentNodeBeans.clear();
 
 		// stop timer
-		if (_timer != null) {
-			_timer.stop();
-			_timer = null;
+		if (timer != null) {
+			timer.stop();
+			timer = null;
 		}
 
 		log.info("AgentNode " + getName() + " has been closed.");
@@ -538,13 +540,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 
 	public void doInit() {
-		_threadPool = Executors.newCachedThreadPool();
+		threadPool = Executors.newCachedThreadPool();
 		agentFutures = new HashMap<String, Future<?>>();
 
 		// call init on all beans of the agentnodes
 		// TODO testing
-		if (_agentNodeBeans != null) {
-			for (IAgentNodeBean anb : _agentNodeBeans) {
+		if (agentNodeBeans != null) {
+			for (IAgentNodeBean anb : agentNodeBeans) {
 				try {
 					log.info("Trying to initialize agentnodebean: " + anb.getBeanName());
 					anb.init();
@@ -565,7 +567,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// call init and set references for all agents if any
-		for (IAgent a : _agents) {
+		for (IAgent a : agents) {
 				
 			if (directory != null) {
 				a.addLifecycleListener(directory);
@@ -592,8 +594,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	public void doStart() {
 		// call start on all beans of the agentnode
 		// TODO testing
-		if (_agentNodeBeans != null) {
-			for (IAgentNodeBean anb : _agentNodeBeans) {
+		if (agentNodeBeans != null) {
+			for (IAgentNodeBean anb : agentNodeBeans) {
 				try {
 					log.info("Trying to start agentnodebean: " + anb.getBeanName());
 					anb.start();
@@ -604,9 +606,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		synchronized(_agents) {
+		synchronized(agents) {
 			// call start() and instantiate Threads for all agents if any
-			for (IAgent a : _agents) {
+			for (IAgent a : agents) {
 				try {
 					if(((Agent)a).getStartTime()==null) {
 						log.info("Trying to start agent: " + a.getAgentName());
@@ -621,7 +623,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		log.info("AgentNode " + getName() + " started with " + _agents.size() + " agents");
+		log.info("AgentNode " + getName() + " started with " + agents.size() + " agents");
 	}
 
 	/**
@@ -630,7 +632,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	public void doStop() {
 		// call stop() for all agents if any
-		for (IAgent a : _agents) {
+		for (IAgent a : agents) {
 			try {
 				log.info("Trying to stop agent: " + a.getAgentName());
 				a.stop();
@@ -642,9 +644,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// call stop on all beans of the agentnode in reverse order
 		// TODO testing
-		if (_agentNodeBeans != null) {
-			for (int i=_agentNodeBeans.size()-1; i>=0; i--) {
-				IAgentNodeBean anb = _agentNodeBeans.get(i);
+		if (agentNodeBeans != null) {
+			for (int i=agentNodeBeans.size()-1; i>=0; i--) {
+				final IAgentNodeBean anb = agentNodeBeans.get(i);
 				try {
 					log.info("Trying to stop agentnodebean: " + anb.getBeanName());
 					anb.stop();
@@ -661,7 +663,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void doCleanup() {
 		// call cleanup for all agents if any
-		for (IAgent a : _agents) {
+		for (IAgent a : agents) {
 			try {
 				log.info("Trying to cleanup agent: " + a.getAgentName());
 				a.cleanup();
@@ -673,9 +675,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// call cleanup on all beans of the agentnode in reverse order
 		// TODO testing
-		if (_agentNodeBeans != null) {
-			for (int i=_agentNodeBeans.size()-1; i>=0; i--) {
-				IAgentNodeBean anb = _agentNodeBeans.get(i);
+		if (agentNodeBeans != null) {
+			for (int i=agentNodeBeans.size()-1; i>=0; i--) {
+				final IAgentNodeBean anb = agentNodeBeans.get(i);
 				try {
 					log.info("Trying to cleanup agentnodebean: " + anb.getBeanName());
 					anb.cleanup();
@@ -686,8 +688,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			}
 		}
 
-		if (_threadPool != null) {
-			_threadPool.shutdown();
+		if (threadPool != null) {
+			threadPool.shutdown();
 		}
 	}
 
@@ -703,15 +705,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
-	public ExecutorService getThreadPool() {
-		return _threadPool;
+	public final ExecutorService getThreadPool() {
+		return threadPool;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<IAgentNodeBean> getAgentNodeBeans() {
-		return Collections.unmodifiableList(_agentNodeBeans);
+	public final List<IAgentNodeBean> getAgentNodeBeans() {
+		return Collections.unmodifiableList(agentNodeBeans);
 	}
 
 	/**
@@ -719,8 +721,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * 
 	 * @return the class of agent beans running in this agent node
 	 */
-	public List<String> getAgentNodeBeanClasses() {
-		ArrayList<String> ret = new ArrayList<String>();
+	public final List<String> getAgentNodeBeanClasses() {
+		final ArrayList<String> ret = new ArrayList<String>();
 		for (ILifecycle bean : getAgentNodeBeans()) {
 			ret.add(bean.getClass().getName());
 		}
@@ -730,27 +732,27 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgentNodeBeans(List<IAgentNodeBean> agentnodebeans) {
-		_agentNodeBeans.clear();
-		_agentNodeBeans.addAll(agentnodebeans); 
+	public final void setAgentNodeBeans(List<IAgentNodeBean> agentnodebeans) {
+		this.agentNodeBeans.clear();
+		this.agentNodeBeans.addAll(agentnodebeans); 
 	}
 
 	/**
 	 * @return the loggingConfig
 	 */
-	public String getLoggingConfig() {
+	public final String getLoggingConfig() {
 		return loggingConfig;
 	}
 
 	/**
-	 * @param loggingConfig
+	 * @param newLoggingConfig
 	 *            the loggingConfig to set
 	 */
-	public void setLoggingConfig(String loggingConfig) {
-		this.loggingConfig = loggingConfig;
+	public final void setLoggingConfig(String newLoggingConfig) {
+		loggingConfig = newLoggingConfig;
 
 		try {
-			Log4jConfigurer.initLogging(loggingConfig);
+			Log4jConfigurer.initLogging(newLoggingConfig);
 		} catch (FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
 		}
@@ -773,11 +775,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addLog4JSocketAppender(String address, int port) {
+	public final void addLog4JSocketAppender(String address, int port) {
 		System.out.println("Add socket appender for " + address + ":" + port + " ...");
 
 		// add appender for logger of the agent node
-		SocketAppender appender = new SocketAppender(address, port);
+		final SocketAppender appender = new SocketAppender(address, port);
 		appender.setName(address+":"+port);
 		((Log4JLogger)log).getLogger().addAppender(appender);
 
@@ -787,7 +789,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeLog4JSocketAppender(String address, int port) {
+	public final void removeLog4JSocketAppender(String address, int port) {
 		System.out.println("Remove socket appender for " + address + ":" + port + " ...");
 
 		// remove appender from logger of the agent node
@@ -799,7 +801,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getDirectoryName() {
+	public final String getDirectoryName() {
 		if (directory != null && directory instanceof AbstractAgentNodeBean) {
 			return ((AbstractAgentNodeBean)directory).getBeanName();
 		}
@@ -809,7 +811,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * Registers the agent node and all its resources for management
 	 * 
-	 * @param manager
+	 * @param manager the manager to be used for enabling management of this agent node.
 	 */
 	public void enableManagement(Manager manager) {
 		// do nothing if management already enabled
@@ -828,7 +830,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		// register agent node timer for management
 		try {
-			manager.registerAgentNodeResource(this, "Timer", _timer);
+			manager.registerAgentNodeResource(this, "Timer", timer);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -837,19 +839,19 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// register agent node beans for management
-		if (_agentNodeBeans != null) {
-			for (IAgentNodeBean anb : this._agentNodeBeans) {
+		if (agentNodeBeans != null) {
+			for (IAgentNodeBean anb : agentNodeBeans) {
 				anb.enableManagement(manager);
 			}
 		}
 
 		// register agents for management
-		for (IAgent a : this._agents) {
+		for (IAgent a : agents) {
 			a.enableManagement(manager);
 		}
 
 		// enable remote management
-		if (_jmxConnectors != null) {
+		if (jmxConnectors != null) {
 			manager.enableRemoteManagement(this);
 		}
 
@@ -869,12 +871,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		_manager.disableRemoteManagement(this);
 
 		// deregister agents from management
-		for (IAgent a : this._agents) {
+		for (IAgent a : agents) {
 			a.disableManagement();
 		}
 
 		// deregister agent node beans from management
-		for (IAgentNodeBean anb : this._agentNodeBeans) {
+		for (IAgentNodeBean anb : agentNodeBeans) {
 			anb.disableManagement();
 		}
 

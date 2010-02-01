@@ -85,12 +85,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   public final void setThisAgent(IAgent agent) {
     // update management
     if (isManagementEnabled()) {
-      Manager manager = _manager;
+      final Manager manager = _manager;
       disableManagement();
-      this.thisAgent = agent;
+      thisAgent = agent;
       enableManagement(manager);
     } else {
-      this.thisAgent = agent;
+      thisAgent = agent;
     }
 
     // update logger
@@ -110,12 +110,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   public final void setBeanName(String name) {
     // update management
     if (isManagementEnabled()) {
-      Manager manager = _manager;
+      final Manager manager = _manager;
       disableManagement();
-      this.beanName = name;
+      beanName = name;
       enableManagement(manager);
     } else {
-      this.beanName = name;
+      beanName = name;
     }
 
     // update logger
@@ -223,14 +223,14 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   /**
    * {@inheritDoc}
    */
-  public int getExecuteInterval() {
+  final public int getExecuteInterval() {
     return executeInterval;
   }
 
   /**
    * {@inheritDoc}
    */
-  public void setExecuteInterval(int executeInterval) {
+  final public void setExecuteInterval(int executeInterval) {
     try {
       if (executeInterval <= 0) {
         nextExecutionTime = 0;
@@ -250,14 +250,14 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   /**
    * {@inheritDoc}
    */
-  public long getNextExecutionTime() {
+  final public long getNextExecutionTime() {
     return nextExecutionTime;
   }
 
   /**
    * {@inheritDoc}
    */
-  public void setNextExecutionTime(long nextExecutionTime) {
+  final public void setNextExecutionTime(long nextExecutionTime) {
     this.nextExecutionTime = nextExecutionTime;
   }
 
@@ -285,9 +285,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          The values for the input parameters.
    * @return The result of the action.
    */
-  protected ActionResult invokeAndWaitForResult(Action a, Serializable[] inputParams) {
+  protected final ActionResult invokeAndWaitForResult(Action a, Serializable[] inputParams) {
     // invoke action
-    ActionResultListener listener = new ActionResultListener();
+    final ActionResultListener listener = new ActionResultListener();
     invoke(a, inputParams, listener);
 
     // wait for result
@@ -310,7 +310,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          the input parameters used for the action invocation.
    * @return the session id of the action invocation.
    */
-  protected String invoke(Action a, Serializable[] inputParams) {
+  protected final String invoke(Action a, Serializable[] inputParams) {
     return invoke(a, inputParams, null);
   }
 
@@ -325,8 +325,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          the receiver to be informed about the results.
    * @return the session id of the action invocation.
    */
-  protected String invoke(Action a, Serializable[] inputParams, ResultReceiver receiver) {
-    DoAction doAct = a.createDoAction(inputParams, receiver);
+  protected final String invoke(Action a, Serializable[] inputParams, ResultReceiver receiver) {
+    final DoAction doAct = a.createDoAction(inputParams, receiver);
     memory.write(doAct);
     return doAct.getSessionId();
   }
@@ -344,8 +344,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          the receiver to be informed about the results.
    * @return the session id of the action invocation.
    */
-  protected String invoke(Action a, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
-    DoAction doAct = a.createDoAction(parent, inputParams, receiver);
+  protected final String invoke(Action a, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
+    final DoAction doAct = a.createDoAction(parent, inputParams, receiver);
     memory.write(doAct);
     return doAct.getSessionId();
   }
@@ -363,8 +363,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @param results
    *          the results of the action.
    */
-  protected void returnResult(DoAction origin, Serializable[] results) {
-    ActionResult res = ((Action) origin.getAction()).createActionResult(origin, results);
+  protected final void returnResult(DoAction origin, Serializable[] results) {
+    final ActionResult res = ((Action) origin.getAction()).createActionResult(origin, results);
     memory.write(res);
   }
 
@@ -376,8 +376,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @param failure
    *          the failure information of the action.
    */
-  protected void returnFailure(DoAction origin, Serializable failure) {
-    ActionResult res = new ActionResult(origin, failure);
+  protected final void returnFailure(DoAction origin, Serializable failure) {
+    final ActionResult res = new ActionResult(origin, failure);
     memory.write(res);
   }
 
@@ -388,8 +388,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          the name of the action to be searched for.
    * @return a found action matching the given name or null if no such action was found.
    */
-  protected Action retrieveAction(String actionName) {
-    Action retAct = memory.read(new Action(actionName));
+  protected final Action retrieveAction(String actionName) {
+    final Action retAct = memory.read(new Action(actionName));
     if (retAct == null) {
       log.warn("Local memory does not contain \'" + actionName + "\'.");
     }
@@ -405,11 +405,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          the provider of the action to be search for.
    * @return a found action matching the given name and provider or null if no such action was found.
    */
-  protected Action retrieveAction(String actionName, IAgentDescription provider) {
-    Action template = new Action(actionName);
+  protected final Action retrieveAction(String actionName, IAgentDescription provider) {
+    final Action template = new Action(actionName);
     template.setProviderDescription(provider);
 
-    Action retAct = memory.read(template);
+    final Action retAct = memory.read(template);
     if (retAct == null) {
       log.warn("Local memory does not contain \'" + actionName + "\' with provider "+provider+".");
     }
@@ -423,8 +423,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 	 * @param oldValue old value (before change)
 	 * @param newValue new value (after change)
 	 */
-	protected void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
-		Notification n = new AttributeChangeNotification(this, 
+	protected final void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
+		final Notification n = new AttributeChangeNotification(this, 
 				sequenceNumber++, System.currentTimeMillis(),
 				"AgentBean Property "+attributeName+ " changed", 
 				attributeName, attributeType, oldValue, newValue);

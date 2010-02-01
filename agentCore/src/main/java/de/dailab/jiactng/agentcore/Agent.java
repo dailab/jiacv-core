@@ -69,6 +69,21 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
 public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		BeanNameAware, NotificationListener {
 
+	/** The default execution interval is 5.*/
+	public static final int DEFAULT_EXECUTION_INTERVAL = 5;
+
+	/** The default bean execution timeout is 300,000 milliseconds (5 minutes).*/
+	public static final long DEFAULT_BEAN_EXECUTION_TIMEOUT = 5 * 60 * 1000;
+	
+	/** The delay for automatic execution of services is 3,000 milliseconds. */
+	public static final long AUTO_EXECUTION_DELAY = 3000;
+
+	/** The delay for agent start time is 3,000 milliseconds. */
+	public static final long AGENT_STARTTIME_DELAY = 3000;
+
+	/** The interval for continuous service execution is 30,000 milliseconds. */
+	public static final long CONTINUOUS_EXECUTION_INTERVAL = 30*1000;
+	
 	/**
 	 * The AID (agent identifier). This property is generated and assigned
 	 * automatically during agent creation. It is not intended to make sense for
@@ -123,14 +138,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * Be nice timer for calling the executionCycle.
 	 */
-	private int executionInterval = 5;
+	private int executionInterval = DEFAULT_EXECUTION_INTERVAL;
 
 	/**
 	 * Timeout after which the execution of a bean will be stopped and the agent
 	 * as well. TODO do something more intelligent, possibly recover the bean
 	 * without stopping the agent.
 	 */
-	private long beanExecutionTimeout = 5 * 60 * 1000;
+	private long beanExecutionTimeout = DEFAULT_BEAN_EXECUTION_TIMEOUT;
 
 	private ArrayList<Action> actionList = null;
 
@@ -142,7 +157,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * start time property cache required to make start time spring-configurable
 	 */
-	private Long _startTime = null;
+	private Long startTime = null;
 	
 	/**
 	 * The id of the stop time notification.
@@ -152,7 +167,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * start time property cache required to make start time spring-configurable
 	 */
-	private Long _stopTime = null;
+	private Long stopTime = null;
 	
 	/**
 	 * The spring configuration XML snippet for this agent.
@@ -189,7 +204,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setMemory(IMemory memory) {
+	public final void setMemory(IMemory memory) {
 		// disable management of old memory
 		if (isManagementEnabled() && (this.memory != null)) {
 			this.memory.disableManagement();
@@ -208,14 +223,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<IAgentBean> getAgentBeans() {
+	public final List<IAgentBean> getAgentBeans() {
 		return Collections.unmodifiableList(agentBeans);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgentBeans(List<IAgentBean> agentbeans) {
+	public final void setAgentBeans(List<IAgentBean> agentbeans) {
 		// disable management of all old agent beans
 		if (isManagementEnabled() && (this.agentBeans != null)) {
 			for (IAgentBean ab : this.agentBeans) {
@@ -248,7 +263,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 					if (active) {
 						executionFuture = agentNode.getThreadPool().submit(
 								execution);
-						FutureTask<?> t = ((FutureTask<?>) executionFuture);
+						final FutureTask<?> t = ((FutureTask<?>) executionFuture);
 						try {
 							t.get(beanExecutionTimeout, TimeUnit.MILLISECONDS);
 						} catch (TimeoutException to) {
@@ -284,7 +299,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 *            the name of the agent.
 	 * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
 	 */
-	public void setBeanName(String name) {
+	public final void setBeanName(String name) {
 		setAgentName(name);
 	}
 
@@ -303,7 +318,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * @throws LifecycleException
 	 *             if an error occurs during stop or cleanup of this agent.
 	 */
-	public void remove() throws LifecycleException {
+	public final void remove() throws LifecycleException {
 		// clean up agent
 		stop();
 		cleanup();
@@ -402,9 +417,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			}
 
 			// if bean is effector, add all actions to memory
-			IAgentDescription myDescription= getAgentDescription();
+			final IAgentDescription myDescription= getAgentDescription();
 			if (ab instanceof IEffector) {
-				List<? extends Action> acts = ((IEffector) ab).getActions();
+				final List<? extends Action> acts = ((IEffector) ab).getActions();
 				if (acts != null) {
 					for (Action item : acts) {
 						item.setProviderDescription(myDescription);
@@ -421,10 +436,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 
 		updateState(LifecycleStates.INITIALIZED);
 		
-		if ((_startTime != null) && (_stopTime != null)) {
+		if ((startTime != null) && (stopTime != null)) {
 			try {
-				registerStartTime(_startTime);
-				registerStopTime(_stopTime);
+				registerStartTime(startTime);
+				registerStopTime(stopTime);
 			} catch (InstanceNotFoundException e) {
 				throw new LifecycleException("Error when initializing start/stoptime", e);
 			}
@@ -482,7 +497,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
       }
 
       // add new timer notification
-      autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()+3000));
+      autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()+AUTO_EXECUTION_DELAY));
       } catch (IOException e) {
         e.printStackTrace();
       } catch (InstanceNotFoundException e) {
@@ -602,7 +617,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return the current lifecycle state of this agent
 	 */
-	public LifecycleStates getAgentState() {
+	public final LifecycleStates getAgentState() {
 		return LifecycleStates.valueOf(memory.read(new ThisAgentDescription())
 				.getState());
 	}
@@ -622,10 +637,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * @see ILifecycle
 	 * 
 	 */
-	public void setBeanState(IAgentBean bean, LifecycleStates newState)
+	public final void setBeanState(IAgentBean bean, LifecycleStates newState)
 			throws LifecycleException {
 	    
-		String beanName = bean.getBeanName();
+		final String beanName = bean.getBeanName();
 
 		if (log != null && log.isInfoEnabled()) {
 			log.info("Trying to switch bean: " + bean.getBeanName()
@@ -648,10 +663,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		default:
 			return;
 		}
-		if (log != null && log.isInfoEnabled())
+		if (log != null && log.isInfoEnabled()) {
 			log.info("Bean " + bean.getBeanName() + " switched to state: "
 					+ newState.toString());
-		this.memory.update(new AgentBeanDescription(beanName, null),
+		}
+		memory.update(new AgentBeanDescription(beanName, null),
 				new AgentBeanDescription(null, newState.name()));
 	}
 
@@ -663,7 +679,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 *            the name of the agent bean
 	 * @return the current lifecycle state of the agent bean
 	 */
-	public LifecycleStates getBeanState(String beanName) {
+	public final LifecycleStates getBeanState(String beanName) {
 		return LifecycleStates.valueOf(this.memory.read(
 				new AgentBeanDescription(beanName, null)).getState());
 	}
@@ -675,8 +691,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * @param oldValue old value (before change)
 	 * @param newValue new value (after change)
 	 */
-	protected void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
-		Notification n = new AttributeChangeNotification(this, 
+	protected final void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
+		final Notification n = new AttributeChangeNotification(this, 
 				sequenceNumber++, System.currentTimeMillis(),
 				"Agent property "+attributeName+ " changed", 
 				attributeName, attributeType, oldValue, newValue);
@@ -686,8 +702,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getAgentName() {
-		return this.agentName;
+	public final String getAgentName() {
+		return agentName;
 	}
 
 	/**
@@ -698,17 +714,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 *            the new name of the agent
 	 * @see #setBeanName(java.lang.String)
 	 */
-	public void setAgentName(String agentname) {
-		String oldName = this.agentName;
+	public final void setAgentName(String agentname) {
+		final String oldName = this.agentName;
 		this.agentName = agentname;
 
 		// send notification
-//		Notification n = new AttributeChangeNotification(this,
-//				sequenceNumber++, System.currentTimeMillis(),
-//				"Name of agent changed", "AgentName", "java.lang.String",
-//				oldName, agentname);
-//		sendNotification(n);
-		
 		sendAttributeChangeNotification("AgentName", "java.lang.String", oldName, agentname);
 		
 	}
@@ -716,7 +726,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public ExecutorService getThreadPool() {
+	public final ExecutorService getThreadPool() {
 		return agentNode.getThreadPool();
 	}
 
@@ -725,14 +735,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return the execution cycle of this agent
 	 */
-	public IExecutionCycle getExecution() {
+	public final IExecutionCycle getExecution() {
 		return execution;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setExecution(IExecutionCycle execution) {
+	public final void setExecution(IExecutionCycle execution) {
 		// disable management of old execution cycle
 		if (isManagementEnabled() && (this.execution != null)) {
 			this.execution.disableManagement();
@@ -751,17 +761,17 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public IAgentNode getAgentNode() {
+	public final IAgentNode getAgentNode() {
 		return agentNode;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setAgentNode(IAgentNode agentNode) {
+	public final void setAgentNode(IAgentNode agentNode) {
 		// update management
 		if (isManagementEnabled()) {
-			Manager manager = _manager;
+			final Manager manager = _manager;
 			disableManagement();
 			this.agentNode = agentNode;
 			enableManagement(manager);
@@ -776,15 +786,15 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getOwner() {
+	public final String getOwner() {
 		return owner;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setOwner(String owner) {
-		String oldOwner = this.owner;
+	public final void setOwner(String owner) {
+		final String oldOwner = this.owner;
 		this.owner = owner;
 		sendAttributeChangeNotification("owner", "java.lang.String", oldOwner, this.owner);
 	}
@@ -792,7 +802,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public Log getLog(IAgentBean bean) {
+	public final Log getLog(IAgentBean bean) {
 		if (agentNode == null) {
 			return null;
 		}
@@ -802,7 +812,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public Log getLog(IAgentBean owner, String extension) {
+	public final Log getLog(IAgentBean owner, String extension) {
 		if (agentNode == null) {
 			return null;
 		}
@@ -814,7 +824,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return the timeout in milliseconds
 	 */
-	public long getBeanExecutionTimeout() {
+	public final long getBeanExecutionTimeout() {
 		return beanExecutionTimeout;
 	}
 
@@ -824,14 +834,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * @param beanExecutionTimeout
 	 *            the timeout in milliseconds
 	 */
-	public void setBeanExecutionTimeout(long beanExecutionTimeout) {
+	public final void setBeanExecutionTimeout(long beanExecutionTimeout) {
 		this.beanExecutionTimeout = beanExecutionTimeout;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getAgentId() {
+	public final String getAgentId() {
 		return agentId;
 	}
 
@@ -840,15 +850,15 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return the agent description of this agent
 	 */
-	public AgentDescription getAgentDescription() {
+	public final AgentDescription getAgentDescription() {
 		return memory.read(new ThisAgentDescription());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<String> getAgentBeanNames() {
-		ArrayList<String> ret = new ArrayList<String>();
+	public final List<String> getAgentBeanNames() {
+		final ArrayList<String> ret = new ArrayList<String>();
 		for (IAgentBean bean : getAgentBeans()) {
 			ret.add(bean.getBeanName());
 		}
@@ -858,8 +868,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<Action> getActionList() {
-		ArrayList<Action> tempList = new ArrayList<Action>();
+	public final List<Action> getActionList() {
+	  final ArrayList<Action> tempList = new ArrayList<Action>();
 	  for(IAgentBean iab : agentBeans) {
 		  if(iab instanceof IEffector) {
 		    tempList.addAll(((IEffector)iab).getActions());
@@ -876,7 +886,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setActionList(List<Action> actionList) {
+	public final void setActionList(List<Action> actionList) {
 		this.actionList = new ArrayList<Action>();
 		this.actionList.addAll(actionList);
 	}
@@ -886,8 +896,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return name of actions provided by this agent
 	 */
-	public List<String> getActionNames() {
-		ArrayList<String> ret = new ArrayList<String>();
+	public final List<String> getActionNames() {
+		final ArrayList<String> ret = new ArrayList<String>();
 		for (Action action : getActionList()) {
 			ret.add(action.getName());
 		}
@@ -899,13 +909,13 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return implementation of the memory of this agent
 	 */
-	public CompositeData getMemoryData() {
+	public final CompositeData getMemoryData() {
 		if (memory == null) {
 			return null;
 		}
-		String[] itemNames = new String[] { "class", "matcher", "updater" };
+		final String[] itemNames = new String[] { "class", "matcher", "updater" };
 		try {
-			CompositeType type = new CompositeType(
+			final CompositeType type = new CompositeType(
 					"javax.management.openmbean.CompositeDataSupport",
 					"Memory information", itemNames, new String[] {
 							"Implementation of the memory instance",
@@ -930,7 +940,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return implementation of the execution cycle of this agent
 	 */
-	public String getExecutionCycleClass() {
+	public final String getExecutionCycleClass() {
 		if (execution == null) {
 			return null;
 		}
@@ -1019,7 +1029,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return the be nice timer between to calls to the executionCycle
 	 */
-	public int getExecutionInterval() {
+	public final int getExecutionInterval() {
 		return executionInterval;
 	}
 
@@ -1029,8 +1039,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * @param executionInterval
 	 *            the be nice timer between to calls to the executionCycle
 	 */
-	public void setExecutionInterval(int executionInterval) {
-		int oldInterval = this.executionInterval;
+	public final void setExecutionInterval(int executionInterval) {
+		final int oldInterval = this.executionInterval;
 		this.executionInterval = executionInterval;
 		sendAttributeChangeNotification("executionInterval", "java.lang.int", 
 				oldInterval, executionInterval);
@@ -1039,7 +1049,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     /**
 	 * {@inheritDoc}
 	 */
-	public Long getStartTime() throws InstanceNotFoundException {
+	public final Long getStartTime() throws InstanceNotFoundException {
 		if (startTimeId == null) {
 			return null;
 		}
@@ -1051,7 +1061,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			return null;
 		}
 		catch (NullPointerException e) {
-			return _startTime;
+			return startTime;
 		}
 	}
 	
@@ -1107,13 +1117,13 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setStartTime(Long startTime) throws InstanceNotFoundException {
+	public final void setStartTime(Long startTime) throws InstanceNotFoundException {
 		// add listener if needed
-	  if((startTime!=null) && (startTime<=(System.currentTimeMillis()+3000))) {
-	    startTime = System.currentTimeMillis()+3000;
+	  if((startTime!=null) && (startTime<=(System.currentTimeMillis()+AGENT_STARTTIME_DELAY))) {
+	    startTime = System.currentTimeMillis()+AGENT_STARTTIME_DELAY;
 	  }
-	  _startTime = startTime;
-	  Long oldStartTime = this.getStartTime();
+	  this.startTime = startTime;
+	  final Long oldStartTime = this.getStartTime();
 	  
 	  if (this.memory.getState() != LifecycleStates.UNDEFINED) {
 		  if (this.getAgentState() != LifecycleStates.UNDEFINED) {
@@ -1127,7 +1137,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     /**
 	 * {@inheritDoc}
 	 */
-	public Long getStopTime() throws InstanceNotFoundException {
+	public final Long getStopTime() throws InstanceNotFoundException {
 		if (stopTimeId == null) {
 			return null;
 		}
@@ -1139,7 +1149,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			return null;
 		}
 		catch (NullPointerException e) {
-			return _stopTime;
+			return stopTime;
 		}
 	}
 	
@@ -1190,10 +1200,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     /**
 	 * {@inheritDoc}
 	 */
-	public void setStopTime(Long stopTime) throws InstanceNotFoundException {
+	public final void setStopTime(Long stopTime) throws InstanceNotFoundException {
 		// add listener if needed
-		_stopTime = stopTime;
-		Long oldStopTime = this.getStopTime();
+		this.stopTime = stopTime;
+		final Long oldStopTime = this.getStopTime();
 		if (this.memory.getState() != LifecycleStates.UNDEFINED) {
 			if (this.getAgentState() != LifecycleStates.UNDEFINED) {
 				registerStopTime(stopTime);
@@ -1210,7 +1220,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 */
 	public void handleNotification(Notification notification, Object handback) {
 		if (notification instanceof TimerNotification) {
-			Integer id = ((TimerNotification) notification).getNotificationID();
+			final Integer id = ((TimerNotification) notification).getNotificationID();
 			if (id.equals(startTimeId) && !getAgentState().equals(LifecycleStates.STARTED) && !getAgentState().equals(LifecycleStates.STARTING)) {
 				try {
 					start();
@@ -1238,12 +1248,12 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			  
 			  if (execution.getAutoExecutionServices() != null) {
   	        for (String serviceName : execution.getAutoExecutionServices()) {
-  	          Action service = memory.read(new Action(serviceName));
+  	          final Action service = memory.read(new Action(serviceName));
   	          if (service != null) {
   	            if(log.isInfoEnabled()) {
   	              log.info("Autoexecuting action: "+service);
   	            }
-  	            DoAction doAct = service.createDoAction(new Serializable[0], null);
+  	            final DoAction doAct = service.createDoAction(new Serializable[0], null);
   	            doAct.getSession().setOriginalService(serviceName);
   	            doAct.getSession().setOriginalProvider(this.getOwner());            
   	            doAct.getSession().setOriginalUser(this.getOwner());
@@ -1262,7 +1272,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
                 timerClient.removeNotification(autoExecTimeId);
             }
             // add new timer notification
-            autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()+(30*1000)));
+            autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()+CONTINUOUS_EXECUTION_INTERVAL));
 
           } catch (IOException e) {
             e.printStackTrace();
@@ -1274,11 +1284,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 	}
 
-  /* (non-Javadoc)
-   * @see de.dailab.jiactng.agentcore.AgentMBean#getAutoExecutionServices()
-   */
+    /**
+     * {@inheritDoc}
+     */
   @Override
-  public List<String> getAutoExecutionServices() {
+  public final List<String> getAutoExecutionServices() {
     if(this.execution!= null){
       return this.execution.getAutoExecutionServices();
     } else {
@@ -1286,11 +1296,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     }
   }
 
-  /* (non-Javadoc)
-   * @see de.dailab.jiactng.agentcore.AgentMBean#getAutoExecutionType()
+  /**
+   * {@inheritDoc}
    */
   @Override
-  public boolean getAutoExecutionType() {
+  public final boolean getAutoExecutionType() {
     if(this.execution!= null){
       return this.execution.getAutoExecutionType();
     } else {
@@ -1298,11 +1308,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     }
   }
 
-  /* (non-Javadoc)
-   * @see de.dailab.jiactng.agentcore.AgentMBean#setAutoExecutionServices(java.util.List)
+  /**
+   * {@inheritDoc}
    */
   @Override
-  public void setAutoExecutionServices(List<String> actionIds) {
+  public final void setAutoExecutionServices(List<String> actionIds) {
     if(this.execution!= null){
     	List<String> oldActionIds = null;
     	if (this.execution.getAutoExecutionServices() != null) {
@@ -1316,13 +1326,13 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     } 
   }
 
-  /* (non-Javadoc)
-   * @see de.dailab.jiactng.agentcore.AgentMBean#setAutoExecutionType(boolean)
+  /**
+   * {@inheritDoc}
    */
   @Override
-  public void setAutoExecutionType(boolean continous) {
+  public final void setAutoExecutionType(boolean continous) {
     if(this.execution!= null){
-    	boolean oldValue = this.execution.getAutoExecutionType();
+    	final boolean oldValue = this.execution.getAutoExecutionType();
     	this.execution.setAutoExecutionType(continous);
     	sendAttributeChangeNotification("autoExecutionType", "java.lang.boolean", 
     			oldValue, continous);
@@ -1333,7 +1343,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    * {@inheritDoc}
    */
   @Override
-  public byte[] getSpringConfigXml() {
+  public final byte[] getSpringConfigXml() {
 	if (springConfigXml != null) {
 		return Arrays.copyOf(springConfigXml, springConfigXml.length);
 	}
@@ -1344,7 +1354,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    * {@inheritDoc}
    */
   @Override
-  public void setSpringConfigXml(byte[] springConfig) {
+  public final void setSpringConfigXml(byte[] springConfig) {
 	  if (springConfig != null) {
 		  this.springConfigXml = Arrays.copyOf(springConfig, springConfig.length);
 	  } else {
@@ -1356,23 +1366,23 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
   	 *           DirectoryAccess                   *
   	 ***********************************************/
   
-	public IDirectory getDirectory() {
+	public final IDirectory getDirectory() {
 		return directory;
 	}
 	
-	public void setDirectory(IDirectory directory) {
+	public final void setDirectory(IDirectory directory) {
 		this.directory = directory;
 	}
 	
 	@Override
-	public void deregisterAction(IActionDescription actionDescription) {
+	public final void deregisterAction(IActionDescription actionDescription) {
 		if (directory != null) {
 			directory.deregisterAction(actionDescription);
 		}
 	}
 	
 	@Override
-	public void modifyAction(IActionDescription oldDescription,
+	public final void modifyAction(IActionDescription oldDescription,
 			IActionDescription newDescription) {
 		if (directory != null) {
 			directory.modifyAction(oldDescription, newDescription);
@@ -1380,7 +1390,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	}
 	
 	@Override
-	public void registerAction(IActionDescription actionDescription) {
+	public final void registerAction(IActionDescription actionDescription) {
 		if (directory != null) {
 			directory.registerAction(actionDescription);
 		} else {
@@ -1389,7 +1399,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	}
 	
 	@Override
-	public IActionDescription searchAction(IActionDescription template) {
+	public final IActionDescription searchAction(IActionDescription template) {
 		if (directory != null) {
 			return directory.searchAction(template);
 		}
@@ -1397,7 +1407,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	}
 	
 	@Override
-	public List<IActionDescription> searchAllActions(IActionDescription template) {
+	public final List<IActionDescription> searchAllActions(IActionDescription template) {
 		if (directory != null) {
 			return directory.searchAllActions(template);
 		}
@@ -1406,28 +1416,28 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	}
 
 	@Override
-	public void deregisterAgent(String aid) {
+	public final void deregisterAgent(String aid) {
 		if (directory != null) {
 			directory.deregisterAgent(aid);
 		}
 	}
 
 	@Override
-	public void modifyAgent(IAgentDescription agentDescription) {
+	public final void modifyAgent(IAgentDescription agentDescription) {
 		if (directory != null) {
 			directory.modifyAgent(agentDescription);
 		}
 	}
 
 	@Override
-	public void registerAgent(IAgentDescription agentDescription) {
+	public final void registerAgent(IAgentDescription agentDescription) {
 		if (directory != null) {
 			directory.registerAgent(agentDescription);
 		}
 	}
 
 	@Override
-	public IAgentDescription searchAgent(IAgentDescription template) {
+	public final IAgentDescription searchAgent(IAgentDescription template) {
 		if (directory != null) {
 			return directory.searchAgent(template);
 		}
@@ -1435,7 +1445,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	}
 
 	@Override
-	public List<IAgentDescription> searchAllAgents(IAgentDescription template) {
+	public final List<IAgentDescription> searchAllAgents(IAgentDescription template) {
 		if (directory != null) {
 			return directory.searchAllAgents(template);
 		}

@@ -15,19 +15,31 @@ import de.dailab.jiactng.agentcore.management.Manager;
 public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements IAgentNodeBean, AbstractAgentNodeBeanMBean, BeanNameAware {
     protected IAgentNode agentNode;
     
-    private String _beanName;
+    private String beanName;
 
-    public final void setAgentNode(IAgentNode agentNode) {
-        this.agentNode = agentNode;
-        setLog(agentNode.getLog(this));
+    /**
+     * Sets the agent node of this agent node bean.
+     * @param newAgentNode the agent node
+     */
+    public final void setAgentNode(IAgentNode newAgentNode) {
+        agentNode = newAgentNode;
+        setLog(newAgentNode.getLog(this));
     }
-    
+
+    /**
+     * Gets the name of this agent node bean.
+     * @return the name of the agent node bean
+     */
     public final String getBeanName() {
-        return _beanName;
+        return beanName;
     }
 
-    public final void setBeanName(String beanName) {
-        _beanName = beanName;
+    /**
+     * Sets the name of this agent node bean.
+     * @param newBeanName the name of the agent node bean
+     */
+    public final void setBeanName(String newBeanName) {
+        beanName = newBeanName;
     }
 
     /**
@@ -43,7 +55,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
         try {
             _manager.unregisterAgentNodeBean(this, agentNode);
         } catch (Exception e) {
-            System.err.println("WARNING: Unable to deregister node bean " + _beanName + " of node "
+            System.err.println("WARNING: Unable to deregister node bean " + beanName + " of node "
                     + agentNode.getName() + " as JMX resource.");
             System.err.println(e.getMessage());
         }
@@ -67,7 +79,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
         try {
             manager.registerAgentNodeBean(this, agentNode);
         } catch (Exception e) {
-            System.err.println("WARNING: Unable to register node bean " + _beanName + " of node " + agentNode.getName()
+            System.err.println("WARNING: Unable to register node bean " + beanName + " of node " + agentNode.getName()
                     + " as JMX resource.");
             System.err.println(e.getMessage());
         }
@@ -75,15 +87,27 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
         super.enableManagement(manager);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doCleanup() throws Exception {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doInit() throws Exception {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doStart() throws Exception {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doStop() throws Exception {}
 }

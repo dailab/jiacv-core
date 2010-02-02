@@ -850,7 +850,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 * 
 	 * @return the agent description of this agent
 	 */
-	public final AgentDescription getAgentDescription() {
+	public AgentDescription getAgentDescription() {
 		return memory.read(new ThisAgentDescription());
 	}
 

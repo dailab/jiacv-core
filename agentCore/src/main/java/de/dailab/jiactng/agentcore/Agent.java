@@ -1365,22 +1365,36 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
   	/***********************************************
   	 *           DirectoryAccess                   *
   	 ***********************************************/
-  
+
+  /**
+   * Get the access to the directory.
+   * @return the directory
+   */
 	public final IDirectory getDirectory() {
 		return directory;
 	}
-	
+
+	/**
+	 * Set the access to the directory
+	 * @param directory the directory
+	 */
 	public final void setDirectory(IDirectory directory) {
 		this.directory = directory;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final void deregisterAction(IActionDescription actionDescription) {
 		if (directory != null) {
 			directory.deregisterAction(actionDescription);
 		}
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final void modifyAction(IActionDescription oldDescription,
 			IActionDescription newDescription) {
@@ -1388,7 +1402,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			directory.modifyAction(oldDescription, newDescription);
 		}
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final void registerAction(IActionDescription actionDescription) {
 		if (directory != null) {
@@ -1397,7 +1414,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		  log.warn("Agent has no reference to directory.");
 		}
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final IActionDescription searchAction(IActionDescription template) {
 		if (directory != null) {
@@ -1405,7 +1425,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 		return null;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final List<IActionDescription> searchAllActions(IActionDescription template) {
 		if (directory != null) {
@@ -1415,6 +1438,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		return new ArrayList<IActionDescription>();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final void deregisterAgent(String aid) {
 		if (directory != null) {
@@ -1422,6 +1448,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final void modifyAgent(IAgentDescription agentDescription) {
 		if (directory != null) {
@@ -1429,6 +1458,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final void registerAgent(IAgentDescription agentDescription) {
 		if (directory != null) {
@@ -1436,6 +1468,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final IAgentDescription searchAgent(IAgentDescription template) {
 		if (directory != null) {
@@ -1444,6 +1479,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public final List<IAgentDescription> searchAllAgents(IAgentDescription template) {
 		if (directory != null) {

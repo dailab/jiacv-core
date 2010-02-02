@@ -31,7 +31,7 @@ public class JARMemory implements JAR, Serializable {
      * @throws FileNotFoundException if the JAR file does not exist.
      * @throws IOException if the JAR file is not readable.
      */
-    public JARMemory(JARFile file) throws IOException {
+    public JARMemory(JARFile file) throws IOException, FileNotFoundException {
         this(new File(file.getJarName()));
     }
 
@@ -41,7 +41,7 @@ public class JARMemory implements JAR, Serializable {
      * @throws FileNotFoundException if the JAR file does not exist.
      * @throws IOException if the JAR file is not readable.
      */
-    public JARMemory(String resource) throws IOException {
+    public JARMemory(String resource) throws IOException, FileNotFoundException {
         this(resource, JARClassLoader.getJVMClassLoader().getResourceAsStream(resource));
     }
 
@@ -51,7 +51,7 @@ public class JARMemory implements JAR, Serializable {
      * @throws FileNotFoundException if the JAR file does not exist.
      * @throws IOException if the JAR file is not readable.
      */
-    public JARMemory(File file) throws IOException {
+    public JARMemory(File file) throws IOException, FileNotFoundException {
         this(file.toString(), new FileInputStream(file));
     }
 

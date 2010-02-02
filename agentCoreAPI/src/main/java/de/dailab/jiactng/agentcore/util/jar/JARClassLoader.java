@@ -86,7 +86,7 @@ public class JARClassLoader extends URLClassLoader {
      * @throws FileNotFoundException if the file does not exist.
      * @throws IOException if the resource is not readable.
      */
-    public synchronized JAR addJAR(String resource) throws IOException {
+    public synchronized JAR addJAR(String resource) throws IOException, FileNotFoundException {
         return jarCP.addJAR(resource);
     }
 

@@ -3,7 +3,9 @@ package de.dailab.jiactng.agentcore.ontology;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 
 
-
+/**
+ * Holds information about this agent.
+ */
 public class ThisAgentDescription extends AgentDescription {
     private static final long serialVersionUID = -4734957489524953244L;
 

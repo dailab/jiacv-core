@@ -9,6 +9,7 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
+ * Abstract superclass of all agent node beans.
  * @author Marcel Patzlaff
  * @version $Revision$
  */

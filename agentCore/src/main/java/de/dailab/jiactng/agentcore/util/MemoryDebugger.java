@@ -14,10 +14,6 @@ import javax.management.Notification;
 import javax.management.NotificationEmitter;
 import javax.management.NotificationListener;
 
-/**
- * @author Some Guy in the internet
- * @version $Revision$
- */
 public class MemoryDebugger {
     static class NotificationListenerImpl implements NotificationListener {
         public void handleNotification(Notification notification, Object handback) {

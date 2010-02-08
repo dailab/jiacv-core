@@ -5,6 +5,7 @@ package de.dailab.jiactng.agentcore.comm.broker;
 
 
 /**
+ * This class is used for the description of ActiveMQ transport connectors.
  * @author Marcel Patzlaff
  * @version $Revision$
  */

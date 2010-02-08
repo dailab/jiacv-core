@@ -35,6 +35,8 @@ import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
+ * Implementation of an object memory based on tuple space technology.
+ * @see org.sercho.masp.space.event.EventedTupleSpace
  * @author Thomas Konnerth
  * @author axle
  * 

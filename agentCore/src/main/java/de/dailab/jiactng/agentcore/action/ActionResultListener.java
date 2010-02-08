@@ -3,6 +3,11 @@ package de.dailab.jiactng.agentcore.action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 
+/**
+ * This class enables the synchronous wait for result of invoked actions.
+ * @see de.dailab.jiactng.agentcore.AbstractAgentBean#invokeAndWaitForResult(Action,Serializable[])
+ * @author Jan Keiser
+ */
 public class ActionResultListener implements ResultReceiver {
 
 	private ActionResult _result = null;

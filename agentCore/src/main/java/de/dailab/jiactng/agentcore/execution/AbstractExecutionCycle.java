@@ -335,6 +335,10 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     _manager = null;
   }
 
+  /**
+   * This exception will be thrown, if the timeout for action execution is reached.
+   * @author Jan Keiser
+   */
   @SuppressWarnings("serial")
   public static class TimeoutException extends RuntimeException {
     public TimeoutException(String s) {

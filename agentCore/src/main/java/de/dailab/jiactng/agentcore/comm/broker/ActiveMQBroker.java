@@ -16,6 +16,8 @@ import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 
 /**
+ * Implements a message broker as agent node bean based on ActiveMQ technology.
+ * @see org.apache.activemq.broker.BrokerService
  * @author Martin Loeffelholz
  * @author Marcel Patzlaff
  * 

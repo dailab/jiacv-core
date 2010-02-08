@@ -4,6 +4,7 @@
 package de.dailab.jiactng.agentcore.util;
 
 /**
+ * Provides methods for checking equality of objects with different considerations of <code>null</code> values.
  * @author Marcel Patzlaff
  * @version $Revision: 18492 $
  */

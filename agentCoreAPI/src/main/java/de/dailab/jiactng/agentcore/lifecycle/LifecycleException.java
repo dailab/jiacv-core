@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.lifecycle;
 
 /**
+ * This exception will be thrown, if the state of a lifecycle-aware JIAC component can not be changed successful.
  * @author Joachim Fuchs
  */
 public class LifecycleException extends Exception {

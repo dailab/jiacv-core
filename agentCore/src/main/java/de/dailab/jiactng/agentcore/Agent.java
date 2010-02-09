@@ -204,19 +204,19 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setMemory(IMemory memory) {
+	public final void setMemory(IMemory newMemory) {
 		// disable management of old memory
-		if (isManagementEnabled() && (this.memory != null)) {
-			this.memory.disableManagement();
+		if (isManagementEnabled() && (memory != null)) {
+			memory.disableManagement();
 		}
 
 		// change memory
-		this.memory = memory;
-		memory.setThisAgent(this);
+		memory = newMemory;
+		newMemory.setThisAgent(this);
 
 		// enable management of new memory
-		if (isManagementEnabled() && (this.memory != null)) {
-			this.memory.enableManagement(_manager);
+		if (isManagementEnabled() && (memory != null)) {
+			memory.enableManagement(_manager);
 		}
 	}
 
@@ -742,19 +742,19 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setExecution(IExecutionCycle execution) {
+	public final void setExecution(IExecutionCycle newExecution) {
 		// disable management of old execution cycle
-		if (isManagementEnabled() && (this.execution != null)) {
-			this.execution.disableManagement();
+		if (isManagementEnabled() && (execution != null)) {
+			execution.disableManagement();
 		}
 
 		// change execution cycle
-		this.execution = execution;
-		this.execution.setThisAgent(this);
+		execution = newExecution;
+		execution.setThisAgent(this);
 
 		// enable management of new execution cycle
-		if (isManagementEnabled() && (this.execution != null)) {
-			this.execution.enableManagement(_manager);
+		if (isManagementEnabled() && (execution != null)) {
+			execution.enableManagement(_manager);
 		}
 	}
 
@@ -768,19 +768,19 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setAgentNode(IAgentNode agentNode) {
+	public final void setAgentNode(IAgentNode newAgentNode) {
 		// update management
 		if (isManagementEnabled()) {
 			final Manager manager = _manager;
 			disableManagement();
-			this.agentNode = agentNode;
+			agentNode = newAgentNode;
 			enableManagement(manager);
 		} else {
-			this.agentNode = agentNode;
+			agentNode = newAgentNode;
 		}
 
 		// update logger
-		setLog(this.agentNode.getLog(this));
+		setLog(agentNode.getLog(this));
 	}
 
 	/**
@@ -793,10 +793,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setOwner(String owner) {
-		final String oldOwner = this.owner;
-		this.owner = owner;
-		sendAttributeChangeNotification("owner", "java.lang.String", oldOwner, this.owner);
+	public final void setOwner(String newOwner) {
+		final String oldOwner = owner;
+		owner = newOwner;
+		sendAttributeChangeNotification("owner", "java.lang.String", oldOwner, owner);
 	}
 
 	/**
@@ -812,11 +812,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final Log getLog(IAgentBean owner, String extension) {
+	public final Log getLog(IAgentBean bean, String extension) {
 		if (agentNode == null) {
 			return null;
 		}
-		return agentNode.getLog(this, owner, extension);
+		return agentNode.getLog(this, bean, extension);
 	}
 
 	/**
@@ -831,11 +831,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * Sets the timeout after which the execution of a bean will be stopped.
 	 * 
-	 * @param beanExecutionTimeout
+	 * @param newBeanExecutionTimeout
 	 *            the timeout in milliseconds
 	 */
-	public final void setBeanExecutionTimeout(long beanExecutionTimeout) {
-		this.beanExecutionTimeout = beanExecutionTimeout;
+	public final void setBeanExecutionTimeout(long newBeanExecutionTimeout) {
+		beanExecutionTimeout = newBeanExecutionTimeout;
 	}
 
 	/**
@@ -886,9 +886,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setActionList(List<Action> actionList) {
-		this.actionList = new ArrayList<Action>();
-		this.actionList.addAll(actionList);
+	public final void setActionList(List<Action> newActionList) {
+		actionList = new ArrayList<Action>();
+		actionList.addAll(newActionList);
 	}
 
 	/**
@@ -1036,14 +1036,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * Setter for the executionInterval timer
 	 * 
-	 * @param executionInterval
+	 * @param newExecutionInterval
 	 *            the be nice timer between to calls to the executionCycle
 	 */
-	public final void setExecutionInterval(int executionInterval) {
-		final int oldInterval = this.executionInterval;
-		this.executionInterval = executionInterval;
+	public final void setExecutionInterval(int newExecutionInterval) {
+		final int oldInterval = executionInterval;
+		executionInterval = newExecutionInterval;
 		sendAttributeChangeNotification("executionInterval", "java.lang.int", 
-				oldInterval, executionInterval);
+				oldInterval, newExecutionInterval);
 	}
 
     /**
@@ -1068,10 +1068,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * Adds the start time listener and notifications for start time.
 	 * Required to enable spring configuration of start/stoptime.
-	 * @param startTime the designated start time
+	 * @param regStartTime the designated start time
 	 */
-    private void registerStartTime(Long startTime) throws InstanceNotFoundException {
-    	if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (startTime != null)) {
+    private void registerStartTime(Long regStartTime) throws InstanceNotFoundException {
+    	if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStartTime != null)) {
 			try {
 				timerClient.addTimerNotificationListener(this);
 			} 
@@ -1091,7 +1091,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 
 		// remove listener if no longer needed
-		if ((startTimeId != null) && (stopTimeId == null) && (autoExecTimeId == null) && (startTime == null)) {
+		if ((startTimeId != null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStartTime == null)) {
 			try {
 				timerClient.removeTimerNotificationListener(this);
 			} 
@@ -1104,9 +1104,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 
 		// add new timer notification
-		if (startTime != null) {
+		if (regStartTime != null) {
 			try {
-				startTimeId = timerClient.addNotification(null, null, null, new Date(startTime));
+				startTimeId = timerClient.addNotification(null, null, null, new Date(regStartTime));
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -1117,18 +1117,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setStartTime(Long startTime) throws InstanceNotFoundException {
+	public final void setStartTime(Long newStartTime) throws InstanceNotFoundException {
 		// add listener if needed
-	  if((startTime!=null) && (startTime<=(System.currentTimeMillis()+AGENT_STARTTIME_DELAY))) {
-	    startTime = System.currentTimeMillis()+AGENT_STARTTIME_DELAY;
+	  if((newStartTime!=null) && (newStartTime<=(System.currentTimeMillis()+AGENT_STARTTIME_DELAY))) {
+	    newStartTime = System.currentTimeMillis()+AGENT_STARTTIME_DELAY;
 	  }
-	  this.startTime = startTime;
-	  final Long oldStartTime = this.getStartTime();
+	  startTime = newStartTime;
+	  final Long oldStartTime = getStartTime();
 	  
 	  if (this.memory.getState() != LifecycleStates.UNDEFINED) {
 		  if (this.getAgentState() != LifecycleStates.UNDEFINED) {
-			  registerStartTime(startTime);
-			  sendAttributeChangeNotification("startTime", "java.lang.Long", oldStartTime, this.getStartTime());
+			  registerStartTime(newStartTime);
+			  sendAttributeChangeNotification("startTime", "java.lang.Long", oldStartTime, getStartTime());
 		  }
 	  }
 		
@@ -1153,8 +1153,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 	}
 	
-	private void registerStopTime(Long stopTime) throws InstanceNotFoundException {
-		if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (stopTime != null)) {
+	private void registerStopTime(Long regStopTime) throws InstanceNotFoundException {
+		if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStopTime != null)) {
 			try {
 				timerClient.addTimerNotificationListener(this);
 			} 
@@ -1174,7 +1174,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 
 		// remove listener if no longer needed
-		if ((startTimeId == null) && (stopTimeId != null) && (autoExecTimeId == null) && (stopTime == null)) {
+		if ((startTimeId == null) && (stopTimeId != null) && (autoExecTimeId == null) && (regStopTime == null)) {
 			try {
 				timerClient.removeTimerNotificationListener(this);
 			} 
@@ -1187,9 +1187,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 
 		// add new timer notification
-		if (stopTime != null) {
+		if (regStopTime != null) {
 			try {
-				stopTimeId = timerClient.addNotification(null, null, null, new Date(stopTime));
+				stopTimeId = timerClient.addNotification(null, null, null, new Date(regStopTime));
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -1200,14 +1200,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     /**
 	 * {@inheritDoc}
 	 */
-	public final void setStopTime(Long stopTime) throws InstanceNotFoundException {
+	public final void setStopTime(Long newStopTime) throws InstanceNotFoundException {
 		// add listener if needed
-		this.stopTime = stopTime;
-		final Long oldStopTime = this.getStopTime();
+		stopTime = newStopTime;
+		final Long oldStopTime = getStopTime();
 		if (this.memory.getState() != LifecycleStates.UNDEFINED) {
 			if (this.getAgentState() != LifecycleStates.UNDEFINED) {
-				registerStopTime(stopTime);
-				sendAttributeChangeNotification("stopTime", "java.lang.Long", oldStopTime, this.getStopTime());	
+				registerStopTime(newStopTime);
+				sendAttributeChangeNotification("stopTime", "java.lang.Long", oldStopTime, getStopTime());	
 			}
 		}
 		
@@ -1376,10 +1376,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 
 	/**
 	 * Set the access to the directory
-	 * @param directory the directory
+	 * @param newDirectory the directory
 	 */
-	public final void setDirectory(IDirectory directory) {
-		this.directory = directory;
+	public final void setDirectory(IDirectory newDirectory) {
+		directory = newDirectory;
 	}
 
 	/**

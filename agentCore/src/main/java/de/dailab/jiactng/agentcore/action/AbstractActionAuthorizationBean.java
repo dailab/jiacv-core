@@ -10,7 +10,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
- * Abstract class of all agentbeans, which are able to authorize action invocations. The class allows to configure an optional authorization action, which will be executed at the
+ * Abstract class of all agent beans, which are able to authorize action invocations. The class allows to configure an optional authorization action, which will be executed at the
  * beginning of all action invocations. The invoked action will only be performed if this authorization action sends a success.
  * 
  * @author Jan Keiser
@@ -30,7 +30,7 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
    /**
     * Map of running authorization invocations.
     */
-   private HashMap<String, DoAction> _doActionAuthorizations = new HashMap<String, DoAction>();
+   private HashMap<String, DoAction> doActionAuthorizations = new HashMap<String, DoAction>();
 
    /**
     * {@inheritDoc}
@@ -40,7 +40,7 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
       super.doStart();
 
       if (authorizationActionName != null) {
-         List<IActionDescription> foundActs = thisAgent.searchAllActions(new Action(authorizationActionName));
+         final List<IActionDescription> foundActs = thisAgent.searchAllActions(new Action(authorizationActionName));
          if ((foundActs != null) && (foundActs.size() >= 1)) {
             authorizationAction = (Action) foundActs.get(0);
          } else {
@@ -69,29 +69,29 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
    /**
     * {@inheritDoc}
     */
-   public void setAuthorizationActionName(String authorizationActionName) {
-      String oldName = this.authorizationActionName;
-	  this.authorizationActionName = authorizationActionName;
+   public void setAuthorizationActionName(String newAuthorizationActionName) {
+      final String oldName = authorizationActionName;
+	  authorizationActionName = newAuthorizationActionName;
       authorizationAction = null;
 
       // // search for authorization action
-      // if ((authorizationActionName != null) && getState().equals(LifecycleStates.STARTED)) {
-      // invokeActionSearch(authorizationActionName, false, 0, this);
+      // if ((newAuthorizationActionName != null) && getState().equals(LifecycleStates.STARTED)) {
+      // invokeActionSearch(newAuthorizationActionName, false, 0, this);
       // }
 
       if ((thisAgent != null) && (LifecycleStates.STARTED.equals(thisAgent.getState()))) {
-         List<IActionDescription> foundActs = thisAgent.searchAllActions(new Action(authorizationActionName));
+         final List<IActionDescription> foundActs = thisAgent.searchAllActions(new Action(newAuthorizationActionName));
          if (log.isDebugEnabled()) {
         	 log.debug("FOUND: " + foundActs);
          }
          if ((foundActs != null) && (foundActs.size() >= 1)) {
             authorizationAction = (Action) foundActs.get(0);
          } else {
-             log.error("Authorization action not found: " + authorizationActionName);
+             log.error("Authorization action not found: " + newAuthorizationActionName);
          }
       }
       // Notify attribute change listeners
-      sendAttributeChangeNotification("authorizationActionName", "java.lang.String", oldName, this.authorizationActionName);
+      sendAttributeChangeNotification("authorizationActionName", "java.lang.String", oldName, authorizationActionName);
    }
 
    /**
@@ -108,9 +108,9 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
     */
    public void receiveResult(ActionResult result) {
       // handle result of authorization
-      DoAction doAction = _doActionAuthorizations.remove(result.getSessionId());
+      final DoAction doAction = doActionAuthorizations.remove(result.getSessionId());
       if (doAction != null) {
-         Serializable[] results = result.getResults();
+         final Serializable[] results = result.getResults();
          if (results != null) {
             if (results.length == 1) {
                try {
@@ -159,8 +159,8 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
          returnFailure(doAction, "Unknown user token");
       } else {
          // start authorization
-         String sessionId = invoke(authorizationAction, doAction.getSession(), new Serializable[] { doAction.getSession().getUserToken(), doAction.getAction() }, this);
-         _doActionAuthorizations.put(sessionId, doAction);
+         final String sessionId = invoke(authorizationAction, doAction.getSession(), new Serializable[] { doAction.getSession().getUserToken(), doAction.getAction() }, this);
+         doActionAuthorizations.put(sessionId, doAction);
       }
    }
 }

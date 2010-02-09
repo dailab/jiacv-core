@@ -50,14 +50,14 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
     }
     
     static ActionScope getScope(Method method) {
-      ActionScope scope = method.getAnnotation(Expose.class).scope();
+      final ActionScope scope = method.getAnnotation(Expose.class).scope();
             
       return scope;
     }
     
     static Class<?>[] getReturnTypes(Method method) {
-        Expose expAnno= method.getAnnotation(Expose.class);
-        Class<?> returnType= method.getReturnType();
+        final Expose expAnno= method.getAnnotation(Expose.class);
+        final Class<?> returnType= method.getReturnType();
         Class<?>[] returnTypes;
         if(returnType.isArray()) {
             returnTypes= expAnno.returnTypes().length > 0 ? expAnno.returnTypes() : new Class[]{returnType};
@@ -72,13 +72,13 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * Utility method which collects all exposed methods along the given hierarchy.
      * Methods which are annotated in more specialised classes will have precedence. 
      * 
-     * @param clazz
-     * @return
+     * @param clazz the class of the method exposing bean
+     * @return the found methods
      */
     static ArrayList<Method> getExposedPublicMethods(Class<? extends AbstractMethodExposingBean> clazz) {
-        Set<Class<?>> processed= new HashSet<Class<?>>();
-        Queue<Class<?>> nextStep= new LinkedList<Class<?>>();
-        ArrayList<Method> methods= new ArrayList<Method>();
+        final Set<Class<?>> processed= new HashSet<Class<?>>();
+        final Queue<Class<?>> nextStep= new LinkedList<Class<?>>();
+        final ArrayList<Method> methods= new ArrayList<Method>();
         nextStep.offer(clazz);
         Class<?> current;
         
@@ -86,7 +86,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
             current= nextStep.poll();
             if(processed.add(current)) {
                 for(Method method : current.getDeclaredMethods()) {
-                    int modifiers= method.getModifiers();
+                    final int modifiers= method.getModifiers();
                     
                     if(Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) {
                         continue;
@@ -131,19 +131,21 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * Utility method for checking equality of methods without regard of the
      * declaring class.
      * 
-     * @param a
-     * @param b
-     * @return
+     * @param a the first method
+     * @param b the second method
+     * @return the result of equality check
      */
     static boolean equalsPublicMethod(Method a, Method b) {
-        if(!a.getName().equals(b.getName()))
+        if(!a.getName().equals(b.getName())) {
             return false;
+        }
         
-        Class<?>[] aParams;
-        Class<?>[] bParams;
+        Class<?>[] aParams = a.getParameterTypes();
+        Class<?>[] bParams = b.getParameterTypes();
         
-        if((aParams= a.getParameterTypes()).length != (bParams= b.getParameterTypes()).length)
+        if(aParams.length != bParams.length) {
             return false;
+        }
         
         for(int i= 0; i < aParams.length; ++i) {
             if(!aParams[i].equals(bParams[i]))
@@ -156,15 +158,18 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
     private static final Class<?>[] EMPTY_CLASSES= new Class[0];
     protected static final char METHOD_SEPARATING_CHAR= '#';
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public final void doAction(DoAction doAction) throws Exception {
     	if (log.isDebugEnabled()) {
     		log.debug("typechecking is '" + doAction.typeCheck() + "'");
     	}
         
-        Action action= (Action)doAction.getAction();
-        Method method= searchMethod(action.getName(), action.getInputTypes());
+        final Action action= (Action)doAction.getAction();
+        final Method method= searchMethod(action.getName(), action.getInputTypes());
         if(method != null) {
-            Serializable result= (Serializable)method.invoke(this, (Object[]) doAction.getParams());
+            final Serializable result= (Serializable)method.invoke(this, (Object[]) doAction.getParams());
         	if (log.isDebugEnabled()) {
         		log.debug("action processed and about to write result...");
         	}
@@ -181,16 +186,19 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         overrideDoAction(doAction);
     }
 
+	/**
+	 * {@inheritDoc}
+	 */
     public final List<? extends Action> getActions() {
-        ArrayList<Action> actions= new ArrayList<Action>();
+        final ArrayList<Action> actions= new ArrayList<Action>();
         
         for(Method method : getExposedPublicMethods(getClass())) {
             // check for Expose annotation
-            Class<?>[] returnTypes= getReturnTypes(method);
-            String name= getName(method);
-            ActionScope scope = getScope(method);
+            final Class<?>[] returnTypes= getReturnTypes(method);
+            final String name= getName(method);
+            final ActionScope scope = getScope(method);
             // build the action object
-            Action act =                 new Action(
+            final Action act = new Action(
                 name,
                 this,
                 method.getParameterTypes(),
@@ -213,18 +221,18 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
     protected List<? extends Action> overrideGetActions() {return Collections.emptyList();}
     
     private Method searchMethod(String name, List<Class<?>> parameters) {
-        String originalName= name;
+        final String originalName= name;
         String assumedMethodName= null;
         // check for hashmark
-        int sep= name.indexOf(METHOD_SEPARATING_CHAR);
+        final int sep= name.indexOf(METHOD_SEPARATING_CHAR);
         
         if(sep > 0 && sep < name.length() - 1) {
             assumedMethodName= name.substring(sep + 1);
         }
         
         for(Method method : getExposedPublicMethods(getClass())) {
-            Expose exposeAnno= method.getAnnotation(Expose.class);
-            List<Class<?>> mpar= Arrays.asList(method.getParameterTypes());
+            final Expose exposeAnno= method.getAnnotation(Expose.class);
+            final List<Class<?>> mpar= Arrays.asList(method.getParameterTypes());
             
             if(mpar.size() == parameters.size()) {
                 if(exposeAnno.name().equals(originalName) || (assumedMethodName != null && method.getName().equals(assumedMethodName))) {
@@ -260,28 +268,28 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 	 */
 	@SuppressWarnings("unchecked")
     public TabularData getActionList() {
-        List<? extends Action> actions = getActions();
+        final List<? extends Action> actions = getActions();
         if (actions.isEmpty()) {
         	return null;
         }
 
         try {
         	// create empty table
-        	String[] itemNames = new String[] {"Name", "InputTypes", "ResultTypes", "ProviderBean"};
-        	OpenType[] itemTypes = new OpenType[] {SimpleType.STRING, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), SimpleType.STRING};
-        	CompositeType rowType = new CompositeType(actions.get(0).getClass().getName(), "provided action", itemNames, itemNames, itemTypes);
-        	TabularType tabularType = new TabularType(actions.getClass().getName(), "list of provided actions", rowType, new String[] {"Name", "InputTypes"});
-        	TabularData actionList = new TabularDataSupport(tabularType);
+        	final String[] itemNames = new String[] {"Name", "InputTypes", "ResultTypes", "ProviderBean"};
+        	final OpenType[] itemTypes = new OpenType[] {SimpleType.STRING, new ArrayType(1, SimpleType.STRING), new ArrayType(1, SimpleType.STRING), SimpleType.STRING};
+        	final CompositeType rowType = new CompositeType(actions.get(0).getClass().getName(), "provided action", itemNames, itemNames, itemTypes);
+        	final TabularType tabularType = new TabularType(actions.getClass().getName(), "list of provided actions", rowType, new String[] {"Name", "InputTypes"});
+        	final TabularData actionList = new TabularDataSupport(tabularType);
 
         	// fill table
         	for (Action action : actions) {
         		// get names of parameter and result classes
-        	    String[] inputTypeList = (action.getInputTypeNames()==null)? null:action.getInputTypeNames().toArray(new String[action.getInputTypeNames().size()]);
-        		String[] resultTypeList = (action.getResultTypeNames()==null)? null:action.getResultTypeNames().toArray(new String[action.getResultTypeNames().size()]);
+        	    final String[] inputTypeList = (action.getInputTypeNames()==null)? null:action.getInputTypeNames().toArray(new String[action.getInputTypeNames().size()]);
+        		final String[] resultTypeList = (action.getResultTypeNames()==null)? null:action.getResultTypeNames().toArray(new String[action.getResultTypeNames().size()]);
 
         		// create and add action description
-        		Object[] itemValues = new Object[] {action.getName(), inputTypeList, resultTypeList, action.getProviderBean().getBeanName()};
-        		CompositeData value = new CompositeDataSupport(rowType, itemNames, itemValues);
+        		final Object[] itemValues = new Object[] {action.getName(), inputTypeList, resultTypeList, action.getProviderBean().getBeanName()};
+        		final CompositeData value = new CompositeDataSupport(rowType, itemNames, itemValues);
         		actionList.put(value);
         	}
         	return actionList;

@@ -43,7 +43,7 @@ public class JmxAgentNodeManagementClientTest extends TestCase implements Notifi
 	 * for changes of the agent node's lifecycle state by using the management client.
 	 * @see ClassPathXmlApplicationContext#ClassPathXmlApplicationContext(String)
 	 * @see JmxManagementClient#JmxManagementClient()
-	 * @see JmxManagementClient#getAgentNodeNames()
+	 * @see JmxManagementClient#getAgentNodeUUIDs()
 	 * @see JmxManagementClient#getAgentNodeManagementClient(String)
 	 * @see JmxAgentNodeManagementClient#addAgentsListener(NotificationListener)
 	 * @see JmxAgentNodeManagementClient#addLifecycleStateListener(NotificationListener)

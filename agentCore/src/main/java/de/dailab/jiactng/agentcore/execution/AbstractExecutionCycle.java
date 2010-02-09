@@ -28,11 +28,11 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     AbstractExecutionCycleMBean {
 
   private int[]                 workload               = { 0, 0, 0 };
-  private final String[]        ATTRIBUTES             = { "ExecutionWorkload", "DoActionWorkload",
+  private static final String[] ATTRIBUTES             = { "ExecutionWorkload", "DoActionWorkload",
       "ActionResultWorkload"                          };
-  protected final int           EXECUTION              = 0;
-  protected final int           DO_ACTION              = 1;
-  protected final int           ACTION_RESULT          = 2;
+  protected static final int    EXECUTION              = 0;
+  protected static final int    DO_ACTION              = 1;
+  protected static final int    ACTION_RESULT          = 2;
   private int                   queueSize              = 100;
   private LinkedBlockingQueue[] queues                 = { new LinkedBlockingQueue<Boolean>(queueSize),
       new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize) };
@@ -47,7 +47,10 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
   /** If true, RemoteExecutor will be used, if false something different.*/
   private boolean useRemoteExecutor = true;
   
-  
+
+  /**
+   * During start of the execution cycle an optional remote executor will be created.
+   */
   @Override
   public void doStart() throws Exception {
 	  super.doStart();
@@ -56,6 +59,9 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 	  }
   }
 
+  /**
+   * During stop of the execution cycle an existing remote executor will be destroyed.
+   */
   @Override
   public void doStop() throws Exception {
 	  super.doStop();
@@ -86,11 +92,11 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
     actionPerformed(act, DoActionState.invoked, null);
     
-    IEffector providerBean = ((Action) act.getAction()).getProviderBean();
+    final IEffector providerBean = ((Action) act.getAction()).getProviderBean();
     if (providerBean != null) {
       try {
         if ((act.getAction().getResultTypes() != null) && (act.getAction().getResultTypes().size() > 0)) {
-          Session session = act.getSession();
+          final Session session = act.getSession();
           if (session.getCurrentCallDepth() == null) {
             session.setCurrentCallDepth(1);
           } else {
@@ -100,7 +106,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
         }
         
         // test for authorization if applicable
-        Session session = act.getSession();
+        final Session session = act.getSession();
         if ((session.getUserToken() == null) && (session.getOriginalProvider() != null)
             && (session.getOriginalUser() != null) && session.getOriginalUser().equals(session.getOriginalProvider())) {
           // no user token, and user is equal to provider - invoke is allowed 
@@ -135,11 +141,11 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    * @see #actionPerformed(DoAction, DoActionState, Object[])
    */
   protected void processResult(ActionResult actionResult) {
-    DoAction doAct = (DoAction) actionResult.getSource();
+    final DoAction doAct = (DoAction) actionResult.getSource();
     actionPerformed(doAct, (actionResult.getFailure() == null) ? DoActionState.success : DoActionState.failed,
         (actionResult.getFailure() == null) ? actionResult.getResults() : new Object[] { actionResult.getFailure() });
 
-    Session session = doAct.getSession();
+    final Session session = doAct.getSession();
     if (session.getCurrentCallDepth() == null) {
       session.setCurrentCallDepth(1);
     }
@@ -214,7 +220,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    */
   protected void updateWorkload(int type, boolean active) {
     // update queue
-    LinkedBlockingQueue<Boolean> queue = (LinkedBlockingQueue<Boolean>) queues[type];
+    final LinkedBlockingQueue<Boolean> queue = (LinkedBlockingQueue<Boolean>) queues[type];
     if (queue.remainingCapacity() == 0) {
       queue.poll();
     }
@@ -227,7 +233,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
         actives++;
       }
     }
-    int oldWorkload = workload[type];
+    final int oldWorkload = workload[type];
     workload[type] = (actives * 100) / queueSize;
     if (oldWorkload != workload[type]) {
       workloadChanged(ATTRIBUTES[type], oldWorkload, workload[type]);
@@ -245,7 +251,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    *          The new value of the workload attribute.
    */
   private void workloadChanged(String attribute, int oldWorkload, int newWorkload) {
-    Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
+    final Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
         "Workload changed ", attribute, "int", oldWorkload, newWorkload);
     sendNotification(n);
   }
@@ -261,7 +267,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    *          The result or failure of the action execution or <code>null</code> if the execution is not yet finished.
    */
   public void actionPerformed(DoAction action, DoActionState state, Object[] result) {
-    Notification n = new ActionPerformedNotification(this, sequenceNumber++, System.currentTimeMillis(),
+    final Notification n = new ActionPerformedNotification(this, sequenceNumber++, System.currentTimeMillis(),
         "Action performed", action, state, result);
 
     sendNotification(n);
@@ -275,17 +281,17 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    */
   @Override
   public MBeanNotificationInfo[] getNotificationInfo() {
-    MBeanNotificationInfo[] parent = super.getNotificationInfo();
-    int size = parent.length;
-    MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
+    final MBeanNotificationInfo[] parent = super.getNotificationInfo();
+    final int size = parent.length;
+    final MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
     for (int i = 0; i < size; i++) {
       result[i] = parent[i];
     }
 
-    String[] types = new String[] { ActionPerformedNotification.ACTION_PERFORMED };
-    String name = ActionPerformedNotification.class.getName();
-    String description = "An action was performed";
-    MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description);
+    final String[] types = new String[] { ActionPerformedNotification.ACTION_PERFORMED };
+    final String name = ActionPerformedNotification.class.getName();
+    final String description = "An action was performed";
+    final MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description);
     result[size] = info;
     return result;
   }
@@ -346,29 +352,49 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void setAutoExecutionServices(List<String> actionIds) {
-    this.autoExecutionServices = actionIds;
+    autoExecutionServices = actionIds;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public List<String> getAutoExecutionServices() {
-    return this.autoExecutionServices;
+    return autoExecutionServices;
 
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public void setAutoExecutionType(boolean continous) {
-    this.continousAutoExecution = continous;
+    continousAutoExecution = continous;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   public boolean getAutoExecutionType() {
-    return this.continousAutoExecution;
+    return continousAutoExecution;
   }
 
+  /**
+   * Check if a remote executor is used.
+   * @return remote executor is used or not
+   */
   public boolean isUseRemoteExecutor() {
-    return this.useRemoteExecutor;
+    return useRemoteExecutor;
   }
 
-  public void setUseRemoteExecutor(boolean useRemoteExecutor) {
-    this.useRemoteExecutor = useRemoteExecutor;
+  /**
+   * Set that a remote executor will be used or not.
+   * @param newUseRemoteExecutor <code>true</code> if a remote executor will be used
+   */
+  public void setUseRemoteExecutor(boolean newUseRemoteExecutor) {
+    useRemoteExecutor = newUseRemoteExecutor;
   }
 
 }

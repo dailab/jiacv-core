@@ -2,8 +2,6 @@ package de.dailab.jiactng.agentcore.management.jmx;
 
 import java.util.Map;
 
-import javax.security.auth.login.AppConfigurationEntry;
-
 /**
  * Implementation of a configurable JAAS login module.
  * @author Jan Keiser
@@ -24,10 +22,10 @@ public class JaasConfigurationEntry {
 
 	/**
 	 * Setter for the name of the login module.
-	 * @param loginModuleName The name of the login module.
+	 * @param newLoginModuleName The name of the login module.
 	 */
-	public void setLoginModuleName(String loginModuleName) {
-		this.loginModuleName = loginModuleName;
+	public void setLoginModuleName(String newLoginModuleName) {
+		loginModuleName = newLoginModuleName;
 	}
 
 	/**
@@ -40,10 +38,10 @@ public class JaasConfigurationEntry {
 
 	/**
 	 * Setter for the control flag of the login module.
-	 * @param controlFlag One of "optional", "required", "requisite" or "sufficient".
+	 * @param newControlFlag One of "optional", "required", "requisite" or "sufficient".
 	 */
-	public void setControlFlag(String controlFlag) {
-		this.controlFlag = controlFlag;
+	public void setControlFlag(String newControlFlag) {
+		controlFlag = newControlFlag;
 	}
 
 	/**
@@ -56,10 +54,10 @@ public class JaasConfigurationEntry {
 
 	/**
 	 * Setter for options of the login module.
-	 * @param options The options of the login module as set of key-value pairs.
+	 * @param newOptions The options of the login module as set of key-value pairs.
 	 */
-	public void setOptions(Map<String,String> options) {
-		this.options = options;
+	public void setOptions(Map<String,String> newOptions) {
+		options = newOptions;
 	}
 
 }

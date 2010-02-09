@@ -58,7 +58,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
       // execute the ripest bean
       IAgentBean minBean = null;
       long minExecutionTime = Long.MAX_VALUE;
-      long now = System.currentTimeMillis();
+      final long now = System.currentTimeMillis();
       for (IAgentBean bean : thisAgent.getAgentBeans()) {
         // check bean's state, if not started --> reject
         if (bean.getState() != LifecycleStates.STARTED) {
@@ -104,7 +104,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
 
       // process one doAction
       // TODO: check if read can be used
-      DoAction act = memory.remove(DOACTION_TEMPLATE);
+      final DoAction act = memory.remove(DOACTION_TEMPLATE);
 
       boolean actionPerformed = false;
       if (act != null) {
@@ -117,7 +117,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
 
       // process one actionResult
       // TODO: check if read can be used
-      Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
+      final Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
       int countNew = 0;
       for (ActionResult ar : resultSet) {
         synchronized (this) {
@@ -130,7 +130,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
       if (!pendingResults.isEmpty()) {
         resultProcessed = true;
         synchronized (this) {
-          ActionResult actionResult = pendingResults.iterator().next();
+          final ActionResult actionResult = pendingResults.iterator().next();
           processResult(actionResult);
           pendingResults.remove(actionResult);
         }
@@ -150,11 +150,11 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
        * If Session has a timeout
        */
       synchronized (memory) {
-        Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
+        final Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
         for (Session session : sessions) {
           if (session.isTimeout()) {
             // session has timeout
-            ArrayList<SessionEvent> history = session.getHistory();
+            final ArrayList<SessionEvent> history = session.getHistory();
 
             // Does Session is related to DoAction?
             boolean doActionFound = false;
@@ -162,12 +162,12 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
               if (event instanceof DoAction) {
                 // doAction found
                 doActionFound = true;
-                DoAction doAction = (DoAction) event;
+                final DoAction doAction = (DoAction) event;
                 if (doAction.getAction() instanceof Action) {
                   // Got an Action, so let's cancel this
                   // doAction
 
-                  Action action = (Action) doAction.getAction();
+                  final Action action = (Action) doAction.getAction();
                   log.debug("canceling DoAction " + doAction);
 
                   ActionResult result = null;
@@ -181,7 +181,7 @@ public class SimpleExecutionCycle extends AbstractExecutionCycle {
 
                   if (session.getSource() != null) {
                     log.debug("sending timeout Result to source of Session " + session);
-                    ResultReceiver receiver = session.getSource();
+                    final ResultReceiver receiver = session.getSource();
 
                     if (result == null) {
                       result = new ActionResult(doAction, new TimeoutException("DoAction has timeout"));

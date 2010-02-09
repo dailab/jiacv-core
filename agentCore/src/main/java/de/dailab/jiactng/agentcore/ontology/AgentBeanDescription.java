@@ -17,39 +17,57 @@ public class AgentBeanDescription implements IFact {
 	/** The current state of the agentbean. */
 	private transient String state;
 
+	/**
+	 * Creates the description of an agent bean.
+	 * @param name the name of the agent bean
+	 * @param state the life-cycle state of the agent bean
+	 */
 	public AgentBeanDescription(String name, String state) {
 		this.name = name;
 		this.state = state;
 	}
 
 	/**
-	 * @return the name of the agentbean
+	 * Get the name of the agent bean.
+	 * @return the name of the agent bean
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @param name the name to set
+	 * Set the name of the agent bean.
+	 * @param newName the name to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String newName) {
+		name = newName;
 	}
 
 	/**
-	 * @return the current state of the agentbean 
+	 * Get the life-cycle state of the agent bean.
+	 * @return the current life-cycle state of the agent bean 
+	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
 	public String getState() {
 		return state;
 	}
 
 	/**
-	 * @param state the state to set
+	 * Set the life-cycle state of the agent bean
+	 * @param newState the life-cycle state to set
+	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
-	public void setState(String state) {
-		this.state = state;
+	public void setState(String newState) {
+		state = newState;
 	}
-	
+
+	/**
+	 * Checks the equality of two agent bean descriptions. The descriptions are equal
+	 * if their names are equal.
+	 * @param obj the other agent bean description
+	 * @return the result of the equality check
+	 * @see EqualityChecker#equals(Object, Object)
+	 */
     @Override
     public boolean equals(Object obj) {
         if(obj == this) {
@@ -64,11 +82,21 @@ public class AgentBeanDescription implements IFact {
         return EqualityChecker.equals(name, other.name);
     }
 
+    /**
+	 * Returns the hash code by calculation from this class and the agent bean name, 
+	 * thus it is the same hash code for all agent bean descriptions with the same name.
+	 * @return the calculated hash code
+     */
     @Override
     public int hashCode() {
         return AgentBeanDescription.class.hashCode() ^ (name != null ? name.hashCode() : 0);
     }
 
+    /**
+	 * Returns a multiline text which contains the name and life-cycle state
+	 * of the agent bean description.
+	 * @return a string representation of the agent bean description
+     */
     @Override
     public String toString() {
         StringBuilder builder= new StringBuilder();

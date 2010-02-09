@@ -30,7 +30,12 @@ import javax.security.auth.login.LoginException;
 public class JaasAuthenticator implements JMXAuthenticator {
 
 	protected Configuration configuration;
-	
+
+	/**
+	 * Authenticates a management client with the given client credentials.
+	 * @param credentials a string array containing user name and password.
+	 * @return the authenticated subject containing its associated principals.
+	 */
 	@Override
 	public Subject authenticate(Object credentials) {
         // verify that credentials is of type String[]
@@ -50,14 +55,14 @@ public class JaasAuthenticator implements JMXAuthenticator {
         
         // perform authentication
 		try {
-			LoginContext lc = new LoginContext("LoginJaas", null, 
+			final LoginContext lc = new LoginContext("LoginJaas", null, 
 					new JaasCallbackHandler(aCredentials[0], aCredentials[1].toCharArray()), 
 					configuration);
 			lc.login();
-			Set<Principal> principals = lc.getSubject().getPrincipals();
+			final Set<Principal> principals = lc.getSubject().getPrincipals();
 
 			// transform to JMX principals
-			HashSet<JMXPrincipal> jmxPrincipals = new HashSet<JMXPrincipal>();
+			final HashSet<JMXPrincipal> jmxPrincipals = new HashSet<JMXPrincipal>();
 			for (Principal principal : principals) {
 				jmxPrincipals.add(new JMXPrincipal(principal.getName()));
 			}
@@ -104,11 +109,11 @@ public class JaasAuthenticator implements JMXAuthenticator {
 		 * @param entries The list of configured JAAS login modules.
 		 */
 		public JaasConfiguration(List<JaasConfigurationEntry> entries) {
-			int size = entries.size();
+			final int size = entries.size();
 			this.entries = new AppConfigurationEntry[size];
 			for (int i=0; i<size; i++) {
-				JaasConfigurationEntry entry = entries.get(i);
-				String controlFlag = entry.getControlFlag();
+				final JaasConfigurationEntry entry = entries.get(i);
+				final String controlFlag = entry.getControlFlag();
 				AppConfigurationEntry.LoginModuleControlFlag flag = null;
 				if (controlFlag.equals("optional")) {
 					flag = AppConfigurationEntry.LoginModuleControlFlag.OPTIONAL;
@@ -161,7 +166,7 @@ public class JaasAuthenticator implements JMXAuthenticator {
 	            if (callbacks[i] instanceof TextOutputCallback) {
 	  
 	                // display the message according to the specified type
-	                TextOutputCallback toc = (TextOutputCallback)callbacks[i];
+	                final TextOutputCallback toc = (TextOutputCallback)callbacks[i];
 	                switch (toc.getMessageType()) {
 	                case TextOutputCallback.INFORMATION:
 	                    System.out.println(toc.getMessage());
@@ -179,13 +184,13 @@ public class JaasAuthenticator implements JMXAuthenticator {
 	            } else if (callbacks[i] instanceof NameCallback) {
 	  
 	                // provide username
-	                NameCallback nc = (NameCallback)callbacks[i];
+	                final NameCallback nc = (NameCallback)callbacks[i];
 	                nc.setName(username);
 
 	            } else if (callbacks[i] instanceof PasswordCallback) {
 	  
 	                // provide sensitive information
-	                PasswordCallback pc = (PasswordCallback)callbacks[i];
+	                final PasswordCallback pc = (PasswordCallback)callbacks[i];
 	                pc.setPassword(password);
 	  
 	            } else {

@@ -38,7 +38,7 @@ public class JmxAgentManagementClientTest extends TestCase implements Notificati
 	 * agent list.
 	 * @see ClassPathXmlApplicationContext#ClassPathXmlApplicationContext(String)
 	 * @see JmxManagementClient#JmxManagementClient()
-	 * @see JmxManagementClient#getAgentNodeNames()
+	 * @see JmxManagementClient#getAgentNodeUUIDs()
 	 * @see JmxManagementClient#getAgentManagementClient(String, String)
 	 * @see JmxAgentNodeManagementClient#addAgentsListener(NotificationListener)
 	 * @see JmxAgentManagementClient#addLifecycleStateListener(NotificationListener)

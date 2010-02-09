@@ -132,11 +132,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * Configuration of a set of JMX connector server used for remote management.
 	 * 
-	 * @param jmxConnectors
+	 * @param newJmxConnectors
 	 *            the set of connectors.
 	 */
-	public final void setJmxConnectors(Set<Map<String, Object>> jmxConnectors) {
-		this.jmxConnectors = jmxConnectors;
+	public final void setJmxConnectors(Set<Map<String, Object>> newJmxConnectors) {
+		jmxConnectors = newJmxConnectors;
 	}
 
 	/**
@@ -151,10 +151,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setAgents(List<IAgent> agents) {
+	public final void setAgents(List<IAgent> newAgents) {
 		// owner of agent node is also owner of the initially created agents
 		final String owner = getOwner();
-		for (IAgent agent : agents) {
+		for (IAgent agent : newAgents) {
 			if (agent.getOwner() == null) {
 				agent.setOwner(owner);
 			}
@@ -164,8 +164,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 		
 		// refresh agent list
-		this.agents.clear();// TODO is this really necessary???
-		this.agents.addAll(agents);
+		agents.clear();// TODO is this really necessary???
+		agents.addAll(newAgents);
 	}
 
 	/**
@@ -342,8 +342,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
-	public final void setName(String name) {
-		this.name = name;
+	public final void setName(String newName) {
+		name = newName;
 	}
 
 	/**
@@ -426,8 +426,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
-	public void setBeanName(String name) {
-		setName(name);
+	public void setBeanName(String newName) {
+		setName(newName);
 	}
 
 	/**

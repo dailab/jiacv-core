@@ -35,11 +35,11 @@ public final class JiacMessage implements IJiacMessage {
     
     
     
-   private IFact _payload;
+   private IFact payload;
 
-   private Map<String, String> _headers;
+   private Map<String, String> headers;
 
-   private transient boolean _recursionDetected = false;
+   private transient boolean recursionDetected = false;
 
    /**
     * Constructor for a template message with no content.
@@ -48,79 +48,117 @@ public final class JiacMessage implements IJiacMessage {
       this(null, null);
    }
 
+   /**
+    * Creates a message with a given payload.
+    * @param payload the payload of the message
+    */
    public JiacMessage(IFact payload) {
       this(payload, null);
    }
 
+   /**
+    * Creates a message with a given payload and reply-to-address.
+    * @param payload the payload of the message
+    * @param replyToAddress the address where reply messages will be send
+    */
    public JiacMessage(IFact payload, ICommunicationAddress replyToAddress) {
-      _payload = payload;
-      _headers = new Hashtable<String, String>();
+      this.payload = payload;
+      headers = new Hashtable<String, String>();
       if (replyToAddress != null) {
          setHeader(Header.REPLY_TO, replyToAddress.toString());
       }
    }
 
+   /**
+    * {@inheritDoc}
+    */
    public IFact getPayload() {
-      return _payload;
+      return payload;
    }
 
-   public void setPayload(IFact payload) {
-      this._payload = payload;
+   /**
+    * Set the payload (content) of this message.
+    * @param newPayload the payload to set
+    */
+   public void setPayload(IFact newPayload) {
+      payload = newPayload;
    }
 
+   /**
+    * {@inheritDoc}
+    */
    public String getHeader(String key) {
-      return _headers.get(key);
+      return headers.get(key);
    }
 
+   /**
+    * {@inheritDoc}
+    */
    public void setHeader(String key, String value) {
       if (value == null) {
-         _headers.remove(key);
+         headers.remove(key);
       }
       else {
-         _headers.put(key, value);
+         headers.put(key, value);
       }
    }
 
+   /**
+    * {@inheritDoc}
+    */
    public Set<String> getHeaderKeys() {
-      Set<String> result = new HashSet<String>();
-      result.addAll(_headers.keySet());
+      final Set<String> result = new HashSet<String>();
+      result.addAll(headers.keySet());
       return result;
    }
 
+   /**
+	* Checks the equality of two messages. The messages are equal
+	* if a recursion was detected within this message, or if their 
+	* headers and payload are equal.
+	* @param obj the other message
+	* @return the result of the equality check
+    */
    @Override
-   public synchronized final boolean equals(Object obj) {
-      if (_recursionDetected) { return true; }
+   public synchronized boolean equals(Object obj) {
+      if (recursionDetected) { return true; }
 
       try {
-         _recursionDetected = true;
+         recursionDetected = true;
          if (obj == this) { return true; }
 
          if (obj == null || !(obj instanceof JiacMessage)) { return false; }
 
-         JiacMessage other = (JiacMessage) obj;
-         Set<String> otherKeys = other.getHeaderKeys();
+         final JiacMessage other = (JiacMessage) obj;
+         final Set<String> otherKeys = other.getHeaderKeys();
 
-         if (otherKeys.size() != _headers.size()) { return false; }
+         if (otherKeys.size() != headers.size()) { return false; }
 
          for (String key : otherKeys) {
-            String myValue = _headers.get(key);
+            final String myValue = headers.get(key);
             if (myValue == null || !other.getHeader(key).equals(myValue)) { return false; }
          }
 
-         IFact otherPayload = other.getPayload();
-         return otherPayload != null && _payload != null ? otherPayload.equals(_payload) : otherPayload == _payload;
+         final IFact otherPayload = other.getPayload();
+         return otherPayload != null && payload != null ? otherPayload.equals(payload) : otherPayload == payload;
       }
       finally {
-         _recursionDetected = false;
+         recursionDetected = false;
       }
    }
 
+   /**
+	* Returns the hash code by calculation from this class, the headers, and payload.
+	* Thus it is the same hash code for all messages with the same headers and payload.
+	* It returns 0 if a recursion was detected within this message.
+	* @return the calculated hash code
+    */
    @Override
-   public synchronized final int hashCode() {
-      if (_recursionDetected) { return 0; }
+   public synchronized int hashCode() {
+      if (recursionDetected) { return 0; }
 
       try {
-         _recursionDetected = true;
+         recursionDetected = true;
          int hashCode = JiacMessage.class.hashCode();
 
          for (String key : getHeaderKeys()) {
@@ -128,29 +166,35 @@ public final class JiacMessage implements IJiacMessage {
             hashCode ^= getHeader(key).hashCode();
          }
 
-         if (_payload != null) {
-            hashCode ^= _payload.hashCode();
+         if (payload != null) {
+            hashCode ^= payload.hashCode();
          }
 
          return hashCode;
       }
       finally {
-         _recursionDetected = false;
+         recursionDetected = false;
       }
    }
 
+   /**
+	* Returns a single-line text which contains the headers, payload,
+	* and sender of the message. It returns only "&lt;recursion&gt;" 
+	* if a recursion was detected within this message.
+	* @return a string representation of the message
+    */
    public synchronized String toString() {
-      if (_recursionDetected) { return "<recursion>"; }
+      if (recursionDetected) { return "<recursion>"; }
 
       try {
-         _recursionDetected = true;
-         StringBuilder builder = new StringBuilder();
+         recursionDetected = true;
+         final StringBuilder builder = new StringBuilder();
          builder.append("[Headers: {");
-         int counter = _headers.size() - 1;
+         int counter = headers.size() - 1;
 
-         for (Iterator<String> keys = _headers.keySet().iterator(); keys.hasNext(); --counter) {
-            String key = keys.next();
-            builder.append(key).append("=>").append(_headers.get(key));
+         for (final Iterator<String> keys = headers.keySet().iterator(); keys.hasNext(); --counter) {
+            final String key = keys.next();
+            builder.append(key).append("=>").append(headers.get(key));
 
             if (counter > 0) {
                builder.append(";");
@@ -163,34 +207,51 @@ public final class JiacMessage implements IJiacMessage {
          return builder.toString();
       }
       finally {
-         _recursionDetected = false;
+         recursionDetected = false;
       }
    }
 
+   /**
+    * {@inheritDoc}
+    */
    public ICommunicationAddress getSender() {
-      String uri = getHeader(Header.SENDER);
+      final String uri = getHeader(Header.SENDER);
 
       if (uri != null) { return CommunicationAddressFactory.createFromURI(uri); }
 
       return null;
    }
 
+   /**
+    * {@inheritDoc}
+    */
    public ICommunicationAddress getReplyToAddress() {
-      String uri = getHeader(Header.REPLY_TO);
+      final String uri = getHeader(Header.REPLY_TO);
 
       if (uri != null) { return CommunicationAddressFactory.createFromURI(uri); }
 
       return null;
    }
 
+   /**
+    * Set the protocol of this message.
+    * @param protocol the protocol to set
+    */
    public void setProtocol(String protocol) {
       setHeader(Header.PROTOCOL, protocol);
    }
 
+   /**
+    * {@inheritDoc}
+    */
    public String getProtocol() {
       return getHeader(Header.PROTOCOL);
    }
 
+   /**
+    * Set the sender of this message.
+    * @param sender the communication address of the sender
+    */
    public void setSender(ICommunicationAddress sender) {
       setHeader(Header.SENDER, sender != null ? sender.toString() : null);
    }
@@ -204,14 +265,14 @@ public final class JiacMessage implements IJiacMessage {
     * @see javax.management.openmbean.CompositeType
     */
    public OpenType<?> getDescriptionType() throws OpenDataException {
-      ArrayList<String> itemNames = new ArrayList<String>();
-      ArrayList<OpenType<?>> itemTypes = new ArrayList<OpenType<?>>();
+      final ArrayList<String> itemNames = new ArrayList<String>();
+      final ArrayList<OpenType<?>> itemTypes = new ArrayList<OpenType<?>>();
 
       // create open type of message payload
-      if (_payload != null) {
+      if (payload != null) {
          itemNames.add(ITEMNAME_PAYLOAD);
-         if (_payload instanceof JmxDescriptionSupport) {
-            itemTypes.add(((JmxDescriptionSupport) _payload).getDescriptionType());
+         if (payload instanceof JmxDescriptionSupport) {
+            itemTypes.add(((JmxDescriptionSupport) payload).getDescriptionType());
          }
          else {
             itemTypes.add(SimpleType.STRING);
@@ -219,24 +280,24 @@ public final class JiacMessage implements IJiacMessage {
       }
 
       // create open type of message headers
-      if (_headers != null) {
+      if (headers != null) {
          itemNames.add(ITEMNAME_HEADERS);
-         String[] headerNames = getHeaderKeys().toArray(new String[getHeaderKeys().size()]);
-         int headerSize = headerNames.length;
-         OpenType<?>[] headerTypes = new OpenType<?>[headerSize];
+         final String[] headerNames = getHeaderKeys().toArray(new String[getHeaderKeys().size()]);
+         final int headerSize = headerNames.length;
+         final OpenType<?>[] headerTypes = new OpenType<?>[headerSize];
          for (int i = 0; i < headerSize; i++) {
             // each header value is of type String
             headerTypes[i] = SimpleType.STRING;
          }
-         itemTypes.add(new CompositeType(_headers.getClass().getName(), "headers of a JIAC-TNG message", headerNames, headerNames, headerTypes));
+         itemTypes.add(new CompositeType(headers.getClass().getName(), "headers of a JIAC-TNG message", headerNames, headerNames, headerTypes));
       }
 
       // use names of message items as their description
-      ArrayList<String> itemDescriptions = itemNames;
+      final ArrayList<String> itemDescriptions = itemNames;
 
       // transform list to array
-      int compositeSize = itemTypes.size();
-      OpenType<?>[] itemTypesArray = new OpenType<?>[compositeSize];
+      final int compositeSize = itemTypes.size();
+      final OpenType<?>[] itemTypesArray = new OpenType<?>[compositeSize];
       for (int i = 0; i < compositeSize; i++) {
          itemTypesArray[i] = itemTypes.get(i);
       }
@@ -259,24 +320,24 @@ public final class JiacMessage implements IJiacMessage {
     * @see javax.management.openmbean.CompositeData
     */
    public Object getDescription() throws OpenDataException {
-      Map<String, Object> items = new HashMap<String, Object>();
-      CompositeType type = (CompositeType) getDescriptionType();
+      final Map<String, Object> items = new HashMap<String, Object>();
+      final CompositeType type = (CompositeType) getDescriptionType();
 
       // create open data of message payload
-      if (_payload != null) {
-         if (_payload instanceof JmxDescriptionSupport) {
-            items.put(ITEMNAME_PAYLOAD, ((JmxDescriptionSupport) _payload).getDescription());
+      if (payload != null) {
+         if (payload instanceof JmxDescriptionSupport) {
+            items.put(ITEMNAME_PAYLOAD, ((JmxDescriptionSupport) payload).getDescription());
          }
          else {
-            items.put(ITEMNAME_PAYLOAD, _payload.toString());
+            items.put(ITEMNAME_PAYLOAD, payload.toString());
          }
       }
 
       // create open data of message headers
-      if (_headers != null) {
-         String[] headerNames = getHeaderKeys().toArray(new String[getHeaderKeys().size()]);
-         int headerSize = headerNames.length;
-         Object[] headerValues = new Object[headerSize];
+      if (headers != null) {
+         final String[] headerNames = getHeaderKeys().toArray(new String[getHeaderKeys().size()]);
+         final int headerSize = headerNames.length;
+         final Object[] headerValues = new Object[headerSize];
          for (int i = 0; i < headerSize; i++) {
             headerValues[i] = getHeader(headerNames[i]);
          }

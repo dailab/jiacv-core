@@ -39,11 +39,22 @@ public class AgentDescription implements IAgentDescription {
 //	public AgentDescription(String aid, String name, String state) {
 //        this(aid, name, state, name != null ? CommunicationAddressFactory.createMessageBoxAddress(aid) : null);
 //	}
-    
+
+	/**
+	 * Creates an empty agent description.
+	 */
 	public AgentDescription() {
 	    this(null, null, null, null, null, null);
 	}
-	
+
+	/**
+	 * Creates a description of a stationary agent.
+	 * @param aid the unique identifier of the agent
+	 * @param name the name of the agent
+	 * @param state the life-cycle state of the agent
+	 * @param messageBoxAddress the communication address of the agent
+	 * @param agentNodeUUID the unique identifier of the agents node
+	 */
     public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
 //        this.aid=aid;
 //        this.name=name;
@@ -52,7 +63,16 @@ public class AgentDescription implements IAgentDescription {
 //        this.agentNodeUUID = agentNodeUUID;
     	this( aid,  name,  state,  messageBoxAddress,  agentNodeUUID, Boolean.valueOf(false));
     }
-    
+
+    /**
+     * Creates an agent description with mobility flag.
+	 * @param aid the unique identifier of the agent
+	 * @param name the name of the agent
+	 * @param state the life-cycle state of the agent
+	 * @param messageBoxAddress the communication address of the agent
+	 * @param agentNodeUUID the unique identifier of the agents node
+     * @param mobile the mobility of the agent
+     */
     public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID, Boolean mobile) {
         this.aid=aid;
         this.name=name;
@@ -65,20 +85,23 @@ public class AgentDescription implements IAgentDescription {
     
 
 	/**
-	 * @return the aid
+	 * Get the unique identifier of the agent.
+	 * @return the unique agent identifier
 	 */
 	public String getAid() {
 		return aid;
 	}
 
 	/**
-	 * @param aid the aid to set
+	 * Set the unique identifier of the agent.
+	 * @param newAid the unique agent identifier to set
 	 */
-	public void setAid(String aid) {
-		this.aid = aid;
+	public void setAid(String newAid) {
+		aid = newAid;
 	}
 
 	/**
+	 * Get the name of the agent.
 	 * @return the name
 	 */
 	public String getName() {
@@ -86,41 +109,54 @@ public class AgentDescription implements IAgentDescription {
 	}
 
 	/**
-	 * @param name the name to set
+	 * Set the name of the agent.
+	 * @param newName the name to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String newName) {
+		name = newName;
 	}
 
 	/**
-	 * @return the state
+	 * Get the life-cycle state of the agent.
+	 * @return the life-cycle state
+	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
 	public String getState() {
 		return state;
 	}
 	
 	/**
-	 * @param state the state to set
+	 * Set the life-cycle state of the agent
+	 * @param newState the life-cycle state to set
+	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
-	public void setState(String state) {
-		this.state = state;
+	public void setState(String newState) {
+		state = newState;
 	}
     
 	/**
-	 * @return the endpoint
-     * 
+	 * Get the communication address of the agent.
+	 * @return the communication end-point
 	 */
 	public IMessageBoxAddress getMessageBoxAddress() {
 		return messageBoxAddress;
 	}
 
 	/**
-	 * @param messageBoxAddress the endpoint to set
+	 * Set the communication address of the agent.
+	 * @param newMessageBoxAddress the communication end-point to set
 	 */
-	public void setMessageBoxAddress(IMessageBoxAddress messageBoxAddress) {
-		this.messageBoxAddress = messageBoxAddress;
+	public void setMessageBoxAddress(IMessageBoxAddress newMessageBoxAddress) {
+		messageBoxAddress = newMessageBoxAddress;
 	}
-    
+
+	/**
+	 * Checks the equality of two agent descriptions. The descriptions are equal
+	 * if their unique identifiers are equal or null.
+	 * @param obj the other agent description
+	 * @return the result of the equality check
+	 * @see EqualityChecker#equalsOrNull(Object, Object)
+	 */
     @Override
     public boolean equals(Object obj) {
         if(this == obj) {
@@ -131,18 +167,28 @@ public class AgentDescription implements IAgentDescription {
             return false;
         }
         
-        AgentDescription other= (AgentDescription) obj;
+        final AgentDescription other= (AgentDescription) obj;
         return EqualityChecker.equalsOrNull(aid, other.aid);
     }
-    
+
+    /**
+	 * Returns the hash code by calculation from this class and the AID, 
+	 * thus it is the same hash code for all agent descriptions with the same AID.
+	 * @return the calculated hash code
+     */
     @Override
     public int hashCode() {
         return AgentDescription.class.hashCode() ^ (aid != null ? aid.hashCode() : 0);
     }
 
+    /**
+	 * Returns a multiline text which contains the name, identifier, life-cycle state,
+	 * communication address, and mobility of the agent description.
+	 * @return a string representation of the agent description
+     */
     @Override
     public String toString() {
-        StringBuilder builder= new StringBuilder();
+        final StringBuilder builder= new StringBuilder();
 
         // name
         builder.append("Agent:\n name=");
@@ -189,7 +235,7 @@ public class AgentDescription implements IAgentDescription {
     }
 
     /**
-     * Returns the UUID of the AgentNode that is holding this agent
+     * Returns the UUID of the AgentNode that is holding this agent.
      * @return UUID of the agent node
      */
 	public String getAgentNodeUUID() {
@@ -197,13 +243,17 @@ public class AgentDescription implements IAgentDescription {
 	}
 	
 	/**
-	 * sets the UUID of the AgentNode that is holding this agent
+	 * Sets the UUID of the AgentNode that is holding this agent.
+	 * @param uuid the UUID of the agent node to set
 	 */
-	public void setAgentNodeUUID(String UUID){
-		agentNodeUUID = UUID;
+	public void setAgentNodeUUID(String uuid){
+		agentNodeUUID = uuid;
 	}
-	
-	
+
+	/**
+	 * Set the mobility of the agent.
+	 * @param mobile the mobility to set
+	 */
 	public void setMobile(Boolean mobile) {
 		
 		if (mobile == null) {
@@ -212,7 +262,11 @@ public class AgentDescription implements IAgentDescription {
 		
 		isMobile = mobile;
 	}
-	
+
+	/**
+	 * Get the mobility of the agent.
+	 * @return the mobility
+	 */
 	public Boolean isMobile() {
 		return isMobile;
 	}
@@ -237,7 +291,7 @@ public class AgentDescription implements IAgentDescription {
 	    * @see javax.management.openmbean.CompositeType
 	    */
 	   public OpenType<?> getDescriptionType() throws OpenDataException {
-	      OpenType<?>[] itemTypes = new OpenType<?>[] {
+	      final OpenType<?>[] itemTypes = new OpenType<?>[] {
 	    		  SimpleType.STRING, 
 	    		  SimpleType.STRING, 
 	    		  SimpleType.STRING, 
@@ -247,7 +301,7 @@ public class AgentDescription implements IAgentDescription {
 	      };
 
 	      // use names of agent description items as their description
-	      String[] itemDescriptions = getItemNames();
+	      final String[] itemDescriptions = getItemNames();
 
 	      // create and return open type of a JIAC agent description
 	      return new CompositeType(this.getClass().getName(), "standard JIAC-TNG agent description", getItemNames(), itemDescriptions, itemTypes);
@@ -262,7 +316,7 @@ public class AgentDescription implements IAgentDescription {
 	    * @see javax.management.openmbean.CompositeData
 	    */
 	   public Object getDescription() throws OpenDataException {
-	      Object[] itemValues = new Object[] {
+	      final Object[] itemValues = new Object[] {
 	    		  aid,
 	    		  name,
 	    		  agentNodeUUID,
@@ -271,7 +325,7 @@ public class AgentDescription implements IAgentDescription {
 	    		  (messageBoxAddress != null)? messageBoxAddress.getName():null,
 	      };
 
-	      CompositeType type = (CompositeType) getDescriptionType();
+	      final CompositeType type = (CompositeType) getDescriptionType();
 	      return new CompositeDataSupport(type, getItemNames(), itemValues);
 	   }
 }

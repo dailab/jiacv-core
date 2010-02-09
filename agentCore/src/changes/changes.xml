@@ -15,7 +15,7 @@
 				in the site.
 			</action>
 			<action dev="joachim" type="add">
-        Strict mode support added to <code>de.dailab.jiactng.agentcore.lifecycle.DefaultLifecycleHandler</code>.
+        Strict mode support added to de.dailab.jiactng.agentcore.lifecycle.DefaultLifecycleHandler.
 			</action>
 		</release>
 	</body>

@@ -290,7 +290,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * @param newState the new state of the lifecycle
      */
     public void stateChanged(LifecycleStates oldState, LifecycleStates newState) {
-        Notification n =
+        final Notification n =
                 new AttributeChangeNotification(this,
                 sequenceNumber++,
                 System.currentTimeMillis(),
@@ -310,12 +310,12 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-        String[] types = new String[] {
+        final String[] types = new String[] {
             AttributeChangeNotification.ATTRIBUTE_CHANGE
         };
-        String name = AttributeChangeNotification.class.getName();
-        String description = "An attribute of this MBean has changed";
-        MBeanNotificationInfo info =
+        final String name = AttributeChangeNotification.class.getName();
+        final String description = "An attribute of this MBean has changed";
+        final MBeanNotificationInfo info =
                 new MBeanNotificationInfo(types, name, description);
         return new MBeanNotificationInfo[] {info};
     }
@@ -343,10 +343,10 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	/**
 	 * Sets a logger to be used for logging purposes. It also sets the log level 
 	 * of this logger if it was preassigned with method <code>setLogLevel</code>.
-	 * @param log The logger instance.
+	 * @param newLog The logger instance.
 	 */
-	protected void setLog(Log log) {
-		this.log = log;
+	protected void setLog(Log newLog) {
+		log = newLog;
 		if ((log != null) && (logLevel != null) && (log instanceof Log4JLogger)) {
 			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
 		}
@@ -359,9 +359,9 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 		if (log == null) {
 			return null;
 		}
-		String[] itemNames = new String[] { "class", "debug", "error", "fatal", "info", "trace", "warn" };
+		final String[] itemNames = new String[] { "class", "debug", "error", "fatal", "info", "trace", "warn" };
 		try {
-			CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] { "Implementation of the logger instance", "debug",
+			final CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] { "Implementation of the logger instance", "debug",
 					"error", "fatal", "info", "trace", "warn" }, new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN,
 					SimpleType.BOOLEAN, SimpleType.BOOLEAN });
 			return new CompositeDataSupport(type, itemNames, new Object[] { log.getClass().getName(), log.isDebugEnabled(), log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(),

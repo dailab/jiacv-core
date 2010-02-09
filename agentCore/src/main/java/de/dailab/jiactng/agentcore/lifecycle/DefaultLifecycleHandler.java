@@ -17,9 +17,9 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 
 /**
  * Basic implementation for a default <code>LifecycleHandler</code>. It manages
- * the propagation of lifecycle events on behalf of the managed <code>ILifecycle/code>.
+ * the propagation of lifecycle events on behalf of the managed <code>ILifecycle</code>.
  * The <code>ILifecycle</code> implementation may call <code>beforeXXX()</code>
- * and <code>afterXXX()</code> when entering or leaving the lifecycle method
+ * and <code>afterXXX()</code> when entering or leaving the life-cycle method
  * <code>xxx()</code>.
  *
  * @author Joachim Fuchs
@@ -175,7 +175,7 @@ public class DefaultLifecycleHandler {
     		}
 //    	}
             
-        LifecycleStates oldState = state;
+        final LifecycleStates oldState = state;
         state = INITIALIZING;
         
         lifecycle.stateChanged(oldState, state);
@@ -195,7 +195,7 @@ public class DefaultLifecycleHandler {
      */
     public void afterInit(boolean success) throws IllegalStateException {
         
-        LifecycleStates oldState = state;
+        final LifecycleStates oldState = state;
         if (success) {
         	state = INITIALIZED;
         } else {
@@ -211,7 +211,7 @@ public class DefaultLifecycleHandler {
     /**
      * Call this method when entering <CODE>start()</CODE>. It sets the state to
      * STARTING and informs all listener. In strict mode the transition 
-     * <CODE>init()<CODE> will be done before if the current state is VOID.
+     * <CODE>init()</CODE> will be done before if the current state is VOID.
      * @throws IllegalStateException if strict mode and the current state is not READY or VOID
      * @see LifecycleStates#STARTING
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
@@ -240,7 +240,7 @@ public class DefaultLifecycleHandler {
     		}
 //    	}
 
-        LifecycleStates oldState = state;
+        final LifecycleStates oldState = state;
         state = STARTING;
         
         lifecycle.stateChanged(oldState, state);
@@ -260,7 +260,7 @@ public class DefaultLifecycleHandler {
      */
     public void afterStart(boolean success) throws IllegalStateException {
         
-        LifecycleStates oldState = state;
+        final LifecycleStates oldState = state;
         if (success) {
         	state = STARTED;
         } else {
@@ -292,7 +292,7 @@ public class DefaultLifecycleHandler {
     		}
 //    	}
             
-        LifecycleStates oldState = state;
+        final LifecycleStates oldState = state;
         state = STOPPING;
         
         lifecycle.stateChanged(oldState, state);
@@ -311,7 +311,7 @@ public class DefaultLifecycleHandler {
      */
     public void afterStop() throws IllegalStateException {
         
-        LifecycleStates oldState = state;
+        final LifecycleStates oldState = state;
         state = STOPPED;
         
         lifecycle.stateChanged(oldState, state);
@@ -323,7 +323,7 @@ public class DefaultLifecycleHandler {
     /**
      * Call this method when entering <CODE>cleanup()</CODE>. It sets the state to
      * CLEANING_UP and informs all listener. In strict mode the transition 
-     * <CODE>stop()<CODE> will be done before if the current state is STARTED.
+     * <CODE>stop()</CODE> will be done before if the current state is STARTED.
      * @throws IllegalStateException if strict mode and the current state is not READY or STARTED
      * @see LifecycleStates#CLEANING_UP
      * @see ILifecycle#stateChanged(LifecycleStates, LifecycleStates)
@@ -351,7 +351,7 @@ public class DefaultLifecycleHandler {
     		}
 //    	}
         
-        LifecycleStates oldState = state;
+        final LifecycleStates oldState = state;
         state = CLEANING_UP;
         
         lifecycle.stateChanged(oldState, state);
@@ -370,7 +370,7 @@ public class DefaultLifecycleHandler {
      */
     public void afterCleanup() throws IllegalStateException {
         
-        LifecycleStates oldState = state;
+        final LifecycleStates oldState = state;
         state = CLEANED_UP;
         
         lifecycle.stateChanged(oldState, state);

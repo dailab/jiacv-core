@@ -51,7 +51,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 	public RemoteExecutor(IMemory memory) {
 		this.memory = memory;
 		
-		JiacMessage template = new JiacMessage();
+		final JiacMessage template = new JiacMessage();
 		template.setProtocol(INVOKE);
 		memory.attach(this, template);
 		
@@ -62,34 +62,34 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 	@Override
 	public void notify(SpaceEvent<? extends IFact> event) {
 		if(event instanceof WriteCallEvent) {
-			WriteCallEvent writeCallEvent = (WriteCallEvent) event;
+			final WriteCallEvent writeCallEvent = (WriteCallEvent) event;
 			if (writeCallEvent.getObject() instanceof JiacMessage){
 				JiacMessage message = (JiacMessage)writeCallEvent.getObject();
 				if (message.getProtocol().equals(INVOKE)) {
 					message = memory.remove(message);
 					
 					if (message.getPayload() instanceof DoAction) {
-						DoAction doAction = (DoAction) message.getPayload();
-						Action localAction = (Action) memory.read(doAction.getAction());
+						final DoAction doAction = (DoAction) message.getPayload();
+						final Action localAction = (Action) memory.read(doAction.getAction());
 						
 						if (localAction != null) {
-							DoAction localDoAction = localAction.createDoAction(doAction.getSession(), doAction.getParams(), this);
+							final DoAction localDoAction = localAction.createDoAction(doAction.getSession(), doAction.getParams(), this);
 							localInvocations.put(localDoAction.getSessionId(), message);	
 							memory.write(localDoAction);
 						} else {
-							RemoteExecutionException ree = new RemoteExecutionException("No action found at provider!" + doAction.getAction().getProviderDescription().getAid());
-							ActionResult failure = new ActionResult(doAction, ree);
-							JiacMessage failureMessage = new JiacMessage(failure);
+							final RemoteExecutionException ree = new RemoteExecutionException("No action found at provider!" + doAction.getAction().getProviderDescription().getAid());
+							final ActionResult failure = new ActionResult(doAction, ree);
+							final JiacMessage failureMessage = new JiacMessage(failure);
 							failureMessage.setProtocol(INVOKE);
 							
-							Serializable[] params = new Serializable[]{failureMessage, message.getSender()};
-							DoAction sendDoAction = sendAction.createDoAction(params, this);
+							final Serializable[] params = new Serializable[]{failureMessage, message.getSender()};
+							final DoAction sendDoAction = sendAction.createDoAction(params, this);
 							memory.write(sendDoAction);
 						}
 					}
 					
 					else if (message.getPayload() instanceof ActionResult) {
-						ActionResult result = (ActionResult) message.getPayload();
+						final ActionResult result = (ActionResult) message.getPayload();
 						result.setSource(remoteInvocations.get(result.getSessionId()));
 						memory.write(result);
 					}
@@ -108,25 +108,25 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 	 * @param doAction the action to be invoked remotely
 	 */
 	public void executeRemote(DoAction doAction) {
-		ICommunicationAddress destination = doAction.getAction().getProviderDescription().getMessageBoxAddress();
+		final ICommunicationAddress destination = doAction.getAction().getProviderDescription().getMessageBoxAddress();
 		if (destination == null) {
 			memory.write(new ActionResult(doAction, new RemoteExecutionException("Provider has no address!")));
 			return;
 		}
 		
-		JiacMessage message = new JiacMessage(doAction);
+		final JiacMessage message = new JiacMessage(doAction);
 		message.setProtocol(INVOKE);
 		
-		Serializable[] params = new Serializable[] {message, destination};
-		DoAction sendDoAction = sendAction.createDoAction(params, this);
+		final Serializable[] params = new Serializable[] {message, destination};
+		final DoAction sendDoAction = sendAction.createDoAction(params, this);
 		memory.write(sendDoAction);
 		remoteInvocations.put(doAction.getSessionId(), doAction);
 		
-		Action act = (Action)doAction.getAction();
+		final Action act = (Action)doAction.getAction();
         try {
 			if ((act.getResultTypes() != null)
 					&& (act.getResultTypes().size() > 0)) {
-				Session session = doAction.getSession();
+				final Session session = doAction.getSession();
 				if (session.getCurrentCallDepth() == null) {
 					session.setCurrentCallDepth(1);
 				} else {
@@ -152,20 +152,20 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 			return;
 		}
 
-		JiacMessage message = localInvocations.get(result.getSessionId());
-		DoAction doAction = (DoAction)message.getPayload();
+		final JiacMessage message = localInvocations.get(result.getSessionId());
+		final DoAction doAction = (DoAction)message.getPayload();
 		ActionResult resultToSend;
 		if (result.getResults() != null) {
-			Action action = (Action)doAction.getAction();
+			final Action action = (Action)doAction.getAction();
 			resultToSend = action.createActionResult(doAction, result.getResults());
 		} else {
 			resultToSend = new ActionResult(doAction, result.getFailure());
 		}
-		JiacMessage resultMessage = new JiacMessage(resultToSend);
+		final JiacMessage resultMessage = new JiacMessage(resultToSend);
 		resultMessage.setProtocol(INVOKE);
 
-		Serializable[] params = new Serializable[]{resultMessage, message.getSender()};
-		DoAction sendDoAction = sendAction.createDoAction(params, this);
+		final Serializable[] params = new Serializable[]{resultMessage, message.getSender()};
+		final DoAction sendDoAction = sendAction.createDoAction(params, this);
 		memory.write(sendDoAction);
 	}
 }

@@ -45,11 +45,11 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 
 	/**
 	 * Sets the messageBox address of the node.
-	 * @param address the address of the node
+	 * @param newAddress the address of the node
 	 * @see ICommunicationAddress
 	 */
-	public void setAddress(ICommunicationAddress address) {
-		this.address = address;
+	public void setAddress(ICommunicationAddress newAddress) {
+		address = newAddress;
 	}
 
 	/**
@@ -62,10 +62,10 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 
 	/**
 	 * Sets the time when the node has reported alive.
-	 * @param alive the time when the node has reported alive
+	 * @param newAlive the time when the node has reported alive
 	 */
-	public void setAlive(long alive) {
-		this.alive = alive;
+	public void setAlive(long newAlive) {
+		alive = newAlive;
 	}
 
 	private String[] getItemNames() {
@@ -84,13 +84,13 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 	    * @see javax.management.openmbean.CompositeType
 	    */
 	   public OpenType<?> getDescriptionType() throws OpenDataException {
-	      OpenType<?>[] itemTypes = new OpenType<?>[] {
+	      final OpenType<?>[] itemTypes = new OpenType<?>[] {
 	    		  SimpleType.STRING, 
 	    		  SimpleType.STRING, 
 	      };
 
 	      // use names of agent node description items as their description
-	      String[] itemDescriptions = getItemNames();
+	      final String[] itemDescriptions = getItemNames();
 
 	      // create and return open type of a JIAC agent node description
 	      return new CompositeType(this.getClass().getName(), "standard JIAC-TNG agent node description", getItemNames(), itemDescriptions, itemTypes);
@@ -105,12 +105,12 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 	    * @see javax.management.openmbean.CompositeData
 	    */
 	   public Object getDescription() throws OpenDataException {
-	      Object[] itemValues = new Object[] {
+	      final Object[] itemValues = new Object[] {
 	    		  (address != null)? address.getName():null,
 	    		  new Date(alive).toString()
 	      };
 
-	      CompositeType type = (CompositeType) getDescriptionType();
+	      final CompositeType type = (CompositeType) getDescriptionType();
 	      return new CompositeDataSupport(type, getItemNames(), itemValues);
 	   }
 }

@@ -230,20 +230,20 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   /**
    * {@inheritDoc}
    */
-  public final void setExecuteInterval(int executeInterval) {
+  public final void setExecuteInterval(int newExecuteInterval) {
     try {
-      if (executeInterval <= 0) {
+      if (newExecuteInterval <= 0) {
         nextExecutionTime = 0;
         return;
       }
-      // execute Interval > 0, schedule/reschedule bean
+      // new execute Interval > 0, schedule/reschedule bean
       if (nextExecutionTime > 0) {
-        nextExecutionTime = nextExecutionTime - this.executeInterval + executeInterval;
+        nextExecutionTime = nextExecutionTime - executeInterval + newExecuteInterval;
       } else {
-        nextExecutionTime = System.currentTimeMillis() + executeInterval;
+        nextExecutionTime = System.currentTimeMillis() + newExecuteInterval;
       }
     } finally {
-      this.executeInterval = executeInterval;
+      executeInterval = newExecuteInterval;
     }
   }
 
@@ -257,8 +257,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   /**
    * {@inheritDoc}
    */
-  public final void setNextExecutionTime(long nextExecutionTime) {
-    this.nextExecutionTime = nextExecutionTime;
+  public final void setNextExecutionTime(long newNextExecutionTime) {
+    nextExecutionTime = newNextExecutionTime;
   }
 
   /**

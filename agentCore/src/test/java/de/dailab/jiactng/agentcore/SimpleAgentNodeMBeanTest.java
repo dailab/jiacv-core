@@ -228,7 +228,6 @@ public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationLi
 	 * includes the previous registration as JMX resource, the change to state CLEANED_UP 
 	 * and the deregistration as JMX resource.
 	 * @see #doAction(String)
-	 * @see #checkRegistrationNotification(String)
 	 * @see #checkStateNotifications(String,String)
 	 */
 	public void testShutdown() {

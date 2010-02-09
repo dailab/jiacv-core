@@ -53,9 +53,9 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 	 */
 	public void run() {
 		// cancel and remove futures which has reached timeout
-		long now = System.currentTimeMillis();
+		final long now = System.currentTimeMillis();
 		while (!futures.isEmpty() && (futures.firstKey() < now)) {
-			Future<?> future = futures.pollFirstEntry().getValue();
+			final Future<?> future = futures.pollFirstEntry().getValue();
 			if (future.cancel(true)) {
 				log.warn("Handler was interrupted by the execution cycle due to timeout constraints");
 			} else if (!future.isCancelled() && !future.isDone()) {
@@ -63,9 +63,9 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 			}
 		}
 		// remove futures which are already done or canceled
-		Long[] keys = futures.keySet().toArray(new Long[futures.keySet().size()]);
+		final Long[] keys = futures.keySet().toArray(new Long[futures.keySet().size()]);
 		for (int i=0; i<keys.length; i++) {
-			Future<?> future = futures.get(keys[i]);
+			final Future<?> future = futures.get(keys[i]);
 			if (future.isCancelled() || future.isDone()) {
 				futures.remove(keys[i]);
 			}
@@ -108,7 +108,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 			boolean executionDone = false;
 			if (minBean != null) {
 				executionDone = true;
-				Future<?> executionFuture = thisAgent.getThreadPool().submit(
+				final Future<?> executionFuture = thisAgent.getThreadPool().submit(
 						new ExecutionHandler(minBean));
 				futures.put(timeout++, executionFuture);
 
@@ -121,13 +121,13 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// process one doAction
 			// TODO: check if read can be used
-			DoAction act = memory.remove(DOACTION_TEMPLATE);
+			final DoAction act = memory.remove(DOACTION_TEMPLATE);
 
 			boolean actionPerformed = false;
 			if (act != null) {
 				actionPerformed = true;
 				synchronized (this) {
-					Future<?> doActionFuture = thisAgent.getThreadPool().submit(
+					final Future<?> doActionFuture = thisAgent.getThreadPool().submit(
 							new DoActionHandler(act));
 					futures.put(timeout++, doActionFuture);
 				}
@@ -136,7 +136,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// process one actionResult
 			// TODO: check if read can be used
-			Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
+			final Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
 			int countNew = 0;
 			for (ActionResult ar : resultSet) {
 				synchronized (this) {
@@ -149,9 +149,9 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 			if (!pendingResults.isEmpty()) {
 				resultProcessed = true;
 				synchronized (this) {
-					ActionResult actionResult = pendingResults.iterator()
+					final ActionResult actionResult = pendingResults.iterator()
 							.next();
-					Future<?> actionResultFuture = thisAgent.getThreadPool().submit(
+					final Future<?> actionResultFuture = thisAgent.getThreadPool().submit(
 							new ActionResultHandler(actionResult));
 					futures.put(timeout++, actionResultFuture);
 					pendingResults.remove(actionResult);
@@ -161,11 +161,11 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// Session-Cleanup, if Session has a timeout
 			synchronized (memory) {
-				Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
+				final Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
 				for (Session session : sessions){
 					if (session.isTimeout()){
 						// session has timeout
-						ArrayList<SessionEvent> history = session.getHistory();
+						final ArrayList<SessionEvent> history = session.getHistory();
 
 						// Does Session is related to DoAction?
 						boolean doActionFound = false;
@@ -173,12 +173,12 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 							if (event instanceof DoAction) {
 								// doAction found
 								doActionFound = true;
-								DoAction doAction = (DoAction) event;
+								final DoAction doAction = (DoAction) event;
 								if (doAction.getAction() instanceof Action) {
 									// Got an Action, so let's cancel this
 									// doAction
 
-									Future<?> sessionTimeoutFuture = thisAgent.getThreadPool().submit(
+									final Future<?> sessionTimeoutFuture = thisAgent.getThreadPool().submit(
 											new SessionTimeoutHandler(session, doAction));
 									futures.put(timeout++, sessionTimeoutFuture);
 								}
@@ -212,72 +212,72 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 	}
 
 	private class ExecutionHandler implements Runnable {
-		private IAgentBean _minBean;
+		private IAgentBean minBean;
 
 		public ExecutionHandler(IAgentBean minBean) {
-			_minBean = minBean;
+			this.minBean = minBean;
 		}
 
 		public void run() {
 			try {
-				_minBean.execute();
+				minBean.execute();
 			} catch (Exception ex) {
 				log.error("Error when executing bean \'"
-						+ _minBean.getBeanName() + "\'", ex);
+						+ minBean.getBeanName() + "\'", ex);
 			}
 		}
 	}
 
 	private class DoActionHandler implements Runnable {
-		private DoAction _act;
+		private DoAction act;
 
 		public DoActionHandler(DoAction act) {
-			_act = act;
+			this.act = act;
 		}
 
 		public void run() {
-			performDoAction(_act);
+			performDoAction(act);
 		}
 	}
 
 	private class ActionResultHandler implements Runnable {
-		private ActionResult _actionResult;
+		private ActionResult actionResult;
 
 		public ActionResultHandler(ActionResult actionResult) {
-			_actionResult = actionResult;
+			this.actionResult = actionResult;
 		}
 
 		public void run() {
-			processResult(_actionResult);
+			processResult(actionResult);
 		}
 	}
 
 	private class SessionTimeoutHandler implements Runnable {
-		private Session _session;
-		private DoAction _doAction;
+		private Session session;
+		private DoAction doAction;
 
 		public SessionTimeoutHandler(Session session, DoAction doAction) {
-			_session = session;
-			_doAction = doAction;
+			this.session = session;
+			this.doAction = doAction;
 		}
 
 		public void run() {
-			Action action = (Action) _doAction.getAction();
-			log.debug("canceling DoAction " + _doAction);
-			ActionResult result = action.getProviderBean().cancelAction(_doAction);
+			final Action action = (Action) doAction.getAction();
+			log.debug("canceling DoAction " + doAction);
+			ActionResult result = action.getProviderBean().cancelAction(doAction);
 	
-			if (_session.getSource() != null) {
-				log.debug("sending timeout Result to source of Session " + _session);
-				ResultReceiver receiver = _session.getSource();
+			if (session.getSource() != null) {
+				log.debug("sending timeout Result to source of Session " + session);
+				final ResultReceiver receiver = session.getSource();
 		
 				if (result == null){
 					result = new ActionResult(
-							_doAction, new TimeoutException("DoAction has timeout"));	
+							doAction, new TimeoutException("DoAction has timeout"));	
 				}
 				receiver.receiveResult(result);
 			} else {
 				log.warn("Session without Source: DoAction has to be canceled due to sessiontimeout "
-					+ _doAction);
+					+ doAction);
 			}
 		}
 	}

@@ -1,6 +1,5 @@
 package de.dailab.jiactng.agentcore.action;
 
-import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 
 /**
@@ -8,19 +7,19 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * @see de.dailab.jiactng.agentcore.AbstractAgentBean#invokeAndWaitForResult(Action,Serializable[])
  * @author Jan Keiser
  */
-public class ActionResultListener implements ResultReceiver {
+public final class ActionResultListener implements ResultReceiver {
 
-	private ActionResult _result = null;
+	private ActionResult result = null;
 
 	/**
 	 * Informs the thread which is waiting for this listener,
 	 * that a result of the invoked action was received. This
 	 * method will be invoked by the execution cycle.
-	 * @param result The received result.
+	 * @param newResult The received result.
 	 */
 	@Override
-	public void receiveResult(ActionResult result) {
-		_result = result;
+	public void receiveResult(ActionResult newResult) {
+		result = newResult;
 		synchronized (this) {
 			this.notify();
 		}
@@ -31,6 +30,6 @@ public class ActionResultListener implements ResultReceiver {
 	 * @return The received result or <code>null</code> if no result was received so far.
 	 */
 	public ActionResult getResult() {
-		return _result;
+		return result;
 	}
 }

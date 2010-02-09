@@ -24,30 +24,30 @@ public interface IAgent extends ILifecycleListener, Runnable,
     ILifecycle, IDirectory {
 
   /**
-   * Setter for the agentnode that hosts this agent. Called by the agentnode,
+   * Setter for the agent node that hosts this agent. Called by the agent node,
    * when the agent is created.
    * 
-   * @param agentNode
-   *          the agentNode that hosts this agent.
+   * @param newAgentNode
+   *          the agent node that hosts this agent.
    */
-  void setAgentNode(IAgentNode agentNode);
+  void setAgentNode(IAgentNode newAgentNode);
 
   /**
    * Setter for the agent's memory-component. Used for dependency injection by
    * Spring.
    * 
-   * @param memory the memory-component of this agent.
+   * @param newMemory the memory-component of this agent.
    */
-  void setMemory(IMemory memory);
+  void setMemory(IMemory newMemory);
   
   
   /**
    * Setter for the agent's execution-cycle-component. Used for dependency
    * injection by Spring.
    * 
-   * @param execution the execution-cycle-component of this agent.
+   * @param newExecution the execution-cycle-component of this agent.
    */
-  void setExecution(IExecutionCycle execution);
+  void setExecution(IExecutionCycle newExecution);
     
 
   /**
@@ -105,9 +105,9 @@ public interface IAgent extends ILifecycleListener, Runnable,
   /**
    * Setter for the owner of this agent.
    * 
-   * @param owner the owner of this agent.
+   * @param newOwner the owner of this agent.
    */
-  void setOwner(String owner);
+  void setOwner(String newOwner);
 
   /**
    * Getter for a list of agentbeans of this agent.
@@ -153,12 +153,12 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * implementation this method should call the approriate method of the
    * agentnode to retrieve the log-instance to insure consistency.
    * 
-   * @param owner the bean for which the logger shall be retrieved.
+   * @param bean the bean for which the logger shall be retrieved.
    * @param extension the part of the bean for which the logger shall be retrieved.
    * @return a log-object that contains the agentnodes name, the agents name,
    *         the beanname and the extension or <code>null</code> if the agent node is unknown.
    */
-  Log getLog(IAgentBean owner, String extension);
+  Log getLog(IAgentBean bean, String extension);
   
   /**
    * Returns the agent description of this agent.
@@ -177,9 +177,9 @@ public interface IAgent extends ILifecycleListener, Runnable,
 
   /**
    * Sets the list of actions to be exposed by this agent.
-   * @param actionList the list of actions.
+   * @param newActionList the list of actions.
    */
-  void setActionList(List<Action> actionList);
+  void setActionList(List<Action> newActionList);
 
   /**
    * Gets the timeout after which the execution of a bean will be stopped.

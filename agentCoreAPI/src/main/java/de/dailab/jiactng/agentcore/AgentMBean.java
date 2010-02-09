@@ -43,9 +43,9 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Setter for attribute "Owner" of the managed agent.
-	 * @param owner the new owner of this agent
+	 * @param newOwner the new owner of this agent
 	 */
-	void setOwner(String owner);
+	void setOwner(String newOwner);
 
 	/**
 	 * Returns the timeout after which the execution of a bean of the managed agent will be stopped.
@@ -55,9 +55,9 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Sets the timeout after which the execution of a bean of the managed agent will be stopped.
-	 * @param beanExecutionTimeout the new timeout in milliseconds
+	 * @param newBeanExecutionTimeout the new timeout in milliseconds
 	 */
-	void setBeanExecutionTimeout(long beanExecutionTimeout);
+	void setBeanExecutionTimeout(long newBeanExecutionTimeout);
 
 	/**
 	 * Getter for attribute "ActionNames" of the managed agent.
@@ -99,10 +99,10 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Sets the date when this managed resource will be started automatically.
-	 * @param startTime the date in msec since 1/1/1970 0am or null if no automatically start should take place.
+	 * @param newStartTime the date in msec since 1/1/1970 0am or null if no automatically start should take place.
 	 * @throws InstanceNotFoundException if the agent node timer is not available.
 	 */
-	void setStartTime(Long startTime) throws InstanceNotFoundException;
+	void setStartTime(Long newStartTime) throws InstanceNotFoundException;
 
 	/**
 	 * Gets the date when this managed resource will be stopped automatically.
@@ -113,10 +113,10 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Sets the date when this managed resource will be stopped automatically.
-	 * @param stopTime the date in msec since 1/1/1970 0am or null if no automatically stop should take place.
+	 * @param newStopTime the date in msec since 1/1/1970 0am or null if no automatically stop should take place.
 	 * @throws InstanceNotFoundException if the agent node timer is not available.
 	 */
-	void setStopTime(Long stopTime) throws InstanceNotFoundException;
+	void setStopTime(Long newStopTime) throws InstanceNotFoundException;
 
 	/**
 	 * Sets the auto Execution service ID list.

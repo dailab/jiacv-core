@@ -60,11 +60,11 @@ public interface IAgentBean extends ILifecycle {
 	 * Setter for Interval by which the execute()-method of the bean is called.
 	 * If non-positive, the execute-method is never called.
 	 * 
-	 * @param executeInterval
+	 * @param newExecuteInterval
 	 *            the time interval between two calls of the execute()-method.
 	 *            If negative, the method is never called.
 	 */
-	void setExecuteInterval(int executeInterval);
+	void setExecuteInterval(int newExecuteInterval);
 
 	/**
 	 * The stub for the execute method, that should be implemented by all beans.
@@ -90,9 +90,9 @@ public interface IAgentBean extends ILifecycle {
 	 * 
 	 * Do not use it except you are implementing the scheduler or execution cycle.
 	 * 
-	 * @param nextExecutionTime the next time to execute this IAgentBean
+	 * @param newNextExecutionTime the next time to execute this IAgentBean
 	 */ 
-	void setNextExecutionTime(long nextExecutionTime);
+	void setNextExecutionTime(long newNextExecutionTime);
 	
 	/**
 	 * Recovery method for handling LifecycleExceptions. If a statechange for an

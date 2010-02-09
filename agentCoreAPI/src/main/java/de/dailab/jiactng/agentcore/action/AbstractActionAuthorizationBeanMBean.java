@@ -16,8 +16,8 @@ public interface AbstractActionAuthorizationBeanMBean extends AbstractAgentBeanM
 
 	/**
 	 * Set name of authorization action.
-	 * @param authorizationActionName the name of the action to be used for authorization.
+	 * @param newAuthorizationActionName the name of the action to be used for authorization.
 	 */
-	void setAuthorizationActionName(String authorizationActionName);
+	void setAuthorizationActionName(String newAuthorizationActionName);
 
 }

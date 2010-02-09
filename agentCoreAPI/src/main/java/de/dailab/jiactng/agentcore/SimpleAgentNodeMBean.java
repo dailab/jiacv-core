@@ -9,7 +9,7 @@ import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
 /**
  * JMX compliant management interface of agent nodes to get information
- * about them and to change their lifecycle states.
+ * about them and to change their life-cycle states.
  * 
  * @author Jan Keiser
  */
@@ -23,9 +23,9 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Setter for attribute "Name" of the managed agent node.
-	 * @param name the new name of this agent node
+	 * @param newName the new name of this agent node
 	 */
-	void setName(String name);
+	void setName(String newName);
 
 	/**
 	 * Getter for attribute "UUID" of the managed agent node.

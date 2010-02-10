@@ -95,6 +95,7 @@ public class ObjectContent implements IFact {
      * Returns the string representation of the object. It returns "&lt;empty&gt;"
      * if the object is <code>null</code>. It returns "&lt;recursion&gt;" if a recursion 
      * was detected within this content.
+     * @return a string representation of the object content
      */
     @Override
 	public synchronized String toString() {

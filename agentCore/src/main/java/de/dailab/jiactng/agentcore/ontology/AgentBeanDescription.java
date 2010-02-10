@@ -78,7 +78,7 @@ public class AgentBeanDescription implements IFact {
             return false;
         }
 
-        AgentBeanDescription other= (AgentBeanDescription) obj;
+        final AgentBeanDescription other= (AgentBeanDescription) obj;
         return EqualityChecker.equals(name, other.name);
     }
 
@@ -99,7 +99,7 @@ public class AgentBeanDescription implements IFact {
      */
     @Override
     public String toString() {
-        StringBuilder builder= new StringBuilder();
+        final StringBuilder builder= new StringBuilder();
 
         // name
         builder.append("AgentBean:\n name=");

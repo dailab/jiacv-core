@@ -140,16 +140,17 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
             return false;
         }
         
-        Class<?>[] aParams = a.getParameterTypes();
-        Class<?>[] bParams = b.getParameterTypes();
+        final Class<?>[] aParams = a.getParameterTypes();
+        final Class<?>[] bParams = b.getParameterTypes();
         
         if(aParams.length != bParams.length) {
             return false;
         }
         
         for(int i= 0; i < aParams.length; ++i) {
-            if(!aParams[i].equals(bParams[i]))
+            if(!aParams[i].equals(bParams[i])) {
                 return false;
+            }
         }
         
         return true;

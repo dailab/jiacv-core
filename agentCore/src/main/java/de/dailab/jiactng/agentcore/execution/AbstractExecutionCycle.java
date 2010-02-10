@@ -50,6 +50,10 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   /**
    * During start of the execution cycle an optional remote executor will be created.
+   * @throws Exception if the execution cycle can not be started.
+   * @see AbstractAgentBean#doStart()
+   * @see #setUseRemoteExecutor(boolean)
+   * @see RemoteExecutor#RemoteExecutor(de.dailab.jiactng.agentcore.knowledge.IMemory)
    */
   @Override
   public void doStart() throws Exception {
@@ -61,6 +65,10 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   /**
    * During stop of the execution cycle an existing remote executor will be destroyed.
+   * @throws Exception if the execution cycle can not be stopped.
+   * @see AbstractAgentBean#doStop()
+   * @see #setUseRemoteExecutor(boolean)
+   * @see RemoteExecutor#cleanup()
    */
   @Override
   public void doStop() throws Exception {
@@ -347,7 +355,12 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    */
   @SuppressWarnings("serial")
   public static class TimeoutException extends RuntimeException {
-    public TimeoutException(String s) {
+
+	  /**
+	   * Creates a timeout exception with a given description.
+	   * @param s the description
+	   */
+	  public TimeoutException(String s) {
       super(s);
     }
   }

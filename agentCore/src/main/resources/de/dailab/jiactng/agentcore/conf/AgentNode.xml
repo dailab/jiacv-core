@@ -51,7 +51,7 @@
       </property>
    </bean>
 
-   <bean name="JaasAuthenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator" singleton="false">
+   <bean name="JaasAuthenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator" singleton="false" lazy-init="true">
       <property name="configuration">
          <list>
             <ref bean="LoginJaas"/>
@@ -65,7 +65,7 @@
       </property>
    </bean>
 
-   <bean name="LoginJaas" class="de.dailab.jiactng.agentcore.management.jmx.JaasConfigurationEntry" singleton="false">
+   <bean name="LoginJaas" class="de.dailab.jiactng.agentcore.management.jmx.JaasConfigurationEntry" singleton="false" lazy-init="true">
       <property name="loginModuleName" value="com.sun.security.auth.module.Krb5LoginModule"/>
       <property name="controlFlag" value="required"/>
       <property name="options">
@@ -129,7 +129,7 @@
 		##################################################################
 	 -->
 
-	<bean name="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" singleton="false"> 
+	<bean name="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" singleton="true" lazy-init="true"> 
 		<property name="messageTransport">
 			<ref bean="StandardJMSMessageTransport" />
 		</property>

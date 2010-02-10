@@ -59,7 +59,7 @@
 		Definition of the standard TCP connector for ActiveMQ.
 		It specifies the transport address and the default multicast address for discovery.
 	-->
-	<bean name="StandardTCPConnector" parent="ActiveMQTransportConnector" singleton="true">
+	<bean name="StandardTCPConnector" parent="ActiveMQTransportConnector" singleton="true" lazy-init="true">
 		<property name="transportURI" value="tcp://0.0.0.0:0" />
 		<property name="discoveryURI" value="smartmulticast://default?group=jiac-tng" />
 	</bean>
@@ -68,7 +68,7 @@
 		Definition of the standard TCP connector with fixed port for ActiveMQ.
 		It specifies the transport address and the default multicast address for discovery.
 	-->
-	<bean name="StandardTCPConnectorFixedPort" parent="ActiveMQTransportConnector" singleton="true">
+	<bean name="StandardTCPConnectorFixedPort" parent="ActiveMQTransportConnector" singleton="true" lazy-init="true">
 		<property name="transportURI" value="tcp://0.0.0.0:61616" />
 		<property name="discoveryURI" value="smartmulticast://default?group=jiac-tng" />
 	</bean>
@@ -81,7 +81,7 @@
 		See the de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker documentation for more details.
 	-->
 	<bean name="StandardJMSConnectionFactory" class="de.dailab.jiactng.agentcore.comm.broker.ConnectionFactoryProxy"
-		singleton="false" />
+		singleton="false" lazy-init="true"/>
 
 	<!-- 
 		The standard JMS message transport for the communication bean (an agent bean).
@@ -92,7 +92,7 @@
 		the broker!
 	-->
 	<bean name="StandardJMSMessageTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
-		singleton="false">
+		singleton="false" lazy-init="true">
 		<property name="connectionFactory" ref="StandardJMSConnectionFactory" />
 	</bean>
 </beans>

@@ -1,0 +1,28 @@
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.jiac.de/microJIAC/configuration" framework="JIAC TNG">
+	<object id="StandardJMSBroker" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker" singleton="true">
+		<list name="connectors">
+			<refItem ref="StandardTCPConnector"/>
+		</list>
+	</object>
+	
+	<object id="StandardJMSBrokerFixedPort" parent="StandardJMSBroker" singleton="true">
+		<list name="connectors" append="false">
+			<refItem ref="StandardTCPConnectorFixedPort"/>
+		</list>
+	</object>
+	
+	<object id="StandardTCPConnector" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQTransportConnector">
+		<simple name="transportURI">tcp://0.0.0.0:0</simple>
+		<simple name="discoveryURI">smartmulticast://default?group=jiac-tng</simple>
+	</object>
+	
+	<object id="StandardTCPConnectorFixedPort" parent="StandardTCPConnector">
+		<simple name="transportURI">tcp://0.0.0.0:61616</simple>
+	</object>
+	
+	<object id="StandardJMSConnectionFactory" class="de.dailab.jiactng.agentcore.comm.broker.ConnectionFactoryProxy" />
+	
+	<object id="StandardJMSMessageTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport">
+		<objectRef name="connectionFactory" ref="StandardJMSConnectionFactory"/>
+	</object>
+</configuration>

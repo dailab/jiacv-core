@@ -1,0 +1,59 @@
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.jiac.de/microJIAC/configuration" framework="JIAC TNG">
+    <!--
+       # The default Node configuration
+       # provides an empty platform definition without JMX and directory support.
+       # the platform bean may be set as parent in any other platfom definitions 
+    -->
+	<node id="Node" class="de.dailab.jiactng.agentcore.SimpleAgentNode" />
+	
+	<!--
+      # The default Node configuration
+      # provides an empty platform definition without JMX support but with a distributed agent and service directory.
+      # the platform bean may be set as parent in any other platfom definitions 
+    -->
+	<node id="NodeWithDirectory" parent="Node">
+		<list name="agentNodeBeans">
+			<refItem namespace="de.dailab.jiactng.agentcore.aamm.jms" ref="StandardJMSBroker"/>
+			<refItem ref="IDirectory"/>
+		</list>
+	</node>
+	
+	<agent id="SimpleAgent" class="de.dailab.jiactng.agentcore.Agent">
+		<simple name="executionInterval">10</simple>
+		<objectRef name="memory" ref="Memory"/>
+		<objectRef name="execution" ref="SimpleExecutionCycle"/>
+	</agent>
+	
+	<agent id="NonBlockingAgent" parent="SimpleAgent">
+		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
+	</agent>
+	
+	<agent id="SimpleAgentWithCommunication" parent="SimpleAgent">
+		<agentElementRef ref="CommunicationBean"/>
+	</agent>
+	
+	<agent id="NonBlockingAgentWithCommunication" parent="SimpleAgentWithCommunication">
+		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
+	</agent>
+	
+	<agentElement id="CommunicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean">
+		<list name="transports">
+			<refItem namespace="de.dailab.jiactng.agentcore.aamm.jms" ref="StandardJMSMessageTransport"/>
+		</list>
+	</agentElement>
+	
+	<!-- 
+		##################################################################
+		# Bean providing yellow and white pages functionality for agents #
+		##################################################################
+	 -->
+	<object id="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean">
+		<objectRef name="messageTransport" namespace="de.dailab.jiactng.agentcore.aamm.jms" ref="StandardJMSMessageTransport"/>
+	</object>
+	
+	<object id="Memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" />
+	
+	<object id="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle" />
+	
+	<object id="NonBlockingExecutionCycle" class="de.dailab.jiactng.agentcore.execution.NonBlockingExecutionCycle" />
+</configuration>

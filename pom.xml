@@ -153,6 +153,39 @@
          <organizationUrl>http://www.dai-labor.de</organizationUrl>
          <timezone>+1</timezone>
       </developer>
+      <developer>
+         <id>kaisers</id>
+         <name>Silvan Kaiser</name>
+         <email>silvan.kaiser@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>kuester</id>
+         <name>Tobias Kuester</name>
+         <email>tobias.kuester@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>masuch</id>
+         <name>Nils Masuch</name>
+         <email>nils.masuch@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
    </developers>
 
    <build>

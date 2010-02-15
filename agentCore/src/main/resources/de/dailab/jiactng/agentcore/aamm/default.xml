@@ -11,7 +11,8 @@
       # provides an empty platform definition without JMX support but with a distributed agent and service directory.
       # the platform bean may be set as parent in any other platfom definitions 
     -->
-	<node id="NodeWithDirectory" parent="Node">
+	<node id="NodeWithDirectory">
+		<parent ref="Node"/>
 		<list name="agentNodeBeans">
 			<refItem namespace="de.dailab.jiactng.agentcore.aamm.jms" ref="StandardJMSBroker"/>
 			<refItem ref="IDirectory"/>
@@ -25,14 +26,17 @@
 	</agent>
 	
 	<agent id="NonBlockingAgent" parent="SimpleAgent">
+		<parent ref="SimpleAgent"/>
 		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
 	</agent>
 	
-	<agent id="SimpleAgentWithCommunication" parent="SimpleAgent">
+	<agent id="SimpleAgentWithCommunication">
+		<parent ref="SimpleAgent"/>
 		<agentElementRef ref="CommunicationBean"/>
 	</agent>
 	
-	<agent id="NonBlockingAgentWithCommunication" parent="SimpleAgentWithCommunication">
+	<agent id="NonBlockingAgentWithCommunication">
+		<parent ref="SimpleAgentWithCommunication"/>
 		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
 	</agent>
 	

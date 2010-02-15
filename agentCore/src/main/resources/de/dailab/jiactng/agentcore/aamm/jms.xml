@@ -5,7 +5,8 @@
 		</list>
 	</object>
 	
-	<object id="StandardJMSBrokerFixedPort" parent="StandardJMSBroker" singleton="true">
+	<object id="StandardJMSBrokerFixedPort" singleton="true">
+		<parent ref="StandardJMSBroker" />
 		<list name="connectors" append="false">
 			<refItem ref="StandardTCPConnectorFixedPort"/>
 		</list>
@@ -16,7 +17,8 @@
 		<simple name="discoveryURI">smartmulticast://default?group=jiac-tng</simple>
 	</object>
 	
-	<object id="StandardTCPConnectorFixedPort" parent="StandardTCPConnector">
+	<object id="StandardTCPConnectorFixedPort">
+		<parent ref="StandardTCPConnector"/>
 		<simple name="transportURI">tcp://0.0.0.0:61616</simple>
 	</object>
 	

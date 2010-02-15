@@ -270,15 +270,15 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	 */
 	@SuppressWarnings("unchecked")
     public CompositeData getSpace() {
-	    Set<IFact> facts = readAllOfType(IFact.class);
+	    final Set<IFact> facts = readAllOfType(IFact.class);
 	    if (facts.isEmpty()) {
 	    	return null;
 	    }
 
 	    // create map with current memory state
-		Map<String,List<String>> map = new Hashtable<String,List<String>>();
+		final Map<String,List<String>> map = new Hashtable<String,List<String>>();
 	    for (IFact fact : facts) {
-	    	String classname = fact.getClass().getName();
+	    	final String classname = fact.getClass().getName();
 	    	List<String> values = map.get(classname);
 	    	if (values == null) {
 	    		values = new ArrayList<String>();
@@ -289,19 +289,19 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 
 	    // create composite data
 	    CompositeData data = null;
-	    int size = map.size();
-	    String[] itemNames = new String[size];
-	    OpenType<?>[] itemTypes = new OpenType[size];
-	    Object[] itemValues = new Object[size];
-	    Object[] classes = map.keySet().toArray();
+	    final int size = map.size();
+	    final String[] itemNames = new String[size];
+	    final OpenType<?>[] itemTypes = new OpenType[size];
+	    final Object[] itemValues = new Object[size];
+	    final Object[] classes = map.keySet().toArray();
 	    try {
 	    	for (int i=0; i<size; i++) {
-	    		String classname = (String) classes[i];
+	    		final String classname = (String) classes[i];
 	    		itemNames[i] = classname;
 	    		itemTypes[i] = new ArrayType(1, SimpleType.STRING);
-	    		List<String> values = map.get(classname);
-	    		String[] value = new String[values.size()];
-	    		Iterator<String> it = values.iterator();	    		
+	    		final List<String> values = map.get(classname);
+	    		final String[] value = new String[values.size()];
+	    		final Iterator<String> it = values.iterator();	    		
 	    		int j = 0;
 	    		while (it.hasNext()) {
 	    			value[j] = it.next();
@@ -309,7 +309,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	    		}
 	    		itemValues[i] = value;
 	    	}
-	    	CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the memory", itemNames, itemNames, itemTypes);
+	    	final CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the memory", itemNames, itemNames, itemTypes);
 	    	data = new CompositeDataSupport(compositeType, itemNames, itemValues);
 	    }
 	    catch (OpenDataException e) {

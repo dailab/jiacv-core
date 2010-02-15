@@ -36,15 +36,15 @@ public class Advertisement implements IFact {
 		return actions;
 	}
 	
-	public void setActions(Set<IActionDescription> actions) {
-		this.actions.addAll(actions);
+	public void setActions(Set<IActionDescription> newActions) {
+		actions.addAll(newActions);
 	}
 
 	public Hashtable<String, IAgentDescription> getAgents() {
 		return agents;
 	}
 
-	public void setAgents(Hashtable<String, IAgentDescription> agents) {
-		this.agents.putAll(agents);
+	public void setAgents(Hashtable<String, IAgentDescription> newAgents) {
+		agents.putAll(newAgents);
 	}
 }

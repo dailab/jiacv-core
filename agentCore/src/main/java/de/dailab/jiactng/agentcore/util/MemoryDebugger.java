@@ -18,7 +18,7 @@ public class MemoryDebugger {
     static class NotificationListenerImpl implements NotificationListener {
         public void handleNotification(Notification notification, Object handback) {
             if (notification.getType().equals(MemoryNotificationInfo.MEMORY_THRESHOLD_EXCEEDED)) {
-                Map<Thread,StackTraceElement[]> map= Thread.getAllStackTraces();
+                final Map<Thread,StackTraceElement[]> map= Thread.getAllStackTraces();
                 
                 for(Map.Entry<Thread,StackTraceElement[]> entry : map.entrySet()) {
                     printStackTrace(entry.getKey().getName(), entry.getValue());
@@ -36,7 +36,7 @@ public class MemoryDebugger {
         }
     }
 
-    private static final MemoryPoolMXBean tenuredGenPool= findTenuredGenPool();
+    private static final MemoryPoolMXBean TENURED_GEN_POOL = findTenuredGenPool();
     private static boolean initialised= false;
     
     private static MemoryPoolMXBean findTenuredGenPool() {
@@ -55,9 +55,9 @@ public class MemoryDebugger {
     public static void setup(double fraction) {
         synchronized (MemoryDebugger.class) {
             if(!initialised) {
-                long maxMemory= tenuredGenPool.getUsage().getMax();
-                tenuredGenPool.setUsageThreshold((long) (fraction * maxMemory));
-                MemoryMXBean mxBean = ManagementFactory.getMemoryMXBean();
+                final long maxMemory= TENURED_GEN_POOL.getUsage().getMax();
+                TENURED_GEN_POOL.setUsageThreshold((long) (fraction * maxMemory));
+                final MemoryMXBean mxBean = ManagementFactory.getMemoryMXBean();
                 ((NotificationEmitter) mxBean).addNotificationListener(new NotificationListenerImpl(), null, null);
                 initialised= true;
             }

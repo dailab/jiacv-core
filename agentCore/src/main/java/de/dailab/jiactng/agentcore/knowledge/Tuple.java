@@ -31,14 +31,14 @@ public class Tuple implements IFact {
   /**
    * Creates a new Tuple from two Strings. Both may be null.
    * 
-   * @param arg1
+   * @param str1
    *          the first argument.
-   * @param arg2
+   * @param str2
    *          the second argument.
    */
-  public Tuple(String arg1, String arg2) {
-    this.arg1 = arg1;
-    this.arg2 = arg2;
+  public Tuple(String str1, String str2) {
+    arg1 = str1;
+    arg2 = str2;
   }
 
   /**
@@ -53,11 +53,11 @@ public class Tuple implements IFact {
   /**
    * Setter for the first argument.
    * 
-   * @param arg1
+   * @param str1
    *          the new value (may be null).
    */
-  public void setArg1(String arg1) {
-    this.arg1 = arg1;
+  public void setArg1(String str1) {
+    arg1 = str1;
   }
 
   /**
@@ -72,11 +72,11 @@ public class Tuple implements IFact {
   /**
    * Setter for the second argument.
    * 
-   * @param arg2
+   * @param str2
    *          the new value (may be null).
    */
-  public void setArg2(String arg2) {
-    this.arg2 = arg2;
+  public void setArg2(String str2) {
+    arg2 = str2;
   }
 
   /**

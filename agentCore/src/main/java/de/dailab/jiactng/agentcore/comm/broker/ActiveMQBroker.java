@@ -23,9 +23,19 @@ import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
  * 
  */
 public class ActiveMQBroker extends AbstractAgentNodeBean {
-    protected static ActiveMQBroker INSTANCE= null;
-    
-    /*package*/ static void initialiseProxy(ConnectionFactoryProxy proxy) {
+
+	/** The ActiveMQ broker used by all agent nodes of the local JVM. */
+	protected static ActiveMQBroker INSTANCE= null;
+
+	/**
+	 * Initializes the given connection factory proxy with a new ActiveMQ connection factory 
+	 * using the name of the broker of this JVM.
+	 * @param proxy the connection factory proxy
+	 * @see ConnectionFactoryProxy#connectionFactory
+	 * @see ActiveMQConnectionFactory#ActiveMQConnectionFactory(String)
+	 * @throws IllegalStateException if no broker is running in this JVM
+	 */
+    static void initialiseProxy(ConnectionFactoryProxy proxy) {
         if(INSTANCE == null) {
             throw new IllegalStateException("no broker is running");
         }
@@ -39,6 +49,10 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
     protected boolean _persistent = false;
     protected int _networkTTL = 1;
 
+    /**
+     * Creates an empty ActiveMQ broker and initializes the static variable
+     * <code>INSTANCE</code> with this broker if not yet set.
+     */
     public ActiveMQBroker() {
         synchronized (ActiveMQBroker.class) {
 //            if(INSTANCE != null) {
@@ -54,7 +68,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
     @SuppressWarnings("unchecked")
     public void setNetworkTTL(int networkTTL) throws Exception {
         if(_networkTTL != networkTTL && _broker != null) {
-        	List<NetworkConnector> netcons = _broker.getNetworkConnectors();
+        	final List<NetworkConnector> netcons = _broker.getNetworkConnectors();
             for (NetworkConnector net : netcons){
             	_broker.removeNetworkConnector(net);
             	net.setNetworkTTL(networkTTL);
@@ -66,6 +80,14 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
     }
     
     // Lifecyclemethods:
+
+    /**
+     * Initialize this broker by instantiating and starting the ActiveMQ broker service. Three connectors
+     * (network URI, transport URI, discovery URI) are added to the broker service for each specified transport connector.
+     * @throws Exception if an error occurs during initialization
+     * @see BrokerService
+     * @see #setConnectors(Set)
+     */
     public void doInit() throws Exception {
         log.debug("initializing embedded broker");
         
@@ -75,7 +97,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
         
         if(agentNode.isManagementEnabled()) {
             _broker.setUseJmx(true);
-            ManagementContext context = new ManagementContext();
+            final ManagementContext context = new ManagementContext();
             context.setJmxDomainName("de.dailab.jiactng");
             context.setCreateConnector(false);
             _broker.setManagementContext(context);
@@ -87,21 +109,21 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
             for (ActiveMQTransportConnector amtc : _connectors) {
                 log.debug("embedded broker initializing transport:: " + amtc.toString());
                 if (amtc.getNetworkURI() != null) {
-                	URI networkUri = new URI(amtc.getNetworkURI());
-                    NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
+                	final URI networkUri = new URI(amtc.getNetworkURI());
+                    final NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
                     networkConnector.setDuplex(amtc.isDuplex());
                     networkConnector.setNetworkTTL(amtc.getNetworkTTL());
                 }
 
                 _broker.setPersistent(_persistent);
 
-            	TransportConnector connector= _broker.addConnector(new URI(amtc.getTransportURI()));
+            	final TransportConnector connector= _broker.addConnector(new URI(amtc.getTransportURI()));
                 if (amtc.getDiscoveryURI() != null) {
-                    URI uri = new URI(amtc.getDiscoveryURI());
-                    URI discoveryURI= new URI(amtc.getDiscoveryURI());
+                    final URI uri = new URI(amtc.getDiscoveryURI());
+                    final URI discoveryURI= new URI(amtc.getDiscoveryURI());
                     connector.setDiscoveryUri(discoveryURI);
 //no such method in 5.3 connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
-                    NetworkConnector networkConnector= new SourceAwareDiscoveryNetworkConnector(uri);
+                    final NetworkConnector networkConnector= new SourceAwareDiscoveryNetworkConnector(uri);
                     networkConnector.setNetworkTTL(_networkTTL);
                     _broker.addNetworkConnector(networkConnector);
                 } 
@@ -115,6 +137,11 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
         log.debug("started broker");
     }
 
+    /**
+     * Cleanup this broker by stopping the ActiveMQ broker service.
+     * @throws Exception if an error occurs during stop of the broker service
+     * @see BrokerService#stop()
+     */
     public void doCleanup() throws Exception {
     	log.debug("stopping broker");
     	_broker.stop();
@@ -149,6 +176,11 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
         _connectors = connectors;
     }
 
+    /**
+     * Get the name of the ActiveMQ broker service.
+     * @return the name
+     * @throws IllegalStateException if the broker service is not initialized
+     */
     protected String getBrokerName() {
         if(_brokerName == null) {
             throw new IllegalStateException("broker is not initialised");

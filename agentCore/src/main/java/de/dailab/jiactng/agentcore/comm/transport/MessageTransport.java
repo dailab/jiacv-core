@@ -18,8 +18,8 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * <p>
  * All client implementations must provide operations to un-/register
  * to specific logical destinations and to deliver message to the bus.
- * Lifecycle methods are optional and should be implemented whenever
- * initialisation/cleanup code is needed.
+ * Life-cycle methods are optional and should be implemented whenever
+ * initialization/cleanup code is needed.
  * </p>
  * 
  * @author Marcel Patzlaff
@@ -29,10 +29,10 @@ public abstract class MessageTransport implements MessageTransportMBean {
     public static interface IMessageTransportDelegate {
         /**
          * This method is called from a transport when a communication 
-         * or administration exceptioned occured.
+         * or administration exception occurred.
          * 
          * @param source        the transport that reports the exception
-         * @param e             the specific exception that was catched
+         * @param e             the specific exception that was caught
          */
         void onAsynchronousException(MessageTransport source, Exception e);
         
@@ -56,13 +56,13 @@ public abstract class MessageTransport implements MessageTransportMBean {
         Log getLog(String extension);
     }
     
-    private final String _transportIdentifier;
-    private IMessageTransportDelegate _delegate;
+    private final String transportIdentifier;
+    private IMessageTransportDelegate delegate;
     
     protected Log log;
     
     protected MessageTransport(String transportIdentifier) {
-        _transportIdentifier= transportIdentifier.toLowerCase();
+        this.transportIdentifier= transportIdentifier.toLowerCase();
     }
     
     /**
@@ -71,15 +71,15 @@ public abstract class MessageTransport implements MessageTransportMBean {
      * {@link IMessageTransportDelegate#onMessage(MessageTransport, IJiacMessage, ICommunicationAddress)},
      * and also about exceptions from the communication infrastructure.
      * 
-     * @param delegate      the handle this transport should delegate information to
+     * @param newDelegate      the handle this transport should delegate information to
      */
-    public final void setDefaultDelegate(IMessageTransportDelegate delegate) {
-        _delegate = delegate;
+    public final void setDefaultDelegate(IMessageTransportDelegate newDelegate) {
+        delegate = newDelegate;
         
-        if (_delegate.getLog(_transportIdentifier) == null) {
+        if (delegate.getLog(transportIdentifier) == null) {
       	  log.error("IMessageTransportDelegate.getLog() returned null! This can cause exceptions! ");
         }
-        log = _delegate.getLog(_transportIdentifier);
+        log = delegate.getLog(transportIdentifier);
         
     }
     
@@ -108,13 +108,14 @@ public abstract class MessageTransport implements MessageTransportMBean {
      * @return      the identifier of this transport
      */
     public final String getTransportIdentifier() {
-        return _transportIdentifier;
+        return transportIdentifier;
     }
     
     /**
      * Overrides the default implementation in {@link Object} and
      * only checks the equality of the identifiers.
-     * 
+     * @param obj the other message transport
+     * @return the result of equality check
      * @see #getTransportIdentifier()
      */
     @Override
@@ -128,7 +129,7 @@ public abstract class MessageTransport implements MessageTransportMBean {
     /**
      * Overrides the default implementation in {@link Object} and
      * returns the hashCode of the identifier.
-     * 
+     * @return the hash code
      * @see #getTransportIdentifier()
      */
     @Override
@@ -137,15 +138,15 @@ public abstract class MessageTransport implements MessageTransportMBean {
     }
 
     /**
-     * Initialisation could can be placed here. The default
+     * Initialization could can be placed here. The default
      * implementation of this method does nothing.
      * 
-     * @throws Exception    if the initialisation process fails
+     * @throws Exception    if the initialization process fails
      */
     public void doInit() throws Exception {};
     
     /**
-     * Whenever the transport requires resources they have to be realised
+     * Whenever the transport requires resources they have to be realized
      * in the implementation of this method. The default implementation
      * does nothing
      * 
@@ -169,10 +170,12 @@ public abstract class MessageTransport implements MessageTransportMBean {
      * to delegate messages that match the given receiving destination and the selector. Messages
      * that are received but do not match any of the queries are silently dropped.
      * <p>
-     * Providing a selector enables the transport to optimise the message bus communication.
+     * Providing a selector enables the transport to optimize the message bus communication.
      * But it is <strong>not</strong> a criterion to delegate messages more then once!
      * </p>
      * 
+     * @param address the communication address
+     * @param selector the selector
      * @throws CommunicationException       when the registration to the message bus fails
      * @throws IllegalArgumentException     if the address is <code>null</code>
      */
@@ -180,20 +183,25 @@ public abstract class MessageTransport implements MessageTransportMBean {
     
     /**
      * The same as {@link #listen(ICommunicationAddress, IJiacMessage)} in reverse ;-)
+     * 
+     * @param address the communication address
+     * @param selector the selector
+     * @throws CommunicationException       when the deregistration to the message bus fails
+     * @throws IllegalArgumentException     if the address is <code>null</code>
      */
     public abstract void stopListen(ICommunicationAddress address, IJiacMessage selector) throws CommunicationException;
     
     // TODO: refactor this because it is not part of the user API
     public final void delegateException(Exception exception) {
-        _delegate.onAsynchronousException(this, exception);
+        delegate.onAsynchronousException(this, exception);
     }
     
     // TODO: refactor this because it is not part of the user API
     public final void delegateMessage(IJiacMessage message, ICommunicationAddress at) {
-        _delegate.onMessage(this, message, at);
+        delegate.onMessage(this, message, at);
     }
     
     protected Log createChildLog(String name) {
-        return _delegate.getLog(_transportIdentifier + "." + name);
+        return delegate.getLog(transportIdentifier + "." + name);
     }
 }

@@ -18,8 +18,11 @@ public final class ConnectionFactoryProxy implements ConnectionFactory {
     protected ConnectionFactory connectionFactory= null;
     
     /**
+     * Creates a connection.
+     * @return the connection
+     * @throws JMSException if an error occurs during creation of the connection
      * @throws IllegalStateException    if no broker is available or the broker is
-     *                                  not yet initialised
+     *                                  not yet initialized
      * 
      * @see ConnectionFactory#createConnection()
      */
@@ -30,6 +33,11 @@ public final class ConnectionFactoryProxy implements ConnectionFactory {
     }
 
     /**
+     * Creates a connection by using given credentials.
+     * @param userName the user name
+     * @param password the password
+     * @return the connection
+     * @throws JMSException if an error occurs during creation of the connection
      * @throws IllegalStateException    if no broker is available or the broker is
      *                                  not yet initialised
      * 

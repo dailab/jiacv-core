@@ -52,7 +52,7 @@ public final class CommunicationAddressFactory {
     }
     
     /**
-     * Parses the specific uri and tries to create a group or message
+     * Parses the specific URI and tries to create a group or message
      * box address from it.
      * 
      * <p>
@@ -60,20 +60,20 @@ public final class CommunicationAddressFactory {
      * this method!
      * </p>
      * 
-     * @param uri       the uri to parse and convert
-     * @return          the address the uri describes
+     * @param uri       the URI to parse and convert
+     * @return          the address the URI describes
      * @throws IllegalArgumentException     if the provided <code>uri</code> is not
      *                                      a valid communication address.
      */
     public static ICommunicationAddress createFromURI(String uri) {
-        int colon= uri.indexOf(':');
+        final int colon= uri.indexOf(':');
         
         if(colon <= 0) {
             throw new IllegalArgumentException("'" + uri + "' is not a valid communication address");
         }
         
-        String prefix= uri.substring(0, colon);
-        String name= uri.substring(colon + 1);
+        final String prefix= uri.substring(0, colon);
+        final String name= uri.substring(colon + 1);
         
         if(prefix.equalsIgnoreCase(GroupAddress.PREFIX)) {
             return createGroupAddress(name);
@@ -87,7 +87,8 @@ public final class CommunicationAddressFactory {
     
     /**
      * This method is the shortcut for {@link #createFromURI(String) createFromURI(uri.toString())}.
-     * 
+     * @param uri the URI to parse and convert
+     * @return the address the URI describes
      * @see #createFromURI(String)
      */
     public static ICommunicationAddress createFromURI(URI uri) {

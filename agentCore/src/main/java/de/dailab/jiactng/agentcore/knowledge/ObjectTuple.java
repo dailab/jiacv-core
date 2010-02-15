@@ -28,16 +28,16 @@ public class ObjectTuple implements IFact {
   private Object arg2;
 
   /**
-   * Creates a new Tuple from two Strings. Both may be null.
+   * Creates a new Tuple from two objects. Both may be null.
    * 
-   * @param arg1
+   * @param obj1
    *          the first argument.
-   * @param arg2
+   * @param obj2
    *          the second argument.
    */
-  public ObjectTuple(Object arg1, Object arg2) {
-    this.arg1 = arg1;
-    this.arg2 = arg2;
+  public ObjectTuple(Object obj1, Object obj2) {
+    arg1 = obj1;
+    arg2 = obj2;
   }
 
   /**
@@ -52,11 +52,11 @@ public class ObjectTuple implements IFact {
   /**
    * Setter for the first argument.
    * 
-   * @param arg1
+   * @param obj1
    *          the new value (may be null).
    */
-  public void setArg1(Object arg1) {
-    this.arg1 = arg1;
+  public void setArg1(Object obj1) {
+    arg1 = obj1;
   }
 
   /**
@@ -71,11 +71,11 @@ public class ObjectTuple implements IFact {
   /**
    * Setter for the second argument.
    * 
-   * @param arg2
+   * @param obj2
    *          the new value (may be null).
    */
-  public void setArg2(Object arg2) {
-    this.arg2 = arg2;
+  public void setArg2(Object obj2) {
+    arg2 = obj2;
   }
 
   /**

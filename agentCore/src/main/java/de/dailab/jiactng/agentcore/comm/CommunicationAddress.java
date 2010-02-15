@@ -4,54 +4,54 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * 
+ * Abstract implementation of all types of communication addresses.
  * @author Martin Loeffelholz
  * @author Marcel Patzlaff
  *
  */
 abstract class CommunicationAddress implements ICommunicationAddress {
-    private final CommunicationAddress _unboundAddress;
-    private final URI _uri;
-    private final String _transportId;
+    private final CommunicationAddress unboundAddress;
+    private final URI uri;
+    private final String transportId;
 	
 	protected CommunicationAddress(String scheme, String schemeSpecificPart) throws URISyntaxException {
-        _uri= new URI(scheme + ':' + schemeSpecificPart);
-        _unboundAddress= this;
-        _transportId= null;
+        uri= new URI(scheme + ':' + schemeSpecificPart);
+        unboundAddress= this;
+        transportId= null;
 	}
     
     protected CommunicationAddress(URI predefined, String expectedScheme) {
         if(!predefined.getScheme().equals(expectedScheme)) {
             throw new IllegalArgumentException("'" + predefined + "' is not applicable to this address type");
         }
-        _uri= predefined;
-        _unboundAddress= this;
-        _transportId= null;
+        uri= predefined;
+        unboundAddress= this;
+        transportId= null;
     }
     
     protected CommunicationAddress(CommunicationAddress unboundAddress, String transportId) throws URISyntaxException {
         if(unboundAddress.isBoundToTransport()) {
             throw new IllegalArgumentException("communication address can only be initialised with unbound address");
         }
-        _unboundAddress= unboundAddress;
-        _transportId= transportId;
-        _uri= new URI(_transportId + ':' + unboundAddress.toURI());
+        this.unboundAddress= unboundAddress;
+        this.transportId= transportId;
+        uri= new URI(transportId + ':' + unboundAddress.toURI());
     }
 
 	public final boolean isBoundToTransport() {
-        return _transportId != null;
+        return transportId != null;
     }
     
     public CommunicationAddress toUnboundAddress() {
-        return _unboundAddress;
+        return unboundAddress;
     }
 
     public final String getName() {
-		return _unboundAddress.toURI().getSchemeSpecificPart();
+		return unboundAddress.toURI().getSchemeSpecificPart();
 	}
 
     public final URI toURI() {
-        return _uri;
+        return uri;
     }
     
     @Override
@@ -64,13 +64,13 @@ abstract class CommunicationAddress implements ICommunicationAddress {
         	return false;
         }
         
-        CommunicationAddress other= (CommunicationAddress) obj;
+        final CommunicationAddress other= (CommunicationAddress) obj;
         return toURI().equals(other.toURI());
     }
 
     @Override
     public final int hashCode() {
-        return _uri.hashCode();
+        return uri.hashCode();
     }
 
     @Override

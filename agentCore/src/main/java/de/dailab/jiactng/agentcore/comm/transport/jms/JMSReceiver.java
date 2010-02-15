@@ -24,8 +24,6 @@ import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
 /**
- * 
- * 
  * JMSReceiver is creating consumers for JMS-Destinations and delegates the messages up to its "parent" JMSReceiver is
  * hold by a JMSMessageTransport, which extends a MessageTransport. The delegate where the message will be handed over
  * to is set through a setter in the extended part of the class.
@@ -40,7 +38,7 @@ class JMSReceiver implements MessageListener {
      * @return a standardized String Expression for address and selector
      */
     protected static String getStringRepresentation(ICommunicationAddress address, String selector) {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         result.append(address.toString());
 
         if (selector != null) {
@@ -55,9 +53,9 @@ class JMSReceiver implements MessageListener {
             return null;
         }
         
-        StringBuilder selector= new StringBuilder();
-        Set<String> keys= jiacMessage.getHeaderKeys();
-        String[] sortedKeys= keys.toArray(new String[keys.size()]);
+        final StringBuilder selector= new StringBuilder();
+        final Set<String> keys= jiacMessage.getHeaderKeys();
+        final String[] sortedKeys= keys.toArray(new String[keys.size()]);
         Arrays.sort(sortedKeys);
         
         for(String key : sortedKeys) {
@@ -79,17 +77,17 @@ class JMSReceiver implements MessageListener {
    
     protected final Log log;
 
-    private ConnectionFactory _connectionFactory;
-    private Connection _connection;
-    private Session _session;
-    private JMSMessageTransport _parent;
-    private Map<String, MessageConsumer> _consumers;
+    private ConnectionFactory connectionFactory;
+    private Connection connection;
+    private Session session;
+    private JMSMessageTransport parent;
+    private Map<String, MessageConsumer> consumers;
 
     public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent, Log log) throws JMSException {
-        _connectionFactory = connectionFactory;
-        _parent = parent;
+        this.connectionFactory = connectionFactory;
+        this.parent = parent;
         this.log = log;
-        _consumers = new HashMap<String, MessageConsumer>();
+        consumers = new HashMap<String, MessageConsumer>();
         doInit();
     }
 
@@ -101,9 +99,9 @@ class JMSReceiver implements MessageListener {
         if (log.isDebugEnabled()) {
             log.debug("JMSReceiver is initializing...");
         }
-        _connection = _connectionFactory.createConnection();
-        _session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        _connection.start();
+        connection = connectionFactory.createConnection();
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        connection.start();
         if (log.isDebugEnabled()) {
             log.debug("JMSReceiver initialized.");
         }
@@ -117,8 +115,8 @@ class JMSReceiver implements MessageListener {
             log.debug("JMSReceiver commencing cleanup...");
         }
         stopListenAll();
-        _session.close();
-        _connection.close();
+        session.close();
+        connection.close();
         if (log.isDebugEnabled()) {
             log.debug("JMSReceiver cleaned up");
         }
@@ -134,35 +132,35 @@ class JMSReceiver implements MessageListener {
      */
     public synchronized void listen(ICommunicationAddress address, IJiacMessage selectorTemplate) throws JMSException {
         // first check if we already have a listener like that
-        String selector= templateToSelector(selectorTemplate);
-        String key = getStringRepresentation(address, selector);
-        if (_consumers.containsKey(key)) {
+        final String selector= templateToSelector(selectorTemplate);
+        final String key = getStringRepresentation(address, selector);
+        if (consumers.containsKey(key)) {
             if (log.isWarnEnabled()) {
                 log.warn("there is already a listener for '" + key + "' registered");
             }
             return;
         }
         // then creating a listener if needed and map it with the others.
-        MessageConsumer consumer = initialiseConsumer(address, selector);
-        _consumers.put(key, consumer);
+        final MessageConsumer consumer = initialiseConsumer(address, selector);
+        consumers.put(key, consumer);
         if (log.isDebugEnabled()) {
             log.debug("Now listening to '" + key + "'");
         }
     }
 
     /**
-     * Stops receivment of the Messages from a given destination by removing the consumer aligned to it from the
-     * consumerlist (especially useful for temporaryDestinations)
+     * Stops receiving messages from a given destination by removing the consumer aligned to it from the
+     * consumer list (especially useful for temporaryDestinations)
      * 
      * @param address
-     *            the communicationaddress we don't want to listen anymore to
+     *            the communication address we don't want to listen anymore to
      * @param selector
      *            the selector given while the listener was created in the first place
      */
     public synchronized void stopListen(ICommunicationAddress address, IJiacMessage selectorTemplate) {
-        String selector= templateToSelector(selectorTemplate);
-        String key = getStringRepresentation(address, selector);
-        MessageConsumer consumer = _consumers.remove(key);
+        final String selector= templateToSelector(selectorTemplate);
+        final String key = getStringRepresentation(address, selector);
+        final MessageConsumer consumer = consumers.remove(key);
 
         if (consumer != null) {
             destroyConsumer(consumer);
@@ -176,11 +174,11 @@ class JMSReceiver implements MessageListener {
      * stops receiving Messages from all enlisted Destinations.
      */
     public synchronized void stopListenAll() {
-        for (MessageConsumer consumer : _consumers.values()) {
+        for (MessageConsumer consumer : consumers.values()) {
             destroyConsumer(consumer);
         }
 
-        _consumers.clear();
+        consumers.clear();
 
         if (log.isDebugEnabled()) {
             log.debug("Stopped Listening to all JMS Addresses");
@@ -201,22 +199,22 @@ class JMSReceiver implements MessageListener {
                 log.debug("JMSReceiver receiving message... delegating message");
             }
 
-            Destination receivedAt = message.getJMSDestination();
+            final Destination receivedAt = message.getJMSDestination();
             ICommunicationAddress at = null;
             if (receivedAt instanceof Topic){
-            	Topic topic = (Topic) receivedAt;
+            	final Topic topic = (Topic) receivedAt;
             	at = CommunicationAddressFactory.createGroupAddress(topic.getTopicName());
             } else {
-            	Queue queue = (Queue) receivedAt;
+            	final Queue queue = (Queue) receivedAt;
             	at = CommunicationAddressFactory.createMessageBoxAddress(queue.getQueueName());
             }
             
-            _parent.delegateMessage(JMSMessageTransport.unpack(message), at);
+            parent.delegateMessage(JMSMessageTransport.unpack(message), at);
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
                 log.error("An error receiving a message occured. Cause is '" + e.getCause() + "'");
             }
-            _parent.delegateException(e);
+            parent.delegateException(e);
         }
     }
     
@@ -236,10 +234,10 @@ class JMSReceiver implements MessageListener {
             if (log.isDebugEnabled()) {
                 log.debug("Listener initializing for '" + address.toString() + "' with '" + selector + "'");
             }
-            String add = address.getName();
-            Destination dest = address instanceof IGroupAddress ? _session.createTopic(add) : _session
+            final String add = address.getName();
+            final Destination dest = address instanceof IGroupAddress ? session.createTopic(add) : session
                     .createQueue(add);
-            consumer = _session.createConsumer(dest, selector == null ? null : selector);
+            consumer = session.createConsumer(dest, selector == null ? null : selector);
             consumer.setMessageListener(this);
         } catch (JMSException e) {
             if (log.isErrorEnabled()) {

@@ -64,7 +64,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             return null;
         }
         
-        JiacMessage result= new JiacMessage();
+        final JiacMessage result= new JiacMessage();
         
         // only header fields are cloned...
         for(String key : template.getHeaderKeys()) {
@@ -94,44 +94,50 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         }
     }
 
-    private final IMessageTransportDelegate _defaultDelegate;
+    private final IMessageTransportDelegate defaultDelegate;
 
-    private Map<String, MessageTransport> _transports;
+    private Map<String, MessageTransport> transports;
     protected final Map<ICommunicationAddress, List<ListenerContext>> addressToListenerMap;
 
+    /**
+     * Creates an initial communication bean.
+     */
     public CommunicationBean() {
-        _defaultDelegate = new MessageTransportDelegate();
-        _transports = new HashMap<String, MessageTransport>();
+        defaultDelegate = new MessageTransportDelegate();
+        transports = new HashMap<String, MessageTransport>();
         addressToListenerMap = new Hashtable<ICommunicationAddress, List<ListenerContext>>();
     }
 
     // ~ START OF CONFIGURATION AND INITIALISATION STUFF ~ //
     /**
-     * sets transports to the set given. All transports allready set which are not within the set given as parameter
+     * Sets transports to the set given. All transports already set which are not within the set given as parameter
      * will be removed.
+     * @param newTransports the message transports
+     * @throws Exception if a message transport can not be added to this bean
+     * @see #addTransport(MessageTransport)
      */
-    public synchronized void setTransports(Set<MessageTransport> transports) throws Exception {
+    public synchronized void setTransports(Set<MessageTransport> newTransports) throws Exception {
         if ((log != null) && log.isInfoEnabled()) {
-            log.info("CommunicationBean is setting it's transports to: " + transports.toString());
+            log.info("CommunicationBean is setting it's transports to: " + newTransports.toString());
         }
 
         Set<MessageTransport> workingCopy;
-        if (transports == null) {
+        if (newTransports == null) {
             workingCopy = Collections.emptySet();
         } else {
             workingCopy = new HashSet<MessageTransport>();
-            workingCopy.addAll(transports);
+            workingCopy.addAll(newTransports);
         }
 
         // first remove all existing transports
-        if (_transports.size() > 0) {
-            Set<MessageTransport> toRemove = new HashSet<MessageTransport>();
-            toRemove.addAll(_transports.values());
+        if (transports.size() > 0) {
+            final Set<MessageTransport> toRemove = new HashSet<MessageTransport>();
+            toRemove.addAll(transports.values());
             // only remove transports that are not in the workingCopy
             toRemove.removeAll(workingCopy);
 
             // only add transports that are not yet installed
-            workingCopy.removeAll(_transports.values());
+            workingCopy.removeAll(transports.values());
 
             // remove transports other than which we want to set
             for (MessageTransport transport : toRemove) {
@@ -144,14 +150,20 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         }
     }
 
+    /**
+     * Cleanup this communication bean by cleaning up all message transports.
+     * @throws Exception if an error occurs during cleanup of this agent bean or a message transport.
+     * @see MessageTransport#doCleanup()
+     * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doCleanup()
+     */
     @Override
     public void doCleanup() throws Exception {
         if (log.isInfoEnabled()) {
             log.info("CommunicationBean starts commencing cleanup");
             log.info("Cleaning up transports");
         }
-        synchronized (_transports) {
-            for (MessageTransport transport : _transports.values()) {
+        synchronized (transports) {
+            for (MessageTransport transport : transports.values()) {
                 try {
                     transport.doCleanup();
                 } catch (Exception e) {
@@ -168,6 +180,14 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         }
     }
 
+    /**
+     * Initialize this communication bean by initializing all specified message transports and establishing the message box.
+     * @throws Exception if an error occurs during initialization of this agent bean or a message transport or during establishing the message box.
+     * @see MessageTransport#doInit()
+     * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
+     * @see #establishMessageBox(IMessageBoxAddress)
+     * @see #setTransports(Set)
+     */
     @Override
     public synchronized void doInit() throws Exception {
         if ((log != null) && log.isInfoEnabled()) {
@@ -177,9 +197,9 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
 
         log.info("initializing Transports");
 
-        for (Iterator<MessageTransport> iter = _transports.values().iterator(); iter.hasNext();) {
-            MessageTransport transport = iter.next();
-            transport.setDefaultDelegate(_defaultDelegate);
+        for (final Iterator<MessageTransport> iter = transports.values().iterator(); iter.hasNext();) {
+            final MessageTransport transport = iter.next();
+            transport.setDefaultDelegate(defaultDelegate);
             try {
                 transport.doInit();
             } catch (Exception e) {
@@ -190,8 +210,8 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
                 try {
                     transport.doCleanup();
                 } catch (Exception x) {
+                	;
                 }
-                ;
                 iter.remove();
 
                 // deregister message transport from management
@@ -202,7 +222,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         // create the default message box for this agent
         establishMessageBox(thisAgent.getAgentDescription().getMessageBoxAddress());
 
-        if (_transports.size() <= 0) {
+        if (transports.size() <= 0) {
             log.warn("no transports available yet!");
         }
 
@@ -217,28 +237,28 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * @param transport
      *            to add
      * @throws Exception
-     *             is thrown if transport allready hold by this CommunicationBean
+     *             is thrown if transport already hold by this CommunicationBean
      */
     public synchronized void addTransport(MessageTransport transport) throws Exception {
         if ((log != null) && log.isInfoEnabled()) {
             log.info("Adding Transport '" + transport + "' to CommunicationBean");
         }
 
-        String id = transport.getTransportIdentifier();
-        if (_transports.containsKey(id)) {
+        final String id = transport.getTransportIdentifier();
+        if (transports.containsKey(id)) {
             throw new IllegalArgumentException("the transport '" + id + "' already exists");
         }
 
         try {
             if (isActive()) {
-                // init message transport
-                transport.setDefaultDelegate(_defaultDelegate);
+                // initialize message transport
+                transport.setDefaultDelegate(defaultDelegate);
                 transport.doInit();
                 registerAllToTransport(transport);
             }
         } finally {
             // add message transport
-            _transports.put(id, transport);
+            transports.put(id, transport);
 
             // register message transport for management
             registerTransport(transport);
@@ -246,14 +266,14 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
     }
 
     /**
-     * removes and cleans up a transport hold by this CommunicationBean
+     * Removes and cleans up a transport hold by this CommunicationBean.
      * 
      * @param transportIdentifier
      *            of the transport to remove
      */
     public synchronized void removeTransport(String transportIdentifier) {
         // remove message transport
-        MessageTransport transport = _transports.remove(transportIdentifier);
+        final MessageTransport transport = transports.remove(transportIdentifier);
 
         if (transport == null) {
             if (log.isWarnEnabled()) {
@@ -297,7 +317,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
     }
     
     public boolean isLocal(IMessageBoxAddress messageBox) {
-        String name= messageBox.getName();
+        final String name= messageBox.getName();
         return name.startsWith(thisAgent.getAgentNode().getUUID());
     }
 
@@ -311,6 +331,15 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         unregister(messageBox, null);
     }
 
+    /**
+     * Send a message to a given communication address.
+     * @param message the message to send
+     * @param address the communication address of the message receiver
+     * @throws CommunicationException if the message can not be send
+     * @throws IllegalArgumentException if one of the parameters is <code>null</code>
+     * @see MessageTransport#send(IJiacMessage, ICommunicationAddress)
+     * @see #messageExchanged(MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
+     */
     public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
         if (message == null) {
             throw new IllegalArgumentException("message must not be null");
@@ -380,7 +409,12 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
 
     // ~ INTERNAL METHODS ~ //
     /**
-     * delegates received messages to the Memory of the agent
+     * Delegates received messages to the memory of the agent
+     * @param source the message transport which has received the message
+     * @param message the received message
+     * @param at the communication address where the message was sent to
+     * @see #messageExchanged(MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
+     * @see de.dailab.jiactng.agentcore.knowledge.Memory#write(de.dailab.jiactng.agentcore.knowledge.IFact)
      */
     protected void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
     	// notification about receiving message
@@ -400,7 +434,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
     }
 
     /**
-     * if an error occures....
+     * if an error occurs ....
      * 
      * @param source
      * @param error
@@ -417,14 +451,14 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      */
     private synchronized void internalSend(JiacMessage message, CommunicationAddress address)
             throws CommunicationException {
-        if (_transports.size() <= 0) {
+        if (transports.size() <= 0) {
             throw new CommunicationException("no transport available");
         }
 
         if (log.isDebugEnabled()) {
             log.debug("send message...");
         }
-        CommunicationAddress unboundAddress = address.toUnboundAddress();
+        final CommunicationAddress unboundAddress = address.toUnboundAddress();
 
         // set the sender of the message
         message.setSender(thisAgent.getAgentDescription().getMessageBoxAddress());
@@ -436,11 +470,11 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             // 1:1 communication
             MessageTransport transport = null;
             if (address.isBoundToTransport()) {
-                String transportId = address.toURI().getScheme();
-                transport = _transports.get(transportId);
+                final String transportId = address.toURI().getScheme();
+                transport = transports.get(transportId);
             } else {
                 // TODO: lookup for transport
-                transport = _transports.values().iterator().next();
+                transport = transports.values().iterator().next();
             }
 
             if (transport != null) {
@@ -455,7 +489,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
                 log.debug("address is a group address -> choosing all transports");
             }
             // 1:n communication
-            for (MessageTransport transport : _transports.values()) {
+            for (MessageTransport transport : transports.values()) {
                 transport.send(message, unboundAddress);
                 // notification about sending message
                 messageExchanged(MessageExchangeAction.SEND, unboundAddress, message, transport.getTransportIdentifier());
@@ -467,7 +501,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * Assumes that the listener and the address are non-null.
      */
     private synchronized void internalRegister(CommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
-        CommunicationAddress unboundAddress = address.toUnboundAddress();
+        final CommunicationAddress unboundAddress = address.toUnboundAddress();
         selectorTemplate= cloneTemplate(selectorTemplate);
         ListenerContext context = new ListenerContext(selectorTemplate);
         List<ListenerContext> registeredContexts = addressToListenerMap.get(unboundAddress);
@@ -478,7 +512,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         // 3. The address isn't registered and nobody is listening to it.
         if (registeredContexts != null) {
             // we have already some listener registered for this communication address
-            int index = registeredContexts.indexOf(context);
+            final int index = registeredContexts.indexOf(context);
 
             if (index >= 0) {
                 // (1.) there is already another listener with same address and selector registered
@@ -518,7 +552,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         	if (log.isDebugEnabled()) {
         		log.debug("isActive -> registering listeners for new address '" + unboundAddress + "'");
         	}
-        	for (MessageTransport transport : _transports.values()) {
+        	for (MessageTransport transport : transports.values()) {
         		transport.listen(address, context.selector);
         	}
         }
@@ -548,9 +582,9 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * Assumes that the listener and the address are non-null.
      */
     private synchronized void internalUnregister(CommunicationAddress address, IJiacMessage selectorTemplate) throws CommunicationException {
-        CommunicationAddress unboundAddress = address.toUnboundAddress();
+        final CommunicationAddress unboundAddress = address.toUnboundAddress();
         selectorTemplate= cloneTemplate(selectorTemplate);
-        List<ListenerContext> registeredContexts = addressToListenerMap.remove(unboundAddress);
+        final List<ListenerContext> registeredContexts = addressToListenerMap.remove(unboundAddress);
 
         if (log.isDebugEnabled()) {
             log.debug("Removing nonWildcardListener with address '" + address + "' and selector '" + selectorTemplate + "'");
@@ -564,7 +598,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         }
         
         ListenerContext context = new ListenerContext(selectorTemplate); // template to find it fast
-        int index = registeredContexts.indexOf(context);
+        final int index = registeredContexts.indexOf(context);
 
         if(index >= 0) {
         	// this address-selectorTemplate combination is actually registered
@@ -576,7 +610,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             	// this was the last one listening to this address with this selectorTemplate
             	if(isActive()) {
                     // remove registration
-                    for(MessageTransport transport : _transports.values()) {
+                    for(MessageTransport transport : transports.values()) {
                         transport.stopListen(unboundAddress, context.selector);
                     }
                 }
@@ -587,7 +621,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             }
             
         } else {
-        	// there doesn't exist a registstration for this combination 
+        	// there doesn't exist a registration for this combination 
             if(log.isWarnEnabled()) {
                 log.warn("Aborted Unregister: There is no listener registered for this address '" + address + "' and selector '" + selectorTemplate + "'");
             }
@@ -627,7 +661,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         super.enableManagement(manager);
 
         // register all message transports for management
-        for (MessageTransport transport : _transports.values()) {
+        for (MessageTransport transport : transports.values()) {
             registerTransport(transport);
         }
     }
@@ -642,7 +676,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         }
 
         // deregister all message transports from management
-        for (String transportId : _transports.keySet()) {
+        for (String transportId : transports.keySet()) {
             deregisterTransport(transportId);
         }
 
@@ -655,7 +689,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * @param transport
      *            the message transport to be registered
      */
-    private final void registerTransport(MessageTransport transport) {
+    private void registerTransport(MessageTransport transport) {
         // do nothing if management is not enabled
         if (!isManagementEnabled()) {
             return;
@@ -687,7 +721,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * @param transportId
      *            the identifier of the message transport
      */
-    private final void deregisterTransport(String transportId) {
+    private void deregisterTransport(String transportId) {
         // do nothing if management is not enabled
         if (!isManagementEnabled()) {
             return;
@@ -717,22 +751,22 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
     @SuppressWarnings("unchecked")
     public CompositeData getSelectorsOfAddresses() {
         CompositeData data = null;
-        int size = addressToListenerMap.size();
-        String[] itemNames = new String[size];
-        OpenType[] itemTypes = new OpenType[size];
-        Object[] itemValues = new Object[size];
-        Object[] addresses = addressToListenerMap.keySet().toArray();
+        final int size = addressToListenerMap.size();
+        final String[] itemNames = new String[size];
+        final OpenType[] itemTypes = new OpenType[size];
+        final Object[] itemValues = new Object[size];
+        final Object[] addresses = addressToListenerMap.keySet().toArray();
         try {
             for (int i = 0; i < size; i++) {
-                ICommunicationAddress address = (ICommunicationAddress) addresses[i];
+                final ICommunicationAddress address = (ICommunicationAddress) addresses[i];
                 itemNames[i] = address.getName();
                 itemTypes[i] = new ArrayType(1, SimpleType.STRING);
-                List<ListenerContext> values = addressToListenerMap.get(address);
-                String[] value = new String[values.size()];
-                Iterator<ListenerContext> it = values.iterator();
+                final List<ListenerContext> values = addressToListenerMap.get(address);
+                final String[] value = new String[values.size()];
+                final Iterator<ListenerContext> it = values.iterator();
                 int j = 0;
                 while (it.hasNext()) {
-                    IJiacMessage selector = it.next().selector;
+                    final IJiacMessage selector = it.next().selector;
                     if (selector == null) {
                         value[j] = "null";
                     } else {
@@ -742,7 +776,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
                 }
                 itemValues[i] = value;
             }
-            CompositeType compositeType = new CompositeType(addressToListenerMap.getClass().getName(),
+            final CompositeType compositeType = new CompositeType(addressToListenerMap.getClass().getName(),
                     "addresses of the communication bean", itemNames, itemNames, itemTypes);
             data = new CompositeDataSupport(compositeType, itemNames, itemValues);
         } catch (OpenDataException e) {
@@ -762,7 +796,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
     public void messageExchanged(MessageExchangeAction action, 
 			ICommunicationAddress receiver, IJiacMessage jiacMessage,
 			String transport) {
-        Notification n =
+        final Notification n =
                 new MessageExchangeNotification(this,
                 sequenceNumber++,
                 System.currentTimeMillis(),
@@ -780,19 +814,19 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-    	MBeanNotificationInfo[] parent = super.getNotificationInfo();
-    	int size = parent.length;
-    	MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
+    	final MBeanNotificationInfo[] parent = super.getNotificationInfo();
+    	final int size = parent.length;
+    	final MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
     	for (int i=0; i<size; i++) {
     		result[i] = parent[i];
     	}
     	
-        String[] types = new String[] {
+        final String[] types = new String[] {
             MessageExchangeNotification.MESSAGE_EXCHANGE
         };
-        String name = MessageExchangeNotification.class.getName();
-        String description = "A message with another agent was exchanged";
-        MBeanNotificationInfo info =
+        final String name = MessageExchangeNotification.class.getName();
+        final String description = "A message with another agent was exchanged";
+        final MBeanNotificationInfo info =
                 new MBeanNotificationInfo(types, name, description);
         result[size] = info;
         return result;
@@ -815,13 +849,18 @@ class ListenerContext {
             return false;
         }
 
-        ListenerContext other = (ListenerContext) obj;
+        final ListenerContext other = (ListenerContext) obj;
         return selector == null ? other.selector == null
                                 : other.selector == null ? false 
                                                          : selector.equals(other.selector);
     }
 
     @Override
+	public int hashCode() {
+        return CommunicationBean.class.hashCode() ^ (selector != null ? selector.hashCode() : 0);
+	}
+
+	@Override
     public String toString() {
         return selector == null ? "*" : selector.toString();
     }

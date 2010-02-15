@@ -21,41 +21,41 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  *
  */
 class JMSSender {
-	private final Log _log;
+	private final Log log;
 	
-	private ConnectionFactory _connectionFactory;
+	private ConnectionFactory connectionFactory;
 
-	private Session _session = null;
-	private Connection _connection = null;
+	private Session session = null;
+	private Connection connection = null;
 	
-	private int _defaultTimeOut = 1000;
+	private static final int DEFAULT_TIMEOUT = 1000;
 
 	public JMSSender(ConnectionFactory connectionFactory, Log log) throws JMSException {
-		_connectionFactory = connectionFactory;
-        _log= log;
+		this.connectionFactory = connectionFactory;
+        this.log= log;
 		doInit();
 	}
 	
 	public void doInit() throws JMSException {
-		if (_log.isDebugEnabled()){
-			_log.debug("JMSSender is initializing...");
+		if (log.isDebugEnabled()){
+			log.debug("JMSSender is initializing...");
 		}
-		_connection = _connectionFactory.createConnection();
-		_session = _connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		_connection.start();
-        if (_log.isDebugEnabled()){
-        	_log.debug("JMSSender initialized.");
+		connection = connectionFactory.createConnection();
+		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		connection.start();
+        if (log.isDebugEnabled()){
+        	log.debug("JMSSender initialized.");
         }
 	}
 	
 	public void doCleanup() throws JMSException {
-		if(_log.isDebugEnabled()){
-			_log.debug("JMSSender is commencing cleanup...");
+		if(log.isDebugEnabled()){
+			log.debug("JMSSender is commencing cleanup...");
 		}
-		_session.close();
-		_connection.close();
-        if (_log.isDebugEnabled()){
-        	_log.debug("JMSSender cleaned up.");
+		session.close();
+		connection.close();
+        if (log.isDebugEnabled()){
+        	log.debug("JMSSender cleaned up.");
         }
 	}
 
@@ -63,27 +63,27 @@ class JMSSender {
 		Destination destination = null;
 		
 		if (address instanceof IGroupAddress) {
-			destination = _session.createTopic(address.getName());
+			destination = session.createTopic(address.getName());
         } else {
-			destination = _session.createQueue(address.getName());
+			destination = session.createQueue(address.getName());
         }
 		
-		sendMessage(message, destination, _defaultTimeOut);
+		sendMessage(message, destination, DEFAULT_TIMEOUT);
 	}
 	
 	private void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {
-        MessageProducer producer = _session.createProducer(destination);
+        final MessageProducer producer = session.createProducer(destination);
 		producer.setTimeToLive(timeToLive);
         
-        if (_log.isDebugEnabled()){
-        	_log.debug("pack message");
+        if (log.isDebugEnabled()){
+        	log.debug("pack message");
         }
-        Message jmsMessage= JMSMessageTransport.pack(message, _session);
+        final Message jmsMessage= JMSMessageTransport.pack(message, session);
         jmsMessage.setJMSDestination(destination);
 		producer.send(jmsMessage);
 		producer.close();
-        if (_log.isDebugEnabled()){
-        	_log.debug("JMSSender sent Message to '" + destination + "'");
+        if (log.isDebugEnabled()){
+        	log.debug("JMSSender sent Message to '" + destination + "'");
         }
 	}
 }

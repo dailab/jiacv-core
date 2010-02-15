@@ -30,22 +30,33 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  */
 public class JMSMessageTransport extends MessageTransport {
 
-	// Zur Zeit sind logs auskommentiert.
-	private ConnectionFactory _connectionFactory;
-	private JMSSender _sender;
-	private JMSReceiver _receiver;
-	
+	private ConnectionFactory connectionFactory;
+	private JMSSender sender;
+	private JMSReceiver receiver;
+
+	/**
+	 * Creates a JMS message transport with the transport identifier "jms".
+	 * @see #JMSMessageTransport(String)
+	 */
 	public JMSMessageTransport() {
 		this("jms");
 	}
-    
+
+	/**
+	 * Creates a JMS message transport with a given transport identifier.
+	 * @param transportIdentifier the transport identifier
+	 * @see MessageTransport#MessageTransport(String)
+	 */
     public JMSMessageTransport(String transportIdentifier) {
         super(transportIdentifier);
     }
 
     /**
-	 * Initializes the JMSMessageTransport 
+	 * Initializes the JMSMessageTransport. 
 	 * Notes: ConnectionFactory needed!
+	 * @throws Exception if no logger or connection factory is set, or if the creation of the JMS sender or receiver failed. 
+	 * @see {@link JMSSender#JMSSender(ConnectionFactory, org.apache.commons.logging.Log)}
+	 * @see JMSReceiver#JMSReceiver(ConnectionFactory, JMSMessageTransport, org.apache.commons.logging.Log)
 	 */
 	@Override
 	public synchronized void doInit() throws Exception {
@@ -58,10 +69,12 @@ public class JMSMessageTransport extends MessageTransport {
 			log.debug("JMSMessageTransport initializing...");
 		}
 	
-		if (getConnectionFactory() == null) throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
+		if (getConnectionFactory() == null) {
+			throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
+		}
 		
-		_sender = new JMSSender(_connectionFactory, createChildLog("sender"));
-		_receiver = new JMSReceiver(_connectionFactory, this, createChildLog("receiver"));
+		sender = new JMSSender(connectionFactory, createChildLog("sender"));
+		receiver = new JMSReceiver(connectionFactory, this, createChildLog("receiver"));
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport initialized");
 		}
@@ -76,8 +89,8 @@ public class JMSMessageTransport extends MessageTransport {
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport commences Cleanup");
 		}
-        try {_receiver.doCleanup();} catch (Exception e) {log.warn("Clean up receiver failed, because " + e.getLocalizedMessage());}
-		try {_sender.doCleanup();} catch (Exception e) {log.warn("Clean up sender failed, because " + e.getLocalizedMessage());}
+        try {receiver.doCleanup();} catch (Exception e) {log.warn("Clean up receiver failed, because " + e.getLocalizedMessage());}
+		try {sender.doCleanup();} catch (Exception e) {log.warn("Clean up sender failed, because " + e.getLocalizedMessage());}
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport cleaned up");
 		}
@@ -95,21 +108,21 @@ public class JMSMessageTransport extends MessageTransport {
     static IJiacMessage unpack(Message message) throws JMSException {
         IFact payload;
         if(message instanceof BytesMessage) {
-            int length= (int)((BytesMessage) message).getBodyLength();
-            byte[] data= new byte[length];
+            final int length= (int)((BytesMessage) message).getBodyLength();
+            final byte[] data= new byte[length];
             ((BytesMessage) message).readBytes(data);
             payload= new BinaryContent(data);
         } else {
             payload= (IFact) ((ObjectMessage)message).getObject();
         }
         
-        IJiacMessage result= new JiacMessage(payload);
-        for(Enumeration<?> keys= message.getPropertyNames(); keys.hasMoreElements(); ) {
-            Object keyObj= keys.nextElement();
+        final IJiacMessage result= new JiacMessage(payload);
+        for(final Enumeration<?> keys= message.getPropertyNames(); keys.hasMoreElements(); ) {
+            final Object keyObj= keys.nextElement();
             
             if(keyObj instanceof String) {
-                String key= (String) keyObj;
-                Object valueObj= message.getObjectProperty(key);
+                final String key= (String) keyObj;
+                final Object valueObj= message.getObjectProperty(key);
                 
                 if(valueObj instanceof String) {
                     result.setHeader(key, (String)valueObj);
@@ -124,12 +137,12 @@ public class JMSMessageTransport extends MessageTransport {
      * Puts a JiacMessage into a JMSMessage which could then be send using JMS
      * 
      * @param message	the JiacMessage to sent
-     * @param session	a (jms)session needed to create the message
-     * @return	Message a jmsmessage to send over a jms broker
+     * @param session	a (JMS)session needed to create the message
+     * @return	Message a JMS message to send over a JMS broker
      * @throws JMSException
      */
     static Message pack(IJiacMessage message, Session session) throws JMSException {
-    	IFact payload= message.getPayload();
+    	final IFact payload= message.getPayload();
     	try {
 //	        IFact payload= message.getPayload();
 	        Message result;
@@ -167,6 +180,7 @@ public class JMSMessageTransport extends MessageTransport {
 	 * @param message 	a JiacMessage
 	 * @param commAdd 	a CommunicationAddress, which might be a GroupAddress or
 	 * 					a MessageBoxAddress
+	 * @throws CommunicationException if an error occurs while sending the message
 	 */
 	public void send(IJiacMessage message, ICommunicationAddress commAdd) throws CommunicationException {
         if (log.isDebugEnabled()){
@@ -174,7 +188,7 @@ public class JMSMessageTransport extends MessageTransport {
         }
 		
 		try {
-            _sender.send(message, commAdd);
+            sender.send(message, commAdd);
         } catch (JMSException jms) {
         	if (log.isErrorEnabled()){
         		log.error("Sending of Message to address '" + commAdd.toUnboundAddress() + 
@@ -193,6 +207,7 @@ public class JMSMessageTransport extends MessageTransport {
 	 * 
 	 * @param address 	the address to listen to
 	 * @param selector	if you want to get only special messages use this to select them
+	 * @throws CommunicationException if an error occurs while creating the message listener
 	 */
 	public void listen(ICommunicationAddress address, IJiacMessage selector) throws CommunicationException {
         if (log.isDebugEnabled()){
@@ -200,7 +215,7 @@ public class JMSMessageTransport extends MessageTransport {
         			+ "' with selector'" + selector + "'");
         }
 		try {
-            _receiver.listen(address, selector);
+            receiver.listen(address, selector);
         } catch (JMSException jms) {
         	if (log.isErrorEnabled()){
         		log.error("Listening to address '" + address.toUnboundAddress() + "' through JMS failed!");
@@ -211,22 +226,30 @@ public class JMSMessageTransport extends MessageTransport {
 	}
 	
 	/**
-	 * Stops receivment of the Messages from a given address by removing the listener
-	 * aligned to it from the listenerlist (especially useful for temporaryDestinations)
+	 * Stops receiving messages from a given address by removing the listener
+	 * aligned to it from the listener list (especially useful for temporaryDestinations).
 	 * 
 	 * @param address	the address you had listen to
 	 * @param selector	the selector given with the address when you started to
 	 * 					listen to it
 	 */
 	public void stopListen(ICommunicationAddress address, IJiacMessage selector) { 
-		_receiver.stopListen(address, selector);
-	}
-    
-	public ConnectionFactory getConnectionFactory() {
-		return _connectionFactory;
+		receiver.stopListen(address, selector);
 	}
 
-	public void setConnectionFactory(ConnectionFactory connectionFactory) {
-		_connectionFactory = connectionFactory;
+	/**
+	 * Get the connection factory used for creating sender and receiver.
+	 * @return the connection factory
+	 */
+	public ConnectionFactory getConnectionFactory() {
+		return connectionFactory;
+	}
+
+	/**
+	 * Set the connection factory to be used for creating sender and receiver.
+	 * @param newConnectionFactory the connection factory
+	 */
+	public void setConnectionFactory(ConnectionFactory newConnectionFactory) {
+		connectionFactory = newConnectionFactory;
 	}
 }

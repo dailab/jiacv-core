@@ -13,13 +13,13 @@
 	</object>
 	
 	<object id="StandardTCPConnector" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQTransportConnector">
-		<simple name="transportURI">tcp://0.0.0.0:0</simple>
-		<simple name="discoveryURI">smartmulticast://default?group=jiac-tng</simple>
+		<simple name="transportURI" value="tcp://0.0.0.0:0" />
+		<simple name="discoveryURI" value="smartmulticast://default?group=jiac-tng" />
 	</object>
 	
 	<object id="StandardTCPConnectorFixedPort">
 		<parent ref="StandardTCPConnector"/>
-		<simple name="transportURI">tcp://0.0.0.0:61616</simple>
+		<simple name="transportURI" value="tcp://0.0.0.0:61616" />
 	</object>
 	
 	<object id="StandardJMSConnectionFactory" class="de.dailab.jiactng.agentcore.comm.broker.ConnectionFactoryProxy" />

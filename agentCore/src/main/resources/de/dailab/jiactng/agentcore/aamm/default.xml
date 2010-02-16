@@ -20,12 +20,12 @@
 	</node>
 	
 	<agent id="SimpleAgent" class="de.dailab.jiactng.agentcore.Agent">
-		<simple name="executionInterval">10</simple>
+		<simple name="executionInterval" value="10" />
 		<objectRef name="memory" ref="Memory"/>
 		<objectRef name="execution" ref="SimpleExecutionCycle"/>
 	</agent>
 	
-	<agent id="NonBlockingAgent" parent="SimpleAgent">
+	<agent id="NonBlockingAgent">
 		<parent ref="SimpleAgent"/>
 		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
 	</agent>

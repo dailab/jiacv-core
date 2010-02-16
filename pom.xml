@@ -186,6 +186,17 @@
          <organizationUrl>http://www.dai-labor.de</organizationUrl>
          <timezone>+1</timezone>
       </developer>
+      <developer>
+         <id>thiele</id>
+         <name>Alexander Thiele</name>
+         <email>alexander.thiele@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
    </developers>
 
    <build>

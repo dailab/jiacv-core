@@ -5,49 +5,20 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.0.5" date="2009-12-03" description="Minor release">
-			<action dev="jakob" type="add">
-				ASGARD - JIAC V Agent Platform Monitor - 3D!
+		<release version="5.1.0" date="t.b.a." description="Major release">
+			<action dev="keiser" type="update">
+				The JMX names of all managed JIAC resources contains the unique ID instead the name of the corresponding agent node.
 			</action>
-			<action dev="kaisers" type="add">
-				AgentUnit - Unit testing of JIAC V agent services made easier.
-			</action>
-			<action dev="kaisers" type="add">
-				Deployment of JADL scripts now uses load distribution.
-			</action>
-			<action dev="kaisers" type="update">
-				Load measurement more robust.
-			</action>
-			<action dev="kaisers" type="update">
-				Load distribution during starttime.
-			</action>
-			<action dev="burkhardt" type="update">
-				JADL++ improved!!: based on Eclipse TMF v0.7.1; services published in IDirectory;
-				new headers (import, include, mapping, define); new modifier for numeric datatypes;
-				new events (message, time); new control flow (switch-case); new commands (listen, receive, send).
+			<action dev="keiser" type="remove">
+				Moved all operational and management interfaces of agentCore to new module agentCoreAPI.
+				Thus, agentCore is now only the implementation of this interfaces.
 			</action>
 		</release>
+		<release version="5.0.5" date="2009-12-03" description="Minor release">
+		</release>
 		<release version="5.0.4" date="2009-01-27" description="Minor release">
-			<action dev="loeffelholz" type="add">
-				Integration of IRML user management as basic service module with flexible user agent authentication
-				and authorisation of JIAC actions.
-			</action>
-			<action dev="marcel" type="add">
-				A gateway for reliable host name resolution for agent discovery and inter-agent communication.
-			</action>
-			<action dev="burkhardt" type="add">
-				OWL support in JADL++ interpreter and service matcher.
-			</action>
-			<action dev="masuch" type="add">
-				A service matcher matching OWL-S service descriptions.
-			</action>
-			<action dev="burkhardt" type="update">
-				Improvement of JADL++ interpreter.
-			</action>
-			<action dev="kuester" type="update">
-				Rule engine API and Drools support has been extracted from JIAC and established as own independent module
-				for use in other DAI-Labor projects without JIAC. Integration of ruleengine into JIAC agents is now build on
-				top of it.
+			<action dev="keiser" type="add">
+				Flexible token-based authorisation for JIAC action invocations.
 			</action>
 			<action dev="keiser" type="update">
 				Enhanced execution cycle now supports parallel action execution.
@@ -61,17 +32,9 @@
 		</release>
 		<release version="5.0.3" date="2008-07-07" description="Minor release">
 		</release>
+		<release version="5.0.2" description="Minor release">
+		</release>
 		<release version="5.0.1" date="2007-11-08" description="First release">
-			<action dev="axle" type="add">
-				Additionally to the normal source and test code structure
-				a site will be created which provides basic information about the module on the one
-				hand, and information about the quality of the module on the other.
-			</action>
-			<action dev="axle" type="add">
-				You may now log your changes in a ChangeLog using
-				this changes.xml. A report will be generated automatically and integrated
-				in the site.
-			</action>
 			<action dev="joachim" type="add">
 				Strict mode support added to "de.dailab.jiactng.agentcore.lifecycle.DefaultLifecycleHandler".
 			</action>

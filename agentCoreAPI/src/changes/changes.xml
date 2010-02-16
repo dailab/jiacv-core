@@ -1,0 +1,17 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://www.cs.tu-berlin.de/%7Esmarqoo/maven-changes.xsd">
+	<properties>
+		<title>Changes</title>
+		<author email="axle.hessler@dai-labor.de">axle</author>
+	</properties>
+	<body>
+		<release version="5.1.0" date="t.b.a." description="First release">
+			<action dev="keiser" type="update">
+				The JMX names of all managed JIAC resources contains the unique ID instead the name of the corresponding agent node.
+			</action>
+			<action dev="keiser" type="add">
+				New module agentCoreAPI which contains all operational and management interfaces from agentCore.
+			</action>
+		</release>
+	</body>
+</document>

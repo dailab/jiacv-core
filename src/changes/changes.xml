@@ -5,14 +5,11 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="1.0" date="t.b.a" desc="First release">
-			<action dev="axle" type="add">Additionally to the normal source and test code structure
-				a site will be created which provides basic information about the module on the one
-				hand, and information about the quality of the module on the other.
-			</action>
-			<action dev="axle" type="add">You may now log your changes in a ChangeLog using
-				this changes.xml. A report will be generated automatically and integrated
-				in the site.
+		<release version="5.1.0" date="t.b.a." description="Major release">
+		</release>
+		<release version="5.0.5" date="2009-12-03" description="Minor release">
+			<action dev="kaisers" type="add">
+				AgentUnit - Unit testing of JIAC V agent services made easier.
 			</action>
 		</release>
 	</body>

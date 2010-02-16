@@ -1,0 +1,21 @@
+<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://www.cs.tu-berlin.de/%7Esmarqoo/maven-changes.xsd">
+	<properties>
+		<title>Changes</title>
+		<author email="axle.hessler@dai-labor.de">axle</author>
+	</properties>
+	<body>
+		<release version="5.1.0" date="t.b.a." description="Major release">
+		</release>
+		<release version="5.0.5" date="2009-12-03" description="Minor release">
+		</release>
+		<release version="5.0.4" date="2009-01-27" description="Minor release">
+		</release>
+		<release version="5.0.3" date="2008-07-07" description="Minor release">
+		</release>
+		<release version="5.0.2" description="Minor release">
+		</release>
+		<release version="5.0.1" date="2007-11-08" description="First release">
+		</release>
+	</body>
+</document>

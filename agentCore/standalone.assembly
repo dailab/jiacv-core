@@ -12,20 +12,6 @@
       	<include>*.jar</include>
       </includes>
     </fileSet>
-    <fileSet>    
-      <directory>${basedir}/src/main/conf</directory>
-      <outputDirectory>conf</outputDirectory>
-      <includes>
-      	<include>**/*.*</include>      	
-      </includes>      
-    </fileSet>
-    <fileSet>    
-      <directory>${basedir}/src/main/bin</directory>
-      <outputDirectory>bin</outputDirectory>
-      <includes>
-      	<include>**/*.*</include>      	
-      </includes>      
-    </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>

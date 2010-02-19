@@ -7,7 +7,7 @@
 		###########
 		# Imports #
 		###########
-		get the abstract AgentNode definition --
+		get the abstract AgentNode definition
 	-->
 	<import resource="AgentNode.xml" />
 	

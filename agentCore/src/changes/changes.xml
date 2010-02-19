@@ -6,15 +6,96 @@
 	</properties>
 	<body>
 		<release version="5.1.0" date="t.b.a." description="Major release">
+			<action dev="marcel" type="add">
+				New AAMM-based configuration of default agent nodes, message brokers, agents, agent beans and other agent resources.
+			</action>
+			<action dev="keiser" type="fix">
+				Default spring configurations fixed to avoid creation of zombie agent resources.
+			</action>
+			<action dev="axle" type="update">
+				Allowed to have more than one message broker per JVM.
+			</action>
+			<action dev="keiser" type="add">
+				New management function to change the name of agent nodes.
+			</action>
 			<action dev="keiser" type="update">
 				The JMX names of all managed JIAC resources contains the unique ID instead the name of the corresponding agent node.
 			</action>
+			<action dev="kaisers" type="update">
+				Renaming spring configurations of default agent nodes from "Platform" to "Node".
+			</action>
+			<action dev="axle" type="remove">
+				Removed package "de.dailab.jiactng.agentcore.comm.wp" with old implementation of distributed agent and service directory.
+			</action>
+			<action dev="axle" type="update">
+				Agent nodes and agents use new implementation of distributed agent and service directory in package
+				"de.dailab.jiactng.agentcore.directory" and added management interface to this implementation.
+			</action>
+			<action dev="keiser" type="fix">
+				Some minor changes and fixes (performance, use copied arrays in getters and setters instead of references, 
+				infinite recursive loop, ...).
+			</action>
+			<action dev="axle" type="update">
+				Upgrade to ActiveMQ 5.3.
+			</action>
 			<action dev="keiser" type="remove">
 				Moved all operational and management interfaces of agentCore to new module agentCoreAPI.
-				Thus, agentCore is now only the implementation of this interfaces.
+				Thus, agentCore is now only the implementation of these interfaces.
 			</action>
 		</release>
 		<release version="5.0.5" date="2009-12-03" description="Minor release">
+			<action dev="axle" type="add">
+				New static ActiveMQ broker and network connector configuration.
+			</action>
+			<action dev="jakob" type="add">
+				New management function to get the description of an agent.
+			</action>
+			<action dev="burkhardt" type="add">
+				New message header field "SEND_TO".
+			</action>
+			<action dev="burkhardt" type="add">
+				New mobility flag within agent description to indicate mobile agents.
+			</action>
+			<action dev="jakob" type="add">
+				Added attribute change notifications for agent beans and agents.
+			</action>
+			<action dev="moekon" type="remove">
+				Removed package "de.dailab.jiactng.agentcore.servicediscovery" with old servicediscovery code.
+			</action>
+			<action dev="jakob" type="add">
+				Added new management functions for getting the authorization capability of agent beans.
+			</action>
+			<action dev="moekon" type="update">
+				GetActionList() of agents collects the current entries of all agent beans.
+			</action>
+			<action dev="moekon" type="update">
+				Use new directory search for remote action invocation and to find authorization action.
+			</action>
+			<action dev="moekon" type="fix">
+				Return same hash code for all actions.
+			</action>
+			<action dev="jakob" type="update">
+				Start and stop time property of agents is now configurable via Spring.
+			</action>
+			<action dev="moekon" type="fix">
+				Do not start agents with an explicit start time when starting agent node.
+			</action>
+			<action dev="axle" type="fix">
+				Broker name is unique in the network by using SecureRandom instead of hashCode.
+			</action>
+			<action dev="axle" type="remove">
+				Removed classes "DoRemoteAction", "RemoteAction" and "RemoteActionResult".
+			</action>
+			<action dev="axle" type="add">
+				Added scope of actions.
+			</action>
+			<action dev="axle" type="add">
+				Added package "de.dailab.jiactng.agentcore.directory" with new implementation of distributed agent and service directory
+				containing also service matcher and ontology storage.
+			</action>
+			<action dev="moekon" type="add">
+				Automatic action invocation.
+			</action>
 		</release>
 		<release version="5.0.4" date="2009-01-27" description="Minor release">
 			<action dev="keiser" type="add">

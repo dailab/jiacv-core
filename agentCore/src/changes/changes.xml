@@ -98,14 +98,67 @@
 			</action>
 		</release>
 		<release version="5.0.4" date="2009-01-27" description="Minor release">
+			<action dev="keiser" type="update">
+				ActionPerformedNotification contains also the state, result, original user, original provider and original service
+				of the action invocation and overwrites the methods equals() and hashCode().
+			</action>
+			<action dev="loeffelholz" type="fix">
+				Revised refreshment of stored agents within service directory.
+			</action>
+			<action dev="moekon" type="fix">
+				Service directory uses action template instead of action for checking action presence in memory.
+			</action>
+			<action dev="marcel" type="new">
+				ActiveMQ broker uses the new network gateway implementation.
+			</action>
+			<action dev="moekon" type="add">
+				Added depth counter to session stack in order to ensure stable handling of sessions in memory.
+			</action>
+			<action dev="moekon" type="add">
+				Added methods for remote action invocation.
+			</action>
+			<action dev="keiser" type="add">
+				Timer-based start and stop of agents using new integrated TimerMBean of agent node.
+			</action>
 			<action dev="keiser" type="add">
 				Flexible token-based authorisation for JIAC action invocations.
 			</action>
 			<action dev="keiser" type="update">
-				Enhanced execution cycle now supports parallel action execution.
+				Creation of agents does not automatically initializes these agents.
 			</action>
-			<action type="fix">
-				Services are now reliably discovered if they are there, also cross-node.
+			<action dev="keiser" type="fix">
+				Write session object into memory before and not after invoking doAction().
+			</action>
+			<action dev="keiser" type="add">
+				New package "de.dailab.jiactng.agentcore.execution" also with a non-blocking execution cycle to support 
+				parallel action execution and synchronous action invocation.
+			</action>
+			<action dev="keiser" type="add">
+				New management interface for agent workload measurement.
+			</action>
+			<action dev="keiser" type="add">
+				New package "de.dailab.jiactng.agentcore.management.jmx.client" with extensible management client API for easy management
+				of local or remote JIAC TNG resources.
+			</action>
+			<action dev="moekon" type="update">
+				Added new name for logging configuration to avoid conflicts.
+			</action>
+			<action dev="keiser" type="fix">
+				Remove sessions from memory also for actions without result receiver.
+			</action>
+			<action dev="marcel" type="fix">
+				AbstractMethodExposingBean writes action results for "void" actions and SimpleExecutionCycle writes action results 
+				with failures in case of an exception.
+			</action>
+			<action dev="loeffelholz" type="add">
+				Services are now reliably discovered by using the service directory if they are there, also cross-node.
+			</action>
+			<action dev="keiser" type="add">
+				New Spring property allowing to list the name of actions which should be registered automatically within the service directory.
+			</action>
+			<action dev="keiser" type="fix">
+				Disable management of old items and enable management of new items when changing memory, execution cycle or 
+				list of agent beans.
 			</action>
 			<action dev="moekon" type="fix">
 				SessionIds are now passed down to sub-services during service usage.

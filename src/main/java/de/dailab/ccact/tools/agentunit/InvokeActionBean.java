@@ -51,7 +51,15 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 		}
 
 		String actionName = result.getAction().getName();
-		Serializable[] results = result.getResults();
+		
+		Serializable[] results = new Serializable[]{};
+		
+		if (result.getFailure() == null) {
+			results = result.getResults();
+		}
+		else {
+			results = new Serializable[]{ result.getFailure() };
+		}
 
 		log.debug("got result for action '" + actionName + "': "
 				+ Arrays.asList(results));
@@ -131,5 +139,7 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 
 		return (Serializable[]) ret.toArray();
 	}
+	
+	
 
 }

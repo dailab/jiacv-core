@@ -84,6 +84,28 @@ public class InvokeActionBean extends AbstractAgentBean implements ResultReceive
 		
 	}
 
+	
+	public void invokeAndForget(final String servicename, Serializable[] params) {
+		
+		Action tpl = new Action(servicename);
+		tpl.setScope(ActionScope.NODE);
+		
+		IActionDescription tpldesc = thisAgent.searchAction(tpl);
+		Action action = (Action) tpldesc;
+		
+		if (action == null) {
+			log.error("action not found");
+			return;
+		}
+
+		if (params != null) {
+			this.invoke(action, params);
+		}
+		else {
+			this.invoke(action, new Serializable[0]);
+		}
+		
+	}
 
 
 	/**

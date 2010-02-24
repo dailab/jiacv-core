@@ -157,6 +157,21 @@ public class ActionTesterNode {
 		}
 
 	}
+	
+	
+	public void invokeAndForget(String jadlServiceName, Serializable[] serviceParameter) {
+
+		try {
+			if (log.isDebugEnabled()) {
+				log.debug("Bean is: " + invokeactionbean.toString());	
+			}
+			invokeactionbean.invokeAndForget(jadlServiceName, serviceParameter);
+		}
+		catch (Exception e) {
+			log.error(e);
+		}
+
+	}
 
 	public void stop() {
 

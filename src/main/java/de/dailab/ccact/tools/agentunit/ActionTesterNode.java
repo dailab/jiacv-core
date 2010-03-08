@@ -75,6 +75,7 @@ public class ActionTesterNode {
 	 * @param nodename The name of the Agent Node specified in spring_node_config_param 
 	 */
 	public ActionTesterNode(String spring_node_config_param, String nodename) {
+		
 		spring_config = spring_node_config_param;
 		context = new ClassPathXmlApplicationContext(spring_config);
 		context.start();

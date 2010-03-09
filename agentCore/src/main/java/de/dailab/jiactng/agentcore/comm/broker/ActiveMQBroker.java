@@ -1,7 +1,6 @@
 package de.dailab.jiactng.agentcore.comm.broker;
 
 import java.net.URI;
-import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -91,7 +90,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
     public void doInit() throws Exception {
         log.debug("initializing embedded broker");
         
-        _brokerName= agentNode.getName() + getBeanName() + SecureRandom.getInstance("SHA1PRNG").nextLong();
+        _brokerName= agentNode.getUUID() + getBeanName();
         _broker = new BrokerService();
         _broker.setBrokerName(getBrokerName());
         

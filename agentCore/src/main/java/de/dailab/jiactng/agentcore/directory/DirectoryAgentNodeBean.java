@@ -911,7 +911,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		message.setSender(myAddress);
 		message.setHeader("UUID", this.agentNode.getUUID());
 		try {
-			messageTransport.send(message, address);
+			messageTransport.send(message, address, 0);
 		} catch (Exception e) {
 			log.error("sendMessage failed. Message:\n" + message.toString(), e);
 		}
@@ -948,7 +948,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				+ payload.getActions().size());
 
 		try {
-			messageTransport.send(adMessage, destination);
+			messageTransport.send(adMessage, destination, 0);
 		} catch (Exception e) {
 			log.error("sendMessage failed. Message:\n" + adMessage.toString(),
 					e);

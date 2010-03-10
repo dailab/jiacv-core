@@ -27,8 +27,6 @@ class JMSSender {
 
 	private Session session = null;
 	private Connection connection = null;
-	
-	private static final int DEFAULT_TIMEOUT = 1000;
 
 	public JMSSender(ConnectionFactory connectionFactory, Log log) throws JMSException {
 		this.connectionFactory = connectionFactory;
@@ -59,7 +57,7 @@ class JMSSender {
         }
 	}
 
-	public void send(IJiacMessage message, ICommunicationAddress address) throws JMSException {
+	public void send(IJiacMessage message, ICommunicationAddress address, long timeToLive) throws JMSException {
 		Destination destination = null;
 		
 		if (address instanceof IGroupAddress) {
@@ -68,7 +66,7 @@ class JMSSender {
 			destination = session.createQueue(address.getName());
         }
 		
-		sendMessage(message, destination, DEFAULT_TIMEOUT);
+		sendMessage(message, destination, timeToLive);
 	}
 	
 	private void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {

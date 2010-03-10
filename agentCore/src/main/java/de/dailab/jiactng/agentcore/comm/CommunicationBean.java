@@ -341,6 +341,21 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * @see #messageExchanged(MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
      */
     public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
+    	send(message, address, 0);
+    }
+
+    /**
+     * Send a message to a given communication address. If the timeout is reached, the message 
+     * will be expired. Please consider that the clocks of different hosts may run asynchronous!
+     * @param message the message to send
+     * @param address the communication address of the message receiver
+     * @param timeToLive the time-to-live of the message in milliseconds or 0 for using timeout specified by the message transport
+     * @throws CommunicationException if the message can not be send
+     * @throws IllegalArgumentException if one of the parameters is <code>null</code>
+     * @see MessageTransport#send(IJiacMessage, ICommunicationAddress)
+     * @see #messageExchanged(MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
+     */
+    public synchronized void send(IJiacMessage message, ICommunicationAddress address, long timeToLive) throws CommunicationException {
         if (message == null) {
             throw new IllegalArgumentException("message must not be null");
         }
@@ -349,7 +364,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             throw new IllegalArgumentException("address must not be null");
         }
 
-        internalSend(saveCast(message, JiacMessage.class), saveCast(address, CommunicationAddress.class));
+        internalSend(saveCast(message, JiacMessage.class), saveCast(address, CommunicationAddress.class), timeToLive);
     }
 
     @Deprecated
@@ -449,7 +464,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
     /**
      * Assumes that both the message and the address are valid.
      */
-    private synchronized void internalSend(JiacMessage message, CommunicationAddress address)
+    private synchronized void internalSend(JiacMessage message, CommunicationAddress address, long timeToLive)
             throws CommunicationException {
         if (transports.size() <= 0) {
             throw new CommunicationException("no transport available");
@@ -478,7 +493,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             }
 
             if (transport != null) {
-                transport.send(message, unboundAddress);
+                transport.send(message, unboundAddress, timeToLive);
                 // notification about sending message
                 messageExchanged(MessageExchangeAction.SEND, unboundAddress, message, transport.getTransportIdentifier());
             } else {
@@ -490,7 +505,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             }
             // 1:n communication
             for (MessageTransport transport : transports.values()) {
-                transport.send(message, unboundAddress);
+                transport.send(message, unboundAddress, timeToLive);
                 // notification about sending message
                 messageExchanged(MessageExchangeAction.SEND, unboundAddress, message, transport.getTransportIdentifier());
             }

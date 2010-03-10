@@ -60,7 +60,11 @@ public abstract class MessageTransport implements MessageTransportMBean {
     private IMessageTransportDelegate delegate;
     
     protected Log log;
-    
+
+	/* 0 means no timeout */
+	public static final long DEFAULT_TIMEOUT = 0;
+	protected long timeToLive = DEFAULT_TIMEOUT;
+
     protected MessageTransport(String transportIdentifier) {
         this.transportIdentifier= transportIdentifier.toLowerCase();
     }
@@ -156,14 +160,17 @@ public abstract class MessageTransport implements MessageTransportMBean {
     
     /**
      * This method issues the delivery of the specified message to the specified destination.
+     * If the timeout is reached, the message will be expired. Please consider that the clocks 
+     * of different hosts may run asynchronous!
      * 
      * @param message       the message to be send
      * @param address       the destination the message should be send to
+     * @param timeToLive	the time-to-live of the message in milliseconds or 0 for using timeout specified by the message transport
      * 
      * @throws CommunicationException       when the delivery of the message to the bus fails
      * @throws IllegalArgumentException     if one of the arguments is <code>null</code>
      */
-    public abstract void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException;
+    public abstract void send(IJiacMessage message, ICommunicationAddress address, long timeToLive) throws CommunicationException;
     
     /**
      * This method queries the transport to open an incoming channel to the message bus and
@@ -204,4 +211,18 @@ public abstract class MessageTransport implements MessageTransportMBean {
     protected Log createChildLog(String name) {
         return delegate.getLog(transportIdentifier + "." + name);
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public final long getTimeToLive() {
+		return timeToLive;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public final void setTimeToLive(long newTimeToLive) {
+		timeToLive = newTimeToLive;
+	}
 }

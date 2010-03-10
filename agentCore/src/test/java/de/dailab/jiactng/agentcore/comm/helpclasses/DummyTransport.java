@@ -52,7 +52,7 @@ public class DummyTransport extends MessageTransport {
 	}
 
 	@Override
-	public void send(IJiacMessage message, ICommunicationAddress address)
+	public void send(IJiacMessage message, ICommunicationAddress address, long ttl)
 			throws CommunicationException {
 		sentTo.add(address);
 		messages.add(message);

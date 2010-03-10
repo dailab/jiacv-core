@@ -176,19 +176,22 @@ public class JMSMessageTransport extends MessageTransport {
 
 	/**
 	 * Sends the given JiacMessage
+	 * If the timeout is reached, the message will be expired. Please consider that the clocks 
+	 * of different hosts may run asynchronous!
 	 * 
 	 * @param message 	a JiacMessage
 	 * @param commAdd 	a CommunicationAddress, which might be a GroupAddress or
 	 * 					a MessageBoxAddress
+     * @param ttl		the time-to-live of the message in milliseconds or 0 for using timeout specified by this message transport
 	 * @throws CommunicationException if an error occurs while sending the message
 	 */
-	public void send(IJiacMessage message, ICommunicationAddress commAdd) throws CommunicationException {
+	public void send(IJiacMessage message, ICommunicationAddress commAdd, long ttl) throws CommunicationException {
         if (log.isDebugEnabled()){
         	log.debug("JMSMessageTransport sends Message to address '" + commAdd.toUnboundAddress() + "'");
         }
 		
 		try {
-            sender.send(message, commAdd);
+            sender.send(message, commAdd, (ttl==0)? timeToLive:ttl);
         } catch (JMSException jms) {
         	if (log.isErrorEnabled()){
         		log.error("Sending of Message to address '" + commAdd.toUnboundAddress() + 

@@ -21,4 +21,17 @@ public interface MessageTransportMBean {
      * @return the connection entry point
      */
     URI getConnectorURI();
+
+	/**
+	 * Get the time-to-live of messages, which are send without a time-to-live parameter.
+	 * @return the time-to-live of messages in milliseconds or 0 for no expiration
+	 */
+	long getTimeToLive();
+
+	/**
+	 * Set the time-to-live of messages, which are send without a time-to-live parameter.
+	 * Please consider that the clocks of different hosts may run asynchronous!
+	 * @param newTimeToLive the time-to-live of messages in milliseconds or 0 for no expiration
+	 */
+	void setTimeToLive(long newTimeToLive);
 }

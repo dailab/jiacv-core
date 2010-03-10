@@ -81,7 +81,29 @@ public interface ICommunicationBean {
 	 * <b>Exceptions:</b> <br />
 	 * 	CommunicationException -  if an error occurs on the message bus <br />
      */
-    String ACTION_SEND= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#send";
+    String ACTION_SEND = "de.dailab.jiactng.agentcore.comm.ICommunicationBean#send";
+    
+    /**
+     * This method provides access to the message bus.
+     * It delivers the message to the specified address.
+     * If the timeout is reached the message will be expired.
+     * Please consider that the clocks of different hosts may run asynchronous!
+     * 
+     * <br />
+	 * <b>InputParameter</b> <br /> 
+	 * 	IJiacMessage	-  the message to send<br />
+	 *  ICommunicationAddress - the address to send the message to<br />
+	 *  long - the time-to-live of the message in milliseconds<br />
+	 *
+	 * <br />
+	 * <b>Result Types:</b> <br />
+	 * 	boolean -  <code>true</code> if the address references a local
+     *                      agent and <code>false</code> otherwise.<br />
+	 * 
+	 * <b>Exceptions:</b> <br />
+	 * 	CommunicationException -  if an error occurs on the message bus <br />
+     */
+    String ACTION_SEND_WITH_TIMEOUT = "de.dailab.jiactng.agentcore.comm.ICommunicationBean#sendWithTimeout";
     
     /**
 	 * Action to start receiving messages that are send to a given address.
@@ -197,6 +219,21 @@ public interface ICommunicationBean {
      */
     @Expose(name = ACTION_SEND)
     void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException;
+    
+    /**
+     * This method provides access to the message bus.
+     * It delivers the message to the specified address.
+     * If the timeout is reached the message will be expired.
+     * Please consider that the clocks of different hosts may run asynchronous!
+     * 
+     * @param message       the message to send
+     * @param address       the address of the recipient (can be a group or a message box)
+     * @param timeToLive	the time-to-live of the message in milliseconds
+     * @throws CommunicationException
+     *                      if an error occurs on the message bus
+     */
+    @Expose(name = ACTION_SEND_WITH_TIMEOUT)
+    void send(IJiacMessage message, ICommunicationAddress address, long timeToLive) throws CommunicationException;
     
     /**
      * Generic method for the registration of both message box and group.

@@ -48,6 +48,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     private DiscoveryAgent discoveryAgent;
     private ConcurrentHashMap<URI, NetworkBridge> bridges = new ConcurrentHashMap<URI, NetworkBridge>();
     private Map<String, String> parameters;
+    private boolean _useAlwaysSourceAddress= false;
     
     public SourceAwareDiscoveryNetworkConnector() {
     }
@@ -66,6 +67,10 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
             LOG.warn("failed to parse query parameters from discoveryURI: " + discoveryURI, e);
         }  
         
+    }
+    
+    public void useAlwaysSourceAddress(boolean value) {
+        _useAlwaysSourceAddress= value;
     }
 
     public void onServiceAdd(DiscoveryEvent event) {
@@ -97,12 +102,15 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
             final InetAddress source= (event instanceof SourceAwareDiscoveryEvent) ? ((SourceAwareDiscoveryEvent)event).getSource() : null;
             
             if(source != null) {
-                boolean useSource= false;
-                try {
-                    InetAddress[] addresses= InetAddress.getAllByName(connectUri.getHost());
-                    useSource= addresses == null || addresses.length <= 0;
-                } catch (UnknownHostException uhe) {
-                    useSource= true;
+                boolean useSource= _useAlwaysSourceAddress;
+                
+                if(!useSource) {
+                    try {
+                        InetAddress[] addresses= InetAddress.getAllByName(connectUri.getHost());
+                        useSource= addresses == null || addresses.length <= 0;
+                    } catch (UnknownHostException uhe) {
+                        useSource= true;
+                    }
                 }
                 
                 if(useSource) {

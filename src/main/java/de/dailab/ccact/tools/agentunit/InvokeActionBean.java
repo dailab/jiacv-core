@@ -1,6 +1,8 @@
 package de.dailab.ccact.tools.agentunit;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
@@ -26,8 +28,27 @@ public final class InvokeActionBean extends AbstractAgentBean {
 	public static final Integer SLEEP_TIME = 200;
 
 
+	public Collection<IActionDescription> getLocalActions() {
+		
+		Collection<IActionDescription> ret = new HashSet<IActionDescription>();
+		
+		for(IActionDescription action : this.thisAgent.searchAllActions(new Action())) {
+			
+			if ( ( action.getScope().equals(ActionScope.NODE) || action.getScope().equals(ActionScope.GLOBAL) ) 
+				&& action.getProviderDescription().getAgentNodeUUID().equals(thisAgent.getAgentNode().getUUID())) {
+				ret.add(action);
+			}
+			
+		}
+		
+		return ret;
+	}
 	
-	
+	/**
+	 * @deprecated does <b>NOT</b> only return node local actions; use {@link InvokeActionBean#getLocalActions()} 
+	 * @return returns local registered actions
+	 */
+	@Deprecated
 	public List<IActionDescription> getFoundActions() {
 		
 		Action tpl = new Action();

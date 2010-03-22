@@ -16,4 +16,22 @@
 			<version>5.3.0</version>
 		</dependency>
 	</dependencies>
+	
+	<profiles>
+		<profile>
+			<id>extern</id>
+			<distributionManagement>
+				<repository>
+					<id>${release.repository.id}</id>
+					<name>${release.repository.name}</name>
+					<url>${release.repository.url}</url>
+				</repository>
+				<snapshotRepository>
+					<id>${snapshot.repository.id}</id>
+					<name>${snapshot.repository.name}</name>
+					<url>${snapshot.repository.url}</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
 </project>

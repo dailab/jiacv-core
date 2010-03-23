@@ -121,59 +121,27 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * Creates a new DoAction-object for this action. The resulting object can
-	 * be written to the memory to trigger the action.
-	 * 
-	 * @see de.dailab.jiactng.agentcore.action.DoAction
-	 * @param newParams
-	 *            the input-parameters that should be used when executing the
-	 *            action.
-	 * @param source
-	 *            the caller of the action.
-	 * @return a new DoAction-object that can be used (by writing it to the
-	 *         memory) to call the action.
+	 * {@inheritDoc}
 	 */
 	public final DoAction createDoAction(Serializable[] newParams, ResultReceiver source) {
 		return new DoAction(this, source, newParams);
 	}
 
 	/**
-	 * Creates a new DoAction-object for this action. The resulting object can
-	 * be written to the memory to trigger the action.
-	 * 
-	 * @see de.dailab.jiactng.agentcore.action.DoAction
-	 * @param newParams
-	 *            the input-parameters that should be used when executing the
-	 *            action.
-	 * @param source
-	 *            the caller of the action.
-	 * @param timeToLive timeout of the action request in milliseconds.
-	 * @return a new DoAction-object that can be used (by writing it to the
-	 *         memory) to call the action.
+	 * {@inheritDoc}
 	 */
 	public final DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
 			Long timeToLive) {
 		return new DoAction(this, source, newParams, timeToLive);
 	}
 
-	 /**
-   * Creates a new DoAction-object for this action. The resulting object can
-   * be written to the memory to trigger the action.
-   * 
-   * @see de.dailab.jiactng.agentcore.action.DoAction
-   * @param parent the session which creates this doAction.
-   * @param newParams
-   *            the input-parameters that should be used when executing the
-   *            action.
-   * @param source
-   *            the caller of the action.
-   * @return a new DoAction-object that can be used (by writing it to the
-   *         memory) to call the action.
-   */
-  public final DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source) {
-    return new DoAction(parent, this, source, newParams);
-  }
-	
+	/**
+	 * {@inheritDoc}
+	 */
+	public final DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source) {
+		return new DoAction(parent, this, source, newParams);
+	}
+
 	/**
 	 * Creates a new Result-object for this action. The resulting object can be
 	 * written to the memory to return the results of the action. *

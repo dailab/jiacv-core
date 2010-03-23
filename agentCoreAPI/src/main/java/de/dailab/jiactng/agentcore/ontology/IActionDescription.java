@@ -3,9 +3,13 @@
  */
 package de.dailab.jiactng.agentcore.ontology;
 
+import java.io.Serializable;
 import java.util.List;
 
+import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
+import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
 
@@ -107,4 +111,50 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
      * @see ActionScope
      */
     ActionScope getScope();
+
+	/**
+	 * Creates a new DoAction-object for this action. The resulting object can
+	 * be written to the memory to trigger the action.
+	 * 
+	 * @param newParams
+	 *            the input-parameters that should be used when executing the
+	 *            action.
+	 * @param source
+	 *            the caller of the action.
+	 * @return a new DoAction-object that can be used (by writing it to the
+	 *         memory) to call the action.
+	 */
+	DoAction createDoAction(Serializable[] newParams, ResultReceiver source);
+
+	/**
+	 * Creates a new DoAction-object for this action. The resulting object can
+	 * be written to the memory to trigger the action.
+	 * 
+	 * @param newParams
+	 *            the input-parameters that should be used when executing the
+	 *            action.
+	 * @param source
+	 *            the caller of the action.
+	 * @param timeToLive timeout of the action request in milliseconds.
+	 * @return a new DoAction-object that can be used (by writing it to the
+	 *         memory) to call the action.
+	 */
+	DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
+			Long timeToLive);
+
+	 /**
+	  * Creates a new DoAction-object for this action. The resulting object can
+	  * be written to the memory to trigger the action.
+	  * 
+	  * @param parent the session which creates this doAction.
+	  * @param newParams
+	  *            the input-parameters that should be used when executing the
+	  *            action.
+	  * @param source
+	  *            the caller of the action.
+	  * @return a new DoAction-object that can be used (by writing it to the
+	  *         memory) to call the action.
+	  */
+	DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source);
+
 }

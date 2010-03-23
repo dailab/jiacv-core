@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.execution;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
 import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
@@ -32,7 +33,10 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 	
 	/** Communication with agent beans needs the memory.*/
 	private IMemory memory;
-	
+
+	/** The logger of this remote executor. */
+	private Log log;
+
 	/** sendAction of CommunicationBean */
 	private Action sendAction;
 
@@ -48,8 +52,9 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 	 * @param memory the space to listen to
 	 * @see IMemory
 	 */
-	public RemoteExecutor(IMemory memory) {
+	public RemoteExecutor(IMemory memory, Log log) {
 		this.memory = memory;
+		this.log = log;
 		
 		final JiacMessage template = new JiacMessage();
 		template.setProtocol(INVOKE);
@@ -66,8 +71,10 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 			if (writeCallEvent.getObject() instanceof JiacMessage){
 				JiacMessage message = (JiacMessage)writeCallEvent.getObject();
 				if (message.getProtocol().equals(INVOKE)) {
-					message = memory.remove(message);
-					
+					if (memory.remove(message) == null) {
+						log.warn("Received JIAC message already removed from memory by another agent component.");
+					}
+
 					if (message.getPayload() instanceof DoAction) {
 						final DoAction doAction = (DoAction) message.getPayload();
 						final Action localAction = (Action) memory.read(doAction.getAction());

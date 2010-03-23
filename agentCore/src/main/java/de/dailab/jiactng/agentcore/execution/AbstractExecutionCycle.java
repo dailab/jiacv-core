@@ -59,7 +59,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
   public void doStart() throws Exception {
 	  super.doStart();
 	  if (useRemoteExecutor) {
-		  remoteExecutor = new RemoteExecutor(memory);
+		  remoteExecutor = new RemoteExecutor(memory, thisAgent.getLog(this, "RemoteExecutor"));
 	  }
   }
 

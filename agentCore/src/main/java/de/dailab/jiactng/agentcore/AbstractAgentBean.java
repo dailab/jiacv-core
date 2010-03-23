@@ -23,6 +23,7 @@ import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
@@ -285,7 +286,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          The values for the input parameters.
    * @return The result of the action.
    */
-  protected final ActionResult invokeAndWaitForResult(Action a, Serializable[] inputParams) {
+  protected final ActionResult invokeAndWaitForResult(IActionDescription a, Serializable[] inputParams) {
     // invoke action
     final ActionResultListener listener = new ActionResultListener();
     invoke(a, inputParams, listener);
@@ -310,7 +311,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          the input parameters used for the action invocation.
    * @return the session id of the action invocation.
    */
-  protected final String invoke(Action a, Serializable[] inputParams) {
+  protected final String invoke(IActionDescription a, Serializable[] inputParams) {
     return invoke(a, inputParams, null);
   }
 
@@ -325,7 +326,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          the receiver to be informed about the results.
    * @return the session id of the action invocation.
    */
-  protected final String invoke(Action a, Serializable[] inputParams, ResultReceiver receiver) {
+  protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver) {
     final DoAction doAct = a.createDoAction(inputParams, receiver);
     memory.write(doAct);
     return doAct.getSessionId();
@@ -344,7 +345,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          the receiver to be informed about the results.
    * @return the session id of the action invocation.
    */
-  protected final String invoke(Action a, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
+  protected final String invoke(IActionDescription a, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
     final DoAction doAct = a.createDoAction(parent, inputParams, receiver);
     memory.write(doAct);
     return doAct.getSessionId();

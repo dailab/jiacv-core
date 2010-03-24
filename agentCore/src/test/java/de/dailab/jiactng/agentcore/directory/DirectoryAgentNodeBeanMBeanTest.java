@@ -81,7 +81,7 @@ public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
 	public void testGetDump() {
 		try {
 			Boolean dump = (Boolean) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "Dump");
-			assertEquals("AgentMBean.isDump is wrong", Boolean.valueOf(true), dump);
+			assertEquals("AgentMBean.isDump is wrong", Boolean.valueOf(false), dump);
 		} catch (Exception e) {
 			fail("Error while getting dump state: "+e.getLocalizedMessage());
 		}

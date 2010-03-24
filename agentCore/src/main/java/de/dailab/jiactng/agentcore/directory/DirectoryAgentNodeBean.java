@@ -44,7 +44,7 @@ import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		IDirectory, IMessageTransportDelegate, DirectoryAgentNodeBeanMBean {
 	
-	private boolean dump = true;
+	private boolean dump = false;
 
 	/**
 	 * Name for address-creation purposes. Will be added to the UUID of
@@ -140,10 +140,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		myAddress = CommunicationAddressFactory
 				.createMessageBoxAddress(ADDRESS_NAME + "@" + myAgentNode);
-		System.out.println("myAddress=" + myAddress);
+		log.info("myAddress=" + myAddress);
 		groupAddress = CommunicationAddressFactory
 				.createGroupAddress(ADDRESS_NAME + "@dfgroup");
-		System.out.println("groupAddress=" + groupAddress);
+		log.info("groupAddress=" + groupAddress);
 
 		try {
 			messageTransport.listen(myAddress, null);
@@ -165,15 +165,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		if (this.serviceMatcher != null) {
 			log.info("Found a ServiceMatcher for this agentnode");
 		} else {
-			log
-					.info("No ServiceMatcher was found on this agentode, complex matching will not be possible!");
+			log.info("No ServiceMatcher was found on this agentode, complex matching will not be possible!");
 		}
 
 		if (this.ontologyStorage != null) {
 			log.info("Found an OntologyStorage for this agentnode");
 		} else {
-			log
-					.info("No OntologyStorage was found on this agentode, ontology-handling will not be possible!");
+			log.info("No OntologyStorage was found on this agentode, ontology-handling will not be possible!");
 		}
 	}
 
@@ -367,8 +365,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return;
 		}
 		if (uuid == null) {
-			log
-					.error("Provider information incomplete. Missing UUID. Cannot register action!\n"
+			log.error("Provider information incomplete. Missing UUID. Cannot register action!\n"
 							+ actionDescription.toString());
 			return;
 		}
@@ -376,8 +373,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		if (myAgentNode.equals(uuid)) {
 			final boolean success = localActions.add(actionDescription);
 			if (!success) {
-				log
-						.warn("Action to register already registered. Substituting with new action:\n"
+				log.warn("Action to register already registered. Substituting with new action:\n"
 								+ actionDescription.toString());
 				localActions.remove(actionDescription);
 				localActions.add(actionDescription);
@@ -393,8 +389,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			final Set<IActionDescription> actions = remoteActions.get(uuid);
 			final boolean success = actions.add(actionDescription);
 			if (!success) {
-				log
-						.warn("Action to register already registered. Substituting with new action:\n"
+				log.warn("Action to register already registered. Substituting with new action:\n"
 								+ actionDescription.toString());
 				actions.remove(actionDescription);
 				actions.add(actionDescription);
@@ -423,8 +418,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return;
 		}
 		if (uuid == null) {
-			log
-					.error("Provider information incomplete. Missing UUID. Cannot deregister action!\n"
+			log.error("Provider information incomplete. Missing UUID. Cannot deregister action!\n"
 							+ actionDescription.toString());
 			return;
 		}
@@ -465,8 +459,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return;
 		}
 		if (uuid == null) {
-			log
-					.error("Provider information incomplete. Missing UUID. Cannot modify action!\n"
+			log.error("Provider information incomplete. Missing UUID. Cannot modify action!\n"
 							+ oldDescription.toString());
 			return;
 		}
@@ -509,13 +502,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				if ((matcherResult != null)) {
 					return matcherResult;
 				} else {
-					log
-							.warn("Matcher found no result, trying normal template matching...");
+					log.warn("Matcher found no result, trying normal template matching...");
 				}
 
 			} else {
-				log
-						.error("This agentnode has no servicematcher - no complex matching possible!");
+				log.error("This agentnode has no servicematcher - no complex matching possible!");
 			}
 		}
 
@@ -560,13 +551,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				if ((matcherResults != null) && (matcherResults.size() > 0)) {
 					actions.addAll(matcherResults);
 				} else {
-					log
-							.warn("Matcher found no result, trying normal template matching...");
+					log.warn("Matcher found no result, trying normal template matching...");
 				}
 
 			} else {
-				log
-						.error("This agentnode has no servicematcher - no complex matching possible!");
+				log.error("This agentnode has no servicematcher - no complex matching possible!");
 			}
 		}
 
@@ -596,8 +585,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	@Override
 	public void onEvent(LifecycleEvent event) {
-		log.debug(myAgentNode + "::" + event.getSource() + " State: "
+		if (log.isDebugEnabled()) {
+			log.debug(myAgentNode + "::" + event.getSource() + " State: "
 				+ event.getState());
+		}
 
 		if (event.getState() == LifecycleStates.INITIALIZED) {
 			if (event.getSource() instanceof Agent) {
@@ -669,10 +660,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return;
 		}
 
-		System.out.println("");
-
 		final String protocol = message.getProtocol();
-		System.out.println("sender=" + senderAddress + " protocol=" + protocol);
+		if (log.isDebugEnabled()) {
+			log.debug("sender=" + senderAddress + " protocol=" + protocol);
+		}
 
 		if (protocol.equals(ALIVE)) {
 			refreshAgentNode(senderAddress);
@@ -694,7 +685,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			refreshAgentNode(senderAddress);
 			final Set<IActionDescription> actions = ((Advertisement) message
 					.getPayload()).getActions();
-			System.out.println("receive ADVERTISE: " + actions.size());
+			if (log.isDebugEnabled()) {
+				log.debug("receive ADVERTISE: " + actions.size());
+			}
 
 			final Set<IActionDescription> receivedActions = new HashSet<IActionDescription>();
 			for (IActionDescription iad : actions) {
@@ -722,10 +715,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 								((Action) tempService).setScope(isd.getScope());
 							}
 						} catch (Exception ex) {
-							log
-									.error(
-											"Caught exception when reading service description: ",
-											ex);
+							log.error("Caught exception when reading service description: ", ex);
 						}
 
 						if (tempService != null) {
@@ -943,9 +933,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		// debug
 		final Advertisement payload = (Advertisement) adMessage.getPayload();
-		System.out.println("sendAdvertisement: agents="
+		if (log.isDebugEnabled()) {
+			log.debug("sendAdvertisement: agents="
 				+ payload.getAgents().size() + " actions="
 				+ payload.getActions().size());
+		}
 
 		try {
 			messageTransport.send(adMessage, destination, 0);

@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 
+import javax.management.remote.JMXServiceURL;
+
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
@@ -14,6 +16,8 @@ public class Advertisement implements IFact {
 	private Set<IActionDescription> actions = new HashSet<IActionDescription>();
 	
 	private Hashtable<String, IAgentDescription> agents = new Hashtable<String, IAgentDescription>();
+
+	private Set<JMXServiceURL> jmxURLs = new HashSet<JMXServiceURL>();
 
 	public Advertisement(Hashtable<String, IAgentDescription> agents) {
 		this(agents, null);
@@ -32,19 +36,35 @@ public class Advertisement implements IFact {
 		}
 	}
 	
-	public Set<IActionDescription> getActions() {
+	public final Set<IActionDescription> getActions() {
 		return actions;
 	}
 	
-	public void setActions(Set<IActionDescription> newActions) {
+	public final void setActions(Set<IActionDescription> newActions) {
 		actions.addAll(newActions);
 	}
 
-	public Hashtable<String, IAgentDescription> getAgents() {
+	public final Hashtable<String, IAgentDescription> getAgents() {
 		return agents;
 	}
 
-	public void setAgents(Hashtable<String, IAgentDescription> newAgents) {
+	public final void setAgents(Hashtable<String, IAgentDescription> newAgents) {
 		agents.putAll(newAgents);
+	}
+
+	/**
+	 * Returns the URLs of all JMX connector server of the advertising agent node.
+	 * @return the URLs of the JMX connector server of the advertising agent node 
+	 */
+	public final Set<JMXServiceURL> getJmxURLs() {
+		return jmxURLs;
+	}
+
+	/**
+	 * Sets the URLs of all JMX connector server of the advertising agent node.
+	 * @param newJmxURLs the URLs of the JMX connector server of the advertising agent node
+	 */
+	public final void setJmxURLs(Set<JMXServiceURL> newJmxURLs) {
+		jmxURLs.addAll(newJmxURLs);
 	}
 }

@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
+import javax.management.remote.JMXServiceURL;
 import javax.management.timer.Timer;
 
 import org.apache.commons.logging.Log;
@@ -81,8 +82,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Optional: IDirectory that manages white and yellow pages.*/
 	private IDirectory directory = null;
 
-	/** A timer for being informed about dates */
+	/** A timer for being informed about dates. */
 	private Timer timer = null;
+
+	/** URLs of the created JMX connector server. */
+	private Set<JMXServiceURL> jmxURLs = null;
 
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
@@ -809,6 +813,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public final Set<JMXServiceURL> getJmxURLs() {
+		return jmxURLs;
+	}
+
+	/**
 	 * Registers the agent node and all its resources for management
 	 * 
 	 * @param manager the manager to be used for enabling management of this agent node.
@@ -851,8 +862,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		}
 
 		// enable remote management
-		if (jmxConnectors != null) {
-			manager.enableRemoteManagement(this);
+		if ((jmxConnectors != null) && (manager instanceof JmxManager)) {
+			jmxURLs = ((JmxManager)manager).enableRemoteManagement(this);
 		}
 
 		super.enableManagement(manager);

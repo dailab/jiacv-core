@@ -18,6 +18,7 @@ import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
+import javax.management.remote.JMXServiceURL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -682,7 +683,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		else if (protocol.equals(ADVERTISE)) {
-			refreshAgentNode(senderAddress);
+			// refresh agent nodes
+			final Set<JMXServiceURL> connectors = ((Advertisement) message
+					.getPayload()).getJmxURLs();
+			refreshAgentNode(senderAddress, connectors);
+
+			// refresh remote actions
 			final Set<IActionDescription> actions = ((Advertisement) message
 					.getPayload()).getActions();
 			if (log.isDebugEnabled()) {
@@ -731,6 +737,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 			remoteActions.put(senderAddress.getName(), receivedActions);
 
+			// refresh remote agents
 			final Hashtable<String, IAgentDescription> agents = ((Advertisement) message
 					.getPayload()).getAgents();
 			for (IAgentDescription agent : agents.values()) {
@@ -793,6 +800,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 					System.currentTimeMillis());
 			nodes.put(uuid, description);
 		}
+	}
+
+	private void refreshAgentNode(ICommunicationAddress node, Set<JMXServiceURL> jmxConnectors) {
+		final String uuid = node.getName();
+		refreshAgentNode(node);
+		nodes.get(uuid).setJmxURLs(jmxConnectors);
 	}
 
 	@Override
@@ -908,7 +921,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	/**
-	 * Send all actions this node is providing.
+	 * Send all actions, agents and JMX URLs this agent node is providing.
 	 */
 	private void sendAdvertisement(ICommunicationAddress destination) {
 		final JiacMessage adMessage = new JiacMessage();
@@ -929,12 +942,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		final Advertisement ad = new Advertisement(localAgents, advActions);
+		ad.setJmxURLs(agentNode.getJmxURLs());
 		adMessage.setPayload(ad);
 
 		// debug
 		final Advertisement payload = (Advertisement) adMessage.getPayload();
 		if (log.isDebugEnabled()) {
-			log.debug("sendAdvertisement: agents="
+			log.debug("sendAdvertisement: jmxURLs="
+				+ payload.getJmxURLs().size() + " agents="
 				+ payload.getAgents().size() + " actions="
 				+ payload.getActions().size());
 		}

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
@@ -1173,17 +1174,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		final Set<Map.Entry<String,Set<IActionDescription>>> entries = remoteActions.entrySet();
 		try {
-			final TabularType actionType = new TabularType(
-				entries.iterator().next().getValue().getClass().getName(),
-				"remote action descriptions",
-				(CompositeType)entries.iterator().next().getValue().iterator().next().getDescriptionType(),
-				new String[] {
-					IActionDescription.ITEMNAME_NAME, 
-					IActionDescription.ITEMNAME_INPUTTYPES, 
-					IActionDescription.ITEMNAME_RESULTTYPES, 
-					IActionDescription.ITEMNAME_AGENT							
-				}
-			);
 			final String[] itemNames = new String[] {"agent node UUID", "remote actions"};
 			final CompositeType entryType = new CompositeType(
 				entries.iterator().next().getClass().getName(),
@@ -1192,7 +1182,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				itemNames,
 				new OpenType<?>[] {
 					SimpleType.STRING,
-					actionType
+					ArrayType.getArrayType(new Action().getDescriptionType())
 				}
 			);
 			final TabularType type = new TabularType(
@@ -1204,14 +1194,16 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 			final TabularData data = new TabularDataSupport(type);
 			for (Map.Entry<String,Set<IActionDescription>> entry : entries) {
-				final TabularData actionData = new TabularDataSupport(actionType);
-				for (IActionDescription action: entry.getValue()) {
-					actionData.put((CompositeData)action.getDescription());
+				int i=0;
+				final Set<IActionDescription> values = entry.getValue();
+				final CompositeData[] actions = new CompositeData[values.size()];
+				for (IActionDescription action : values) {
+					actions[i++] = (CompositeData)action.getDescription();
 				}
 				final CompositeData entryData = new CompositeDataSupport(
 					entryType, 
 					itemNames, 
-					new Object[] {entry.getKey(), actionData}
+					new Object[] {entry.getKey(), actions}
 				);
 				data.put(entryData);
 			}

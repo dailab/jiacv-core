@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
+import javax.management.remote.JMXServiceURL;
+
 import org.apache.commons.logging.Log;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -169,19 +171,26 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    */
   List<IAgentNodeBean> getAgentNodeBeans();
 
-	/**
-	 * Sets the configuration of the JMX connector servers used for remote management.
-	 * 
-	 * @param newJmxConnectors
-	 *            the set of connectors.
-	 */
-	void setJmxConnectors(Set<Map<String, Object>> newJmxConnectors);
+  /**
+   * Sets the configuration of the JMX connector servers used for remote management.
+   * 
+   * @param newJmxConnectors
+   *            the set of connectors.
+   */
+  void setJmxConnectors(Set<Map<String, Object>> newJmxConnectors);
 
-	/**
-	 * Gets the configuration of the JMX connector servers used for remote management.
-	 * 
-	 * @return the set of connectors.
-	 */
-	Set<Map<String, Object>> getJmxConnectors();
+  /**
+   * Gets the configuration of the JMX connector servers used for remote management.
+   * 
+   * @return the set of connectors.
+   */
+  Set<Map<String, Object>> getJmxConnectors();
 
+  /**
+   * Gets the URLs of the JMX connector server.
+   * 
+   * @return the URLs of the JMX connector server.
+   */
+  Set<JMXServiceURL> getJmxURLs();
+  
 }

@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -727,13 +728,14 @@ public final class JmxManager implements Manager {
 	 * Creates all specified connector server for remote management, registers
 	 * them in the MBean server and announces them via multicast periodically.
 	 * @param node the agent node
+	 * @return The URLs of all created connector server.
 	 * @see IAgentNode#getJmxConnectors()
 	 * @see JMXServiceURL#JMXServiceURL(String, String, int, String)
 	 * @see JMXConnectorServerFactory#newJMXConnectorServer(JMXServiceURL, Map, MBeanServer)
 	 * @see javax.management.remote.JMXConnectorServerMBean#start()
 	 * @see JmxMulticastSender
 	 */
-	public void enableRemoteManagement(IAgentNode node) {
+	public Set<JMXServiceURL> enableRemoteManagement(IAgentNode node) {
 		final Set<Map<String,Object>> jmxConnectors = node.getJmxConnectors();
 		if (!jmxConnectors.isEmpty()) {
 			System.setProperty("com.sun.management.jmxremote", "");
@@ -841,6 +843,13 @@ public final class JmxManager implements Manager {
 		final JmxMulticastSender multiSend = new JmxMulticastSender(MULTICAST_PORT, MULTICAST_ADDRESS, 1, jmxURLs);
 		ti.schedule(multiSend, MULTICAST_DELAY, MULTICAST_PERIOD);
 		System.out.println("Initiated multicast sender on port " + MULTICAST_PORT + " with group " + MULTICAST_ADDRESS + " and interval " + MULTICAST_PERIOD);
+
+		// return connector server URLs
+		final Set<JMXServiceURL> urls = new HashSet<JMXServiceURL>();
+		for (int i=0; i<connectorServer.size(); i++) {
+			urls.add(connectorServer.get(i).getAddress());
+		}
+		return urls;
 	}
 
 	/**

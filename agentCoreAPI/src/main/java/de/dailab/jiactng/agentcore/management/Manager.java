@@ -414,8 +414,9 @@ public interface Manager {
 	/**
 	 * Creates all specified connector server for remote management.
 	 * @param node the agent node
+	 * @return Information about the created connector server.
 	 */
-	void enableRemoteManagement(IAgentNode node);
+	Object enableRemoteManagement(IAgentNode node);
 
 	/**
 	 * Stops all connector servers.

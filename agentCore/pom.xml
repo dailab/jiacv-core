@@ -40,34 +40,35 @@
 		
 		<!-- only necessary for JMX-Webservice connector, will only be needed in Projects -->
 		<!--dependency> 
-		 <groupId>jsr262-ri</groupId>
-		 <artifactId>jmxws</artifactId>
-		 <version>20060512</version>
-		 </dependency-->
+			<groupId>jsr262-ri</groupId>
+			<artifactId>jmxws</artifactId>
+			<version>20060512</version>
+			</dependency-->
 		
-		<!-- needed for NodeConfigurationMonitorBean --><!--
-		<dependency>
+		<!-- needed for NodeConfigurationMonitorBean -->
+		<!--<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom</artifactId>
 			<version>1.1</version>
-			</dependency>
-		
-		--></dependencies>
+			</dependency>-->
+	</dependencies>
 	
 	<build>
-		<!--		<resources>
-		 <resource>
-		 <directory>.</directory>
-		 </resource>
-		 </resources>
+		<!--
+		<resources>
+			<resource>
+			<directory>.</directory>
+			</resource>
+			</resources>
 		 -->
+
 		<plugins>
-	      	<plugin>
-	        	<artifactId>maven-antrun-plugin</artifactId>
-	        	<executions>
-	          		<execution>
-	            		<phase>generate-sources</phase>
-	            		<configuration>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<configuration>
 							<tasks>
 								<tstamp><format property="build.date" pattern="dd.MM.yyyy HH:mm:ss" locale="de" /></tstamp>
 								<echo append="false" file="${basedir}/src/main/java/de/dailab/jiactng/Version.java">
@@ -103,25 +104,70 @@
 									return TIMESTAMP;		
 									}
 									}
-									</echo>	
-								</tasks>
-							</configuration>
-	            		<goals>
-	              			<goal>run</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
+								</echo>	
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<additionalClasspathElements>
 						<additionalClasspathElement>${basedir}</additionalClasspathElement>
-						</additionalClasspathElements>
-					</configuration>
-				</plugin>
-			
-			</plugins>		
-		</build>
-	</project>
+					</additionalClasspathElements>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCoreAPI/apidocs/</link>
+						<link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
+						<link>http://commons.apache.org/logging/commons-logging-1.1/apidocs/</link>
+						<link>http://activemq.apache.org/maven/5.3.0/activemq-core/apidocs/</link>
+						<link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
+						<link>http://repositories.dai-labor.de/sites/SimpleSpace/SimpleSpaceCore/apidocs/</link>
+					</links>
+					<quiet>true</quiet>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>		
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCoreAPI/apidocs/</link>
+						<link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
+						<link>http://commons.apache.org/logging/commons-logging-1.1/apidocs/</link>
+						<link>http://activemq.apache.org/maven/5.3.0/activemq-core/apidocs/</link>
+						<link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
+						<link>http://repositories.dai-labor.de/sites/SimpleSpace/SimpleSpaceCore/apidocs/</link>
+					</links>
+					<quiet>true</quiet>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+</project>

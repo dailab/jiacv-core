@@ -16,7 +16,47 @@
 			<version>5.3.0</version>
 		</dependency>
 	</dependencies>
-	
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
+						<link>http://activemq.apache.org/maven/5.3.0/activemq-core/apidocs/</link>
+					</links>
+					<quiet>true</quiet>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>		
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
+						<link>http://activemq.apache.org/maven/5.3.0/activemq-core/apidocs/</link>
+					</links>
+					<quiet>true</quiet>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
 	<profiles>
 		<profile>
 			<id>extern</id>

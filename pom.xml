@@ -40,7 +40,48 @@
 					</excludes>
 				</configuration>
 			</plugin>
-		</plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
+						<link>http://commons.apache.org/logging/commons-logging-1.1/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCoreAPI/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCore/apidocs/</link>
+						<link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
+					</links>
+					<quiet>true</quiet>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>		
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/javase/6/docs/api/</link>
+						<link>http://commons.apache.org/logging/commons-logging-1.1/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCoreAPI/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCore/apidocs/</link>
+						<link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
+					</links>
+					<quiet>true</quiet>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>

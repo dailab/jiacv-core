@@ -32,7 +32,7 @@ public final class InvokeActionBean extends AbstractAgentBean {
 		
 		Collection<IActionDescription> ret = new HashSet<IActionDescription>();
 		
-		for(IActionDescription action : this.thisAgent.searchAllActions(new Action())) {
+		for(IActionDescription action : thisAgent.searchAllActions(new Action())) {
 			
 			if ( ( action.getScope().equals(ActionScope.NODE) || action.getScope().equals(ActionScope.GLOBAL) ) 
 				&& action.getProviderDescription().getAgentNodeUUID().equals(thisAgent.getAgentNode().getUUID())) {
@@ -64,8 +64,7 @@ public final class InvokeActionBean extends AbstractAgentBean {
 		Action tpl = new Action(servicename);
 		tpl.setScope(ActionScope.NODE);
 		
-		IActionDescription tpldesc = thisAgent.searchAction(tpl);
-		Action action = (Action) tpldesc;
+		IActionDescription action = thisAgent.searchAction(tpl);
 		
 		if (action == null) {
 			log.error("action not found");
@@ -73,10 +72,10 @@ public final class InvokeActionBean extends AbstractAgentBean {
 		}
 
 		if (params != null) {
-			this.invoke(action, params);
+			invoke(action, params);
 		}
 		else {
-			this.invoke(action, new Serializable[0]);
+			invoke(action, new Serializable[0]);
 		}
 		
 	}
@@ -100,9 +99,7 @@ public final class InvokeActionBean extends AbstractAgentBean {
 		tpl.setScope(ActionScope.NODE);
 
 		// fetch action from directory
-		IActionDescription tpldesc = thisAgent.searchAction(tpl);
-		Action action = (Action)tpldesc;
-		// Action action = memory.read(tpl); // old version, fetches action from local memory
+		IActionDescription action = thisAgent.searchAction(tpl);
 		
 		if (action == null) {
 			log.warn("action '" + serviceName + "' not found; try again later.");
@@ -113,10 +110,10 @@ public final class InvokeActionBean extends AbstractAgentBean {
 		ActionResult result = null;
 		
 		if ( input != null ) {
-			result =  this.invokeAndWaitForResult(action, input);
+			result =  invokeAndWaitForResult(action, input);
 		}
 		else {
-			result = this.invokeAndWaitForResult(action, new Serializable[]{});
+			result = invokeAndWaitForResult(action, new Serializable[]{});
 		}
 
 		

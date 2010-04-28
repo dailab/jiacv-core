@@ -87,9 +87,9 @@ public final class InvokeActionBean extends AbstractAgentBean {
 	 * @param serviceName
 	 * @param input
 	 * @return null it the action could not be found, the results of the operation otherwise.
-	 * @throws Exception
+	 * @throws RuntimeException
 	 */
-	public Serializable[] invokeAction(final String serviceName, Serializable[] input) throws Exception {
+	public Serializable[] invokeAction(final String serviceName, Serializable[] input) {
 
 		if (log.isDebugEnabled()) {
 			log.debug("Invoking action " + serviceName + " with input " + input);
@@ -118,7 +118,12 @@ public final class InvokeActionBean extends AbstractAgentBean {
 
 		
 		if (result.getFailure() != null) {
-			throw new Exception(result.getFailure().toString());
+			if (result.getFailure() instanceof Throwable) {
+				throw new RuntimeException((Throwable) result.getFailure());
+			}
+			else {
+				throw new RuntimeException(result.getFailure().toString());
+			}
 		}
 		
 		Serializable[] ret = result.getResults();

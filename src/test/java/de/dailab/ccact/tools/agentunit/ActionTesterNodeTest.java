@@ -24,14 +24,8 @@ public class ActionTesterNodeTest {
 	 */
 	@Test
 	public void ActionAccess(){
-		try {
-			Serializable[] results = atn.invoke("testAction",null);
-			System.out.println("Test result for action access: " + results[0].toString());
-		}
-		catch (Exception e) {
-			System.err.println("Access to test action failed: " + e.getLocalizedMessage());
-			assert false;
-		}
+		Serializable[] results = atn.invoke("testAction",null);
+		System.out.println("Test result for action access: " + results[0].toString());
 	}
 	
 	/**

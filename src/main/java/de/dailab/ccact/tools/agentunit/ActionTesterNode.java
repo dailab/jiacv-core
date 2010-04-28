@@ -144,7 +144,7 @@ public class ActionTesterNode {
 
 
 
-	public Serializable[] invoke(String jadlServiceName, Serializable[] serviceParameter) throws Exception {
+	public Serializable[] invoke(String jadlServiceName, Serializable[] serviceParameter) {
 
 		try {
 			if (log.isDebugEnabled()) {
@@ -152,7 +152,7 @@ public class ActionTesterNode {
 			}
 			return invokeactionbean.invokeAction(jadlServiceName, serviceParameter);
 		}
-		catch (Exception e) {
+		catch (RuntimeException e) {
 			log.error(e);
 			throw e;
 		}

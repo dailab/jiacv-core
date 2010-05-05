@@ -289,7 +289,35 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   protected final ActionResult invokeAndWaitForResult(IActionDescription a, Serializable[] inputParams) {
     // invoke action
     final ActionResultListener listener = new ActionResultListener();
-    invoke(a, inputParams, listener);
+    this.invoke(a, inputParams, listener);
+
+    // wait for result
+    synchronized (listener) {
+      try {
+        listener.wait();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    return listener.getResult();
+  }
+  
+  /**
+   * Invokes an action and waits for its result. NOTE: This method MUST NOT be used with a blocking execution cycle
+   * (e.g. SimpleExecutionCycle).
+   * 
+   * @param a
+   *          The action to be invoked.
+   * @param inputParams
+   *          The values for the input parameters.
+   * @param timeout
+   *          the timeout in milliseconds after this DoAction failes.
+   * @return The result of the action.
+   */
+  protected final ActionResult invokeAndWaitForResult(IActionDescription a, Serializable[] inputParams, Long timeout) {
+    // invoke action
+    final ActionResultListener listener = new ActionResultListener();
+    this.invoke(a, inputParams, listener, timeout);
 
     // wait for result
     synchronized (listener) {
@@ -328,6 +356,26 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver) {
     final DoAction doAct = a.createDoAction(inputParams, receiver);
+    memory.write(doAct);
+    return doAct.getSessionId();
+  }
+  
+  /**
+   * Invokes an action asynchronously with handling the result by a given receiver.
+   * 
+   * @param a
+   *          the action to be invoked.
+   * @param inputParams
+   *          the input parameters used for the action invocation.
+   * @param receiver
+   *          the receiver to be informed about the results.
+   * @param timeOut
+   *          a timeout in milliseconds after the DoAction failes.
+   * @return the session id of the action invocation.
+   */
+  protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver, final Long timeOut) {
+    final DoAction doAct = a.createDoAction(inputParams, receiver);
+    doAct.getSession().setTimeToLive(timeOut);
     memory.write(doAct);
     return doAct.getSessionId();
   }

@@ -277,7 +277,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   }
 
   /**
-   * Invokes an action and waits for its result. NOTE: This method MUST NOT be used with a blocking execution cycle
+   * Invokes an action with default timeout and waits for its result. NOTE: This method MUST NOT be used with a blocking execution cycle
    * (e.g. SimpleExecutionCycle).
    * 
    * @param a
@@ -285,25 +285,15 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @param inputParams
    *          The values for the input parameters.
    * @return The result of the action.
+   * @see #invokeAndWaitForResult(IActionDescription, Serializable[], Long)
+   * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final ActionResult invokeAndWaitForResult(IActionDescription a, Serializable[] inputParams) {
-    // invoke action
-    final ActionResultListener listener = new ActionResultListener();
-    this.invoke(a, inputParams, listener);
-
-    // wait for result
-    synchronized (listener) {
-      try {
-        listener.wait();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    return listener.getResult();
+	return invokeAndWaitForResult(a, inputParams, Session.DEFAULT_TIMETOLIVE);
   }
-  
+
   /**
-   * Invokes an action and waits for its result. NOTE: This method MUST NOT be used with a blocking execution cycle
+   * Invokes an action with given timeout and waits for its result. NOTE: This method MUST NOT be used with a blocking execution cycle
    * (e.g. SimpleExecutionCycle).
    * 
    * @param a
@@ -311,13 +301,15 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @param inputParams
    *          The values for the input parameters.
    * @param timeout
-   *          the timeout in milliseconds after this DoAction failes.
+   *          the timeout in milliseconds after this DoAction fails.
    * @return The result of the action.
+   * @see #invoke(IActionDescription, Serializable[], ResultReceiver, Long)
+   * @see ActionResultListener#getResult()
    */
   protected final ActionResult invokeAndWaitForResult(IActionDescription a, Serializable[] inputParams, Long timeout) {
     // invoke action
     final ActionResultListener listener = new ActionResultListener();
-    this.invoke(a, inputParams, listener, timeout);
+    invoke(a, inputParams, listener, timeout);
 
     // wait for result
     synchronized (listener) {
@@ -331,20 +323,22 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   }
 
   /**
-   * Invokes an action asynchronously without handling the result.
+   * Invokes an action asynchronously with default timeout and without handling the result.
    * 
    * @param a
    *          the action to be invoked.
    * @param inputParams
    *          the input parameters used for the action invocation.
    * @return the session id of the action invocation.
+   * @see #invoke(IActionDescription, Serializable[], ResultReceiver)
+   * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final String invoke(IActionDescription a, Serializable[] inputParams) {
     return invoke(a, inputParams, null);
   }
 
   /**
-   * Invokes an action asynchronously with handling the result by a given receiver.
+   * Invokes an action asynchronously with default timeout and with handling the result by a given receiver.
    * 
    * @param a
    *          the action to be invoked.
@@ -353,15 +347,15 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @param receiver
    *          the receiver to be informed about the results.
    * @return the session id of the action invocation.
+   * @see IActionDescription#createDoAction(Serializable[], ResultReceiver)
+   * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver) {
-    final DoAction doAct = a.createDoAction(inputParams, receiver);
-    memory.write(doAct);
-    return doAct.getSessionId();
+	return invoke(a, inputParams, receiver, Session.DEFAULT_TIMETOLIVE);
   }
-  
+
   /**
-   * Invokes an action asynchronously with handling the result by a given receiver.
+   * Invokes an action asynchronously with given timeout and with handling the result by a given receiver.
    * 
    * @param a
    *          the action to be invoked.
@@ -370,18 +364,18 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @param receiver
    *          the receiver to be informed about the results.
    * @param timeOut
-   *          a timeout in milliseconds after the DoAction failes.
+   *          a timeout in milliseconds after the DoAction fails.
    * @return the session id of the action invocation.
+   * @see IActionDescription#createDoAction(Serializable[], ResultReceiver, Long)
    */
   protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver, final Long timeOut) {
-    final DoAction doAct = a.createDoAction(inputParams, receiver);
-    doAct.getSession().setTimeToLive(timeOut);
+    final DoAction doAct = a.createDoAction(inputParams, receiver, timeOut);
     memory.write(doAct);
     return doAct.getSessionId();
   }
 
   /**
-   * Invokes an action asynchronously as part of a parent session with handling the result by a given receiver.
+   * Invokes an action asynchronously as part of a parent session with default timeout and with handling the result by a given receiver.
    * 
    * @param a
    *          the action to be invoked.
@@ -392,6 +386,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @param receiver
    *          the receiver to be informed about the results.
    * @return the session id of the action invocation.
+   * @see IActionDescription#createDoAction(Session, Serializable[], ResultReceiver)
+   * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final String invoke(IActionDescription a, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
     final DoAction doAct = a.createDoAction(parent, inputParams, receiver);

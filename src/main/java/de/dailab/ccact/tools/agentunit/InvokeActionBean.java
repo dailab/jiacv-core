@@ -25,7 +25,7 @@ public final class InvokeActionBean extends AbstractAgentBean {
 	/**
 	 * SLEEP_TIME = 200 ms
 	 */
-	public static final Integer SLEEP_TIME = 200;
+	public static final Integer SLEEP_TIME = Integer.valueOf(200);
 
 
 	public Collection<IActionDescription> getLocalActions() {

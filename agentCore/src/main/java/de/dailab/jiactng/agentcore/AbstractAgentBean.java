@@ -289,7 +289,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final ActionResult invokeAndWaitForResult(IActionDescription a, Serializable[] inputParams) {
-	return invokeAndWaitForResult(a, inputParams, Session.DEFAULT_TIMETOLIVE);
+	return invokeAndWaitForResult(a, inputParams, Long.valueOf(Session.DEFAULT_TIMETOLIVE));
   }
 
   /**
@@ -351,7 +351,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver) {
-	return invoke(a, inputParams, receiver, Session.DEFAULT_TIMETOLIVE);
+	return invoke(a, inputParams, receiver, Long.valueOf(Session.DEFAULT_TIMETOLIVE));
   }
 
   /**

@@ -85,7 +85,7 @@ public class DummyTransport extends MessageTransport {
 		public IJiacMessage _selector = null;
 		
 		// was the order an order to register(true) or unregister(false)?
-		Boolean _register = true;
+		boolean _register = true;
 		
 		public RegistrationOrder(){
 			

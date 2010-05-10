@@ -88,7 +88,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
 	 */
 	public final Integer addNotification(String type, String message, Object userDate, Date date, long period) throws IOException, InstanceNotFoundException {
-		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long"});
+		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, Long.valueOf(period)}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long"});
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
 	 */
 	public final Integer addNotification(String type, String message, Object userDate, Date date, long period, long nbOccurences) throws IOException, InstanceNotFoundException {
-		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period, nbOccurences}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long", "long"});
+		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, Long.valueOf(period), Long.valueOf(nbOccurences)}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long", "long"});
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class JmxAgentNodeTimerManagementClient extends
 	 * @see javax.management.timer.TimerMBean#addNotification(String, String, Object, Date)
 	 */
 	public final Integer addNotification(String type, String message, Object userDate, Date date, long period, long nbOccurences, boolean fixedRate) throws IOException, InstanceNotFoundException {
-		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, period, nbOccurences, fixedRate}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long", "long", "boolean"});
+		return (Integer) invokeOperation("addNotification", new Object[]{type, message, userDate, date, Long.valueOf(period), Long.valueOf(nbOccurences), Boolean.valueOf(fixedRate)}, new String[]{"java.lang.String", "java.lang.String", "java.lang.Object", "java.util.Date", "long", "long", "boolean"});
 	}
 
 	/**

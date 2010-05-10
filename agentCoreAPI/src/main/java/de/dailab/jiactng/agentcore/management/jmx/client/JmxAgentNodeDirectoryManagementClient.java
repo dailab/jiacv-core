@@ -38,7 +38,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAliveInterval()
 	 */
 	public final long getAliveInterval() throws IOException, InstanceNotFoundException {
-		return (Long) getAttribute("AliveInterval");
+		return ((Long) getAttribute("AliveInterval")).longValue();
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAdvertiseInterval()
 	 */
 	public final long getAdvertiseInterval() throws IOException, InstanceNotFoundException {
-		return (Long) getAttribute("AdvertiseInterval");
+		return ((Long) getAttribute("AdvertiseInterval")).longValue();
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#isDump()
 	 */
 	public final boolean isDump() throws IOException, InstanceNotFoundException {
-		return (Boolean) getAttribute("Dump");
+		return ((Boolean) getAttribute("Dump")).booleanValue();
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#setAliveInterval(long)
 	 */
 	public final void setAliveInterval(long aliveInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("AliveInterval", aliveInterval);
+		setAttribute("AliveInterval", Long.valueOf(aliveInterval));
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#setAdvertiseInterval(long)
 	 */
 	public final void setAdvertiseInterval(long advertiseInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("AdvertiseInterval", advertiseInterval);
+		setAttribute("AdvertiseInterval", Long.valueOf(advertiseInterval));
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#setDump(boolean)
 	 */
 	public final void setDump(boolean dump) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("Dump", dump);
+		setAttribute("Dump", Boolean.valueOf(dump));
 	}
 
 }

@@ -137,7 +137,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 				if (session.getCurrentCallDepth() == null) {
 					session.setCurrentCallDepth(1);
 				} else {
-					session.setCurrentCallDepth(session.getCurrentCallDepth() + 1);
+					session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
 				}
 				memory.write(doAction.getSession());
 			}

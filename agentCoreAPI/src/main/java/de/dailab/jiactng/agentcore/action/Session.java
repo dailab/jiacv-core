@@ -84,8 +84,8 @@ public class Session implements IFact {
    *          the source that created the new session
    */
   public Session(ResultReceiver source) {
-    this(IdFactory.createSessionId((source != null) ? source.hashCode() : Session.class.hashCode()), System
-        .currentTimeMillis(), source, new ArrayList<SessionEvent>());
+    this(IdFactory.createSessionId((source != null) ? source.hashCode() : Session.class.hashCode()), Long.valueOf(System
+        .currentTimeMillis()), source, new ArrayList<SessionEvent>());
   }
 
   /**
@@ -134,7 +134,7 @@ public class Session implements IFact {
     this.creationTime = creationTime;
     this.source = source;
     this.history = history;
-    if (timeToLive != 0) {
+    if (timeToLive != null && timeToLive.longValue() > 0) {
       this.timeToLive = timeToLive;
     } else {
       this.timeToLive = null;
@@ -328,7 +328,7 @@ public class Session implements IFact {
 
     // time
     final Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(creationTime);
+    calendar.setTimeInMillis(creationTime != null ? creationTime.longValue() : 0L);
     builder.append("\n created='").append(calendar.getTime().toString()).append("'");
 
     // source
@@ -467,6 +467,6 @@ public class Session implements IFact {
    * @param newCurrentCallDepth the session call depth.
    */
   public final void setCurrentCallDepth(int newCurrentCallDepth) {
-    currentCallDepth = newCurrentCallDepth;
+    currentCallDepth = Integer.valueOf(newCurrentCallDepth);
   }
 }

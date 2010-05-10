@@ -54,7 +54,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 	public void run() {
 		// cancel and remove futures which has reached timeout
 		final long now = System.currentTimeMillis();
-		while (!futures.isEmpty() && (futures.firstKey() < now)) {
+		while (!futures.isEmpty() && (futures.firstKey().longValue() < now)) {
 			final Future<?> future = futures.pollFirstEntry().getValue();
 			if (future.cancel(true)) {
 				log.warn("Handler was interrupted by the execution cycle due to timeout constraints");
@@ -110,7 +110,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 				executionDone = true;
 				final Future<?> executionFuture = thisAgent.getThreadPool().submit(
 						new ExecutionHandler(minBean));
-				futures.put(timeout++, executionFuture);
+				futures.put(Long.valueOf(timeout++), executionFuture);
 
 				// reschedule bean
 				minBean
@@ -129,7 +129,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 				synchronized (this) {
 					final Future<?> doActionFuture = thisAgent.getThreadPool().submit(
 							new DoActionHandler(act));
-					futures.put(timeout++, doActionFuture);
+					futures.put(Long.valueOf(timeout++), doActionFuture);
 				}
 			}
 			updateWorkload(DO_ACTION, actionPerformed);
@@ -153,7 +153,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 							.next();
 					final Future<?> actionResultFuture = thisAgent.getThreadPool().submit(
 							new ActionResultHandler(actionResult));
-					futures.put(timeout++, actionResultFuture);
+					futures.put(Long.valueOf(timeout++), actionResultFuture);
 					pendingResults.remove(actionResult);
 				}
 			}
@@ -180,7 +180,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 									final Future<?> sessionTimeoutFuture = thisAgent.getThreadPool().submit(
 											new SessionTimeoutHandler(session, doAction));
-									futures.put(timeout++, sessionTimeoutFuture);
+									futures.put(Long.valueOf(timeout++), sessionTimeoutFuture);
 								}
 							}
 						}

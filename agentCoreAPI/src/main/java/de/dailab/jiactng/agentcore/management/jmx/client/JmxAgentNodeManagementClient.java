@@ -327,7 +327,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#addLog4JSocketAppender(String, int)
 	 */
 	public final void addLog4JSocketAppender(String address, int port) throws IOException, InstanceNotFoundException {
-		invokeOperation("addLog4JSocketAppender", new Object[]{address, port}, new String[]{"java.lang.String", "int"});
+		invokeOperation("addLog4JSocketAppender", new Object[]{address, Integer.valueOf(port)}, new String[]{"java.lang.String", "int"});
 	}
 
 	/**
@@ -342,7 +342,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#removeLog4JSocketAppender(String, int)
 	 */
 	public final void removeLog4JSocketAppender(String address, int port) throws IOException, InstanceNotFoundException {
-		invokeOperation("removeLog4JSocketAppender", new Object[]{address, port}, new String[]{"java.lang.String", "int"});
+		invokeOperation("removeLog4JSocketAppender", new Object[]{address, Integer.valueOf(port)}, new String[]{"java.lang.String", "int"});
 	}
 
 	/**

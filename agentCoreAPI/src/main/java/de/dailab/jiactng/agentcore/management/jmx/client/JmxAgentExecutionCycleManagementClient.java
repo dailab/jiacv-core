@@ -48,7 +48,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getExecutionWorkload()
 	 */
 	public final int getExecutionWorkload() throws IOException, InstanceNotFoundException {
-		return (Integer) getAttribute("ExecutionWorkload");
+		return ((Integer) getAttribute("ExecutionWorkload")).intValue();
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getDoActionWorkload()
 	 */
 	public final int getDoActionWorkload() throws IOException, InstanceNotFoundException {
-		return (Integer) getAttribute("DoActionWorkload");
+		return ((Integer) getAttribute("DoActionWorkload")).intValue();
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class JmxAgentExecutionCycleManagementClient extends JmxAbstractManagemen
 	 * @see de.dailab.jiactng.agentcore.execution.AbstractExecutionCycleMBean#getActionResultWorkload()
 	 */
 	public final int getActionResultWorkload() throws IOException, InstanceNotFoundException {
-		return (Integer) getAttribute("ActionResultWorkload");
+		return ((Integer) getAttribute("ActionResultWorkload")).intValue();
 	}
 
 	/**

@@ -364,8 +364,11 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 			final CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] { "Implementation of the logger instance", "debug",
 					"error", "fatal", "info", "trace", "warn" }, new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN,
 					SimpleType.BOOLEAN, SimpleType.BOOLEAN });
-			return new CompositeDataSupport(type, itemNames, new Object[] { log.getClass().getName(), log.isDebugEnabled(), log.isErrorEnabled(), log.isFatalEnabled(), log.isInfoEnabled(),
-					log.isTraceEnabled(), log.isWarnEnabled() });
+			return new CompositeDataSupport(type, itemNames, new Object[] {
+			        log.getClass().getName(), Boolean.valueOf(log.isDebugEnabled()),
+			        Boolean.valueOf(log.isErrorEnabled()), Boolean.valueOf(log.isFatalEnabled()),
+			        Boolean.valueOf(log.isInfoEnabled()), Boolean.valueOf(log.isTraceEnabled()),
+			        Boolean.valueOf(log.isWarnEnabled()) });
 		} catch (OpenDataException e) {
 			e.printStackTrace();
 			return null;

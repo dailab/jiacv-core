@@ -1043,7 +1043,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		final int oldInterval = executionInterval;
 		executionInterval = newExecutionInterval;
 		sendAttributeChangeNotification("executionInterval", "java.lang.int", 
-				oldInterval, newExecutionInterval);
+				Integer.valueOf(oldInterval), Integer.valueOf(newExecutionInterval));
 	}
 
     /**
@@ -1054,7 +1054,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			return null;
 		}
 		try {
-			return timerClient.getDate(startTimeId).getTime();
+			return Long.valueOf(timerClient.getDate(startTimeId).getTime());
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -1106,7 +1106,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		// add new timer notification
 		if (regStartTime != null) {
 			try {
-				startTimeId = timerClient.addNotification(null, null, null, new Date(regStartTime));
+				startTimeId = timerClient.addNotification(null, null, null, new Date(regStartTime.longValue()));
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -1115,24 +1115,23 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     }
 	
 	/**
-	 * {@inheritDoc}
-	 */
-	public final void setStartTime(Long newStartTime) throws InstanceNotFoundException {
-		// add listener if needed
-	  if((newStartTime!=null) && (newStartTime<=(System.currentTimeMillis()+AGENT_STARTTIME_DELAY))) {
-	    newStartTime = System.currentTimeMillis()+AGENT_STARTTIME_DELAY;
-	  }
-	  startTime = newStartTime;
-	  final Long oldStartTime = getStartTime();
-	  
-	  if (this.memory.getState() != LifecycleStates.UNDEFINED) {
-		  if (this.getAgentState() != LifecycleStates.UNDEFINED) {
-			  registerStartTime(newStartTime);
-			  sendAttributeChangeNotification("startTime", "java.lang.Long", oldStartTime, getStartTime());
-		  }
-	  }
-		
-	}
+     * {@inheritDoc}
+     */
+    public final void setStartTime(Long newStartTime) throws InstanceNotFoundException {
+        // add listener if needed
+        if ((newStartTime != null) && (newStartTime.longValue() <= (System.currentTimeMillis() + AGENT_STARTTIME_DELAY))) {
+            newStartTime= Long.valueOf(System.currentTimeMillis() + AGENT_STARTTIME_DELAY);
+        }
+        startTime= newStartTime;
+        final Long oldStartTime= getStartTime();
+
+        if (this.memory.getState() != LifecycleStates.UNDEFINED) {
+            if (this.getAgentState() != LifecycleStates.UNDEFINED) {
+                registerStartTime(newStartTime);
+                sendAttributeChangeNotification("startTime", "java.lang.Long", oldStartTime, getStartTime());
+            }
+        }
+    }
 
     /**
 	 * {@inheritDoc}
@@ -1142,7 +1141,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			return null;
 		}
 		try {
-			return timerClient.getDate(stopTimeId).getTime();
+			return Long.valueOf(timerClient.getDate(stopTimeId).getTime());
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -1189,7 +1188,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		// add new timer notification
 		if (regStopTime != null) {
 			try {
-				stopTimeId = timerClient.addNotification(null, null, null, new Date(regStopTime));
+				stopTimeId = timerClient.addNotification(null, null, null, new Date(regStopTime.longValue()));
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -1335,7 +1334,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     	final boolean oldValue = this.execution.getAutoExecutionType();
     	this.execution.setAutoExecutionType(continous);
     	sendAttributeChangeNotification("autoExecutionType", "java.lang.boolean", 
-    			oldValue, continous);
+    			Boolean.valueOf(oldValue), Boolean.valueOf(continous));
     } 
   }
 

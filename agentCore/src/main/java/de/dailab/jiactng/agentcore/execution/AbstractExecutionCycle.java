@@ -108,7 +108,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
           if (session.getCurrentCallDepth() == null) {
             session.setCurrentCallDepth(1);
           } else {
-            session.setCurrentCallDepth(session.getCurrentCallDepth() + 1);
+            session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
           }
           memory.write(act.getSession());
         }
@@ -157,13 +157,13 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     if (session.getCurrentCallDepth() == null) {
       session.setCurrentCallDepth(1);
     }
-    session.setCurrentCallDepth(session.getCurrentCallDepth() - 1);
+    session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() - 1);
     if (memory.read(session) == null) {
       if ((doAct.getAction().getResultTypeNames() != null) && doAct.getAction().getResultTypeNames().size() > 0) {
         log.warn("ActionResult for Action " + actionResult.getAction().getName()
             + " written with non existing Session.");
       }
-    } else if (session.getCurrentCallDepth() <= 0) {
+    } else if (session.getCurrentCallDepth().intValue() <= 0) {
       memory.remove(session);
       log.debug("Session removed for action " + doAct.getAction().getName());
     }
@@ -232,7 +232,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     if (queue.remainingCapacity() == 0) {
       queue.poll();
     }
-    queue.offer(active);
+    queue.offer(Boolean.valueOf(active));
 
     // update workload
     int actives = 0;
@@ -260,7 +260,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    */
   private void workloadChanged(String attribute, int oldWorkload, int newWorkload) {
     final Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
-        "Workload changed ", attribute, "int", oldWorkload, newWorkload);
+        "Workload changed ", attribute, "int", Integer.valueOf(oldWorkload), Integer.valueOf(newWorkload));
     sendNotification(n);
   }
 

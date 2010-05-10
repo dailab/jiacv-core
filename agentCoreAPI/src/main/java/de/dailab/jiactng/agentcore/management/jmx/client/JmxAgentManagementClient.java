@@ -317,7 +317,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getBeanExecutionTimeout()
 	 */
 	public final long getBeanExecutionTimeout() throws IOException, InstanceNotFoundException {
-		return (Long) getAttribute("BeanExecutionTimeout");
+		return ((Long) getAttribute("BeanExecutionTimeout")).longValue();
 	}
 
 	/**
@@ -331,7 +331,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#setBeanExecutionTimeout(long)
 	 */
 	public final void setBeanExecutionTimeout(long beanExecutionTimeout) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		setAttribute("BeanExecutionTimeout", beanExecutionTimeout);
+		setAttribute("BeanExecutionTimeout", Long.valueOf(beanExecutionTimeout));
 	}
 
 	/**
@@ -455,7 +455,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 */
 	public final void setAutoExecutionType(boolean continous)throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		this.setAttribute("AutoExecutionType", continous);
+		this.setAttribute("AutoExecutionType", Boolean.valueOf(continous));
 	}
   
 	/**
@@ -465,7 +465,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 */
 	public final boolean getAutoExecutionType()throws IOException, InstanceNotFoundException {
-		return (Boolean) getAttribute("AutoExecutionType");
+		return ((Boolean) getAttribute("AutoExecutionType")).booleanValue();
 	}
   
 	/**

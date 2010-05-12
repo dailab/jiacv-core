@@ -297,12 +297,13 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent, Runna
             this.sockAddress = new InetSocketAddress(this.inetAddress, myPort);
             mcast = new MulticastSocket(myPort);
             mcast.setLoopbackMode(loopBackMode);
+            if (mcInterface != null) {
+                // FIX: interface must be set here to influence join/leave
+                mcast.setInterface(InetAddress.getByName(mcInterface));
+            }
             mcast.setTimeToLive(getTimeToLive());
             mcast.joinGroup(inetAddress);
             mcast.setSoTimeout((int)keepAliveInterval);
-            if (mcInterface != null) {
-                mcast.setInterface(InetAddress.getByName(mcInterface));
-            }
             if (mcNetworkInterface != null) {
                 mcast.setNetworkInterface(NetworkInterface.getByName(mcNetworkInterface));
             }

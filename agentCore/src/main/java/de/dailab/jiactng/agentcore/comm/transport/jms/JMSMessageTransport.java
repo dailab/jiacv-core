@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.comm.transport.jms;
 import java.util.Enumeration;
 
 import javax.jms.BytesMessage;
+import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -30,7 +31,8 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  */
 public class JMSMessageTransport extends MessageTransport {
 
-	private ConnectionFactory connectionFactory;
+	private ConnectionFactory _connectionFactory;
+	private Connection _connection;
 	private JMSSender sender;
 	private JMSReceiver receiver;
 
@@ -69,16 +71,19 @@ public class JMSMessageTransport extends MessageTransport {
 			log.debug("JMSMessageTransport initializing...");
 		}
 	
-		if (getConnectionFactory() == null) {
+		if (_connectionFactory == null) {
 			throw new Exception("NullPointer Exception: No ConnectionFactory Set!");
 		}
 		
-		sender = new JMSSender(connectionFactory, createChildLog("sender"));
-		receiver = new JMSReceiver(connectionFactory, this, createChildLog("receiver"));
+		_connection= _connectionFactory.createConnection();
+		
+		sender = new JMSSender(_connection, createChildLog("sender"));
+		receiver = new JMSReceiver(_connection, this, createChildLog("receiver"));
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport initialized");
 		}
 		
+		_connection.start();
 	}
 	
 	
@@ -89,8 +94,20 @@ public class JMSMessageTransport extends MessageTransport {
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport commences Cleanup");
 		}
-        try {receiver.doCleanup();} catch (Exception e) {log.warn("Clean up receiver failed, because " + e.getLocalizedMessage());}
-		try {sender.doCleanup();} catch (Exception e) {log.warn("Clean up sender failed, because " + e.getLocalizedMessage());}
+		
+		try {
+            _connection.stop();
+        } catch (JMSException e) {
+            log.warn("could not stop JMS connection ", e);
+        }
+		
+        try {
+            _connection.close();
+        } catch (Exception e) {
+            log.warn("could not close connection ", e);
+        }
+        
+        _connection= null;
 		if (log.isDebugEnabled()){
 			log.debug("JMSMessageTransport cleaned up");
 		}
@@ -239,20 +256,20 @@ public class JMSMessageTransport extends MessageTransport {
 	public void stopListen(ICommunicationAddress address, IJiacMessage selector) { 
 		receiver.stopListen(address, selector);
 	}
-
-	/**
-	 * Get the connection factory used for creating sender and receiver.
-	 * @return the connection factory
-	 */
-	public ConnectionFactory getConnectionFactory() {
-		return connectionFactory;
-	}
+//
+//	/**
+//	 * Get the connection factory used for creating sender and receiver.
+//	 * @return the connection factory
+//	 */
+//	public ConnectionFactory getConnectionFactory() {
+//		return connectionFactory;
+//	}
 
 	/**
 	 * Set the connection factory to be used for creating sender and receiver.
 	 * @param newConnectionFactory the connection factory
 	 */
 	public void setConnectionFactory(ConnectionFactory newConnectionFactory) {
-		connectionFactory = newConnectionFactory;
+		_connectionFactory = newConnectionFactory;
 	}
 }

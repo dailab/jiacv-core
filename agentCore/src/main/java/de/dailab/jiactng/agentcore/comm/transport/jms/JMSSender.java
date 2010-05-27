@@ -1,7 +1,6 @@
 package de.dailab.jiactng.agentcore.comm.transport.jms;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -23,63 +22,36 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 class JMSSender {
 	private final Log log;
 	
-	private ConnectionFactory connectionFactory;
+	private final Session _session;
+	private final MessageProducer _producer;
 
-	private Session session = null;
-	private Connection connection = null;
-
-	public JMSSender(ConnectionFactory connectionFactory, Log log) throws JMSException {
-		this.connectionFactory = connectionFactory;
+	public JMSSender(Connection connection, Log log) throws JMSException {
         this.log= log;
-		doInit();
+        _session= connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        _producer= _session.createProducer(null);
 	}
 	
-	public void doInit() throws JMSException {
-		if (log.isDebugEnabled()){
-			log.debug("JMSSender is initializing...");
-		}
-		connection = connectionFactory.createConnection();
-		session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		connection.start();
-        if (log.isDebugEnabled()){
-        	log.debug("JMSSender initialized.");
-        }
-	}
-	
-	public void doCleanup() throws JMSException {
-		if(log.isDebugEnabled()){
-			log.debug("JMSSender is commencing cleanup...");
-		}
-		session.close();
-		connection.close();
-        if (log.isDebugEnabled()){
-        	log.debug("JMSSender cleaned up.");
-        }
-	}
-
 	public void send(IJiacMessage message, ICommunicationAddress address, long timeToLive) throws JMSException {
 		Destination destination = null;
 		
 		if (address instanceof IGroupAddress) {
-			destination = session.createTopic(address.getName());
+			destination = _session.createTopic(address.getName());
         } else {
-			destination = session.createQueue(address.getName());
+			destination = _session.createQueue(address.getName());
         }
 		
 		sendMessage(message, destination, timeToLive);
 	}
 	
 	private void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {
-        final MessageProducer producer = session.createProducer(destination);
-		producer.setTimeToLive(timeToLive);
+		_producer.setTimeToLive(timeToLive);
         
         if (log.isDebugEnabled()){
         	log.debug("pack message");
         }
-        final Message jmsMessage= JMSMessageTransport.pack(message, session);
+        final Message jmsMessage= JMSMessageTransport.pack(message, _session);
         jmsMessage.setJMSDestination(destination);
-		producer.send(jmsMessage);
-		producer.close();
+		_producer.send(destination, jmsMessage);
         if (log.isDebugEnabled()){
         	log.debug("JMSSender sent Message to '" + destination + "'");
         }

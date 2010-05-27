@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -77,49 +76,15 @@ class JMSReceiver implements MessageListener {
    
     protected final Log log;
 
-    private ConnectionFactory connectionFactory;
-    private Connection connection;
     private Session session;
     private JMSMessageTransport parent;
     private Map<String, MessageConsumer> consumers;
 
-    public JMSReceiver(ConnectionFactory connectionFactory, JMSMessageTransport parent, Log log) throws JMSException {
-        this.connectionFactory = connectionFactory;
+    public JMSReceiver(Connection connection, JMSMessageTransport parent, Log log) throws JMSException {
         this.parent = parent;
         this.log = log;
+        session= connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         consumers = new HashMap<String, MessageConsumer>();
-        doInit();
-    }
-
-    /**
-     * Initializes the JiacReceiver creating and starting session and connection. throws an JMSException if something
-     * goes wrong doing so.
-     */
-    public synchronized void doInit() throws JMSException {
-        if (log.isDebugEnabled()) {
-            log.debug("JMSReceiver is initializing...");
-        }
-        connection = connectionFactory.createConnection();
-        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        connection.start();
-        if (log.isDebugEnabled()) {
-            log.debug("JMSReceiver initialized.");
-        }
-    }
-
-    /**
-     * commence Cleanup procedures, closing all consumers and connections.
-     */
-    public synchronized void doCleanup() throws JMSException {
-        if (log.isDebugEnabled()) {
-            log.debug("JMSReceiver commencing cleanup...");
-        }
-        stopListenAll();
-        session.close();
-        connection.close();
-        if (log.isDebugEnabled()) {
-            log.debug("JMSReceiver cleaned up");
-        }
     }
 
     /**

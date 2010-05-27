@@ -37,7 +37,7 @@ public class MessageReaderBean extends AbstractAgentBean {
             _numBytes= 0;
         };
         
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "synthetic-access" })
         public void notify(SpaceEvent<? extends IFact> event) {
             if(event instanceof WriteCallEvent) {
                 if(_startTime < 0) {
@@ -63,7 +63,7 @@ public class MessageReaderBean extends AbstractAgentBean {
             if(_countMarkers.size() == max) {
                 _endTime= System.currentTimeMillis();
                 System.out.println("RECEIVED " + _countMarkers.size() + " messages (" + _numBytes +  ") between " + _startTime + " and " + _endTime + " total: " + (_endTime - _startTime));
-                System.exit(0);
+                FlooderLauncher.shutdownNode(thisAgent.getAgentNode());
             }
         }
     }

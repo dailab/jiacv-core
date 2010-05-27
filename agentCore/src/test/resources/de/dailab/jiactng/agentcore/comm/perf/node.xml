@@ -48,6 +48,7 @@
 				<ref bean="MessageFlooderBean" />
 			</list>
 		</property>
+		<property name="executionInterval" value="0" />
 	</bean>
 
 	<bean name="FloodReader" parent="SimpleAgent" singleton="false">

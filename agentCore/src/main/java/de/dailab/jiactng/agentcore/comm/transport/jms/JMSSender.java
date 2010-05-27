@@ -44,14 +44,12 @@ class JMSSender {
 	}
 	
 	private void sendMessage(IJiacMessage message, Destination destination, long timeToLive) throws JMSException {
-		_producer.setTimeToLive(timeToLive);
-        
         if (log.isDebugEnabled()){
         	log.debug("pack message");
         }
         final Message jmsMessage= JMSMessageTransport.pack(message, _session);
         jmsMessage.setJMSDestination(destination);
-		_producer.send(destination, jmsMessage);
+		_producer.send(destination, jmsMessage, _producer.getDeliveryMode(), _producer.getPriority(), timeToLive);
         if (log.isDebugEnabled()){
         	log.debug("JMSSender sent Message to '" + destination + "'");
         }

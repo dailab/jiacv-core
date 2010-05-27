@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml"/>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
+	
+	<bean name="FloodNode" parent="Node">
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="LocalJMSBroker"/>
+			</list>
+		</property>
+		<property name="agents">
+			<list>
+				<ref bean="FloodAgent" />
+				<ref bean="FloodReader01" />
+				<ref bean="FloodReader02" />
+				<ref bean="FloodReader03" />
+				<ref bean="FloodReader04" />
+				<ref bean="FloodReader05" />
+				<ref bean="FloodReader06" />
+				<ref bean="FloodReader07" />
+				<ref bean="FloodReader08" />
+				<ref bean="FloodReader09" />
+				<ref bean="FloodReader10" />
+				<ref bean="FloodReader11" />
+				<ref bean="FloodReader12" />
+				<ref bean="FloodReader13" />
+				<ref bean="FloodReader14" />
+				<ref bean="FloodReader15" />
+				<ref bean="FloodReader16" />
+				<ref bean="FloodReader17" />
+				<ref bean="FloodReader18" />
+				<ref bean="FloodReader19" />
+				<ref bean="FloodReader20" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="LocalJMSBroker" parent="ActiveMQBroker" singleton="true"/>
+	
+	<bean name="FloodAgent" parent="SimpleAgent" singleton="false">
+		<property name="agentBeans">
+			<list>
+				<ref bean="CommunicationBean" />
+				<ref bean="MessageFlooderBean" />
+			</list>
+		</property>
+	</bean>
+
+	<bean name="FloodReader" parent="SimpleAgent" singleton="false">
+		<property name="agentBeans">
+			<list>
+				<ref bean="CommunicationBean" />
+				<ref bean="MessageReaderBean" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="FloodReader01" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader02" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader03" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader04" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader05" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader06" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader07" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader08" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader09" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader10" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader11" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader12" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader13" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader14" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader15" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader16" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader17" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader18" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader19" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader20" parent="FloodReader" singleton="false"/>
+	
+
+	<bean name="MessageFlooderBean" class="de.dailab.jiactng.agentcore.comm.perf.MessageFlooderBean" singleton="false">
+		<property name="groupName" value="flooders" />
+		<property name="max" value="800" />
+	</bean>
+	
+	<bean name="MessageReaderBean" class="de.dailab.jiactng.agentcore.comm.perf.MessageReaderBean" singleton="false" >
+		<property name="groupName" value="flooders" />
+		<property name="max" value="800" />
+	</bean>
+</beans>

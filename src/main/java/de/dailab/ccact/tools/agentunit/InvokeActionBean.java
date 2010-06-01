@@ -34,7 +34,7 @@ public final class InvokeActionBean extends AbstractAgentBean {
 		
 		for(IActionDescription action : thisAgent.searchAllActions(new Action())) {
 			
-			if ( ( action.getScope().equals(ActionScope.NODE) || action.getScope().equals(ActionScope.GLOBAL) ) 
+			if ( action.getScope() != null && ( action.getScope().equals(ActionScope.NODE) || action.getScope().equals(ActionScope.GLOBAL) ) 
 				&& action.getProviderDescription().getAgentNodeUUID().equals(thisAgent.getAgentNode().getUUID())) {
 				ret.add(action);
 			}

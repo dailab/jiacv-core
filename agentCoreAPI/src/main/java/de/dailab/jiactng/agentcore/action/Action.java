@@ -54,7 +54,7 @@ public class Action implements IActionDescription {
 	private IAgentDescription providerDescription;
 	
 	/** The scope of the action, i.e. which agent will it know or can it use.*/
-	private ActionScope scope = null;
+	private ActionScope scope = ActionScope.AGENT;
 	
 	/**
 	 * This constructor is used to create an action template

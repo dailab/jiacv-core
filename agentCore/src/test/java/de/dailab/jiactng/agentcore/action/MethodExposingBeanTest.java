@@ -37,7 +37,7 @@ public class MethodExposingBeanTest extends TestCase {
         super.tearDown();
         ((SimpleAgentNodeMBean)_node).shutdown();
     }
-    
+
     public void testActions() {
         Set<String> expected= new HashSet<String>();
         
@@ -53,5 +53,10 @@ public class MethodExposingBeanTest extends TestCase {
         }
         
         assertEquals("missing some actions " + expected, 0, expected.size());
+    }
+
+    public void testOneAction() {
+    	Action action = _testBean.getActionFromMemory("OderDochAnders");
+    	assertNotNull("missing action 'OderDochAnders'", action);
     }
 }

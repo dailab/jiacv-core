@@ -36,4 +36,8 @@ public class ExampleExposingBean extends AbstractMethodExposingBean {
     public Set<Action> getAllActionsFromMemory() {
         return memory.readAllOfType(Action.class);
     }
+
+    public Action getActionFromMemory(String name) {
+    	return memory.read(new Action(name));
+    }
 }

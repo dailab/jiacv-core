@@ -54,7 +54,7 @@ public class Action implements IActionDescription {
 	private IAgentDescription providerDescription;
 	
 	/** The scope of the action, i.e. which agent will it know or can it use.*/
-	private ActionScope scope = ActionScope.AGENT;
+	private ActionScope scope;
 	
 	/**
 	 * This constructor is used to create an action template
@@ -73,7 +73,7 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * Constructor. Creates a new action-declaration.
+	 * Constructor. Creates a new action-declaration with agent internal scope.
 	 * 
 	 * @param name
 	 *            the name of the action
@@ -91,7 +91,7 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * Constructor. Creates a new action-declaration.
+	 * Constructor. Creates a new action-declaration with agent internal scope.
 	 * @param name the name of the action
 	 * @param providerBean the component that holds the functionality of this action
 	 * @param inputTypes the classes of the input-parameters of this action
@@ -103,6 +103,7 @@ public class Action implements IActionDescription {
 		setProviderBean(providerBean);
 		setInputTypes(inputTypes);
 		setResultTypes(resultTypes);
+		setScope(ActionScope.AGENT);
 	}
 
 	/**
@@ -114,6 +115,7 @@ public class Action implements IActionDescription {
 	public Action(Action action) {
 		name = action.getName();
 		providerBean = action.getProviderBean();
+		scope = action.getScope();
 
 		// we can exchange references here, because the lists are immutable
 		inputTypeNames = action.getInputTypeNames();

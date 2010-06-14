@@ -60,7 +60,7 @@ public class Action implements IActionDescription {
 	 * This constructor is used to create an action template
 	 */
 	public Action() {
-		this(null, null, (List<Class<?>>) null, (List<Class<?>>) null);
+		this(null, null, (List<Class<?>>) null, (List<Class<?>>) null, null);
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class Action implements IActionDescription {
 	 * @param name the name of the action template
 	 */
 	public Action(String name) {
-		this(name, null, (List<Class<?>>) null, (List<Class<?>>) null);
+		this(name, null, (List<Class<?>>) null, (List<Class<?>>) null, null);
 	}
 
 	/**
@@ -99,11 +99,24 @@ public class Action implements IActionDescription {
 	 */
 	public Action(String name, IEffector providerBean,
 			List<Class<?>> inputTypes, List<Class<?>> resultTypes) {
+		this(name, providerBean, inputTypes, resultTypes, ActionScope.AGENT);
+	}
+
+	/**
+	 * Constructor. Creates a new action-declaration.
+	 * @param name the name of the action
+	 * @param providerBean the component that holds the functionality of this action
+	 * @param inputTypes the classes of the input-parameters of this action
+	 * @param resultTypes the classes of the results of this action
+	 * @param scope the scope of this action
+	 */
+	public Action(String name, IEffector providerBean,
+			List<Class<?>> inputTypes, List<Class<?>> resultTypes, ActionScope scope) {
 		setName(name);
 		setProviderBean(providerBean);
 		setInputTypes(inputTypes);
 		setResultTypes(resultTypes);
-		setScope(ActionScope.AGENT);
+		setScope(scope);
 	}
 
 	/**

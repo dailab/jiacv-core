@@ -5,12 +5,12 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.logging.Log;
 
-import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
@@ -173,13 +173,13 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * 
    * @see java.util.Collections#unmodifiableList(List)
    */
-  List<Action> getActionList();
+  List<IActionDescription> getActionList();
 
   /**
    * Sets the list of actions to be exposed by this agent.
    * @param newActionList the list of actions.
    */
-  void setActionList(List<Action> newActionList);
+  void setActionList(List<IActionDescription> newActionList);
 
   /**
    * Gets the timeout after which the execution of a bean will be stopped.

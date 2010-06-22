@@ -603,10 +603,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 					for (IAgentBean ab : beans) {
 						if (ab instanceof IEffector) {
 							final IEffector effector = (IEffector) ab;
-							final List<? extends Action> actions = effector
+							final List<? extends IActionDescription> actions = effector
 									.getActions();
 							if (actions != null && !actions.isEmpty()) {
-								for (Action action : actions) {
+								for (IActionDescription action : actions) {
 									if ((action.getScope() != null)
 											&& action.getScope().contains(
 													ActionScope.NODE)) {

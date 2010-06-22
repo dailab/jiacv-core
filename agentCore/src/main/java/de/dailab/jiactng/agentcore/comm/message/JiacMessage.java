@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
@@ -67,6 +68,18 @@ public final class JiacMessage implements IJiacMessage {
       if (replyToAddress != null) {
          setHeader(Header.REPLY_TO, replyToAddress.toString());
       }
+   }
+
+   /**
+    * Creates a message from JMX composite data, but with ignoring the payload.
+    * @param descr the message description based on JMX open types.
+    */
+   public JiacMessage(CompositeData descr) {
+	   headers = new Hashtable<String, String>();
+	   CompositeData messageHeaders = (CompositeData) descr.get(IJiacMessage.ITEMNAME_HEADERS);
+	   for (String key : messageHeaders.getCompositeType().keySet()) {
+		   headers.put(key, (String) messageHeaders.get(key));
+	   }
    }
 
    /**

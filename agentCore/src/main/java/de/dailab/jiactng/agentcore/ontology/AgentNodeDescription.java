@@ -1,10 +1,14 @@
 package de.dailab.jiactng.agentcore.ontology;
 
+import java.net.MalformedURLException;
+import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
@@ -12,6 +16,7 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.remote.JMXServiceURL;
 
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 
 /**
@@ -39,6 +44,37 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 	public AgentNodeDescription(ICommunicationAddress address, long alive) {
 		this.address = address;
 		this.alive = alive;
+	}
+
+	/**
+	 * Creates an agent node description from JMX composite data.
+	 * @param descr the agent node description based on JMX open types.
+	 */
+	public AgentNodeDescription(CompositeData descr) {
+		// set address
+		String commAddress = (String) descr.get(IAgentNodeDescription.ITEMNAME_ADDRESS);
+		if (commAddress != null) {
+			address = CommunicationAddressFactory.createMessageBoxAddress(commAddress);
+		}
+
+		// set JMX URLs
+		jmxURLs = new HashSet<JMXServiceURL>();
+		for (String url : (String[])descr.get(IAgentNodeDescription.ITEMNAME_JMXURLS)) {
+			try {
+				jmxURLs.add(new JMXServiceURL(url));
+			}
+			catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// set alive date
+		try {
+			alive = DateFormat.getInstance().parse((String)descr.get(IAgentNodeDescription.ITEMNAME_ALIVE)).getTime();
+		}
+		catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

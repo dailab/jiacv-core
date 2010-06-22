@@ -1,11 +1,13 @@
 package de.dailab.jiactng.agentcore.ontology;
 
+import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
@@ -81,8 +83,22 @@ public class AgentDescription implements IAgentDescription {
         this.agentNodeUUID = agentNodeUUID;
         this.isMobile = mobile;
     }
-    
-    
+
+    /**
+     * Creates an agent description from JMX composite data.
+     * @param descr the agent description based on JMX open types.
+     */
+    public AgentDescription(CompositeData descr) {
+		aid = (String) descr.get(IAgentDescription.ITEMNAME_ID);
+		name = (String) descr.get(IAgentDescription.ITEMNAME_NAME);
+		agentNodeUUID = (String) descr.get(IAgentDescription.ITEMNAME_NODE);
+		state = (String) descr.get(IAgentDescription.ITEMNAME_STATE);
+		isMobile = (Boolean) descr.get(IAgentDescription.ITEMNAME_MOBILE);
+		String address = (String) descr.get(IAgentDescription.ITEMNAME_MESSAGEBOX);
+		if (address != null) {
+			messageBoxAddress = CommunicationAddressFactory.createMessageBoxAddress(address);
+		}
+    }
 
 	/**
 	 * Get the unique identifier of the agent.

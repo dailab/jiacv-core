@@ -56,7 +56,7 @@ public class PongerBean extends AbstractAgentBean implements ResultReceiver {
     @Override
     public void doInit() throws Exception {
         super.doInit();
-        memory.attach(new MessageObserver(), new JiacMessage(null));
+        memory.attach(new MessageObserver(), new JiacMessage());
     }
 
     public void receiveResult(ActionResult result) {

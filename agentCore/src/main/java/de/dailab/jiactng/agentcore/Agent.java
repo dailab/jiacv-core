@@ -147,7 +147,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 */
 	private long beanExecutionTimeout = DEFAULT_BEAN_EXECUTION_TIMEOUT;
 
-	private ArrayList<Action> actionList = null;
+	private ArrayList<IActionDescription> actionList = null;
 
 	/**
 	 * The id of the start time notification.
@@ -382,7 +382,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 		}
 
 		// initialize agent elements
-		this.actionList = new ArrayList<Action>();
+		this.actionList = new ArrayList<IActionDescription>();
 
 		if (log != null && log.isInfoEnabled()) {
 			log.info("Trying to initalize memory and executioncycle");
@@ -419,9 +419,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 			// if bean is effector, add all actions to memory
 			final IAgentDescription myDescription= getAgentDescription();
 			if (ab instanceof IEffector) {
-				final List<? extends Action> acts = ((IEffector) ab).getActions();
+				final List<? extends IActionDescription> acts = ((IEffector) ab).getActions();
 				if (acts != null) {
-					for (Action item : acts) {
+					for (IActionDescription item : acts) {
 						item.setProviderDescription(myDescription);
 						if(item.getProviderBean() == null) {
 							item.setProviderBean((IEffector) ab);
@@ -868,15 +868,15 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final List<Action> getActionList() {
-	  final ArrayList<Action> tempList = new ArrayList<Action>();
+	public final List<IActionDescription> getActionList() {
+	  final ArrayList<IActionDescription> tempList = new ArrayList<IActionDescription>();
 	  for(IAgentBean iab : agentBeans) {
 		  if(iab instanceof IEffector) {
 		    tempList.addAll(((IEffector)iab).getActions());
 		  }
 		}
 	  
-	  for(Action a: tempList) {
+	  for(IActionDescription a: tempList) {
 	    a.setProviderDescription(getAgentDescription());
 	  }
 	  actionList = tempList;
@@ -886,8 +886,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setActionList(List<Action> newActionList) {
-		actionList = new ArrayList<Action>();
+	public final void setActionList(List<IActionDescription> newActionList) {
+		actionList = new ArrayList<IActionDescription>();
 		actionList.addAll(newActionList);
 	}
 
@@ -898,7 +898,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
 	 */
 	public final List<String> getActionNames() {
 		final ArrayList<String> ret = new ArrayList<String>();
-		for (Action action : getActionList()) {
+		for (IActionDescription action : getActionList()) {
 			ret.add(action.getName());
 		}
 		return ret;

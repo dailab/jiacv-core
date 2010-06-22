@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.OpenDataException;
@@ -23,6 +24,7 @@ import javax.management.openmbean.SimpleType;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
+import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.util.EqualityChecker;
@@ -136,6 +138,24 @@ public class Action implements IActionDescription {
 	}
 
 	/**
+	 * Creates an action description from JMX composite data.
+	 * @param descr the action description based on JMX open types.
+	 */
+	public Action(CompositeData descr) {
+		name = (String) descr.get(IActionDescription.ITEMNAME_NAME);
+		inputTypeNames = Arrays.asList((String[])descr.get(IActionDescription.ITEMNAME_INPUTTYPES));
+		resultTypeNames = Arrays.asList((String[])descr.get(IActionDescription.ITEMNAME_RESULTTYPES));
+		String actionScope = (String) descr.get(IActionDescription.ITEMNAME_SCOPE);
+		if (actionScope != null) {
+			scope = ActionScope.valueOf(actionScope);
+		}
+		CompositeData provider = (CompositeData) descr.get(IActionDescription.ITEMNAME_AGENT);
+		if (provider != null) {
+			providerDescription = new AgentDescription(provider);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public final DoAction createDoAction(Serializable[] newParams, ResultReceiver source) {
@@ -178,30 +198,21 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * Getter for the name.
-	 * 
-	 * @return a string representing the name of this action.
+	 * {@inheritDoc}
 	 */
 	public final String getName() {
 		return name;
 	}
 
 	/**
-	 * Getter for the input-parameter class names.
-	 * 
-	 * @return an array containing the class names of the parameters in correct
-	 *         order.
+	 * {@inheritDoc}
 	 */
 	public final List<String> getInputTypeNames() {
 		return inputTypeNames;
 	}
 
 	/**
-	 * Getter for the input-parameter classes.
-	 * 
-	 * @return an array containing the classes of the parameters in correct
-	 *         order.
-	 * @throws ClassNotFoundException if one of the classes is unknown.
+	 * {@inheritDoc}
 	 */
 	public final List<Class<?>> getInputTypes() throws ClassNotFoundException {
 		if (inputTypeNames != null) {
@@ -216,39 +227,28 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * Getter for the component that holds the functionality of this action
-	 * 
-	 * @return a life-reference to the component.
+	 * {@inheritDoc}
 	 */
 	public final IEffector getProviderBean() {
 		return providerBean;
 	}
 
 	/**
-	 * Getter for the description of the agent, which provides this action.
-	 * 
-	 * @return the description of the providing agent.
+	 * {@inheritDoc}
 	 */
 	public final IAgentDescription getProviderDescription() {
 		return providerDescription;
 	}
 
 	/**
-	 * Getter for the result class names.
-	 * 
-	 * @return an array containing the class names of the return-values in correct
-	 *         order.
+	 * {@inheritDoc}
 	 */
 	public final List<String> getResultTypeNames() {
 		return resultTypeNames;
 	}
 
 	/**
-	 * Getter for the result classes.
-	 * 
-	 * @return an array containing the classes of the return-values in correct
-	 *         order.
-	 * @throws ClassNotFoundException if one of the classes is unknown.
+	 * {@inheritDoc}
 	 */
 	public final List<Class<?>> getResultTypes() throws ClassNotFoundException {
 		if (resultTypeNames != null) {
@@ -304,17 +304,14 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * Sets the agent bean which provides this action.
-	 * @param newProviderBean
-	 *            the providerBean to set
+	 * {@inheritDoc}
 	 */
 	public final void setProviderBean(IEffector newProviderBean) {
 		providerBean = newProviderBean;
 	}
 
 	/**
-	 * Sets the description of the agent which provides this action.
-	 * @param newProviderDescription description of the providing agent
+	 * {@inheritDoc}
 	 */
 	public final void setProviderDescription(
 			IAgentDescription newProviderDescription) {

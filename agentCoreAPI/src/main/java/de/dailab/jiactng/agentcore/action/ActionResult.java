@@ -3,6 +3,8 @@ package de.dailab.jiactng.agentcore.action;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
+
 /**
  * This class represents the result or a failure of an action.
  */
@@ -34,7 +36,7 @@ public class ActionResult extends SessionEvent {
 	 * @param source
 	 *            the object that created the results
 	 */
-	public ActionResult(Action action, Session session, Serializable[] results,
+	public ActionResult(IActionDescription action, Session session, Serializable[] results,
 			DoAction source) {
 		super(session, action, source);
 		if (results != null) {

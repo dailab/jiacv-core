@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * Used to submit an action for execution. An agent will check its memory
@@ -51,7 +52,7 @@ public class DoAction extends SessionEvent {
 	 * @param params
 	 *            the input-parameters for the call.
 	 */
-	public DoAction(Action thisAction, ResultReceiver source, Serializable[] params) {
+	public DoAction(IActionDescription thisAction, ResultReceiver source, Serializable[] params) {
 		this(new Session(source), thisAction, source, params);
 	}
 	
@@ -70,7 +71,7 @@ public class DoAction extends SessionEvent {
 	 * @param timeToLive
 	 * 			  time until timeout in milliseconds
 	 */
-	public DoAction(Action thisAction, ResultReceiver source, Serializable[] params, long timeToLive) {
+	public DoAction(IActionDescription thisAction, ResultReceiver source, Serializable[] params, long timeToLive) {
 		this(new Session(source, timeToLive), thisAction, source, params);
 	}
 
@@ -89,7 +90,7 @@ public class DoAction extends SessionEvent {
 	 * @param params
 	 *            the input-parameters for the call.
 	 */
-	public DoAction(Session session, Action thisAction, ResultReceiver source,
+	public DoAction(Session session, IActionDescription thisAction, ResultReceiver source,
 			Serializable[] params) {
 		super(session, thisAction, source);
 		setParams(params);

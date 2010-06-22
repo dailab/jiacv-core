@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 import javax.management.Notification;
 
-import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * This class represents a JMX-compliant notification about a performed
@@ -69,11 +69,11 @@ public class ActionPerformedNotification extends Notification {
 			long timeStamp, String msg, DoAction action, DoActionState state, Object[] result) {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		actionName = action.getAction().getName();
-		if(((Action)action.getAction()).getProviderBean() == null) {
-		  System.err.println("\n-- "+((Action)action.getAction()).getName()+" / "+((Action)action.getAction()).getProviderBean() + " / " + state);
+		if(((IActionDescription)action.getAction()).getProviderBean() == null) {
+		  System.err.println("\n-- "+((IActionDescription)action.getAction()).getName()+" / "+((IActionDescription)action.getAction()).getProviderBean() + " / " + state);
 		  agentbeanName = "null";
 		} else {
-		  agentbeanName = ((Action)action.getAction()).getProviderBean().getBeanName();
+		  agentbeanName = ((IActionDescription)action.getAction()).getProviderBean().getBeanName();
 		}
 		sessionId = action.getSessionId();
 		owner = action.getOwner();

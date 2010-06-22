@@ -9,9 +9,9 @@ package de.dailab.jiactng.agentcore.environment;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.IAgentBean;
-import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * This interfaces describes the way how components can register actions within
@@ -32,7 +32,7 @@ public interface IEffector extends IAgentBean {
 	 * @see de.dailab.jiactng.agentcore.action.Action
 	 * @return A List containing all actions from this component.
 	 */
-	List<? extends Action> getActions();
+	List<? extends IActionDescription> getActions();
 
 	/**
 	 * Executes a selected action. This method should be implemented by the

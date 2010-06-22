@@ -9,6 +9,7 @@ import java.util.List;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
+import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.management.jmx.JmxDescriptionSupport;
@@ -111,6 +112,26 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
      * @see ActionScope
      */
     ActionScope getScope();
+
+	/**
+	 * Getter for the component that holds the functionality of this action.
+	 * 
+	 * @return a life-reference to the component.
+	 */
+    IEffector getProviderBean();
+
+	/**
+	 * Sets the agent bean which provides this action.
+	 * @param newProviderBean
+	 *            the providerBean to set
+	 */
+    void setProviderBean(IEffector newProviderBean);
+
+    /**
+	 * Sets the description of the agent which provides this action.
+	 * @param newProviderDescription description of the providing agent
+	 */
+    void setProviderDescription(IAgentDescription newProviderDescription);
 
 	/**
 	 * Creates a new DoAction-object for this action. The resulting object can

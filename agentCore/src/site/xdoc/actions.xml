@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
 	<properties>
 		<title>Action Handling</title>
 		<author email="axel.hessler@dai-labor.de">axle</author>
@@ -28,9 +29,9 @@
 			  </p>
 			</subsection>
 			<subsection name="Providing Actions">
-        If an agentbean wants to provide one or more actions, it has to implement the 
+        <p>If an agentbean wants to provide one or more actions, it has to implement the 
         <a href="apidocs/de/dailab/jiactng/agentcore/environment/IEffector.html">
-        <code>IEffector</code></a>-Interface. This interface specifies two methods:
+        <code>IEffector</code></a>-Interface. This interface specifies two methods:</p>
         <ul>
           <li><code>public ArrayList&lt;? extends Action&gt; getActions()</code>
             <p>
@@ -42,7 +43,7 @@
               The actions should all have unique names, and parameters and results are simply
               arrays of the classes that should be used for the parameters. For no parameters/results use Class-arrays of length 0.
             </p>
-            <p><b>Example-Code</b><br/>
+            <p><b>Example-Code</b><br/></p>
 <pre>
     public ArrayList&lt;Action&gt; getActions() {
       ArrayList myActions = new ArrayList();
@@ -51,7 +52,6 @@
       return myActions;
     }
 </pre>
-            </p>
           </li>
           <li><code>public void doAction(DoAction doAction)</code>
             <p>
@@ -70,7 +70,7 @@
               This can be created by calling the <b>createActionResult</b>-method 
               on the action-object.
             </p>
-            <p><b>Example-Code</b><br/>
+            <p><b>Example-Code</b><br/></p>
 <pre>
     public void doAction(DoAction arg0) {
       if (helloAction.equals(arg0.getAction())) {
@@ -83,7 +83,6 @@
       }
     }
 </pre>
-            </p>          
           </li>
         </ul>
 			</subsection>
@@ -96,7 +95,7 @@
 			    mark a method that you want to publish. Everything else is done by the bean. Your agentbean
 			    has to extend the <code>AbstractMethodExposingBean</code>.
 			  </p>
-        <p><b>Example-Code</b><br/>
+        <p><b>Example-Code</b><br/></p>
 <pre>
   public class ExampleExposingBean extends AbstractMethodExposingBean {
     
@@ -116,7 +115,6 @@
     }
   }
 </pre>
-            </p>			  
             <p>
               In the second method in this example, the name-field in the annotation is used to 
               change the name of the action, if you want to give it another name than the method.
@@ -132,11 +130,9 @@
               As all Actions are written to the agents memory during initialization,
               the easiest way to retrieve an Action is this:
 			  </p>
-        <p>
 <pre>
 		Action a = memory.read(new Action("helloWorld", null, null, null));
 </pre>
-        </p>
         <p>
           With this action you can then create the DoAction, which is executed by 
           writing it to the agents memory:

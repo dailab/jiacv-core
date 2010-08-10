@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
   <properties>
     <title>Overview</title>
     <author email="axel.hessler@dai-labor.de">axle</author>
@@ -24,7 +25,7 @@
 
       <p>		         
          <a href="images/StaticStructure.png">
-	      <img src="images/StaticStructure.png"/>
+	      <img src="images/StaticStructure.png" alt="Static Structure"/>
 	 </a>
       </p>
     </subsection>
@@ -39,7 +40,7 @@
 
       <p>
          <a href="images/Startup.png">
-	      <img src="images/Startup.png"/>
+	      <img src="images/Startup.png" alt="Startup"/>
 	 </a>
       </p>
     </subsection>
@@ -59,7 +60,7 @@
 
         <p>
            <a href="images/Lifecycle.png">
-	        <img src="images/Lifecycle.png"/>
+	        <img src="images/Lifecycle.png" alt="Lifecycle"/>
 	   </a>
         </p>
 
@@ -71,14 +72,13 @@
     </subsection>
 
     <subsection name="Measurement data">
-        <p>The data below are measured by using the test class <code>SetupMeasurement</code> with the following environment:
+        <p>The data below are measured by using the test class <code>SetupMeasurement</code> with the following environment:</p>
 	      <ul>
 	        <li>Processor: Intel Centrino Duo 2.00GHz</li>
 	        <li>Memory: 1.00GB RAM</li>
 	        <li>Operating system: Windows XP Professional 2002 SP2</li>
 	        <li>Java version: JRE 1.6.0_03</li>
 	      </ul>
-        </p>
 	<table>
 	      <tr>
 	        <td>Scenario</td>

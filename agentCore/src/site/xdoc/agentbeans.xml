@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
 	<properties>
 		<title>AgentBeans</title>
 		<author email="marcel.patzlaff@dai-labor.de">Marcel Patzlaff</author>
@@ -28,60 +29,60 @@
 						<code>AbstractAgentBean</code>
 					</a>
 					which should be overridden if required. The purpose of these methods are listed below:
-					<ul>
-						<li>
-							<b>doInit</b>
-							<br />
-							<p>
-								Should contain initialisation code that ensures the functionality of the AgentBean. In
-								this stage you should
-								<b>avoid</b>
-								the interaction with other AgentBeans as they might not have been initialised yet!
-							</p>
-						</li>
-						<li>
-							<b>doStart</b>
-							<br />
-							<p>
-								Code which activates the functionality of the AgentBean should be placed here.
-								Interaction with other AgentBeans is possible.
-							</p>
-						</li>
-						<li>
-							<b>doStop</b>
-							<br />
-							<p>
-								This method is called when the current AgentBean is due to be stopped. So code which
-								deactivates the AgentBean's functionality should be placed here. Interaction with other
-								AgentBeans is possible.
-							</p>
-						</li>
-						<li>
-							<b>doCleanup</b>
-							<br />
-							<p>
-								Before being removed from the Agent this method gives the opportunity to free every
-								resource acquired by and to finish all initiated processions of this AgentBean.
-								Afterwards, the state of this AgentBean should be the same as before initialisation!
-							</p>
-						</li>
-					</ul>
-					<p>
-						<b>Note:</b>
-						If you override some of the aforementioned hook methods, you
-						<b>should</b>
-						call the super methods in the appropriate order. This means you should invoke
-						<code>super.doInit()</code>
-						and
-						<code>super.doStart()</code>
-						<b>before</b>
-						and
-						<code>super.doStop()</code>
-						and
-						<code>super.doCleanup()</code>
-						<b>after</b>
-						your code!
-					</p>
+				</p>
+				<ul>
+					<li>
+						<b>doInit</b>
+						<br />
+						<p>
+							Should contain initialisation code that ensures the functionality of the AgentBean. In
+							this stage you should
+							<b>avoid</b>
+							the interaction with other AgentBeans as they might not have been initialised yet!
+						</p>
+					</li>
+					<li>
+						<b>doStart</b>
+						<br />
+						<p>
+							Code which activates the functionality of the AgentBean should be placed here.
+							Interaction with other AgentBeans is possible.
+						</p>
+					</li>
+					<li>
+						<b>doStop</b>
+						<br />
+						<p>
+							This method is called when the current AgentBean is due to be stopped. So code which
+							deactivates the AgentBean's functionality should be placed here. Interaction with other
+							AgentBeans is possible.
+						</p>
+					</li>
+					<li>
+						<b>doCleanup</b>
+						<br />
+						<p>
+							Before being removed from the Agent this method gives the opportunity to free every
+							resource acquired by and to finish all initiated processions of this AgentBean.
+							Afterwards, the state of this AgentBean should be the same as before initialisation!
+						</p>
+					</li>
+				</ul>
+				<p>
+					<b>Note:</b>
+					If you override some of the aforementioned hook methods, you
+					<b>should</b>
+					call the super methods in the appropriate order. This means you should invoke
+					<code>super.doInit()</code>
+					and
+					<code>super.doStart()</code>
+					<b>before</b>
+					and
+					<code>super.doStop()</code>
+					and
+					<code>super.doCleanup()</code>
+					<b>after</b>
+					your code!
 				</p>
 			</subsection>
 			<subsection name="Activity in AgentBeans">
@@ -128,8 +129,10 @@
 				</p>
 			</subsection>
 			<subsection name="Pre-defined Spring Configurations">
+				<p>
 				There are Spring Bean definitions for the SimpleExecutionCycle and a SimpleAgent available. Please check
 				<code>de.dailab.jiactng.agentcore.conf.Agent.xml</code> for further details.
+				</p>
 			</subsection>
 		</section>
 	</body>

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
   <properties>
     <title>Management interface</title>
     <author email="axel.hessler@dai-labor.de">axle</author>
@@ -24,7 +25,7 @@
 
       <p>		         
          <a href="images/Management.png">
-	      <img src="images/Management.png"/>
+	      <img src="images/Management.png" alt="Management"/>
 	     </a>
 	  </p>
      
@@ -93,11 +94,13 @@ catch (Exception e) {
 	    <p>While no security settings are made, every object has the possibility 
 	       to manage all resources. To manage resources which are located in the 
 	       same JVM (agent node) you have to
+        </p>
 	       <ul>
 	         <li>allow local invocations by setting the appropriate property</li>
 	         <li>get a reference to the <a href="http://java.sun.com/javase/6/docs/api/javax/management/MBeanServer.html">MBean server</a></li>
 	         <li>specify the respective <a href="http://java.sun.com/javase/6/docs/api/javax/management/ObjectName.html">object name</a> of the resources</li>
 	       </ul>
+	       <p>
 	       <source>
 System.setProperty("jmx.invoke.getters", "");
 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();

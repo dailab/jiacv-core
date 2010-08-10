@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
 	<properties>
 		<title>Directory of Agents and Services</title>
 		<author email="martin.loeffelholz@dai-labor.de"> Martin Loeffelholz	</author>
@@ -11,31 +12,31 @@
 			<subsection name="What does this Directory provide">
 				<p>
 					The directory provides white and yellow pages services and supplies an API for...
-					<ul>
-						<li>registering, updating and deleting information about agents and their actions</li>
-						<li>
-							searching for agents and actions on the local <code>AgentNode</code>, and, globally,
-							on all other known <code>AgentNode</code>s (which we call Platform)
-						</li>
-					</ul>
 				</p>
+				<ul>
+					<li>registering, updating and deleting information about agents and their actions</li>
+					<li>
+						searching for agents and actions on the local <code>AgentNode</code>, and, globally,
+						on all other known <code>AgentNode</code>s (which we call Platform)
+					</li>
+				</ul>
 				<p>
 					The directory also provides...
-					<ul>
-						<li>
-							caching of information about agents and actions of remote
-							<code>AgentNode</code>s
-						</li>
-						<li>
-							automatic propagation of changes from one	<code>AgentNode</code> to other AgentNodes via
-							advertisements
-						</li>
-						<li>
-							automatic update of information about agents and action on the own node as
-							well as on other nodes
-						</li>
-					</ul>
 				</p>
+				<ul>
+					<li>
+						caching of information about agents and actions of remote
+						<code>AgentNode</code>s
+					</li>
+					<li>
+						automatic propagation of changes from one	<code>AgentNode</code> to other AgentNodes via
+						advertisements
+					</li>
+					<li>
+						automatic update of information about agents and action on the own node as
+						well as on other nodes
+					</li>
+				</ul>
 			</subsection>
 
 			<subsection name="DirectoryAgentNodeBean and what it does">
@@ -107,15 +108,16 @@
 					in the directory and during <i>CLEANING_UP</i> it will be unregistered automatically,
 					provided that the <code>ActionScope</code> is set right. There are four
 					<code>ActionScope</code>s at the moment:
-					<dl>
-						<dt>AGENT</dt><dd>the action is only known to the agent who provides it</dd>
-						<dt>NODE</dt><dd>the action is known to all agents residing on the same node, includes AGENT</dd>
-						<dt>GLOBAL</dt><dd>the action is know to all agents in the platform (i.e. is propagated
-							to all known AgentNodes), includes NODE</dd>
-						<dt>WEBSERVICES</dt><dd>if a webservice gateway agent has been configured on the node, the
-							action is provided as webservice, includes GLOBAL</dd>
-					</dl>
 				</p>
+				<dl>
+					<dt>AGENT</dt><dd>the action is only known to the agent who provides it</dd>
+					<dt>NODE</dt><dd>the action is known to all agents residing on the same node, includes AGENT</dd>
+					<dt>GLOBAL</dt><dd>the action is know to all agents in the platform (i.e. is propagated
+						to all known AgentNodes), includes NODE</dd>
+					<dt>WEBSERVICES</dt><dd>if a webservice gateway agent has been configured on the node, the
+						action is provided as webservice, includes GLOBAL</dd>
+				</dl>
+
 				<p>
 					For searching an agent or action use one of the following methods:
 					<source>

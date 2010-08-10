@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
 	<properties>
 		<title>Agent Communication</title>
 		<author email="marcel.patzlaff@dai-labor.de">Marcel Patzlaff</author>
@@ -18,47 +19,47 @@
 					<code>de.dailab.jiactng.agentcore.comm.transport</code>
 				</a>
 				packages. The following list describes the most essential classes and their functions:
-				<ul>
-					<li>
-					<a href="apidocs/de/dailab/jiactng/agentcore/comm/broker/ActiveMQBroker.html">
-							<code>ActiveMQBroker</code>
-						</a>
-						
-						<br />
-						The ActiveMQBroker is meant to be an AgentNode component.
-						<br />
-						The ActiveMQBroker is responsible for the actual deliverance of the messages.
-						There is no need for more than one per JVM as it has by default an vm Connector
-						in it which allows messages to be passed within an JVM to the broker and from
-						there to an consumer.
-					</li>
-					<li>
-						<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationBean.html">
-							<code>CommunicationBean</code>
-						</a>
-						<br />
-						The CommunicationBean is an agent component which provides access to the message bus. It can be
-						configured with one or more message transports. If no transports are available, then this bean
-						cannot do anything.
-					</li>
-					<li>
-						<a href="apidocs/de/dailab/jiactng/agentcore/comm/transport/MessageTransport.html">
-							<code>MessageTransport</code>
-						</a>
-						<br />
-						The MessageTransport is an abstract class which defines send and un-/registering primitives for
-						the various message busses.
-					</li>
-					<li>
-						<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationAddressFactory.html">
-							<code>CommunicationAddressFactory</code>
-						</a>
-						<br />
-						This factory class is the only way to create communication addresses. There are two different
-						types of addresses which covers 1:1 (message box) and 1:n (group) communication.
-					</li>
-				</ul>
 			</p>
+			<ul>
+				<li>
+				<a href="apidocs/de/dailab/jiactng/agentcore/comm/broker/ActiveMQBroker.html">
+						<code>ActiveMQBroker</code>
+					</a>
+					
+					<br />
+					The ActiveMQBroker is meant to be an AgentNode component.
+					<br />
+					The ActiveMQBroker is responsible for the actual deliverance of the messages.
+					There is no need for more than one per JVM as it has by default an vm Connector
+					in it which allows messages to be passed within an JVM to the broker and from
+					there to an consumer.
+				</li>
+				<li>
+					<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationBean.html">
+						<code>CommunicationBean</code>
+					</a>
+					<br />
+					The CommunicationBean is an agent component which provides access to the message bus. It can be
+					configured with one or more message transports. If no transports are available, then this bean
+					cannot do anything.
+				</li>
+				<li>
+					<a href="apidocs/de/dailab/jiactng/agentcore/comm/transport/MessageTransport.html">
+						<code>MessageTransport</code>
+					</a>
+					<br />
+					The MessageTransport is an abstract class which defines send and un-/registering primitives for
+					the various message busses.
+				</li>
+				<li>
+					<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationAddressFactory.html">
+						<code>CommunicationAddressFactory</code>
+					</a>
+					<br />
+					This factory class is the only way to create communication addresses. There are two different
+					types of addresses which covers 1:1 (message box) and 1:n (group) communication.
+				</li>
+			</ul>
 			<p>
 				Currently the message bus in AgentCore, which connects agents (on the same or on remote hosts), is a JMS
 				implementation.
@@ -216,8 +217,8 @@
 					with it's own messageboxaddress. Using Selectors, as described in the passage below, many cases of
 					communication can be managed with just this one address in mind.</p>
 					<p> But if you need or want to register a new address to the system you can do that using the
-					CommunicationBean.ACTION_REGISTER action.</p>
-					Let's look at an Example:
+					CommunicationBean.ACTION_REGISTER action.
+					Let's look at an Example:</p>
 <source>
 Action register = memory.read(new Action(CommunicationBean.ACTION_REGISTER));
 DoAction doRegister = register.createDoAction(new Serializable[] {yourNewAddress, yourSelector}, this);

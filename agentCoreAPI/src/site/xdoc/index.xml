@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="http://cyber888.com/xsd/xdocs.xsd">
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
   <properties>
     <title>Overview</title>
     <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
@@ -23,7 +24,7 @@
 
         <p>
           <a href="images/ProgrammingInterfaces.png">
-	    <img src="images/ProgrammingInterfaces.png"/>
+	    <img src="images/ProgrammingInterfaces.png" alt="Programming Interfaces"/>
 	  </a>
         </p>
       </subsection>
@@ -39,7 +40,7 @@
 
         <p>
           <a href="images/ManagementInterfaces.png">
-	    <img src="images/ManagementInterfaces.png"/>
+	    <img src="images/ManagementInterfaces.png" alt="Management Interfaces"/>
 	  </a>
         </p>
       </subsection>
@@ -58,7 +59,7 @@
 
         <p>
           <a href="images/ManagementClient.png">
-	    <img src="images/ManagementClient.png"/>
+	    <img src="images/ManagementClient.png" alt="Management Client"/>
 	  </a>
         </p>
       </subsection>

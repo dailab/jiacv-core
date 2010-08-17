@@ -108,7 +108,6 @@ public class ActionTesterNode {
          final String invokeactionagentid = createdagents.get(0); // Only one agent added, therefore no search
                                                                   // implemented
 
-         // fetch ServiceDeployAgentBean
          final List<IAgent> iagentslist = this.agentNode.findAgents();
          final Iterator<IAgent> ialit = iagentslist.iterator();
          IAgent invokeactionagent;

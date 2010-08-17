@@ -428,15 +428,6 @@
                </tags>
             </configuration>
          </plugin>
-         <plugin>
-            <groupId>org.fusesource.mvnplugins</groupId>
-            <artifactId>maven-graph-plugin</artifactId>
-            <version>1.11d-SNAPSHOT</version>
-            <configuration>
-               <hideScopes>test</hideScopes>
-               <direction>BT</direction>
-            </configuration>
-         </plugin>
       </plugins>
    </reporting>
 
@@ -577,4 +568,26 @@
       <module>tools</module>
 	  <module>jadlDeployment</module>
   </modules>
+  
+  <profiles>
+    <profile>
+      <!--
+         Active this profile during site build if you want to generate dependency graphs 
+       -->
+      <id>graph</id>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>org.fusesource.mvnplugins</groupId>
+            <artifactId>maven-graph-plugin</artifactId>
+            <version>1.11d-SNAPSHOT</version>
+            <configuration>
+               <hideScopes>test</hideScopes>
+               <direction>BT</direction>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+  </profiles>
 </project>

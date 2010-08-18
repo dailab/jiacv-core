@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.broker;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -175,6 +176,11 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
         _connectors = connectors;
     }
 
+    public Set<ActiveMQTransportConnector> getConnectors() {
+      return Collections.unmodifiableSet(_connectors);
+    }
+
+    
     /**
      * Get the name of the ActiveMQ broker service.
      * @return the name
@@ -187,4 +193,5 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
 
         return _brokerName;
     }
+
 }

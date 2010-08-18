@@ -193,4 +193,10 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    */
   Set<JMXServiceURL> getJmxURLs();
   
+  /**
+   * Utility method for retrieving a reference to an agentnodebean of the given class. 
+   * @param type the class of the agentnodebean that you want to find.
+   * @return a reference to the agentnodebean. 
+   */
+  <T> T findAgentNodeBean(Class<T> type);
 }

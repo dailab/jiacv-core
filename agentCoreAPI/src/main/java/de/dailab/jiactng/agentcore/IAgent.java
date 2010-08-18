@@ -202,4 +202,11 @@ public interface IAgent extends ILifecycleListener, Runnable,
    */
   void setSpringConfigXml(byte[] springConfig);
 
+  /**
+   * Utility method for retrieving a reference to an agentbean of the given class. 
+   * @param type the class of the agentbean that you want to find.
+   * @return a reference to the agentbean. 
+   */
+  <T> T findAgentBean(Class<T> type);
+  
 }

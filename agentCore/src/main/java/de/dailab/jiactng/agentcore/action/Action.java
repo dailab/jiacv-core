@@ -45,7 +45,7 @@ public class Action implements IActionDescription {
 	private String name;
 
 	/** The component that holds the funtionality for this action */
-	private transient IEffector providerBean;
+	private transient IEffector providerBean = null;
 
 	/** The class names of the input-parameters of this action */
 	private List<String> inputTypeNames;

@@ -27,7 +27,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * @see DoAction
  * @see ActionResult
  */
-public class NonBlockingExecutionCycle extends AbstractExecutionCycle 
+public final class NonBlockingExecutionCycle extends AbstractExecutionCycle 
 	implements NonBlockingExecutionCycleMBean {
 
 	private static final Session SESSION_TEMPLATE = new Session();

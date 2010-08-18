@@ -30,7 +30,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  * @see DoAction
  * @see ActionResult
  */
-public class SimpleExecutionCycle extends AbstractExecutionCycle {
+public final class SimpleExecutionCycle extends AbstractExecutionCycle {
 
   private static final Session SESSION_TEMPLATE = new Session();
   

@@ -32,18 +32,19 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
  * 
  * @author Thomas Konnerth
  */
-public abstract class AbstractAgentBean extends AbstractLifecycle implements IAgentBean, AbstractAgentBeanMBean, BeanNameAware {
+public abstract class AbstractAgentBean extends AbstractLifecycle implements IAgentBean, AbstractAgentBeanMBean,
+    BeanNameAware {
 
   /**
    * Interval by which the execute()-method of the bean is called. If negative, the execute-method is never called.
    */
-  private int                       executeInterval   = -1;
+  private int  executeInterval   = -1;
 
   /**
    * Used by the execution cycle to determine the next execution time when <code>executeInterval</code> is greater
    * than 0.
    */
-  private long                      nextExecutionTime = 0;
+  private long nextExecutionTime = 0;
 
   /**
    * Creates an agent bean that uses lifecycle support in loose mode
@@ -173,7 +174,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @return the result of the canceled action (always <code>null</code> if this method is not overwritten)
    */
   public ActionResult cancelAction(DoAction doAction) {
-    return null;
+    return new ActionResult(doAction, "The cancelAction.method was is not implemented by this agentbean");
   }
 
   /**
@@ -277,8 +278,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   }
 
   /**
-   * Invokes an action with default timeout and waits for its result. NOTE: This method MUST NOT be used with a blocking execution cycle
-   * (e.g. SimpleExecutionCycle).
+   * Invokes an action with default timeout and waits for its result. NOTE: This method MUST NOT be used with a blocking
+   * execution cycle (e.g. SimpleExecutionCycle).
    * 
    * @param a
    *          The action to be invoked.
@@ -289,12 +290,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final ActionResult invokeAndWaitForResult(IActionDescription a, Serializable[] inputParams) {
-	return invokeAndWaitForResult(a, inputParams, Long.valueOf(Session.DEFAULT_TIMETOLIVE));
+    return invokeAndWaitForResult(a, inputParams, Long.valueOf(Session.DEFAULT_TIMETOLIVE));
   }
 
   /**
-   * Invokes an action with given timeout and waits for its result. NOTE: This method MUST NOT be used with a blocking execution cycle
-   * (e.g. SimpleExecutionCycle).
+   * Invokes an action with given timeout and waits for its result. NOTE: This method MUST NOT be used with a blocking
+   * execution cycle (e.g. SimpleExecutionCycle).
    * 
    * @param a
    *          The action to be invoked.
@@ -313,10 +314,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 
     // wait for result
     synchronized (listener) {
-      try {
-        listener.wait();
-      } catch (Exception e) {
-        e.printStackTrace();
+      if (listener.getResult() == null) {
+        try {
+          listener.wait();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
     }
     return listener.getResult();
@@ -351,7 +354,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver) {
-	return invoke(a, inputParams, receiver, Long.valueOf(Session.DEFAULT_TIMETOLIVE));
+    return invoke(a, inputParams, receiver, Long.valueOf(Session.DEFAULT_TIMETOLIVE));
   }
 
   /**
@@ -368,14 +371,16 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @return the session id of the action invocation.
    * @see IActionDescription#createDoAction(Serializable[], ResultReceiver, Long)
    */
-  protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver, final Long timeOut) {
+  protected final String invoke(IActionDescription a, Serializable[] inputParams, ResultReceiver receiver,
+      final Long timeOut) {
     final DoAction doAct = a.createDoAction(inputParams, receiver, timeOut);
     memory.write(doAct);
     return doAct.getSessionId();
   }
 
   /**
-   * Invokes an action asynchronously as part of a parent session with default timeout and with handling the result by a given receiver.
+   * Invokes an action asynchronously as part of a parent session with default timeout and with handling the result by a
+   * given receiver.
    * 
    * @param a
    *          the action to be invoked.
@@ -389,7 +394,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @see IActionDescription#createDoAction(Session, Serializable[], ResultReceiver)
    * @see Session#DEFAULT_TIMETOLIVE
    */
-  protected final String invoke(IActionDescription a, Session parent, Serializable[] inputParams, ResultReceiver receiver) {
+  protected final String invoke(IActionDescription a, Session parent, Serializable[] inputParams,
+      ResultReceiver receiver) {
     final DoAction doAct = a.createDoAction(parent, inputParams, receiver);
     memory.write(doAct);
     return doAct.getSessionId();
@@ -456,24 +462,28 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 
     final Action retAct = memory.read(template);
     if (retAct == null) {
-      log.warn("Local memory does not contain \'" + actionName + "\' with provider "+provider+".");
+      log.warn("Local memory does not contain \'" + actionName + "\' with provider " + provider + ".");
     }
     return retAct;
   }
 
   /**
-	 * Sends an attribute change notification to JMX listeners.
-	 * @param attributeName Attribute Name
-	 * @param attributeType Attribute Type
-	 * @param oldValue old value (before change)
-	 * @param newValue new value (after change)
-	 */
-	protected final void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
-		final Notification n = new AttributeChangeNotification(this, 
-				sequenceNumber++, System.currentTimeMillis(),
-				"AgentBean Property "+attributeName+ " changed", 
-				attributeName, attributeType, oldValue, newValue);
-		sendNotification(n);
-	}
+   * Sends an attribute change notification to JMX listeners.
+   * 
+   * @param attributeName
+   *          Attribute Name
+   * @param attributeType
+   *          Attribute Type
+   * @param oldValue
+   *          old value (before change)
+   * @param newValue
+   *          new value (after change)
+   */
+  protected final void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue,
+      Object newValue) {
+    final Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
+        "AgentBean Property " + attributeName + " changed", attributeName, attributeType, oldValue, newValue);
+    sendNotification(n);
+  }
 
 }

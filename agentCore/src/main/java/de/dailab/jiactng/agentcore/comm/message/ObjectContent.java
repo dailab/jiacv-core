@@ -49,7 +49,7 @@ public class ObjectContent implements IFact {
 	 * @see EqualityChecker#equals(Object, Object)
 	 */
     @Override
-    public synchronized boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if(recursionDetected) {
             return true;
         }
@@ -78,7 +78,7 @@ public class ObjectContent implements IFact {
 	 * @return the calculated hash code
      */
     @Override
-    public synchronized int hashCode() {
+    public int hashCode() {
         if(recursionDetected) {
             return 0;
         }

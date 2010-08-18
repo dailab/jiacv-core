@@ -57,474 +57,465 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
-
 /**
- * Agentclass implementing the IAgent interface and therby realizing the basic
- * JIAC-TNG agent. The Agent currently holds a Memory-Component, an
- * ExecutionCycle component and a list of agentbeans.
+ * Agentclass implementing the IAgent interface and therby realizing the basic JIAC-TNG agent. The Agent currently holds
+ * a Memory-Component, an ExecutionCycle component and a list of agentbeans.
  * 
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.IAgent
  */
-public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
-		BeanNameAware, NotificationListener {
+public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, BeanNameAware, NotificationListener {
 
-	/** The default execution interval is 5.*/
-	public static final int DEFAULT_EXECUTION_INTERVAL = 5;
+  /** The default execution interval is 5. */
+  public static final int                   DEFAULT_EXECUTION_INTERVAL     = 5;
 
-	/** The default bean execution timeout is 300,000 milliseconds (5 minutes).*/
-	public static final long DEFAULT_BEAN_EXECUTION_TIMEOUT = 5 * 60 * 1000;
-	
-	/** The delay for automatic execution of services is 3,000 milliseconds. */
-	public static final long AUTO_EXECUTION_DELAY = 3000;
+  /** The default bean execution timeout is 300,000 milliseconds (5 minutes). */
+  public static final long                  DEFAULT_BEAN_EXECUTION_TIMEOUT = 5 * 60 * 1000;
 
-	/** The delay for agent start time is 3,000 milliseconds. */
-	public static final long AGENT_STARTTIME_DELAY = 3000;
+  /** The delay for automatic execution of services is 3,000 milliseconds. */
+  public static final long                  AUTO_EXECUTION_DELAY           = 3000;
 
-	/** The interval for continuous service execution is 30,000 milliseconds. */
-	public static final long CONTINUOUS_EXECUTION_INTERVAL = 30*1000;
-	
-	/**
-	 * The AID (agent identifier). This property is generated and assigned
-	 * automatically during agent creation. It is not intended to make sense for
-	 * human readers.
-	 */
-	private final String agentId;
+  /** The delay for agent start time is 3,000 milliseconds. */
+  public static final long                  AGENT_STARTTIME_DELAY          = 3000;
 
-	/**
-	 * Reference to the agentNode that holds this agent.
-	 */
-	private IAgentNode agentNode = null;
+  /** The interval for continuous service execution is 30,000 milliseconds. */
+  public static final long                  CONTINUOUS_EXECUTION_INTERVAL  = 30 * 1000;
 
-	/**
-	 * The name of this agent.
-	 */
-	private String agentName = null;
+  /**
+   * The AID (agent identifier). This property is generated and assigned automatically during agent creation. It is not
+   * intended to make sense for human readers.
+   */
+  private final String                      agentId;
 
-	/**
-	 * The owner of this agent.
-	 */
-	private String owner = null;
+  /**
+   * Reference to the agentNode that holds this agent.
+   */
+  private transient IAgentNode              agentNode                      = null;
 
-	/**
-	 * Comment for <code>memory</code>
-	 */
-	protected IMemory memory = null;
-	
-	/** Reference to directory, if any. */
-	private IDirectory directory;
+  /**
+   * The name of this agent.
+   */
+  private String                            agentName                      = null;
 
-	/**
-	 * The list of agentbeans of this agent.
-	 */
-	protected final ArrayList<IAgentBean> agentBeans = new ArrayList<IAgentBean>();
+  /**
+   * The owner of this agent.
+   */
+  private String                            owner                          = null;
 
-	/**
-	 * activity Flag (could be replaced by statecheck
-	 */
-	private boolean active = false;
+  /**
+   * Comment for <code>memory</code>
+   */
+  protected IMemory                         memory                         = null;
 
-	/**
-	 * Reference to the Object that handles the executionCycle
-	 */
-	private IExecutionCycle execution = null;
+  /** Reference to directory, if any. */
+  private transient IDirectory              directory                      = null;
 
-	/**
-	 * Future for the executionCycle of this agent. Used to store and cancel the
-	 * executionThread.
-	 */
-	private Future<?> executionFuture = null;
+  /**
+   * The list of agentbeans of this agent.
+   */
+  protected final ArrayList<IAgentBean>     agentBeans                     = new ArrayList<IAgentBean>();
 
-	/**
-	 * Be nice timer for calling the executionCycle.
-	 */
-	private int executionInterval = DEFAULT_EXECUTION_INTERVAL;
+  /**
+   * activity Flag (could be replaced by statecheck
+   */
+  private boolean                           active                         = false;
 
-	/**
-	 * Timeout after which the execution of a bean will be stopped and the agent
-	 * as well. TODO do something more intelligent, possibly recover the bean
-	 * without stopping the agent.
-	 */
-	private long beanExecutionTimeout = DEFAULT_BEAN_EXECUTION_TIMEOUT;
+  /**
+   * Reference to the Object that handles the executionCycle
+   */
+  private IExecutionCycle                   execution                      = null;
 
-	private ArrayList<IActionDescription> actionList = null;
+  /**
+   * Future for the executionCycle of this agent. Used to store and cancel the executionThread.
+   */
+  private Future<?>                         executionFuture                = null;
 
-	/**
-	 * The id of the start time notification.
-	 */
-	private Integer startTimeId = null;
+  /**
+   * Be nice timer for calling the executionCycle.
+   */
+  private int                               executionInterval              = DEFAULT_EXECUTION_INTERVAL;
 
-	/**
-	 * start time property cache required to make start time spring-configurable
-	 */
-	private Long startTime = null;
-	
-	/**
-	 * The id of the stop time notification.
-	 */
-	private Integer stopTimeId = null;
-	
-	/**
-	 * start time property cache required to make start time spring-configurable
-	 */
-	private Long stopTime = null;
-	
-	/**
-	 * The spring configuration XML snippet for this agent.
-	 * Currently only written if agents are added by SimpleAgentNode.addAgent()
-	 */
-	private byte[] springConfigXml = null;
+  /**
+   * Timeout after which the execution of a bean will be stopped and the agent as well. TODO do something more
+   * intelligent, possibly recover the bean without stopping the agent.
+   */
+  private long                              beanExecutionTimeout           = DEFAULT_BEAN_EXECUTION_TIMEOUT;
 
-	/**
-	 * Client for accessing the agent node timer.
-	 */
-	private JmxAgentNodeTimerManagementClient timerClient = null;
+  /**
+   * List of the agents actions
+   */
+  private ArrayList<IActionDescription>     actionList                     = null;
 
-	private Integer autoExecTimeId = null;
-	
-	private boolean singleExecutionsDone = false;
-	
-	/**
-	 * Public default constructor, creating the agent identifier.
-	 */
-	public Agent() {
-		agentId = IdFactory.createAgentId(this.hashCode());
-	}
-	
-	/**
-	 * Constructor for spring-based agentnode persistency, creates an agent with a given ID.
-	 * Note: You should not try to assign agentIds yourself, but always use the {@link Agent#Agent() Agent()}
-	 * constructor to create a new agent.
-	 * @param agentID AgentID to assign.
-	 */
-	public Agent(String agentID) {
-		this.agentId = agentID;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void setMemory(IMemory newMemory) {
-		// disable management of old memory
-		if (isManagementEnabled() && (memory != null)) {
-			memory.disableManagement();
-		}
+  /**
+   * The id of the start time notification.
+   */
+  private Integer                           startTimeId                    = null;
 
-		// change memory
-		memory = newMemory;
-		newMemory.setThisAgent(this);
+  /**
+   * start time property cache required to make start time spring-configurable
+   */
+  private Long                              startTime                      = null;
 
-		// enable management of new memory
-		if (isManagementEnabled() && (memory != null)) {
-			memory.enableManagement(_manager);
-		}
-	}
+  /**
+   * The id of the stop time notification.
+   */
+  private Integer                           stopTimeId                     = null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public final List<IAgentBean> getAgentBeans() {
-		return Collections.unmodifiableList(agentBeans);
-	}
+  /**
+   * start time property cache required to make start time spring-configurable
+   */
+  private Long                              stopTime                       = null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void setAgentBeans(List<IAgentBean> agentbeans) {
-		// disable management of all old agent beans
-		if (isManagementEnabled() && (this.agentBeans != null)) {
-			for (IAgentBean ab : this.agentBeans) {
-				ab.disableManagement();
-			}
-		}
+  /**
+   * The spring configuration XML snippet for this agent. Currently only written if agents are added by
+   * SimpleAgentNode.addAgent()
+   */
+  private byte[]                            springConfigXml                = null;
 
-		// change agent beans
-		this.agentBeans.clear();
-		this.agentBeans.addAll(agentbeans);
+  /**
+   * Client for accessing the agent node timer.
+   */
+  private JmxAgentNodeTimerManagementClient timerClient                    = null;
 
-		// set references for all new agent beans and
-		// enable management of all new agent beans
-		for (IAgentBean ab : this.agentBeans) {
-			ab.setThisAgent(this);
-			if (isManagementEnabled()) {
-				ab.enableManagement(_manager);
-			}
-		}
-	}
+  private Integer                           autoExecTimeId                 = null;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void run() {
-		while (true) {
-			try {
-				Thread.sleep(executionInterval);
-				synchronized (this) {
-					if (active) {
-						executionFuture = agentNode.getThreadPool().submit(
-								execution);
-						final FutureTask<?> t = ((FutureTask<?>) executionFuture);
-						try {
-							t.get(beanExecutionTimeout, TimeUnit.MILLISECONDS);
-						} catch (TimeoutException to) {
-							System.err.print("this: " + agentName);
-							to.printStackTrace();
-							t.cancel(true);
-							this.stop();
-							log.error("ExecutionCycle did not return: ", to);
-						}
-					} else {
-						break;
-					}
-				}
-			} catch (Exception e) {
-				log.error("Critical error in controlcycle of agent: "
-						+ agentName + ". Stopping Agent. Exception was: ",e);
-				e.printStackTrace();
-				try {
-					this.stop();
-				} catch (LifecycleException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		}
-	}
+  private boolean                           singleExecutionsDone           = false;
 
-	/**
-	 * Setter for the agentname. Called by Spring via the BeanNameAware
-	 * interface.
-	 * 
-	 * @param name
-	 *            the name of the agent.
-	 * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
-	 */
-	public final void setBeanName(String name) {
-		setAgentName(name);
-	}
+  /**
+   * Public default constructor, creating the agent identifier.
+   */
+  public Agent() {
+    agentId = IdFactory.createAgentId(this.hashCode());
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void onEvent(LifecycleEvent evt) {
-		// TODO Auto-generated method stub
+  /**
+   * Constructor for spring-based agentnode persistency, creates an agent with a given ID. Note: You should not try to
+   * assign agentIds yourself, but always use the {@link Agent#Agent() Agent()} constructor to create a new agent.
+   * 
+   * @param agentID
+   *          AgentID to assign.
+   */
+  public Agent(String agentID) {
+    this.agentId = agentID;
+  }
 
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public final void setMemory(IMemory newMemory) {
+    // disable management of old memory
+    if (isManagementEnabled() && (memory != null)) {
+      memory.disableManagement();
+    }
 
-	/**
-	 * Stops and undeploys this agent from its agent node (incl. deregistration
-	 * as JMX resource).
-	 * 
-	 * @throws LifecycleException
-	 *             if an error occurs during stop or cleanup of this agent.
-	 */
-	public final void remove() throws LifecycleException {
-		// clean up agent
-		stop();
-		cleanup();
+    // change memory
+    memory = newMemory;
+    newMemory.setThisAgent(this);
 
-		// remove agent from the agent list of the agent node
-		if (agentNode != null) {
-			agentNode.removeAgent(this);
-		}
-	}
+    // enable management of new memory
+    if (isManagementEnabled() && (memory != null)) {
+      memory.enableManagement(_manager);
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void doCleanup() throws LifecycleException {
-		if (executionFuture != null) {
-			executionFuture.cancel(true);
-			executionFuture = null;
-		}
+  /**
+   * {@inheritDoc}
+   */
+  public final List<IAgentBean> getAgentBeans() {
+    return Collections.unmodifiableList(agentBeans);
+  }
 
-		// call cleanup for all agentbeans
-		for (IAgentBean a : this.agentBeans) {
-			try {
-				setBeanState(a, LifecycleStates.CLEANED_UP);
-			} catch (LifecycleException e) {
-				handleBeanException(a, e, LifecycleStates.CLEANED_UP);
-			}
-		}
+  /**
+   * {@inheritDoc}
+   */
+  public final void setAgentBeans(List<IAgentBean> agentbeans) {
+    // disable management of all old agent beans
+    if (isManagementEnabled() && (this.agentBeans != null)) {
+      for (IAgentBean ab : this.agentBeans) {
+        ab.disableManagement();
+      }
+    }
 
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Trying to cleanup memory and executioncycle");
-		}
-		this.memory.removeAll(new Action());
+    // change agent beans
+    this.agentBeans.clear();
+    this.agentBeans.addAll(agentbeans);
 
-		// update state information in agent's memory
-		updateState(LifecycleStates.CLEANED_UP);
+    // set references for all new agent beans and
+    // enable management of all new agent beans
+    for (IAgentBean ab : this.agentBeans) {
+      ab.setThisAgent(this);
+      if (isManagementEnabled()) {
+        ab.enableManagement(_manager);
+      }
+    }
+  }
 
-		this.actionList = null;
-		this.execution.cleanup();
-		this.memory.cleanup();
+  /**
+   * {@inheritDoc}
+   */
+  public void run() {
+    while (true) {
+      try {
+        Thread.sleep(executionInterval);
+        synchronized (this) {
+          if (active) {
+            executionFuture = agentNode.getThreadPool().submit(execution);
+            final FutureTask<?> t = ((FutureTask<?>) executionFuture);
+            try {
+              t.get(beanExecutionTimeout, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException to) {
+              log.error("ExecutionCycle did not return: ", to);
+              t.cancel(true);
+              this.stop();
+            }
+          } else {
+            break;
+          }
+        }
+      } catch (Exception e) {
+        if ((log != null) && (log.isErrorEnabled())) {
+          log.error("Critical error in controlcycle of agent: " + getAgentName() + ". Stopping Agent! Exception: ", e);
+        } else {
+          System.err.println("Critical error in controlcycle of agent: " + getAgentName()
+              + ". Stopping Agent. Exception: ");
+          e.printStackTrace();
+        }
 
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Memory and executioncycle switched to state "
-					+ LifecycleStates.CLEANED_UP);
-		}
+        try {
+          this.stop();
+        } catch (LifecycleException lex) {
+          printCriticalMessage("Agent " + getAgentName() + " could not be stopped because of:", lex);
+        }
+      }
+    }
+  }
 
-		timerClient = null;
-	}
+  /**
+   * Setter for the agentname. Called by Spring via the BeanNameAware interface.
+   * 
+   * @param name
+   *          the name of the agent.
+   * @see de.dailab.jiactng.agentcore.IAgent#setBeanName(java.lang.String)
+   */
+  public final void setBeanName(String name) {
+    setAgentName(name);
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void doInit() throws LifecycleException {
-		// initialize timer client
-		try {
-			timerClient = new JmxManagementClient().getAgentNodeTimerManagementClient(agentNode.getUUID());
-		}
-		catch (MalformedObjectNameException e) {
-			throw new LifecycleException("Error when initializing timer client", e);
-		}
+  /**
+   * {@inheritDoc}
+   */
+  public void onEvent(LifecycleEvent evt) {
+    // TODO Auto-generated method stub
 
-		// initialize agent elements
-		this.actionList = new ArrayList<IActionDescription>();
+  }
 
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Trying to initalize memory and executioncycle");
-		}
+  /**
+   * Stops and undeploys this agent from its agent node (incl. deregistration as JMX resource).
+   * 
+   * @throws LifecycleException
+   *           if an error occurs during stop or cleanup of this agent.
+   */
+  public final void remove() throws LifecycleException {
+    // clean up agent
+    stop();
+    cleanup();
 
-		this.memory.init();
-		this.memory.write(new ThisAgentDescription(this.agentId,
-				this.agentName, LifecycleStates.INITIALIZING.name(),
-				CommunicationAddressFactory
-						.createMessageBoxAddress(this.agentNode.getUUID() + '/'
-								+ this.agentId), this.agentNode.getUUID()));
+    // remove agent from the agent list of the agent node
+    if (agentNode != null) {
+      agentNode.removeAgent(this);
+    }
+  }
 
-		this.execution.setMemory(memory);
-		this.execution.init();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void doCleanup() throws LifecycleException {
+    synchronized (this) {
+      if (executionFuture != null) {
+        executionFuture.cancel(true);
+        executionFuture = null;
+      }
+    }
 
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Memory and executioncycle switched to state "
-					+ LifecycleStates.INITIALIZED);
-		}
+    // call cleanup for all agentbeans
+    for (IAgentBean a : this.agentBeans) {
+      try {
+        setBeanState(a, LifecycleStates.CLEANED_UP);
+      } catch (LifecycleException e) {
+        handleBeanException(a, e, LifecycleStates.CLEANED_UP);
+      }
+    }
 
-		// call init for all agentbeans
-		for (IAgentBean ab : this.agentBeans) {
-			try {
-				ab.setMemory(memory);
-				ab.addLifecycleListener(this);
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Trying to cleanup memory and executioncycle");
+    }
+    this.memory.removeAll(new Action());
 
-				// memory.write(new AgentBeanDescription(ab.getBeanName(),
-				// LifecycleStates.INITIALIZED.name()));
-				setBeanState(ab, LifecycleStates.INITIALIZED);
-			} catch (LifecycleException e) {
-				handleBeanException(ab, e, LifecycleStates.INITIALIZED);
-			}
+    // update state information in agent's memory
+    updateState(LifecycleStates.CLEANED_UP);
 
-			// if bean is effector, add all actions to memory
-			final IAgentDescription myDescription= getAgentDescription();
-			if (ab instanceof IEffector) {
-				final List<? extends IActionDescription> acts = ((IEffector) ab).getActions();
-				if (acts != null) {
-					for (IActionDescription item : acts) {
-						item.setProviderDescription(myDescription);
-						if(item.getProviderBean() == null) {
-							item.setProviderBean((IEffector) ab);
-						}
-						memory.write(item);
-						actionList.add(item);
-					}
-				}
-			}
-		}
+    this.actionList = null;
+    this.execution.cleanup();
+    this.memory.cleanup();
 
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Memory and executioncycle switched to state " + LifecycleStates.CLEANED_UP);
+    }
 
-		updateState(LifecycleStates.INITIALIZED);
-		
-		if ((startTime != null) && (stopTime != null)) {
-			try {
-				registerStartTime(startTime);
-				registerStopTime(stopTime);
-			} catch (InstanceNotFoundException e) {
-				throw new LifecycleException("Error when initializing start/stoptime", e);
-			}
-		}
-	}
+    timerClient = null;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void doStart() throws LifecycleException {
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Trying to start memory and executioncycle");
-		}
-		
-		this.memory.start();
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void doInit() throws LifecycleException {
+    // initialize timer client
+    try {
+      timerClient = new JmxManagementClient().getAgentNodeTimerManagementClient(agentNode.getUUID());
+    } catch (MalformedObjectNameException e) {
+      throw new LifecycleException("Error when initializing timer client", e);
+    }
 
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Memory and executioncycle switched to state "
-					+ LifecycleStates.STARTED);
-		}
+    // initialize agent elements
+    this.actionList = new ArrayList<IActionDescription>();
 
-		// call start for all agentbeans
-		for (IAgentBean a : this.agentBeans) {
-			try {
-				setBeanState(a, LifecycleStates.STARTED);
-			} catch (LifecycleException e) {
-				handleBeanException(a, e, LifecycleStates.STARTED);
-			}
-		}
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Trying to initalize memory and executioncycle");
+    }
+
+    this.memory.init();
+    this.memory.write(new ThisAgentDescription(this.agentId, this.agentName, LifecycleStates.INITIALIZING.name(),
+        CommunicationAddressFactory.createMessageBoxAddress(this.agentNode.getUUID() + '/' + this.agentId),
+        this.agentNode.getUUID()));
+
+    this.execution.setMemory(memory);
+    this.execution.init();
+
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Memory and executioncycle switched to state " + LifecycleStates.INITIALIZED);
+    }
+
+    // call init for all agentbeans
+    for (IAgentBean ab : this.agentBeans) {
+      try {
+        ab.setMemory(memory);
+        ab.addLifecycleListener(this);
+
+        // memory.write(new AgentBeanDescription(ab.getBeanName(),
+        // LifecycleStates.INITIALIZED.name()));
+        setBeanState(ab, LifecycleStates.INITIALIZED);
+      } catch (LifecycleException e) {
+        handleBeanException(ab, e, LifecycleStates.INITIALIZED);
+      }
+
+      // if bean is effector, add all actions to memory
+      final IAgentDescription myDescription = getAgentDescription();
+      if (ab instanceof IEffector) {
+        final List<? extends IActionDescription> acts = ((IEffector) ab).getActions();
+        if (acts != null) {
+          for (IActionDescription item : acts) {
+            item.setProviderDescription(myDescription);
+            if (item.getProviderBean() == null) {
+              item.setProviderBean((IEffector) ab);
+            }
+            memory.write(item);
+            actionList.add(item);
+          }
+        }
+      }
+    }
+
+    updateState(LifecycleStates.INITIALIZED);
+
+    if ((startTime != null) && (stopTime != null)) {
+      try {
+        registerStartTime(startTime);
+        registerStopTime(stopTime);
+      } catch (InstanceNotFoundException e) {
+        throw new LifecycleException("Error when initializing start/stoptime", e);
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void doStart() throws LifecycleException {
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Trying to start memory and executioncycle");
+    }
+
+    this.memory.start();
+
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Memory and executioncycle switched to state " + LifecycleStates.STARTED);
+    }
+
+    // call start for all agentbeans
+    for (IAgentBean a : this.agentBeans) {
+      try {
+        setBeanState(a, LifecycleStates.STARTED);
+      } catch (LifecycleException e) {
+        handleBeanException(a, e, LifecycleStates.STARTED);
+      }
+    }
 
     this.execution.start();
 
     singleExecutionsDone = false;
-    if(execution.getAutoExecutionServices()!=null) {
+    if (execution.getAutoExecutionServices() != null) {
       try {
-      // add listener if needed
-      if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null)) {
-        try {
-          timerClient.addTimerNotificationListener(this);
-        } 
-        catch (IOException e) {
-          e.printStackTrace();
+        // add listener if needed
+        if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null)) {
+          try {
+            timerClient.addTimerNotificationListener(this);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         }
-      }
 
-      // remove old timer notification
-      if (autoExecTimeId != null) {
-        try {
-          timerClient.removeNotification(autoExecTimeId);
+        // remove old timer notification
+        if (autoExecTimeId != null) {
+          try {
+            timerClient.removeNotification(autoExecTimeId);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         }
-        catch (IOException e) {
-          e.printStackTrace();
-        }     
-      }
 
-      // add new timer notification
-      autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()+AUTO_EXECUTION_DELAY));
+        // add new timer notification
+        autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()
+            + AUTO_EXECUTION_DELAY));
       } catch (IOException e) {
         e.printStackTrace();
       } catch (InstanceNotFoundException e) {
         e.printStackTrace();
-      }     
+      }
     }
-    
-		synchronized (this) {
-			active = true;
-		}
-		updateState(LifecycleStates.STARTED);
 
-	}
+    synchronized (this) {
+      active = true;
+    }
+    updateState(LifecycleStates.STARTED);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void doStop() throws LifecycleException {
-		// call stop for all agentbeans
-		for (IAgentBean a : this.agentBeans) {
-			try {
-				setBeanState(a, LifecycleStates.STOPPED);
-			} catch (LifecycleException e) {
-				handleBeanException(a, e, LifecycleStates.STOPPED);
-			}
-		}
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void doStop() throws LifecycleException {
+    // call stop for all agentbeans
+    for (IAgentBean a : this.agentBeans) {
+      try {
+        setBeanState(a, LifecycleStates.STOPPED);
+      } catch (LifecycleException e) {
+        handleBeanException(a, e, LifecycleStates.STOPPED);
+      }
+    }
 
     if (log != null && log.isInfoEnabled()) {
       log.info("Trying to stop memory and executioncycle");
@@ -541,754 +532,724 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
     this.execution.stop();
 
     if (log != null && log.isInfoEnabled()) {
-      log.info("Memory and executioncycle switched to state "
-          + LifecycleStates.STOPPED);
+      log.info("Memory and executioncycle switched to state " + LifecycleStates.STOPPED);
     }
-		
-		this.memory.stop();
-		
-		updateState(LifecycleStates.STOPPED);
-	}
 
-	/**
-	 * Utility-Method for handling bean exections during lifecycle changes.
-	 * 
-	 * @param a
-	 *            the bean that threw the exception
-	 * @param e
-	 *            the actual exception
-	 * @param state
-	 *            the state to which the bean should have changed.
-	 */
-	private void handleBeanException(IAgentBean a, LifecycleException e,
-			LifecycleStates state) {
+    this.memory.stop();
 
-		printCriticalMessage("Agentbean: \'" + a.getBeanName()
-				+ "\' could not switch to state: \'" + state
-				+ "\'! \n  Exception was: ", e);
-		try {
-			a.handleLifecycleException(e, state);
-			setBeanState(a, state);
-			printCriticalMessage("Recovery for Agentbean: \'" + a.getBeanName()
-					+ "\' successful.", null);
-		} catch (Exception newEx) {
-			printCriticalMessage("Recovery for Agentbean: \'" + a.getBeanName()
-					+ "\' failed, removing Bean.", newEx);
-			// TODO: probably remove bean
-		}
+    updateState(LifecycleStates.STOPPED);
+  }
 
-	}
+  /**
+   * Utility-Method for handling bean exections during lifecycle changes.
+   * 
+   * @param a
+   *          the bean that threw the exception
+   * @param e
+   *          the actual exception
+   * @param state
+   *          the state to which the bean should have changed.
+   */
+  private void handleBeanException(IAgentBean a, LifecycleException e, LifecycleStates state) {
 
-	/**
-	 * Delivers a message to the logging system or to the console, if the
-	 * logging-system is not yet initiated. An optional exception can be
-	 * submitted.
-	 * 
-	 * @param message
-	 *            the message to print
-	 * @param e
-	 *            an optional exception
-	 */
-	private void printCriticalMessage(String message, Exception e) {
-		if (log != null) {
-			log.error(message, e);
-		} else {
-			System.err.println(message);
-			if (e != null) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * Utility-Method that updates the state of the agent in the Memory
-	 * 
-	 * @param newState
-	 *            the new state
-	 */
-	private void updateState(ILifecycle.LifecycleStates newState) {
-		memory.update(new ThisAgentDescription(), new ThisAgentDescription(
-				null, null, newState.name(), null, this.getAgentNode().getUUID()));
-	}
-
-	/**
-	 * Gets the lifecycle state of this agent by reading the agent description
-	 * within the agent's memory.
-	 * 
-	 * @return the current lifecycle state of this agent
-	 */
-	public final LifecycleStates getAgentState() {
-		return LifecycleStates.valueOf(memory.read(new ThisAgentDescription())
-				.getState());
-	}
-
-	/**
-	 * Sets the lifecycle state of an agent bean by invoking the corresponding
-	 * method of interface <code>ILifecycle</code>. It also updates the bean
-	 * description within the agent's memory.
-	 * 
-	 * @param bean
-	 *            the agent bean
-	 * @param newState
-	 *            the intended state of the agent bean (must be one of
-	 *            CLEANED_UP, INITIALIZED, STOPPED or STARTED).
-	 * @throws LifecycleException
-	 *             if the corresponding lifecycle method throws an exception.
-	 * @see ILifecycle
-	 * 
-	 */
-	public final void setBeanState(IAgentBean bean, LifecycleStates newState)
-			throws LifecycleException {
-	    
-		final String beanName = bean.getBeanName();
-
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Trying to switch bean: " + bean.getBeanName()
-					+ " to " + newState.toString());
-		}
-
-		switch (newState) {
-		case CLEANED_UP:
-			bean.cleanup();
-			break;
-		case INITIALIZED:
-			bean.init();
-			break;
-		case STOPPED:
-			bean.stop();
-			break;
-		case STARTED:
-			bean.start();
-			break;
-		default:
-			return;
-		}
-		if (log != null && log.isInfoEnabled()) {
-			log.info("Bean " + bean.getBeanName() + " switched to state: "
-					+ newState.toString());
-		}
-		memory.update(new AgentBeanDescription(beanName, null),
-				new AgentBeanDescription(null, newState.name()));
-	}
-
-	/**
-	 * Gets the lifecycle state of an agent bean by reading the bean description
-	 * within the agent's memory.
-	 * 
-	 * @param beanName
-	 *            the name of the agent bean
-	 * @return the current lifecycle state of the agent bean
-	 */
-	public final LifecycleStates getBeanState(String beanName) {
-		return LifecycleStates.valueOf(this.memory.read(
-				new AgentBeanDescription(beanName, null)).getState());
-	}
-	
-	/**
-	 * Sends an attribute change notification to JMX listeners.
-	 * @param attributeName Attribute Name
-	 * @param attributeType Attribute Type
-	 * @param oldValue old value (before change)
-	 * @param newValue new value (after change)
-	 */
-	protected final void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue, Object newValue) {
-		final Notification n = new AttributeChangeNotification(this, 
-				sequenceNumber++, System.currentTimeMillis(),
-				"Agent property "+attributeName+ " changed", 
-				attributeName, attributeType, oldValue, newValue);
-		sendNotification(n);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public final String getAgentName() {
-		return agentName;
-	}
-
-	/**
-	 * Setter for attribute <code>AgentName</code>. It also sends a
-	 * notification to JMX listeners.
-	 * 
-	 * @param agentname
-	 *            the new name of the agent
-	 * @see #setBeanName(java.lang.String)
-	 */
-	public final void setAgentName(String agentname) {
-		final String oldName = this.agentName;
-		this.agentName = agentname;
-
-		// send notification
-		sendAttributeChangeNotification("AgentName", "java.lang.String", oldName, agentname);
-		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final ExecutorService getThreadPool() {
-		return agentNode.getThreadPool();
-	}
-
-	/**
-	 * Gets the execution cycle of this agent.
-	 * 
-	 * @return the execution cycle of this agent
-	 */
-	public final IExecutionCycle getExecution() {
-		return execution;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void setExecution(IExecutionCycle newExecution) {
-		// disable management of old execution cycle
-		if (isManagementEnabled() && (execution != null)) {
-			execution.disableManagement();
-		}
-
-		// change execution cycle
-		execution = newExecution;
-		execution.setThisAgent(this);
-
-		// enable management of new execution cycle
-		if (isManagementEnabled() && (execution != null)) {
-			execution.enableManagement(_manager);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final IAgentNode getAgentNode() {
-		return agentNode;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void setAgentNode(IAgentNode newAgentNode) {
-		// update management
-		if (isManagementEnabled()) {
-			final Manager manager = _manager;
-			disableManagement();
-			agentNode = newAgentNode;
-			enableManagement(manager);
-		} else {
-			agentNode = newAgentNode;
-		}
-
-		// update logger
-		setLog(agentNode.getLog(this));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final String getOwner() {
-		return owner;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void setOwner(String newOwner) {
-		final String oldOwner = owner;
-		owner = newOwner;
-		sendAttributeChangeNotification("owner", "java.lang.String", oldOwner, owner);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final Log getLog(IAgentBean bean) {
-		if (agentNode == null) {
-			return null;
-		}
-		return agentNode.getLog(this, bean);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final Log getLog(IAgentBean bean, String extension) {
-		if (agentNode == null) {
-			return null;
-		}
-		return agentNode.getLog(this, bean, extension);
-	}
-
-	/**
-	 * Returns the timeout after which the execution of a bean will be stopped.
-	 * 
-	 * @return the timeout in milliseconds
-	 */
-	public final long getBeanExecutionTimeout() {
-		return beanExecutionTimeout;
-	}
-
-	/**
-	 * Sets the timeout after which the execution of a bean will be stopped.
-	 * 
-	 * @param newBeanExecutionTimeout
-	 *            the timeout in milliseconds
-	 */
-	public final void setBeanExecutionTimeout(long newBeanExecutionTimeout) {
-		beanExecutionTimeout = newBeanExecutionTimeout;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final String getAgentId() {
-		return agentId;
-	}
-
-	/**
-	 * Returns the agent description of this agent.
-	 * 
-	 * @return the agent description of this agent
-	 */
-	public AgentDescription getAgentDescription() {
-		return memory.read(new ThisAgentDescription());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final List<String> getAgentBeanNames() {
-		final ArrayList<String> ret = new ArrayList<String>();
-		for (IAgentBean bean : getAgentBeans()) {
-			ret.add(bean.getBeanName());
-		}
-		return ret;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final List<IActionDescription> getActionList() {
-	  final ArrayList<IActionDescription> tempList = new ArrayList<IActionDescription>();
-	  for(IAgentBean iab : agentBeans) {
-		  if(iab instanceof IEffector) {
-		    tempList.addAll(((IEffector)iab).getActions());
-		  }
-		}
-	  
-	  for(IActionDescription a: tempList) {
-	    a.setProviderDescription(getAgentDescription());
-	  }
-	  actionList = tempList;
-	  return Collections.unmodifiableList(actionList);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void setActionList(List<IActionDescription> newActionList) {
-		actionList = new ArrayList<IActionDescription>();
-		actionList.addAll(newActionList);
-	}
-
-	/**
-	 * Getter for attribute "ActionNames" of the managed agent.
-	 * 
-	 * @return name of actions provided by this agent
-	 */
-	public final List<String> getActionNames() {
-		final ArrayList<String> ret = new ArrayList<String>();
-		for (IActionDescription action : getActionList()) {
-			ret.add(action.getName());
-		}
-		return ret;
-	}
-
-	/**
-	 * Getter for attribute "MemoryData" of the managed agent.
-	 * 
-	 * @return implementation of the memory of this agent
-	 */
-	public final CompositeData getMemoryData() {
-		if (memory == null) {
-			return null;
-		}
-		final String[] itemNames = new String[] { "class", "matcher", "updater" };
-		try {
-			final CompositeType type = new CompositeType(
-					"javax.management.openmbean.CompositeDataSupport",
-					"Memory information", itemNames, new String[] {
-							"Implementation of the memory instance",
-							"Implementation of the matcher instance",
-							"Implementation of the updater instance" },
-					new OpenType[] { SimpleType.STRING, SimpleType.STRING,
-							SimpleType.STRING });
-			return new CompositeDataSupport(type, itemNames, new Object[] {
-					memory.getClass().getName(),
-					(memory.getMatcher() == null) ? null : memory.getMatcher()
-							.getClass().getName(),
-					(memory.getUpdater() == null) ? null : memory.getUpdater()
-							.getClass().getName() });
-		} catch (OpenDataException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
-	 * Getter for attribute "ExecutionCycleClass" of the managed agent.
-	 * 
-	 * @return implementation of the execution cycle of this agent
-	 */
-	public final String getExecutionCycleClass() {
-		if (execution == null) {
-			return null;
-		}
-		return execution.getClass().getName();
-	}
-
-	/**
-	 * Registers the agent and all its resources for management
-	 * 
-	 * @param manager
-	 *            the manager to be used for registration
-	 */
-	public void enableManagement(Manager manager) {
-		// do nothing if management already enabled
-		if (isManagementEnabled()) {
-			return;
-		}
-
-		// register agent for management
-		try {
-			manager.registerAgent(this);
-		} catch (Exception e) {
-			System.err.println("WARNING: Unable to register agent "
-					+ getAgentName() + " of agent node "
-					+ getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());
-		}
-
-		// register agent beans for management
-		for (IAgentBean ab : this.agentBeans) {
-			ab.enableManagement(manager);
-		}
-
-		// register memory for management
-		if (memory != null) {
-			memory.enableManagement(manager);
-		}
-
-		// register execution cycle for management
-		if (execution != null) {
-			execution.enableManagement(manager);
-		}
-
-		super.enableManagement(manager);
-	}
-
-	/**
-	 * Deregisters the agent and all its resources from management.
-	 */
-	public void disableManagement() {
-		// do nothing if management already disabled
-		if (!isManagementEnabled()) {
-			return;
-		}
-
-		// deregister memory from management
-		if (memory != null) {
-			memory.disableManagement();
-		}
-
-		// deregister execution cycle from management
-		if (execution != null) {
-			execution.disableManagement();
-		}
-
-		// deregister agent beans from management
-		for (IAgentBean ab : this.agentBeans) {
-			ab.disableManagement();
-		}
-
-		// deregister agent from management
-		try {
-			_manager.unregisterAgent(this);
-		} catch (Exception e) {
-			System.err.println("WARNING: Unable to deregister agent "
-					+ getAgentName() + " of agent node "
-					+ getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());
-		}
-
-		super.disableManagement();
-	}
-
-	/**
-	 * Getter for the executionInterval timer
-	 * 
-	 * @return the be nice timer between to calls to the executionCycle
-	 */
-	public final int getExecutionInterval() {
-		return executionInterval;
-	}
-
-	/**
-	 * Setter for the executionInterval timer
-	 * 
-	 * @param newExecutionInterval
-	 *            the be nice timer between to calls to the executionCycle
-	 */
-	public final void setExecutionInterval(int newExecutionInterval) {
-		final int oldInterval = executionInterval;
-		executionInterval = newExecutionInterval;
-		sendAttributeChangeNotification("executionInterval", "java.lang.int", 
-				Integer.valueOf(oldInterval), Integer.valueOf(newExecutionInterval));
-	}
-
-    /**
-	 * {@inheritDoc}
-	 */
-	public final Long getStartTime() throws InstanceNotFoundException {
-		if (startTimeId == null) {
-			return null;
-		}
-		try {
-			return Long.valueOf(timerClient.getDate(startTimeId).getTime());
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		catch (NullPointerException e) {
-			return startTime;
-		}
-	}
-	
-	/**
-	 * Adds the start time listener and notifications for start time.
-	 * Required to enable spring configuration of start/stoptime.
-	 * @param regStartTime the designated start time
-	 */
-    private void registerStartTime(Long regStartTime) throws InstanceNotFoundException {
-    	if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStartTime != null)) {
-			try {
-				timerClient.addTimerNotificationListener(this);
-			} 
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// remove old timer notification
-		if (startTimeId != null) {
-			try {
-				timerClient.removeNotification(startTimeId);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}			
-		}
-
-		// remove listener if no longer needed
-		if ((startTimeId != null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStartTime == null)) {
-			try {
-				timerClient.removeTimerNotificationListener(this);
-			} 
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-			catch (ListenerNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// add new timer notification
-		if (regStartTime != null) {
-			try {
-				startTimeId = timerClient.addNotification(null, null, null, new Date(regStartTime.longValue()));
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}			
-		}
+    printCriticalMessage("Agentbean: \'" + a.getBeanName() + "\' could not switch to state: \'" + state
+        + "\'! \n  Exception was: ", e);
+    try {
+      a.handleLifecycleException(e, state);
+      setBeanState(a, state);
+      printCriticalMessage("Recovery for Agentbean: \'" + a.getBeanName() + "\' successful.", null);
+    } catch (Exception newEx) {
+      printCriticalMessage("Recovery for Agentbean: \'" + a.getBeanName() + "\' failed, removing Bean.", newEx);
+      // TODO: probably remove bean
     }
-	
-	/**
-     * {@inheritDoc}
-     */
-    public final void setStartTime(Long newStartTime) throws InstanceNotFoundException {
-        // add listener if needed
-        if ((newStartTime != null) && (newStartTime.longValue() <= (System.currentTimeMillis() + AGENT_STARTTIME_DELAY))) {
-            newStartTime= Long.valueOf(System.currentTimeMillis() + AGENT_STARTTIME_DELAY);
+
+  }
+
+  /**
+   * Delivers a message to the logging system or to the console, if the logging-system is not yet initiated. An optional
+   * exception can be submitted.
+   * 
+   * @param message
+   *          the message to print
+   * @param e
+   *          an optional exception
+   */
+  private void printCriticalMessage(String message, Exception e) {
+    if (log != null) {
+      log.error(message, e);
+    } else {
+      System.err.println(message);
+      if (e != null) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  /**
+   * Utility-Method that updates the state of the agent in the Memory
+   * 
+   * @param newState
+   *          the new state
+   */
+  private void updateState(ILifecycle.LifecycleStates newState) {
+    memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, null, newState.name(), null, this
+        .getAgentNode().getUUID()));
+  }
+
+  /**
+   * Gets the lifecycle state of this agent by reading the agent description within the agent's memory.
+   * 
+   * @return the current lifecycle state of this agent
+   */
+  public final LifecycleStates getAgentState() {
+    return LifecycleStates.valueOf(memory.read(new ThisAgentDescription()).getState());
+  }
+
+  /**
+   * Sets the lifecycle state of an agent bean by invoking the corresponding method of interface <code>ILifecycle</code>.
+   * It also updates the bean description within the agent's memory.
+   * 
+   * @param bean
+   *          the agent bean
+   * @param newState
+   *          the intended state of the agent bean (must be one of CLEANED_UP, INITIALIZED, STOPPED or STARTED).
+   * @throws LifecycleException
+   *           if the corresponding lifecycle method throws an exception.
+   * @see ILifecycle
+   * 
+   */
+  public final void setBeanState(IAgentBean bean, LifecycleStates newState) throws LifecycleException {
+
+    final String beanName = bean.getBeanName();
+
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Trying to switch bean: " + bean.getBeanName() + " to " + newState.toString());
+    }
+
+    switch (newState) {
+      case CLEANED_UP:
+        bean.cleanup();
+        break;
+      case INITIALIZED:
+        bean.init();
+        break;
+      case STOPPED:
+        bean.stop();
+        break;
+      case STARTED:
+        bean.start();
+        break;
+      default:
+        return;
+    }
+    if (log != null && log.isInfoEnabled()) {
+      log.info("Bean " + bean.getBeanName() + " switched to state: " + newState.toString());
+    }
+    memory.update(new AgentBeanDescription(beanName, null), new AgentBeanDescription(null, newState.name()));
+  }
+
+  /**
+   * Gets the lifecycle state of an agent bean by reading the bean description within the agent's memory.
+   * 
+   * @param beanName
+   *          the name of the agent bean
+   * @return the current lifecycle state of the agent bean
+   */
+  public final LifecycleStates getBeanState(String beanName) {
+    return LifecycleStates.valueOf(this.memory.read(new AgentBeanDescription(beanName, null)).getState());
+  }
+
+  /**
+   * Sends an attribute change notification to JMX listeners.
+   * 
+   * @param attributeName
+   *          Attribute Name
+   * @param attributeType
+   *          Attribute Type
+   * @param oldValue
+   *          old value (before change)
+   * @param newValue
+   *          new value (after change)
+   */
+  protected final void sendAttributeChangeNotification(String attributeName, String attributeType, Object oldValue,
+      Object newValue) {
+    final Notification n = new AttributeChangeNotification(this, sequenceNumber++, System.currentTimeMillis(),
+        "Agent property " + attributeName + " changed", attributeName, attributeType, oldValue, newValue);
+    sendNotification(n);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final String getAgentName() {
+    return agentName;
+  }
+
+  /**
+   * Setter for attribute <code>AgentName</code>. It also sends a notification to JMX listeners.
+   * 
+   * @param agentname
+   *          the new name of the agent
+   * @see #setBeanName(java.lang.String)
+   */
+  public final void setAgentName(String agentname) {
+    final String oldName = this.agentName;
+    this.agentName = agentname;
+
+    // send notification
+    sendAttributeChangeNotification("AgentName", "java.lang.String", oldName, agentname);
+
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final ExecutorService getThreadPool() {
+    return agentNode.getThreadPool();
+  }
+
+  /**
+   * Gets the execution cycle of this agent.
+   * 
+   * @return the execution cycle of this agent
+   */
+  public final IExecutionCycle getExecution() {
+    return execution;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void setExecution(IExecutionCycle newExecution) {
+    // disable management of old execution cycle
+    if (isManagementEnabled() && (execution != null)) {
+      execution.disableManagement();
+    }
+
+    // change execution cycle
+    execution = newExecution;
+    execution.setThisAgent(this);
+
+    // enable management of new execution cycle
+    if (isManagementEnabled() && (execution != null)) {
+      execution.enableManagement(_manager);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final IAgentNode getAgentNode() {
+    return agentNode;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void setAgentNode(IAgentNode newAgentNode) {
+    // update management
+    if (isManagementEnabled()) {
+      final Manager manager = _manager;
+      disableManagement();
+      agentNode = newAgentNode;
+      enableManagement(manager);
+    } else {
+      agentNode = newAgentNode;
+    }
+
+    // update logger
+    setLog(agentNode.getLog(this));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final String getOwner() {
+    return owner;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void setOwner(String newOwner) {
+    final String oldOwner = owner;
+    owner = newOwner;
+    sendAttributeChangeNotification("owner", "java.lang.String", oldOwner, owner);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final Log getLog(IAgentBean bean) {
+    if (agentNode == null) {
+      return null;
+    }
+    return agentNode.getLog(this, bean);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final Log getLog(IAgentBean bean, String extension) {
+    if (agentNode == null) {
+      return null;
+    }
+    return agentNode.getLog(this, bean, extension);
+  }
+
+  /**
+   * Returns the timeout after which the execution of a bean will be stopped.
+   * 
+   * @return the timeout in milliseconds
+   */
+  public final long getBeanExecutionTimeout() {
+    return beanExecutionTimeout;
+  }
+
+  /**
+   * Sets the timeout after which the execution of a bean will be stopped.
+   * 
+   * @param newBeanExecutionTimeout
+   *          the timeout in milliseconds
+   */
+  public final void setBeanExecutionTimeout(long newBeanExecutionTimeout) {
+    beanExecutionTimeout = newBeanExecutionTimeout;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final String getAgentId() {
+    return agentId;
+  }
+
+  /**
+   * Returns the agent description of this agent.
+   * 
+   * @return the agent description of this agent
+   */
+  public AgentDescription getAgentDescription() {
+    return memory.read(new ThisAgentDescription());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final List<String> getAgentBeanNames() {
+    final ArrayList<String> ret = new ArrayList<String>();
+    for (IAgentBean bean : getAgentBeans()) {
+      ret.add(bean.getBeanName());
+    }
+    return ret;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final List<IActionDescription> getActionList() {
+    final ArrayList<IActionDescription> tempList = new ArrayList<IActionDescription>();
+    for (IAgentBean iab : agentBeans) {
+      if (iab instanceof IEffector) {
+        tempList.addAll(((IEffector) iab).getActions());
+      }
+    }
+
+    for (IActionDescription a : tempList) {
+      a.setProviderDescription(getAgentDescription());
+    }
+    actionList = tempList;
+    return Collections.unmodifiableList(actionList);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void setActionList(List<IActionDescription> newActionList) {
+    actionList = new ArrayList<IActionDescription>();
+    actionList.addAll(newActionList);
+  }
+
+  /**
+   * Getter for attribute "ActionNames" of the managed agent.
+   * 
+   * @return name of actions provided by this agent
+   */
+  public final List<String> getActionNames() {
+    final ArrayList<String> ret = new ArrayList<String>();
+    for (IActionDescription action : getActionList()) {
+      ret.add(action.getName());
+    }
+    return ret;
+  }
+
+  /**
+   * Getter for attribute "MemoryData" of the managed agent.
+   * 
+   * @return implementation of the memory of this agent
+   */
+  public final CompositeData getMemoryData() {
+    if (memory == null) {
+      return null;
+    }
+    final String[] itemNames = new String[] { "class", "matcher", "updater" };
+    try {
+      final CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport",
+          "Memory information", itemNames, new String[] { "Implementation of the memory instance",
+              "Implementation of the matcher instance", "Implementation of the updater instance" }, new OpenType[] {
+              SimpleType.STRING, SimpleType.STRING, SimpleType.STRING });
+      return new CompositeDataSupport(type, itemNames, new Object[] { memory.getClass().getName(),
+          (memory.getMatcher() == null) ? null : memory.getMatcher().getClass().getName(),
+          (memory.getUpdater() == null) ? null : memory.getUpdater().getClass().getName() });
+    } catch (OpenDataException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  /**
+   * Getter for attribute "ExecutionCycleClass" of the managed agent.
+   * 
+   * @return implementation of the execution cycle of this agent
+   */
+  public final String getExecutionCycleClass() {
+    if (execution == null) {
+      return null;
+    }
+    return execution.getClass().getName();
+  }
+
+  /**
+   * Registers the agent and all its resources for management
+   * 
+   * @param manager
+   *          the manager to be used for registration
+   */
+  public void enableManagement(Manager manager) {
+    // do nothing if management already enabled
+    if (isManagementEnabled()) {
+      return;
+    }
+
+    // register agent for management
+    try {
+      manager.registerAgent(this);
+    } catch (Exception e) {
+      System.err.println("WARNING: Unable to register agent " + getAgentName() + " of agent node "
+          + getAgentNode().getName() + " as JMX resource.");
+      System.err.println(e.getMessage());
+    }
+
+    // register agent beans for management
+    for (IAgentBean ab : this.agentBeans) {
+      ab.enableManagement(manager);
+    }
+
+    // register memory for management
+    if (memory != null) {
+      memory.enableManagement(manager);
+    }
+
+    // register execution cycle for management
+    if (execution != null) {
+      execution.enableManagement(manager);
+    }
+
+    super.enableManagement(manager);
+  }
+
+  /**
+   * Deregisters the agent and all its resources from management.
+   */
+  public void disableManagement() {
+    // do nothing if management already disabled
+    if (!isManagementEnabled()) {
+      return;
+    }
+
+    // deregister memory from management
+    if (memory != null) {
+      memory.disableManagement();
+    }
+
+    // deregister execution cycle from management
+    if (execution != null) {
+      execution.disableManagement();
+    }
+
+    // deregister agent beans from management
+    for (IAgentBean ab : this.agentBeans) {
+      ab.disableManagement();
+    }
+
+    // deregister agent from management
+    try {
+      _manager.unregisterAgent(this);
+    } catch (Exception e) {
+      System.err.println("WARNING: Unable to deregister agent " + getAgentName() + " of agent node "
+          + getAgentNode().getName() + " as JMX resource.");
+      System.err.println(e.getMessage());
+    }
+
+    super.disableManagement();
+  }
+
+  /**
+   * Getter for the executionInterval timer
+   * 
+   * @return the be nice timer between to calls to the executionCycle
+   */
+  public final int getExecutionInterval() {
+    return executionInterval;
+  }
+
+  /**
+   * Setter for the executionInterval timer
+   * 
+   * @param newExecutionInterval
+   *          the be nice timer between to calls to the executionCycle
+   */
+  public final void setExecutionInterval(int newExecutionInterval) {
+    final int oldInterval = executionInterval;
+    executionInterval = newExecutionInterval;
+    sendAttributeChangeNotification("executionInterval", "java.lang.int", Integer.valueOf(oldInterval), Integer
+        .valueOf(newExecutionInterval));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final Long getStartTime() throws InstanceNotFoundException {
+    if (startTimeId == null) {
+      return null;
+    }
+    try {
+      return Long.valueOf(timerClient.getDate(startTimeId).getTime());
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    } catch (NullPointerException e) {
+      return startTime;
+    }
+  }
+
+  /**
+   * Adds the start time listener and notifications for start time. Required to enable spring configuration of
+   * start/stoptime.
+   * 
+   * @param regStartTime
+   *          the designated start time
+   */
+  private void registerStartTime(Long regStartTime) throws InstanceNotFoundException {
+    if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStartTime != null)) {
+      try {
+        timerClient.addTimerNotificationListener(this);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    // remove old timer notification
+    if (startTimeId != null) {
+      try {
+        timerClient.removeNotification(startTimeId);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    // remove listener if no longer needed
+    if ((startTimeId != null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStartTime == null)) {
+      try {
+        timerClient.removeTimerNotificationListener(this);
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (ListenerNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
+
+    // add new timer notification
+    if (regStartTime != null) {
+      try {
+        startTimeId = timerClient.addNotification(null, null, null, new Date(regStartTime.longValue()));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void setStartTime(Long newStartTime) throws InstanceNotFoundException {
+    // add listener if needed
+    if ((newStartTime != null) && (newStartTime.longValue() <= (System.currentTimeMillis() + AGENT_STARTTIME_DELAY))) {
+      newStartTime = Long.valueOf(System.currentTimeMillis() + AGENT_STARTTIME_DELAY);
+    }
+    startTime = newStartTime;
+    final Long oldStartTime = getStartTime();
+
+    if (this.memory.getState() != LifecycleStates.UNDEFINED) {
+      if (this.getAgentState() != LifecycleStates.UNDEFINED) {
+        registerStartTime(newStartTime);
+        sendAttributeChangeNotification("startTime", "java.lang.Long", oldStartTime, getStartTime());
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final Long getStopTime() throws InstanceNotFoundException {
+    if (stopTimeId == null) {
+      return null;
+    }
+    try {
+      return Long.valueOf(timerClient.getDate(stopTimeId).getTime());
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    } catch (NullPointerException e) {
+      return stopTime;
+    }
+  }
+
+  private void registerStopTime(Long regStopTime) throws InstanceNotFoundException {
+    if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStopTime != null)) {
+      try {
+        timerClient.addTimerNotificationListener(this);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    // remove old timer notification
+    if (stopTimeId != null) {
+      try {
+        timerClient.removeNotification(stopTimeId);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    // remove listener if no longer needed
+    if ((startTimeId == null) && (stopTimeId != null) && (autoExecTimeId == null) && (regStopTime == null)) {
+      try {
+        timerClient.removeTimerNotificationListener(this);
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (ListenerNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
+
+    // add new timer notification
+    if (regStopTime != null) {
+      try {
+        stopTimeId = timerClient.addNotification(null, null, null, new Date(regStopTime.longValue()));
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void setStopTime(Long newStopTime) throws InstanceNotFoundException {
+    // add listener if needed
+    stopTime = newStopTime;
+    final Long oldStopTime = getStopTime();
+    if (this.memory.getState() != LifecycleStates.UNDEFINED) {
+      if (this.getAgentState() != LifecycleStates.UNDEFINED) {
+        registerStopTime(newStopTime);
+        sendAttributeChangeNotification("stopTime", "java.lang.Long", oldStopTime, getStopTime());
+      }
+    }
+
+  }
+
+  /**
+   * Handles notifications about start and stop time.
+   * 
+   * @param notification
+   *          the received notification.
+   * @param handback
+   *          the corresponding user data.
+   */
+  public void handleNotification(Notification notification, Object handback) {
+    if (notification instanceof TimerNotification) {
+      final Integer id = ((TimerNotification) notification).getNotificationID();
+      if (id.equals(startTimeId) && !getAgentState().equals(LifecycleStates.STARTED)
+          && !getAgentState().equals(LifecycleStates.STARTING)) {
+        try {
+          start();
+        } catch (LifecycleException e) {
+          e.printStackTrace();
         }
-        startTime= newStartTime;
-        final Long oldStartTime= getStartTime();
+      }
+      if (id.equals(stopTimeId) && !getAgentState().equals(LifecycleStates.STOPPED)
+          && !getAgentState().equals(LifecycleStates.STOPPING)) {
+        try {
+          stop();
+        } catch (LifecycleException e) {
+          e.printStackTrace();
+        }
+      }
 
-        if (this.memory.getState() != LifecycleStates.UNDEFINED) {
-            if (this.getAgentState() != LifecycleStates.UNDEFINED) {
-                registerStartTime(newStartTime);
-                sendAttributeChangeNotification("startTime", "java.lang.Long", oldStartTime, getStartTime());
+      // check autoExec timer
+      if (id.equals(autoExecTimeId) && getAgentState().equals(LifecycleStates.STARTED)) {
+
+        // if not continous and one execution was done - continue;
+        if (!execution.getAutoExecutionType() && singleExecutionsDone) {
+          return;
+        }
+
+        if (execution.getAutoExecutionServices() != null) {
+          for (String serviceName : execution.getAutoExecutionServices()) {
+            final Action service = memory.read(new Action(serviceName));
+            if (service != null) {
+              if (log.isInfoEnabled()) {
+                log.info("Autoexecuting action: " + service);
+              }
+              final DoAction doAct = service.createDoAction(new Serializable[0], null);
+              doAct.getSession().setOriginalService(serviceName);
+              doAct.getSession().setOriginalProvider(this.getOwner());
+              doAct.getSession().setOriginalUser(this.getOwner());
+              memory.write(doAct);
+            } else {
+              log.warn("Could not find action for autoExecution: " + serviceName);
             }
+          }
+          singleExecutionsDone = true;
         }
-    }
-
-    /**
-	 * {@inheritDoc}
-	 */
-	public final Long getStopTime() throws InstanceNotFoundException {
-		if (stopTimeId == null) {
-			return null;
-		}
-		try {
-			return Long.valueOf(timerClient.getDate(stopTimeId).getTime());
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-		catch (NullPointerException e) {
-			return stopTime;
-		}
-	}
-	
-	private void registerStopTime(Long regStopTime) throws InstanceNotFoundException {
-		if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStopTime != null)) {
-			try {
-				timerClient.addTimerNotificationListener(this);
-			} 
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// remove old timer notification
-		if (stopTimeId != null) {
-			try {
-				timerClient.removeNotification(stopTimeId);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}			
-		}
-
-		// remove listener if no longer needed
-		if ((startTimeId == null) && (stopTimeId != null) && (autoExecTimeId == null) && (regStopTime == null)) {
-			try {
-				timerClient.removeTimerNotificationListener(this);
-			} 
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-			catch (ListenerNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-
-		// add new timer notification
-		if (regStopTime != null) {
-			try {
-				stopTimeId = timerClient.addNotification(null, null, null, new Date(regStopTime.longValue()));
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}			
-		}
-	}
-	
-    /**
-	 * {@inheritDoc}
-	 */
-	public final void setStopTime(Long newStopTime) throws InstanceNotFoundException {
-		// add listener if needed
-		stopTime = newStopTime;
-		final Long oldStopTime = getStopTime();
-		if (this.memory.getState() != LifecycleStates.UNDEFINED) {
-			if (this.getAgentState() != LifecycleStates.UNDEFINED) {
-				registerStopTime(newStopTime);
-				sendAttributeChangeNotification("stopTime", "java.lang.Long", oldStopTime, getStopTime());	
-			}
-		}
-		
-	}
-
-	/**
-	 * Handles notifications about start and stop time.
-	 * @param notification the received notification.
-	 * @param handback the corresponding user data.
-	 */
-	public void handleNotification(Notification notification, Object handback) {
-		if (notification instanceof TimerNotification) {
-			final Integer id = ((TimerNotification) notification).getNotificationID();
-			if (id.equals(startTimeId) && !getAgentState().equals(LifecycleStates.STARTED) && !getAgentState().equals(LifecycleStates.STARTING)) {
-				try {
-					start();
-				}
-				catch (LifecycleException e) {
-					e.printStackTrace();
-				}
-			}
-			if (id.equals(stopTimeId) && !getAgentState().equals(LifecycleStates.STOPPED) && !getAgentState().equals(LifecycleStates.STOPPING)) {
-				try {
-					stop();
-				}
-				catch (LifecycleException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			// check autoExec timer
-			if (id.equals(autoExecTimeId) && getAgentState().equals(LifecycleStates.STARTED)) {
-  	    
-			  // if not continous and one execution was done - continue;
-			  if(!execution.getAutoExecutionType() && singleExecutionsDone) {
-  	      return;
-  	    }
-			  
-			  if (execution.getAutoExecutionServices() != null) {
-  	        for (String serviceName : execution.getAutoExecutionServices()) {
-  	          final Action service = memory.read(new Action(serviceName));
-  	          if (service != null) {
-  	            if(log.isInfoEnabled()) {
-  	              log.info("Autoexecuting action: "+service);
-  	            }
-  	            final DoAction doAct = service.createDoAction(new Serializable[0], null);
-  	            doAct.getSession().setOriginalService(serviceName);
-  	            doAct.getSession().setOriginalProvider(this.getOwner());            
-  	            doAct.getSession().setOriginalUser(this.getOwner());
-  	            memory.write(doAct);
-  	          } else {
-  	            log.warn("Could not find action for autoExecution: "+serviceName);
-  	          }
-  	        }
-  	        singleExecutionsDone = true;
-  	      }
         if (execution.getAutoExecutionType()) {
           // set new timer for contiunous execution
           // remove old timer notification
           try {
             if (autoExecTimeId != null) {
-                timerClient.removeNotification(autoExecTimeId);
+              timerClient.removeNotification(autoExecTimeId);
             }
             // add new timer notification
-            autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()+CONTINUOUS_EXECUTION_INTERVAL));
+            autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()
+                + CONTINUOUS_EXECUTION_INTERVAL));
 
           } catch (IOException e) {
             e.printStackTrace();
           } catch (InstanceNotFoundException e) {
             e.printStackTrace();
-          }               
+          }
         }
-			}
-		}
-	}
+      }
+    }
+  }
 
-    /**
-     * {@inheritDoc}
-     */
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public final List<String> getAutoExecutionServices() {
-    if(this.execution!= null){
+    if (this.execution != null) {
       return this.execution.getAutoExecutionServices();
     } else {
       return null;
@@ -1300,7 +1261,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    */
   @Override
   public final boolean getAutoExecutionType() {
-    if(this.execution!= null){
+    if (this.execution != null) {
       return this.execution.getAutoExecutionType();
     } else {
       return false;
@@ -1312,17 +1273,17 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    */
   @Override
   public final void setAutoExecutionServices(List<String> actionIds) {
-    if(this.execution!= null){
-    	List<String> oldActionIds = null;
-    	if (this.execution.getAutoExecutionServices() != null) {
-    		oldActionIds = new ArrayList<String>();
-    		oldActionIds.addAll(this.execution.getAutoExecutionServices());
-    	}
-    	this.execution.setAutoExecutionServices(actionIds);
-    	sendAttributeChangeNotification("autoExecutionServices", "java.util.ArrayList<java.lang.String>", 
-    			oldActionIds, actionIds);
-    	
-    } 
+    if (this.execution != null) {
+      List<String> oldActionIds = null;
+      if (this.execution.getAutoExecutionServices() != null) {
+        oldActionIds = new ArrayList<String>();
+        oldActionIds.addAll(this.execution.getAutoExecutionServices());
+      }
+      this.execution.setAutoExecutionServices(actionIds);
+      sendAttributeChangeNotification("autoExecutionServices", "java.util.ArrayList<java.lang.String>", oldActionIds,
+          actionIds);
+
+    }
   }
 
   /**
@@ -1330,12 +1291,12 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    */
   @Override
   public final void setAutoExecutionType(boolean continous) {
-    if(this.execution!= null){
-    	final boolean oldValue = this.execution.getAutoExecutionType();
-    	this.execution.setAutoExecutionType(continous);
-    	sendAttributeChangeNotification("autoExecutionType", "java.lang.boolean", 
-    			Boolean.valueOf(oldValue), Boolean.valueOf(continous));
-    } 
+    if (this.execution != null) {
+      final boolean oldValue = this.execution.getAutoExecutionType();
+      this.execution.setAutoExecutionType(continous);
+      sendAttributeChangeNotification("autoExecutionType", "java.lang.boolean", Boolean.valueOf(oldValue), Boolean
+          .valueOf(continous));
+    }
   }
 
   /**
@@ -1343,160 +1304,183 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean,
    */
   @Override
   public final byte[] getSpringConfigXml() {
-	if (springConfigXml != null) {
-		return Arrays.copyOf(springConfigXml, springConfigXml.length);
-	}
-	return springConfigXml;
+    if (springConfigXml != null) {
+      return Arrays.copyOf(springConfigXml, springConfigXml.length);
+    }
+    return springConfigXml;
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
   public final void setSpringConfigXml(byte[] springConfig) {
-	  if (springConfig != null) {
-		  this.springConfigXml = Arrays.copyOf(springConfig, springConfig.length);
-	  } else {
-		  this.springConfigXml = springConfig;
-	  }
+    if (springConfig != null) {
+      this.springConfigXml = Arrays.copyOf(springConfig, springConfig.length);
+    } else {
+      this.springConfigXml = null;
+    }
   }
 
-  	/***********************************************
-  	 *           DirectoryAccess                   *
-  	 ***********************************************/
+  /*********************************************************************************************************************
+   * DirectoryAccess *
+   ********************************************************************************************************************/
 
   /**
    * Get the access to the directory.
+   * 
    * @return the directory
    */
-	public final IDirectory getDirectory() {
-		return directory;
-	}
+  public final IDirectory getDirectory() {
+    return directory;
+  }
 
-	/**
-	 * Set the access to the directory
-	 * @param newDirectory the directory
-	 */
-	public final void setDirectory(IDirectory newDirectory) {
-		directory = newDirectory;
-	}
+  /**
+   * Set the access to the directory
+   * 
+   * @param newDirectory
+   *          the directory
+   */
+  public final void setDirectory(IDirectory newDirectory) {
+    directory = newDirectory;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final void deregisterAction(IActionDescription actionDescription) {
-		if (directory != null) {
-			directory.deregisterAction(actionDescription);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final void deregisterAction(IActionDescription actionDescription) {
+    if (directory != null) {
+      directory.deregisterAction(actionDescription);
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final void modifyAction(IActionDescription oldDescription,
-			IActionDescription newDescription) {
-		if (directory != null) {
-			directory.modifyAction(oldDescription, newDescription);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final void modifyAction(IActionDescription oldDescription, IActionDescription newDescription) {
+    if (directory != null) {
+      directory.modifyAction(oldDescription, newDescription);
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final void registerAction(IActionDescription actionDescription) {
-		if (directory != null) {
-			directory.registerAction(actionDescription);
-		} else {
-		  log.warn("Agent has no reference to directory.");
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final void registerAction(IActionDescription actionDescription) {
+    if (directory != null) {
+      directory.registerAction(actionDescription);
+    } else {
+      log.warn("Agent has no reference to directory.");
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final IActionDescription searchAction(IActionDescription template) {
-		if (directory != null) {
-			return directory.searchAction(template);
-		}
-		return null;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final IActionDescription searchAction(IActionDescription template) {
+    if (directory != null) {
+      return directory.searchAction(template);
+    }
+    return null;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final List<IActionDescription> searchAllActions(IActionDescription template) {
-		if (directory != null) {
-			return directory.searchAllActions(template);
-		}
-		log.warn("no directory found, returning empty list...");
-		return new ArrayList<IActionDescription>();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final List<IActionDescription> searchAllActions(IActionDescription template) {
+    if (directory != null) {
+      return directory.searchAllActions(template);
+    }
+    log.warn("no directory found, returning empty list...");
+    return new ArrayList<IActionDescription>();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final void deregisterAgent(String aid) {
-		if (directory != null) {
-			directory.deregisterAgent(aid);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final void deregisterAgent(String aid) {
+    if (directory != null) {
+      directory.deregisterAgent(aid);
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final void modifyAgent(IAgentDescription agentDescription) {
-		if (directory != null) {
-			directory.modifyAgent(agentDescription);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final void modifyAgent(IAgentDescription agentDescription) {
+    if (directory != null) {
+      directory.modifyAgent(agentDescription);
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final void registerAgent(IAgentDescription agentDescription) {
-		if (directory != null) {
-			directory.registerAgent(agentDescription);
-		}
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final void registerAgent(IAgentDescription agentDescription) {
+    if (directory != null) {
+      directory.registerAgent(agentDescription);
+    }
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final IAgentDescription searchAgent(IAgentDescription template) {
-		if (directory != null) {
-			return directory.searchAgent(template);
-		}
-		return null;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final IAgentDescription searchAgent(IAgentDescription template) {
+    if (directory != null) {
+      return directory.searchAgent(template);
+    }
+    return null;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final List<IAgentDescription> searchAllAgents(IAgentDescription template) {
-		if (directory != null) {
-			return directory.searchAllAgents(template);
-		}
-		return null;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final List<IAgentDescription> searchAllAgents(IAgentDescription template) {
+    if (directory != null) {
+      return directory.searchAllAgents(template);
+    }
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}}
+   */
+  public final <T> T findAgentBean(Class<T> type) {
+    if (type == null) {
+      throw new IllegalArgumentException("Cannot find AgentBean for null-type");
+    }
+    IAgentBean ret = null;
+    synchronized (this.agentBeans) {
+      for (IAgentBean iab : this.agentBeans) {
+        if (type.isInstance(iab)) {
+          ret = iab;
+          break;
+        }
+      }
+    }
+
+    return type.cast(ret);
+  }
   
-	// ///////////////////////////////////
-	// TODO
-	// ///////////////////////////////////
-	//
-	// - addAgentBean method
-	// - removeAgentBean method
-	//   -> suggestion: use the add, addAll, remove, and removeAll methods of List.
-	//      Then we do not have to render the list unmodifiable...
-	//   -> the (add|remove)All methods are convenient to install/remove new beans and synchronize their state changes between them
-	// - setBeanState method should be renamed and moved to the AbstractLifecycle and ILifecycle
+  // ///////////////////////////////////
+  // TODO
+  // ///////////////////////////////////
+  //
+  // - addAgentBean method
+  // - removeAgentBean method
+  // -> suggestion: use the add, addAll, remove, and removeAll methods of List.
+  // Then we do not have to render the list unmodifiable...
+  // -> the (add|remove)All methods are convenient to install/remove new beans and synchronize their state changes
+  // between them
+  // - setBeanState method should be renamed and moved to the AbstractLifecycle and ILifecycle
 }

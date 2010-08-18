@@ -155,14 +155,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// find serviceMatcherBean and ontologystorage
-		for (IAgentNodeBean ianb : this.agentNode.getAgentNodeBeans()) {
-			if (ianb instanceof IServiceMatcher) {
-				this.serviceMatcher = (IServiceMatcher) ianb;
-
-			} else if (ianb instanceof IOntologyStorage) {
-				this.ontologyStorage = (IOntologyStorage) ianb;
-			}
-		}
+		this.serviceMatcher = this.agentNode.findAgentNodeBean(IServiceMatcher.class);
+		this.ontologyStorage = this.agentNode.findAgentNodeBean(IOntologyStorage.class);
 
 		if (this.serviceMatcher != null) {
 			log.info("Found a ServiceMatcher for this agentnode");

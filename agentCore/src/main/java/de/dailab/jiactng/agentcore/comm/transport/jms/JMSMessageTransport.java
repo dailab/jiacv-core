@@ -63,7 +63,7 @@ public class JMSMessageTransport extends MessageTransport {
     * @see JMSReceiver#JMSReceiver(ConnectionFactory, JMSMessageTransport, org.apache.commons.logging.Log)
     */
    @Override
-   public synchronized void doInit() throws Exception {
+   public void doInit() throws Exception {
 
       if (this.log == null) {
          throw new Exception("logging was not set!");
@@ -92,7 +92,7 @@ public class JMSMessageTransport extends MessageTransport {
     * cleans up the JMSMessageTransports and the classes it holds
     */
    @Override
-   public synchronized void doCleanup() {
+   public void doCleanup() {
       if (this.log.isDebugEnabled()) {
          this.log.debug("JMSMessageTransport commences Cleanup");
       }

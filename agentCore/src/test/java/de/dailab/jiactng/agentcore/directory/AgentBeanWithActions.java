@@ -12,10 +12,10 @@ public class AgentBeanWithActions extends AbstractMethodExposingBean {
 
 	@Expose(scope=ActionScope.GLOBAL)
 	public String mirror(String s) {
-		String tmp = new String();
+		StringBuffer tmp = new StringBuffer();
 		for (int i = s.length() - 1; i >= 0; i--) {
-			tmp += s.charAt(i);
+			tmp.append(s.charAt(i));
 		}
-		return tmp;
+		return tmp.toString();
 	}
 }

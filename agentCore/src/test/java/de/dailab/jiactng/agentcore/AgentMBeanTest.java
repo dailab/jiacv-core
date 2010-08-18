@@ -236,7 +236,7 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	public void testGetAutoExecutionType() {
 		try {
 			Boolean type = (Boolean) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "AutoExecutionType");
-			assertEquals("AgentMBean.getAutoExecutionType is wrong", new Boolean(false), type);
+			assertEquals("AgentMBean.getAutoExecutionType is wrong", Boolean.FALSE, type);
 		} catch (Exception e) {
 			fail("Error while getting type of automatic executed services of the agent");
 		}

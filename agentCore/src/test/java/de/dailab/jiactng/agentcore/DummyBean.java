@@ -3,7 +3,6 @@
  */
 package de.dailab.jiactng.agentcore;
 
-
 /**
  * The HelloWorldBean. Simply prints Hello World and quits the agent afterwards.
  * 
@@ -47,11 +46,15 @@ public class DummyBean extends AbstractAgentBean {
   }
 
   public String getTest() {
-    return test;
+    synchronized (this) {
+      return test;
+    }
   }
 
   public void setTest(String test) {
-    this.test = test;
+    synchronized (this) {
+      this.test = test;
+    }
   }
 
   public void setMode(Modes newMode) {
@@ -61,7 +64,9 @@ public class DummyBean extends AbstractAgentBean {
   }
 
   public Modes getMode() {
-    return this.mode;
+    synchronized (this) {
+      return this.mode;
+    }
   }
 
 }

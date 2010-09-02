@@ -566,7 +566,6 @@
       <module>basicServices</module>
       <module>examples</module>
       <module>tools</module>
-	  <module>jadlDeployment</module>
   </modules>
   
   <profiles>

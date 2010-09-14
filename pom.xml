@@ -560,7 +560,7 @@
       <module>agentCoreAPI</module>
       <module>gateway</module>
       <module>agentCore</module>
-      <module>jiacSecurity</module>
+      <!-- module>jiacSecurity</module-->
       <module>bdiAgent</module>
       <module>ruleEngine</module>
       <module>basicServices</module>

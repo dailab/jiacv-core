@@ -70,7 +70,7 @@ public class ActionPerformedNotification extends Notification {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		actionName = action.getAction().getName();
 		if(((IActionDescription)action.getAction()).getProviderBean() == null) {
-		  System.err.println("\n-- "+((IActionDescription)action.getAction()).getName()+" / "+((IActionDescription)action.getAction()).getProviderBean() + " / " + state);
+//		  System.err.println("\n-- "+((IActionDescription)action.getAction()).getName()+" / "+((IActionDescription)action.getAction()).getProviderBean() + " / " + state);
 		  agentbeanName = "null";
 		} else {
 		  agentbeanName = ((IActionDescription)action.getAction()).getProviderBean().getBeanName();

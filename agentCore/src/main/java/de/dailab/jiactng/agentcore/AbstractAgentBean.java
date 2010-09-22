@@ -120,10 +120,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
       beanName = name;
     }
 
-    // update logger
-    if (thisAgent != null) {
-      setLog(thisAgent.getLog(this));
-    }
   }
 
   /**
@@ -140,9 +136,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   @Override
   public void doInit() throws Exception {
-    if (log == null) {
-      setLog(thisAgent.getLog(this));
-    }
   }
 
   /**

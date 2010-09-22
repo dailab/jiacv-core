@@ -172,16 +172,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       throw new IllegalArgumentException("Cannot set agentlist to null! Use remove if you want to delete the list.");
     }
 
-    // owner of agent node is also owner of the initially created agents
-    final String owner = getOwner();
     for (IAgent agent : newAgents) {
       if (agent == null) {
         log.warn("Found null-entry in agentlist for setAgents. This entry is ignored.");
         continue;
       }
-      if (agent.getOwner() == null) {
-        agent.setOwner(owner);
-      }
+
       if (directory != null) {
         agent.addLifecycleListener(directory);
       }
@@ -532,7 +528,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     // set references for all agents
     addLifecycleListener(this);
     synchronized (agents) {
+      // owner of agent node is also owner of the initially created agents
+      final String owner = getOwner();
+
       for (IAgent a : agents) {
+        if (a.getOwner() == null) {
+          a.setOwner(owner);
+        }
         a.setAgentNode(this);
         a.addLifecycleListener(this.lifecycle.createLifecycleListener());
       }
@@ -540,7 +542,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
     synchronized (agentNodeBeans) {
       for (IAgentNodeBean nodeBean : agentNodeBeans) {
-        nodeBean.setAgentNode(this);
         nodeBean.addLifecycleListener(this.lifecycle.createLifecycleListener());
       }
     }
@@ -826,7 +827,11 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    */
   public final void setAgentNodeBeans(List<IAgentNodeBean> agentnodebeans) {
     this.agentNodeBeans.clear();
-    this.agentNodeBeans.addAll(agentnodebeans);
+    
+    for(IAgentNodeBean anb : agentnodebeans) {
+      this.agentNodeBeans.add(anb);
+      anb.setAgentNode(this);
+    }
   }
 
   /**

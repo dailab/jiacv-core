@@ -46,7 +46,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
     /**
      * Deregisters the node bean and all its resources from management
      */
-    public void disableManagement() {
+    public final void disableManagement() {
         // do nothing if management already disabled
         if (!isManagementEnabled()) {
             return;
@@ -70,7 +70,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
      * @param manager
      *            the manager responsible for this agentbean.
      */
-    public void enableManagement(Manager manager) {
+    public final void enableManagement(Manager manager) {
         // do nothing if management already enabled
         if (isManagementEnabled()) {
             return;

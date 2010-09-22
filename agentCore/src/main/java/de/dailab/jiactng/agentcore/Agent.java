@@ -210,7 +210,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
     // change memory
     memory = newMemory;
-    newMemory.setThisAgent(this);
 
     // enable management of new memory
     if (isManagementEnabled() && (memory != null)) {
@@ -243,7 +242,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     // set references for all new agent beans and
     // enable management of all new agent beans
     for (IAgentBean ab : this.agentBeans) {
-      ab.setThisAgent(this);
       if (isManagementEnabled()) {
         ab.enableManagement(_manager);
       }
@@ -728,7 +726,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
     // change execution cycle
     execution = newExecution;
-    execution.setThisAgent(this);
 
     // enable management of new execution cycle
     if (isManagementEnabled() && (execution != null)) {
@@ -759,6 +756,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
     // update logger
     setLog(agentNode.getLog(this));
+    this.memory.setThisAgent(this);
+    this.execution.setThisAgent(this);
+    for(IAgentBean iab : this.agentBeans) {
+      iab.setThisAgent(this);
+    }
   }
 
   /**

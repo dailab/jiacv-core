@@ -51,7 +51,7 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 	 * @see de.dailab.jiactng.agentcore.execution.IExecutionCycle#run()
 	 * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
 	 */
-	public void run() {
+	public final void run() {
 		// cancel and remove futures which has reached timeout
 		final long now = System.currentTimeMillis();
 		while (!futures.isEmpty() && (futures.firstKey().longValue() < now)) {

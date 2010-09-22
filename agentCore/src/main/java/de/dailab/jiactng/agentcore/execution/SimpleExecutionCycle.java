@@ -52,7 +52,7 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
    * @see de.dailab.jiactng.agentcore.execution.IExecutionCycle#run()
    * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
    */
-  public void run() {
+  public final void run() {
     // check if lifecycle has been started --> execute if STARTED
     if (getState() == LifecycleStates.STARTED) {
       // execute the ripest bean

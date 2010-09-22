@@ -80,7 +80,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * previous states (depending on mode) or an error occurs during change of 
      * the state.
      */
-    public void init() throws LifecycleException {
+    public final void init() throws LifecycleException {
         try {
         	lifecycle.beforeInit();
         }
@@ -121,7 +121,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * previous states (depending on mode) or an error occurs during change of 
      * the state.
      */
-    public void start() throws LifecycleException {
+    public final void start() throws LifecycleException {
         try {
         	lifecycle.beforeStart();
         }
@@ -160,7 +160,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * previous states (depending on mode) or an error occurs during change of 
      * the state.
      */
-    public void stop() throws LifecycleException {
+    public final void stop() throws LifecycleException {
         try {
         	lifecycle.beforeStop();
         }
@@ -202,7 +202,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * previous states (depending on mode) or an error occurs during change of 
      * the state.
      */
-    public void cleanup() throws LifecycleException {
+    public final void cleanup() throws LifecycleException {
         try {
         	lifecycle.beforeCleanup();
         }
@@ -240,7 +240,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * Registers the supplied <code>ILifecycleListener</code>.
      * @param listener the lifecycle listener.
      */
-    public void addLifecycleListener(ILifecycleListener listener) {
+    public final void addLifecycleListener(ILifecycleListener listener) {
         
         lifecycle.addLifecycleListener(listener);
         
@@ -250,7 +250,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * Unregisters the supplied <code>ILifecycleListener</code>.
      * @param listener the lifecycle listener.
      */
-    public void removeLifecycleListener(ILifecycleListener listener) {
+    public final void removeLifecycleListener(ILifecycleListener listener) {
         
         lifecycle.removeLifecycleListener(listener);
         
@@ -261,7 +261,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      *
      * @return the current lifecycle state.
      */
-    public LifecycleStates getState() {
+    public final LifecycleStates getState() {
         
         return lifecycle.getState();
         
@@ -270,7 +270,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
     /**
 	 * {@inheritDoc}
 	 */
-    public String getLifecycleState() {
+    public final String getLifecycleState() {
         return getState().toString();
     }
     
@@ -289,7 +289,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
      * @param oldState the old state of the lifecycle
      * @param newState the new state of the lifecycle
      */
-    public void stateChanged(LifecycleStates oldState, LifecycleStates newState) {
+    public final void stateChanged(LifecycleStates oldState, LifecycleStates newState) {
         final Notification n =
                 new AttributeChangeNotification(this,
                 sequenceNumber++,
@@ -323,7 +323,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getLogLevel() {
+	public final String getLogLevel() {
 		if (log != null && (log instanceof Log4JLogger)) {
 			logLevel = ((Log4JLogger)log).getLogger().getEffectiveLevel().toString();
 		}
@@ -333,7 +333,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	/**
 	 * {@inheritDoc}
 	 */
-	public void setLogLevel(String level) {
+	public final void setLogLevel(String level) {
 		logLevel = level;
 		if (log != null && (log instanceof Log4JLogger)) {
 			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
@@ -345,7 +345,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 * of this logger if it was preassigned with method <code>setLogLevel</code>.
 	 * @param newLog The logger instance.
 	 */
-	protected void setLog(Log newLog) {
+	protected final void setLog(Log newLog) {
 		log = newLog;
 		if ((log != null) && (logLevel != null) && (log instanceof Log4JLogger)) {
 			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
@@ -355,7 +355,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	/**
 	 * {@inheritDoc}
 	 */
-	public CompositeData getLogger() {
+	public final CompositeData getLogger() {
 		if (log == null) {
 			return null;
 		}
@@ -396,7 +396,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 * 
 	 * @return <code>true</code> if the management is enabled, otherwise <code>false</code>
 	 */
-	public boolean isManagementEnabled() {
+	public final boolean isManagementEnabled() {
 		return _manager != null;
 	}
 

@@ -368,14 +368,14 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
   /**
    * {@inheritDoc}
    */
-  public void setAutoExecutionServices(List<String> actionIds) {
+  public final void setAutoExecutionServices(List<String> actionIds) {
     autoExecutionServices = actionIds;
   }
 
   /**
    * {@inheritDoc}
    */
-  public List<String> getAutoExecutionServices() {
+  public final List<String> getAutoExecutionServices() {
     return autoExecutionServices;
 
   }
@@ -383,14 +383,14 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
   /**
    * {@inheritDoc}
    */
-  public void setAutoExecutionType(boolean continous) {
+  public final void setAutoExecutionType(boolean continous) {
     continousAutoExecution = continous;
   }
 
   /**
    * {@inheritDoc}
    */
-  public boolean getAutoExecutionType() {
+  public final boolean getAutoExecutionType() {
     return continousAutoExecution;
   }
 
@@ -398,7 +398,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    * Check if a remote executor is used.
    * @return remote executor is used or not
    */
-  public boolean isUseRemoteExecutor() {
+  public final boolean isUseRemoteExecutor() {
     return useRemoteExecutor;
   }
 
@@ -406,7 +406,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    * Set that a remote executor will be used or not.
    * @param newUseRemoteExecutor <code>true</code> if a remote executor will be used
    */
-  public void setUseRemoteExecutor(boolean newUseRemoteExecutor) {
+  public final void setUseRemoteExecutor(boolean newUseRemoteExecutor) {
     useRemoteExecutor = newUseRemoteExecutor;
   }
 

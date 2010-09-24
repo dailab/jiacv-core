@@ -257,6 +257,17 @@
           </faq>
           
     </part>
+    <part id="communication">
+        <title>Communication</title>
+        <faq id="network-interface">
+            <question>Why sending messages fails?</question>
+            <answer><p>
+                ActiveMQ needs an active network interface (Ethernet, WLAN, etc.) to send messages also between
+                local agent nodes. If such a network interface is not available, you should add a default route
+                by invoking the commands "route add default lo" and "ifconfig lo multicast" on the console.</p>
+            </answer>
+        </faq>
+    </part>
     <part id="management">
         <title>Monitoring and Control</title>
         <faq id="how-manage">

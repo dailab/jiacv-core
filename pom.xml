@@ -445,7 +445,7 @@
       <repository>
          <id>dai-releases</id>
          <name>DAI Maven 2 Releases Repository</name>
-         <url>http://repositories.dai-lab.de/nexus/content/repositories/dai-releases/</url>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
          <snapshots>
             <enabled>false</enabled>
          </snapshots>
@@ -481,7 +481,7 @@
       <pluginRepository>
          <id>dai-releases</id>
          <name>DAI Maven 2 Releases Repository</name>
-         <url>http://repositories.dai-lab.de/nexus/content/repositories/dai-releases/</url>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
          <snapshots>
             <enabled>false</enabled>
          </snapshots>
@@ -510,12 +510,12 @@
       <repository>
          <id>dai-releases</id>
          <name>dai-releases</name>
-         <url>http://repositories.dai-lab.de/nexus/content/repositories/dai-releases/</url>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
       </repository>
       <snapshotRepository>
          <id>dai-snapshots</id>
          <name>dai-snapshots</name>
-         <url>http://repositories.dai-lab.de/nexus/content/repositories/dai-snapshots/</url>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url>
       </snapshotRepository>
    </distributionManagement>
 

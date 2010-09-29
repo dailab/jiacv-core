@@ -3,7 +3,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>de.dailab</groupId>
    <artifactId>jiactng</artifactId>
-   <version>5.1.0</version>
+   <version>5.1.1-SNAPSHOT</version>
    <packaging>pom</packaging>
 
    <name>Java-based Intelligent Agent Componentware TNG</name>
@@ -300,7 +300,7 @@
                <dependency>
                   <groupId>de.dailab.jiactng</groupId>
                   <artifactId>agentCoreAPI</artifactId>
-                  <version>5.1.0-SNAPSHOT</version>
+                  <version>5.1.1-SNAPSHOT</version>
                </dependency>
             </dependencies>
             <configuration>

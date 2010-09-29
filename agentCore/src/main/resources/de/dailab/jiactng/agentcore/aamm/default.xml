@@ -1,6 +1,6 @@
 <configuration xmlns="http://www.jiac.de/AAMM/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.jiac.de/AAMM/1.0 http://www.jiac.de/xsd/aamm-1.0.xsd"
-	framework="JIAC TNG">
+	framework="JIAC V">
     <!--
        # The default Node configuration
        # provides an empty platform definition without JMX and directory support.

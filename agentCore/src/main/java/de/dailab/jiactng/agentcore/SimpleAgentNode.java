@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,6 +41,7 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
+import de.dailab.jiactng.agentcore.management.jmx.JmxConnector;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
@@ -80,7 +80,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
   private HashMap<String, Future<?>>      agentFutures          = null;
 
   /** Configuration of a set of JMX connector server. */
-  private Set<Map<String, Object>>        jmxConnectors         = null;
+  private Set<JmxConnector>        jmxConnectors         = null;
 
   /** Optional: IDirectory that manages white and yellow pages. */
   private IDirectory                      directory             = null;
@@ -151,7 +151,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    * @param newJmxConnectors
    *          the set of connectors.
    */
-  public final void setJmxConnectors(Set<Map<String, Object>> newJmxConnectors) {
+  public final void setJmxConnectors(Set<JmxConnector> newJmxConnectors) {
     jmxConnectors = newJmxConnectors;
   }
 
@@ -160,7 +160,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    * 
    * @return the set of connectors.
    */
-  public final Set<Map<String, Object>> getJmxConnectors() {
+  public final Set<JmxConnector> getJmxConnectors() {
     return jmxConnectors;
   }
 

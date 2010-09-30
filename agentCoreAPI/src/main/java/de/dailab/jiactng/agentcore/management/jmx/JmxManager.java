@@ -736,38 +736,38 @@ public final class JmxManager implements Manager {
 	 * @see JmxMulticastSender
 	 */
 	public Set<JMXServiceURL> enableRemoteManagement(IAgentNode node) {
-		final Set<Map<String,Object>> jmxConnectors = node.getJmxConnectors();
+		final Set<JmxConnector> jmxConnectors = node.getJmxConnectors();
 		if (!jmxConnectors.isEmpty()) {
 			System.setProperty("com.sun.management.jmxremote", "");
 		}
 		// Create and register all specified JMX connector servers
-		for (Map<String,Object> conf : jmxConnectors) {
+		for (JmxConnector conf : jmxConnectors) {
 			// get parameters of connector server
-			final String protocol = (String) conf.get("protocol");
+			final String protocol = conf.getProtocol();
 			if (protocol == null) {
 				System.out.println("WARNING: No protocol specified for a JMX connector server");
 				continue;
 			}
-			final String portStr = (String) conf.get("port");
-			int port = 0;
-			if (portStr != null) {
-				try {
-					port = Integer.parseInt(portStr);
-				} catch (Exception e) {
-					System.err.println("Port " + portStr + " of the JMX connector server for protocol " + protocol + " is not an integer. Will use 0 instead.");
-					System.err.println(e.getMessage());
-				}
-			}
-			String path = (String) conf.get("path");
-			final JMXAuthenticator authenticator = (JMXAuthenticator) conf.get("authenticator");
+//			final String portStr = (String) conf.get("port");
+			int port = conf.getPort();
+//			if (portStr != null) {
+//				try {
+//					port = Integer.parseInt(portStr);
+//				} catch (Exception e) {
+//					System.err.println("Port " + portStr + " of the JMX connector server for protocol " + protocol + " is not an integer. Will use 0 instead.");
+//					System.err.println(e.getMessage());
+//				}
+//			}
+			String path = conf.getPath();
+			final JMXAuthenticator authenticator = conf.getAuthenticator();
 
 			if (protocol.equals("rmi")) {
 				// check use of RMI registry
-				final String registryPort = (String) conf.get("registryPort");
-				final String registryHost = (String) conf.get("registryHost");
-				if ((registryPort != null) || (registryHost != null)) {
+				final int registryPort = ((RmiJmxConnector) conf).getRegistryPort();
+				final String registryHost = ((RmiJmxConnector) conf).getRegistryHost();
+				if ((registryPort > 0) || (registryHost != null)) {
 					path = "/jndi/rmi://" + ((registryHost == null) ? "localhost" : registryHost)
-																									+ ((registryPort == null) ? "" : ":" + registryPort) + "/" + node.getUUID();
+																									+ ((registryPort > 0) ? "" : ":" + registryPort) + "/" + node.getUUID();
 				}
 			}
 

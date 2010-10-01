@@ -41,8 +41,8 @@
 		<dependency>
 			<groupId>de.dailab.jiac.common</groupId>
 			<artifactId>aamm-spring</artifactId>
-			<version>0.4-SNAPSHOT</version>
-			<scope>test</scope>
+			<version>0.0.4-SNAPSHOT</version>
+			<optional>true</optional>
 		</dependency>
 		
 		<!-- only necessary for JMX-Webservice connector, will only be needed in Projects -->

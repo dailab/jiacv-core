@@ -63,5 +63,15 @@ public class PasswordFileAuthenticator implements JMXAuthenticator {
 		passwords = new Properties();
 		passwords.load(new FileReader(filename));
 	}
+	
+	/**
+	 * Setter for a resource name of a class path relative password file.
+	 * @param resource  class path relative resource name.
+	 * @throws IOException
+	 */
+	public void setPasswordResource(String resource) throws IOException {
+	    passwords= new Properties();
+	    passwords.load(getClass().getClassLoader().getResourceAsStream(resource));
+	}
 
 }

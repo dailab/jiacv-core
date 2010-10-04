@@ -3,27 +3,97 @@
  */
 package de.dailab.jiactng.agentcore.management.jmx;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Set;
+
+import javax.management.ObjectInstance;
 
 import junit.framework.TestCase;
+import de.dailab.jiactng.aamm.ApplicationContext;
+import de.dailab.jiactng.agentcore.IAgentNode;
 
 /**
  * @author Marcel Patzlaff
  * @version $Revision$
  */
 public class JmxRemoteTest extends TestCase {
-    private Process _clientProcess= null;
+    private class StreamPumper extends Thread {
+        private final BufferedReader _reader;
+        private final String _prefix;
+        private final boolean _fail;
+        
+        StreamPumper(InputStream in, String prefix, boolean fail) {
+            _reader= new BufferedReader(new InputStreamReader(in), 1024);
+            _prefix= prefix;
+            _fail= fail;
+        }
+
+        @Override
+        public void run() {
+            boolean read= false;
+            try {
+                String s;
+                
+                while((s= _reader.readLine()) != null) {
+                    if(s.length() > 0) {
+                        read= true;
+                    }
+                    System.out.println(_prefix + ": " + s);
+                }
+            } catch (Throwable t) {
+                // ignore
+            } finally {
+                try {_reader.close();} catch (IOException e) {}
+            }
+            
+            if(read && _fail) {
+                fail("client failed");
+            }
+        }
+    }
     
-    @Override
-    protected void setUp() throws Exception {
+    
+    public void testJmxRemote() throws Exception {
+        // launch node
+        ApplicationContext ac= new ApplicationContext("de.dailab.jiactng.agentcore.management.jmx.jmxremote");
+        
+        final IAgentNode node= (IAgentNode) ac.getBean("NodeWithRemoteJMX");
+        StartListener listener= new StartListener(node);
+        node.addLifecycleListener(listener);
+        
+        assertTrue("node did not start properly", listener.ensureStarted(2000L));
+        
+        Set<ObjectInstance> mbeans= ManagementFactory.getPlatformMBeanServer().queryMBeans(
+            new JmxManager().getMgmtNameOfAgentNodeResource("*", "JMXConnectorServer", "*"),
+            null
+        );
+        assertEquals("invalid number of connectors", 1, mbeans.size());
+        
+        // now we have OUR service url
+        ObjectInstance theOne= mbeans.iterator().next();
+        String serviceUrl= theOne.getObjectName().getKeyProperty("resource").replace("\"", "");
+        
+        Process clientProcess= createClientProcess(JmxClient.class, serviceUrl);
+        
+        new StreamPumper(clientProcess.getInputStream(), "JmxClient.STDOUT", false).start();
+        new StreamPumper(clientProcess.getErrorStream(), "JmxClient.STDERR", true).start();
+        
+        clientProcess.waitFor();
+    }
+    
+    private Process createClientProcess(Class<?> mainClass, String... mainArgs) throws Exception {
         URL[] urls= null;
         
         // do we have a URL class loader?
         try {
-            ClassLoader loader= JmxClient.class.getClassLoader();
+            ClassLoader loader= mainClass.getClassLoader();
             
             if(loader instanceof URLClassLoader) {
                 urls= ((URLClassLoader) loader).getURLs();
@@ -35,7 +105,7 @@ public class JmxRemoteTest extends TestCase {
         if(urls == null) {
             // get code location for test class only
             try {
-                URL url= JmxClient.class.getProtectionDomain().getCodeSource().getLocation();
+                URL url= mainClass.getProtectionDomain().getCodeSource().getLocation();
                 if(url != null) {
                     urls= new URL[] {url};
                 }
@@ -69,30 +139,14 @@ public class JmxRemoteTest extends TestCase {
         }
         
         // build command line
-        String[] cmdL= new String[] {
-            "java",
-            "-classpath",
-            builder.toString(),
-            JmxClient.class.getName()
-        };
+        String[] cmdL= new String[4 + mainArgs.length];
+        cmdL[0]= "java";
+        cmdL[1]= "-classpath";
+        cmdL[2]= builder.toString();
+        cmdL[3]= mainClass.getName();
+        System.arraycopy(mainArgs, 0, cmdL, 4, mainArgs.length);
         
         // create client process
-        _clientProcess= Runtime.getRuntime().exec(cmdL);
-    }
-    
-    public void testJmxRemote() throws Exception {
-        InputStream in= _clientProcess.getInputStream();
-        for(int ch; (ch= in.read()) > 0;) {
-            System.out.print((char) ch);
-        }
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        if(_clientProcess != null) {
-            _clientProcess.destroy();
-        }
-        
-        _clientProcess= null;
+        return Runtime.getRuntime().exec(cmdL);
     }
 }

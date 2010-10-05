@@ -59,8 +59,8 @@ public class JMSMessageTransport extends MessageTransport {
     * 
     * @throws Exception
     *            if no logger or connection factory is set, or if the creation of the JMS sender or receiver failed.
-    * @see {@link JMSSender#JMSSender(ConnectionFactory, org.apache.commons.logging.Log)}
-    * @see JMSReceiver#JMSReceiver(ConnectionFactory, JMSMessageTransport, org.apache.commons.logging.Log)
+    * @see JMSSender#JMSSender(Connection, org.apache.commons.logging.Log)
+    * @see JMSReceiver#JMSReceiver(Connection, JMSMessageTransport, org.apache.commons.logging.Log)
     */
    @Override
    public void doInit() throws Exception {

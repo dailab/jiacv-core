@@ -337,8 +337,8 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * @param address the communication address of the message receiver
      * @throws CommunicationException if the message can not be send
      * @throws IllegalArgumentException if one of the parameters is <code>null</code>
-     * @see MessageTransport#send(IJiacMessage, ICommunicationAddress)
-     * @see #messageExchanged(MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
+     * @see MessageTransport#send(IJiacMessage, ICommunicationAddress, long)
+     * @see #messageExchanged(MessageExchangeNotification.MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
      */
     public synchronized void send(IJiacMessage message, ICommunicationAddress address) throws CommunicationException {
     	send(message, address, 0);
@@ -352,8 +352,8 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * @param timeToLive the time-to-live of the message in milliseconds or 0 for using timeout specified by the message transport
      * @throws CommunicationException if the message can not be send
      * @throws IllegalArgumentException if one of the parameters is <code>null</code>
-     * @see MessageTransport#send(IJiacMessage, ICommunicationAddress)
-     * @see #messageExchanged(MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
+     * @see MessageTransport#send(IJiacMessage, ICommunicationAddress, long)
+     * @see #messageExchanged(MessageExchangeNotification.MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
      */
     public synchronized void send(IJiacMessage message, ICommunicationAddress address, long timeToLive) throws CommunicationException {
         if (message == null) {
@@ -428,7 +428,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * @param source the message transport which has received the message
      * @param message the received message
      * @param at the communication address where the message was sent to
-     * @see #messageExchanged(MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
+     * @see #messageExchanged(MessageExchangeNotification.MessageExchangeAction, ICommunicationAddress, IJiacMessage, String)
      * @see de.dailab.jiactng.agentcore.knowledge.Memory#write(de.dailab.jiactng.agentcore.knowledge.IFact)
      */
     protected void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {

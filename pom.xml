@@ -20,6 +20,10 @@
       <maven>2.0.3</maven>
    </prerequisites>
 
+   <properties>
+		 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	 </properties>
+
    <developers>
       <developer>
          <id>axle</id>

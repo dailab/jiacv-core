@@ -13,8 +13,11 @@ import de.dailab.jiactng.agentcore.action.ActionResult;
  * an agent. These actions include local actions for the agent as well as
  * services.
  * 
+ * @see ActionResult
+ * @see de.dailab.jiactng.agentcore.ontology.IActionDescription
+ * @see de.dailab.jiactng.agentcore.action.DoAction
+ *
  * @author Thomas Konnerth
- * @see de.dailab.jiactng.agentcore.action.Action
  */
 public interface ResultReceiver { 
 

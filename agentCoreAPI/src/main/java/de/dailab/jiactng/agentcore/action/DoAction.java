@@ -9,13 +9,12 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * Used to submit an action for execution. An agent will check its memory
- * periodically for DoAction-objects, an it will call the approriate component
+ * periodically for DoAction-objects, an it will call the appropriate component
  * if such an object is encountered. Note that this class is also a subclass of
  * Session to make sure executed actions can be identified and tracked.
  * 
- * @see de.dailab.jiactng.agentcore.action.Action
- * @see de.dailab.jiactng.agentcore.action.Session
- * @see de.dailab.jiactng.agentcore.environment.IEffector
+ * @see IActionDescription
+ * @see Session
  * @author Thomas Konnerth
  * 
  */

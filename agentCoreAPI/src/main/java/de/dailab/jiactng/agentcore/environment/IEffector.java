@@ -14,12 +14,15 @@ import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
- * This interfaces describes the way how components can register actions within
+ * This interfaces describes the way how agentbeans can register actions within
  * an agent. These actions include local actions for the agent as well as
  * services.
- * 
- * @author Thomas Konnerth
- * @see de.dailab.jiactng.agentcore.action.Action
+ *
+ * @see IActionDescription
+ * @see DoAction
+ * @see IAgentBean
+ *
+ * @author Thomas Konnerth 
  */
 public interface IEffector extends IAgentBean {
 
@@ -29,7 +32,7 @@ public interface IEffector extends IAgentBean {
 	 * action-objects are written to the memory where they are available for all
 	 * components.
 	 * 
-	 * @see de.dailab.jiactng.agentcore.action.Action
+	 * @see IActionDescription
 	 * @return A List containing all actions from this component.
 	 */
 	List<? extends IActionDescription> getActions();
@@ -40,7 +43,7 @@ public interface IEffector extends IAgentBean {
 	 * that this action is called automatically by the agents kernel, whenever
 	 * an action registered by this component should be executed.
 	 * 
-	 * @see de.dailab.jiactng.agentcore.action.DoAction
+	 * @see DoAction
 	 * @param doAction
 	 *            the action-invocation that describes the action to be executed
 	 *            as well as its parameters.

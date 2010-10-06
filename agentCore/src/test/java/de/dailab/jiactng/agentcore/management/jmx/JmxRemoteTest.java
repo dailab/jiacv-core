@@ -8,12 +8,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Set;
 
-import javax.management.ObjectInstance;
+import javax.management.remote.JMXServiceURL;
 
 import junit.framework.TestCase;
 import de.dailab.jiactng.aamm.ApplicationContext;
@@ -28,7 +27,7 @@ public class JmxRemoteTest extends TestCase {
         private final BufferedReader _reader;
         private final String _prefix;
         private final boolean _fail;
-        
+
         StreamPumper(InputStream in, String prefix, boolean fail) {
             _reader= new BufferedReader(new InputStreamReader(in), 1024);
             _prefix= prefix;
@@ -40,7 +39,7 @@ public class JmxRemoteTest extends TestCase {
             boolean read= false;
             try {
                 String s;
-                
+
                 while((s= _reader.readLine()) != null) {
                     if(s.length() > 0) {
                         read= true;
@@ -52,56 +51,52 @@ public class JmxRemoteTest extends TestCase {
             } finally {
                 try {_reader.close();} catch (IOException e) {}
             }
-            
+
             if(read && _fail) {
                 fail("client failed");
             }
         }
     }
-    
-    
+
+
     public void testJmxRemote() throws Exception {
         // launch node
         ApplicationContext ac= new ApplicationContext("de.dailab.jiactng.agentcore.management.jmx.jmxremote");
-        
+
         final IAgentNode node= (IAgentNode) ac.getBean("NodeWithRemoteJMX");
         StartListener listener= new StartListener(node);
         node.addLifecycleListener(listener);
-        
+
         assertTrue("node did not start properly", listener.ensureStarted(2000L));
-        
-        Set<ObjectInstance> mbeans= ManagementFactory.getPlatformMBeanServer().queryMBeans(
-            new JmxManager().getMgmtNameOfAgentNodeResource("*", "JMXConnectorServer", "*"),
-            null
-        );
-        assertEquals("invalid number of connectors", 1, mbeans.size());
-        
+
+        Set<JMXServiceURL> jmxURLs = node.getJmxURLs();
+        assertEquals("invalid number of connectors", 1, jmxURLs.size());
+
         // now we have OUR service url
-        ObjectInstance theOne= mbeans.iterator().next();
-        String serviceUrl= theOne.getObjectName().getKeyProperty("resource").replace("\"", "");
-        
+        String serviceUrl= jmxURLs.iterator().next().toString();
+
         Process clientProcess= createClientProcess(JmxClient.class, serviceUrl);
-        
+
         new StreamPumper(clientProcess.getInputStream(), "JmxClient.STDOUT", false).start();
         new StreamPumper(clientProcess.getErrorStream(), "JmxClient.STDERR", true).start();
-        
+
         clientProcess.waitFor();
     }
-    
+
     private Process createClientProcess(Class<?> mainClass, String... mainArgs) throws Exception {
         URL[] urls= null;
-        
+
         // do we have a URL class loader?
         try {
             ClassLoader loader= mainClass.getClassLoader();
-            
+
             if(loader instanceof URLClassLoader) {
                 urls= ((URLClassLoader) loader).getURLs();
             }
         } catch (Exception e) {
             System.out.println("could not loader urls: " + e.getMessage());
         }
-        
+
         if(urls == null) {
             // get code location for test class only
             try {
@@ -115,7 +110,7 @@ public class JmxRemoteTest extends TestCase {
         }
 
         assertNotNull("could not resolve any code location", urls);
-        
+
         // build class path for client process
         StringBuilder builder= new StringBuilder();
         for(int i= 0; i < urls.length; ++i) {
@@ -123,11 +118,11 @@ public class JmxRemoteTest extends TestCase {
             try {
                 File file= new File(url.toURI());
                 String path= file.getAbsolutePath();
-                
+
                 if(builder.length() > 0) {
                     builder.append(File.pathSeparatorChar);
                 }
-                
+
                 if(path.indexOf(' ') > 0) {
                     builder.append('"').append(path).append('"');
                 } else {
@@ -137,7 +132,7 @@ public class JmxRemoteTest extends TestCase {
                 System.err.println("have to leave out: "+ urls);
             }
         }
-        
+
         // build command line
         String[] cmdL= new String[4 + mainArgs.length];
         cmdL[0]= "java";
@@ -145,7 +140,7 @@ public class JmxRemoteTest extends TestCase {
         cmdL[2]= builder.toString();
         cmdL[3]= mainClass.getName();
         System.arraycopy(mainArgs, 0, cmdL, 4, mainArgs.length);
-        
+
         // create client process
         return Runtime.getRuntime().exec(cmdL);
     }

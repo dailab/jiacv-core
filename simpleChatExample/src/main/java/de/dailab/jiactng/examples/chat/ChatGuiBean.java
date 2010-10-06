@@ -151,8 +151,7 @@ public class ChatGuiBean extends AbstractAgentBean implements SpaceObserver<IFac
 	 * Entrypoint for messages coming from the CommunicationBean through the tuplespace.
 	 * Here all messages will get processed.
 	 * 
-	 *  @param message an IJiacMessage received from the communicationAddress
-	 *  @param at the ICommunicationAddress the messages was sent to
+	 *  @param event an IJiacMessage received from the communicationAddress at the ICommunicationAddress the messages was sent to
 	 *  
 	 */
 	@SuppressWarnings("unchecked")

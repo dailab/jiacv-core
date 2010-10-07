@@ -200,6 +200,23 @@ public class JmxManagementClient {
 	}
 
 	/**
+	 * Gets the UUID of the agent node which provides a JMX connector server with the given URL.
+	 * @param url The URL of the JMX connector server.
+	 * @return The UUID of the agent node or <code>null</code> if no JMX connector server with the given URL is registered.
+	 * @throws IOException A communication problem occurred when searching for agent nodes.
+	 * @throws MalformedObjectNameException if the URL contains an illegal character or does not follow the rules for quoting.
+	 * @throws SecurityException if the agent node query cannot be made for security reasons.
+	 * @see MBeanServerConnection#queryNames(ObjectName, javax.management.QueryExp)
+	 */
+	public final String getAgentNodeUUID(JMXServiceURL url) throws IOException, MalformedObjectNameException {
+		final Set<ObjectName> connectorServers = mbsc.queryNames(new JmxManager().getMgmtNameOfAgentNodeResource("*", "JMXConnectorServer", "\"" + url + "\""), null);
+		if (connectorServers.isEmpty()) {
+			return null;
+		}
+		return connectorServers.iterator().next().getKeyProperty("agentnode");
+	}
+
+	/**
 	 * Gets a client for the management of an agent node within the managed JVM.
 	 * @param agentNodeID The UUID of the agent node.
 	 * @return A management client for the agent node.

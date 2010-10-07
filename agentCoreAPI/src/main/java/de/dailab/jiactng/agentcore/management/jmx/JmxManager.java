@@ -1,8 +1,13 @@
 package de.dailab.jiactng.agentcore.management.jmx;
 
 import java.lang.management.ManagementFactory;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -736,10 +741,38 @@ public final class JmxManager implements Manager {
 	 * @see JmxMulticastSender
 	 */
 	public Set<JMXServiceURL> enableRemoteManagement(IAgentNode node) {
+		String host = null;
 		final Set<JmxConnector> jmxConnectors = node.getJmxConnectors();
 		if (!jmxConnectors.isEmpty()) {
 			System.setProperty("com.sun.management.jmxremote", "");
+
+			// identify hostname to be used by the connector servers
+			try {
+				Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+				while (interfaces.hasMoreElements()) {
+					NetworkInterface ifc = interfaces.nextElement();
+					if (ifc.isLoopback() || !ifc.isUp()) {
+						continue;
+					}
+					Enumeration<InetAddress> addresses = ifc.getInetAddresses();
+					while (addresses.hasMoreElements()) {
+						InetAddress address = addresses.nextElement();
+						if ((address instanceof Inet4Address) && !address.getHostName().endsWith(".local")) {
+							host = address.getHostName();
+							System.setProperty("java.rmi.server.hostname", host);
+							break;
+						}
+					}
+				}
+				if (host == null) {
+					System.err.println("WARNING: Found no global IPv4 address. Will use localhost for JMX connector servers instead.");
+				}
+			}
+			catch (SocketException e) {
+				System.err.println("WARNING: Unable to get network interfaces. Will use localhost for JMX connector servers instead.");
+			}
 		}
+
 		// Create and register all specified JMX connector servers
 		for (JmxConnector conf : jmxConnectors) {
 			// get parameters of connector server
@@ -748,16 +781,7 @@ public final class JmxManager implements Manager {
 				System.out.println("WARNING: No protocol specified for a JMX connector server");
 				continue;
 			}
-//			final String portStr = (String) conf.get("port");
 			int port = conf.getPort();
-//			if (portStr != null) {
-//				try {
-//					port = Integer.parseInt(portStr);
-//				} catch (Exception e) {
-//					System.err.println("Port " + portStr + " of the JMX connector server for protocol " + protocol + " is not an integer. Will use 0 instead.");
-//					System.err.println(e.getMessage());
-//				}
-//			}
 			String path = conf.getPath();
 			final JMXAuthenticator authenticator = conf.getAuthenticator();
 
@@ -766,8 +790,9 @@ public final class JmxManager implements Manager {
 				final int registryPort = ((RmiJmxConnector) conf).getRegistryPort();
 				final String registryHost = ((RmiJmxConnector) conf).getRegistryHost();
 				if ((registryPort > 0) || (registryHost != null)) {
-					path = "/jndi/rmi://" + ((registryHost == null) ? "localhost" : registryHost)
-																									+ ((registryPort > 0) ? "" : ":" + registryPort) + "/" + node.getUUID();
+					path = "/jndi/rmi://" + 
+						((registryHost == null) ? "localhost" : registryHost) +
+						((registryPort > 0) ? ":" + registryPort : "") + "/" + node.getUUID();
 				}
 			}
 
@@ -780,7 +805,7 @@ public final class JmxManager implements Manager {
 			// construct server URL
 			JMXServiceURL jurl = null;
 			try {
-				jurl = new JMXServiceURL(protocol, null, port, path);
+				jurl = new JMXServiceURL(protocol, host, port, path);
 			}
 			catch (Exception e) {
 				System.err.println("WARNING: Unable to construct URL of JMX connector server.");

@@ -5,7 +5,18 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.1.0" date="t.b.a." description="First release">
+		<release version="5.1.1" date="t.b.a." description="Minor release">
+			<action dev="keiser" type="fix">
+				RMI connector tries to use global instead of local addresses to be available by remote JMX clients.
+			</action>
+			<action dev="keiser" type="add">
+				JMX management client provides a method to get the agent node ID for a given JMX URL.
+			</action>
+			<action dev="marcel" type="update">
+				Changed configuration of JMX connectors to be usable within AAMM.
+			</action>
+		</release>
+		<release version="5.1.0" date="2010-10-01" description="First release">
 			<action dev="keiser" type="update">
 				The JMX names of all managed JIAC resources contains the unique ID instead the name of the corresponding agent node.
 			</action>

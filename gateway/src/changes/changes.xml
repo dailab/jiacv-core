@@ -5,7 +5,9 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.1.0" date="t.b.a." description="Major release">
+		<release version="5.1.1" date="t.b.a." description="Minor release">
+		</release>
+		<release version="5.1.0" date="2010-10-01" description="Major release">
 		</release>
 		<release version="5.0.5" date="2009-12-03" description="Minor release">
 		</release>

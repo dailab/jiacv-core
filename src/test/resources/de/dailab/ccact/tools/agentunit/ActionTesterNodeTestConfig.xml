@@ -20,13 +20,6 @@
 			</list>
 		</property>
 
-		<property name="jmxConnectors">
-			<set>
-         		<bean class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector" />
-			</set>
-		</property>
-
-		<property name="logLevel" value="WARN" />
 	</bean>
 
 

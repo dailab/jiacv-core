@@ -757,8 +757,8 @@ public final class JmxManager implements Manager {
 					Enumeration<InetAddress> addresses = ifc.getInetAddresses();
 					while (addresses.hasMoreElements()) {
 						InetAddress address = addresses.nextElement();
-						if ((address instanceof Inet4Address) && !address.getHostName().endsWith(".local")) {
-							host = address.getHostName();
+						if (address instanceof Inet4Address) {
+							host = address.getCanonicalHostName();
 							System.setProperty("java.rmi.server.hostname", host);
 							break;
 						}

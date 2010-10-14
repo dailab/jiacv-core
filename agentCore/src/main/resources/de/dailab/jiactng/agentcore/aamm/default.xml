@@ -20,6 +20,25 @@
 			<refItem ref="IDirectory"/>
 		</list>
 	</node>
+	
+	<!--
+      # The default AgentNode configuration
+      # provides an empty platform definition with service directory and JMX support using RMI without registry
+      # this platform bean may be set as parent in any other platfom definitions if you want to make use of inheritance
+      # other possible properties are:
+      * Agents: contains a List of Agents (interface IAgent)
+      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch wich turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
+      * AgentNodeBeans: a list of AgentNodeBeans
+      * ServiceDirectory: sets the ServiceDirectory
+      * LoggingConfig: sets the Logging configuration !needs more documentation here!
+      * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
+	-->
+	<node id="NodeWithJMX">
+		<parent ref="NodeWithDirectory"/>
+		<list name="jmxConnectors">
+			<objItem class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector" />
+		</list>
+	</node>
 
 	<!--
       # The default AgentNode configuration

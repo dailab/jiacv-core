@@ -92,12 +92,13 @@
 				</p>
 				<p>
 					<b>Important Note:</b> ActiveMQ needs an active network interface to send messages via the message bus.
-					If no network interface (Ethernet, WLAN, etc.) is available, you should add a default route to
-					enable communication between local agent nodes by invoking the following commands on the console:
+					If no network interface (Ethernet, WLAN, etc.) is available, you should activate the loopback interface
+					to enable communication between local agent nodes. You can do this on Windows by using "System Control 
+					- System - Hardware - Device Manager - Network Adapter" and on Linux by invoking the following commands 
+					on the console:
 					<source>
 route add default lo
-ifconfig lo multicast
-					</source>
+ifconfig lo multicast</source>
 				</p>
 				<p>
 					The ActiveMQ-Broker will build a network-of-brokers with other brokers within the network that are

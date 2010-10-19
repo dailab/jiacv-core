@@ -263,8 +263,10 @@
             <question>Why sending messages fails?</question>
             <answer><p>
                 ActiveMQ needs an active network interface (Ethernet, WLAN, etc.) to send messages also between
-                local agent nodes. If such a network interface is not available, you should add a default route
-                by invoking the commands "route add default lo" and "ifconfig lo multicast" on the console.</p>
+                local agent nodes. If such a network interface is not available, you should activate the loopback
+                interface. You can do this on Windows by using "System Control - System - Hardware - Device Manager 
+                - Network Adapter" and on Linux by invoking the commands "route add default lo" and "ifconfig lo 
+                multicast" on the console.</p>
             </answer>
         </faq>
     </part>

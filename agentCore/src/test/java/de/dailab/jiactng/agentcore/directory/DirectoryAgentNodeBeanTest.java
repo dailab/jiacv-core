@@ -16,9 +16,11 @@ import junit.framework.TestCase;
 public class DirectoryAgentNodeBeanTest extends TestCase {
 	private final String nodeName = "myNode";
 	private final String beanName = "IDirectory";
+	private final String actionBeanName = "AgentBeanWithActions";
 	private ClassPathXmlApplicationContext context = null;
 	private SimpleAgentNode nodeRef = null;
 	private DirectoryAgentNodeBean directoryRef = null;
+	private AgentBeanWithActions agentBeanRef = null;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -27,11 +29,13 @@ public class DirectoryAgentNodeBeanTest extends TestCase {
 		"de/dailab/jiactng/agentcore/directory/directoryTests.xml");
 		nodeRef = (SimpleAgentNode) context.getBean(nodeName);
 		directoryRef = (DirectoryAgentNodeBean)context.getBean(beanName);
+		agentBeanRef = (AgentBeanWithActions)context.getBean(actionBeanName);
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
+		agentBeanRef = null;
 		directoryRef = null;
 		nodeRef.shutdown();
 		context.close();
@@ -69,5 +73,12 @@ public class DirectoryAgentNodeBeanTest extends TestCase {
 		}
 		assertEquals(0, directoryRef.searchAllAgents(new AgentDescription()).size());
 		assertEquals(0, directoryRef.searchAllActions(new Action()).size());
+	}
+	
+	public void testAgentSide() throws Exception {
+		while (!agentBeanRef.getState().equals(LifecycleStates.STARTED));
+		assertNotNull(agentBeanRef.searchAction("de.dailab.jiactng.agentcore.directory.AgentBeanWithActions#concat"));
+		assertEquals(2, agentBeanRef.searchAllActions("de.dailab.jiactng.agentcore.comm.ICommunicationBean#joinGroup").size());
+		assertEquals(15, agentBeanRef.searchAllActions(null).size());
 	}
 }

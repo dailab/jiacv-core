@@ -12,7 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -1379,28 +1381,36 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public final IActionDescription searchAction(IActionDescription template) {
-    if (directory != null) {
-      return directory.searchAction(template);
-    }
-    return null;
-  }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final IActionDescription searchAction(IActionDescription template) {
+		IActionDescription myAction = null;
+		if (memory != null) {
+			myAction = memory.read(template);
+		}
+		if (myAction == null && directory != null) {
+			myAction = directory.searchAction(template);
+		}
+		return myAction;
+	}
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public final List<IActionDescription> searchAllActions(IActionDescription template) {
-    if (directory != null) {
-      return directory.searchAllActions(template);
-    }
-    log.warn("no directory found, returning empty list...");
-    return new ArrayList<IActionDescription>();
-  }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final List<IActionDescription> searchAllActions(IActionDescription template) {
+		Set<IActionDescription> actionDescriptions = new HashSet<IActionDescription>();
+		if (memory != null) {
+			actionDescriptions.addAll(memory.readAll(template));
+		}
+
+		if (directory != null) {
+			actionDescriptions.addAll(directory.searchAllActions(template));
+		}
+		return new ArrayList<IActionDescription>(actionDescriptions);
+	}
 
   /**
    * {@inheritDoc}

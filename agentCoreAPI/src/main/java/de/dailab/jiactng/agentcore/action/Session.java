@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.action;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
@@ -60,15 +61,8 @@ public class Session implements IFact {
    */
   private String                   originalService  = null;
 
-  /** Stores the reference to the creator of this session. */
-  /*
-   * FIXME: this source is transient now... examine whether this provides issues ->
-   * remember that session objects are serialised in the Remote* classes!
-   */
-  private transient ResultReceiver source;
-
   /**
-   * The history of the session. This list contains all sources of the session
+   * The history of the session. This list contains all sessionevents of the session
    * (i.E. of actions, results, etc.) in order of appearance. TODO should be of
    * type ArrayList<SessionEvent>
    */
@@ -77,41 +71,23 @@ public class Session implements IFact {
   private transient Integer currentCallDepth = null;
   
   /**
-   * Constructor for a new session. Can be called with any kind of object as
-   * source, usually the class, that initiated the session.
-   * 
-   * @param source
-   *          the source that created the new session
+   * Constructor for a new session. Creates a session with a unique id, so not all fields are null.
    */
-  public Session(ResultReceiver source) {
-    this(IdFactory.createSessionId((source != null) ? source.hashCode() : Session.class.hashCode()), Long.valueOf(System
-        .currentTimeMillis()), source, new ArrayList<SessionEvent>());
+  public Session() {
+    this(IdFactory.createSessionId(Session.class.hashCode()), Long.valueOf(System
+        .currentTimeMillis()), new ArrayList<SessionEvent>());
   }
 
   /**
-   * Constructor for a new session. Can be called with any kind of object as
-   * source, usually the class, that initiated the session.
+   * Constructor for a new session. Creates a session with a unique id, so not all fields are null.
    * 
-   * @param source
-   *          the source that created the new session
    * @param timeToLive
    *          time to live in milliseconds
    */
-  public Session(ResultReceiver source, long timeToLive) {
-    this(IdFactory.createSessionId((source != null) ? source.hashCode() : Session.class.hashCode()), Long.valueOf(System
-        .currentTimeMillis()), source, new ArrayList<SessionEvent>());
+  public Session(long timeToLive) {
+    this(IdFactory.createSessionId(Session.class.hashCode()), Long.valueOf(System
+        .currentTimeMillis()), new ArrayList<SessionEvent>());
     this.timeToLive = Long.valueOf(timeToLive);
-  }
-
-  /**
-   * Constructs an empty session.
-   */
-  public Session() {
-    this.sessionId = null;
-    this.creationTime = null;
-    this.history = null;
-    this.source = null;
-    this.timeToLive = null;
   }
 
   /**
@@ -121,18 +97,15 @@ public class Session implements IFact {
    *          the session sessionId
    * @param creationTime
    *          the time of creation of this session
-   * @param source
-   *          the creator object of this session
    * @param history
    *          the history of this session
    * @param timeToLive
    *          time until timeout if 0 it will be set to null
    * 
    */
-  public Session(String id, Long creationTime, ResultReceiver source, ArrayList<SessionEvent> history, Long timeToLive) {
+  public Session(String id, Long creationTime, ArrayList<SessionEvent> history, Long timeToLive) {
     this.sessionId = id;
     this.creationTime = creationTime;
-    this.source = source;
     this.history = history;
     if (timeToLive != null && timeToLive.longValue() > 0) {
       this.timeToLive = timeToLive;
@@ -148,18 +121,15 @@ public class Session implements IFact {
    *          the session sessionId
    * @param creationTime
    *          the time of creation of this session
-   * @param source
-   *          the creator object of this session
    * @param history
    *          the history of this session
    * 
    * Note: TimeToLive will keep at default of 60 seconds
    * 
    */
-  public Session(String id, Long creationTime, ResultReceiver source, ArrayList<SessionEvent> history) {
+  public Session(String id, Long creationTime, ArrayList<SessionEvent> history) {
     this.sessionId = id;
     this.creationTime = creationTime;
-    this.source = source;
     this.history = history;
   }
 
@@ -171,10 +141,13 @@ public class Session implements IFact {
    *          the session to copy the values from
    */
   public Session(Session session) {
-    this.sessionId = session.getSessionId();
-    this.creationTime = session.getCreationTime();
-    this.source = session.getSource();
-    this.history = session.getHistory();
+    if(session != null) {
+      this.sessionId = session.getSessionId();
+      this.creationTime = session.getCreationTime();
+      this.history = session.getHistory();
+    } else {
+      this.timeToLive = null;
+    }
   }
 
   /**
@@ -211,23 +184,6 @@ public class Session implements IFact {
    */
   public final void setSessionId(String id) {
     this.sessionId = id;
-  }
-
-  /**
-   * Gets the receiver of the session result.
-   * @return the source
-   */
-  public final ResultReceiver getSource() {
-    return source;
-  }
-
-  /**
-   * Sets the receiver of the session result.
-   * @param newSource
-   *          the source to set
-   */
-  public final void setSource(ResultReceiver newSource) {
-    source = newSource;
   }
 
   /**
@@ -311,7 +267,7 @@ public class Session implements IFact {
 
   /**
    * Returns a multiline text which contains the ID, the creation time, 
-   * the source, and the history of the session.
+   * and the history of the session.
    * @return a string representation of the session
    */
   @Override
@@ -330,15 +286,10 @@ public class Session implements IFact {
     final Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(creationTime != null ? creationTime.longValue() : 0L);
     builder.append("\n created='").append(calendar.getTime().toString()).append("'");
-
-    // source
-    builder.append("\n source=");
-    if (source != null) {
-      builder.append("'").append(source.toString()).append("'");
-    } else {
-      builder.append("null");
-    }
-
+    
+    // timeToLive
+    builder.append("\n timeToLive='").append(timeToLive).append("'");
+    
     // history
     builder.append("\n history=");
     if (history != null) {

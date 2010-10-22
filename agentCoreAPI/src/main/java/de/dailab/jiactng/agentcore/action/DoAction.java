@@ -52,7 +52,8 @@ public class DoAction extends SessionEvent {
 	 *            the input-parameters for the call.
 	 */
 	public DoAction(IActionDescription thisAction, ResultReceiver source, Serializable[] params) {
-		this(new Session(source), thisAction, source, params);
+		this(new Session(), thisAction, source, params);
+		
 	}
 	
 	/**
@@ -71,7 +72,7 @@ public class DoAction extends SessionEvent {
 	 * 			  time until timeout in milliseconds
 	 */
 	public DoAction(IActionDescription thisAction, ResultReceiver source, Serializable[] params, long timeToLive) {
-		this(new Session(source, timeToLive), thisAction, source, params);
+		this(new Session(timeToLive), thisAction, source, params);
 	}
 
 	/**

@@ -46,6 +46,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   private long nextExecutionTime = 0;
 
+  
+  public final static String TIMEOUT_MESSAGE = "Session timed out.";
+  
   /**
    * Creates an agent bean that uses lifecycle support in loose mode
    */
@@ -167,7 +170,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * @return the result of the canceled action (always <code>null</code> if this method is not overwritten)
    */
   public ActionResult cancelAction(DoAction doAction) {
-    return new ActionResult(doAction, "The cancelAction.method was is not implemented by this agentbean");
+    return new ActionResult(doAction, "The cancelAction-method was is not implemented by this agentbean");
   }
 
   /**

@@ -20,8 +20,8 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 
 /**
  * A simple ExecutionCycle implementation. This class executes active agentbeans (those agentbeans where the
- * <code>executionInterval</code> is set to a value greater than 0) and takes care of action requests (<code>DoAction</code>)
- * and their results (<code>ActionResult</code>).
+ * <code>executionInterval</code> is set to a value greater than 0) and takes care of action requests (
+ * <code>DoAction</code>) and their results (<code>ActionResult</code>).
  * 
  * @author Thomas Konnerth
  * @author axle
@@ -32,13 +32,13 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
  */
 public final class SimpleExecutionCycle extends AbstractExecutionCycle {
 
-  private static final Session SESSION_TEMPLATE = new Session();
-  
+  private static final Session      SESSION_TEMPLATE      = new Session(null, null, null, null);
+
   private static final ActionResult ACTIONRESULT_TEMPLATE = new ActionResult(null, null);
-  
-  private static final DoAction DOACTION_TEMPLATE = new DoAction(null, null, null, null);
-  
-  private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
+
+  private static final DoAction     DOACTION_TEMPLATE     = new DoAction(null, null, null, null);
+
+//  private Set<ActionResult>         pendingResults        = new HashSet<ActionResult>();
 
   /**
    * Run-method for the execution cycle. The method iterates over the list of agentbeans and calls the execute method of
@@ -46,8 +46,8 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
    * 
    * This method also takes care of new <code>DoAction</code>s and <code>ActionResult</code>s.
    * 
-   * The <code>SimpleExecutionCycle</code> only executes agentbeans and handles DoActions and ActionResults when it
-   * has reached <code>LifecycleStates.STARTED</code>.
+   * The <code>SimpleExecutionCycle</code> only executes agentbeans and handles DoActions and ActionResults when it has
+   * reached <code>LifecycleStates.STARTED</code>.
    * 
    * @see de.dailab.jiactng.agentcore.execution.IExecutionCycle#run()
    * @see de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates
@@ -55,159 +55,191 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
   public final void run() {
     // check if lifecycle has been started --> execute if STARTED
     if (getState() == LifecycleStates.STARTED) {
-      // execute the ripest bean
-      IAgentBean minBean = null;
-      long minExecutionTime = Long.MAX_VALUE;
-      final long now = System.currentTimeMillis();
-      for (IAgentBean bean : thisAgent.getAgentBeans()) {
-        // check bean's state, if not started --> reject
-        if (bean.getState() != LifecycleStates.STARTED) {
-          continue;
-        }
 
-        // check if bean has cyclic behavior, if not --> reject
-        if (bean.getExecuteInterval() <= 0) {
-          continue;
-        }
+      // execute one Beans execute Method
+      processBeanExecutes();
 
-        // execution time not reached yet --> reject
-        if (bean.getNextExecutionTime() > now) {
-          continue;
-        }
+      // process one DoAction
+      processDoActions();
 
-        // execution time is not minimum --> reject
-        if (bean.getNextExecutionTime() > minExecutionTime) {
-          continue;
-        }
+      // process one ActionResult
+      processActionResults();
 
-        minBean = bean;
-        minExecutionTime = bean.getNextExecutionTime();
-      }
-
-      // if there is a minBean then execute
-      boolean executionDone = false;
-      if (minBean != null) {
-        executionDone = true;
-        try {
-          minBean.execute();
-        } catch (Exception ex) {
-          log.error("Error when executing bean \'" + minBean.getBeanName() + "\'", ex);
-        }
-
-        // reschedule bean
-        minBean.setNextExecutionTime(now + minBean.getExecuteInterval());
-      }
-      // else {
-      // log.debug("No active beans to execute");
-      // }
-      updateWorkload(EXECUTION, executionDone);
-
-      // process one doAction
-      // TODO: check if read can be used
-      final DoAction act = memory.remove(DOACTION_TEMPLATE);
-
-      boolean actionPerformed = false;
-      if (act != null) {
-        actionPerformed = true;
-        synchronized (this) {
-        	performDoAction(act);
-        }
-      }
-      updateWorkload(DO_ACTION, actionPerformed);
-
-      // process one actionResult
-      // TODO: check if read can be used
-      final Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
-      int countNew = 0;
-      for (ActionResult ar : resultSet) {
-        synchronized (this) {
-          pendingResults.add(ar);
-          countNew++;
-        }
-      }
-
-      boolean resultProcessed = false;
-      if (!pendingResults.isEmpty()) {
-        resultProcessed = true;
-        synchronized (this) {
-          final ActionResult actionResult = pendingResults.iterator().next();
-          processResult(actionResult);
-          pendingResults.remove(actionResult);
-        }
-      }
-      updateWorkload(ACTION_RESULT, resultProcessed);
-
-      // ActionResult actionResult = memory.remove(ACTIONRESULT_TEMPLATE);
-      // if (actionResult != null) {
-      // synchronized (this) {
-      // processResult(actionResult);
-      // }
-      // }
-
-      /*
-       * Session-Cleanup
-       * 
-       * If Session has a timeout
-       */
-      synchronized (memory) {
-        final Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
-        for (Session session : sessions) {
-          if (session.isTimeout()) {
-            // session has timeout
-            final ArrayList<SessionEvent> history = session.getHistory();
-
-            // Does Session is related to DoAction?
-            boolean doActionFound = false;
-            for (SessionEvent event : history) {
-              if (event instanceof DoAction) {
-                // doAction found
-                doActionFound = true;
-                final DoAction doAction = (DoAction) event;
-                if (doAction.getAction() instanceof Action) {
-                  // Got an Action, so let's cancel this
-                  // doAction
-
-                  final Action action = (Action) doAction.getAction();
-                  log.debug("canceling DoAction " + doAction);
-
-                  ActionResult result = null;
-                  if ((action == null)) {
-                    log.warn("Found doAction with missing action:" + doAction);
-                  } else if (action.getProviderBean() == null) {
-                    log.warn("Found doAction with missing providerBean:" + action);
-                  } else {
-                    result = action.getProviderBean().cancelAction(doAction);
-                  }
-
-                  if (session.getSource() != null) {
-                    log.debug("sending timeout Result to source of Session " + session);
-                    final ResultReceiver receiver = session.getSource();
-
-                    if (result == null) {
-                      result = new ActionResult(doAction, new TimeoutException("DoAction has timeout"));
-                    }
-                    receiver.receiveResult(result);
-                  } else {
-                    log.warn("Session without Source: DoAction has to be canceled due to sessiontimeout " + doAction);
-                  }
-                }
-              }
-            }
-
-            if (!doActionFound) {
-              log.warn("Session with no DoAction was deleted due to timeout. Session: " + session);
-            }
-            // last but not least remove timeout session from memory
-            memory.remove(session);
-          }
-        }
-      }
+      processSessionTimeouts();
 
     }
 
     // reject execution if SimpleExecutionCycle hasn't been started
     else {
       log.error("Trying to run SimpleExecutionCycle in state " + getState());
+    }
+  }
+
+  /**
+   * Find one bean whose execute Method is due and execute it.
+   */
+  private void processBeanExecutes() {
+    IAgentBean minBean = null;
+    long minExecutionTime = Long.MAX_VALUE;
+    final long now = System.currentTimeMillis();
+    for (IAgentBean bean : thisAgent.getAgentBeans()) {
+      // check bean's state, if not started --> reject
+      if (bean.getState() != LifecycleStates.STARTED) {
+        continue;
+      }
+
+      // check if bean has cyclic behavior, if not --> reject
+      if (bean.getExecuteInterval() <= 0) {
+        continue;
+      }
+
+      // execution time not reached yet --> reject
+      if (bean.getNextExecutionTime() > now) {
+        continue;
+      }
+
+      // execution time is not minimum --> reject
+      if (bean.getNextExecutionTime() > minExecutionTime) {
+        continue;
+      }
+
+      minBean = bean;
+      minExecutionTime = bean.getNextExecutionTime();
+    }
+
+    // if there is a minBean then execute
+    boolean executionDone = false;
+    if (minBean != null) {
+      executionDone = true;
+      try {
+        minBean.execute();
+      } catch (Exception ex) {
+        log.error("Error when executing bean \'" + minBean.getBeanName() + "\'", ex);
+      }
+
+      // reschedule bean
+      minBean.setNextExecutionTime(now + minBean.getExecuteInterval());
+    }
+
+    updateWorkload(EXECUTION, executionDone);
+  }
+
+  /**
+   * Process one DoAction from the Memory
+   */
+  private void processDoActions() {
+    final DoAction act = memory.remove(DOACTION_TEMPLATE);
+
+    boolean actionPerformed = false;
+    if (act != null) {
+      actionPerformed = true;
+      synchronized (this) {
+        performDoAction(act);
+      }
+    }
+    updateWorkload(DO_ACTION, actionPerformed);
+  }
+
+  /**
+   * Process one ActionResult from the Memory
+   */
+  private void processActionResults() {
+//    final Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
+
+
+//    for (ActionResult ar : resultSet) {
+//      synchronized (this) {
+//        pendingResults.add(ar);
+//      }
+//    }
+
+//    boolean resultProcessed = false;
+//    if (!pendingResults.isEmpty()) {
+//      resultProcessed = true;
+//      synchronized (this) {
+//        final ActionResult actionResult = pendingResults.iterator().next();
+//        processResult(actionResult);
+//        pendingResults.remove(actionResult);
+//      }
+//    }
+
+    final ActionResult result = memory.remove(ACTIONRESULT_TEMPLATE);
+    
+    boolean resultProcessed = false;
+    if(result != null) {
+      resultProcessed = true;
+      synchronized(this) {
+        processResult(result);
+      }
+    }
+    
+    updateWorkload(ACTION_RESULT, resultProcessed);
+  }
+
+  /**
+   * Session-Cleanup
+   * 
+   * If Session has a timeout
+   */
+  private void processSessionTimeouts() {
+    synchronized (memory) {
+      final Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
+      for (Session session : sessions) {
+        if (session.isTimeout()) {
+          // session has timeout
+          log.warn(TIMEOUT_MESSAGE + session);
+
+          final ArrayList<SessionEvent> history = session.getHistory();
+
+          // Does Session is related to DoAction?
+          boolean doActionFound = false;
+          for (SessionEvent event : history) {
+            if (event instanceof DoAction) {
+              // doAction found
+              doActionFound = true;
+              final DoAction doAction = (DoAction) event;
+              memory.remove(doAction);
+
+              if (doAction.getAction() instanceof Action) {
+                // Got an Action, so let's cancel this doAction
+
+                final Action action = (Action) doAction.getAction();
+                log.info("Canceling DoAction " + doAction);
+
+                ActionResult result = null;
+                if ((action == null)) {
+                  log.warn("Found doAction with missing action:" + doAction);
+                } else if (action.getProviderBean() == null) {
+                  log.warn("Found doAction with missing providerBean:" + action);
+                } else {
+                  result = action.getProviderBean().cancelAction(doAction);
+                }
+
+                // if no result was created, use TimeoutExecption as default result
+                if (result == null) {
+                  result = new ActionResult(doAction, new TimeoutException(TIMEOUT_MESSAGE));
+                }
+                
+                if ((doAction.getSource() != null) && (doAction.getSource() instanceof ResultReceiver)) {
+                  log.debug("sending timeout Result to source of DoAction " + doAction);
+                  final ResultReceiver receiver = (ResultReceiver)doAction.getSource();
+
+                  receiver.receiveResult(result);
+                } else {
+                  log.warn("DoAction without ResultReceiver-Source: DoAction had to be canceled due to sessiontimeout " + doAction);
+                }
+              }
+            }
+          }
+
+          if (!doActionFound) {
+            // Such a Session should not exist, but who knows... 
+            log.warn("Session with no DoAction was deleted due to timeout. Session: " + session);
+          }
+          // last but not least remove timeout session from memory
+          memory.remove(session);
+        }
+      }
     }
   }
 

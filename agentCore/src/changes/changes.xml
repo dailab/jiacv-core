@@ -9,6 +9,18 @@
 			<action dev="axle" type="fix">
 				"thisAgent.searchAction()" and "thisAgent.searchAllActions()" now also return own Actions.
 			</action>
+      <action dev="moekon" type="change">
+				"Session class no longer uses a source, all information about affected beans is now in the session-events."
+			</action>
+      <action dev="moekon" type="change">
+				"Added getMemory() method to Agent-class."
+			</action>
+      <action dev="moekon" type="fix">
+				"Both execution cycles now correctly process Session-Timeouts and inform all sources of doActions about the cancelation."
+			</action>
+      <action dev="moekon" type="fix">
+				"The NonBlockingExecutionCycle now checks if a CommunicationBean is present. If no CommunicationBean is found, usage of RemoteExecutors is disabled."
+			</action>
 		</release>
 		<release version="5.1.0" date="2010-09-29" description="Major release">
 			<action dev="marcel" type="add">

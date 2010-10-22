@@ -716,6 +716,15 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   public final IExecutionCycle getExecution() {
     return execution;
   }
+  
+  /**
+   * Getter for the memory of this agent. 
+   * 
+   * @return the memory instance of this agent.
+   */
+  public final IMemory getMemory() {
+    return memory;
+  }
 
   /**
    * {@inheritDoc}

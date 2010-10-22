@@ -13,6 +13,7 @@ import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.action.SessionEvent;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
+import de.dailab.jiactng.agentcore.execution.AbstractExecutionCycle.TimeoutException;
 
 /**
  * A non-blocking ExecutionCycle implementation. This class executes active agentbeans
@@ -30,11 +31,10 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 public final class NonBlockingExecutionCycle extends AbstractExecutionCycle 
 	implements NonBlockingExecutionCycleMBean {
 
-	private static final Session SESSION_TEMPLATE = new Session();
-	private static final ActionResult ACTIONRESULT_TEMPLATE = new ActionResult(
-						null, null);
+	private static final Session SESSION_TEMPLATE = new Session(null, null, null, null);
+	private static final ActionResult ACTIONRESULT_TEMPLATE = new ActionResult(null, null);
 	private static final DoAction DOACTION_TEMPLATE = new DoAction(null, null, null, null);
-	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
+//	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
 	private TreeMap<Long,Future<?>> futures = new TreeMap<Long,Future<?>>();
 
 	/**
@@ -136,35 +136,51 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// process one actionResult
 			// TODO: check if read can be used
-			final Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
-			int countNew = 0;
-			for (ActionResult ar : resultSet) {
-				synchronized (this) {
-					pendingResults.add(ar);
-					countNew++;
-				}
-			}
+//			final Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
+//			int countNew = 0;
+//			for (ActionResult ar : resultSet) {
+//				synchronized (this) {
+//					pendingResults.add(ar);
+//					countNew++;
+//				}
+//			}
+//
+//			boolean resultProcessed = false;
+//			if (!pendingResults.isEmpty()) {
+//				resultProcessed = true;
+//				synchronized (this) {
+//					final ActionResult actionResult = pendingResults.iterator()
+//							.next();
+//					final Future<?> actionResultFuture = thisAgent.getThreadPool().submit(
+//							new ActionResultHandler(actionResult));
+//					futures.put(Long.valueOf(timeout++), actionResultFuture);
+//					pendingResults.remove(actionResult);
+//				}
+//			}
+//			updateWorkload(ACTION_RESULT, resultProcessed);
 
+			
+			final ActionResult result = memory.remove(ACTIONRESULT_TEMPLATE);
 			boolean resultProcessed = false;
-			if (!pendingResults.isEmpty()) {
-				resultProcessed = true;
-				synchronized (this) {
-					final ActionResult actionResult = pendingResults.iterator()
-							.next();
-					final Future<?> actionResultFuture = thisAgent.getThreadPool().submit(
-							new ActionResultHandler(actionResult));
-					futures.put(Long.valueOf(timeout++), actionResultFuture);
-					pendingResults.remove(actionResult);
-				}
+			if (result != null) {
+			  resultProcessed = true;
+			  synchronized (this) {
+			    final Future<?> actionResultFuture = thisAgent.getThreadPool().submit(
+			       new ActionResultHandler(result));
+			    futures.put(Long.valueOf(timeout++), actionResultFuture);
+			  }
 			}
 			updateWorkload(ACTION_RESULT, resultProcessed);
-
+			
+			
 			// Session-Cleanup, if Session has a timeout
 			synchronized (memory) {
 				final Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
 				for (Session session : sessions){
 					if (session.isTimeout()){
-						// session has timeout
+	          // session has timeout
+	          log.warn(TIMEOUT_MESSAGE + session);
+
 						final ArrayList<SessionEvent> history = session.getHistory();
 
 						// Does Session is related to DoAction?
@@ -174,9 +190,10 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 								// doAction found
 								doActionFound = true;
 								final DoAction doAction = (DoAction) event;
+								memory.remove(doAction);
+								
 								if (doAction.getAction() instanceof Action) {
-									// Got an Action, so let's cancel this
-									// doAction
+									// Got an Action, so let's cancel this doAction
 
 									final Future<?> sessionTimeoutFuture = thisAgent.getThreadPool().submit(
 											new SessionTimeoutHandler(session, doAction));
@@ -264,21 +281,30 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 		public void run() {
 			final Action action = (Action) doAction.getAction();
 			log.debug("canceling DoAction " + doAction);
-			ActionResult result = action.getProviderBean().cancelAction(doAction);
-	
-			if (session.getSource() != null) {
+
+			ActionResult result = null;
+      if ((action == null)) {
+        log.warn("Found doAction with missing action:" + doAction);
+      } else if (action.getProviderBean() == null) {
+        log.warn("Found doAction with missing providerBean:" + action);
+      } else {
+        result = action.getProviderBean().cancelAction(doAction);
+      }
+			
+      // if no result was created, use TimeoutExecption as default result
+      if (result == null) {
+        result = new ActionResult(doAction, new TimeoutException(TIMEOUT_MESSAGE));
+      }
+      
+			if ((doAction.getSource() != null) && (doAction.getSource() instanceof ResultReceiver)) {
 				log.debug("sending timeout Result to source of Session " + session);
-				final ResultReceiver receiver = session.getSource();
+				final ResultReceiver receiver = (ResultReceiver)doAction.getSource();
 		
-				if (result == null){
-					result = new ActionResult(
-							doAction, new TimeoutException("DoAction has timeout"));	
-				}
 				receiver.receiveResult(result);
 			} else {
-				log.warn("Session without Source: DoAction has to be canceled due to sessiontimeout "
-					+ doAction);
+				log.warn("Session without Result-Receiver Source: DoAction had to be canceled due to sessiontimeout " + doAction);
 			}
 		}
+		
 	}
 }

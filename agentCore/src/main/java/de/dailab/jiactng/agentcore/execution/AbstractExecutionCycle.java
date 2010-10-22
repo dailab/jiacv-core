@@ -8,11 +8,13 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
+import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
+import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
@@ -41,42 +43,60 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   private boolean               continousAutoExecution = false;
 
-  /** Class for handling remote agent actions.*/
-  private RemoteExecutor remoteExecutor;
-  
-  /** If true, RemoteExecutor will be used, if false something different.*/
-  private boolean useRemoteExecutor = true;
-  
+  /** Class for handling remote agent actions. */
+  private RemoteExecutor        remoteExecutor;
+
+  /** If true, RemoteExecutor will be used, if false something different. */
+  private boolean               useRemoteExecutor      = true;
 
   /**
    * During start of the execution cycle an optional remote executor will be created.
-   * @throws Exception if the execution cycle can not be started.
+   * 
+   * @throws Exception
+   *           if the execution cycle can not be started.
    * @see AbstractAgentBean#doStart()
    * @see #setUseRemoteExecutor(boolean)
    * @see RemoteExecutor#RemoteExecutor(de.dailab.jiactng.agentcore.knowledge.IMemory, org.apache.commons.logging.Log)
    */
   @Override
   public void doStart() throws Exception {
-	  super.doStart();
-	  if (useRemoteExecutor) {
-		  remoteExecutor = new RemoteExecutor(memory, thisAgent.getLog(this, "RemoteExecutor"));
-	  }
+    super.doStart();
+    
+    boolean commBeanFound = false;
+    List<IAgentBean> abList = thisAgent.getAgentBeans();
+    for(IAgentBean iab : abList) {
+      if(iab instanceof ICommunicationBean) {
+        commBeanFound = true;
+        break;
+      }
+    }
+    
+    if(!commBeanFound) {
+      log.warn("Could not find CommunicationBean in this agent - RemoteExecutors are disabled!");
+      useRemoteExecutor = false;
+    }
+    
+    if (useRemoteExecutor) {
+      remoteExecutor = new RemoteExecutor(memory, thisAgent.getLog(this, "RemoteExecutor"));
+    }
   }
 
   /**
    * During stop of the execution cycle an existing remote executor will be destroyed.
-   * @throws Exception if the execution cycle can not be stopped.
+   * 
+   * @throws Exception
+   *           if the execution cycle can not be stopped.
    * @see AbstractAgentBean#doStop()
    * @see #setUseRemoteExecutor(boolean)
    * @see RemoteExecutor#cleanup()
    */
   @Override
   public void doStop() throws Exception {
-	  super.doStop();
-	  if (useRemoteExecutor) {
-		  remoteExecutor.cleanup();
-		  remoteExecutor = null;
-	  }
+    super.doStop();
+    if (useRemoteExecutor) {
+      remoteExecutor.cleanup();
+      remoteExecutor = null;
+    }
   }
 
   /**
@@ -89,17 +109,24 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    * @see #actionPerformed(DoAction, DoActionState, Object[])
    */
   protected void performDoAction(DoAction act) {
-	//fishing out delegations
+    if (act.getSession().isTimeout()) {
+      log.warn("Session for DoAction is timed out, returning failure.");
+      memory.write(new ActionResult(act, new TimeoutException(TIMEOUT_MESSAGE)));
+      // actionPerformed(act, DoActionState.failed, null);
+      return;
+    }
+
+    // fishing out delegations
     if (useRemoteExecutor) {
-    	if (act.getAction().getProviderDescription() != null && 
-    			!act.getAction().getProviderDescription().getAid().equals(thisAgent.getAgentId())) {
-    		remoteExecutor.executeRemote(act);
-    		return;
-    	}
-	}
+      if (act.getAction().getProviderDescription() != null
+          && !act.getAction().getProviderDescription().getAid().equals(thisAgent.getAgentId())) {
+        remoteExecutor.executeRemote(act);
+        return;
+      }
+    }
 
     actionPerformed(act, DoActionState.invoked, null);
-    
+
     final IEffector providerBean = ((Action) act.getAction()).getProviderBean();
     if (providerBean != null) {
       try {
@@ -112,23 +139,23 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
           }
           memory.write(act.getSession());
         }
-        
+
         // test for authorization if applicable
         final Session session = act.getSession();
         if ((session.getUserToken() == null) && (session.getOriginalProvider() != null)
             && (session.getOriginalUser() != null) && session.getOriginalUser().equals(session.getOriginalProvider())) {
-          // no user token, and user is equal to provider - invoke is allowed 
+          // no user token, and user is equal to provider - invoke is allowed
           providerBean.doAction(act);
 
         } else if (providerBean instanceof AbstractActionAuthorizationBean) {
           // use authorizationAction
           ((AbstractActionAuthorizationBean) providerBean).authorize(act);
-        
+
         } else {
           // no authorization required
           providerBean.doAction(act);
         }
-        
+
         actionPerformed(act, DoActionState.started, null);
       } catch (Throwable t) {
         memory.write(new ActionResult(act, t));
@@ -160,8 +187,12 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() - 1);
     if (memory.read(session) == null) {
       if ((doAct.getAction().getResultTypeNames() != null) && doAct.getAction().getResultTypeNames().size() > 0) {
-        log.warn("ActionResult for Action " + actionResult.getAction().getName()
-            + " written with non existing Session.");
+        if (doAct.getSession().isTimeout()) {
+          log.info("ActionResult for Action " + actionResult.getAction().getName() + " written after session timeout");
+        } else {
+          log.warn("ActionResult for Action " + actionResult.getAction().getName()
+              + " written with non existing Session.");
+        }
       }
     } else if (session.getCurrentCallDepth().intValue() <= 0) {
       memory.remove(session);
@@ -184,8 +215,13 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       // memory.write(actionResult);
       log.debug("No ResultReceiver for action " + doAct.getAction().getName());
     } else {
-      ((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
-      log.debug("ResultReceiver informed about result of action " + doAct.getAction().getName());
+      if (actionResult.getSession().isTimeout() && !(actionResult.getFailure() instanceof TimeoutException)) {
+        log.debug("Skipping result due to session timeout");
+      
+      } else {
+        ((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
+        log.debug("ResultReceiver informed about result of action " + doAct.getAction().getName());
+      }
     }
     // ArrayList history = actionResult.getSession().getHistory();
     // for (int i = history.size() - 1; i >= 0; i--) {
@@ -351,16 +387,19 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   /**
    * This exception will be thrown, if the timeout for action execution is reached.
+   * 
    * @author Jan Keiser
    */
   @SuppressWarnings("serial")
   public static class TimeoutException extends RuntimeException {
 
-	  /**
-	   * Creates a timeout exception with a given description.
-	   * @param s the description
-	   */
-	  public TimeoutException(String s) {
+    /**
+     * Creates a timeout exception with a given description.
+     * 
+     * @param s
+     *          the description
+     */
+    public TimeoutException(String s) {
       super(s);
     }
   }
@@ -396,6 +435,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   /**
    * Check if a remote executor is used.
+   * 
    * @return remote executor is used or not
    */
   public final boolean isUseRemoteExecutor() {
@@ -404,7 +444,9 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
   /**
    * Set that a remote executor will be used or not.
-   * @param newUseRemoteExecutor <code>true</code> if a remote executor will be used
+   * 
+   * @param newUseRemoteExecutor
+   *          <code>true</code> if a remote executor will be used
    */
   public final void setUseRemoteExecutor(boolean newUseRemoteExecutor) {
     useRemoteExecutor = newUseRemoteExecutor;

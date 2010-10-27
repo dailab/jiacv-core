@@ -251,7 +251,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
         }
         beanListIterator.remove();
         System.err
-            .println("\n\nWARNING from Agent \'"+agentName+"\': Agents now have an own property for the CommunicationBean (communication). Please use that property for configuration. For now, the CommunicationBean will be used correctly, but further releases of JIAC will no longer support a CommunicationBean in the agentbeans property.\n\n");
+            .println("\n\nWARNING: Agents now have an own property for the CommunicationBean (communication). Please use that property for configuration. For now, the CommunicationBean will be used correctly, but further releases of JIAC will no longer support a CommunicationBean in the agentbeans property.\n\n");
 
         break;
       }

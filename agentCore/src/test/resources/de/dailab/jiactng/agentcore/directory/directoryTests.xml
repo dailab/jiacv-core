@@ -21,7 +21,6 @@
 	<bean name="TestAgent" parent="SimpleAgent">
 		<property name="agentBeans">
 			<list>
-				<ref bean="CommunicationBean" />
 				<ref bean="AgentBeanWithActions"/>
 			</list>
 		</property>

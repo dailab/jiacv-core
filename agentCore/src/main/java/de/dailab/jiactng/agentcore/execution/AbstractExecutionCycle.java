@@ -63,15 +63,16 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     super.doStart();
     
     boolean commBeanFound = false;
-    List<IAgentBean> abList = thisAgent.getAgentBeans();
-    for(IAgentBean iab : abList) {
-      if(iab instanceof ICommunicationBean) {
-        commBeanFound = true;
-        break;
-      }
-    }
+//    List<IAgentBean> abList = thisAgent.getAgentBeans();
+//    for(IAgentBean iab : abList) {
+//      if(iab instanceof ICommunicationBean) {
+//        commBeanFound = true;
+//        break;
+//      }
+//    }
+//    if(!commBeanFound) {
     
-    if(!commBeanFound) {
+    if(thisAgent.getCommunication() == null) {
       log.warn("Could not find CommunicationBean in this agent - RemoteExecutors are disabled!");
       useRemoteExecutor = false;
     }

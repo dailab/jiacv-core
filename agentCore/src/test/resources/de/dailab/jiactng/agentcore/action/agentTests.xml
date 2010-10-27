@@ -18,12 +18,15 @@
 	</bean>
 
 
-	<bean name="TestAgent" parent="SimpleAgent" singleton="false">
-		<property name="agentBeans">
-			<list>
-				<ref bean="testBean" />
-			</list>
-		</property>
+	<bean name="TestAgent" class="de.dailab.jiactng.agentcore.Agent">
+      <property name="memory" ref="Memory" />
+      <property name="execution" ref="SimpleExecutionCycle" />
+      <property name="executionInterval" value="10"/>
+  	  <property name="agentBeans">
+	    <list>
+		  <ref bean="testBean" />
+        </list>
+	  </property>
 	</bean>
 
 	<bean name="testBean"

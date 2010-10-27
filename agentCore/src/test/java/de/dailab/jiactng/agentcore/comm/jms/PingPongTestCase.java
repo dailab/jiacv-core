@@ -37,9 +37,10 @@ public class PingPongTestCase extends TestCase {
             for(IAgentBean bean : agent.getAgentBeans()) {
                 if(bean instanceof PingerBean) {
                     _pingerBean= (PingerBean) bean;
-                } else if(bean instanceof CommunicationBean) {
-                    ((CommunicationBean) bean).joinGroup(address);
-                }
+                } 
+            }
+            if(agent.getCommunication()!=null) {
+              agent.getCommunication().joinGroup(address);    
             }
         }
         

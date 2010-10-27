@@ -20,9 +20,9 @@
 	</bean>
 
 	<bean name="Communicator" parent="SimpleAgent" singleton="false">
+		<property name="communication" ref="SpecificCommunicationBean" />
 		<property name="agentBeans">
 			<list>
-				<ref bean="SpecificCommunicationBean" />
 				<ref bean="MemoryExposingBean" />
 			</list>
 		</property>

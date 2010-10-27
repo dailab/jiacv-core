@@ -3,6 +3,8 @@ package de.dailab.jiactng.agentcore;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.BeanNameAware;
+
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
@@ -14,7 +16,7 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  * 
  * @author axle
  */
-public class AgentRole implements IAgentRole {
+public class AgentRole implements IAgentRole, BeanNameAware {
 	private static final long serialVersionUID = -4262133709570599762L;
 	
 	private String name = null;
@@ -106,4 +108,20 @@ public class AgentRole implements IAgentRole {
 		this.scripts.clear();
 		this.scripts.addAll(scripts);
 	}
+
+  @Override
+  public String toString() {
+    return "AgentRole [name=" + this.name + ", agentBeans=" + this.agentBeans + ", includedAgentRoles="
+        + this.includedAgentRoles + "]";
+  }
+
+  /* (non-Javadoc)
+   * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+   */
+  @Override
+  public void setBeanName(String name) {
+    this.name = name;
+  }
+	
+	
 }

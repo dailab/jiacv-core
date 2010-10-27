@@ -79,11 +79,15 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 			_beans = _communicator.getAgentBeans(); 
 
 			// find the communicationBean within the beans of that agent
+			_cBean = (CommunicationBean)_communicator.getCommunication(); 
+			
 			Iterator<IAgentBean> it = _beans.iterator();
 			while (it.hasNext()){
 				ILifecycle lc = it.next();
 				if (lc instanceof CommunicationBean){
-					_cBean = (CommunicationBean) lc;
+				  if(_cBean==null) {
+				    _cBean = (CommunicationBean) lc;
+			    }
 				} else if (lc instanceof MemoryExposingBean){
 					_meb = (MemoryExposingBean) lc;
 				}

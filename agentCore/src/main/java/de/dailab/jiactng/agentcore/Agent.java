@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -41,6 +42,7 @@ import org.springframework.beans.factory.BeanNameAware;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
+import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
@@ -117,6 +119,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    */
   protected final ArrayList<IAgentBean>     agentBeans                     = new ArrayList<IAgentBean>();
 
+  private List<IAgentRole>                  agentRoles                     = new ArrayList<IAgentRole>();
+
   /**
    * activity Flag (could be replaced by statecheck
    */
@@ -126,6 +130,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    * Reference to the Object that handles the executionCycle
    */
   private IExecutionCycle                   execution                      = null;
+
+  /**
+   * Reference to the Object that handles the executionCycle
+   */
+  private ICommunicationBean                communication                  = null;
 
   /**
    * Future for the executionCycle of this agent. Used to store and cancel the executionThread.
@@ -230,6 +239,28 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    * {@inheritDoc}
    */
   public final void setAgentBeans(List<IAgentBean> agentbeans) {
+    // look for communicationBean in list
+    // TODO: remove in next release
+    Iterator<IAgentBean> beanListIterator = agentbeans.iterator();
+
+    while (beanListIterator.hasNext()) {
+      IAgentBean iab = beanListIterator.next();
+      if (iab instanceof ICommunicationBean) {
+        if (this.communication == null) {
+          this.communication = (ICommunicationBean) iab;
+        }
+        beanListIterator.remove();
+        System.err
+            .println("\n\nWARNING: Agents now have an own property for the CommunicationBean (communication). Please use that property for configuration. For now, the CommunicationBean will be used correctly, but further releases of JIAC will no longer support a CommunicationBean in the agentbeans property.\n\n");
+
+        break;
+      }
+    }
+
+    // if(this.communication!=null) {
+    // agentbeans.add(this.communication);
+    // }
+
     // disable management of all old agent beans
     if (isManagementEnabled() && (this.agentBeans != null)) {
       for (IAgentBean ab : this.agentBeans) {
@@ -356,6 +387,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     updateState(LifecycleStates.CLEANED_UP);
 
     this.actionList = null;
+    if (communication != null) {
+      this.communication.cleanup();
+    }
     this.execution.cleanup();
     this.memory.cleanup();
 
@@ -393,8 +427,20 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     this.execution.setMemory(memory);
     this.execution.init();
 
+    if (communication != null) {
+      this.communication.setMemory(memory);
+      this.communication.init();
+    }
+
     if (log != null && log.isInfoEnabled()) {
       log.info("Memory and executioncycle switched to state " + LifecycleStates.INITIALIZED);
+    }
+
+    final IAgentDescription myDescription = getAgentDescription();
+
+    // add agentBeans from roles to this agent
+    for (IAgentRole role : this.agentRoles) {
+      this.agentBeans.addAll(role.getAgentBeans());
     }
 
     // call init for all agentbeans
@@ -411,7 +457,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
       }
 
       // if bean is effector, add all actions to memory
-      final IAgentDescription myDescription = getAgentDescription();
       if (ab instanceof IEffector) {
         final List<? extends IActionDescription> acts = ((IEffector) ab).getActions();
         if (acts != null) {
@@ -425,6 +470,24 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
           }
         }
       }
+    }
+
+    if (this.communication != null) {
+      final List<? extends IActionDescription> acts = ((IEffector) this.communication).getActions();
+      if (acts != null) {
+        for (IActionDescription item : acts) {
+          item.setProviderDescription(myDescription);
+          if (item.getProviderBean() == null) {
+            item.setProviderBean((IEffector) ((IEffector) this.communication));
+          }
+          memory.write(item);
+          actionList.add(item);
+        }
+      }
+    }
+
+    for (IAgentRole role : this.agentRoles) {
+      memory.write(role);
     }
 
     updateState(LifecycleStates.INITIALIZED);
@@ -452,6 +515,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
     if (log != null && log.isInfoEnabled()) {
       log.info("Memory and executioncycle switched to state " + LifecycleStates.STARTED);
+    }
+
+    if (communication != null) {
+      this.communication.start();
     }
 
     // call start for all agentbeans
@@ -531,6 +598,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
     this.execution.stop();
 
+    if (communication != null) {
+      this.communication.stop();
+    }
+
     if (log != null && log.isInfoEnabled()) {
       log.info("Memory and executioncycle switched to state " + LifecycleStates.STOPPED);
     }
@@ -606,8 +677,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Sets the lifecycle state of an agent bean by invoking the corresponding method of interface <code>ILifecycle</code>.
-   * It also updates the bean description within the agent's memory.
+   * Sets the lifecycle state of an agent bean by invoking the corresponding method of interface <code>ILifecycle</code>
+   * . It also updates the bean description within the agent's memory.
    * 
    * @param bean
    *          the agent bean
@@ -716,9 +787,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   public final IExecutionCycle getExecution() {
     return execution;
   }
-  
+
   /**
-   * Getter for the memory of this agent. 
+   * Gets the communicationbean of this agent.
+   * 
+   * @return the CommunicationBean of this agent
+   */
+  public final ICommunicationBean getCommunication() {
+    return communication;
+  }
+
+  /**
+   * Getter for the memory of this agent.
    * 
    * @return the memory instance of this agent.
    */
@@ -747,6 +827,24 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   /**
    * {@inheritDoc}
    */
+  public final void setCommunication(ICommunicationBean newCommunication) {
+    // disable management of old execution cycle
+    if (isManagementEnabled() && (communication != null)) {
+      communication.disableManagement();
+    }
+
+    // change execution cycle
+    communication = newCommunication;
+
+    // enable management of new execution cycle
+    if (isManagementEnabled() && (communication != null)) {
+      communication.enableManagement(_manager);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public final IAgentNode getAgentNode() {
     return agentNode;
   }
@@ -769,7 +867,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     setLog(agentNode.getLog(this));
     this.memory.setThisAgent(this);
     this.execution.setThisAgent(this);
-    for(IAgentBean iab : this.agentBeans) {
+    if (communication != null) {
+      this.communication.setThisAgent(this);
+    }
+    for (IAgentBean iab : this.agentBeans) {
       iab.setThisAgent(this);
     }
   }
@@ -867,6 +968,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
       }
     }
 
+    if (communication != null) {
+      tempList.addAll(((IEffector) communication).getActions());
+    }
+
     for (IActionDescription a : tempList) {
       a.setProviderDescription(getAgentDescription());
     }
@@ -962,6 +1067,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
       memory.enableManagement(manager);
     }
 
+    // register communication for management
+    if (communication != null) {
+      communication.enableManagement(manager);
+    }
+
     // register execution cycle for management
     if (execution != null) {
       execution.enableManagement(manager);
@@ -982,6 +1092,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     // deregister memory from management
     if (memory != null) {
       memory.disableManagement();
+    }
+
+    // deregister communication from management
+    if (communication != null) {
+      communication.disableManagement();
     }
 
     // deregister execution cycle from management
@@ -1024,8 +1139,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   public final void setExecutionInterval(int newExecutionInterval) {
     final int oldInterval = executionInterval;
     executionInterval = newExecutionInterval;
-    sendAttributeChangeNotification("executionInterval", "java.lang.int", Integer.valueOf(oldInterval), Integer
-        .valueOf(newExecutionInterval));
+    sendAttributeChangeNotification("executionInterval", "java.lang.int", Integer.valueOf(oldInterval),
+        Integer.valueOf(newExecutionInterval));
   }
 
   /**
@@ -1307,8 +1422,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     if (this.execution != null) {
       final boolean oldValue = this.execution.getAutoExecutionType();
       this.execution.setAutoExecutionType(continous);
-      sendAttributeChangeNotification("autoExecutionType", "java.lang.boolean", Boolean.valueOf(oldValue), Boolean
-          .valueOf(continous));
+      sendAttributeChangeNotification("autoExecutionType", "java.lang.boolean", Boolean.valueOf(oldValue),
+          Boolean.valueOf(continous));
     }
   }
 
@@ -1390,36 +1505,36 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
   }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final IActionDescription searchAction(IActionDescription template) {
-		IActionDescription myAction = null;
-		if (memory != null) {
-			myAction = memory.read(template);
-		}
-		if (myAction == null && directory != null) {
-			myAction = directory.searchAction(template);
-		}
-		return myAction;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final IActionDescription searchAction(IActionDescription template) {
+    IActionDescription myAction = null;
+    if (memory != null) {
+      myAction = memory.read(template);
+    }
+    if (myAction == null && directory != null) {
+      myAction = directory.searchAction(template);
+    }
+    return myAction;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public final List<IActionDescription> searchAllActions(IActionDescription template) {
-		Set<IActionDescription> actionDescriptions = new HashSet<IActionDescription>();
-		if (memory != null) {
-			actionDescriptions.addAll(memory.readAll(template));
-		}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final List<IActionDescription> searchAllActions(IActionDescription template) {
+    Set<IActionDescription> actionDescriptions = new HashSet<IActionDescription>();
+    if (memory != null) {
+      actionDescriptions.addAll(memory.readAll(template));
+    }
 
-		if (directory != null) {
-			actionDescriptions.addAll(directory.searchAllActions(template));
-		}
-		return new ArrayList<IActionDescription>(actionDescriptions);
-	}
+    if (directory != null) {
+      actionDescriptions.addAll(directory.searchAllActions(template));
+    }
+    return new ArrayList<IActionDescription>(actionDescriptions);
+  }
 
   /**
    * {@inheritDoc}
@@ -1474,7 +1589,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * {@inheritDoc}}
+   * {@inheritDoc}
    */
   public final <T> T findAgentBean(Class<T> type) {
     if (type == null) {
@@ -1492,7 +1607,44 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
     return type.cast(ret);
   }
-  
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#getRoles()
+   */
+  @Override
+  public List<IAgentRole> getRoles() {
+    return Collections.unmodifiableList(agentRoles);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.dailab.jiactng.agentcore.IAgent#setRoles(java.util.List)
+   */
+  @Override
+  public void setRoles(List<IAgentRole> roles) {
+    this.agentRoles = collectIncludedRoles(roles);
+  }
+
+  private List<IAgentRole> collectIncludedRoles(List<IAgentRole> roles) {
+    ArrayList<IAgentRole> ret = new ArrayList<IAgentRole>();
+
+    if (roles != null) {
+      for (IAgentRole role : roles) {
+        if (role != null) {
+          ret.add(role);
+          if (role.getIncludedAgentRoles() != null) {
+            ret.addAll(collectIncludedRoles(role.getIncludedAgentRoles()));
+          }
+        }
+      }
+    }
+
+    return ret;
+  }
+
   // ///////////////////////////////////
   // TODO
   // ///////////////////////////////////

@@ -20,7 +20,6 @@
   <bean name="TestAgent" parent="NonBlockingAgent" singleton="false">
     <property name="agentBeans">
       <list>
-        <ref bean="CommunicationBean" />
         <ref bean="TestBean"/>
       </list>
     </property>

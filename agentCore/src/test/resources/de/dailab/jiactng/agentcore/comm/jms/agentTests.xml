@@ -29,7 +29,6 @@
 	<bean name="Pinger" parent="SimpleAgent" singleton="false">
 		<property name="agentBeans">
 			<list>
-				<ref bean="CommunicationBean" />
 				<ref bean="PingerBean" />
 			</list>
 		</property>
@@ -38,7 +37,6 @@
 	<bean name="Ponger" parent="SimpleAgent" singleton="false">
 		<property name="agentBeans">
 			<list>
-				<ref bean="CommunicationBean" />
 				<ref bean="PongerBean" />
 			</list>
 		</property>

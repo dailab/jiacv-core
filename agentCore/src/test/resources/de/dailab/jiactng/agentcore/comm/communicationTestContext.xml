@@ -28,7 +28,6 @@
 	<bean name="Communicator" parent="SimpleAgent" singleton="false">
 		<property name="agentBeans">
 			<list>
-				<ref bean="CommunicationBean" />
 				<ref bean="MemoryExposingBean" />
 			</list>
 		</property>

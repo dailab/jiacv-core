@@ -22,7 +22,6 @@
 	<bean name="SessionTestAgent1" parent="NonBlockingAgent" singleton="false">
 		<property name="agentBeans">
 			<list>
-			    <ref bean="CommunicationBean" />
 				<ref bean="SessionTestBean1" />
 			</list>
 		</property>
@@ -31,7 +30,6 @@
 	<bean name="SessionTestAgent2" parent="NonBlockingAgent" singleton="false">
 		<property name="agentBeans">
 			<list>
-			    <ref bean="CommunicationBean" />
 				<ref bean="SessionTestBean2" />
 			</list>
 		</property>

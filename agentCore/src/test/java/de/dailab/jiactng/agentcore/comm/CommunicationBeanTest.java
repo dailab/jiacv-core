@@ -70,14 +70,17 @@ public class CommunicationBeanTest extends TestCase {
 			_beans = _communicator.getAgentBeans(); 
 
 			// find the communicationBean within the beans of that agent
-			Iterator<IAgentBean> it = _beans.iterator();
-			while (it.hasNext()){
-				ILifecycle lc = it.next();
-				if (lc instanceof CommunicationBean){
-					_cBean = (CommunicationBean) lc;
-				}
+			_cBean = (CommunicationBean)_communicator.getCommunication();
+			if(_cBean == null) {
+  			Iterator<IAgentBean> it = _beans.iterator();
+  			while (it.hasNext()){
+  				ILifecycle lc = it.next();
+  				if (lc instanceof CommunicationBean){
+  					_cBean = (CommunicationBean) lc;
+  				}
+  			}
 			}
-
+			
 			// init DummyTransport for testing purposes and add it to the Communicationbean
 			_registration.doInit();
 			_cBean.addTransport(_registration);

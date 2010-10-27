@@ -28,22 +28,19 @@
       <property name="memory" ref="Memory" />
       <property name="execution" ref="SimpleExecutionCycle" />
       <property name="executionInterval" value="10"/>
+      <property name="communication" ref="CommunicationBean" />
    </bean>
 
    <bean name="NonBlockingAgent" parent="SimpleAgent" abstract="true">
       <property name="execution" ref="NonBlockingExecutionCycle" />
    </bean>
 
-   <bean name="SimpleAgentWithCommunication" parent="SimpleAgent" abstract="true">
-      <property name="agentBeans">
-         <list>
-            <ref bean="CommunicationBean" />
-         </list>
-      </property>
-   </bean>
+   <!--bean name="SimpleAgentWithCommunication" parent="SimpleAgent" abstract="true">
+      <property name="communication" ref="CommunicationBean" />
+   </bean-->
 
-   <bean name="NonBlockingAgentWithCommunication" parent="SimpleAgentWithCommunication" abstract="true">
+   <!--bean name="NonBlockingAgentWithCommunication" parent="SimpleAgentWithCommunication" abstract="true">
       <property name="execution" ref="NonBlockingExecutionCycle" />
-   </bean>
+   </bean-->
 </beans>
 

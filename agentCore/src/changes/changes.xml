@@ -6,7 +6,16 @@
 	</properties>
 	<body>
 		<release version="5.1.1" date="t.b.a." description="Minor release">
-			<action dev="axle" type="fix">
+			<action dev="moekon" type="NEW">
+				"First prototype of agentRole-usage in agents."
+			</action>	
+      <action dev="moekon" type="change">
+				"The SimpleAgent configuration now contains a CommunicationBean. The Configurations for SimpleAgentWithCommunication and NonBlockingAgentWithCommunication have been removed."
+			</action>
+      <action dev="moekon" type="change">
+				"Added new property agent.communication which should be used for the CommunicationBean now. CommunicationBeans in the agentbeans-List are automatically set to this property for this version, but throw a warning. This will however be changed for further releases."
+			</action>			
+      <action dev="axle" type="fix">
 				"thisAgent.searchAction()" and "thisAgent.searchAllActions()" now also return own Actions.
 			</action>
       <action dev="moekon" type="change">

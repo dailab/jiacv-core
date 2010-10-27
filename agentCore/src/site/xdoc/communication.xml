@@ -66,8 +66,8 @@
 			</p>
 			<subsection name="Using the CommunicationBean">
 				<p>
-					There are two ways to use the functionalities of the communication bean. First you can iterate
-					through the agent's beans list to find an instance of
+					There are two ways to use the functionalities of the communication bean. First you retrieve a reference 
+          on the CommunicationBean through thisAgent.getCommunication(), which returns:
 					<a href="apidocs/de/dailab/jiactng/agentcore/comm/CommunicationBean.html">
 						<code>CommunicationBean</code>
 					</a>
@@ -145,18 +145,18 @@ ifconfig lo multicast</source>
 	&lt;/bean&gt;
 	
 	&lt;bean name="Pinger" parent="SimpleAgent" singleton="false"&gt;
+    &lt;property name="communication" value="CommunicationBean" /&gt;
 		&lt;property name="agentBeans"&gt;
 			&lt;list&gt;
-				&lt;ref bean="CommunicationBean" /&gt;
 				&lt;ref bean="PingerBean" /&gt;
 			&lt;/list&gt;
 		&lt;/property&gt;
 	&lt;/bean&gt;
 
 	&lt;bean name="Ponger" parent="SimpleAgent" singleton="false"&gt;
+    &lt;property name="communication" value="CommunicationBean" /&gt;
 		&lt;property name="agentBeans"&gt;
 			&lt;list&gt;
-				&lt;ref bean="CommunicationBean" /&gt;
 				&lt;ref bean="PongerBean" /&gt;
 			&lt;/list&gt;
 		&lt;/property&gt;

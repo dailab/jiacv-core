@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.logging.Log;
 
+import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
@@ -49,6 +50,14 @@ public interface IAgent extends ILifecycleListener, Runnable,
    */
   void setExecution(IExecutionCycle newExecution);
     
+  
+  /**
+   * Setter for the agent's communication-component. Used for dependency
+   * injection by Spring.
+   * 
+   * @param newCommunication the communication-component of this agent.
+   */
+  void setCommunication(ICommunicationBean newCommunication);
 
   /**
    * Setter for the agent's agentbeans. Used for dependency injection by
@@ -208,5 +217,16 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * @return a reference to the agentbean. 
    */
   <T> T findAgentBean(Class<T> type);
+ 
+  
+  /**
+   * Getter for the communication bean of this agent
+   * @return a reference to the communicationbean
+   */
+  ICommunicationBean getCommunication();
+  
+  List<IAgentRole> getRoles();
+  
+  void setRoles(List<IAgentRole> roles);
   
 }

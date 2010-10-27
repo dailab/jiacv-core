@@ -3,6 +3,7 @@
  */
 package de.dailab.jiactng.agentcore.comm;
 
+import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.IMethodExposingBean.Expose;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 
@@ -12,7 +13,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @author Marcel Patzlaff
  * @version $Revision: 24453 $
  */
-public interface ICommunicationBean {
+public interface ICommunicationBean extends IAgentBean {
 	
 	/**
 	 * Action to join a Group, which means start receiving all messages that are send to it.

@@ -41,6 +41,14 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	String getHost() throws UnknownHostException;
 
 	/**
+	 * Gets the name of the agent platform, which is defined by the group of the discovery URI.
+	 * Only agent nodes which belongs to the same agent platform are able to communicate.
+	 * @return the platform name or <code>null</code> if no network connector exist or the
+	 * discovery URI of the network connector does not define a group. 
+	 */
+	String getPlatformName();
+
+	/**
 	 * Getter for attribute "Agents" of the managed agent node.
 	 * @return the unique identifier of agents running on this agent node
 	 */

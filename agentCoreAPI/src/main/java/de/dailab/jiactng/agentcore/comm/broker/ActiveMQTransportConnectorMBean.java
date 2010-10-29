@@ -7,6 +7,8 @@ package de.dailab.jiactng.agentcore.comm.broker;
  */
 public interface ActiveMQTransportConnectorMBean {
 
+	public static String RESOURCE_TYPE = "TransportConnector";
+
     /**
      * Set the URI where remote connections are accepted. Examples are:
      * <pre>

@@ -185,6 +185,21 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
+	 * Gets the name of the agent platform, which is defined by the group of the discovery URI.
+	 * Only agent nodes which belongs to the same agent platform are able to communicate.
+	 * @return the platform name or <code>null</code> if no network connector exist or the
+	 * discovery URI of the network connector does not define a group. 
+	 * @throws InstanceNotFoundException The agent node does not exist. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
+	 * @throws SecurityException if the agent node's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#getPlatformName()
+	 */
+	public final String getPlatformName() throws IOException, InstanceNotFoundException {
+		return (String) getAttribute("PlatformName");
+	}
+
+	/**
 	 * Gets the owner of the managed agent node.
 	 * @return The name of agent node's owner.
 	 * @throws InstanceNotFoundException The agent node does not exist. 
@@ -383,5 +398,4 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	public final void shutdownAgentNode() throws IOException, InstanceNotFoundException {
 		invokeOperation("shutdown", new Object[]{}, new String[]{});
 	}
-
 }

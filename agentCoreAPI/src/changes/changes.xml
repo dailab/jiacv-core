@@ -6,6 +6,9 @@
 	</properties>
 	<body>
 		<release version="5.1.1" date="t.b.a." description="Minor release">
+			<action dev="keiser" type="add">
+				Added method to management interface to get name of agent node's platform.
+			</action>
 			<action dev="keiser" type="fix">
 				RMI connector tries to use global instead of local addresses to be available by remote JMX clients.
 			</action>

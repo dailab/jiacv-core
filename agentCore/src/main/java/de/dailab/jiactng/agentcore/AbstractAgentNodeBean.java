@@ -19,6 +19,14 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
     private String beanName;
 
     /**
+     * Gets the agent node of this agent node bean.
+     * @return the agent node
+     */
+    public final IAgentNode getAgentNode() {
+        return agentNode;
+    }
+
+    /**
      * Sets the agent node of this agent node bean.
      * @param newAgentNode the agent node
      */
@@ -46,7 +54,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
     /**
      * Deregisters the node bean and all its resources from management
      */
-    public final void disableManagement() {
+    public void disableManagement() {
         // do nothing if management already disabled
         if (!isManagementEnabled()) {
             return;
@@ -70,7 +78,7 @@ public abstract class AbstractAgentNodeBean extends AbstractLifecycle implements
      * @param manager
      *            the manager responsible for this agentbean.
      */
-    public final void enableManagement(Manager manager) {
+    public void enableManagement(Manager manager) {
         // do nothing if management already enabled
         if (isManagementEnabled()) {
             return;

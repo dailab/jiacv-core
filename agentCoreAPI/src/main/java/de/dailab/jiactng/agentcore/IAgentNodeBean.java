@@ -14,14 +14,23 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
  * @version $Revision: 19890 $
  */
 public interface IAgentNodeBean extends ILifecycle {
-    /**
+
+	/**
      * Setter for the agentNode-reference that is responsible for this
      * agentNodeBean.
      * 
      * @param agentNode     the agentNode that holds this bean
      */
     void setAgentNode(IAgentNode agentNode);
-    
+
+    /**
+     * Getter for the agentNode-reference that is responsible for this
+     * agentNodeBean.
+     * 
+     * @return the agentNode that holds this bean
+     */
+    IAgentNode getAgentNode();
+
     /**
      * Setter for the beanName.
      * 
@@ -31,7 +40,7 @@ public interface IAgentNodeBean extends ILifecycle {
     void setBeanName(String name);
 
     /**
-     * Getter for the name of this node bean
+     * Getter for the name of this node bean.
      * 
      * @return a string representing the name of this node bean.
      */

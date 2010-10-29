@@ -93,6 +93,23 @@ public final class JmxManager implements Manager {
 	}
 
 	/**
+	 * Constructs a JMX compliant name for the management of an agent node bean resource. The
+	 * agent node bean may contain more than one resource of the specified type.
+	 * @param nodeId the UUID of the agent node
+	 * @param beanName the name of the agent node bean
+	 * @param resourceType the type of the agent node bean resource
+	 * @param resourceName the name of the agent node bean resource
+	 * @return the JMX compliant name of the agent node bean resource
+	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
+	 */
+	public ObjectName getMgmtNameOfAgentNodeBeanResource(String nodeId, String beanName, String resourceType, String resourceName) throws MalformedObjectNameException {
+		return new ObjectName(DOMAIN + 
+				":category1=AgentNode,agentnode=" + nodeId + 
+				",category2=agentNodeBean,agentnodebean=" + beanName +
+				",category3=" + resourceType + ",resource=" + resourceName);
+	}
+
+	/**
 	 * Constructs a JMX compliant name for the management of an agent node resource. The
 	 * agent node always contains only one resource of the specified type.
 	 * @param nodeId the UUID of the agent node
@@ -251,6 +268,26 @@ public final class JmxManager implements Manager {
 	}
 
 	/**
+	 * Registers an agent node bean resource as JMX resource. The agent node bean may contain more
+	 * than one resource of the specified type.
+	 * @param agentNodeBean the agent node bean
+	 * @param agentNode the agent node which contains the agent node bean
+	 * @param resourceType the type of the agent node bean resource
+	 * @param resourceName the name of the agent node bean resource
+	 * @param resource the agent node bean resource to be registered
+	 * @throws MalformedObjectNameException The name of the agent node bean or agent node or the type or name of the resource contains an illegal character or does not follow the rules for quoting.
+	 * @throws InstanceAlreadyExistsException The agent node bean resource is already under the control of the MBean server.
+	 * @throws MBeanRegistrationException The preRegister (MBeanRegistration  interface) method of the agent node bean resource has thrown an exception. The agent node bean resource will not be registered.
+	 * @throws NotCompliantMBeanException The agent node bean resource is not a JMX compliant MBean.
+	 * @see #getMgmtNameOfAgentNodeBeanResource(String, String, String, String)
+	 * @see MBeanServer#registerMBean(Object, ObjectName)
+	 */
+	public void registerAgentNodeBeanResource(IAgentNodeBean agentNodeBean, IAgentNode agentNode, String resourceType, String resourceName, Object resource) throws MalformedObjectNameException, InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
+		final ObjectName name = getMgmtNameOfAgentNodeBeanResource(agentNode.getUUID(), agentNodeBean.getBeanName(), resourceType, resourceName);
+		mbs.registerMBean(resource, name);
+	}
+
+	/**
 	 * Registers an agent node resource as JMX resource. The agent node contains only
 	 * one resource of the specified type.
 	 * @param node the agent node
@@ -401,6 +438,24 @@ public final class JmxManager implements Manager {
 	 */
 	public void unregisterAgentNodeBean(IAgentNodeBean agentNodeBean, IAgentNode agentNode) throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
 		final ObjectName name = getMgmtNameOfAgentNodeBean(agentNode.getUUID(), agentNodeBean.getBeanName());
+		mbs.unregisterMBean(name);
+	}
+
+	/**
+	 * Unregisters an agent node bean resource as JMX resource. The agent node bean may contain more
+	 * than one resource of the specified type.
+	 * @param agentNodeBean the agent node bean
+	 * @param agentNode the agent node which contains the agent node bean
+	 * @param resourceType the type of the agent node bean resource
+	 * @param resourceName the name of the agent node bean resource
+	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
+	 * @throws InstanceNotFoundException The agent node bean resource is not registered in the MBean server.
+	 * @throws MBeanRegistrationException The preDeregister ((MBeanRegistration interface) method of the agent node bean resource has thrown an exception.
+	 * @see #getMgmtNameOfAgentNodeBean(String, String, String, String)
+	 * @see MBeanServer#unregisterMBean(ObjectName)
+	 */
+	public void unregisterAgentNodeBeanResource(IAgentNodeBean agentNodeBean, IAgentNode agentNode, String resourceType, String resourceName) throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
+		final ObjectName name = getMgmtNameOfAgentNodeBeanResource(agentNode.getUUID(), agentNodeBean.getBeanName(), resourceType, resourceName);
 		mbs.unregisterMBean(name);
 	}
 

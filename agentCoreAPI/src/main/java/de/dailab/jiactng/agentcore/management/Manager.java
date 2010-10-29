@@ -33,6 +33,18 @@ public interface Manager {
 	Object getMgmtNameOfAgentNodeBean(String nodeId, String beanName) throws Exception;
 
 	/**
+	 * Constructs a unique name for the management of an agent node bean resource. The
+	 * agent node bean may contain more than one resource of the specified type.
+	 * @param nodeId the UUID of the agent node which contains the agent node bean
+	 * @param beanName the name of the agent node bean
+	 * @param resourceType the type of the agent node bean resource
+	 * @param resourceName the name of the agent node bean resource
+	 * @return unique name of the agent node bean resource
+	 * @throws Exception If one of the parameters is incorrect.
+	 */
+	Object getMgmtNameOfAgentNodeBeanResource(String nodeId, String beanName, String resourceType, String resourceName) throws Exception;
+
+	/**
 	 * Constructs a unique name for the management of an agent node resource. The
 	 * agent node always contains only one resource of the specified type.
 	 * @param nodeId the UUID of the agent node
@@ -136,6 +148,18 @@ public interface Manager {
 	void registerAgentNodeBean(IAgentNodeBean agentNodeBean, IAgentNode agentNode) throws Exception;
 
 	/**
+	 * Registers an agent node bean resource for management. The agent node bean may contain more
+	 * than one resource of the specified type.
+	 * @param agentNodeBean the agent node bean
+	 * @param agentNode the agent node which contains the agent node bean
+	 * @param resourceType the type of the agent node bean resource
+	 * @param resourceName the name of the agent node bean resource
+	 * @param resource the agent node bean resource to be registered
+	 * @throws Exception The name of the agent node bean or agent node is incorrect or the type or name of the resource is incorrect or the agent node bean resource is already registered.
+	 */
+	void registerAgentNodeBeanResource(IAgentNodeBean agentNodeBean, IAgentNode agentNode, String resourceType, String resourceName, Object resource) throws Exception;
+
+	/**
 	 * Registers an agent node resource for management. The agent node contains only
 	 * one resource of the specified type.
 	 * @param node the agent node
@@ -218,6 +242,17 @@ public interface Manager {
 	 * @throws Exception The name of the agent node bean or agent node is incorrect or the agent node bean is not registered.
 	 */
 	void unregisterAgentNodeBean(IAgentNodeBean agentNodeBean, IAgentNode agentNode) throws Exception;
+
+	/**
+	 * Unregisters an agent node bean resource from management. The agent node bean may contain more
+	 * than one resource of the specified type.
+	 * @param agentNodeBean the agent node bean
+	 * @param agentNode the agent node which contains the agent node bean
+	 * @param resourceType the type of the agent node bean resource
+	 * @param resourceName the name of the agent node bean resource
+	 * @throws Exception One of the parameters is incorrect or the agent node bean resource is not registered.
+	 */
+	void unregisterAgentNodeBeanResource(IAgentNodeBean agentNodeBean, IAgentNode agentNode, String resourceType, String resourceName) throws Exception;
 
 	/**
 	 * Unregisters an agent node resource from management. The agent node contains only

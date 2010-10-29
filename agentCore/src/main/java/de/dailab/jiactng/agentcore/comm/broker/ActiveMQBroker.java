@@ -14,6 +14,7 @@ import org.apache.activemq.network.NetworkConnector;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
+import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * Implements a message broker as agent node bean based on ActiveMQ technology.
@@ -22,7 +23,7 @@ import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
  * @author Marcel Patzlaff
  * 
  */
-public class ActiveMQBroker extends AbstractAgentNodeBean {
+public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBrokerMBean {
 
 	/** The ActiveMQ broker used by all agent nodes of the local JVM. */
 	protected static ActiveMQBroker INSTANCE= null;
@@ -65,6 +66,16 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public int getNetworkTTL() {
+    	return _networkTTL;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     public void setNetworkTTL(int networkTTL) throws Exception {
         if(_networkTTL != networkTTL && _broker != null) {
@@ -149,6 +160,13 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public boolean getPersistent() {
+    	return _persistent;
+    }
+
+    /**
      * Indicates whether messages should be stored in a data base or not.
      * ActiveMQ uses Derby to store message.
      * You must include this dependency explicitly in your project as it is
@@ -192,6 +210,105 @@ public class ActiveMQBroker extends AbstractAgentNodeBean {
         }
 
         return _brokerName;
+    }
+
+    /**
+     * Register the broker and all transport connectors for management
+     * 
+     * @param manager
+     *            the manager to be used for registration
+     */
+    public void enableManagement(Manager manager) {
+        // do nothing if management already enabled
+        if (isManagementEnabled()) {
+            return;
+        }
+
+        // register broker
+        super.enableManagement(manager);
+
+        // register all transport connectors for management
+        for (ActiveMQTransportConnector connector : _connectors) {
+            registerConnector(connector);
+        }
+    }
+
+    /**
+     * Unregister the broker and all transport connectors from management
+     */
+    public void disableManagement() {
+        // do nothing if management already disabled
+        if (!isManagementEnabled()) {
+            return;
+        }
+
+        // unregister all transport connectors from management
+        for (ActiveMQTransportConnector connector : _connectors) {
+            unregisterConnector(connector);
+        }
+
+        super.disableManagement();
+    }
+
+    /**
+     * Register a transport connector for management.
+     * 
+     * @param connector
+     *            the transport connector to be registered
+     */
+    private void registerConnector(ActiveMQTransportConnector connector) {
+        // do nothing if management is not enabled
+        if (!isManagementEnabled()) {
+            return;
+        }
+
+        // register message transport for management
+        try {
+            _manager.registerAgentNodeBeanResource(this, getAgentNode(), "TransportConnector", "\"" + connector.getTransportURI() + "\"",
+            		connector);
+        } catch (Exception e) {
+            if ((log != null) && (log.isErrorEnabled())) {
+                log.error("WARNING: Unable to register transport connector " + connector.getTransportURI()
+                        + " of the broker of agent node "
+                        + getAgentNode().getName() + " as JMX resource.");
+                log.error(e.getMessage());
+            } else {
+                System.err.println("WARNING: Unable to register transport connector "
+                        + connector.getTransportURI() + " of the broker of agent node "
+                        + getAgentNode().getName() + " as JMX resource.");
+                System.err.println(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Unregister a transport connector from management.
+     * 
+     * @param connector
+     *            the transport connector to be unregistered
+     */
+    private void unregisterConnector(ActiveMQTransportConnector connector) {
+        // do nothing if management is not enabled
+        if (!isManagementEnabled()) {
+            return;
+        }
+
+        // unregister transport connector from management
+        try {
+            _manager.unregisterAgentNodeBeanResource(this, getAgentNode(), "TransportConnector", "\"" + connector.getTransportURI() + "\"");
+        } catch (Exception e) {
+            if ((log != null) && (log.isErrorEnabled())) {
+                log.error("WARNING: Unable to deregister transport connector " + connector.getTransportURI() 
+                		+ " of the broker of agent node "
+                        + getAgentNode().getName() + " as JMX resource.");
+                log.error(e.getMessage());
+            } else {
+                System.err.println("WARNING: Unable to deregister transport connector " + connector.getTransportURI() 
+                		+ " of the broker of agent node "
+                        + getAgentNode().getName() + " as JMX resource.");
+                System.err.println(e.getMessage());
+            }
+        }
     }
 
 }

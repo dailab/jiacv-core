@@ -16,7 +16,6 @@ import org.apache.log4j.Level;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.IAgent;
-import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
@@ -41,145 +40,143 @@ import de.dailab.jiactng.agentcore.util.jar.JARMemory;
  */
 public class ActionTesterNode {
 
-   // const
-   private static String INVOKE_ACTION_AGENT_CONFIGURATION_FILE = "de/dailab/ccact/tools/agentunit/invoke_action_agent_config.xml";
+	// const
+	private static String INVOKE_ACTION_AGENT_CONFIGURATION_FILE = "de/dailab/ccact/tools/agentunit/invoke_action_agent_config.xml";
 
-   // var
-   private final String spring_config;
+	// var
+	private final String spring_config;
 
-   /**
-    * The application context of this node.
-    */
-   protected ClassPathXmlApplicationContext context;
+	/**
+	 * The application context of this node.
+	 */
+	protected ClassPathXmlApplicationContext context;
 
-   /**
-    * the agent node
-    */
-   protected SimpleAgentNode agentNode;
-   // protected IAgent invokeactionagent;
-   protected InvokeActionBean invokeactionbean;
+	/**
+	 * the agent node
+	 */
+	protected SimpleAgentNode agentNode;
+	// protected IAgent invokeactionagent;
+	protected InvokeActionBean invokeactionbean;
 
-   /**
-    * default agent node logger
-    */
-   protected Log log;
+	/**
+	 * default agent node logger
+	 */
+	protected Log log = LogFactory.getLog(ActionTesterNode.class);
 
-   /**
-    * Creates an ActionTesterNode from the given configuration file
-    * 
-    * @param spring_node_config_param
-    *           path to an JIAC AgentNode configuration file containting an Agent Node description castable to the
-    *           SimpleAgentNode class.
-    * @param nodename
-    *           The name of the Agent Node specified in spring_node_config_param
-    */
-   public ActionTesterNode(final String spring_node_config_param, final String nodename) {
+	/**
+	 * Creates an ActionTesterNode from the given configuration file
+	 * 
+	 * @param spring_node_config_param
+	 *           path to an JIAC AgentNode configuration file containting an Agent Node description castable to the
+	 *           SimpleAgentNode class.
+	 * @param nodename
+	 *           The name of the Agent Node specified in spring_node_config_param
+	 */
+	public ActionTesterNode(final String spring_node_config_param, final String nodename) {
 
-      this.spring_config = spring_node_config_param;
-      this.context = new ClassPathXmlApplicationContext(this.spring_config);
-      this.context.start();
+		this.spring_config = spring_node_config_param;
+		this.context = new ClassPathXmlApplicationContext(this.spring_config);
+		this.context.start();
 
-      // fetch Agent Node handle
-      this.agentNode = (SimpleAgentNode) this.context.getBean(nodename);
+		// fetch Agent Node handle
+		this.agentNode = (SimpleAgentNode) this.context.getBean(nodename, SimpleAgentNode.class);
 
-      this.log = LogFactory.getLog(ActionTesterNode.class);
+		((Log4JLogger) this.log).getLogger().setLevel(Level.toLevel(this.agentNode.getLogLevel()));
 
-      ((Log4JLogger) this.log).getLogger().setLevel(Level.toLevel(this.agentNode.getLogLevel()));
+		// Add InvokeActionAgent to AgentNode
+		try {
+			final JARClassLoader jcl = new JARClassLoader();
+			// get content of agent configuration file
+			final InputStream cfis = jcl.getResourceAsStream(ActionTesterNode.INVOKE_ACTION_AGENT_CONFIGURATION_FILE);
 
-      // Add InvokeActionAgent to AgentNode
-      try {
-         final JARClassLoader jcl = new JARClassLoader();
-         // get content of agent configuration file
-         final InputStream cfis = jcl.getResourceAsStream(ActionTesterNode.INVOKE_ACTION_AGENT_CONFIGURATION_FILE);
+			if (this.log.isDebugEnabled()) {
+				this.log.debug("Reading INVOKE_ACTION_AGENT_CONFIGURATION_FILE with up to " + cfis.available() + " bytes.");
+			}
 
-         if (this.log.isDebugEnabled()) {
-            this.log.debug("Reading INVOKE_ACTION_AGENT_CONFIGURATION_FILE with up to " + cfis.available() + " bytes.");
-         }
+			final byte[] byteconfig = new byte[cfis.available()];
+			final int bytesread = cfis.read(byteconfig, 0, cfis.available());
 
-         final byte[] byteconfig = new byte[cfis.available()];
-         final int bytesread = cfis.read(byteconfig, 0, cfis.available());
+			if (this.log.isDebugEnabled()) {
+				this.log.debug("Read " + bytesread + " bytes. The byteconfig content is:" + byteconfig.toString());
+			}
 
-         if (this.log.isDebugEnabled()) {
-            this.log.debug("Read " + bytesread + " bytes. The byteconfig content is:" + byteconfig.toString());
-         }
+			// add InvokeActionAgent
+			final List<String> createdagents = this.agentNode.addAgents(byteconfig, new ArrayList<JARMemory>(), this.agentNode.getOwner());
+			final String invokeactionagentid = createdagents.get(0); // Only one agent added, therefore no search
+			// implemented
 
-         // add InvokeActionAgent
-         final List<String> createdagents = this.agentNode.addAgents(byteconfig, new ArrayList<JARMemory>(), this.agentNode.getOwner());
-         final String invokeactionagentid = createdagents.get(0); // Only one agent added, therefore no search
-                                                                  // implemented
+			final List<IAgent> iagentslist = this.agentNode.findAgents();
+			final Iterator<IAgent> ialit = iagentslist.iterator();
+			IAgent invokeactionagent;
+			while (ialit.hasNext()) {
+				invokeactionagent = ialit.next();
+				if (invokeactionagent.getAgentId().equalsIgnoreCase(invokeactionagentid)) {
+					invokeactionagent.init();
+					invokeactionagent.start();
+					this.invokeactionbean = invokeactionagent.findAgentBean(InvokeActionBean.class);
+					// for (final IAgentBean iab : beanList) {
+					// if (iab instanceof InvokeActionBean) {
+					// this.invokeactionbean = (InvokeActionBean) iab;
+					// this.log.debug("Located Bean: " + this.invokeactionbean);
+					// break;
+					// }
+					// }
+				}
+			}
+		}
+		catch (final Exception e) {
+			this.log.error("ActionTesterNode cannot be initalized!", e);
+		}
 
-         final List<IAgent> iagentslist = this.agentNode.findAgents();
-         final Iterator<IAgent> ialit = iagentslist.iterator();
-         IAgent invokeactionagent;
-         while (ialit.hasNext()) {
-            invokeactionagent = ialit.next();
-            if (invokeactionagent.getAgentId().equalsIgnoreCase(invokeactionagentid)) {
-               invokeactionagent.init();
-               invokeactionagent.start();
-               final List<IAgentBean> beanList = invokeactionagent.getAgentBeans();
-               for (final IAgentBean iab : beanList) {
-                  if (iab instanceof InvokeActionBean) {
-                     this.invokeactionbean = (InvokeActionBean) iab;
-                     this.log.debug("Located Bean: " + this.invokeactionbean);
-                     break;
-                  }
-               }
-            }
-         }
-      }
-      catch (final Exception e) {
-         this.log.error("ActionTesterNode cannot be initalized!", e);
-      }
+	}
 
-   }
+	/**
+	 * @return the agentNode
+	 */
+	public SimpleAgentNode getAgentNode() {
+		return this.agentNode;
+	}
 
-   /**
-    * @return the agentNode
-    */
-   public SimpleAgentNode getAgentNode() {
-      return this.agentNode;
-   }
+	public Serializable[] invoke(final String serviceName, final Serializable[] serviceParameter) {
 
-   public Serializable[] invoke(final String jadlServiceName, final Serializable[] serviceParameter) {
+		try {
+			if (this.log.isDebugEnabled()) {
+				this.log.debug("Bean is: " + this.invokeactionbean.toString());
+			}
+			return this.invokeactionbean.invokeAction(serviceName, serviceParameter);
+		}
+		catch (final RuntimeException e) {
+			this.log.error(e);
+			throw e;
+		}
 
-      try {
-         if (this.log.isDebugEnabled()) {
-            this.log.debug("Bean is: " + this.invokeactionbean.toString());
-         }
-         return this.invokeactionbean.invokeAction(jadlServiceName, serviceParameter);
-      }
-      catch (final RuntimeException e) {
-         this.log.error(e);
-         throw e;
-      }
+	}
 
-   }
+	public void invokeAndForget(final String serviceName, final Serializable[] serviceParameter) {
 
-   public void invokeAndForget(final String jadlServiceName, final Serializable[] serviceParameter) {
+		try {
+			if (this.log.isDebugEnabled()) {
+				this.log.debug("Bean is: " + this.invokeactionbean.toString());
+			}
+			this.invokeactionbean.invokeAndForget(serviceName, serviceParameter);
+		}
+		catch (final Exception e) {
+			this.log.error(e);
+		}
 
-      try {
-         if (this.log.isDebugEnabled()) {
-            this.log.debug("Bean is: " + this.invokeactionbean.toString());
-         }
-         this.invokeactionbean.invokeAndForget(jadlServiceName, serviceParameter);
-      }
-      catch (final Exception e) {
-         this.log.error(e);
-      }
+	}
 
-   }
+	public void stop() {
 
-   public void stop() {
+		try {
+			this.agentNode.shutdown();
+		}
+		catch (final LifecycleException e) {
+			this.log.error("exception shutting down Node.", e);
+		}
 
-      try {
-         this.agentNode.shutdown();
-      }
-      catch (final LifecycleException e) {
-         this.log.error("exception shutting down Node.", e);
-      }
+		this.context.stop();
 
-      this.context.stop();
-
-   }
+	}
 
 }

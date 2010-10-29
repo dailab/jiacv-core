@@ -8,7 +8,6 @@
 		<property name="agentBeans">
 			<list>
 				<ref bean="InvokeActionBean" />
-				<ref bean="CommunicationBean" />
 			</list>
 		</property>
 	</bean>

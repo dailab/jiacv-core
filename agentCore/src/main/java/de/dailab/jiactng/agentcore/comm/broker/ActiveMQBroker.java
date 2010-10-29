@@ -264,7 +264,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
         // register message transport for management
         try {
-            _manager.registerAgentNodeBeanResource(this, getAgentNode(), "TransportConnector", "\"" + connector.getTransportURI() + "\"",
+            _manager.registerAgentNodeBeanResource(this, getAgentNode(), 
+            		ActiveMQTransportConnectorMBean.RESOURCE_TYPE, 
+            		"\"" + connector.getTransportURI() + "\"",
             		connector);
         } catch (Exception e) {
             if ((log != null) && (log.isErrorEnabled())) {
@@ -295,7 +297,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
         // unregister transport connector from management
         try {
-            _manager.unregisterAgentNodeBeanResource(this, getAgentNode(), "TransportConnector", "\"" + connector.getTransportURI() + "\"");
+            _manager.unregisterAgentNodeBeanResource(this, getAgentNode(), 
+            		ActiveMQTransportConnectorMBean.RESOURCE_TYPE, 
+            		"\"" + connector.getTransportURI() + "\"");
         } catch (Exception e) {
             if ((log != null) && (log.isErrorEnabled())) {
                 log.error("WARNING: Unable to deregister transport connector " + connector.getTransportURI() 

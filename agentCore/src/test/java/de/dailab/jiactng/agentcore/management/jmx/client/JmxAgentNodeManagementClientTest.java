@@ -136,6 +136,21 @@ public class JmxAgentNodeManagementClientTest extends TestCase implements Notifi
 	}
 
 	/**
+	 * Tests if you get the platform name of the agent node by using the
+	 * agent node management client.
+	 * @see JmxAgentNodeManagementClient#getPlatformName()
+	 */
+	public void testGetPlatformName() {
+		String platform = "";
+		try {
+			platform = nodeClient.getPlatformName();
+		} catch (Exception e) {
+			fail("Error while getting agent node's platform");
+		}
+		assertEquals("JmxAgentNodeManagementClient.getPlatformName() is wrong", null, platform);
+	}
+
+	/**
 	 * Tests if you get the owner (system property "user.name") of the agent node by using the 
 	 * agent node management client.
 	 * @see JmxAgentNodeManagementClient#getAgentNodeOwner()

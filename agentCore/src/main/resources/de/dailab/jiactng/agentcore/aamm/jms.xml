@@ -1,5 +1,5 @@
-<configuration xmlns="http://www.jiac.de/AAMM/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.jiac.de/AAMM/1.0 http://www.jiac.de/xsd/aamm-1.0.xsd"
+<configuration xmlns="http://www.jiac.de/AAMM/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.jiac.de/AAMM/1.1 http://www.jiac.de/xsd/aamm-1.1.xsd"
 	framework="JIAC V">
 	
 	<object id="StandardJMSBroker" class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker" singleton="true">
@@ -8,8 +8,7 @@
 		</list>
 	</object>
 	
-	<object id="StandardJMSBrokerFixedPort" singleton="true">
-		<parent ref="StandardJMSBroker" />
+	<object id="StandardJMSBrokerFixedPort" parent="StandardJMSBroker" singleton="true">
 		<list name="connectors" append="false">
 			<refItem ref="StandardTCPConnectorFixedPort"/>
 		</list>
@@ -20,8 +19,7 @@
 		<simple name="discoveryURI" value="smartmulticast://default?group=jiac-tng" />
 	</object>
 	
-	<object id="StandardTCPConnectorFixedPort">
-		<parent ref="StandardTCPConnector"/>
+	<object id="StandardTCPConnectorFixedPort" parent="StandardTCPConnector">
 		<simple name="transportURI" value="tcp://0.0.0.0:61616" />
 	</object>
 	

@@ -414,7 +414,7 @@ public class SessionTestBean extends AbstractAgentBean implements IEffector, Res
       act = thisAgent.searchAction(template);
     }
 
-    invoke(act, new Serializable[] { param }, receiver, timeOut);
+    invoke(act, new Serializable[] { param }, receiver, Long.valueOf(timeOut));
 
   }
 

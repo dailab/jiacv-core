@@ -1,6 +1,9 @@
-<configuration xmlns="http://www.jiac.de/AAMM/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.jiac.de/AAMM/1.0 http://www.jiac.de/xsd/aamm-1.0.xsd"
+<configuration xmlns="http://www.jiac.de/AAMM/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.jiac.de/AAMM/1.1 http://www.jiac.de/xsd/aamm-1.1.xsd"
 	framework="JIAC V">
+	
+	<import namespace="de.dailab.jiactng.agentcore.aamm.jms" as="jms"/>
+	
     <!--
        # The default Node configuration
        # provides an empty platform definition without JMX and directory support.
@@ -13,10 +16,9 @@
       # provides an empty platform definition without JMX support but with a distributed agent and service directory.
       # the platform bean may be set as parent in any other platfom definitions 
     -->
-	<node id="NodeWithDirectory">
-		<parent ref="Node"/>
+	<node id="NodeWithDirectory" parent="Node">
 		<list name="agentNodeBeans">
-			<refItem namespace="de.dailab.jiactng.agentcore.aamm.jms" ref="StandardJMSBroker"/>
+			<refItem ref="jms:StandardJMSBroker"/>
 			<refItem ref="IDirectory"/>
 		</list>
 	</node>
@@ -33,8 +35,7 @@
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
 	-->
-	<node id="NodeWithJMX">
-		<parent ref="NodeWithDirectory"/>
+	<node id="NodeWithJMX" parent="NodeWithDirectory">
 		<list name="jmxConnectors">
 			<objItem class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector" />
 		</list>
@@ -52,8 +53,7 @@
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
 	-->
-	<node id="NodeWithRegistry">
-		<parent ref="NodeWithDirectory"/>
+	<node id="NodeWithRegistry" parent="NodeWithDirectory">
 		<list name="jmxConnectors">
 			<objItem class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector">
 				<simple name="registryPort" value="1099"/>
@@ -73,8 +73,7 @@
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
 	-->
-	<node id="NodeWithSecuredJMX">
-		<parent ref="NodeWithDirectory"/>
+	<node id="NodeWithSecuredJMX" parent="NodeWithDirectory">
 		<list name="jmxConnectors">
 			<objItem class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector">
 				<object name="authenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator">
@@ -103,24 +102,21 @@
 		<objectRef name="execution" ref="SimpleExecutionCycle"/>
 	</agent>
 	
-	<agent id="NonBlockingAgent">
-		<parent ref="SimpleAgent"/>
+	<agent id="NonBlockingAgent" parent="SimpleAgent">
 		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
 	</agent>
 	
-	<agent id="SimpleAgentWithCommunication">
-		<parent ref="SimpleAgent"/>
+	<agent id="SimpleAgentWithCommunication" parent="SimpleAgent">
 		<agentElementRef ref="CommunicationBean"/>
 	</agent>
 	
-	<agent id="NonBlockingAgentWithCommunication">
-		<parent ref="SimpleAgentWithCommunication"/>
+	<agent id="NonBlockingAgentWithCommunication" parent="SimpleAgentWithCommunication">
 		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
 	</agent>
 	
 	<agentElement id="CommunicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean">
 		<list name="transports">
-			<refItem namespace="de.dailab.jiactng.agentcore.aamm.jms" ref="StandardJMSMessageTransport"/>
+			<refItem ref="jms:StandardJMSMessageTransport"/>
 		</list>
 	</agentElement>
 	
@@ -130,7 +126,7 @@
 		##################################################################
 	 -->
 	<object id="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean">
-		<objectRef name="messageTransport" namespace="de.dailab.jiactng.agentcore.aamm.jms" ref="StandardJMSMessageTransport"/>
+		<objectRef name="messageTransport" ref="jms:StandardJMSMessageTransport"/>
 	</object>
 	
 	<object id="Memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" />

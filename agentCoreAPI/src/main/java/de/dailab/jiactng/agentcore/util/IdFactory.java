@@ -26,7 +26,10 @@ public final class IdFactory {
         Node("n-"), 
 
     	/** The prefix for session IDs is "s-". */
-        Session("s-");
+        Session("s-"),
+        
+        /** The prefix for conversation IDs is "c-". */
+        Conversation("c-");
 
         private final String value;
 
@@ -100,6 +103,17 @@ public final class IdFactory {
      */
     public static String createSessionId(int hashcode) {
         return createId(IdPrefix.Session, hashcode);
+    }
+    
+    /**
+     * Creates a id for a conversation.
+     * 
+     * @param hashcode
+     *            the hash code of the protocol handler.
+     * @return the conversation id
+     */
+    public static String createConversationId(int hashcode) {
+        return createId(IdPrefix.Conversation, hashcode);
     }
 
     /**

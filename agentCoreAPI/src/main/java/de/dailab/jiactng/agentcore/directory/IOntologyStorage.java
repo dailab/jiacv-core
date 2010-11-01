@@ -2,7 +2,6 @@ package de.dailab.jiactng.agentcore.directory;
 
 import java.net.URI;
 
-import de.dailab.jiactng.agentcore.IAgentNodeBean;
 import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 
 /**
@@ -12,7 +11,7 @@ import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
  * 
  * @author moekon
  */
-public interface IOntologyStorage extends IAgentNodeBean {
+public interface IOntologyStorage {
 
   /**
    * Loads a ServiceDescription from a given URI (which may also point to a local file). The Ontology is parsed,

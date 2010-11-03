@@ -168,7 +168,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
         		String address = ia.getHostAddress();
             	URI newURI = new URI(scheme + "://" + address + ":" + port);
             	tc.setConnectUri(newURI);
-            	System.out.println("NewConnectURI: " + newURI);
+            	System.out.println("\tNewConnectURI: " + newURI);
+            	_broker.removeConnector(tc);
+            	_broker.addConnector(newURI);
         	}
         }
         

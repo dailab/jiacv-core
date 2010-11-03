@@ -135,6 +135,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
                 _broker.setPersistent(_persistent);
 
+                
+                
             	final TransportConnector connector= _broker.addConnector(new URI(amtc.getTransportURI()));
             	System.out.println("TransportURI" + amtc.getTransportURI());
                 if (amtc.getDiscoveryURI() != null) {
@@ -158,20 +160,20 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
         	URI uri = tc.getConnectUri();
         	System.out.println("\tConnectURI: " + uri);
 
-        	String host = uri.getHost();
-        	int port = uri.getPort();
-        	String scheme = uri.getScheme();
-        	
-        	InetSocketAddress isa = new InetSocketAddress(host, port);
-        	InetAddress ia = isa.getAddress();
-        	if (ia != null) {
-        		String address = ia.getHostAddress();
-            	URI newURI = new URI(scheme + "://" + address + ":" + port);
-            	tc.setConnectUri(newURI);
-            	System.out.println("\tNewConnectURI: " + newURI);
-            	_broker.removeConnector(tc);
-            	_broker.addConnector(newURI);
-        	}
+//        	String host = uri.getHost();
+//        	int port = uri.getPort();
+//        	String scheme = uri.getScheme();
+//        	
+//        	InetSocketAddress isa = new InetSocketAddress(host, port);
+//        	InetAddress ia = isa.getAddress();
+//        	if (ia != null) {
+//        		String address = ia.getHostAddress();
+//            	URI newURI = new URI(scheme + "://" + address + ":" + port);
+//            	tc.setConnectUri(newURI);
+//            	System.out.println("\tNewConnectURI: " + newURI);
+//            	_broker.removeConnector(tc);
+//            	_broker.addConnector(newURI);
+//        	}
         }
         
         log.debug("started broker");

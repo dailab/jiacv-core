@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.comm.broker;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
@@ -7,9 +9,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.Service;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
+import org.apache.activemq.command.WireFormatInfo;
 import org.apache.activemq.network.NetworkConnector;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
@@ -105,6 +109,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
         _brokerName= agentNode.getUUID() + getBeanName();
         _broker = new BrokerService();
         _broker.setBrokerName(getBrokerName());
+        System.out.println("BrokerName: " + _broker.getBrokerName());
         
         if(agentNode.isManagementEnabled()) {
             _broker.setUseJmx(true);
@@ -119,8 +124,10 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
         try {
             for (ActiveMQTransportConnector amtc : _connectors) {
                 log.debug("embedded broker initializing transport:: " + amtc.toString());
+                System.out.println("embedded broker initializing transport:: " + amtc.toString());
                 if (amtc.getNetworkURI() != null) {
                 	final URI networkUri = new URI(amtc.getNetworkURI());
+                	System.out.println("NetworkURI: " + networkUri);
                     final NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
                     networkConnector.setDuplex(amtc.isDuplex());
                     networkConnector.setNetworkTTL(amtc.getNetworkTTL());
@@ -129,6 +136,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
                 _broker.setPersistent(_persistent);
 
             	final TransportConnector connector= _broker.addConnector(new URI(amtc.getTransportURI()));
+            	System.out.println("TransportURI" + amtc.getTransportURI());
                 if (amtc.getDiscoveryURI() != null) {
                     final URI uri = new URI(amtc.getDiscoveryURI());
                     final URI discoveryURI= new URI(amtc.getDiscoveryURI());
@@ -145,6 +153,25 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
         }
 
         _broker.start();
+        List<TransportConnector> tcs = _broker.getTransportConnectors();
+        for (TransportConnector tc:tcs) {
+        	URI uri = tc.getConnectUri();
+        	System.out.println("\tConnectURI: " + uri);
+
+        	String host = uri.getHost();
+        	int port = uri.getPort();
+        	String scheme = uri.getScheme();
+        	
+        	InetSocketAddress isa = new InetSocketAddress(host, port);
+        	InetAddress ia = isa.getAddress();
+        	if (ia != null) {
+        		String address = ia.getHostAddress();
+            	URI newURI = new URI(scheme + "://" + address + ":" + port);
+            	tc.setConnectUri(newURI);
+            	System.out.println("NewConnectURI: " + newURI);
+        	}
+        }
+        
         log.debug("started broker");
     }
 

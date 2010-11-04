@@ -48,7 +48,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     private DiscoveryAgent discoveryAgent;
     private ConcurrentHashMap<URI, NetworkBridge> bridges = new ConcurrentHashMap<URI, NetworkBridge>();
     private Map<String, String> parameters;
-    private boolean _useAlwaysSourceAddress= false;
+    private boolean _useAlwaysSourceAddress= true;
     
     public SourceAwareDiscoveryNetworkConnector() {
     }
@@ -88,11 +88,13 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                 LOG.warn("Could not connect to remote URI: " + url + " due to bad URI syntax: " + e, e);
                 return;
             }
+
             // Should we try to connect to that URI?
             if( bridges.containsKey(uri) ) {
                 LOG.debug("Discovery agent generated a duplicate onServiceAdd event for: "+uri );
                 return;
             }
+
             if ( localURI.equals(uri) || (connectionFilter != null && !connectionFilter.connectTo(uri))) {
                 LOG.debug("not connecting loopback: " + uri);
                 return;

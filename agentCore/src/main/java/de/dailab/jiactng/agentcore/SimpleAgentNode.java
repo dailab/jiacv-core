@@ -420,13 +420,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
   }
 
   /**
-   * Gets the name of the agent platform, which is defined by the group of the discovery URI.
-   * Only agent nodes which belongs to the same agent platform are able to communicate.
-   * @return the platform name or <code>null</code> if no network connector exist or the
-   * discovery URI of the network connector does not define a group. 
+   * Gets the name of the agent platform, which is defined by address and 
+   * group of the discovery URI. Only agent nodes which belongs to the same 
+   * agent platform are able to communicate.
+   * @return the platform name or <code>null</code> if no network connector 
+   * exist or the discovery URI of the network connector does not belong to 
+   * the protocol "smartmulticast". 
    */
   public String getPlatformName() {
-	final String prefix = "smartmulticast://default?group=";
+	final String prefix = "smartmulticast://";
     for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
       if (agentNodeBean instanceof ActiveMQBroker) {
         Set<ActiveMQTransportConnector> connectors = ((ActiveMQBroker) agentNodeBean).getConnectors();

@@ -64,6 +64,25 @@ public final class JmxManager implements Manager {
 	/** The domain of JMX object names is "de.dailab.jiactng".*/
 	public static final String DOMAIN = "de.dailab.jiactng";
 
+	// category names
+
+	/** The name of the agent node category as part of the JMX object names. This is also visualized in the tree of beans within jConsole. */
+	public static final String CATEGORY_AGENT_NODE = "AgentNode";
+
+	/** The name of the agent node bean category as part of the JMX object names. This is also visualized in the tree of beans within jConsole. */
+	public static final String CATEGORY_AGENT_NODE_BEAN = "agentNodeBean";
+
+	/** The name of the agent category as part of the JMX object names. This is also visualized in the tree of beans within jConsole. */
+	public static final String CATEGORY_AGENT = "Agent";
+
+	/** The name of the agent bean category as part of the JMX object names. This is also visualized in the tree of beans within jConsole. */
+	public static final String CATEGORY_AGENT_BEAN = "AgentBean";
+
+	/** The name of the JMX connector server category as part of the JMX object names. This is also visualized in the tree of beans within jConsole. */
+	public static final String CATEGORY_JMX_CONNECTOR_SERVER = "JMXConnectorServer";
+
+	// private fields
+
 	private MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 	private ArrayList<JMXConnectorServer> connectorServer = new ArrayList<JMXConnectorServer>();
 	private Timer ti = null;
@@ -75,8 +94,9 @@ public final class JmxManager implements Manager {
 	 * @throws MalformedObjectNameException The parameter contains an illegal character or does not follow the rules for quoting.
 	 */
 	public ObjectName getMgmtNameOfAgentNode(String nodeId) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId);
+		return new ObjectName(new StringBuffer(DOMAIN)
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.toString());
 	}
 
 	/**
@@ -87,9 +107,10 @@ public final class JmxManager implements Manager {
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
 	public ObjectName getMgmtNameOfAgentNodeBean(String nodeId, String beanName) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=agentNodeBean,agentnodebean=" + beanName);
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(CATEGORY_AGENT_NODE_BEAN).append(",agentnodebean=").append(beanName)
+			.toString());
 	}
 
 	/**
@@ -103,10 +124,11 @@ public final class JmxManager implements Manager {
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
 	public ObjectName getMgmtNameOfAgentNodeBeanResource(String nodeId, String beanName, String resourceType, String resourceName) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=agentNodeBean,agentnodebean=" + beanName +
-				",category3=" + resourceType + ",resource=" + resourceName);
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(CATEGORY_AGENT_NODE_BEAN).append(",agentnodebean=").append(beanName)
+			.append(",category3=").append(resourceType).append(",resource=").append(resourceName)
+			.toString());
 	}
 
 	/**
@@ -118,9 +140,10 @@ public final class JmxManager implements Manager {
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
 	public ObjectName getMgmtNameOfAgentNodeResource(String nodeId, String resourceType) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=" + resourceType);
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(resourceType)
+			.toString());
 	}
 
 	/**
@@ -133,107 +156,114 @@ public final class JmxManager implements Manager {
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
 	public ObjectName getMgmtNameOfAgentNodeResource(String nodeId, String resourceType, String resourceName) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=" + resourceType + ",resource=" + resourceName);
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(resourceType).append(",resource=").append(resourceName)
+			.toString());
 	}
 
 	/**
 	 * Constructs a JMX compliant name for the management of an agent.
 	 * @param nodeId the UUID of the agent node where the agent is residing on
-	 * @param agentName the name of the agent
+	 * @param agentId the ID of the agent
 	 * @return the JMX compliant name of the agent
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
-	public ObjectName getMgmtNameOfAgent(String nodeId, String agentName) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=Agent,agent=" + agentName);
+	public ObjectName getMgmtNameOfAgent(String nodeId, String agentId) throws MalformedObjectNameException {
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(CATEGORY_AGENT).append(",agent=").append(agentId)
+			.toString());
 	}
 
 	/**
 	 * Constructs a JMX compliant name for the management of an agent resource. The
 	 * agent always contains only one resource of the specified type.
 	 * @param nodeId the UUID of the agent node where the agent is residing on
-	 * @param agentName the name of the agent
+	 * @param agentId the ID of the agent
 	 * @param resourceType the type of the agent resource
 	 * @return the JMX compliant name of the agent resource
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
-	public ObjectName getMgmtNameOfAgentResource(String nodeId, String agentName, String resourceType) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=Agent,agent=" + agentName + 
-				",category3=" + resourceType);
+	public ObjectName getMgmtNameOfAgentResource(String nodeId, String agentId, String resourceType) throws MalformedObjectNameException {
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(CATEGORY_AGENT).append(",agent=").append(agentId)
+			.append(",category3=").append(resourceType)
+			.toString());
 	}
 
 	/**
 	 * Constructs a JMX compliant name for the management of an agent resource. The
 	 * agent may contain more than one resource of the specified type.
 	 * @param nodeId the UUID of the agent node where the agent is residing on
-	 * @param agentName the name of the agent
+	 * @param agentId the ID of the agent
 	 * @param resourceType the type of the agent resource
 	 * @param resourceName the name of the agent resource
 	 * @return the JMX compliant name of the agent resource
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
-	public ObjectName getMgmtNameOfAgentResource(String nodeId, String agentName, String resourceType, String resourceName) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=Agent,agent=" + agentName + 
-				",category3=" + resourceType + ",resource=" + resourceName);
+	public ObjectName getMgmtNameOfAgentResource(String nodeId, String agentId, String resourceType, String resourceName) throws MalformedObjectNameException {
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(CATEGORY_AGENT).append(",agent=").append(agentId)
+			.append(",category3=").append(resourceType).append(",resource=").append(resourceName)
+			.toString());
 	}
 
 	/**
 	 * Constructs a JMX compliant name for the management of an agent bean.
 	 * @param nodeId the UUID of the agent node where the agent is residing on which contains the agent bean
-	 * @param agentName the name of the agent which contains the agent bean
+	 * @param agentId the ID of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @return the JMX compliant name of the agent bean
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
-	public ObjectName getMgmtNameOfAgentBean(String nodeId, String agentName, String beanName) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=Agent,agent=" + agentName + 
-				",category3=AgentBean,agentbean=" + beanName);
+	public ObjectName getMgmtNameOfAgentBean(String nodeId, String agentId, String beanName) throws MalformedObjectNameException {
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(CATEGORY_AGENT).append(",agent=").append(agentId)
+			.append(",category3=").append(CATEGORY_AGENT_BEAN).append(",agentbean=").append(beanName)
+			.toString());
 	}
 
 	/**
 	 * Constructs a JMX compliant name for the management of an agent bean resource. The
 	 * agent bean always contains only one resource of the specified type.
 	 * @param nodeId the UUID of the agent node where the agent is residing on which contains the agent bean
-	 * @param agentName the name of the agent which contains the agent bean
+	 * @param agentId the ID of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @param resourceType the type of the resource
 	 * @return the JMX compliant name of the agent bean resource
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
-	public ObjectName getMgmtNameOfAgentBeanResource(String nodeId, String agentName, String beanName, String resourceType) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=Agent,agent=" + agentName + 
-				",category3=AgentBean,agentbean=" + beanName + 
-				",category4=" + resourceType);
+	public ObjectName getMgmtNameOfAgentBeanResource(String nodeId, String agentId, String beanName, String resourceType) throws MalformedObjectNameException {
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(CATEGORY_AGENT).append(",agent=").append(agentId)
+			.append(",category3=").append(CATEGORY_AGENT_BEAN).append(",agentbean=").append(beanName)
+			.append(",category4=").append(resourceType)
+			.toString());
 	}
 
 	/**
 	 * Constructs a JMX compliant name for the management of an agent bean resource. The
 	 * agent bean may contain more than one resource of the specified type.
 	 * @param nodeId the UUID of the agent node where the agent is residing on which contains the agent bean
-	 * @param agentName the name of the agent which contains the agent bean
+	 * @param agentId the ID of the agent which contains the agent bean
 	 * @param beanName the name of the agent bean
 	 * @param resourceType the type of the resource
 	 * @param resourceName the name of the resource
 	 * @return the JMX compliant name of the agent bean resource
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 */
-	public ObjectName getMgmtNameOfAgentBeanResource(String nodeId, String agentName, String beanName, String resourceType, String resourceName) throws MalformedObjectNameException {
-		return new ObjectName(DOMAIN + 
-				":category1=AgentNode,agentnode=" + nodeId + 
-				",category2=Agent,agent=" + agentName + 
-				",category3=AgentBean,agentbean=" + beanName + 
-				",category4=" + resourceType + ",resource=" + resourceName);
+	public ObjectName getMgmtNameOfAgentBeanResource(String nodeId, String agentId, String beanName, String resourceType, String resourceName) throws MalformedObjectNameException {
+		return new ObjectName(new StringBuffer(DOMAIN) 
+			.append(":category1=").append(CATEGORY_AGENT_NODE).append(",agentnode=").append(nodeId)
+			.append(",category2=").append(CATEGORY_AGENT).append(",agent=").append(agentId)
+			.append(",category3=").append(CATEGORY_AGENT_BEAN).append(",agentbean=").append(beanName)
+			.append(",category4=").append(resourceType).append(",resource=").append(resourceName)
+			.toString());
 	}
 	
 	/**
@@ -906,7 +936,7 @@ public final class JmxManager implements Manager {
 
 			// register connector server as JMX resource
 			try {
-				this.registerAgentNodeResource(node, "JMXConnectorServer", "\"" + cs.getAddress() + "\"", cs);
+				this.registerAgentNodeResource(node, CATEGORY_JMX_CONNECTOR_SERVER, "\"" + cs.getAddress() + "\"", cs);
 			}
 			catch (Exception e) {
 				System.err.println("WARNING: Unable to register JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");
@@ -954,7 +984,7 @@ public final class JmxManager implements Manager {
 
 			// deregister connector server as JMX resource
 			try {
-				this.unregisterAgentNodeResource(node, "JMXConnectorServer", "\"" + cs.getAddress() + "\"");
+				this.unregisterAgentNodeResource(node, CATEGORY_JMX_CONNECTOR_SERVER, "\"" + cs.getAddress() + "\"");
 			}
 			catch (Exception e) {
 				System.err.println("WARNING: Unable to deregister JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");

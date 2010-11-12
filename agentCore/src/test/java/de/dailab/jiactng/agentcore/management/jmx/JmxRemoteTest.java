@@ -62,24 +62,25 @@ public class JmxRemoteTest extends TestCase {
     public void testJmxRemote() throws Exception {
         // launch node
         ApplicationContext ac= new ApplicationContext("de.dailab.jiactng.agentcore.management.jmx.jmxremote");
-
         final IAgentNode node= (IAgentNode) ac.getBean("NodeWithRemoteJMX");
+
+        // wait 5 seconds to ensure creation and registration of the JMX connector server
+        Thread.sleep(5000);
+
+        // ensure that node is started within 2 seconds (not needed anymore)
         StartListener listener= new StartListener(node);
         node.addLifecycleListener(listener);
-
         assertTrue("node did not start properly", listener.ensureStarted(2000L));
 
+        // get one of the service URLs
         Set<JMXServiceURL> jmxURLs = node.getJmxURLs();
-        assertEquals("invalid number of connectors", 1, jmxURLs.size());
-
-        // now we have OUR service url
+        assertTrue("no connector found", !jmxURLs.isEmpty());
         String serviceUrl= jmxURLs.iterator().next().toString();
 
+        // test connecting to service URL without error
         Process clientProcess= createClientProcess(JmxClient.class, serviceUrl);
-
         new StreamPumper(clientProcess.getInputStream(), "JmxClient.STDOUT", false).start();
         new StreamPumper(clientProcess.getErrorStream(), "JmxClient.STDERR", true).start();
-
         clientProcess.waitFor();
     }
 

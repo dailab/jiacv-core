@@ -1,7 +1,9 @@
 package de.dailab.jiactng.agentcore;
 
 import java.io.FileNotFoundException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +18,7 @@ import java.util.concurrent.Future;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
+import javax.management.ObjectName;
 import javax.management.remote.JMXServiceURL;
 import javax.management.timer.Timer;
 
@@ -87,9 +90,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
   /** A timer for being informed about dates. */
   private Timer                           timer                 = null;
-
-  /** URLs of the created JMX connector server. */
-  private Set<JMXServiceURL>              jmxURLs               = null;
 
   /** Shutdown thread to be started when JVM was killed */
   private Thread                          shutdownhook          = new Thread() {
@@ -406,7 +406,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    * @see InetAddress#toString()
    */
   public final String getHost() throws UnknownHostException {
-    return InetAddress.getLocalHost().toString();
+    return InetAddress.getLocalHost().getCanonicalHostName();
   }
 
   /**
@@ -932,7 +932,28 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    * {@inheritDoc}
    */
   public final Set<JMXServiceURL> getJmxURLs() {
-    return jmxURLs;
+	if (_manager == null) {
+		return null;
+	}
+
+	Set<JMXServiceURL> jmxURLs = new HashSet<JMXServiceURL>();
+	try {
+		ObjectName query = ((JmxManager)_manager).getMgmtNameOfAgentNodeResource(uuid, JmxManager.CATEGORY_JMX_CONNECTOR_SERVER, "*");
+		for (ObjectName o : ManagementFactory.getPlatformMBeanServer().queryNames(query, null)) {
+			String url = o.getKeyProperty("resource");
+			url = url.substring(1, url.length()-1);
+			try {
+				jmxURLs.add(new JMXServiceURL(url));
+			}
+			catch (MalformedURLException mue) {
+				mue.printStackTrace();
+			}
+		}
+		return jmxURLs;
+	}
+	catch (Exception e) {
+		throw new RuntimeException(e);
+	}
   }
 
   /**
@@ -981,7 +1002,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
     // enable remote management
     if ((jmxConnectors != null) && (manager instanceof JmxManager)) {
-      jmxURLs = ((JmxManager) manager).enableRemoteManagement(this);
+      ((JmxManager) manager).enableRemoteManagement(this);
     }
 
     super.enableManagement(manager);

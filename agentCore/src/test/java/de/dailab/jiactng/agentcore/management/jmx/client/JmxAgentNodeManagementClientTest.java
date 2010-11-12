@@ -119,7 +119,7 @@ public class JmxAgentNodeManagementClientTest extends TestCase implements Notifi
 		// get host directly
 		String intendedHost = "";
 		try {
-			intendedHost = InetAddress.getLocalHost().toString();
+			intendedHost = InetAddress.getLocalHost().getCanonicalHostName();
 		} catch (UnknownHostException uhe) {}
 		
 		// get host by JMX

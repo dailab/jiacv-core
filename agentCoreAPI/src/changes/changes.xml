@@ -6,6 +6,10 @@
 	</properties>
 	<body>
 		<release version="5.1.1" date="t.b.a." description="Minor release">
+			<action dev="keiser" type="update">
+				Creation of JMX connector server for each network interface and sending multicast message
+				with the JMX service URL via this network interface.
+			</action>
 			<action dev="keiser" type="add">
 				Added method to management interface to get name of agent node's platform.
 			</action>

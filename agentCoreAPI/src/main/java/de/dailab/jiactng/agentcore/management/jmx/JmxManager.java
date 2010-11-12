@@ -1,18 +1,6 @@
 package de.dailab.jiactng.agentcore.management.jmx;
 
 import java.lang.management.ManagementFactory;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 
 import javax.management.Attribute;
@@ -27,10 +15,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import javax.management.remote.JMXAuthenticator;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
-import javax.management.remote.JMXServiceURL;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
@@ -50,7 +34,7 @@ import de.dailab.jiactng.agentcore.management.Manager;
 public final class JmxManager implements Manager {
 
 	/** The delay for sending multicast messages is 1,000 milliseconds. */
-	public static final long MULTICAST_DELAY = 1000;
+	public static final long MULTICAST_DELAY = 0;
 
 	/** The period for sending multicast messages is 3,600 milliseconds. */
 	public static final long MULTICAST_PERIOD = 3600;
@@ -84,8 +68,8 @@ public final class JmxManager implements Manager {
 	// private fields
 
 	private MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-	private ArrayList<JMXConnectorServer> connectorServer = new ArrayList<JMXConnectorServer>();
 	private Timer ti = null;
+	private JmxConnectorManager connectorManager = null;
 
 	/**
 	 * Constructs a JMX compliant name for the management of an agent node.
@@ -820,146 +804,27 @@ public final class JmxManager implements Manager {
 	 * @param node the agent node
 	 * @return The URLs of all created connector server.
 	 * @see IAgentNode#getJmxConnectors()
-	 * @see JMXServiceURL#JMXServiceURL(String, String, int, String)
-	 * @see JMXConnectorServerFactory#newJMXConnectorServer(JMXServiceURL, Map, MBeanServer)
-	 * @see javax.management.remote.JMXConnectorServerMBean#start()
-	 * @see JmxMulticastSender
+	 * @see JmxConnectorManager
+	 * @see Timer#schedule(java.util.TimerTask, long, long)
 	 */
-	public Set<JMXServiceURL> enableRemoteManagement(IAgentNode node) {
-		String host = null;
-		final Set<JmxConnector> jmxConnectors = node.getJmxConnectors();
-		if (!jmxConnectors.isEmpty()) {
-			System.setProperty("com.sun.management.jmxremote", "");
-
-			// identify hostname to be used by the connector servers
-			try {
-				Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-				while (interfaces.hasMoreElements()) {
-					NetworkInterface ifc = interfaces.nextElement();
-					if (ifc.isLoopback() || !ifc.isUp()) {
-						continue;
-					}
-					Enumeration<InetAddress> addresses = ifc.getInetAddresses();
-					while (addresses.hasMoreElements()) {
-						InetAddress address = addresses.nextElement();
-						if (address instanceof Inet4Address) {
-							host = address.getCanonicalHostName();
-							System.setProperty("java.rmi.server.hostname", host);
-							break;
-						}
-					}
-				}
-				if (host == null) {
-					System.err.println("WARNING: Found no global IPv4 address. Will use localhost for JMX connector servers instead.");
-				}
-			}
-			catch (SocketException e) {
-				System.err.println("WARNING: Unable to get network interfaces. Will use localhost for JMX connector servers instead.");
-			}
+	public void enableRemoteManagement(IAgentNode node) {
+		if (node.getJmxConnectors().isEmpty()) {
+			return;
 		}
 
-		// Create and register all specified JMX connector servers
-		for (JmxConnector conf : jmxConnectors) {
-			// get parameters of connector server
-			final String protocol = conf.getProtocol();
-			if (protocol == null) {
-				System.out.println("WARNING: No protocol specified for a JMX connector server");
-				continue;
-			}
-			int port = conf.getPort();
-			String path = conf.getPath();
-			final JMXAuthenticator authenticator = conf.getAuthenticator();
-
-			if (protocol.equals("rmi")) {
-				// check use of RMI registry
-				final int registryPort = ((RmiJmxConnector) conf).getRegistryPort();
-				final String registryHost = ((RmiJmxConnector) conf).getRegistryHost();
-				if ((registryPort > 0) || (registryHost != null)) {
-					path = "/jndi/rmi://" + 
-						((registryHost == null) ? "localhost" : registryHost) +
-						((registryPort > 0) ? ":" + registryPort : "") + "/" + node.getUUID();
-				}
-			}
-
-			// configure authentication
-			final HashMap<String,Object> env = new HashMap<String,Object>();
-			if (authenticator != null) {
-				env.put(JMXConnectorServer.AUTHENTICATOR, authenticator);
-			}
-
-			// construct server URL
-			JMXServiceURL jurl = null;
-			try {
-				jurl = new JMXServiceURL(protocol, host, port, path);
-			}
-			catch (Exception e) {
-				System.err.println("WARNING: Unable to construct URL of JMX connector server.");
-				System.err.println("It is not possible to find the local host name, or the protocol " + protocol + ", port " + port + " or path " + path + " is incorrect.");
-				System.err.println(e.getMessage());
-				continue;
-			}
-			
-			// create connector server
-			System.out.println("Creating JMX connector server: " + jurl);
-			JMXConnectorServer cs = null;
-			try {
-				cs = JMXConnectorServerFactory.newJMXConnectorServer(jurl, env, mbs);
-			}
-			catch (MalformedURLException e) {
-				System.err.println("WARNING: Unable to create JMX connector server for " + jurl);
-				System.err.println("Missing provider implementation for the specified protocol.");
-				System.err.println(e.getMessage());
-				continue;
-			}
-			catch (Exception e) {
-				System.err.println("WARNING: Unable to create JMX connector server for " + jurl);
-				System.err.println("Communication problem, or the found provider implementation for the specified protocol can not be used.");
-				System.err.println(e.getMessage());
-				continue;
-			}
-
-			// start connector server
-			try {
-				cs.start();
-			}
-			catch (Exception e) {
-				System.err.println("WARNING: Start of JMX connector server failed for " + jurl);
-				final String prefix = "/jndi/rmi://";
-				if ((path != null) && path.startsWith(prefix)) {
-					System.err.println("Please ensure that a rmi registry is started on " + path.substring(prefix.length(), path.length() - node.getUUID().length() - 1));
-				}
-				System.err.println(e.getMessage());
-				continue;
-			}
-			System.out.println("JMX connector server successfully started: " + cs.getAddress());
-			connectorServer.add(cs);
-
-			// register connector server as JMX resource
-			try {
-				this.registerAgentNodeResource(node, CATEGORY_JMX_CONNECTOR_SERVER, "\"" + cs.getAddress() + "\"", cs);
-			}
-			catch (Exception e) {
-				System.err.println("WARNING: Unable to register JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");
-				System.err.println(e.getMessage());
-			}
+		System.setProperty("com.sun.management.jmxremote", "");
+		try {
+			// create connector manager
+			connectorManager = new JmxConnectorManager(node, MULTICAST_PORT, MULTICAST_ADDRESS, 1);
+		}
+		catch (Exception e) {
+			return;
 		}
 
-		// send addresses of all connector servers via multicast periodically
-		final String[] jmxURLs = new String[connectorServer.size()];
-		for (int i=0; i<connectorServer.size(); i++) {
-			jmxURLs[i] = connectorServer.get(i).getAddress().toString();
-		}
+		// schedule timer task
 		ti = new Timer();
-		final JmxMulticastSender multiSend = new JmxMulticastSender(MULTICAST_PORT, MULTICAST_ADDRESS, 1, jmxURLs);
-		ti.schedule(multiSend, MULTICAST_DELAY, MULTICAST_PERIOD);
+		ti.schedule(connectorManager, MULTICAST_DELAY, MULTICAST_PERIOD);
 		System.out.println("Initiated multicast sender on port " + MULTICAST_PORT + " with group " + MULTICAST_ADDRESS + " and interval " + MULTICAST_PERIOD);
-
-		// return connector server URLs
-		final Set<JMXServiceURL> urls = new HashSet<JMXServiceURL>();
-		for (int i=0; i<connectorServer.size(); i++) {
-			urls.add(connectorServer.get(i).getAddress());
-		}
-		return urls;
 	}
 
 	/**
@@ -968,38 +833,16 @@ public final class JmxManager implements Manager {
 	 * @see javax.management.remote.JMXConnectorServerMBean#stop()
 	 */
 	public void disableRemoteManagement(IAgentNode node) {
-		// stop multicast sender
+		// stop connector manager
 		if (ti != null) {
 			ti.cancel();
 			ti = null;
 		}
 
-		// Deregister and stop all connector servers
-		final Iterator<JMXConnectorServer> i = connectorServer.iterator();
-		while (i.hasNext()) {
-			final JMXConnectorServer cs = i.next();
-			
-			// deregister connector server
-			// TODO deregister the connector server from the server directory
-
-			// deregister connector server as JMX resource
-			try {
-				this.unregisterAgentNodeResource(node, CATEGORY_JMX_CONNECTOR_SERVER, "\"" + cs.getAddress() + "\"");
-			}
-			catch (Exception e) {
-				System.err.println("WARNING: Unable to deregister JMX connector server \""+ cs.getAddress() + "\" as JMX resource.");
-				System.err.println(e.getMessage());				
-			}
-
-			// stop connector server
-			System.out.println("Stop connector server " + cs.getAddress().toString());
-			try {
-				cs.stop();
-			} catch (Exception e) {
-				System.err.println("WARNING: Unable to stop JMX connector server!");
-				System.err.println(e.getMessage());
-			}
-			i.remove();
+		// remove all connector servers
+		if (connectorManager != null) {
+			connectorManager.removeAll();
+			connectorManager = null;
 		}
 	}
 }

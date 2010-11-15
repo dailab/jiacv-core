@@ -39,6 +39,7 @@ import de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker;
 import de.dailab.jiactng.agentcore.comm.broker.ActiveMQTransportConnector;
 import de.dailab.jiactng.agentcore.conf.GenericAgentProperties;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
+import de.dailab.jiactng.agentcore.group.IAgentGroup;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleEvent;
@@ -46,6 +47,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.JmxConnector;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
+import de.dailab.jiactng.agentcore.ontology.AgentGroupDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
 import de.dailab.jiactng.agentcore.util.jar.JARMemory;
@@ -78,6 +80,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
   /** The list of agents. */
   private final ArrayList<IAgent>         agents;
+  
+  /** The list of all agentgroups. */
+  private final ArrayList<IAgentGroup> groups;
 
   /** Storage for the agentFutures. Used to stop/cancel agentthreads. */
   private HashMap<String, Future<?>>      agentFutures          = null;
@@ -135,6 +140,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     setLog(LogFactory.getLog(uuid));
     agentNodeBeans = new ArrayList<IAgentNodeBean>();
     agents = new ArrayList<IAgent>();
+    groups = new ArrayList<IAgentGroup>();
 
     // start timer
     timer = new Timer();
@@ -194,6 +200,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       // refresh agent list
       agents.addAll(newAgents);
     }
+  }
+  
+  /**
+   * Sets a list of groups.
+   * 
+   * @param groups the list of groups to set
+   */
+  public void setGroups(List<IAgentGroup> groups) {
+	  this.groups.addAll(groups);
   }
 
   /**
@@ -555,6 +570,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       // owner of agent node is also owner of the initially created agents
       final String owner = getOwner();
 
+		for (IAgentGroup group : groups) {
+			System.out.println("group: " + group.getName()
+					+ " members.size: " + group.getMembers().size());
+			this.agents.addAll(group.getMembers());
+			System.out.println("agents.size: " + agents.size());
+		}
+
       for (IAgent a : agents) {
         if (a.getOwner() == null) {
           a.setOwner(owner);
@@ -694,6 +716,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
           // TODO:
           log.error("Failure when initializing agent: " + a.getAgentName(), e);
         }
+      }
+
+      for (IAgentGroup group:groups) {
+    	  for (IAgent agent:group.getMembers()) {
+    		  AgentGroupDescription groupdescr = new AgentGroupDescription();
+    		  groupdescr.setName(group.getName());
+    		  ((Agent)agent).getMemory().write(groupdescr);
+    	  }
       }
     }
   }

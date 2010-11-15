@@ -42,10 +42,12 @@ import org.springframework.beans.factory.BeanNameAware;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
+import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
+import de.dailab.jiactng.agentcore.group.IAgentGroup;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -56,6 +58,7 @@ import de.dailab.jiactng.agentcore.management.jmx.client.JmxAgentNodeTimerManage
 import de.dailab.jiactng.agentcore.management.jmx.client.JmxManagementClient;
 import de.dailab.jiactng.agentcore.ontology.AgentBeanDescription;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
+import de.dailab.jiactng.agentcore.ontology.AgentGroupDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
@@ -120,6 +123,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   protected final ArrayList<IAgentBean>     agentBeans                     = new ArrayList<IAgentBean>();
 
   private List<IAgentRole>                  agentRoles                     = new ArrayList<IAgentRole>();
+  
+  private List<IAgentGroup>                 agentGroups                    = new ArrayList<IAgentGroup>();
 
   /**
    * activity Flag (could be replaced by statecheck
@@ -568,6 +573,22 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
     updateState(LifecycleStates.STARTED);
 
+    Set<AgentGroupDescription> groupDescriptions = memory.readAllOfType(AgentGroupDescription.class);
+    if (log != null && log.isInfoEnabled()) {
+    	log.info("Groups: " + groupDescriptions.size());
+    }
+    if (communication != null) {
+	    for (AgentGroupDescription description: groupDescriptions) {
+	    	try {
+				communication.joinGroup(CommunicationAddressFactory.createGroupAddress(description.getName()));
+			    if (log != null && log.isInfoEnabled()) {
+			    	log.info("Joined group: " + description.getName());
+			    }
+			} catch (CommunicationException e) {
+				e.printStackTrace();
+			}
+	    }
+    }
   }
 
   /**

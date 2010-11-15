@@ -30,8 +30,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /**
- * Describes an action that can be used within an agent. This is only the
- * action-declaration.
+ * Describes an action that can be used within an agent. This is only the action-declaration.
  * 
  * @see de.dailab.jiactng.agentcore.environment.IEffector
  * @see de.dailab.jiactng.agentcore.action.DoAction
@@ -54,10 +53,16 @@ public class Action implements IActionDescription {
 	private List<String> resultTypeNames;
 
 	private IAgentDescription providerDescription;
-	
-	/** The scope of the action, i.e. which agent will it know or can it use.*/
+
+	/** The scope of the action, i.e. which agent will it know or can it use. */
 	private ActionScope scope;
-	
+
+	/**
+	 * The type of this action. This field is designed to store information about the type of the action. By default,
+	 * this field is null. If the provider publishes distinct actions, this field will be set by the provider.
+	 */
+	private String actionType = null;
+
 	/**
 	 * This constructor is used to create an action template
 	 */
@@ -66,11 +71,12 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * This constructor is used to create an action template with only the name
-	 * specified.
-	 * @param name the name of the action template
+	 * This constructor is used to create an action template with only the name specified.
+	 * 
+	 * @param name
+	 *           the name of the action template
 	 */
-	public Action(String name) {
+	public Action(final String name) {
 		this(name, null, (List<Class<?>>) null, (List<Class<?>>) null, null);
 	}
 
@@ -78,120 +84,129 @@ public class Action implements IActionDescription {
 	 * Constructor. Creates a new action-declaration with agent internal scope.
 	 * 
 	 * @param name
-	 *            the name of the action
+	 *           the name of the action
 	 * @param providerBean
-	 *            the component that holds the functionality of this action
+	 *           the component that holds the functionality of this action
 	 * @param inputTypes
-	 *            the classes of the input-parameters of this action
+	 *           the classes of the input-parameters of this action
 	 * @param resultTypes
-	 *            the classes of the results of this action
+	 *           the classes of the results of this action
 	 */
-	public Action(String name, IEffector providerBean, Class<?>[] inputTypes,
-			Class<?>[] resultTypes) {
-		this(name, providerBean, inputTypes != null ? Arrays.asList(inputTypes)
-				: null, resultTypes != null ? Arrays.asList(resultTypes) : null);
+	public Action(final String name, final IEffector providerBean, final Class<?>[] inputTypes, final Class<?>[] resultTypes) {
+		this(name, providerBean, inputTypes != null ? Arrays.asList(inputTypes) : null, resultTypes != null ? Arrays.asList(resultTypes)
+		      : null);
 	}
 
 	/**
 	 * Constructor. Creates a new action-declaration with agent internal scope.
-	 * @param name the name of the action
-	 * @param providerBean the component that holds the functionality of this action
-	 * @param inputTypes the classes of the input-parameters of this action
-	 * @param resultTypes the classes of the results of this action
+	 * 
+	 * @param name
+	 *           the name of the action
+	 * @param providerBean
+	 *           the component that holds the functionality of this action
+	 * @param inputTypes
+	 *           the classes of the input-parameters of this action
+	 * @param resultTypes
+	 *           the classes of the results of this action
 	 */
-	public Action(String name, IEffector providerBean,
-			List<Class<?>> inputTypes, List<Class<?>> resultTypes) {
+	public Action(final String name, final IEffector providerBean, final List<Class<?>> inputTypes, final List<Class<?>> resultTypes) {
 		this(name, providerBean, inputTypes, resultTypes, ActionScope.AGENT);
 	}
 
 	/**
 	 * Constructor. Creates a new action-declaration.
-	 * @param name the name of the action
-	 * @param providerBean the component that holds the functionality of this action
-	 * @param inputTypes the classes of the input-parameters of this action
-	 * @param resultTypes the classes of the results of this action
-	 * @param scope the scope of this action
+	 * 
+	 * @param name
+	 *           the name of the action
+	 * @param providerBean
+	 *           the component that holds the functionality of this action
+	 * @param inputTypes
+	 *           the classes of the input-parameters of this action
+	 * @param resultTypes
+	 *           the classes of the results of this action
+	 * @param scope
+	 *           the scope of this action
 	 */
-	public Action(String name, IEffector providerBean,
-			List<Class<?>> inputTypes, List<Class<?>> resultTypes, ActionScope scope) {
-		setName(name);
-		setProviderBean(providerBean);
-		setInputTypes(inputTypes);
-		setResultTypes(resultTypes);
-		setScope(scope);
+	public Action(final String name, final IEffector providerBean, final List<Class<?>> inputTypes, final List<Class<?>> resultTypes,
+	      final ActionScope scope) {
+		this.setName(name);
+		this.setProviderBean(providerBean);
+		this.setInputTypes(inputTypes);
+		this.setResultTypes(resultTypes);
+		this.setScope(scope);
 	}
 
 	/**
 	 * Copying constructor
 	 * 
 	 * @param action
-	 *            the action to create an action from
+	 *           the action to create an action from
 	 */
-	public Action(Action action) {
-		name = action.getName();
-		providerBean = action.getProviderBean();
-		scope = action.getScope();
+	public Action(final Action action) {
+		this.name = action.getName();
+		this.providerBean = action.getProviderBean();
+		this.scope = action.getScope();
 
 		// we can exchange references here, because the lists are immutable
-		inputTypeNames = action.getInputTypeNames();
-		resultTypeNames = action.getResultTypeNames();
+		this.inputTypeNames = action.getInputTypeNames();
+		this.resultTypeNames = action.getResultTypeNames();
 	}
 
 	/**
 	 * Creates an action description from JMX composite data.
-	 * @param descr the action description based on JMX open types.
+	 * 
+	 * @param descr
+	 *           the action description based on JMX open types.
 	 */
-	public Action(CompositeData descr) {
-		name = (String) descr.get(IActionDescription.ITEMNAME_NAME);
-		inputTypeNames = Arrays.asList((String[])descr.get(IActionDescription.ITEMNAME_INPUTTYPES));
-		resultTypeNames = Arrays.asList((String[])descr.get(IActionDescription.ITEMNAME_RESULTTYPES));
-		String actionScope = (String) descr.get(IActionDescription.ITEMNAME_SCOPE);
+	public Action(final CompositeData descr) {
+		this.name = (String) descr.get(IActionDescription.ITEMNAME_NAME);
+		this.inputTypeNames = Arrays.asList((String[]) descr.get(IActionDescription.ITEMNAME_INPUTTYPES));
+		this.resultTypeNames = Arrays.asList((String[]) descr.get(IActionDescription.ITEMNAME_RESULTTYPES));
+		final String actionScope = (String) descr.get(IActionDescription.ITEMNAME_SCOPE);
 		if (actionScope != null) {
-			scope = ActionScope.valueOf(actionScope);
+			this.scope = ActionScope.valueOf(actionScope);
 		}
-		CompositeData provider = (CompositeData) descr.get(IActionDescription.ITEMNAME_AGENT);
+		final CompositeData provider = (CompositeData) descr.get(IActionDescription.ITEMNAME_AGENT);
 		if (provider != null) {
-			providerDescription = new AgentDescription(provider);
+			this.providerDescription = new AgentDescription(provider);
 		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public final DoAction createDoAction(Serializable[] newParams, ResultReceiver source) {
+	public final DoAction createDoAction(final Serializable[] newParams, final ResultReceiver source) {
 		return new DoAction(this, source, newParams);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public final DoAction createDoAction(Serializable[] newParams, ResultReceiver source,
-			Long timeToLive) {
+	public final DoAction createDoAction(final Serializable[] newParams, final ResultReceiver source, final Long timeToLive) {
 		return new DoAction(this, source, newParams, timeToLive.longValue());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public final DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source) {
+	public final DoAction createDoAction(final Session parent, final Serializable[] newParams, final ResultReceiver source) {
 		return new DoAction(parent, this, source, newParams);
 	}
 
 	/**
-	 * Creates a new Result-object for this action. The resulting object can be
-	 * written to the memory to return the results of the action. *
+	 * Creates a new Result-object for this action. The resulting object can be written to the memory to return the
+	 * results of the action. *
 	 * 
 	 * @param source
-	 *            the entity that created the results of the action (usually the
-	 *            providing component)
+	 *           the entity that created the results of the action (usually the providing component)
 	 * @param results
-	 *            the results that come from executing the action.
+	 *           the results that come from executing the action.
 	 * 
 	 * @see de.dailab.jiactng.agentcore.action.ActionResult
-	 * @return a new ActionResult-object that can be used (by writing it to the
-	 *         memory) to return the results of the action.
+	 * @return a new ActionResult-object that can be used (by writing it to the memory) to return the results of the
+	 *         action.
 	 */
-	public final ActionResult createActionResult(DoAction source, Serializable[] results) {
+	public final ActionResult createActionResult(final DoAction source, final Serializable[] results) {
 		final ActionResult ret = new ActionResult(source, results);
 		ret.setMetaData(source.getMetaData());
 		return ret;
@@ -201,27 +216,28 @@ public class Action implements IActionDescription {
 	 * {@inheritDoc}
 	 */
 	public final String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public final List<String> getInputTypeNames() {
-		return inputTypeNames;
+		return this.inputTypeNames;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public final List<Class<?>> getInputTypes() throws ClassNotFoundException {
-		if (inputTypeNames != null) {
+		if (this.inputTypeNames != null) {
 			final List<Class<?>> list = new ArrayList<Class<?>>();
-			for (String type : inputTypeNames) {
-				list.add(getClassForName(type));
+			for (final String type : this.inputTypeNames) {
+				list.add(this.getClassForName(type));
 			}
 			return list;
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
@@ -230,129 +246,146 @@ public class Action implements IActionDescription {
 	 * {@inheritDoc}
 	 */
 	public final IEffector getProviderBean() {
-		return providerBean;
+		return this.providerBean;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public final IAgentDescription getProviderDescription() {
-		return providerDescription;
+		return this.providerDescription;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public final List<String> getResultTypeNames() {
-		return resultTypeNames;
+		return this.resultTypeNames;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public final List<Class<?>> getResultTypes() throws ClassNotFoundException {
-		if (resultTypeNames != null) {
+		if (this.resultTypeNames != null) {
 			final List<Class<?>> list = new ArrayList<Class<?>>();
-			for (String type : resultTypeNames) {
-				list.add(getClassForName(type));
+			for (final String type : this.resultTypeNames) {
+				list.add(this.getClassForName(type));
 			}
 			return list;
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
 
 	/**
 	 * Sets the name of this action.
+	 * 
 	 * @param newName
-	 *            the name to set
+	 *           the name to set
 	 */
-	public final void setName(String newName) {
-		name = newName;
+	public final void setName(final String newName) {
+		this.name = newName;
 	}
 
 	/**
 	 * Sets the input types of this action.
+	 * 
 	 * @param newInputTypeNames
-	 *            the parameters to set
+	 *           the parameters to set
 	 */
-	public final void setInputTypeNames(List<String> newInputTypeNames) {
+	public final void setInputTypeNames(final List<String> newInputTypeNames) {
 		if (newInputTypeNames != null) {
 			final List<String> copy = new ArrayList<String>();
 			copy.addAll(newInputTypeNames);
-			inputTypeNames = Collections.unmodifiableList(copy);
-		} else {
-			inputTypeNames = null;
+			this.inputTypeNames = Collections.unmodifiableList(copy);
+		}
+		else {
+			this.inputTypeNames = null;
 		}
 	}
 
 	/**
 	 * Sets the input types of this action.
+	 * 
 	 * @param newInputTypes
-	 *            the parameters to set
+	 *           the parameters to set
 	 */
-	public final void setInputTypes(List<Class<?>> newInputTypes) {
+	public final void setInputTypes(final List<Class<?>> newInputTypes) {
 		if (newInputTypes != null) {
 			final List<String> copy = new ArrayList<String>();
-			for (Class<?> type : newInputTypes) {
+			for (final Class<?> type : newInputTypes) {
 				copy.add(type.getName());
 			}
-			inputTypeNames = Collections.unmodifiableList(copy);
-		} else {
-			inputTypeNames = null;
+			this.inputTypeNames = Collections.unmodifiableList(copy);
+		}
+		else {
+			this.inputTypeNames = null;
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public final void setProviderBean(IEffector newProviderBean) {
-		providerBean = newProviderBean;
+	public String getActionType() {
+		return this.actionType;
+	}
+
+	public void setActionType(final String actionType) {
+		this.actionType = actionType;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void setProviderDescription(
-			IAgentDescription newProviderDescription) {
-		providerDescription = newProviderDescription;
+	public final void setProviderBean(final IEffector newProviderBean) {
+		this.providerBean = newProviderBean;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public final void setProviderDescription(final IAgentDescription newProviderDescription) {
+		this.providerDescription = newProviderDescription;
 	}
 
 	/**
 	 * Sets the result types of this action.
+	 * 
 	 * @param newResultTypeNames
-	 *            the results to set
+	 *           the results to set
 	 */
-	public final void setResultTypeNames(List<String> newResultTypeNames) {
+	public final void setResultTypeNames(final List<String> newResultTypeNames) {
 		if (newResultTypeNames != null) {
 			final List<String> copy = new ArrayList<String>();
 			copy.addAll(newResultTypeNames);
-			resultTypeNames = Collections.unmodifiableList(copy);
-		} else {
-			resultTypeNames = null;
+			this.resultTypeNames = Collections.unmodifiableList(copy);
+		}
+		else {
+			this.resultTypeNames = null;
 		}
 	}
 
 	/**
 	 * Sets the result types of this action.
+	 * 
 	 * @param newResultTypes
-	 *            the results to set
+	 *           the results to set
 	 */
-	public final void setResultTypes(List<Class<?>> newResultTypes) {
+	public final void setResultTypes(final List<Class<?>> newResultTypes) {
 		if (newResultTypes != null) {
 			final List<String> copy = new ArrayList<String>();
-			for (Class<?> type : newResultTypes) {
+			for (final Class<?> type : newResultTypes) {
 				copy.add(type.getName());
 			}
-			resultTypeNames = Collections.unmodifiableList(copy);
-		} else {
-			resultTypeNames = null;
+			this.resultTypeNames = Collections.unmodifiableList(copy);
+		}
+		else {
+			this.resultTypeNames = null;
 		}
 	}
 
 	/**
-	 * Returns the hash code of the action class, 
-	 * thus it is the same hash code for all actions.
+	 * Returns the hash code of the action class, thus it is the same hash code for all actions.
+	 * 
 	 * @return the hash code of the action class
 	 */
 	@Override
@@ -363,88 +396,92 @@ public class Action implements IActionDescription {
 	}
 
 	/**
-	 * Checks the equality of two actions. The actions are equal
-	 * if their names, input types, and result types are equal or null.
-	 * The actions are not equal if they are provided by different agents.
-	 * @param obj the other action
+	 * Checks the equality of two actions. The actions are equal if their names, input types, and result types are equal
+	 * or null. The actions are not equal if they are provided by different agents.
+	 * 
+	 * @param obj
+	 *           the other action
 	 * @return the result of the equality check
 	 * @see EqualityChecker#equalsOrNull(Object, Object)
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null || !(obj instanceof Action)) {
 			return false;
 		}
 
-		if(this == obj) {
+		if (this == obj) {
 			return true;
 		}
-		
+
 		final Action other = (Action) obj;
-		
+
 		final IAgentDescription myAgent = this.getProviderDescription();
 		final IAgentDescription otherAgent = other.getProviderDescription();
 
-		if((myAgent!=null) && (otherAgent != null)) {
-			if(!EqualityChecker.equalsOrNull(myAgent.getAid(), otherAgent.getAid())) {
+		if ((myAgent != null) && (otherAgent != null)) {
+			if (!EqualityChecker.equalsOrNull(myAgent.getAid(), otherAgent.getAid())) {
 				return false;
 			}
 		}
 
 		return EqualityChecker.equalsOrNull(this.getName(), other.getName())
-				&& EqualityChecker.equalsOrNull(this.getInputTypeNames(), other.getInputTypeNames())
-				&& EqualityChecker.equalsOrNull(this.getResultTypeNames(), other.getResultTypeNames());
+		      && EqualityChecker.equalsOrNull(this.getInputTypeNames(), other.getInputTypeNames())
+		      && EqualityChecker.equalsOrNull(this.getResultTypeNames(), other.getResultTypeNames());
 	}
 
 	/**
-	 * Returns a multiline text which contains the name, input types,
-	 * result types, the provider bean, provider agent, and scope of the action.
+	 * Returns a multiline text which contains the name, input types, result types, the provider bean, provider agent,
+	 * and scope of the action.
+	 * 
 	 * @return a string representation of the action
 	 */
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
-		builder.append("Action:\n name='").append(name).append("'");
+		builder.append("Action:\n name='").append(this.name).append("'");
 		builder.append("\n parameters=");
-		prettyPrintArray(builder, inputTypeNames);
+		this.prettyPrintArray(builder, this.inputTypeNames);
 		builder.append("\n results=");
-		prettyPrintArray(builder, resultTypeNames);
-    builder.append("\n bean=");
-    builder.append(this.providerBean);
-		
+		this.prettyPrintArray(builder, this.resultTypeNames);
+		builder.append("\n bean=");
+		builder.append(this.providerBean);
+
 		builder.append("\n provider =");
-		if (providerDescription != null) {
-			builder.append(providerDescription.getName()+"("+providerDescription.getAid()+")");
-		} else {
-		  builder.append(providerDescription);
+		if (this.providerDescription != null) {
+			builder.append(this.providerDescription.getName() + "(" + this.providerDescription.getAid() + ")");
 		}
-		builder.append("\n scope=").append(scope);
+		else {
+			builder.append(this.providerDescription);
+		}
+		builder.append("\n scope=").append(this.scope);
 		builder.append("\n");
-		
+
 		return builder.toString();
 	}
 
 	/*
 	 * Utility-method for a nicely formatted output
 	 */
-	private void prettyPrintArray(StringBuilder builder, List<String> list) {
-		if(list == null) {
+	private void prettyPrintArray(final StringBuilder builder, final List<String> list) {
+		if (list == null) {
 			builder.append("null");
-		} else {
+		}
+		else {
 			builder.append('[');
 			for (final Iterator<String> iter = list.iterator(); iter.hasNext();) {
 				builder.append(iter.next());
-	
+
 				if (iter.hasNext()) {
 					builder.append("; ");
 				}
 			}
-	
+
 			builder.append(']');
 		}
 	}
 
-	private Class<?> getClassForName(String type) throws ClassNotFoundException {
+	private Class<?> getClassForName(final String type) throws ClassNotFoundException {
 		if (type.equals("boolean")) {
 			return boolean.class;
 		}
@@ -478,76 +515,64 @@ public class Action implements IActionDescription {
 	 * {@inheritDoc}
 	 */
 	public final ActionScope getScope() {
-		return scope;
+		return this.scope;
 	}
 
 	/**
-	 * Sets the scope of this action. Usually, when the scope has been
-	 * changed, it is not a bad idea to notify the directory about the
-	 * change.
+	 * Sets the scope of this action. Usually, when the scope has been changed, it is not a bad idea to notify the
+	 * directory about the change.
 	 * 
-	 * @param newScope the scope of this action.
+	 * @param newScope
+	 *           the scope of this action.
 	 * @see ActionScope
 	 */
-	public final void setScope(ActionScope newScope) {
-		scope = newScope;
+	public final void setScope(final ActionScope newScope) {
+		this.scope = newScope;
 	}
 
 	private String[] getItemNames() {
-		return new String[] {
-	    		ITEMNAME_NAME, 
-	    		ITEMNAME_INPUTTYPES, 
-	    		ITEMNAME_RESULTTYPES, 
-	    		ITEMNAME_SCOPE, 
-	    		ITEMNAME_BEAN, 
-	    		ITEMNAME_AGENT
-	    };
+		return new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTTYPES,
+		      IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_SCOPE, IActionDescription.ITEMNAME_BEAN,
+		      IActionDescription.ITEMNAME_AGENT };
 	}
 
-	   /**
-	    * Gets the type of JIAC action descriptions based on JMX open types.
-	    * 
-	    * @return A composite type containing action name, input types, result types, scope, provider bean, and provider agent.
-	    * @throws OpenDataException
-	    *             if an error occurs during the creation of the type.
-	    * @see javax.management.openmbean.CompositeType
-	    */
-	   public OpenType<?> getDescriptionType() throws OpenDataException {
-	      final OpenType<?>[] itemTypes = new OpenType<?>[] {
-	    		  SimpleType.STRING, 
-	    		  new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
-	    		  new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
-	    		  SimpleType.STRING, 
-	    		  SimpleType.STRING,
-	    		  (providerDescription != null)? providerDescription.getDescriptionType():SimpleType.VOID,
-	      };
+	/**
+	 * Gets the type of JIAC action descriptions based on JMX open types.
+	 * 
+	 * @return A composite type containing action name, input types, result types, scope, provider bean, and provider
+	 *         agent.
+	 * @throws OpenDataException
+	 *            if an error occurs during the creation of the type.
+	 * @see javax.management.openmbean.CompositeType
+	 */
+	public OpenType<?> getDescriptionType() throws OpenDataException {
+		final OpenType<?>[] itemTypes = new OpenType<?>[] { SimpleType.STRING, new ArrayType<SimpleType<String>>(SimpleType.STRING, false),
+		      new ArrayType<SimpleType<String>>(SimpleType.STRING, false), SimpleType.STRING, SimpleType.STRING,
+		      (this.providerDescription != null) ? this.providerDescription.getDescriptionType() : SimpleType.VOID, };
 
-	      // use names of action items as their description
-	      final String[] itemDescriptions = getItemNames();
+		// use names of action items as their description
+		final String[] itemDescriptions = this.getItemNames();
 
-	      // create and return open type of a JIAC action
-	      return new CompositeType(this.getClass().getName(), "standard JIAC-TNG action", getItemNames(), itemDescriptions, itemTypes);
-	   }
+		// create and return open type of a JIAC action
+		return new CompositeType(this.getClass().getName(), "standard JIAC-TNG action", this.getItemNames(), itemDescriptions, itemTypes);
+	}
 
-	   /**
-	    * Gets the description of this JIAC action based on JMX open types.
-	    * 
-	    * @return Composite data containing action name, input types, result types, scope, provider bean, and provider agent.
-	    * @throws OpenDataException
-	    *             if an error occurs during the creation of the data.
-	    * @see javax.management.openmbean.CompositeData
-	    */
-	   public Object getDescription() throws OpenDataException {
-	      final Object[] itemValues = new Object[] {
-	    		  name,
-	    		  inputTypeNames.toArray(new String[resultTypeNames.size()]),
-	    		  resultTypeNames.toArray(new String[resultTypeNames.size()]),
-	    		  (scope != null)? scope.toString():null,
-	    		  (providerBean != null)? providerBean.getBeanName():null,
-	    		  (providerDescription != null)? providerDescription.getDescription():null
-	      };
+	/**
+	 * Gets the description of this JIAC action based on JMX open types.
+	 * 
+	 * @return Composite data containing action name, input types, result types, scope, provider bean, and provider
+	 *         agent.
+	 * @throws OpenDataException
+	 *            if an error occurs during the creation of the data.
+	 * @see javax.management.openmbean.CompositeData
+	 */
+	public Object getDescription() throws OpenDataException {
+		final Object[] itemValues = new Object[] { this.name, this.inputTypeNames.toArray(new String[this.resultTypeNames.size()]),
+		      this.resultTypeNames.toArray(new String[this.resultTypeNames.size()]), (this.scope != null) ? this.scope.toString() : null,
+		      (this.providerBean != null) ? this.providerBean.getBeanName() : null,
+		      (this.providerDescription != null) ? this.providerDescription.getDescription() : null };
 
-	      final CompositeType type = (CompositeType) getDescriptionType();
-	      return new CompositeDataSupport(type, getItemNames(), itemValues);
-	   }
+		final CompositeType type = (CompositeType) this.getDescriptionType();
+		return new CompositeDataSupport(type, this.getItemNames(), itemValues);
+	}
 }

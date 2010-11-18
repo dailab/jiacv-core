@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.management.AttributeChangeNotificationFilter;
 import javax.management.InstanceNotFoundException;
@@ -11,6 +12,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
+import javax.management.remote.JMXServiceURL;
 
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
@@ -197,6 +199,16 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 */
 	public final String getPlatformName() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("PlatformName");
+	}
+	
+	/**
+	 * Gets the JMX URLs for the connector servers of this agent node.
+	 * @return set of JMXServiceUrls
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
+	 * @throws InstanceNotFoundException The agent node does not exist.
+	 */
+	public final Set<JMXServiceURL> getJmxURLs() throws IOException, InstanceNotFoundException {
+		return (Set<JMXServiceURL>) getAttribute("JmxURLs");
 	}
 
 	/**

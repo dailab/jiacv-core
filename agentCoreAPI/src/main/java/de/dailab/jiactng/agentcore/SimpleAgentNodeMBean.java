@@ -2,6 +2,9 @@ package de.dailab.jiactng.agentcore;
 
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Set;
+
+import javax.management.remote.JMXServiceURL;
 
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
@@ -117,6 +120,13 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * @return the name of the directory agent node bean or null if not exists
 	 */
 	String getDirectoryName();
+	
+	/**
+	   * Gets the URLs of the JMX connector server.
+	   * 
+	   * @return the URLs of the JMX connector server.
+	   */
+	Set<JMXServiceURL> getJmxURLs();
 
 	/**
 	 * Shuts down the managed agent node.

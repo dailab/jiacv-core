@@ -114,13 +114,6 @@ public class ActionTesterNode {
 					invokeactionagent.init();
 					invokeactionagent.start();
 					this.invokeactionbean = invokeactionagent.findAgentBean(InvokeActionBean.class);
-					// for (final IAgentBean iab : beanList) {
-					// if (iab instanceof InvokeActionBean) {
-					// this.invokeactionbean = (InvokeActionBean) iab;
-					// this.log.debug("Located Bean: " + this.invokeactionbean);
-					// break;
-					// }
-					// }
 				}
 			}
 		}
@@ -167,16 +160,13 @@ public class ActionTesterNode {
 	}
 
 	public void stop() {
-
 		try {
 			this.agentNode.shutdown();
 		}
 		catch (final LifecycleException e) {
 			this.log.error("exception shutting down Node.", e);
 		}
-
 		this.context.stop();
-
 	}
 
 }

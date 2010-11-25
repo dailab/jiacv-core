@@ -74,7 +74,7 @@ public class Session implements IFact {
    * Constructor for a new session. Creates a session with a unique id, so not all fields are null.
    */
   public Session() {
-    this(IdFactory.createSessionId(Session.class.hashCode()), Long.valueOf(System
+    this(IdFactory.createSessionId(new Object().hashCode()), Long.valueOf(System
         .currentTimeMillis()), new ArrayList<SessionEvent>());
   }
 
@@ -85,7 +85,7 @@ public class Session implements IFact {
    *          time to live in milliseconds
    */
   public Session(long timeToLive) {
-    this(IdFactory.createSessionId(Session.class.hashCode()), Long.valueOf(System
+    this(IdFactory.createSessionId(new Object().hashCode()), Long.valueOf(System
         .currentTimeMillis()), new ArrayList<SessionEvent>());
     this.timeToLive = Long.valueOf(timeToLive);
   }

@@ -192,7 +192,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
           log.info("ActionResult for Action " + actionResult.getAction().getName() + " written after session timeout");
         } else {
           log.warn("ActionResult for Action " + actionResult.getAction().getName()
-              + " written with non existing Session.");
+              + " written with non existing Session: "+doAct.getSessionId());
         }
       }
     } else if (session.getCurrentCallDepth().intValue() <= 0) {

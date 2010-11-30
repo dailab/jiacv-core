@@ -924,6 +924,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
         final JiacMessage aliveMessage = new JiacMessage();
         aliveMessage.setProtocol(ALIVE);
         sendMessage(aliveMessage, groupAddress);
+        log.info("Alive Ping: "+System.currentTimeMillis()+" with counter: "+counter);
         counter += aliveInterval;
       } else {
         counter = 0;

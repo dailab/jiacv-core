@@ -125,7 +125,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 		message.setProtocol(INVOKE);
 		
 		final Serializable[] params = new Serializable[] {message, destination};
-		final DoAction sendDoAction = sendAction.createDoAction(params, this);
+		final DoAction sendDoAction = sendAction.createDoAction(doAction.getSession(), params, this);
 		memory.write(sendDoAction);
 		remoteInvocations.put(doAction.getSessionId(), doAction);
 		
@@ -139,6 +139,9 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 				} else {
 					session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
 				}
+ 	      if(log.isInfoEnabled()) {
+          log.info("Writing session to memory: "+doAction.getSessionId()+" ("+session.getCurrentCallDepth()+")");
+        }				
 				memory.write(doAction.getSession());
 			}
 		} catch (ClassNotFoundException e) {

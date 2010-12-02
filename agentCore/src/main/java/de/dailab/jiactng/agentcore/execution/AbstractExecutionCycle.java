@@ -138,6 +138,9 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
           } else {
             session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
           }
+          if(log.isInfoEnabled()) {
+            log.info("Writing session to memory: "+act.getSessionId()+" ("+session.getCurrentCallDepth()+")");
+          }
           memory.write(act.getSession());
         }
 
@@ -146,14 +149,23 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
         if ((session.getUserToken() == null) && (session.getOriginalProvider() != null)
             && (session.getOriginalUser() != null) && session.getOriginalUser().equals(session.getOriginalProvider())) {
           // no user token, and user is equal to provider - invoke is allowed
+          if(log.isInfoEnabled()) {
+            log.info("Calling doAction with authorization: "+act.getAction().getName()+" ("+act.getSessionId()+")");
+          }
           providerBean.doAction(act);
 
         } else if (providerBean instanceof AbstractActionAuthorizationBean) {
           // use authorizationAction
+          if(log.isInfoEnabled()) {
+            log.info("Checking authorization for action: "+act.getAction().getName()+" ("+act.getSessionId()+")");
+          }
           ((AbstractActionAuthorizationBean) providerBean).authorize(act);
 
         } else {
           // no authorization required
+          if(log.isInfoEnabled()) {
+            log.info("Calling doAction: "+act.getAction().getName()+" ("+act.getSessionId()+")");
+          }          
           providerBean.doAction(act);
         }
 
@@ -183,6 +195,9 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
     final Session session = doAct.getSession();
     if (session.getCurrentCallDepth() == null) {
+      if(log.isWarnEnabled()) {
+        log.warn("Found session with call-depth null. Setting calldepth to 1 for: "+session.getSessionId());
+      }
       session.setCurrentCallDepth(1);
     }
     session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() - 1);
@@ -192,12 +207,14 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
           log.info("ActionResult for Action " + actionResult.getAction().getName() + " written after session timeout");
         } else {
           log.warn("ActionResult for Action " + actionResult.getAction().getName()
-              + " written with non existing Session: "+doAct.getSessionId());
+              + " written with unknwon Session: "+doAct.getSessionId());
         }
       }
     } else if (session.getCurrentCallDepth().intValue() <= 0) {
+      if(log.isInfoEnabled()) {
+        log.info("Removing session from memory: "+session.getSessionId()+" ("+session.getCurrentCallDepth()+")");
+      }
       memory.remove(session);
-      log.debug("Session removed for action " + doAct.getAction().getName());
     }
 
     // remove session from memory

@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.management.jmx.client;
 
+import java.io.IOException;
+
 import javax.management.remote.JMXServiceURL;
 
 /**
@@ -25,8 +27,14 @@ public class JmxConnectionTester implements Runnable {
 	 */
 	public void run() {
 		try {
-			new JmxManagementClient(url);
+			JmxManagementClient client = new JmxManagementClient(url);
 			success = true;
+			try {
+				client.close();
+			}
+			catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
 		catch (SecurityException se) {
 			success = true;

@@ -7,7 +7,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.action.Action;
-import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
@@ -57,24 +56,33 @@ public class DirectoryAgentNodeBeanTest extends TestCase {
 
 	public void test() throws Exception{
 		while (!nodeRef.getState().equals(LifecycleStates.STARTED));
-		assertEquals(1, directoryRef.searchAllAgents(new AgentDescription()).size());
-		assertEquals(2, directoryRef.searchAllActions(new Action()).size());
-		
+
+		// create template for searching only local agents
+		AgentDescription agentTemplate = new AgentDescription();
+		agentTemplate.setAgentNodeUUID(nodeRef.getUUID());
+
+		// create template for searching only local actions
+		Action actionTemplate = new Action();
+		actionTemplate.setProviderDescription(agentTemplate);
+
+		assertEquals(1, directoryRef.searchAllAgents(agentTemplate).size());
+		assertEquals(2, directoryRef.searchAllActions(actionTemplate).size());
+
 		IActionDescription action = directoryRef.searchAction(new Action("de.dailab.jiactng.agentcore.directory.AgentBeanWithActions#mirror"));
 		assertNotNull(action);
-		
+
 		directoryRef.deregisterAction(action);
-		assertEquals(1, directoryRef.searchAllActions(new Action()).size());
-		
+		assertEquals(1, directoryRef.searchAllActions(actionTemplate).size());
+
 		List<IAgent> agents = nodeRef.findAgents();
 		for (IAgent agent :agents) {
 			agent.stop();
 			agent.cleanup();
 		}
-		assertEquals(0, directoryRef.searchAllAgents(new AgentDescription()).size());
-		assertEquals(0, directoryRef.searchAllActions(new Action()).size());
+		assertEquals(0, directoryRef.searchAllAgents(agentTemplate).size());
+		assertEquals(0, directoryRef.searchAllActions(actionTemplate).size());
 	}
-	
+
 	public void testAgentSide() throws Exception {
 		while (!agentBeanRef.getState().equals(LifecycleStates.STARTED));
 		assertNotNull(agentBeanRef.searchAction("de.dailab.jiactng.agentcore.directory.AgentBeanWithActions#concat"));

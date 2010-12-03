@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
@@ -34,8 +35,8 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  */
 public class JmxManagementClient {
 
-	/** The timeout for receiving multicast messages to collect agent node UUIDs is 5,000 milliseconds. */
-	public static final long MULTICAST_RECEIVER_TIMEOUT = 5000;
+	/** The timeout for connection tests is 2,000 milliseconds. */
+	public static final long CONNECTION_TESTER_TIMEOUT = 2000;
 
 	/** The maximum length of multicast messages is 1,000 bytes. */
 	public static final int MAX_MULTICAST_MESSAGE_LENGTH = 1000;
@@ -45,7 +46,8 @@ public class JmxManagementClient {
 	private JMXConnector jmxc = null;
 
 	/**
-	 * Gets the URL of all JMX connector server registered in a RMI registry. 
+	 * Gets the URL of all JMX connector server, which are registered in a RMI
+	 * registry and reachable by the client. 
 	 * @param host The host of the registry.
 	 * @param port The port used by the registry.
 	 * @return URLs of the registered JMX connector server.
@@ -54,32 +56,53 @@ public class JmxManagementClient {
 	 * @see JMXServiceURL#JMXServiceURL(String, String, int, String)
 	 */
 	public static List<JMXServiceURL> getURLsFromRegistry(String host, int port) throws RemoteException {
-		final List<JMXServiceURL> urls = new ArrayList<JMXServiceURL>();
+		final Map<JMXServiceURL,JmxConnectionTester> urls = new HashMap<JMXServiceURL,JmxConnectionTester>();
 		final Iterator<String> nodeIdIterator = Arrays.asList(LocateRegistry.getRegistry(host, port).list()).iterator();
 		while (nodeIdIterator.hasNext()) {
 			final String nodeId = nodeIdIterator.next();
 			if (nodeId.startsWith(IdFactory.IdPrefix.Node.toString())) {
 				try {
-					urls.add(new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + host + ":" + port + "/" + nodeId));
+					final JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + host + ":" + port + "/" + nodeId);
+					final JmxConnectionTester tester = new JmxConnectionTester(url);
+					urls.put(url, tester);
+					// start connection test
+					new Thread(tester).start();
 				}
 				catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		return urls;
+
+		// wait for connection tests
+		try {
+			Thread.sleep(CONNECTION_TESTER_TIMEOUT);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// get successful connections
+		final List<JMXServiceURL> result = new ArrayList<JMXServiceURL>();
+		for (Map.Entry<JMXServiceURL,JmxConnectionTester> entry : urls.entrySet()) {
+			if (entry.getValue().getSuccess()) {
+				result.add(entry.getKey());
+			}
+		}
+		return result;
 	}
 
 	/**
-	 * Gets the URL of all JMX connector server announced by multicast messages within a time frame of 5 seconds.
+	 * Gets the URL of all JMX connector server, which are announced by 
+	 * multicast messages and reachable by the client.
 	 * @return The list of received JMX URLs.
 	 * @throws IOException A communication problem occurred when creating a multicast socket or receiving multicast packets.
 	 * @see MulticastSocket#receive(DatagramPacket)
 	 */
 	public static List<JMXServiceURL> getURLsFromMulticast() throws IOException {
-		final List<JMXServiceURL> urls = new ArrayList<JMXServiceURL>();
+		final Map<JMXServiceURL,JmxConnectionTester> urls = new HashMap<JMXServiceURL,JmxConnectionTester>();
 		byte[] buffer = new byte[MAX_MULTICAST_MESSAGE_LENGTH];
-		final long endTime = System.currentTimeMillis() + MULTICAST_RECEIVER_TIMEOUT;
+		final long endTime = System.currentTimeMillis() + JmxManager.MULTICAST_PERIOD + CONNECTION_TESTER_TIMEOUT;
 
 		// activate multicast socket
 		final InetAddress group = InetAddress.getByName("226.6.6.7");
@@ -104,8 +127,11 @@ public class JmxManagementClient {
 					url = new JMXServiceURL(message.replace("localhost", url.getHost()));
 				}
 				// check whether the URL is already known
-				if (!urls.contains(url)) {
-					urls.add(url);
+				if (!urls.containsKey(url)) {
+					final JmxConnectionTester tester = new JmxConnectionTester(url);
+					urls.put(url, tester);
+					// start connection test
+					new Thread(tester).start();
 				}
 			}
 			catch (Exception e) {
@@ -113,7 +139,14 @@ public class JmxManagementClient {
 			}
 		}
 
-		return urls;
+		// get successful connections
+		final List<JMXServiceURL> result = new ArrayList<JMXServiceURL>();
+		for (Map.Entry<JMXServiceURL,JmxConnectionTester> entry : urls.entrySet()) {
+			if (entry.getValue().getSuccess()) {
+				result.add(entry.getKey());
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -328,4 +361,5 @@ public class JmxManagementClient {
 		}
 		return clients;
 	}
+
 }

@@ -286,14 +286,19 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
       if ((action == null)) {
         log.warn("Found doAction with missing action:" + doAction);
       } else if (action.getProviderBean() == null) {
-        log.warn("Found doAction with missing providerBean:" + action);
+        // TODO: this happens always with transmitted doActions due to transient fields. Is there a better solution?
+        if(thisAgent.getAgentDescription().getAid().equals(action.getProviderDescription().getAid())) {
+          log.info("Found doAction with missing providerBean:" + doAction);
+        }
       } else {
         result = action.getProviderBean().cancelAction(doAction);
       }
 			
       // if no result was created, use TimeoutExecption as default result
       if (result == null) {
-        result = new ActionResult(doAction, new TimeoutException(TIMEOUT_MESSAGE));
+        if(doAction.getSource()!=null) {
+          result = new ActionResult(doAction, new TimeoutException(TIMEOUT_MESSAGE));
+        }
       }
       
 			if ((doAction.getSource() != null) && (doAction.getSource() instanceof ResultReceiver)) {
@@ -302,7 +307,8 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 		
 				receiver.receiveResult(result);
 			} else {
-				log.warn("Session without Result-Receiver Source: DoAction had to be canceled due to sessiontimeout " + doAction);
+			  // TODO: this happens always with transmitted doActions due to transient fields. Is there a better solution? 
+				log.info("Session without Result-Receiver Source: DoAction had to be canceled due to sessiontimeout " + doAction);
 			}
 		}
 		

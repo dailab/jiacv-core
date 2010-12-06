@@ -194,14 +194,15 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
         (actionResult.getFailure() == null) ? actionResult.getResults() : new Object[] { actionResult.getFailure() });
 
     final Session session = doAct.getSession();
-    if (session.getCurrentCallDepth() == null) {
-      if(log.isWarnEnabled()) {
-        log.warn("Found session with call-depth null. Setting calldepth to 1 for: "+session.getSessionId());
-      }
-      session.setCurrentCallDepth(1);
-    }
     
     if((doAct.getAction().getResultTypeNames()!=null) && (doAct.getAction().getResultTypeNames().size()>0)) {
+      if (session.getCurrentCallDepth() == null) {
+        if(log.isWarnEnabled()) {
+          log.warn("Found session with call-depth null. Setting calldepth to 1 for: "+session.getSessionId());
+        }
+        session.setCurrentCallDepth(1);
+      }
+      
       session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() - 1);
     }
     if (memory.read(session) == null) {

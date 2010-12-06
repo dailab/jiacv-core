@@ -200,14 +200,17 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       }
       session.setCurrentCallDepth(1);
     }
-    session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() - 1);
+    
+    if((doAct.getAction().getResultTypeNames()!=null) && (doAct.getAction().getResultTypeNames().size()>0)) {
+      session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() - 1);
+    }
     if (memory.read(session) == null) {
       if ((doAct.getAction().getResultTypeNames() != null) && doAct.getAction().getResultTypeNames().size() > 0) {
         if (doAct.getSession().isTimeout()) {
           log.info("ActionResult for Action " + actionResult.getAction().getName() + " written after session timeout");
         } else {
           log.warn("ActionResult for Action " + actionResult.getAction().getName()
-              + " written with unknwon Session: "+doAct.getSessionId());
+              + " written with unknown Session: "+doAct.getSessionId());
         }
       }
     } else if (session.getCurrentCallDepth().intValue() <= 0) {

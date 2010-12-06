@@ -70,7 +70,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 			final WriteCallEvent writeCallEvent = (WriteCallEvent) event;
 			if (writeCallEvent.getObject() instanceof JiacMessage){
 				JiacMessage message = (JiacMessage)writeCallEvent.getObject();
-				if (message.getProtocol().equals(INVOKE)) {
+				if ((message.getProtocol()) != null && (message.getProtocol().equals(INVOKE))) {
 					if (memory.remove(message) == null) {
 						log.warn("Received JIAC message already removed from memory by another agent component.");
 					}

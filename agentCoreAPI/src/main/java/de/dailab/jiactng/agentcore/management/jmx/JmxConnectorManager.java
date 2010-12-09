@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.management.jmx;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.DatagramPacket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.MulticastSocket;
@@ -98,8 +99,22 @@ public final class JmxConnectorManager extends TimerTask {
 				if (ifc.isUp() && ifc.supportsMulticast()) {
 					// handle active interface
 					try {
+						// choose best address of the network interface
+						InetAddress address = null;
+						Enumeration<InetAddress> addresses = ifc.getInetAddresses();
+						while (addresses.hasMoreElements()) {
+							InetAddress addr = addresses.nextElement();
+							if (addr instanceof Inet4Address) {
+								address = addr;
+								break;
+							}
+							else if (!addr.isLinkLocalAddress()) {
+								address = addr;
+							}
+						}
+
+						// check connector server for the address
 						socket.setNetworkInterface(ifc);
-						InetAddress address = socket.getInterface();
 						System.setProperty("java.rmi.server.hostname", address.getHostAddress());
 						if (!interfaces.containsKey(ifcName)) {
 							// connectors not yet exist for this interface

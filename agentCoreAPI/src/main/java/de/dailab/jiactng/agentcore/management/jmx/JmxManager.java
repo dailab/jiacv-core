@@ -36,8 +36,8 @@ public final class JmxManager implements Manager {
 	/** The delay for sending multicast messages is 1,000 milliseconds. */
 	public static final long MULTICAST_DELAY = 0;
 
-	/** The period for sending multicast messages is 3,600 milliseconds. */
-	public static final long MULTICAST_PERIOD = 3600;
+	/** The period for sending multicast messages is 7,500 milliseconds. */
+	public static final long MULTICAST_PERIOD = 7500;
 	
 	/** The port for sending multicast messages is 9999. */
 	public static final int MULTICAST_PORT = 9999;

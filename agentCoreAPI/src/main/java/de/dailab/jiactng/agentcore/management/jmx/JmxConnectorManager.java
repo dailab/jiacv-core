@@ -112,6 +112,10 @@ public final class JmxConnectorManager extends TimerTask {
 								address = addr;
 							}
 						}
+						if (address == null) {
+							// found no valid address => continue with next interface
+							continue;
+						}
 
 						// check connector server for the address
 						socket.setNetworkInterface(ifc);

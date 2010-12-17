@@ -652,6 +652,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
       if (connectors != null) {
         refreshAgentNode(senderAddress, connectors);
       }
+      else {
+    	refreshAgentNode(senderAddress);
+      }
 
       // refresh remote actions
       final Set<IActionDescription> actions = ((Advertisement) message.getPayload()).getActions();

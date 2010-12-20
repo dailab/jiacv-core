@@ -662,6 +662,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
           anbClassSet.add(anb.getClass());
         }
 
+        // initialize node bean
         try {
           log.info("Trying to initialize agentnodebean: " + anb.getBeanName());
           anb.init();
@@ -670,29 +671,18 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
           log.error("Failure when initializing agentnodebean: " + anb.getBeanName(), lce);
         }
 
-        if (directory == null) {
-          directory = findAgentNodeBean(IDirectory.class);
-        }
-        // if (directory == null) {
-        // for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
-        // if (agentNodeBean instanceof IDirectory) {
-        // directory = (IDirectory) agentNodeBean;
-        // break;
-        // }
-        // }
-        // }
-
-        if (this.overwriteDiscoveryURI != null) {
-          log.warn("Overwriting discoveryURI of TransportConnectors with: " + this.overwriteDiscoveryURI);
-          for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
-            if (agentNodeBean instanceof ActiveMQBroker) {
-              Set<ActiveMQTransportConnector> connectors = ((ActiveMQBroker) agentNodeBean).getConnectors();
-              for (ActiveMQTransportConnector conn : connectors) {
-                conn.setDiscoveryURI(this.overwriteDiscoveryURI);
-              }
-              break;
-            }
+        // overwrite discovery URI
+        if ((overwriteDiscoveryURI != null) && (anb instanceof ActiveMQBroker)) {
+          log.warn("Overwriting discoveryURI of TransportConnectors with: " + overwriteDiscoveryURI);
+          Set<ActiveMQTransportConnector> connectors = ((ActiveMQBroker) anb).getConnectors();
+          for (ActiveMQTransportConnector conn : connectors) {
+            conn.setDiscoveryURI(overwriteDiscoveryURI);
           }
+        }
+
+        // check for directory
+        if ((directory == null) && (anb instanceof IDirectory)) {
+          directory = (IDirectory) anb;
         }
       }
     }

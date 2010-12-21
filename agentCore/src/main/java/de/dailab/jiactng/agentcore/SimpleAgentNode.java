@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -924,6 +925,21 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     ((Log4JLogger) log).getLogger().addAppender(appender);
 
     System.out.println("Socket appender added.");
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final InetAddress addLog4JSocketAppender(Set<InetAddress> addresses, int port) {
+	for (InetAddress address : addresses) {
+		try {
+			if (address.isReachable(3000)) {
+				addLog4JSocketAppender(address.getHostAddress(), port);
+				return address;
+			}
+		} catch (IOException e) {}
+	}
+	return null;
   }
 
   /**

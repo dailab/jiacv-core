@@ -1,6 +1,10 @@
 package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -340,6 +344,55 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 */
 	public final String getJiacVersion() throws IOException, InstanceNotFoundException {
 		return (String) getAttribute("JiacVersion");
+	}
+
+	/**
+	 * Adds a socket appender to the logger of the managed agent node, agent node beans
+	 * and agents, which connects to the local server at specified port.
+	 * @param port The port of the local logging server.
+	 * @return address The IP address of the local logging server used by the remote socket appender
+	 * or <code>null</code> if all IP addresses are unreachable.
+	 * @throws InstanceNotFoundException The agent node does not exist. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
+	 * @throws SecurityException if the operation cannot be invoked for security reasons.
+	 * @see MBeanServerConnection#invoke(ObjectName, String, Object[], String[])
+	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#addLog4JSocketAppender(Set, int)
+	 */
+	public final String addLog4JSocketAppender(int port) throws IOException, InstanceNotFoundException {
+		HashSet<InetAddress> addresses = new HashSet<InetAddress>();
+		InetAddress loopback = null;
+
+		// get all IP addresses which are not local
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+		while (interfaces.hasMoreElements()) {
+			Enumeration<InetAddress> ifcAddresses = interfaces.nextElement().getInetAddresses();
+			while (ifcAddresses.hasMoreElements()) {
+				InetAddress address = ifcAddresses.nextElement();
+				if (address.isLoopbackAddress()) {
+					loopback = address;
+				}
+				else if (!address.isLinkLocalAddress()) {
+					addresses.add(address);
+				}
+			}
+		}
+
+		// check if it is only reachable via loopback interface
+		if (addresses.isEmpty()) {
+			if ((loopback != null) && getHost().equals(InetAddress.getLocalHost().getCanonicalHostName())) {
+				addresses.add(loopback);
+			}
+			else {
+				return null;
+			}
+		}
+
+		// invoke adding socket appender and check result
+		Object result = invokeOperation("addLog4JSocketAppender", new Object[]{addresses, Integer.valueOf(port)}, new String[]{"java.util.Set", "int"});
+		if (result == null) {
+			return null;
+		}
+		return ((InetAddress)result).getHostAddress();
 	}
 
 	/**

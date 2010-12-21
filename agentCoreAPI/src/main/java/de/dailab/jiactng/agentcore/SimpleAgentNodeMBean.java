@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Set;
@@ -96,16 +97,27 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	 * node beans and all agents, which connects to a remote server at 
 	 * specified address and port.
 	 * @param address The IP address of the logging server.
-	 * @param port The port of the logging port.
+	 * @param port The port of the logging server.
 	 */
 	void addLog4JSocketAppender(String address, int port);
+
+	/**
+	 * Adds a socket appender to the logger of the agent node, all agent
+	 * node beans and all agents, which connects to a remote server at 
+	 * one of the specified addresses and port.
+	 * @param addresses The IP addresses of the logging server.
+	 * @param port The port of the logging server.
+	 * @return The used address of the logging server or <code>null</code>
+	 * if all specified addresses are unreachable.
+	 */
+	InetAddress addLog4JSocketAppender(Set<InetAddress> addresses, int port);
 
 	/**
 	 * Removes a socket appender from the logger of the agent node, all agent
 	 * node beans and all agents, which connects to a remote server at 
 	 * specified address and port.
 	 * @param address The IP address of the logging server.
-	 * @param port The port of the logging port.
+	 * @param port The port of the logging server.
 	 */
 	void removeLog4JSocketAppender(String address, int port);
 

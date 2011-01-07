@@ -140,7 +140,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 					session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
 				}
  	      if(log.isInfoEnabled()) {
-          log.info("Writing session to memory: "+doAction.getSessionId()+" ("+session.getCurrentCallDepth()+")");
+          log.info("Writing session for "+act.getName()+" to memory: "+doAction.getSessionId()+" ("+session.getCurrentCallDepth()+")");
         }				
 				memory.write(doAction.getSession());
 			}

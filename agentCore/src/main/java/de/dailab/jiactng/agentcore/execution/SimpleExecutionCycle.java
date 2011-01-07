@@ -7,7 +7,6 @@
 package de.dailab.jiactng.agentcore.execution;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 
 import de.dailab.jiactng.agentcore.IAgentBean;
@@ -37,8 +36,6 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
   private static final ActionResult ACTIONRESULT_TEMPLATE = new ActionResult(null, null);
 
   private static final DoAction     DOACTION_TEMPLATE     = new DoAction(null, null, null, null);
-
-//  private Set<ActionResult>         pendingResults        = new HashSet<ActionResult>();
 
   /**
    * Run-method for the execution cycle. The method iterates over the list of agentbeans and calls the execute method of
@@ -144,25 +141,6 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
    * Process one ActionResult from the Memory
    */
   private void processActionResults() {
-//    final Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
-
-
-//    for (ActionResult ar : resultSet) {
-//      synchronized (this) {
-//        pendingResults.add(ar);
-//      }
-//    }
-
-//    boolean resultProcessed = false;
-//    if (!pendingResults.isEmpty()) {
-//      resultProcessed = true;
-//      synchronized (this) {
-//        final ActionResult actionResult = pendingResults.iterator().next();
-//        processResult(actionResult);
-//        pendingResults.remove(actionResult);
-//      }
-//    }
-
     final ActionResult result = memory.remove(ACTIONRESULT_TEMPLATE);
     
     boolean resultProcessed = false;

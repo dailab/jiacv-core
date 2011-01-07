@@ -1,7 +1,6 @@
 package de.dailab.jiactng.agentcore.execution;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Future;
@@ -13,7 +12,6 @@ import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.action.SessionEvent;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
-import de.dailab.jiactng.agentcore.execution.AbstractExecutionCycle.TimeoutException;
 
 /**
  * A non-blocking ExecutionCycle implementation. This class executes active agentbeans
@@ -34,7 +32,6 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 	private static final Session SESSION_TEMPLATE = new Session(null, null, null, null);
 	private static final ActionResult ACTIONRESULT_TEMPLATE = new ActionResult(null, null);
 	private static final DoAction DOACTION_TEMPLATE = new DoAction(null, null, null, null);
-//	private Set<ActionResult> pendingResults = new HashSet<ActionResult>();
 	private TreeMap<Long,Future<?>> futures = new TreeMap<Long,Future<?>>();
 
 	/**
@@ -136,29 +133,6 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// process one actionResult
 			// TODO: check if read can be used
-//			final Set<ActionResult> resultSet = memory.removeAll(ACTIONRESULT_TEMPLATE);
-//			int countNew = 0;
-//			for (ActionResult ar : resultSet) {
-//				synchronized (this) {
-//					pendingResults.add(ar);
-//					countNew++;
-//				}
-//			}
-//
-//			boolean resultProcessed = false;
-//			if (!pendingResults.isEmpty()) {
-//				resultProcessed = true;
-//				synchronized (this) {
-//					final ActionResult actionResult = pendingResults.iterator()
-//							.next();
-//					final Future<?> actionResultFuture = thisAgent.getThreadPool().submit(
-//							new ActionResultHandler(actionResult));
-//					futures.put(Long.valueOf(timeout++), actionResultFuture);
-//					pendingResults.remove(actionResult);
-//				}
-//			}
-//			updateWorkload(ACTION_RESULT, resultProcessed);
-
 			
 			final ActionResult result = memory.remove(ACTIONRESULT_TEMPLATE);
 			boolean resultProcessed = false;

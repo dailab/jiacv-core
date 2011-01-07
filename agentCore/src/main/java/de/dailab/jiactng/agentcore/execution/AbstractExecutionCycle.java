@@ -8,13 +8,11 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
-import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
-import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
@@ -62,16 +60,6 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
   public void doStart() throws Exception {
     super.doStart();
     
-    boolean commBeanFound = false;
-//    List<IAgentBean> abList = thisAgent.getAgentBeans();
-//    for(IAgentBean iab : abList) {
-//      if(iab instanceof ICommunicationBean) {
-//        commBeanFound = true;
-//        break;
-//      }
-//    }
-//    if(!commBeanFound) {
-    
     if(thisAgent.getCommunication() == null) {
       log.warn("Could not find CommunicationBean in this agent - RemoteExecutors are disabled!");
       useRemoteExecutor = false;
@@ -111,7 +99,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    */
   protected void performDoAction(DoAction act) {
     if (act.getSession().isTimeout()) {
-      log.warn("Session for DoAction is timed out, returning failure.");
+      log.warn("Session " + act.getSessionId() + " for DoAction " + act.getAction().getName() + " is timed out, returning failure.");
       memory.write(new ActionResult(act, new TimeoutException(TIMEOUT_MESSAGE)));
       // actionPerformed(act, DoActionState.failed, null);
       return;
@@ -139,7 +127,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
             session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
           }
           if(log.isInfoEnabled()) {
-            log.info("Writing session to memory: "+act.getSessionId()+" ("+session.getCurrentCallDepth()+")");
+            log.info("Writing session for "+act.getAction().getName()+" to memory: "+act.getSessionId()+" ("+session.getCurrentCallDepth()+")");
           }
           memory.write(act.getSession());
         }
@@ -172,7 +160,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
         actionPerformed(act, DoActionState.started, null);
       } catch (Throwable t) {
         memory.write(new ActionResult(act, t));
-        log.error("--- action failed: " + act.getAction().getName(), t);
+        log.error("--- action failed: " + act.getAction().getName()+" ("+act.getSessionId()+")", t);
       }
     } else {
       actionPerformed(act, DoActionState.failed, new Object[] { "Action without provider bean" });
@@ -198,7 +186,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     if((doAct.getAction().getResultTypeNames()!=null) && (doAct.getAction().getResultTypeNames().size()>0)) {
       if (session.getCurrentCallDepth() == null) {
         if(log.isWarnEnabled()) {
-          log.warn("Found session with call-depth null. Setting calldepth to 1 for: "+session.getSessionId());
+          log.warn("Found session with call-depth null. Setting calldepth to 1 for: "+doAct.getAction().getName()+" ("+session.getSessionId()+")");
         }
         session.setCurrentCallDepth(1);
       }
@@ -208,7 +196,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     if (memory.read(session) == null) {
       if ((doAct.getAction().getResultTypeNames() != null) && doAct.getAction().getResultTypeNames().size() > 0) {
         if (doAct.getSession().isTimeout()) {
-          log.info("ActionResult for Action " + actionResult.getAction().getName() + " written after session timeout");
+          log.info("ActionResult for Action " + actionResult.getAction().getName() + " (" + actionResult.getSessionId() + ") written after session timeout");
         } else {
           log.warn("ActionResult for Action " + actionResult.getAction().getName()
               + " written with unknown Session: "+doAct.getSessionId());
@@ -216,43 +204,24 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       }
     } else if (session.getCurrentCallDepth().intValue() <= 0) {
       if(log.isInfoEnabled()) {
-        log.info("Removing session from memory: "+session.getSessionId()+" ("+session.getCurrentCallDepth()+")");
+        log.info("Removing session for "+actionResult.getAction().getName()+" from memory: "+session.getSessionId()+" ("+session.getCurrentCallDepth()+")");
       }
       memory.remove(session);
     }
 
-    // remove session from memory
-    // if (memory.remove(doAct.getSession()) == null){
-    // log.warn("ActionResult for Action " + actionResult.getAction().getName() + " written with non existing
-    // Session.");
-    // } else {
-    // log.debug("Session removed for action " + doAct.getAction().getName());
-    // }
-    // Session template= new
-    // Session(doAct.getSessionId(),doAct.getSession().getCreationTime(),null,null);
-    // memory.remove(template);
-
     // inform ResultReceiver
     if (doAct.getSource() == null) {
       // memory.write(actionResult);
-      log.debug("No ResultReceiver for action " + doAct.getAction().getName());
+      log.debug("No ResultReceiver for action " + doAct.getAction().getName() + " (" + doAct.getSessionId() + ")");
     } else {
       if (actionResult.getSession().isTimeout() && !(actionResult.getFailure() instanceof TimeoutException)) {
-        log.debug("Skipping result due to session timeout");
+        log.debug("Skipping result of "+actionResult.getAction().getName()+" ("+actionResult.getSessionId()+") due to session timeout");
       
       } else {
         ((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
-        log.debug("ResultReceiver informed about result of action " + doAct.getAction().getName());
+        log.debug("ResultReceiver informed about result of action " + doAct.getAction().getName() + " (" + doAct.getSessionId() + ")");
       }
     }
-    // ArrayList history = actionResult.getSession().getHistory();
-    // for (int i = history.size() - 1; i >= 0; i--) {
-    // if (history.get(i) instanceof DoAction) {
-    // ((ResultReceiver) ((DoAction) history.get(i))
-    // .getSource()).receiveResult(actionResult);
-    // break;
-    // }
-    // }
   }
 
   /**

@@ -133,8 +133,14 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 
 			// process one actionResult
 			// TODO: check if read can be used
-			
-			final ActionResult result = memory.remove(ACTIONRESULT_TEMPLATE);
+			ActionResult result = null;
+			synchronized (memory) {
+				int n = memory.readAll(ACTIONRESULT_TEMPLATE).size();
+				result = memory.remove(ACTIONRESULT_TEMPLATE);
+				if ((n > 0) && (result == null)) {
+					log.error("Getting action result from memory failed.");
+				}
+			}
 			boolean resultProcessed = false;
 			if (result != null) {
 			  resultProcessed = true;

@@ -1,7 +1,5 @@
 package de.dailab.jiactng.agentcore.action;
 
-import java.io.Serializable;
-
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 

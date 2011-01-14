@@ -42,6 +42,12 @@ public interface IMethodExposingBean {
 
         /** The action scope to be used for the exposed method. */
         ActionScope scope() default ActionScope.AGENT;
+        
+        String servicename() default "";
+        
+        String operationname() default "";
+        
+        String url() default "";
 
     }
     

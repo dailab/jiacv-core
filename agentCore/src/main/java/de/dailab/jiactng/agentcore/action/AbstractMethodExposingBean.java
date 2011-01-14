@@ -39,6 +39,27 @@ import de.dailab.jiactng.agentcore.action.scope.ActionScope;
  */
 public abstract class AbstractMethodExposingBean extends AbstractActionAuthorizationBean implements IMethodExposingBean, AbstractMethodExposingBeanMBean {
     
+	static String getServicename(Method method){
+		String servicename= method.getAnnotation(Expose.class).servicename();
+		
+		if (servicename.isEmpty()){
+			servicename = null;
+		}
+		
+		return servicename;
+	}
+	
+	static String getOperationname(Method method){
+		String operationname= method.getAnnotation(Expose.class).operationname();
+		
+		if (operationname.isEmpty()){
+			operationname = null;
+		}
+		
+		return operationname;
+	}
+	
+	
     static String getName(Method method) {
         String name= method.getAnnotation(Expose.class).name();
         
@@ -206,8 +227,24 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
                 returnTypes
             );
             act.setScope(scope);
-
-            actions.add(act);
+            
+            String servicename = getServicename(method);
+            String operationname = getOperationname(method);
+            
+            WebserviceAction wsaction = null;
+            
+            if ((servicename != null) ||
+            		(operationname != null) ){
+            	wsaction = new WebserviceAction(act);
+            	wsaction.setServiceName(servicename);
+            	wsaction.setOperationName(operationname);
+            }
+            
+            if (wsaction != null){
+            	actions.add(wsaction);
+            } else {
+            	actions.add(act);
+            }
         }
         
         // add further actions

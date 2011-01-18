@@ -129,7 +129,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public <E extends IFact> E read(E template) {
+	public synchronized <E extends IFact> E read(E template) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -139,7 +139,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public <E extends IFact> E read(E template, long timeout) {
+	public synchronized <E extends IFact> E read(E template, long timeout) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -149,7 +149,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public <E extends IFact> Set<E> readAll(E template) {
+	public synchronized <E extends IFact> Set<E> readAll(E template) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -159,7 +159,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public <E extends IFact> Set<E> readAllOfType(Class<E> c) {
+	public synchronized <E extends IFact> Set<E> readAllOfType(Class<E> c) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -169,7 +169,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public <E extends IFact> E remove(E template) {
+	public synchronized <E extends IFact> E remove(E template) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -179,7 +179,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public <E extends IFact> E remove(E template, long timeout) {
+	public synchronized <E extends IFact> E remove(E template, long timeout) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -189,7 +189,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public <E extends IFact> Set<E> removeAll(E template) {
+	public synchronized <E extends IFact> Set<E> removeAll(E template) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -199,7 +199,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public <E extends IFact> boolean update(E template, E pattern) {
+	public synchronized <E extends IFact> boolean update(E template, E pattern) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -209,7 +209,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void write(IFact fact) {
+	public synchronized void write(IFact fact) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -365,7 +365,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public Set<IFact> readAll() {
+	public synchronized Set<IFact> readAll() {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}

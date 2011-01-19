@@ -139,7 +139,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public synchronized <E extends IFact> E read(E template, long timeout) {
+	public <E extends IFact> E read(E template, long timeout) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}
@@ -179,7 +179,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     /**
      * {@inheritDoc}
      */
-	public synchronized <E extends IFact> E remove(E template, long timeout) {
+	public <E extends IFact> E remove(E template, long timeout) {
 		if(space==null) {
 			throw new RuntimeException("Memory has not yet been initialized!");
 		}

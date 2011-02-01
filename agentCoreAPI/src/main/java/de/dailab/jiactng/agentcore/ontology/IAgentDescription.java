@@ -21,6 +21,9 @@ public interface IAgentDescription extends IFact, JmxDescriptionSupport {
 	/** Item name which can be used to get the name of the JMX-based agent description. */
     String ITEMNAME_NAME = "name";
 
+	/** Item name which can be used to get the owner of the JMX-based agent description. */
+    String ITEMNAME_OWNER = "owner";
+
 	/** Item name which can be used to get the node UUID of the JMX-based agent description. */
     String ITEMNAME_NODE = "node UUID";
 
@@ -48,6 +51,14 @@ public interface IAgentDescription extends IFact, JmxDescriptionSupport {
      * @return      the display name of the agent
      */
     String getName();
+    
+    /**
+     * This method returns the owner of the agent this
+     * description refers to.
+     * 
+     * @return      the owner of the agent
+     */
+    String getOwner();
     
     /**
      * This method returns the unique communication address of

@@ -12,8 +12,8 @@ import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
 import de.dailab.jiactng.agentcore.util.EqualityChecker;
 
 /**
- * Klasse zum Beschreiben eines Agenten. Sie enthuelt also META-Infos ueber den Agenten.
- * Es ist nicht der Agent selbst.
+ * This ontology is used to describe agents. Thus, it contains META information about agents
+ * and is not the agent itself.
  * @author janko
  * @author axle
  */
@@ -25,6 +25,9 @@ public class AgentDescription implements IAgentDescription {
 	
 	/** Agent name. */
 	private String name;
+	
+	/** Agent owner. */
+	private String owner;
 	
 	/** Agent's state. */
 	private String state;
@@ -46,38 +49,41 @@ public class AgentDescription implements IAgentDescription {
 	 * Creates an empty agent description.
 	 */
 	public AgentDescription() {
-	    this(null, null, null, null, null, null);
+	    this(null, null, null, null, null, null, null);
 	}
 
 	/**
 	 * Creates a description of a stationary agent.
 	 * @param aid the unique identifier of the agent
 	 * @param name the name of the agent
+	 * @param owner the owner of the agent
 	 * @param state the life-cycle state of the agent
 	 * @param messageBoxAddress the communication address of the agent
 	 * @param agentNodeUUID the unique identifier of the agents node
 	 */
-    public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
+    public AgentDescription(String aid, String name, String owner, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
 //        this.aid=aid;
 //        this.name=name;
 //        this.state=state;
 //        this.messageBoxAddress= messageBoxAddress;
 //        this.agentNodeUUID = agentNodeUUID;
-    	this( aid,  name,  state,  messageBoxAddress,  agentNodeUUID, Boolean.valueOf(false));
+    	this( aid,  name,  owner, state,  messageBoxAddress,  agentNodeUUID, Boolean.valueOf(false));
     }
 
     /**
      * Creates an agent description with mobility flag.
 	 * @param aid the unique identifier of the agent
 	 * @param name the name of the agent
+	 * @param owner the owner of the agent
 	 * @param state the life-cycle state of the agent
 	 * @param messageBoxAddress the communication address of the agent
 	 * @param agentNodeUUID the unique identifier of the agents node
      * @param mobile the mobility of the agent
      */
-    public AgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID, Boolean mobile) {
+    public AgentDescription(String aid, String name, String owner, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID, Boolean mobile) {
         this.aid=aid;
         this.name=name;
+        this.owner=owner;
         this.state=state;
         this.messageBoxAddress= messageBoxAddress;
         this.agentNodeUUID = agentNodeUUID;
@@ -91,6 +97,7 @@ public class AgentDescription implements IAgentDescription {
     public AgentDescription(CompositeData descr) {
 		aid = (String) descr.get(IAgentDescription.ITEMNAME_ID);
 		name = (String) descr.get(IAgentDescription.ITEMNAME_NAME);
+		owner = (String) descr.get(IAgentDescription.ITEMNAME_OWNER);
 		agentNodeUUID = (String) descr.get(IAgentDescription.ITEMNAME_NODE);
 		state = (String) descr.get(IAgentDescription.ITEMNAME_STATE);
 		isMobile = (Boolean) descr.get(IAgentDescription.ITEMNAME_MOBILE);
@@ -130,6 +137,22 @@ public class AgentDescription implements IAgentDescription {
 	 */
 	public void setName(String newName) {
 		name = newName;
+	}
+
+	/**
+	 * Get the owner of the agent.
+	 * @return the owner
+	 */
+	public String getOwner() {
+		return owner;
+	}
+
+	/**
+	 * Set the owner of the agent.
+	 * @param newOwner the owner to set
+	 */
+	public void setOwner(String newOwner) {
+		owner = newOwner;
 	}
 
 	/**
@@ -222,6 +245,14 @@ public class AgentDescription implements IAgentDescription {
         	builder.append("null");
         }
 
+        // owner
+        builder.append("\n owner=");
+        if (owner != null) {
+        	builder.append("'").append(owner).append("'");
+        } else {
+        	builder.append("null");
+        }
+
         // state
         builder.append("\n state=");
         if (state != null) {
@@ -291,6 +322,7 @@ public class AgentDescription implements IAgentDescription {
 		return new String[] {
 	    		ITEMNAME_ID,
 	    		ITEMNAME_NAME,
+	    		ITEMNAME_OWNER,
 	    		ITEMNAME_NODE,
 	    	    ITEMNAME_STATE,
 	    		ITEMNAME_MOBILE,
@@ -301,13 +333,14 @@ public class AgentDescription implements IAgentDescription {
 	   /**
 	    * Gets the type of JIAC agent descriptions based on JMX open types.
 	    * 
-	    * @return A composite type containing agent id, name, node's UUID, state, mobility, and message box address.
+	    * @return A composite type containing agent id, name, owner, node's UUID, state, mobility, and message box address.
 	    * @throws OpenDataException
 	    *             if an error occurs during the creation of the type.
 	    * @see javax.management.openmbean.CompositeType
 	    */
 	   public OpenType<?> getDescriptionType() throws OpenDataException {
 	      final OpenType<?>[] itemTypes = new OpenType<?>[] {
+	    		  SimpleType.STRING, 
 	    		  SimpleType.STRING, 
 	    		  SimpleType.STRING, 
 	    		  SimpleType.STRING, 
@@ -326,7 +359,7 @@ public class AgentDescription implements IAgentDescription {
 	   /**
 	    * Gets the description of this JIAC agent description based on JMX open types.
 	    * 
-	    * @return Composite data containing agent id, name, node's UUID, state, mobility, and message box address.
+	    * @return Composite data containing agent id, name, owner, node's UUID, state, mobility, and message box address.
 	    * @throws OpenDataException
 	    *             if an error occurs during the creation of the data.
 	    * @see javax.management.openmbean.CompositeData
@@ -335,6 +368,7 @@ public class AgentDescription implements IAgentDescription {
 	      final Object[] itemValues = new Object[] {
 	    		  aid,
 	    		  name,
+	    		  owner,
 	    		  agentNodeUUID,
 	    		  state,
 	    		  isMobile,

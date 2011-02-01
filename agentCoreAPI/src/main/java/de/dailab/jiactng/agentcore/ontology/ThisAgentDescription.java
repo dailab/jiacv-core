@@ -21,11 +21,12 @@ public class ThisAgentDescription extends AgentDescription {
 	 * 
 	 * @param aid the agents uid.
 	 * @param name the name of the agent.
+	 * @param owner the owner of the agent.
 	 * @param state the agents current state.
 	 * @param messageBoxAddress the communication address of the agent.
 	 * @param agentNodeUUID the UUID of the agents node.
 	 */
-	public ThisAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
-		super(aid, name, state, messageBoxAddress, agentNodeUUID);
+	public ThisAgentDescription(String aid, String name, String owner, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
+		super(aid, name, owner, state, messageBoxAddress, agentNodeUUID);
 	}
 }

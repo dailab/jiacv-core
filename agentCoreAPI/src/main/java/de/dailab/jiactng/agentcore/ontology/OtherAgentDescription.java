@@ -17,12 +17,13 @@ public class OtherAgentDescription extends AgentDescription {
 	 * Creates a new description of another agent.
 	 * @param aid the agent id
 	 * @param name the name of the other agent
+	 * @param owner the owner of the other agent
 	 * @param state the state of the other agent
 	 * @param messageBoxAddress the communication address of the agent.
 	 * @param agentNodeUUID the UUID of the agents node.
 	 */
-	public OtherAgentDescription(String aid, String name, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
-		super(aid, name, state, messageBoxAddress, agentNodeUUID);
+	public OtherAgentDescription(String aid, String name, String owner, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
+		super(aid, name, owner, state, messageBoxAddress, agentNodeUUID);
 	}
 
 	/**
@@ -30,7 +31,7 @@ public class OtherAgentDescription extends AgentDescription {
 	 * @param descr the agent description to create a description of an other agent
 	 */
 	public OtherAgentDescription(AgentDescription descr) {
-		super(descr.getAid(), descr.getName(), descr.getState(), descr.getMessageBoxAddress(), descr.getAgentNodeUUID());
+		super(descr.getAid(), descr.getName(), descr.getOwner(), descr.getState(), descr.getMessageBoxAddress(), descr.getAgentNodeUUID());
 	}
 
 	/**
@@ -38,6 +39,6 @@ public class OtherAgentDescription extends AgentDescription {
 	 * @param descr the agent description to create a description of an other agent
 	 */
 	public OtherAgentDescription(IAgentDescription descr) {
-	    super(descr.getAid(), descr.getName(), null, descr.getMessageBoxAddress(), descr.getAgentNodeUUID());
+	    super(descr.getAid(), descr.getName(), descr.getOwner(), null, descr.getMessageBoxAddress(), descr.getAgentNodeUUID());
 	}
 }

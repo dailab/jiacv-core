@@ -425,7 +425,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
 
     this.memory.init();
-    this.memory.write(new ThisAgentDescription(this.agentId, this.agentName, LifecycleStates.INITIALIZING.name(),
+    this.memory.write(new ThisAgentDescription(this.agentId, this.agentName, this.owner, LifecycleStates.INITIALIZING.name(),
         CommunicationAddressFactory.createMessageBoxAddress(this.agentNode.getUUID() + '/' + this.agentId),
         this.agentNode.getUUID()));
 
@@ -684,7 +684,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    *          the new state
    */
   private void updateState(ILifecycle.LifecycleStates newState) {
-    memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, null, newState.name(), null, this
+    memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, null, null, newState.name(), null, this
         .getAgentNode().getUUID()));
   }
 
@@ -788,9 +788,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     final String oldName = this.agentName;
     this.agentName = agentname;
 
+    // update memory
+    switch (memory.getState()) {
+    case INITIALIZED:
+    case STARTING:
+    case STARTED:
+    case STOPPING:
+    case STOPPED:
+    	memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, agentname, null, null, null, null));
+    }
+
     // send notification
     sendAttributeChangeNotification("AgentName", "java.lang.String", oldName, agentname);
-
   }
 
   /**
@@ -909,6 +918,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   public final void setOwner(String newOwner) {
     final String oldOwner = owner;
     owner = newOwner;
+
+    // update memory
+    switch (memory.getState()) {
+    case INITIALIZED:
+    case STARTING:
+    case STARTED:
+    case STOPPING:
+    case STOPPED:
+    	memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, null, owner, null, null, null));
+    }
+
+    // send notification
     sendAttributeChangeNotification("owner", "java.lang.String", oldOwner, owner);
   }
 

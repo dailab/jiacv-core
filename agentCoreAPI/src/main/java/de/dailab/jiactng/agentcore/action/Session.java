@@ -282,7 +282,8 @@ public class Session implements IFact {
       // history
       builder.append("\n history=");
       if (history != null) {
-         builder.append(history.toString());
+         // TODO: history probably needs real synchronization 
+         builder.append(getHistory().toString());
       } else {
          builder.append("null");
       }

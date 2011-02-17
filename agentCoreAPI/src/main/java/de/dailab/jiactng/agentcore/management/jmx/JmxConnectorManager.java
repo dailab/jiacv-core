@@ -119,7 +119,10 @@ public final class JmxConnectorManager extends TimerTask {
 
 						// check connector server for the address
 						socket.setNetworkInterface(ifc);
-						System.setProperty("java.rmi.server.hostname", address.getHostAddress());
+						// FIXME !!! Find a solution that works the same on all OSs
+						if (!(System.getProperty("os.name").startsWith("Mac"))) {
+							System.setProperty("java.rmi.server.hostname", address.getHostAddress());
+						}
 						if (!interfaces.containsKey(ifcName)) {
 							// connectors not yet exist for this interface
 							// => create connector servers

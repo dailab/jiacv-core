@@ -154,5 +154,18 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	 */
 	IAgentDescription getAgentDescription();
 
-	
+	/**
+	 * Gets the name of the agent specific JARs.
+	 * @return the list of JAR names or <code>null</code> if the agent does not use a JARClassLoader.
+	 * @see de.dailab.jiactng.agentcore.util.jar.JARClassLoader
+	 */
+	List<String> getJarNames();
+
+	/**
+	 * Tries to load a given class.
+	 * @param className the name of the class.
+	 * @throws ClassNotFoundException if the class was not found by the agent's class loader.
+	 */
+	void loadClass(String className) throws ClassNotFoundException;
+
 }

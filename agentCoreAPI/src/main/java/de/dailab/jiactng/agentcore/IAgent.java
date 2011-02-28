@@ -13,6 +13,7 @@ import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
+import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
 
 /**
  * Interface for agents. This interfaces defines functionalities, that are
@@ -228,5 +229,17 @@ public interface IAgent extends ILifecycleListener, Runnable,
   List<IAgentRole> getRoles();
   
   void setRoles(List<IAgentRole> roles);
-  
+
+  /**
+   * Gets the agent specific class loader.
+   * @return the class loader
+   */
+  JARClassLoader getClassLoader();
+
+  /**
+   * Sets the agent specific class loader.
+   * @param cl the class loader
+   */
+  void setClassLoader(JARClassLoader cl);
+
 }

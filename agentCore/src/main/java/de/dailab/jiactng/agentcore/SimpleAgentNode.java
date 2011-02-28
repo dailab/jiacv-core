@@ -54,7 +54,7 @@ import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
 import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
 /**
- * Simple agent node implementation
+ * Simple agent node implementation.
  * 
  * @author Joachim Fuchs
  * @author Thomas Konnerth
@@ -70,22 +70,22 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    */
   private String                          loggingConfig;
 
-  /** The unique ID of this agentnode */
+  /** The unique ID of this agent node */
   protected String                        uuid                  = null;
 
-  /** The name of the agentnode. */
+  /** The name of the agent node. */
   protected String                        name                  = null;
 
-  /** The list of agentnodebeans. */
+  /** The list of agent node beans. */
   private final ArrayList<IAgentNodeBean> agentNodeBeans;
 
   /** The list of agents. */
   private final ArrayList<IAgent>         agents;
   
-  /** The list of all agentgroups. */
+  /** The list of all agent groups. */
   private final ArrayList<IAgentGroup> groups;
 
-  /** Storage for the agentFutures. Used to stop/cancel agentthreads. */
+  /** Storage for the agentFutures. Used to stop/cancel agent threads. */
   private HashMap<String, Future<?>>      agentFutures          = null;
 
   /** Configuration of a set of JMX connector server. */
@@ -112,7 +112,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
   /**
    * Property for overwriting the discoveryURI this is a convenience property that overwrites the standard discoveryURI
-   * in the TransportConnectors of the messagebroker
+   * in the TransportConnectors of the message broker
    */
   private String                          overwriteDiscoveryURI = null;
 
@@ -121,7 +121,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    * ClassPathXmlApplicationContext to instantiate its contents
    * 
    * @param args
-   *          the first argument is interpreted as a classpathrelative name of a spring configurations file. Other
+   *          the first argument is interpreted as a classpath-relative name of a spring configurations file. Other
    *          arguments are ignored.
    * @see org.springframework.context.support.ClassPathXmlApplicationContext
    */
@@ -135,7 +135,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    * -------------Jetzt geht's lo'hos -----------------------------------------
    */
 
-  /** Constructor. Creates the uuid for the agentnode. */
+  /** Constructor. Creates the UUID for the agent node. */
   public SimpleAgentNode() {
     uuid = IdFactory.createAgentNodeId(this.hashCode());
     setLog(LogFactory.getLog(uuid));
@@ -147,7 +147,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     timer = new Timer();
     timer.start();
 
-    // make sure jiac version appears on console/logging
+    // make sure JIAC version appears on console/logging
     log.warn("JIAC version: " + getJiacVersion() + " (" + getJiacVendor() + ")");
     System.err.println("JIAC version: " + getJiacVersion() + " (" + getJiacVendor() + ")");
   }
@@ -192,7 +192,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
     synchronized (agents) {
       if (agents.size() > 0) {
-        // If the agentlist is not empty, overwriting it may lead to agentobjects that are no longer known to the node.
+        // If the agent list is not empty, overwriting it may lead to agent objects that are no longer known to the node.
         // This should not happen.
         log.error("The old list of agents is not empty! Overwriting this list is probably not a good idea!");
         agents.clear();
@@ -262,7 +262,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
     agent.setAgentNode(this);
 
-    // TODO: statechanges?
+    // TODO: state changes?
     final List<String> oldAgentList = getAgents();
     synchronized (agents) {
       agents.add(agent);
@@ -285,7 +285,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    */
 
   public final void removeAgent(IAgent agent) {
-    // TODO: statechanges?
+    // TODO: state changes?
 
     if (agent == null) {
       throw new IllegalArgumentException("Argument for removeAgent must not be null!");
@@ -303,7 +303,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
           + ") while it is not yet cleaned up. Make sure you try to change the state first.");
     }
 
-    // deregister agent from management
+    // unregister agent from management
     agent.disableManagement();
 
     // remove agent
@@ -478,7 +478,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    * {@inheritDoc}
    */
   public final List<String> addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws Exception {
-    // create classloader for the new agents
+    // create class loader for the new agents
     final JARClassLoader cl = new JARClassLoader();
     for (JARMemory jar : libraries) {
       cl.addJAR(jar);
@@ -498,6 +498,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       final IAgent agent = (IAgent) a;
       agent.setOwner(owner);
       agent.setSpringConfigXml(configuration);
+      agent.setClassLoader(cl);
 
       addAgent(agent);
       agentIds.add(agent.getAgentId());
@@ -518,10 +519,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
   }
 
   /**
-   * Handles the change of lifecycle states of agents on this agent node.
+   * Handles the change of life-cycle states of agents on this agent node.
    * 
    * @param evt
-   *          the lifecycle event
+   *          the life-cycle event
    */
   public void onEvent(LifecycleEvent evt) {
     final Object source = evt.getSource();
@@ -552,7 +553,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
   /**
    * Initialisation-method. This method is called by Spring after startup (through the InitializingBean-Interface) and
-   * is used to start the agentnode after all beans haven been instantiated by Spring. Currently only creates the JMX
+   * is used to start the agent node after all beans haven been instantiated by Spring. Currently only creates the JMX
    * connector servers, registers the agent node as JMX resource and calls the init() and start()-methods from
    * ILifefycle for this.
    * 
@@ -602,7 +603,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
   }
 
   /**
-   * Shuts down the managed agent node and all its agents (incl. deregistration as JMX resource) before stopping all JMX
+   * Shuts down the managed agent node and all its agents (incl. unregister as JMX resource) before stopping all JMX
    * connector servers.
    * 
    * @throws LifecycleException
@@ -629,7 +630,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     disableManagement();
 
     synchronized (agentNodeBeans) {
-      // Todo: anything left to do for the nodeBeans?
+      // TODO: anything left to do for the nodeBeans?
       agentNodeBeans.clear();
     }
 
@@ -650,10 +651,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     threadPool = Executors.newCachedThreadPool();
     agentFutures = new HashMap<String, Future<?>>();
 
-    // call init on all beans of the agentnodes
+    // initialize all beans of the agent nodes
     // TODO testing
     synchronized (agentNodeBeans) {
-      HashSet<Class> anbClassSet = new HashSet<Class>();
+      HashSet<Class<?>> anbClassSet = new HashSet<Class<?>>();
 
       for (IAgentNodeBean anb : agentNodeBeans) {
         if(anbClassSet.contains(anb.getClass())) {
@@ -688,7 +689,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       }
     }
 
-    // call init and set references for all agents if any
+    // initialize and set references for all agents if any
     synchronized (agents) {
       for (IAgent a : agents) {
 
@@ -724,7 +725,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    */
 
   public void doStart() {
-    // call start on all beans of the agentnode
+    // call start on all beans of the agent node
     // TODO testing
     synchronized (agentNodeBeans) {
       for (IAgentNodeBean anb : agentNodeBeans) {
@@ -776,7 +777,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       }
     }
 
-    // call stop on all beans of the agentnode in reverse order
+    // call stop on all beans of the agent node in reverse order
     // TODO testing
     synchronized (agentNodeBeans) {
       for (int i = agentNodeBeans.size() - 1; i >= 0; i--) {
@@ -809,7 +810,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       }
     }
 
-    // call cleanup on all beans of the agentnode in reverse order
+    // call cleanup on all beans of the agent node in reverse order
     // TODO testing
     synchronized (agentNodeBeans) {
       for (int i = agentNodeBeans.size() - 1; i >= 0; i--) {
@@ -1045,7 +1046,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
   }
 
   /**
-   * Deregisters the agent node and all its resources from management
+   * Unregisters the agent node and all its resources from management
    */
   public void disableManagement() {
     // do nothing if management already disabled
@@ -1056,19 +1057,19 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     // disable remote management
     _manager.disableRemoteManagement(this);
 
-    // deregister agents from management
+    // unregister agents from management
     synchronized (agents) {
       for (IAgent a : agents) {
         a.disableManagement();
       }
     }
 
-    // deregister agent node beans from management
+    // unregister agent node beans from management
     for (IAgentNodeBean anb : agentNodeBeans) {
       anb.disableManagement();
     }
 
-    // deregister agent node timer from management
+    // unregister agent node timer from management
     try {
       _manager.unregisterAgentNodeResource(this, "Timer");
     } catch (Exception e) {
@@ -1077,7 +1078,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       System.err.println(e.getMessage());
     }
 
-    // deregister agent node from management
+    // unregister agent node from management
     try {
       _manager.unregisterAgentNode(this);
     } catch (Exception e) {

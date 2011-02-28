@@ -63,10 +63,12 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
+import de.dailab.jiactng.agentcore.util.jar.JAR;
+import de.dailab.jiactng.agentcore.util.jar.JARClassLoader;
 
 /**
- * Agentclass implementing the IAgent interface and therby realizing the basic JIAC-TNG agent. The Agent currently holds
- * a Memory-Component, an ExecutionCycle component and a list of agentbeans.
+ * Agent class realizing the basic JIAC-TNG agent by implementing the IAgent interface. The Agent currently holds
+ * a Memory-Component, an ExecutionCycle component and a list of agent beans.
  * 
  * @author Thomas Konnerth
  * @see de.dailab.jiactng.agentcore.IAgent
@@ -100,6 +102,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   private transient IAgentNode              agentNode                      = null;
 
   /**
+   * Reference to the agent's specific class loader.
+   */
+  private transient JARClassLoader          classLoader                    = null;
+
+  /**
    * The name of this agent.
    */
   private String                            agentName                      = null;
@@ -118,7 +125,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   private transient IDirectory              directory                      = null;
 
   /**
-   * The list of agentbeans of this agent.
+   * The list of agent beans of this agent.
    */
   protected final ArrayList<IAgentBean>     agentBeans                     = new ArrayList<IAgentBean>();
 
@@ -127,7 +134,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   private List<IAgentGroup>                 agentGroups                    = new ArrayList<IAgentGroup>();
 
   /**
-   * activity Flag (could be replaced by statecheck
+   * activity Flag (could be replaced by state check)
    */
   private boolean                           active                         = false;
 
@@ -205,7 +212,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Constructor for spring-based agentnode persistency, creates an agent with a given ID. Note: You should not try to
+   * Constructor for spring-based agent node persistency, creates an agent with a given ID. Note: You should not try to
    * assign agentIds yourself, but always use the {@link Agent#Agent() Agent()} constructor to create a new agent.
    * 
    * @param agentID
@@ -327,7 +334,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Setter for the agentname. Called by Spring via the BeanNameAware interface.
+   * Setter for the agent name. Called by Spring via the BeanNameAware interface.
    * 
    * @param name
    *          the name of the agent.
@@ -346,7 +353,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Stops and undeploys this agent from its agent node (incl. deregistration as JMX resource).
+   * Stops and undeploys this agent from its agent node (incl. unregister as JMX resource).
    * 
    * @throws LifecycleException
    *           if an error occurs during stop or cleanup of this agent.
@@ -374,7 +381,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
       }
     }
 
-    // call cleanup for all agentbeans
+    // cleanup all agent beans
     for (IAgentBean a : this.agentBeans) {
       try {
         setBeanState(a, LifecycleStates.CLEANED_UP);
@@ -448,7 +455,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
       this.agentBeans.addAll(role.getAgentBeans());
     }
 
-    // call init for all agentbeans
+    // initialize all agent beans
     for (IAgentBean ab : this.agentBeans) {
       try {
         ab.setMemory(memory);
@@ -526,7 +533,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
       this.communication.start();
     }
 
-    // call start for all agentbeans
+    // call start for all agent beans
     for (IAgentBean a : this.agentBeans) {
       try {
         setBeanState(a, LifecycleStates.STARTED);
@@ -596,7 +603,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    */
   @Override
   public void doStop() throws LifecycleException {
-    // call stop for all agentbeans
+    // call stop for all agent beans
     for (IAgentBean a : this.agentBeans) {
       try {
         setBeanState(a, LifecycleStates.STOPPED);
@@ -633,7 +640,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Utility-Method for handling bean exections during lifecycle changes.
+   * Utility-Method for handling bean executions during life-cycle changes.
    * 
    * @param a
    *          the bean that threw the exception
@@ -689,16 +696,16 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Gets the lifecycle state of this agent by reading the agent description within the agent's memory.
+   * Gets the life-cycle state of this agent by reading the agent description within the agent's memory.
    * 
-   * @return the current lifecycle state of this agent
+   * @return the current life-cycle state of this agent
    */
   public final LifecycleStates getAgentState() {
     return LifecycleStates.valueOf(memory.read(new ThisAgentDescription()).getState());
   }
 
   /**
-   * Sets the lifecycle state of an agent bean by invoking the corresponding method of interface <code>ILifecycle</code>
+   * Sets the life-cycle state of an agent bean by invoking the corresponding method of interface <code>ILifecycle</code>
    * . It also updates the bean description within the agent's memory.
    * 
    * @param bean
@@ -706,7 +713,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    * @param newState
    *          the intended state of the agent bean (must be one of CLEANED_UP, INITIALIZED, STOPPED or STARTED).
    * @throws LifecycleException
-   *           if the corresponding lifecycle method throws an exception.
+   *           if the corresponding life-cycle method throws an exception.
    * @see ILifecycle
    * 
    */
@@ -741,11 +748,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Gets the lifecycle state of an agent bean by reading the bean description within the agent's memory.
+   * Gets the life-cycle state of an agent bean by reading the bean description within the agent's memory.
    * 
    * @param beanName
    *          the name of the agent bean
-   * @return the current lifecycle state of the agent bean
+   * @return the current life-cycle state of the agent bean
    */
   public final LifecycleStates getBeanState(String beanName) {
     return LifecycleStates.valueOf(this.memory.read(new AgentBeanDescription(beanName, null)).getState());
@@ -819,7 +826,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Gets the communicationbean of this agent.
+   * Gets the communication bean of this agent.
    * 
    * @return the CommunicationBean of this agent
    */
@@ -1123,7 +1130,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Deregisters the agent and all its resources from management.
+   * Unregisters the agent and all its resources from management.
    */
   public void disableManagement() {
     // do nothing if management already disabled
@@ -1131,27 +1138,27 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
       return;
     }
 
-    // deregister memory from management
+    // unregister memory from management
     if (memory != null) {
       memory.disableManagement();
     }
 
-    // deregister communication from management
+    // unregister communication from management
     if (communication != null) {
       communication.disableManagement();
     }
 
-    // deregister execution cycle from management
+    // unregister execution cycle from management
     if (execution != null) {
       execution.disableManagement();
     }
 
-    // deregister agent beans from management
+    // unregister agent beans from management
     for (IAgentBean ab : this.agentBeans) {
       ab.disableManagement();
     }
 
-    // deregister agent from management
+    // unregister agent from management
     try {
       _manager.unregisterAgent(this);
     } catch (Exception e) {
@@ -1204,7 +1211,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
   /**
    * Adds the start time listener and notifications for start time. Required to enable spring configuration of
-   * start/stoptime.
+   * start/stop-time.
    * 
    * @param regStartTime
    *          the designated start time
@@ -1370,7 +1377,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
       // check autoExec timer
       if (id.equals(autoExecTimeId) && getAgentState().equals(LifecycleStates.STARTED)) {
 
-        // if not continous and one execution was done - continue;
+        // if not continuous and one execution was done - continue;
         if (!execution.getAutoExecutionType() && singleExecutionsDone) {
           return;
         }
@@ -1394,7 +1401,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
           singleExecutionsDone = true;
         }
         if (execution.getAutoExecutionType()) {
-          // set new timer for contiunous execution
+          // set new timer for continuous execution
           // remove old timer notification
           try {
             if (autoExecTimeId != null) {
@@ -1650,20 +1657,16 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     return type.cast(ret);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.IAgent#getRoles()
+  /**
+   * {@inheritDoc}
    */
   @Override
   public List<IAgentRole> getRoles() {
     return Collections.unmodifiableList(agentRoles);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.dailab.jiactng.agentcore.IAgent#setRoles(java.util.List)
+  /**
+   * {@inheritDoc}
    */
   @Override
   public void setRoles(List<IAgentRole> roles) {
@@ -1685,6 +1688,51 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
 
     return ret;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public JARClassLoader getClassLoader() {
+	  return classLoader;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setClassLoader(JARClassLoader cl) {
+	  classLoader = cl;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<String> getJarNames() {
+	if (classLoader == null) {
+		return null;
+	}
+
+	ArrayList<String> names = new ArrayList<String>();
+	JAR[] jars = classLoader.getJARs();
+	for (int i=0; i<jars.length; i++) {
+		String jarName = jars[i].getJarName();
+		names.add(jarName.substring(Math.max(jarName.lastIndexOf("/"), jarName.lastIndexOf("\\")) + 1));
+	}
+	return names;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void loadClass(String className) throws ClassNotFoundException {
+	  if (classLoader == null) {
+		  getClass().getClassLoader().loadClass(className);
+	  } else {
+		  classLoader.loadClass(className);
+	  }
   }
 
   // ///////////////////////////////////

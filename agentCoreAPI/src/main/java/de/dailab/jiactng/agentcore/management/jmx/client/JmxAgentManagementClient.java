@@ -396,7 +396,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#setStartTime(Long)
 	 */
 	public final void setStartTime(Long startTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		this.setAttribute("StartTime", startTime);
+		setAttribute("StartTime", startTime);
 	}
 
 	/**
@@ -423,9 +423,9 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#setStopTime(Long)
 	 */
 	public final void setStopTime(Long stopTime) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		this.setAttribute("StopTime", stopTime);
+		setAttribute("StopTime", stopTime);
 	}
-	
+
 	/**
 	 * Sets the auto execution service list for the connected agent.
 	 * @param actionIds the list of action names.
@@ -434,9 +434,9 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 */
 	public final void setAutoExecutionServices(List<String> actionIds) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		this.setAttribute("AutoExecutionServices", actionIds);
+		setAttribute("AutoExecutionServices", actionIds);
 	}
-  
+
 	/**
 	 * Gets the auto execution service list for the connected agent.
 	 * @return auto execution service id list
@@ -446,7 +446,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	public final List<String> getAutoExecutionServices() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("AutoExecutionServices");
 	}
-  
+
 	/**
 	 * Sets the auto execution type for the connected agent.
 	 * @param continous <code>true</code> if the automatic actions will be continuously executed.
@@ -455,9 +455,9 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
 	 */
 	public final void setAutoExecutionType(boolean continous)throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
-		this.setAttribute("AutoExecutionType", Boolean.valueOf(continous));
+		setAttribute("AutoExecutionType", Boolean.valueOf(continous));
 	}
-  
+
 	/**
 	 * Gets the auto execution type for the connected agent.
 	 * @return <code>true</code> if the automatic actions will be continuously executed.
@@ -467,7 +467,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	public final boolean getAutoExecutionType()throws IOException, InstanceNotFoundException {
 		return ((Boolean) getAttribute("AutoExecutionType")).booleanValue();
 	}
-  
+
 	/**
 	 * Gets the spring config xml snippet for the connected agent.
 	 * @return Spring Config XML snippet
@@ -477,7 +477,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	public final byte[] getSpringConfigXml() throws IOException, InstanceNotFoundException {
 		return (byte[]) getAttribute("SpringConfigXml");
 	}
-  
+
 	/**
 	 * Gets the Agent description for the connected agent.
 	 * @return Agent Description
@@ -487,6 +487,34 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	public final IAgentDescription getAgentDescription() throws InstanceNotFoundException, IOException {
 		return (IAgentDescription) getAttribute("AgentDescription");
 	}
-  
-  
+
+	/**
+	 * Gets the name of the agent specific JARs.
+	 * @return the list of JAR names or <code>null</code> if the agent does not use a JARClassLoader.
+	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
+	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
+	 */
+	public List<String> getJarNames() throws InstanceNotFoundException, IOException {
+		return (List<String>) getAttribute("JarNames");
+	}
+
+	/**
+	 * Tries to load a given class.
+	 * @param className the name of the class.
+	 * @throws ClassNotFoundException if the class was not found by the agent's class loader.
+	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
+	 * @throws IOException A communication problem occurred when invoking the operation of the remote agent.
+	 */
+	public void loadClass(String className) throws ClassNotFoundException, InstanceNotFoundException, IOException {
+		try {
+			invokeOperation("loadClass", new Object[] {className}, new String[] {"java.lang.String"});
+		}
+		catch (RuntimeException e) {
+			if ((e.getCause() != null) && (e.getCause().getCause() != null) && 
+					(e.getCause().getCause() instanceof ClassNotFoundException)) {
+				throw (ClassNotFoundException) e.getCause().getCause();
+			}
+		}
+	}
+
 }

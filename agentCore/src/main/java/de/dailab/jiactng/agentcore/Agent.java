@@ -1729,7 +1729,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    */
   public void loadClass(String className) throws ClassNotFoundException {
 	  if (classLoader == null) {
-		  getClass().getClassLoader().loadClass(className);
+		  agentNode.loadClass(className);
 	  } else {
 		  classLoader.loadClass(className);
 	  }

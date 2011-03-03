@@ -552,7 +552,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
   }
 
   /**
-   * Initialisation-method. This method is called by Spring after startup (through the InitializingBean-Interface) and
+   * Initialization-method. This method is called by Spring after startup (through the InitializingBean-Interface) and
    * is used to start the agent node after all beans haven been instantiated by Spring. Currently only creates the JMX
    * connector servers, registers the agent node as JMX resource and calls the init() and start()-methods from
    * ILifefycle for this.
@@ -1115,6 +1115,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     }
 
     return type.cast(ret);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void loadClass(String className) throws ClassNotFoundException {
+	getClass().getClassLoader().loadClass(className);
   }
 
 }

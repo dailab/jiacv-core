@@ -145,4 +145,12 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
      * @throws LifecycleException if an error occurs during stop and cleanup of this agent node.
 	 */
 	void shutdown() throws LifecycleException;
+
+	/**
+	 * Tries to load a given class.
+	 * @param className the name of the class.
+	 * @throws ClassNotFoundException if the class was not found by the agent node's class loader.
+	 */
+	void loadClass(String className) throws ClassNotFoundException;
+
 }

@@ -47,7 +47,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
 
   /**
    * Setter for the initial list of agents of this agent node. Used by Spring
-   * during initialisation.
+   * during initialization.
    * 
    * @param newAgents
    *          the list of agents that should be started with the agent nodes.
@@ -194,9 +194,17 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
   Set<JMXServiceURL> getJmxURLs();
   
   /**
-   * Utility method for retrieving a reference to an agentnodebean of the given class. 
-   * @param type the class of the agentnodebean that you want to find.
-   * @return a reference to the agentnodebean. 
+   * Utility method for retrieving a reference to an agent node bean of the given class. 
+   * @param type the class of the agent node bean that you want to find.
+   * @return a reference to the agent node bean. 
    */
   <T> T findAgentNodeBean(Class<T> type);
+
+  /**
+   * Tries to load a given class.
+   * @param className the name of the class.
+   * @throws ClassNotFoundException if the class was not found by the agent node's class loader.
+   */
+  void loadClass(String className) throws ClassNotFoundException;
+
 }

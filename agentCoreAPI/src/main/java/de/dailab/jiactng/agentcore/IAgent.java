@@ -61,15 +61,15 @@ public interface IAgent extends ILifecycleListener, Runnable,
   void setCommunication(ICommunicationBean newCommunication);
 
   /**
-   * Setter for the agent's agentbeans. Used for dependency injection by
+   * Setter for the agent's agent beans. Used for dependency injection by
    * Spring.
    * 
-   * @param agentbeans the agentbeans of this agent.
+   * @param agentbeans the agent beans of this agent.
    */
   void setAgentBeans(List<IAgentBean> agentbeans);
 
   /** TODO rename to setAgentName
-   * Setter for the name of this agent. Used by Spring during initialisation.
+   * Setter for the name of this agent. Used by Spring during initialization.
    * 
    * @param name
    *          the name of this agent
@@ -78,7 +78,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
   void setBeanName(String name);
 
   /**
-   * Setter for the name of this agent. Used by Spring during initialisation.
+   * Setter for the name of this agent. Used by Spring during initialization.
    * 
    * @param name the name of this agent.
    */
@@ -99,9 +99,9 @@ public interface IAgent extends ILifecycleListener, Runnable,
   String getAgentId();
 
   /**
-   * Getter for the agentnode that hosts this agent.
+   * Getter for the agent node that hosts this agent.
    * 
-   * @return a reference to the agentnode.
+   * @return a reference to the agent node.
    */
   IAgentNode getAgentNode();
 
@@ -120,19 +120,19 @@ public interface IAgent extends ILifecycleListener, Runnable,
   void setOwner(String newOwner);
 
   /**
-   * Getter for a list of agentbeans of this agent.
+   * Getter for a list of agent beans of this agent.
    * 
-   * @return the unmodifiable list of the agentbeans.
+   * @return the unmodifiable list of the agent beans.
    * 
    * @see java.util.Collections#unmodifiableList(List)
    */
   List<IAgentBean> getAgentBeans();
 
   /**
-   * Getter for the global threadpool responsivle for this agent. All threads
-   * should be created via this threadpool, to make sure the ressources can be
-   * controled. Note that the implementation this method should call the
-   * approriate method of the agentnode to retrieve the threadpool to insure
+   * Getter for the global thread pool responsible for this agent. All threads
+   * should be created via this thread pool, to make sure the resources can be
+   * controlled. Note that the implementation this method should call the
+   * appropriate method of the agent node to retrieve the thread pool to insure
    * consistency.
    * 
    * @return a new ExecutorService
@@ -142,31 +142,31 @@ public interface IAgent extends ILifecycleListener, Runnable,
   ExecutorService getThreadPool();
 
   /**
-   * Getter for a log-instance that heeds the hierarchie of the agentnode and
-   * the agent, i.e the name of the logger consists of the agentnode-name and
-   * the name of the agent-parameter and the beanname. Note that the
-   * implementation this method should call the approriate method of the
-   * agentnode to retrieve the log-instance to insure consistency.
+   * Getter for a log-instance that heeds the hierarchy of the agent node and
+   * the agent, i.e the name of the logger consists of the agent node's name and
+   * the name of the agent-parameter and the bean name. Note that the
+   * implementation this method should call the appropriate method of the
+   * agent node to retrieve the log-instance to insure consistency.
    * 
    * @param bean
    *          the bean for which the logger shall be retrieved.
-   * @return a log-object that contains the agentnodes name, the agents name and
-   *         the beanname.
+   * @return a log-object that contains the agent node's name, the agents name and
+   *         the bean name.
    * @see org.apache.commons.logging.Log
    */
   Log getLog(IAgentBean bean);
 
   /**
-   * Getter for a log-instance that heeds the hierarchie of the agentnode,
-   * the agent and the agentbean, i.e the name of the logger consists of the agentnode-name,
-   * the name of the agent-parameter, the beanname and the extension. Note that the
-   * implementation this method should call the approriate method of the
-   * agentnode to retrieve the log-instance to insure consistency.
+   * Getter for a log-instance that heeds the hierarchy of the agent node,
+   * the agent and the agent bean, i.e the name of the logger consists of the agent node's name,
+   * the name of the agent-parameter, the bean name and the extension. Note that the
+   * implementation this method should call the appropriate method of the
+   * agent node to retrieve the log-instance to insure consistency.
    * 
    * @param bean the bean for which the logger shall be retrieved.
    * @param extension the part of the bean for which the logger shall be retrieved.
-   * @return a log-object that contains the agentnodes name, the agents name,
-   *         the beanname and the extension or <code>null</code> if the agent node is unknown.
+   * @return a log-object that contains the agent node's name, the agents name,
+   *         the bean name and the extension or <code>null</code> if the agent node is unknown.
    */
   Log getLog(IAgentBean bean, String extension);
   
@@ -199,30 +199,30 @@ public interface IAgent extends ILifecycleListener, Runnable,
   long getBeanExecutionTimeout();
   
   /**
-   * Gets the Spring configuration xml snippet for this agent.
+   * Gets the Spring configuration XML snippet for this agent.
    * 
-   * @return bytearray of the xml spring source
+   * @return byte array of the XML spring source
    */
   byte[] getSpringConfigXml();
   
   /**
-   * Stores the Spring configuration xml snippet. Note: this function only stores a
-   * xml code snippet, it will NOT configure the agent.
-   * @param springConfig Spring Configuration xml source
+   * Stores the Spring configuration XML snippet. Note: this function only stores a
+   * XML code snippet, it will NOT configure the agent.
+   * @param springConfig Spring Configuration XML source
    */
   void setSpringConfigXml(byte[] springConfig);
 
   /**
-   * Utility method for retrieving a reference to an agentbean of the given class. 
-   * @param type the class of the agentbean that you want to find.
-   * @return a reference to the agentbean. 
+   * Utility method for retrieving a reference to an agent bean of the given class. 
+   * @param type the class of the agent bean that you want to find.
+   * @return a reference to the agent bean. 
    */
   <T> T findAgentBean(Class<T> type);
  
   
   /**
-   * Getter for the communication bean of this agent
-   * @return a reference to the communicationbean
+   * Getter for the communication bean of this agent.
+   * @return a reference to the communication bean.
    */
   ICommunicationBean getCommunication();
   
@@ -241,5 +241,12 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * @param cl the class loader
    */
   void setClassLoader(JARClassLoader cl);
+
+  /**
+   * Tries to load a given class.
+   * @param className the name of the class.
+   * @throws ClassNotFoundException if the class was not found by the agent's class loader.
+   */
+  void loadClass(String className) throws ClassNotFoundException;
 
 }

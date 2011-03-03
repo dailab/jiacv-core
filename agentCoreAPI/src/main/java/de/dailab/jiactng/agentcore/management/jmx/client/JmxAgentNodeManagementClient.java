@@ -48,8 +48,8 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
-	 * Gets the lifecycle state of the managed agent node.
-	 * @return The agent node's lifecycle state.
+	 * Gets the life-cycle state of the managed agent node.
+	 * @return The agent node's life-cycle state.
 	 * @throws InstanceNotFoundException The agent node does not exist. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
 	 * @throws SecurityException if the agent node's attribute cannot be read for security reasons.
@@ -61,7 +61,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
-	 * Adds a listener for changes on the lifecycle state of the managed agent node.
+	 * Adds a listener for changes on the life-cycle state of the managed agent node.
 	 * @param listener The listener object which will handle the notifications emitted by the managed agent node.
 	 * @throws IOException A communication problem occurred when adding the listener to the remote agent node.
 	 * @throws InstanceNotFoundException The agent node does not exist in the JVM.
@@ -73,7 +73,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
-	 * Removes a listener for changes on the lifecycle state from the managed agent node.
+	 * Removes a listener for changes on the life-cycle state from the managed agent node.
 	 * @param listener The listener object which will no longer handle the notifications from the managed agent node.
 	 * @throws IOException A communication problem occurred when removing the listener from the remote agent node.
 	 * @throws InstanceNotFoundException The agent node does not exist in the JVM.
@@ -463,4 +463,24 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	public final void shutdownAgentNode() throws IOException, InstanceNotFoundException {
 		invokeOperation("shutdown", new Object[]{}, new String[]{});
 	}
+
+	/**
+	 * Tries to load a given class.
+	 * @param className the name of the class.
+	 * @throws ClassNotFoundException if the class was not found by the agent node's class loader.
+	 * @throws InstanceNotFoundException The agent node does not exist in the managed JVM.
+	 * @throws IOException A communication problem occurred when invoking the operation of the remote agent node.
+	 */
+	public void loadClass(String className) throws ClassNotFoundException, InstanceNotFoundException, IOException {
+		try {
+			invokeOperation("loadClass", new Object[] {className}, new String[] {"java.lang.String"});
+		}
+		catch (RuntimeException e) {
+			if ((e.getCause() != null) && (e.getCause().getCause() != null) && 
+					(e.getCause().getCause() instanceof ClassNotFoundException)) {
+				throw (ClassNotFoundException) e.getCause().getCause();
+			}
+		}
+	}
+
 }

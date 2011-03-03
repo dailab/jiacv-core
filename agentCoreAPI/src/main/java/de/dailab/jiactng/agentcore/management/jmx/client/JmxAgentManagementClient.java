@@ -45,8 +45,8 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
-	 * Gets the lifecycle state of the managed agent.
-	 * @return The agent's lifecycle state.
+	 * Gets the life-cycle state of the managed agent.
+	 * @return The agent's life-cycle state.
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node. 
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent.
 	 * @throws SecurityException if the agent's attribute cannot be read for security reasons.
@@ -58,7 +58,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
-	 * Adds a listener for changes on the lifecycle state of the managed agent.
+	 * Adds a listener for changes on the life-cycle state of the managed agent.
 	 * @param listener The listener object which will handle the notifications emitted by the managed agent.
 	 * @throws IOException A communication problem occurred when adding the listener to the remote agent.
 	 * @throws InstanceNotFoundException The agent does not exist in the JVM.
@@ -70,7 +70,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
-	 * Removes a listener for changes on the lifecycle state from the managed agent.
+	 * Removes a listener for changes on the life-cycle state from the managed agent.
 	 * @param listener The listener object which will no longer handle the notifications from the managed agent.
 	 * @throws IOException A communication problem occurred when removing the listener from the remote agent.
 	 * @throws InstanceNotFoundException The agent does not exist in the JVM.
@@ -469,8 +469,8 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
-	 * Gets the spring config xml snippet for the connected agent.
-	 * @return Spring Config XML snippet
+	 * Gets the spring configuration XML snippet for the connected agent.
+	 * @return Spring configuration XML snippet
 	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 */

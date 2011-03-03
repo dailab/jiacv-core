@@ -11,7 +11,7 @@ import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 
 /**
  * JMX compliant management interface of agents to get information
- * about them and to change their lifecycle states.
+ * about them and to change their life-cycle states.
  * 
  * @author Jan Keiser
  */
@@ -92,28 +92,28 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 
 	/**
 	 * Gets the date when this managed resource will be started automatically.
-	 * @return the date in msec since 1/1/1970 0am or null if no automatically start will take place.
+	 * @return the date in milliseconds since 1/1/1970 0am or null if no automatically start will take place.
 	 * @throws InstanceNotFoundException if the agent node timer is not available.
 	 */
 	Long getStartTime() throws InstanceNotFoundException;
 
 	/**
 	 * Sets the date when this managed resource will be started automatically.
-	 * @param newStartTime the date in msec since 1/1/1970 0am or null if no automatically start should take place.
+	 * @param newStartTime the date in milliseconds since 1/1/1970 0am or null if no automatically start should take place.
 	 * @throws InstanceNotFoundException if the agent node timer is not available.
 	 */
 	void setStartTime(Long newStartTime) throws InstanceNotFoundException;
 
 	/**
 	 * Gets the date when this managed resource will be stopped automatically.
-	 * @return the date in msec since 1/1/1970 0am or null if no automatically stop will take place.
+	 * @return the date in milliseconds since 1/1/1970 0am or null if no automatically stop will take place.
 	 * @throws InstanceNotFoundException if the agent node timer is not available.
 	 */
 	Long getStopTime() throws InstanceNotFoundException;
 
 	/**
 	 * Sets the date when this managed resource will be stopped automatically.
-	 * @param newStopTime the date in msec since 1/1/1970 0am or null if no automatically stop should take place.
+	 * @param newStopTime the date in milliseconds since 1/1/1970 0am or null if no automatically stop should take place.
 	 * @throws InstanceNotFoundException if the agent node timer is not available.
 	 */
 	void setStopTime(Long newStopTime) throws InstanceNotFoundException;
@@ -144,7 +144,7 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	
 	/**
 	 * Gets the Spring configuration XML snippet.
-	 * @return Spring config as byte array
+	 * @return Spring configuration as byte array
 	 */
 	byte[] getSpringConfigXml();
 	

@@ -191,8 +191,9 @@ public class JmxManagementClient {
 	}
 
 	/**
-	 * Creates a new management client which uses the JMX connection of another management client. This 
-	 * connection can only be closed by the original management client.
+	 * Creates a new management client which uses the JMX connection of 
+	 * another management client. This connection can only be closed by the 
+	 * original management client.
 	 * @param client The original management client.
 	 */
 	public JmxManagementClient(JmxManagementClient client) {
@@ -209,6 +210,16 @@ public class JmxManagementClient {
 			jmxc.close();
 			jmxc = null;
 		}
+	}
+
+	/**
+	 * This method is called by the garbage collector to close the JMX 
+	 * connection to the remote agent node if it still exists. 
+	 */
+	protected void finalize() {
+		try {
+			close();
+		} catch (IOException e) {}
 	}
 
 	/**

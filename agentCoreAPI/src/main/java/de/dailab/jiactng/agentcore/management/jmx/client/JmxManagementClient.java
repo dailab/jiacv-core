@@ -65,7 +65,8 @@ public class JmxManagementClient {
 				try {
 					final JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + host + ":" + port + "/" + nodeId);
 					//start finding and testing URLs recursively by using agent node directories
-					new JmxConnectionTester(url, urls);
+					JmxConnectionTester tester = new JmxConnectionTester(url, urls);
+					new Thread(tester).start();
 				}
 				catch (Exception e) {
 					e.printStackTrace();
@@ -130,7 +131,8 @@ public class JmxManagementClient {
 				// check whether the URL is already known
 				if (!urls.containsKey(url)) {
 					//start finding and testing URLs recursively by using agent node directories
-					new JmxConnectionTester(url, urls);
+					JmxConnectionTester tester = new JmxConnectionTester(url, urls);
+					new Thread(tester).start();
 				}
 			}
 			catch (Exception e) {

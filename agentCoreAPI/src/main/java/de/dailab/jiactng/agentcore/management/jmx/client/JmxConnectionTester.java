@@ -25,8 +25,7 @@ public class JmxConnectionTester implements Runnable {
 	private boolean success;
 
 	/**
-	 * Creates and starts the tester for a given JMX URL and optional put it 
-	 * to the map of URLs.
+	 * Creates the tester for a given JMX URL and optional put it to the map of URLs.
 	 * @param url the new JMX service URL to be tested.
 	 * @param urls the map of already found and tested URLs to be recursively 
 	 * filled by the testers or <code>null</code> if only the given URL will 
@@ -41,8 +40,6 @@ public class JmxConnectionTester implements Runnable {
 				urls.put(url, this);
 			}
 		}
-		// start testing connection and finding other URLs
-		new Thread(this).start();
 	}
 
 	/**
@@ -72,7 +69,8 @@ public class JmxConnectionTester implements Runnable {
 											// check whether the other URL is already known
 											if (!urls.containsKey(otherURL)) {
 												//start finding and testing URLs recursively by using agent node directories
-												new JmxConnectionTester(new JMXServiceURL(otherURL), urls);
+												JmxConnectionTester tester = new JmxConnectionTester(new JMXServiceURL(otherURL), urls);
+												new Thread(tester).start();
 											}
 										}
 										catch (MalformedURLException e) {

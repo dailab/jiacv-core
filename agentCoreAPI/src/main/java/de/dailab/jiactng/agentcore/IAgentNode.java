@@ -192,7 +192,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @return the URLs of the JMX connector server.
    */
   Set<JMXServiceURL> getJmxURLs();
-  
+
   /**
    * Utility method for retrieving a reference to an agent node bean of the given class. 
    * @param type the class of the agent node bean that you want to find.
@@ -206,5 +206,11 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @throws ClassNotFoundException if the class was not found by the agent node's class loader.
    */
   void loadClass(String className) throws ClassNotFoundException;
+
+  /**
+   * Gets the discovery URI used by all brokers of the agent node.
+   * @return the discovery URI or <code>null</code> if the broker use their own discovery URIs.
+   */
+  String getOverwriteDiscoveryURI();
 
 }

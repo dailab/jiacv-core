@@ -93,19 +93,21 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
     // Lifecyclemethods:
 
     /**
-     * Initialize this broker by instantiating and starting the ActiveMQ broker service. Three connectors
-     * (network URI, transport URI, discovery URI) are added to the broker service for each specified transport connector.
+     * Initialize this broker by instantiating and starting the ActiveMQ broker
+     * service. Three connectors (network URI, transport URI, discovery URI) 
+     * are added to the broker service for each specified transport connector.
+     * The discovery URI defined by the agent node will be preferred.
      * @throws Exception if an error occurs during initialization
      * @see BrokerService
      * @see #setConnectors(Set)
      */
     public void doInit() throws Exception {
         log.debug("initializing embedded broker");
-        
+
         _brokerName= agentNode.getUUID() + getBeanName();
         _broker = new BrokerService();
         _broker.setBrokerName(getBrokerName());
-        
+
         if(agentNode.isManagementEnabled()) {
             _broker.setUseJmx(true);
             final ManagementContext context = new ManagementContext();
@@ -115,9 +117,13 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
         } else {
             _broker.setUseJmx(false);
         }
-        
+
         try {
             for (ActiveMQTransportConnector amtc : _connectors) {
+            	if (agentNode.getOverwriteDiscoveryURI() != null) {
+            		amtc.setDiscoveryURI(agentNode.getOverwriteDiscoveryURI());
+            	}
+
                 log.debug("embedded broker initializing transport:: " + amtc.toString());
                 if (amtc.getNetworkURI() != null) {
                 	final URI networkUri = new URI(amtc.getNetworkURI());
@@ -127,7 +133,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
                 }
 
                 _broker.setPersistent(_persistent);
-                
+
             	final TransportConnector connector= _broker.addConnector(new URI(amtc.getTransportURI()));
                 if (amtc.getDiscoveryURI() != null) {
                     final URI uri = new URI(amtc.getDiscoveryURI());

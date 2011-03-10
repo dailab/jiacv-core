@@ -444,6 +444,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    * the protocol "smartmulticast". 
    */
   public String getPlatformName() {
+	//TODO: consider multiple brokers with different discovery URIs
 	final String prefix = "smartmulticast://";
     for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
       if (agentNodeBean instanceof ActiveMQBroker) {
@@ -671,15 +672,6 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
         } catch (LifecycleException lce) {
           // TODO
           log.error("Failure when initializing agentnodebean: " + anb.getBeanName(), lce);
-        }
-
-        // overwrite discovery URI
-        if ((overwriteDiscoveryURI != null) && (anb instanceof ActiveMQBroker)) {
-          log.warn("Overwriting discoveryURI of TransportConnectors with: " + overwriteDiscoveryURI);
-          Set<ActiveMQTransportConnector> connectors = ((ActiveMQBroker) anb).getConnectors();
-          for (ActiveMQTransportConnector conn : connectors) {
-            conn.setDiscoveryURI(overwriteDiscoveryURI);
-          }
         }
 
         // check for directory
@@ -1089,12 +1081,20 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     super.disableManagement();
   }
 
+  /**
+   * {@inheritDoc}}
+   */
   public String getOverwriteDiscoveryURI() {
-    return this.overwriteDiscoveryURI;
+    return overwriteDiscoveryURI;
   }
 
-  public void setOverwriteDiscoveryURI(String overwriteDiscoveryURI) {
-    this.overwriteDiscoveryURI = overwriteDiscoveryURI;
+  /**
+   * Sets the discovery URI to be used by all brokers of the agent node.
+   * Changes after initialization of the agent node will be ignored.
+   * @param newOverwriteDiscoveryURI the discovery URI
+   */
+  public void setOverwriteDiscoveryURI(String newOverwriteDiscoveryURI) {
+    overwriteDiscoveryURI = newOverwriteDiscoveryURI;
   }
 
   /**

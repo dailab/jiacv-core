@@ -2,7 +2,10 @@ package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.management.InstanceNotFoundException;
@@ -13,102 +16,144 @@ import javax.management.remote.JMXServiceURL;
 import de.dailab.jiactng.agentcore.ontology.IAgentNodeDescription;
 
 /**
- * This class allows testing of a JMX connection within an own thread and 
- * optional also recursively finding and testing other URLs by using the 
+ * This class allows testing of JMX connections within an own thread and 
+ * optional also recursively searching and testing other URLs by using the 
  * agent node directory.
  * @author Jan Keiser
  */
-public class JmxConnectionTester implements Runnable {
+public class JmxConnectionTester {
 
-	private JMXServiceURL url;
-	private Map<JMXServiceURL,JmxConnectionTester> urls;
-	private boolean success;
+	private Map<JMXServiceURL,JmxConnectionTesterThread> urls = new HashMap<JMXServiceURL,JmxConnectionTesterThread>();
+	private boolean recursiveSearch; 
 
 	/**
-	 * Creates the tester for a given JMX URL and optional put it to the map of URLs.
-	 * @param url the new JMX service URL to be tested.
-	 * @param urls the map of already found and tested URLs to be recursively 
-	 * filled by the testers or <code>null</code> if only the given URL will 
-	 * be tested. 
+	 * Creates the connections tester.
+	 * @param recursiveSearch <code>true</code> if the URLs should be 
+	 * recursively searched and tested by using the agent node directories.
 	 */
-	public JmxConnectionTester(JMXServiceURL url, Map<JMXServiceURL,JmxConnectionTester> urls) {
-		this.url = url;
-		this.urls = urls;
-		success = false;
-		if (urls != null) {
-			synchronized (urls) {
-				urls.put(url, this);
+	public JmxConnectionTester(boolean recursiveSearch) {
+		this.recursiveSearch = recursiveSearch;
+	}
+
+	/**
+	 * Adds an URL to be tested within an own thread.
+	 * @param url the new URL to be tested
+	 * @see Thread#start()
+	 */
+	public void addURL(JMXServiceURL url) {
+		// check whether the URL is already known
+		synchronized(urls) {
+			if (!urls.containsKey(url)) {
+				//start connection tester thread for the URL
+				JmxConnectionTesterThread tester = new JmxConnectionTesterThread(url);
+				urls.put(url, tester);
+				new Thread(tester).start();
 			}
 		}
 	}
 
 	/**
-	 * Tries to create the JMX connection and optional to find other JMX URLs.
+	 * Gets the result of all tester threads.
+	 * @return the list of successfully tested URLs.
 	 */
-	public void run() {
-		try {
-			// test JMX connection
-			JmxManagementClient client = new JmxManagementClient(url);
-			success = true;
+	public List<JMXServiceURL> getResult() {
+		final List<JMXServiceURL> result = new ArrayList<JMXServiceURL>();
+		synchronized (urls) {
+			for (Map.Entry<JMXServiceURL,JmxConnectionTesterThread> entry : urls.entrySet()) {
+				if (entry.getValue().getSuccess()) {
+					result.add(entry.getKey());
+				}
+			}
+		}
+		return result;		
+	}
 
-			// find other JMX URLs via agent node directory
-			if (urls != null) {
-				JmxAgentNodeDirectoryManagementClient directoryClient = client.getDirectoryManagementClient(client.getAgentNodeUUID(url));
-				TabularData knownNodes = null;
-				try {
-					knownNodes = directoryClient.getKnownNodes();
-					Collection<CompositeData> values = (Collection<CompositeData>) knownNodes.values();
-					if (values != null) {
-						for (CompositeData value : values) {
-							CompositeData desc =  (CompositeData) value.get("description");
-							if (desc != null) {
-								String[] otherURLs = (String[])desc.get(IAgentNodeDescription.ITEMNAME_JMXURLS);
-								if (otherURLs != null) {
-									for (String otherURL : otherURLs) {
-										try {
-											// check whether the other URL is already known
-											if (!urls.containsKey(otherURL)) {
-												//start finding and testing URLs recursively by using agent node directories
-												JmxConnectionTester tester = new JmxConnectionTester(new JMXServiceURL(otherURL), urls);
-												new Thread(tester).start();
+	private class JmxConnectionTesterThread implements Runnable {
+
+		private JMXServiceURL url;
+		private boolean success;
+
+		/**
+		 * Creates the tester thread for a given JMX URL.
+		 * @param url the new JMX service URL to be tested.
+		 */
+		public JmxConnectionTesterThread(JMXServiceURL url) {
+			this.url = url;
+			success = false;
+		}
+
+		/**
+		 * Tries to create the JMX connection and optional to find other JMX URLs.
+		 */
+		public void run() {
+			try {
+				// test JMX connection
+				JmxManagementClient client = new JmxManagementClient(url);
+				success = true;
+
+				// find other JMX URLs via agent node directory
+				if (recursiveSearch) {
+					JmxAgentNodeDirectoryManagementClient directoryClient = client.getDirectoryManagementClient(client.getAgentNodeUUID(url));
+					TabularData knownNodes = null;
+					try {
+						knownNodes = directoryClient.getKnownNodes();
+						Collection<CompositeData> values = (Collection<CompositeData>) knownNodes.values();
+						if (values != null) {
+							for (CompositeData value : values) {
+								CompositeData desc =  (CompositeData) value.get("description");
+								if (desc != null) {
+									String[] otherURLs = (String[])desc.get(IAgentNodeDescription.ITEMNAME_JMXURLS);
+									if (otherURLs != null) {
+										for (String o : otherURLs) {
+											try {
+												JMXServiceURL otherURL = new JMXServiceURL(o);
+												// check whether the other URL is already known
+												synchronized(urls) {
+													if (!urls.containsKey(otherURL)) {
+														//start connection tester thread for the other URL
+														JmxConnectionTesterThread tester = new JmxConnectionTesterThread(otherURL);
+														urls.put(otherURL, tester);
+														new Thread(tester).start();													
+													}
+												}
 											}
-										}
-										catch (MalformedURLException e) {
-											System.err.println("Found URL is malformed: " + otherURL);
+											catch (MalformedURLException e) {
+												System.err.println("Found URL is malformed: " + o);
+											}
 										}
 									}
 								}
 							}
 						}
+					} catch (InstanceNotFoundException e) {
+						// can not read agent node directory to get other agent nodes
 					}
-				} catch (InstanceNotFoundException e) {
-					// can not read agent node directory to get other agent nodes
+				}
+
+				// close JMX connection
+				try {
+					client.close();
+				}
+				catch (IOException ioe) {
+					ioe.printStackTrace();
 				}
 			}
-
-			// close JMX connection
-			try {
-				client.close();
+			catch (SecurityException se) {
+				success = true;
 			}
-			catch (IOException ioe) {
-				ioe.printStackTrace();
+			catch (Exception e) {
+				System.err.println("Unable to connect to " + url + ": " + e.getLocalizedMessage());
 			}
 		}
-		catch (SecurityException se) {
-			success = true;
-		}
-		catch (Exception e) {
-			System.err.println("Unable to connect to " + url + ": " + e.getLocalizedMessage());
-		}
-	}
 
-	/**
-	 * Gets the success of connecting to JMX URL.
-	 * @return <code>true</code> if the connection can be established or only
-	 * security problems occur.
-	 */
-	public boolean getSuccess() {
-		return success;
+		/**
+		 * Gets the success of connecting to JMX URL.
+		 * @return <code>true</code> if the connection can be established or only
+		 * security problems occur.
+		 */
+		public boolean getSuccess() {
+			return success;
+		}
 	}
 
 }

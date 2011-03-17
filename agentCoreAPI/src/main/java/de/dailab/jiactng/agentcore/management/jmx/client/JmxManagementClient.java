@@ -7,13 +7,11 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
@@ -54,19 +52,17 @@ public class JmxManagementClient {
 	 * @throws RemoteException if remote communication with the registry failed. If exception is a <code>ServerException</code> containing an <code>AccessException</code>, then the registry denies the caller access to perform this operation.
 	 * @see java.rmi.registry.Registry#list()
 	 * @see JMXServiceURL#JMXServiceURL(String, String, int, String)
-	 * @see JmxConnectionTester#JmxConnectionTester(JMXServiceURL, Map)
+	 * @see JmxConnectionTester
 	 */
 	public static List<JMXServiceURL> getURLsFromRegistry(String host, int port) throws RemoteException {
-		final Map<JMXServiceURL,JmxConnectionTester> urls = new HashMap<JMXServiceURL,JmxConnectionTester>();
+		final JmxConnectionTester tester = new JmxConnectionTester(true);
 		final Iterator<String> nodeIdIterator = Arrays.asList(LocateRegistry.getRegistry(host, port).list()).iterator();
 		while (nodeIdIterator.hasNext()) {
 			final String nodeId = nodeIdIterator.next();
 			if (nodeId.startsWith(IdFactory.IdPrefix.Node.toString())) {
 				try {
 					final JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + host + ":" + port + "/" + nodeId);
-					//start finding and testing URLs recursively by using agent node directories
-					JmxConnectionTester tester = new JmxConnectionTester(url, urls);
-					new Thread(tester).start();
+					tester.addURL(url);
 				}
 				catch (Exception e) {
 					e.printStackTrace();
@@ -82,14 +78,7 @@ public class JmxManagementClient {
 			e.printStackTrace();
 		}
 
-		// get successful connections
-		final List<JMXServiceURL> result = new ArrayList<JMXServiceURL>();
-		for (Map.Entry<JMXServiceURL,JmxConnectionTester> entry : urls.entrySet()) {
-			if (entry.getValue().getSuccess()) {
-				result.add(entry.getKey());
-			}
-		}
-		return result;
+		return tester.getResult();
 	}
 
 	/**
@@ -99,10 +88,10 @@ public class JmxManagementClient {
 	 * @return The list of found JMX URLs.
 	 * @throws IOException A communication problem occurred when creating a multicast socket or receiving multicast packets.
 	 * @see MulticastSocket#receive(DatagramPacket)
-	 * @see JmxConnectionTester#JmxConnectionTester(JMXServiceURL, Map)
+	 * @see JmxConnectionTester
 	 */
 	public static List<JMXServiceURL> getURLsFromMulticast() throws IOException {
-		final Map<JMXServiceURL,JmxConnectionTester> urls = new HashMap<JMXServiceURL,JmxConnectionTester>();
+		final JmxConnectionTester tester = new JmxConnectionTester(true);
 		byte[] buffer = new byte[MAX_MULTICAST_MESSAGE_LENGTH];
 		final long endTime = System.currentTimeMillis() + JmxManager.MULTICAST_PERIOD + CONNECTION_TESTER_TIMEOUT;
 
@@ -128,28 +117,14 @@ public class JmxManagementClient {
 				if (url.getURLPath().contains("localhost")) {
 					url = new JMXServiceURL(message.replace("localhost", url.getHost()));
 				}
-				// check whether the URL is already known
-				if (!urls.containsKey(url)) {
-					//start finding and testing URLs recursively by using agent node directories
-					JmxConnectionTester tester = new JmxConnectionTester(url, urls);
-					new Thread(tester).start();
-				}
+				tester.addURL(url);
 			}
 			catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		// get successful connections
-		final List<JMXServiceURL> result = new ArrayList<JMXServiceURL>();
-		synchronized (urls) {
-			for (Map.Entry<JMXServiceURL,JmxConnectionTester> entry : urls.entrySet()) {
-				if (entry.getValue().getSuccess()) {
-					result.add(entry.getKey());
-				}
-			}
-		}
-		return result;
+		return tester.getResult();
 	}
 
 	/**

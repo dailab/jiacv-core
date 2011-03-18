@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!--
+	- Application context definition for "example" DispatcherServlet.
+-->
+<beans>
+
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+
+	<bean name="myNode" parent="NodeWithDirectory">
+	</bean>
+
+</beans>

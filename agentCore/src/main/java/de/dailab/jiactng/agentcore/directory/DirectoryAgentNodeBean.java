@@ -889,7 +889,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     // find OWL-S ServiceDescriptions and deserialize them by hand
     final Set<IActionDescription> advActions = new HashSet<IActionDescription>();
     for (IActionDescription iad : localActions) {
-      if (iad instanceof IServiceDescription) {
+      if (iad.getScope() != ActionScope.GLOBAL) {
+    	  continue;
+      }
+	  if (iad instanceof IServiceDescription) {
         final IServiceDescription isd = (IServiceDescription) iad;
         isd.setOntologySource(ontologyStorage.serializeServiceDescription(isd));
       }

@@ -39,7 +39,7 @@ public class SourceAwareMulticastDiscoveryAgentFactory extends DiscoveryAgentFac
 
             // allow MDA's params to be set via query arguments
             // (e.g., multicast://default?group=foo
-            Map options = URISupport.parseParamters(uri);
+            Map options = URISupport.parseParameters(uri);
             IntrospectionSupport.setProperties(samda, options);
 
             return samda;

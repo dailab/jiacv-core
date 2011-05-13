@@ -60,7 +60,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     public void setUri(URI discoveryURI) throws IOException {
         setDiscoveryAgent(DiscoveryAgentFactory.createDiscoveryAgent(discoveryURI));
         try {
-            parameters = URISupport.parseParamters(discoveryURI);
+            parameters = URISupport.parseParameters(discoveryURI);
             // allow discovery agent to grab it's parameters
             IntrospectionSupport.setProperties(getDiscoveryAgent(), parameters);
         } catch (URISyntaxException e) {

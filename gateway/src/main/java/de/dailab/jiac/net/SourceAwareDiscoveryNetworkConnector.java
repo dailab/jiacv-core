@@ -11,7 +11,6 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.activemq.broker.SslContext;
 import org.apache.activemq.command.DiscoveryEvent;
@@ -22,6 +21,7 @@ import org.apache.activemq.network.NetworkBridgeFactory;
 import org.apache.activemq.network.NetworkBridgeListener;
 import org.apache.activemq.network.NetworkConnector;
 import org.apache.activemq.transport.Transport;
+import org.apache.activemq.transport.TransportDisposedIOException;
 import org.apache.activemq.transport.TransportFactory;
 import org.apache.activemq.transport.discovery.DiscoveryAgent;
 import org.apache.activemq.transport.discovery.DiscoveryAgentFactory;
@@ -46,8 +46,9 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     private static final Log LOG = LogFactory.getLog(SourceAwareDiscoveryNetworkConnector.class);
 
     private DiscoveryAgent discoveryAgent;
-    private ConcurrentHashMap<URI, NetworkBridge> bridges = new ConcurrentHashMap<URI, NetworkBridge>();
+    
     private Map<String, String> parameters;
+    
     private boolean _useAlwaysSourceAddress= true;
     
     public SourceAwareDiscoveryNetworkConnector() {
@@ -74,7 +75,6 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     }
 
     public void onServiceAdd(DiscoveryEvent event) {
-        String localURIName = localURI.getScheme() + "://" + localURI.getHost();
         // Ignore events once we start stopping.
         if (serviceSupport.isStopped() || serviceSupport.isStopping()) {
             return;
@@ -88,13 +88,11 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                 LOG.warn("Could not connect to remote URI: " + url + " due to bad URI syntax: " + e, e);
                 return;
             }
-
             // Should we try to connect to that URI?
             if( bridges.containsKey(uri) ) {
                 LOG.debug("Discovery agent generated a duplicate onServiceAdd event for: "+uri );
                 return;
             }
-
             if ( localURI.equals(uri) || (connectionFilter != null && !connectionFilter.connectTo(uri))) {
                 LOG.debug("not connecting loopback: " + uri);
                 return;
@@ -116,7 +114,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                 }
                 
                 if(useSource) {
-                    LOG.info("Could not resolve remote host: " + connectUri);
+                    LOG.debug("Use source address for " + uri + ": " + connectUri);
                     try {
                         connectUri= new URI(
                             uri.getScheme(),
@@ -135,11 +133,12 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
             }
             
             try {
+                connectUri= URISupport.removeQuery(connectUri);
                 connectUri = URISupport.applyParameters(connectUri, parameters);
             } catch (URISyntaxException e) {
                 LOG.warn("could not apply query parameters: " + parameters + " to: " + connectUri, e);
             }
-            LOG.info("Establishing network connection from " + localURIName + " to " + connectUri);
+            LOG.info("Establishing network connection from " + localURI + " to " + connectUri);
 
             Transport remoteTransport;
             Transport localTransport;
@@ -157,7 +156,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                     localTransport = createLocalTransport();
                 } catch (Exception e) {
                     ServiceSupport.dispose(remoteTransport);
-                    LOG.warn("Could not connect to local URI: " + localURIName + ": " + e.getMessage());
+                    LOG.warn("Could not connect to local URI: " + localURI + ": " + e.getMessage());
                     LOG.debug("Connection failure exception: " + e, e);
                     return;
                 }
@@ -168,10 +167,12 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
             try {
                 bridge.start();
                 bridges.put(uri, bridge);
+            } catch (TransportDisposedIOException e) {
+                LOG.warn("Network bridge between: " + localURI + " and: " + uri + " was correctly stopped before it was correctly started.");
             } catch (Exception e) {
                 ServiceSupport.dispose(localTransport);
                 ServiceSupport.dispose(remoteTransport);
-                LOG.warn("Could not start network bridge between: " + localURIName + " and: " + uri + " due to: " + e);
+                LOG.warn("Could not start network bridge between: " + localURI + " and: " + uri + " due to: " + e);
                 LOG.debug("Start failure exception: " + e, e);
                 try {
                     discoveryAgent.serviceFailed(event);

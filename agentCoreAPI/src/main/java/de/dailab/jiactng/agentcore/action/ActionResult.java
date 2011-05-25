@@ -147,10 +147,10 @@ public class ActionResult extends SessionEvent {
 	// this.success = success;
 	// }
 
-	  /**
-	   * Returns a multiline text which contains the successful result of an action.
-	   * @return a string representation of the action result
-	   */
+	/**
+	 * Returns a multiline text which contains the successful result of an action.
+	 * @return a string representation of the action result
+	 */
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
@@ -159,6 +159,9 @@ public class ActionResult extends SessionEvent {
 			builder.append(Arrays.asList(results).toString());
 		} else {
 			builder.append("null");
+		}
+		if (failure != null) {
+			builder.append("\n failure=" + String.valueOf(failure));
 		}
 		builder.append('\n');
 		return builder.toString();

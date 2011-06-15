@@ -135,7 +135,7 @@
 				<configuration>
 					<links>
 						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCoreAPI/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCoreAPI/apidocs/</link>
 						<link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
 						<link>http://commons.apache.org/logging/commons-logging-1.1/apidocs/</link>
 						<link>http://activemq.apache.org/maven/5.3.0/activemq-core/apidocs/</link>
@@ -164,7 +164,7 @@
 				<configuration>
 					<links>
 						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCoreAPI/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCoreAPI/apidocs/</link>
 						<link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
 						<link>http://commons.apache.org/logging/commons-logging-1.1/apidocs/</link>
 						<link>http://activemq.apache.org/maven/5.3.0/activemq-core/apidocs/</link>

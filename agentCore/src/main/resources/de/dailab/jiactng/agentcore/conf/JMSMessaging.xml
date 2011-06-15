@@ -81,7 +81,8 @@
 		See the de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker documentation for more details.
 	-->
 	<bean name="StandardJMSConnectionFactory" class="de.dailab.jiactng.agentcore.comm.broker.ConnectionFactoryProxy"
-		singleton="false" lazy-init="true"/>
+		singleton="false"/>
+<!--		lazy-init="true"/>-->
 
 	<!-- 
 		The standard JMS message transport for the communication bean (an agent bean).
@@ -92,7 +93,8 @@
 		the broker!
 	-->
 	<bean name="StandardJMSMessageTransport" class="de.dailab.jiactng.agentcore.comm.transport.jms.JMSMessageTransport"
-		singleton="false" lazy-init="true">
+		singleton="false">
+<!--		 lazy-init="true">-->
 		<property name="connectionFactory" ref="StandardJMSConnectionFactory" />
 	</bean>
 </beans>

@@ -18,7 +18,9 @@
 		
 		maybe think about initial facts to be put here
 	-->
-	<bean name="Memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false" lazy-init="true"></bean>
+	<bean name="Memory" class="de.dailab.jiactng.agentcore.knowledge.Memory" singleton="false" >
+<!--	lazy-init="true">-->
+	</bean>
 
 
 	<!--
@@ -27,10 +29,12 @@
 		########################################################
 		
 	-->
-	<bean name="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle" singleton="false" lazy-init="true">
+	<bean name="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle" singleton="false" >
+<!--	lazy-init="true">-->
 	</bean>
 
-	<bean name="NonBlockingExecutionCycle" class="de.dailab.jiactng.agentcore.execution.NonBlockingExecutionCycle" singleton="false" lazy-init="true">
+	<bean name="NonBlockingExecutionCycle" class="de.dailab.jiactng.agentcore.execution.NonBlockingExecutionCycle" singleton="false" >
+<!--	lazy-init="true">-->
 	</bean>
 
 
@@ -42,7 +46,8 @@
 		This standard communication component uses a JMSMessageTransport to exchange messages.
 		See the documentation of the referenced bean to ensure the functionality!
 	-->
-	<bean name="CommunicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false" lazy-init="true">
+	<bean name="CommunicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean" singleton="false" >
+<!--	lazy-init="true">-->
 		<property name="transports">
 			<set>
 				<ref bean="StandardJMSMessageTransport" />

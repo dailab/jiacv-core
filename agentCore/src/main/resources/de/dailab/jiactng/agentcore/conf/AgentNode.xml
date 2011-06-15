@@ -48,7 +48,8 @@
       </property>
    </bean>
 
-   <bean name="JaasAuthenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator" singleton="false" lazy-init="true">
+   <bean name="JaasAuthenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator" singleton="false">
+<!--    lazy-init="true">-->
       <property name="configuration">
          <list>
             <ref bean="LoginJaas"/>
@@ -62,7 +63,8 @@
       </property>
    </bean>
 
-   <bean name="LoginJaas" class="de.dailab.jiactng.agentcore.management.jmx.JaasConfigurationEntry" singleton="false" lazy-init="true">
+   <bean name="LoginJaas" class="de.dailab.jiactng.agentcore.management.jmx.JaasConfigurationEntry" singleton="false">
+<!--    lazy-init="true">-->
       <property name="loginModuleName" value="com.sun.security.auth.module.Krb5LoginModule"/>
       <property name="controlFlag" value="required"/>
       <property name="options">

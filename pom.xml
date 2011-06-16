@@ -3,7 +3,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>de.dailab</groupId>
    <artifactId>jiactng</artifactId>
-   <version>5.1.1</version>
+   <version>5.1.2-SNAPSHOT</version>
    <packaging>pom</packaging>
 
    <name>Java-based Intelligent Agent Componentware TNG</name>
@@ -554,9 +554,9 @@
    </mailingLists>
 
    <scm>
-      <connection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/tags/jiactng-5.1.1</connection>
-      <developerConnection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/tags/jiactng-5.1.1</developerConnection>
-      <url>https://cvs.dai-labor.de/jiac/jiac-tng/tags/jiactng-5.1.1</url>
+      <connection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/trunk</connection>
+      <developerConnection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/trunk</developerConnection>
+      <url>https://cvs.dai-labor.de/jiac/jiac-tng/trunk</url>
    </scm>
 
    <modules>

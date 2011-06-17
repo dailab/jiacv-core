@@ -111,8 +111,8 @@
 				<configuration>
 					<links>
 						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCoreAPI/apidocs/</link>
-						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCore/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${project.parent.version}/agentCoreAPI/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${project.parent.version}/agentCore/apidocs/</link>
 						<link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
 					</links>
 					<quiet>true</quiet>
@@ -137,8 +137,8 @@
 				<configuration>
 					<links>
 						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCoreAPI/apidocs/</link>
-						<link>http://repositories.dai-labor.de/sites/jiactng/${parent.version}/agentCore/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${project.parent.version}/agentCoreAPI/apidocs/</link>
+						<link>http://repositories.dai-labor.de/sites/jiactng/${project.parent.version}/agentCore/apidocs/</link>
 						<link>http://static.springsource.org/spring/docs/2.0.x/api/</link>
 					</links>
 					<quiet>true</quiet>

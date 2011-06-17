@@ -10,7 +10,7 @@
    <description>
       JIAC TNG is a framework to fast and efficiently develop agent-based applications and services.
    </description>
-   <url>http://repositories.dai-labor.de/sites/jiactng/${version}/</url>
+   <url>http://repositories.dai-labor.de/sites/jiactng/${project.version}/</url>
    <inceptionYear>2006</inceptionYear>
    <organization>
       <name>DAI-Labor</name>
@@ -516,7 +516,7 @@
    <distributionManagement>
       <site>
          <id>dai-repository</id>
-         <url>scp://repositories.dai-labor.de/export/home/local/maven/sites/jiactng/${version}</url>
+         <url>scp://repositories.dai-labor.de/export/home/local/maven/sites/jiactng/${project.version}</url>
       </site>
       <repository>
          <id>dai-releases</id>

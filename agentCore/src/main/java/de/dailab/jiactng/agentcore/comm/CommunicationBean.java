@@ -158,6 +158,8 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      */
     @Override
     public void doCleanup() throws Exception {
+        destroyMessageBox(thisAgent.getAgentDescription().getMessageBoxAddress());
+        
         if (log.isInfoEnabled()) {
             log.info("CommunicationBean starts commencing cleanup");
             log.info("Cleaning up transports");

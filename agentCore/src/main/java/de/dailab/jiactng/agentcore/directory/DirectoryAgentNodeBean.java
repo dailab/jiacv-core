@@ -562,7 +562,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
       log.debug(myAgentNode + "::" + event.getSource() + " State: " + event.getState());
     }
 
-    if (event.getState() == LifecycleStates.INITIALIZED) {
+    if (event.getState() == LifecycleStates.STARTING) {
       if (event.getSource() instanceof Agent) {
         final Agent agent = (Agent) event.getSource();
         registerAgent(agent.getAgentDescription());

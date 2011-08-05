@@ -9,62 +9,67 @@ import org.apache.activemq.network.NetworkConnector;
 
 public class StaticActiveMQBroker extends ActiveMQBroker {
 
-	
-    public StaticActiveMQBroker() {
-//        if(INSTANCE != null) {
-//        	
-//            throw new IllegalStateException("only one instance of broker per VM is allowed\ninstanceof = " + INSTANCE.getClass());
-//        }
-        
-        INSTANCE= this;
-    }
+   public StaticActiveMQBroker() {
+      // if(INSTANCE != null) {
+      //
+      // throw new IllegalStateException("only one instance of broker per VM is allowed\ninstanceof = " + INSTANCE.getClass());
+      // }
 
-	@Override
-	public void doInit() throws Exception {
-        log.debug("initializing embedded broker");
-        
-        _brokerName= agentNode.getName() + getBeanName() + SecureRandom.getInstance("SHA1PRNG").nextLong();
-        _broker = new BrokerService();
-        _broker.setBrokerName(getBrokerName());
-        
-        if(agentNode.isManagementEnabled()) {
-            _broker.setUseJmx(true);
-            final ManagementContext context = new ManagementContext();
-            context.setJmxDomainName("de.dailab.jiactng");
-            context.setCreateConnector(false);
-            _broker.setManagementContext(context);
-        } else {
-            _broker.setUseJmx(false);
-        }
-        
-        try {
-            for (ActiveMQTransportConnector amtc : _connectors) {
-                log.debug("embedded broker initializing transport:: " + amtc.toString());
-                
-                //network - connect to a static broker via network
-                if (amtc.getNetworkURI() != null) {
-                	final URI networkUri = new URI(amtc.getNetworkURI());
-                    final NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
-                    networkConnector.setNetworkTTL(_networkTTL);
-                }
+      INSTANCE = this;
+   }
 
-                _broker.setPersistent(_persistent);
+   @Override
+   public void doInit() throws Exception {
+      log.debug("initializing embedded broker");
 
-                //transport - locally listening to port
-                if (amtc.getTransportURI() != null) {
-	                final URI transportUri = new URI(amtc.getTransportURI());
-	                _broker.addConnector(transportUri);
-                }
+      _brokerName = agentNode.getName() + getBeanName() + SecureRandom.getInstance("SHA1PRNG").nextLong();
+      _broker = new BrokerService();
+      _broker.setBrokerName(getBrokerName());
 
+      if (isManagement()) {
+         _broker.setUseJmx(true);
+         final ManagementContext context = new ManagementContext();
+         context.setJmxDomainName("de.dailab.jiactng");
+         context.setCreateConnector(false);
+         _broker.setManagementContext(context);
+      } else {
+         _broker.setUseJmx(false);
+      }
+
+      try {
+         for (ActiveMQTransportConnector amtc : _connectors) {
+            log.debug("embedded broker initializing transport:: " + amtc.toString());
+
+            // network - connect to a static broker via network
+            if (amtc.getNetworkURI() != null) {
+               final URI networkUri = new URI(amtc.getNetworkURI());
+               //log.debug("adding network connector...");
+               final NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
+               networkConnector.setNetworkTTL(_networkTTL);
+               networkConnector.setDuplex(amtc.isDuplex());
+               //log.debug("...network connector added");
             }
 
-        } catch (Exception e) {
-            log.error(e.toString());
-        }
+            _broker.setPersistent(_persistent);
 
-        _broker.start();
-        log.debug("started broker");
-	}
+            // transport - locally listening to port
+            if (amtc.getTransportURI() != null) {
+               //log.debug("adding transport connector...");
+               final URI transportUri = new URI(amtc.getTransportURI());
+               _broker.addConnector(transportUri);
+               //log.debug("...transport connector added");
+            }
 
-    
+         }
+
+      } catch (Exception e) {
+         log.error(e.toString(),e);
+         //e.printStackTrace();
+         //System.out.println(e.getStackTrace());
+      }
+
+      _broker.start();
+      log.debug("started broker");
+   }
+
 }

@@ -108,7 +108,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       _brokerName = agentNode.getUUID() + getBeanName();
       _broker = new BrokerService();
       _broker.setBrokerName(getBrokerName());
-
+      _broker.setPersistent(_persistent);
+      
+      
       if (isManagement()) {
          _broker.setUseJmx(true);
          final ManagementContext context = new ManagementContext();
@@ -133,7 +135,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
                networkConnector.setNetworkTTL(amtc.getNetworkTTL());
             }
 
-            _broker.setPersistent(_persistent);
+         
 
             final TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
             if (amtc.getDiscoveryURI() != null) {

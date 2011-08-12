@@ -597,22 +597,35 @@
   <profiles>
     <profile>
       <!--
-         Active this profile during site build if you want to generate dependency graphs 
+         Activate this profile during site build if you want to generate dependency graphs 
        -->
       <id>graph</id>
-      <reporting>
-        <plugins>
-          <plugin>
-            <groupId>org.fusesource.mvnplugins</groupId>
-            <artifactId>maven-graph-plugin</artifactId>
-            <version>1.11d-SNAPSHOT</version>
-            <configuration>
-               <hideScopes>test</hideScopes>
-               <direction>BT</direction>
-            </configuration>
-          </plugin>
-        </plugins>
-      </reporting>
+      <activation>
+      	<activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-site-plugin</artifactId>
+              <configuration>
+                <reportPlugins combine.children="append">
+                  <plugin>
+                    <groupId>org.fusesource.mvnplugins</groupId>
+                    <artifactId>maven-graph-plugin</artifactId>
+                    <version>1.11d</version>
+                    <configuration>
+                      <hideScopes>test</hideScopes>
+                      <direction>BT</direction>
+                    </configuration>
+                  </plugin>
+                </reportPlugins>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 </project>

@@ -586,6 +586,7 @@
       <module>agentCoreAPI</module>
       <module>gateway</module>
       <module>agentCore</module>
+      <module>protocol</module>
       <module>jiacSecurity</module>
       <module>bdiAgent</module>
       <module>ruleEngine</module>

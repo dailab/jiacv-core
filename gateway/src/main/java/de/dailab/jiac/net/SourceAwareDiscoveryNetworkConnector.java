@@ -12,10 +12,14 @@ import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.management.ObjectName;
+
+import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.SslContext;
 import org.apache.activemq.command.DiscoveryEvent;
 import org.apache.activemq.network.DemandForwardingBridge;
 import org.apache.activemq.network.DiscoveryNetworkConnector;
+import org.apache.activemq.network.MBeanNetworkListener;
 import org.apache.activemq.network.NetworkBridge;
 import org.apache.activemq.network.NetworkBridgeFactory;
 import org.apache.activemq.network.NetworkBridgeListener;
@@ -133,8 +137,7 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
             }
             
             try {
-                connectUri= URISupport.removeQuery(connectUri);
-                connectUri = URISupport.applyParameters(connectUri, parameters);
+                connectUri = URISupport.applyParameters(connectUri, parameters, DISCOVERED_OPTION_PREFIX);
             } catch (URISyntaxException e) {
                 LOG.warn("could not apply query parameters: " + parameters + " to: " + connectUri, e);
             }
@@ -242,7 +245,11 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     }
 
     protected NetworkBridge createBridge(Transport localTransport, Transport remoteTransport, final DiscoveryEvent event) {
-        NetworkBridgeListener listener = new NetworkBridgeListener() {
+        class DiscoverNetworkBridgeListener extends MBeanNetworkListener {
+
+            public DiscoverNetworkBridgeListener(BrokerService brokerService, ObjectName connectorName) {
+                super(brokerService, connectorName);
+            }
 
             public void bridgeFailed() {
                 if (!serviceSupport.isStopped()) {
@@ -253,32 +260,16 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
                 }
 
             }
+        }
+        NetworkBridgeListener listener = new DiscoverNetworkBridgeListener(getBrokerService(), getObjectName());
 
-            public void onStart(NetworkBridge bridge) {
-                registerNetworkBridgeMBean(bridge);
-            }
-
-            public void onStop(NetworkBridge bridge) {
-                unregisterNetworkBridgeMBean(bridge);
-            }
-
-        };
         DemandForwardingBridge result = NetworkBridgeFactory.createBridge(this, localTransport, remoteTransport, listener);
         result.setBrokerService(getBrokerService());
         return configureBridge(result);
     }
 
-    public String getName() {
-        String name = super.getName();
-        if (name == null) {
-            name = discoveryAgent.toString();
-            super.setName(name);
-        }
-        return name;
-    }
-
     @Override
     public String toString() {
-        return "DiscoveryNetworkConnector:" + getName() + ":" + getBrokerService();
+        return "SourceAwareDiscoveryNetworkConnector:" + getName() + ":" + getBrokerService();
     }
 }

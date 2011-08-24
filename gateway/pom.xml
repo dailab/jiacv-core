@@ -13,7 +13,17 @@
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-core</artifactId>
-			<version>5.4.0</version>
+			<version>5.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jcl</artifactId>
+			<version>1.6.1</version>
 		</dependency>
 	</dependencies>
 
@@ -25,7 +35,7 @@
 				<configuration>
 					<links>
 						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://activemq.apache.org/maven/5.3.0/activemq-core/apidocs/</link>
+						<link>http://activemq.apache.org/maven/5.5.0/activemq-core/apidocs/</link>
 					</links>
 					<quiet>true</quiet>
 				</configuration>

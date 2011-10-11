@@ -41,8 +41,12 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       if (INSTANCE == null) {
          throw new IllegalStateException("no broker is running");
       }
-
-      proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName());
+      //since a new broker is created upon the first connection, we need to set the persistence flag here too, otherwise kahadb is always used for this broker
+      if (proxy.isPersistent()) {
+         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName() + "?broker.persistent=false");
+      } else {
+         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName());
+      }
    }
 
    protected String _brokerName = null;
@@ -50,7 +54,6 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
    protected Set<ActiveMQTransportConnector> _connectors = new HashSet<ActiveMQTransportConnector>();
    protected boolean _persistent = false;
    protected boolean _management = false;
-
    protected int _networkTTL = 1;
 
    /**
@@ -109,8 +112,13 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       _broker = new BrokerService();
       _broker.setBrokerName(getBrokerName());
       _broker.setPersistent(_persistent);
-      
-      
+      //_broker.setUseShutdownHook(true);
+
+      if (!_persistent) {
+         _broker.setDeleteAllMessagesOnStartup(true);
+         _broker.setEnableStatistics(false);
+      }
+
       if (isManagement()) {
          _broker.setUseJmx(true);
          final ManagementContext context = new ManagementContext();
@@ -133,24 +141,25 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
                final NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
                networkConnector.setDuplex(amtc.isDuplex());
                networkConnector.setNetworkTTL(amtc.getNetworkTTL());
+
             }
 
-         
-
-            final TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
-            if (amtc.getDiscoveryURI() != null) {
-               final URI uri = new URI(amtc.getDiscoveryURI());
-               final URI discoveryURI = new URI(amtc.getDiscoveryURI());
-               connector.setDiscoveryUri(discoveryURI);
-               // no such method in 5.3 connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
-               final NetworkConnector networkConnector = new SourceAwareDiscoveryNetworkConnector(uri);
-               networkConnector.setNetworkTTL(_networkTTL);
-               _broker.addNetworkConnector(networkConnector);
+            if (amtc.getTransportURI() != null) {
+               final TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
+               if (amtc.getDiscoveryURI() != null) {
+                  final URI uri = new URI(amtc.getDiscoveryURI());
+                  final URI discoveryURI = new URI(amtc.getDiscoveryURI());
+                  connector.setDiscoveryUri(discoveryURI);
+                  // no such method in 5.3 connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
+                  final NetworkConnector networkConnector = new SourceAwareDiscoveryNetworkConnector(uri);
+                  networkConnector.setNetworkTTL(_networkTTL);
+                  _broker.addNetworkConnector(networkConnector);
+               }
             }
          }
 
       } catch (Exception e) {
-         log.error(e.toString(),e);
+         log.error(e.toString(), e);
       }
 
       _broker.start();
@@ -166,7 +175,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
    public void doCleanup() throws Exception {
       log.debug("stopping broker");
       _broker.stop();
+      // _broker.waitUntilStopped();
       log.debug("stopping broker done");
+      _broker = null;
    }
 
    /**

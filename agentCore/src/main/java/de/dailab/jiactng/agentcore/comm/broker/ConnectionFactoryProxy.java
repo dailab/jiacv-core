@@ -8,54 +8,63 @@ import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 
 /**
- * This connection factory proxy class is used to lazy-initialise the underlying
- * factory.
+ * This connection factory proxy class is used to lazy-initialise the underlying factory.
  * 
  * @author Marcel Patzlaff
  * @version $Revision$
  */
 public final class ConnectionFactoryProxy implements ConnectionFactory {
-    protected ConnectionFactory connectionFactory= null;
-    
-    /**
-     * Creates a connection.
-     * @return the connection
-     * @throws JMSException if an error occurs during creation of the connection
-     * @throws IllegalStateException    if no broker is available or the broker is
-     *                                  not yet initialized
-     * 
-     * @see ConnectionFactory#createConnection()
-     */
-    @Override
-    public Connection createConnection() throws JMSException {
-        checkConnectionFactory();
-        return connectionFactory.createConnection();
-    }
+   protected ConnectionFactory connectionFactory = null;
+   private boolean persistent = false;
 
-    /**
-     * Creates a connection by using given credentials.
-     * @param userName the user name
-     * @param password the password
-     * @return the connection
-     * @throws JMSException if an error occurs during creation of the connection
-     * @throws IllegalStateException    if no broker is available or the broker is
-     *                                  not yet initialised
-     * 
-     * @see ConnectionFactory#createConnection(String, String)
-     */
-    @Override
-    public Connection createConnection(String userName, String password) throws JMSException {
-        checkConnectionFactory();
-        return connectionFactory.createConnection(userName, password);
-    }
-    
-    private void checkConnectionFactory() {
-        if(connectionFactory == null) {
-            synchronized(this) {
-                if(connectionFactory == null) {
-                    ActiveMQBroker.initialiseProxy(this);
-                }
+   /**
+    * Creates a connection.
+    * 
+    * @return the connection
+    * @throws JMSException if an error occurs during creation of the connection
+    * @throws IllegalStateException if no broker is available or the broker is not yet initialized
+    * 
+    * @see ConnectionFactory#createConnection()
+    */
+   @Override
+   public Connection createConnection() throws JMSException {
+      checkConnectionFactory();
+      return connectionFactory.createConnection();
+   }
+
+   /**
+    * Creates a connection by using given credentials.
+    * 
+    * @param userName the user name
+    * @param password the password
+    * @return the connection
+    * @throws JMSException if an error occurs during creation of the connection
+    * @throws IllegalStateException if no broker is available or the broker is not yet initialised
+    * 
+    * @see ConnectionFactory#createConnection(String, String)
+    */
+   @Override
+   public Connection createConnection(String userName, String password) throws JMSException {
+      checkConnectionFactory();
+      return connectionFactory.createConnection(userName, password);
+   }
+
+   private void checkConnectionFactory() {
+      if (connectionFactory == null) {
+         synchronized (this) {
+            if (connectionFactory == null) {
+               ActiveMQBroker.initialiseProxy(this);
             }
-        }
-    }
+         }
+      }
+   }
+
+   public boolean isPersistent() {
+      return persistent;
+   }
+
+   public void setPersistent(boolean persistence) {
+      this.persistent = persistence;
+   }
+
 }

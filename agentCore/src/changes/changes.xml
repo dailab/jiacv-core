@@ -5,6 +5,11 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
+	  <release version="5.1.2" date="t.b.a." description="Minor release">
+			<action dev="moekon" type="fix">
+				"Fixed memory leak in RemoteExecutor"
+			</action>	
+		</release>
 		<release version="5.1.1" date="t.b.a." description="Minor release">
 			<action dev="moekon" type="NEW">
 				"First prototype of agentRole-usage in agents."

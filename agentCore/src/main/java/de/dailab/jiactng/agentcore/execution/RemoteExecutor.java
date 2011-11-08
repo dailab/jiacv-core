@@ -97,8 +97,12 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 					
 					else if (message.getPayload() instanceof ActionResult) {
 						final ActionResult result = (ActionResult) message.getPayload();
-						result.setSource(remoteInvocations.get(result.getSessionId()));
-						memory.write(result);
+						if(remoteInvocations.get(result.getSessionId())!=null) {
+						  result.setSource(remoteInvocations.remove(result.getSessionId()));
+						  memory.write(result);
+						} else {
+						  log.error("Received ActionResult with unknown session - result is dropped. "+result);
+						}
 					}
 					
 					else {
@@ -163,6 +167,11 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 		}
 
 		final JiacMessage message = localInvocations.get(result.getSessionId());
+		if(message == null) {
+		  log.error("Received ActionResult with unknown session - result is dropped. "+result);
+		  return;
+		}
+ 		
 		final DoAction doAction = (DoAction)message.getPayload();
 		ActionResult resultToSend;
 		if (result.getResults() != null) {
@@ -177,5 +186,6 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 		final Serializable[] params = new Serializable[]{resultMessage, message.getSender()};
 		final DoAction sendDoAction = sendAction.createDoAction(params, this);
 		memory.write(sendDoAction);
+		localInvocations.remove(result.getSessionId());
 	}
 }

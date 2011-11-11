@@ -26,6 +26,7 @@ import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 
+import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 
 /**
@@ -93,10 +94,13 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * Utility method which collects all exposed methods along the given hierarchy.
      * Methods which are annotated in more specialised classes will have precedence. 
      * 
+     * Modified this method so it can be used by AbstractAgentBean to check whether
+     * methods are using the @Expose tag, which in this case could not be used.
+     * 
      * @param clazz the class of the method exposing bean
      * @return the found methods
      */
-    static ArrayList<Method> getExposedPublicMethods(Class<? extends AbstractMethodExposingBean> clazz) {
+    public static ArrayList<Method> getExposedPublicMethods(Class<? extends AbstractAgentBean> clazz) {
         final Set<Class<?>> processed= new HashSet<Class<?>>();
         final Queue<Class<?>> nextStep= new LinkedList<Class<?>>();
         final ArrayList<Method> methods= new ArrayList<Method>();

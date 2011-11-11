@@ -7,12 +7,15 @@
 package de.dailab.jiactng.agentcore;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.List;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
 
 import org.springframework.beans.factory.BeanNameAware;
 
+import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.ActionResultListener;
@@ -54,6 +57,19 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    */
   public AbstractAgentBean() {
     super();
+    /*
+     * If this class is _not_ an instance of AbstractMethodExposingBean, check 
+     * whether there are Methods with the @Expose tag attached to them. This is 
+     * a quite common programming mistake, as the actions are then not exposed, 
+     * without mention by Eclipse or JIAC.
+     */
+	  if (! (this instanceof AbstractMethodExposingBean)) {
+		  List<Method> methods = AbstractMethodExposingBean.getExposedPublicMethods(getClass());
+		  if (! methods.isEmpty()) {
+			  // logging is not yet initialized, using System.err instead
+			  System.err.println("WARNING: Using @Expose Annotation in Bean " + this.getClass().getName() + " without extending AbstractMethodExposingBean!");
+		  }
+	  }
   }
 
   // /**

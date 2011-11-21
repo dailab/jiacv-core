@@ -1,11 +1,11 @@
 package de.dailab.jiactng.agentcore.action;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
-import de.dailab.jiactng.agentcore.comm.IMessageBoxAddress;
-import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
@@ -429,4 +429,18 @@ public class Session implements IFact {
       this.originalAgentDescription = originalAgentDescription;
    }
 
+   private void writeObject(ObjectOutputStream oos) throws IOException {
+     oos.defaultWriteObject();
+     Long timePassed = Long.valueOf(System.currentTimeMillis() - creationTime.longValue()); 
+     oos.writeObject(timePassed);
+   }
+
+   
+   private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+     ois.defaultReadObject();
+     Long timePassed = (Long)ois.readObject();
+     creationTime = Long.valueOf(System.currentTimeMillis() - timePassed);
+   }
+    
+   
 }

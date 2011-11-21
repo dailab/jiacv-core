@@ -6,7 +6,10 @@
 	</properties>
 	<body>
 	  <release version="5.1.2" date="t.b.a." description="Minor release">
-			<action dev="moekon" type="fix">
+			<action dev="moekon" type="change">
+				"Change default executionInterval for agents to 1ms (from 10ms)"
+			</action>	
+	    <action dev="moekon" type="fix">
 				"Fixed memory leak in RemoteExecutor"
 			</action>	
 		</release>

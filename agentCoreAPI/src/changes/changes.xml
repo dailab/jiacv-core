@@ -5,6 +5,13 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
+	
+	<action dev="moekon" type="change">
+	  <release version="5.1.2" date="t.b.a." description="Minor release">
+	    <action dev="moekon" type="change">
+			  "Changed serialization of Session.java to accomodate for time differences of machines - Serialization is incompatible with older versions"
+			</action>
+	  </release>
 		<release version="5.1.1" date="t.b.a." description="Minor release">
 			<action dev="keiser" type="update">
 				Creation of JMX connector server for each network interface and sending multicast message

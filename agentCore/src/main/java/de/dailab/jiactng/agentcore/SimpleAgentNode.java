@@ -74,6 +74,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
    /** The name of the agent node. */
    protected String name = null;
+   
+   /** The name of the agent node owner (per default, the system user)*/
+   private String owner = null;
 
    /** The list of agent node beans. */
    private final ArrayList<IAgentNodeBean> agentNodeBeans;
@@ -136,7 +139,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       agentNodeBeans = new ArrayList<IAgentNodeBean>();
       agents = new ArrayList<IAgent>();
       groups = new ArrayList<IAgentGroup>();
-
+      owner = System.getProperty("user.name");
+      
       // start timer
       timer = new Timer();
       timer.start();
@@ -408,13 +412,21 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
    }
 
    /**
-    * Returns the user's account name.
+    * Returns the agent node owner.
+    * The default owner name is the system's user account.
     * 
-    * @return user's account name
-    * @see System#getProperties()
+    * @return owner name
     */
    public String getOwner() {
-      return System.getProperty("user.name");
+      return this.owner;
+   }
+   
+   /**
+    * Sets the agent node's owner name.
+    * @param owner owner name
+    */
+   public void setOwner(String owner) {
+	   this.owner = owner;
    }
 
    /**

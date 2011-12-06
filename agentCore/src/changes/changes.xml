@@ -8,7 +8,10 @@
 	  <release version="5.1.2" date="t.b.a." description="Minor release">
 	  	<action dev="luetze" type="add">
 			  "Added AgentQuickStarter Class for Bean testing"
-		</action>	
+		</action>
+		<action dev="kuester" type="fix">
+			"added warning when using @expose tags without extending method exposing bean"
+		</action>
 		<action dev="moekon" type="change">
 			  "Changed serialization of Session.java to accomodate for time differences of machines - Serialization is incompatible with older versions"
 			</action>	

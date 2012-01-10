@@ -40,10 +40,10 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
    static void initialiseProxy(ConnectionFactoryProxy proxy) {
       if (INSTANCE == null) {
          throw new IllegalStateException("no broker is running");
-      }
+      } 
       //since a new broker is created upon the first connection, we need to set the persistence flag here too, otherwise kahadb is always used for this broker
-      if (proxy.isPersistent()) {
-         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName() + "?broker.persistent=false");
+      if (proxy.isPersistent()) {         
+         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName() + "?broker.persistent=false&broker.enableStatistics=false&broker.useJmx=false");
       } else {
          proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName());
       }
@@ -53,7 +53,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
    protected BrokerService _broker = null;
    protected Set<ActiveMQTransportConnector> _connectors = new HashSet<ActiveMQTransportConnector>();
    protected boolean _persistent = false;
-   protected boolean _management = false;
+   protected boolean _management = true;
    protected int _networkTTL = 1;
 
    /**
@@ -111,9 +111,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       _brokerName = agentNode.getUUID() + getBeanName();
       _broker = new BrokerService();
       _broker.setBrokerName(getBrokerName());
-      _broker.setPersistent(_persistent);
-      //_broker.setUseShutdownHook(true);
-
+      _broker.setPersistent(_persistent);      
+      
       if (!_persistent) {
          _broker.setDeleteAllMessagesOnStartup(true);
          _broker.setEnableStatistics(false);
@@ -141,7 +140,6 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
                final NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
                networkConnector.setDuplex(amtc.isDuplex());
                networkConnector.setNetworkTTL(amtc.getNetworkTTL());
-
             }
 
             if (amtc.getTransportURI() != null) {
@@ -243,8 +241,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
     * @param manager the manager to be used for registration
     */
    public void enableManagement(Manager manager) {
-      // do nothing if management already enabled
-      if (isManagementEnabled()) {
+      // do nothing if management is already enabled or management is disabled for this bean
+      if (!isManagement() && isManagementEnabled()) {
          return;
       }
 
@@ -261,8 +259,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
     * Unregister the broker and all transport connectors from management
     */
    public void disableManagement() {
-      // do nothing if management already disabled
-      if (!isManagementEnabled()) {
+      // do nothing if management is already disabled  or management is disabled for this bean
+      if (!isManagement() && !isManagementEnabled()) {
          return;
       }
 
@@ -281,7 +279,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
     */
    private void registerConnector(ActiveMQTransportConnector connector) {
       // do nothing if management is not enabled
-      if (!isManagementEnabled()) {
+      if (!(isManagement() && isManagementEnabled())) {
          return;
       }
 
@@ -290,7 +288,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
          _manager.registerAgentNodeBeanResource(this, getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE, "\"" + connector.getTransportURI() + "\"", connector);
       } catch (Exception e) {
          if ((log != null) && (log.isErrorEnabled())) {
-            log.error("WARNING: Unable to register transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.");
+            log.error("WARNING: Unable to register transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.",e);
             log.error(e.getMessage());
          } else {
             System.err.println("WARNING: Unable to register transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.");

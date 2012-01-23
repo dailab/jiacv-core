@@ -437,14 +437,21 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     */
    public String getPlatformName() {
       // TODO: consider multiple brokers with different discovery URIs
-      final String prefix = "smartmulticast://";
+      final String discoveryprefix = "smartmulticast://";
+      final String networkprefix = "static:(";
+      final String failoverprefix = "failover:(";
       for (IAgentNodeBean agentNodeBean : this.getAgentNodeBeans()) {
          if (agentNodeBean instanceof ActiveMQBroker) {
             Set<ActiveMQTransportConnector> connectors = ((ActiveMQBroker) agentNodeBean).getConnectors();
             for (ActiveMQTransportConnector conn : connectors) {
-               String uri = conn.getDiscoveryURI();
-               if ((uri != null) && uri.startsWith(prefix)) {
-                  return uri.substring(prefix.length());
+               final String discoveryUri = conn.getDiscoveryURI();
+               if ((discoveryUri != null) && discoveryUri.startsWith(discoveryprefix)) {
+                  return discoveryUri.substring(discoveryprefix.length());
+               }
+               final String networkUri = conn.getNetworkURI();
+               if ((networkUri != null) && networkUri.startsWith(networkprefix)) {
+            	   String uri = networkUri.substring(networkprefix.length(), networkUri.length()-1);
+            	   return (uri.startsWith(failoverprefix))? uri.substring(failoverprefix.length(), uri.length()-1):uri;
                }
             }
          }

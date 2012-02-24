@@ -43,9 +43,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       } 
       //since a new broker is created upon the first connection, we need to set the persistence flag here too, otherwise kahadb is always used for this broker
       if (proxy.isPersistent()) {         
-         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName() + "?broker.persistent=false&broker.enableStatistics=false&broker.useJmx=false");
-      } else {
          proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName());
+      } else {
+         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName() + "?broker.persistent=false&broker.enableStatistics=false&broker.useJmx=false");
       }
    }
 
@@ -55,6 +55,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
    protected boolean _persistent = false;
    protected boolean _management = true;
    protected int _networkTTL = 1;
+   protected String _dataDirectory = null; 
+   
 
    /**
     * Creates an empty ActiveMQ broker and initializes the static variable <code>INSTANCE</code> with this broker if not yet set.
@@ -111,7 +113,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       _brokerName = agentNode.getUUID() + getBeanName();
       _broker = new BrokerService();
       _broker.setBrokerName(getBrokerName());
-      _broker.setPersistent(_persistent);      
+      _broker.setPersistent(_persistent);
+      _broker.setDataDirectory(_dataDirectory);
       
       if (!_persistent) {
          _broker.setDeleteAllMessagesOnStartup(true);
@@ -203,6 +206,14 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       _management = management;
    }
 
+   public String getDataDirectory() {
+      return _dataDirectory;
+   }
+
+   public void setDataDirectory(String _dataDirectory) {
+      this._dataDirectory = _dataDirectory;
+   }   
+   
    /**
     * Setter for the set of connectors. Connectors are entry points to the broker that accept remote connections. By default, every broker has a logical vm-connector which permits
     * the inner-vm-message exchange.

@@ -114,7 +114,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       _broker = new BrokerService();
       _broker.setBrokerName(getBrokerName());
       _broker.setPersistent(_persistent);
-      _broker.setDataDirectory(_dataDirectory);
+      if (_dataDirectory != null) _broker.setDataDirectory(getDataDirectory());
       
       if (!_persistent) {
          _broker.setDeleteAllMessagesOnStartup(true);
@@ -189,8 +189,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
    }
 
    /**
-    * Indicates whether messages should be stored in a data base or not. ActiveMQ uses Derby to store message. You must include this dependency explicitly in your project as it is
-    * not associated with agentCore.
+    * Indicates whether messages should be stored in a data base or not.<br/>as default ActiveMQ uses KahaDB to store message. 
+    * KahaDB is included in the activeMQ dependency
     * 
     * @param persistent <code>true</code> to store messages and <code>false</code> otherwise.
     */
@@ -206,10 +206,23 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
       _management = management;
    }
 
+   /**
+    * Get the location of the activeMQ data directory used as persistence store
+    * the directory applies only when a persistency adapter other than MemoryAdapter is used, e.g. when persistency is switched on
+    * 
+    * @return the location of the message store as a String
+    */
    public String getDataDirectory() {
       return _dataDirectory;
    }
 
+   /**
+    * sets the location of the Message store, e.g. the activeMQ persistency data base<br/>
+    * the location is expected to be a folder represented as String<br/>
+    * the default location is /$userhome/activemq-data/
+    * 
+    * @param _dataDirectory the location of the message store as a String
+    */
    public void setDataDirectory(String _dataDirectory) {
       this._dataDirectory = _dataDirectory;
    }   

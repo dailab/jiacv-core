@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -59,7 +60,8 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     }
 
     public SourceAwareDiscoveryNetworkConnector(URI discoveryURI) throws IOException {
-        setUri(discoveryURI);
+      super.setName("SourceAwareDiscoveryNetworkConnector:"+discoveryURI.toString());  
+      setUri(discoveryURI);
     }
 
     public void setUri(URI discoveryURI) throws IOException {

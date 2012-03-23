@@ -22,13 +22,14 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.security.auth.DestroyFailedException;
 
+import org.apache.commons.logging.LogFactory;
 import org.sercho.masp.space.ObjectMatcher;
 import org.sercho.masp.space.ObjectUpdater;
 import org.sercho.masp.space.SimpleObjectSpace;
 import org.sercho.masp.space.event.EventedSpaceWrapper;
+import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 import org.sercho.masp.space.event.EventedTupleSpace;
 import org.sercho.masp.space.event.SpaceObserver;
-import org.sercho.masp.space.event.EventedSpaceWrapper.SpaceDestroyer;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
@@ -36,6 +37,7 @@ import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
  * Implementation of an object memory based on tuple space technology.
+ * 
  * @see org.sercho.masp.space.event.EventedTupleSpace
  * @author Thomas Konnerth
  * @author axle
@@ -44,331 +46,412 @@ import de.dailab.jiactng.agentcore.management.Manager;
  */
 public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
 
-	/** SerialVersionUID for Serialization */
-	private static final long serialVersionUID = -5229424084593098741L;
+  /** SerialVersionUID for Serialization */
+  private static final long        serialVersionUID = -5229424084593098741L;
 
-	
-	private SpaceDestroyer<IFact> destroyer = null;
-	private EventedTupleSpace<IFact> space = null;
+  private SpaceDestroyer<IFact>    destroyer        = null;
+  private EventedTupleSpace<IFact> space            = null;
 
-	/** The agent which contains this memory */
-	private transient IAgent thisAgent = null;
+  /** The agent which contains this memory */
+  private transient IAgent         thisAgent        = null;
 
-    /**
-     * During initialization the TupleSpace is created.
-     * 
-     * @see org.sercho.masp.space.TupleSpace
-     */
-	@Override
-	public void doInit() {
-		destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("FactBase"));
-		space = destroyer.destroybleSpace;
-	}
+  private boolean                  logAgentcore     = false;
 
-    /**
-     * {@inheritDoc}
-     */
-	@Override
-	public void doStart() {
-		// nothing to do yet
-	}
+  /**
+   * During initialization the TupleSpace is created.
+   * 
+   * @see org.sercho.masp.space.TupleSpace
+   */
+  @Override
+  public void doInit() {
+    destroyer = EventedSpaceWrapper.getSpaceWithDestroyer(new SimpleObjectSpace<IFact>("FactBase"));
+    space = destroyer.destroybleSpace;
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void doStop() {
-		// nothing to do yet
-		// persistency may go here
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void doStart() {
+    // nothing to do yet
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	@Override
-	public void doCleanup() {
-		try {
-			destroyer.destroy();
-		} catch (DestroyFailedException e) {
-			e.printStackTrace();
-		}
-		space = null;
-		destroyer = null;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void doStop() {
+    // nothing to do yet
+    // persistency may go here
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	public String getID() {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.getID();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void doCleanup() {
+    try {
+      destroyer.destroy();
+    } catch (DestroyFailedException e) {
+      e.printStackTrace();
+    }
+    space = null;
+    destroyer = null;
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	public ObjectMatcher getMatcher() {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.getMatcher();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public String getID() {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+    return space.getID();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	public ObjectUpdater getUpdater() {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.getUpdater();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public ObjectMatcher getMatcher() {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+    return space.getMatcher();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	public synchronized <E extends IFact> E read(E template) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.read(template);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public ObjectUpdater getUpdater() {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+    return space.getUpdater();
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	public <E extends IFact> E read(E template, long timeout) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.read(template, timeout);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public synchronized <E extends IFact> E read(E template) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-	public synchronized <E extends IFact> Set<E> readAll(E template) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.readAll(template);
-	}
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("read", template.getClass());
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-	public synchronized <E extends IFact> Set<E> readAllOfType(Class<E> c) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.readAllOfType(c);
-	}
+    return space.read(template);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	public synchronized <E extends IFact> E remove(E template) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.remove(template);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public <E extends IFact> E read(E template, long timeout) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-	public <E extends IFact> E remove(E template, long timeout) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.remove(template, timeout);
-	}
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("read", template.getClass());
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-	public synchronized <E extends IFact> Set<E> removeAll(E template) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.removeAll(template);
-	}
+    return space.read(template, timeout);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	public synchronized <E extends IFact> boolean update(E template, E pattern) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.update(template, pattern);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public synchronized <E extends IFact> Set<E> readAll(E template) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public synchronized void write(IFact fact) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		space.write(fact);
-	}
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("readAll", template.getClass());
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-	public Iterator<IFact> iterator() {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.iterator();
-	}
+    return space.readAll(template);
+  }
 
-    /**
-     * {@inheritDoc}
-     */
-	public void attach(SpaceObserver<? super IFact> observer) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		space.attach(observer);
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public synchronized <E extends IFact> Set<E> readAllOfType(Class<E> c) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-	public void attach(SpaceObserver<? super IFact> observer, IFact template) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		space.attach(observer, template);
-	}
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("readAllOfType", c);
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-	public void detach(SpaceObserver<? super IFact> observer) {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		space.detach(observer);
-	}
+    return space.readAllOfType(c);
+  }
 
-	/**
-	 * Sets the reference to the agent which contains this memory.
-	 * @param agent the agent which contains this memory
-	 */
-	public void setThisAgent(IAgent agent) {
-		thisAgent = agent;
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public synchronized <E extends IFact> E remove(E template) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
 
-	/**
-	 * Information about the facts stored in the memory.
-	 * @return information about facts stored in memory
-	 */
-	@SuppressWarnings("unchecked")
-    public CompositeData getSpace() {
-	    final Set<IFact> facts = readAllOfType(IFact.class);
-	    if (facts.isEmpty()) {
-	    	return null;
-	    }
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("remove", template.getClass());
+    }
 
-	    // create map with current memory state
-		final Map<String,List<String>> map = new Hashtable<String,List<String>>();
-	    for (IFact fact : facts) {
-	    	final String classname = fact.getClass().getName();
-	    	List<String> values = map.get(classname);
-	    	if (values == null) {
-	    		values = new ArrayList<String>();
-	    		map.put(classname, values);
-	    	}
-    		values.add(fact.toString());
-	    }
+    return space.remove(template);
+  }
 
-	    // create composite data
-	    CompositeData data = null;
-	    final int size = map.size();
-	    final String[] itemNames = new String[size];
-	    final OpenType<?>[] itemTypes = new OpenType[size];
-	    final Object[] itemValues = new Object[size];
-	    final Object[] classes = map.keySet().toArray();
-	    try {
-	    	for (int i=0; i<size; i++) {
-	    		final String classname = (String) classes[i];
-	    		itemNames[i] = classname;
-	    		itemTypes[i] = new ArrayType(1, SimpleType.STRING);
-	    		final List<String> values = map.get(classname);
-	    		final String[] value = new String[values.size()];
-	    		final Iterator<String> it = values.iterator();	    		
-	    		int j = 0;
-	    		while (it.hasNext()) {
-	    			value[j] = it.next();
-	    			j++;
-	    		}
-	    		itemValues[i] = value;
-	    	}
-	    	final CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the memory", itemNames, itemNames, itemTypes);
-	    	data = new CompositeDataSupport(compositeType, itemNames, itemValues);
-	    }
-	    catch (OpenDataException e) {
-	    	e.printStackTrace();
-	    }
+  /**
+   * {@inheritDoc}
+   */
+  public <E extends IFact> E remove(E template, long timeout) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
 
-	    return data;
-	}
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("remove", template.getClass());
+    }
 
-	/**
-     * Registers the memory for management.
-     * @param manager the manager to be used for registration
-	 */
-	public void enableManagement(Manager manager) {
-		// do nothing if management already enabled
-		if (isManagementEnabled()) {
-			return;
-		}
-		
-		// register memory for management
-		try {
-			manager.registerAgentResource(thisAgent, "Memory", this);
-		}
-		catch (Exception e) {
-			System.err.println("WARNING: Unable to register memory of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());					
-		}
+    return space.remove(template, timeout);
+  }
 
-		super.enableManagement(manager);
-	}
-	  
-	/**
-	 * Deregisters the memory from management.
-	 */
-	public void disableManagement() {
-		// do nothing if management already disabled
-		if (!isManagementEnabled()) {
-			return;
-		}
-		
-		// deregister memory from management
-		try {
-			_manager.unregisterAgentResource(thisAgent, "Memory");
-		}
-		catch (Exception e) {
-			System.err.println("WARNING: Unable to deregister memory of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
-			System.err.println(e.getMessage());					
-		}
-		
-		super.disableManagement();
-	}
+  /**
+   * {@inheritDoc}
+   */
+  public synchronized <E extends IFact> Set<E> removeAll(E template) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
 
-    /**
-     * {@inheritDoc}
-     */
-	public synchronized Set<IFact> readAll() {
-		if(space==null) {
-			throw new RuntimeException("Memory has not yet been initialized!");
-		}
-		return space.readAll();
-	}	  
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("removeAll", template.getClass());
+    }
+
+    return space.removeAll(template);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public synchronized <E extends IFact> boolean update(E template, E pattern) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("update", template.getClass());
+    }
+
+    return space.update(template, pattern);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public synchronized void write(IFact fact) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("write", fact.getClass());
+    }
+
+    space.write(fact);
+
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public Iterator<IFact> iterator() {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+    return space.iterator();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void attach(SpaceObserver<? super IFact> observer) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+    space.attach(observer);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void attach(SpaceObserver<? super IFact> observer, IFact template) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+    space.attach(observer, template);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void detach(SpaceObserver<? super IFact> observer) {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+    space.detach(observer);
+  }
+
+  /**
+   * Sets the reference to the agent which contains this memory.
+   * 
+   * @param agent
+   *          the agent which contains this memory
+   */
+  public void setThisAgent(IAgent agent) {
+    thisAgent = agent;
+
+    // update logger
+    setLog(LogFactory.getLog(thisAgent.getAgentNode().getUUID() + "." + thisAgent.getAgentId() + ".Memory"));
+  }
+
+  /**
+   * Information about the facts stored in the memory.
+   * 
+   * @return information about facts stored in memory
+   */
+  @SuppressWarnings("unchecked")
+  public CompositeData getSpace() {
+    final Set<IFact> facts = readAllOfType(IFact.class);
+    if (facts.isEmpty()) {
+      return null;
+    }
+
+    // create map with current memory state
+    final Map<String, List<String>> map = new Hashtable<String, List<String>>();
+    for (IFact fact : facts) {
+      final String classname = fact.getClass().getName();
+      List<String> values = map.get(classname);
+      if (values == null) {
+        values = new ArrayList<String>();
+        map.put(classname, values);
+      }
+      values.add(fact.toString());
+    }
+
+    // create composite data
+    CompositeData data = null;
+    final int size = map.size();
+    final String[] itemNames = new String[size];
+    final OpenType<?>[] itemTypes = new OpenType[size];
+    final Object[] itemValues = new Object[size];
+    final Object[] classes = map.keySet().toArray();
+    try {
+      for (int i = 0; i < size; i++) {
+        final String classname = (String) classes[i];
+        itemNames[i] = classname;
+        itemTypes[i] = new ArrayType(1, SimpleType.STRING);
+        final List<String> values = map.get(classname);
+        final String[] value = new String[values.size()];
+        final Iterator<String> it = values.iterator();
+        int j = 0;
+        while (it.hasNext()) {
+          value[j] = it.next();
+          j++;
+        }
+        itemValues[i] = value;
+      }
+      final CompositeType compositeType = new CompositeType(map.getClass().getName(), "facts stored in the memory",
+          itemNames, itemNames, itemTypes);
+      data = new CompositeDataSupport(compositeType, itemNames, itemValues);
+    } catch (OpenDataException e) {
+      e.printStackTrace();
+    }
+
+    return data;
+  }
+
+  /**
+   * Registers the memory for management.
+   * 
+   * @param manager
+   *          the manager to be used for registration
+   */
+  public void enableManagement(Manager manager) {
+    // do nothing if management already enabled
+    if (isManagementEnabled()) {
+      return;
+    }
+
+    // register memory for management
+    try {
+      manager.registerAgentResource(thisAgent, "Memory", this);
+    } catch (Exception e) {
+      System.err.println("WARNING: Unable to register memory of agent " + thisAgent.getAgentName() + " of agent node "
+          + thisAgent.getAgentNode().getName() + " as JMX resource.");
+      System.err.println(e.getMessage());
+    }
+
+    super.enableManagement(manager);
+  }
+
+  /**
+   * Deregisters the memory from management.
+   */
+  public void disableManagement() {
+    // do nothing if management already disabled
+    if (!isManagementEnabled()) {
+      return;
+    }
+
+    // deregister memory from management
+    try {
+      _manager.unregisterAgentResource(thisAgent, "Memory");
+    } catch (Exception e) {
+      System.err.println("WARNING: Unable to deregister memory of agent " + thisAgent.getAgentName()
+          + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
+      System.err.println(e.getMessage());
+    }
+
+    super.disableManagement();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public synchronized Set<IFact> readAll() {
+    if (space == null) {
+      throw new RuntimeException("Memory has not yet been initialized!");
+    }
+
+    if ((log != null) && log.isDebugEnabled()) {
+      logMemoryAccess("readAll", Object.class);
+    }
+
+    return space.readAll();
+  }
+
+  private void logMemoryAccess(String methodName, Class clazz) {
+    if (log == null) {
+      return;
+    }
+
+    StackTraceElement ste = Thread.currentThread().getStackTrace()[4];
+    if (isLogAgentcore() || !ste.getClassName().startsWith("de.dailab.jiactng.agentcore")) {
+      log.debug("Memory." + methodName + "(" + clazz.getName() + ") called by: " + ste);
+    }
+
+  }
+
+  public boolean isLogAgentcore() {
+    return logAgentcore;
+  }
+
+  public void setLogAgentcore(boolean logAgentcore) {
+    this.logAgentcore = logAgentcore;
+  }
+
 }

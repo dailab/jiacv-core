@@ -31,7 +31,6 @@
 	-->
 	<bean name="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle" singleton="false" >
 <!--	lazy-init="true">-->
-    <property name="logLevel" value="WARN" />
 	</bean>
 
 	<bean name="NonBlockingExecutionCycle" class="de.dailab.jiactng.agentcore.execution.NonBlockingExecutionCycle" singleton="false" >

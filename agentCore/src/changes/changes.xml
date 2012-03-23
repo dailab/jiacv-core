@@ -6,7 +6,10 @@
 	</properties>
 	<body>
 	  <release version="5.1.2" date="t.b.a." description="Minor release">
-	  	<action dev="luetze" type="add">
+  	<action dev="moekon" type="add">
+			  "Added logging to memory. For Loglevel.DEBUG, the memory now logs all accesses (read, write, update). There is also a new flag named logAgentcore, which enables/disables logging of accesses from agentcore."
+		</action>
+  	<action dev="luetze" type="add">
 			  "Added AgentQuickStarter Class for Bean testing"
 		</action>
 		<action dev="kuester" type="fix">

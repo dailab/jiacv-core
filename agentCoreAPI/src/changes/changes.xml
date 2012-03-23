@@ -5,8 +5,6 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-	
-	<action dev="moekon" type="change">
 	  <release version="5.1.2" date="t.b.a." description="Minor release">
 	    <action dev="moekon" type="fix">
 			  "Added timeout for MulticastSocket in JMXManagementClient."

@@ -19,6 +19,15 @@
    <prerequisites>
       <maven>2.0.3</maven>
    </prerequisites>
+            
+   <licenses>      
+     <license>
+       <name>The Apache Software License, Version 2.0</name>
+       <distribution>http://www.jiac.de</distribution>
+       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+       <comments></comments>
+     </license>
+   </licenses>
 
    <properties>
 		 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -205,6 +214,38 @@
 
    <build>
       <resources>
+        <resource>
+			  	<directory>${basedir}</directory>
+			  	<targetPath>META-INF</targetPath>
+			  	<includes>
+			  		<include>NOTICE.txt</include>
+			  		<include>LICENSE.txt</include>
+			  	</includes>
+			  </resource>
+        <resource>
+			  	<directory>${basedir}/../</directory>
+			  	<targetPath>META-INF</targetPath>
+			  	<includes>
+			  		<include>NOTICE.txt</include>
+			  		<include>LICENSE.txt</include>
+			  	</includes>
+			  </resource>
+			  <resource>
+			  	<directory>${basedir}/../../</directory>
+			  	<targetPath>META-INF</targetPath>
+			  	<includes>
+			  		<include>NOTICE.txt</include>
+			  		<include>LICENSE.txt</include>
+			  	</includes>
+			  </resource>
+			  <resource>
+			  	<directory>${basedir}/../../../</directory>
+			  	<targetPath>META-INF</targetPath>
+			  	<includes>
+			  		<include>NOTICE.txt</include>
+			  		<include>LICENSE.txt</include>
+			  	</includes>
+			  </resource>			  
          <resource>
             <directory>${basedir}/src/main/java</directory>
             <includes>
@@ -675,7 +716,7 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-site-plugin</artifactId>
-              <configuration>
+              <configuration>       
                 <reportPlugins combine.children="append">
                   <plugin>
                     <groupId>org.fusesource.mvnplugins</groupId>

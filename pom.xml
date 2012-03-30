@@ -214,6 +214,7 @@
 
    <build>
       <resources>
+      <!-- REMOVED LICENSE INCLUSION BECAUSE OF PROBLEMS WITH MAVEN 2.x
         <resource>
 			  	<directory>${basedir}</directory>
 			  	<targetPath>META-INF</targetPath>
@@ -246,6 +247,7 @@
 			  		<include>LICENSE.txt</include>
 			  	</includes>
 			  </resource>			  
+			  -->
          <resource>
             <directory>${basedir}/src/main/java</directory>
             <includes>

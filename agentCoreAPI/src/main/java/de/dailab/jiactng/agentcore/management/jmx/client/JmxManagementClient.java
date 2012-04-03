@@ -99,7 +99,7 @@ public class JmxManagementClient {
 		// activate multicast socket
 		final InetAddress group = InetAddress.getByName("226.6.6.7");
 		final MulticastSocket socket = new MulticastSocket(9999);
-    socket.setSoTimeout((int)CONNECTION_TESTER_TIMEOUT);
+    socket.setSoTimeout((int)(JmxManager.MULTICAST_PERIOD+CONNECTION_TESTER_TIMEOUT));
 		socket.setTimeToLive(1);
 		final DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
 		socket.joinGroup(group);

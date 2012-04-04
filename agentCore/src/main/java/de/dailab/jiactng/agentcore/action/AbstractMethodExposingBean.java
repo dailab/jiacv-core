@@ -135,15 +135,15 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
                             methods.add(method);
                         }
                     }
-                    
-                    // ascend hierarchy
-                    if(current.getSuperclass() != null && current.getSuperclass() != AbstractMethodExposingBean.class) {
-                        nextStep.offer(current.getSuperclass());
-                    }
-                    
-                    for(Class<?> superIntfc : current.getInterfaces()) {
-                        nextStep.offer(superIntfc);
-                    }
+                } // end method loop
+                
+                // ascend hierarchy
+                if(current.getSuperclass() != null && current.getSuperclass() != AbstractMethodExposingBean.class) {
+                	nextStep.offer(current.getSuperclass());
+                }
+                
+                for(Class<?> superIntfc : current.getInterfaces()) {
+                	nextStep.offer(superIntfc);
                 }
             } else {
                 continue;

@@ -6,11 +6,11 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 /**
  * This Interface is meant to be an extension to the IActionDescription Interface.
  * It's purpose is to make the usage of the WebserviceGateway for JIAC more flexible
- * and userfriendly.
- * 
- *  On the other side it also merges with the management of actiondescriptions within the
- *  WebserviceProviderBean. 
- * 
+ * and user-friendly.
+ *
+ *  On the other side, it also merges with the management of action descriptions within the
+ *  WebserviceProviderBean.
+ *
  * If there is already a service with <code>serviceName</code> this action will be added to
  * the service. 
  * 

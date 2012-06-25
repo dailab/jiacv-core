@@ -42,11 +42,24 @@ public interface IMethodExposingBean {
 
         /** The action scope to be used for the exposed method. */
         ActionScope scope() default ActionScope.AGENT;
-        
+
+        /**
+         * If this is set, an IWebserviceAction will be created,
+         * instead of a normal IAction.
+         * @see IWebserviceAction#getServiceName()
+         */
         String servicename() default "";
-        
+
+        /**
+         * If this is set, an IWebserviceAction will be created,
+         * instead of a normal IAction.
+         * @see IWebserviceAction#getOperationName()
+         */
         String operationname() default "";
-        
+
+        /**
+         * Unused?
+         */
         String url() default "";
 
     }

@@ -1,8 +1,5 @@
 /*
  * Created on 27.02.2007
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 package de.dailab.jiactng.agentcore.action;
 
@@ -43,7 +40,7 @@ public class Action implements IActionDescription {
 	/** the name of the action */
 	private String name;
 
-	/** The component that holds the funtionality for this action */
+	/** The component that holds the functionality for this action */
 	private transient IEffector providerBean = null;
 
 	/** The class names of the input-parameters of this action */

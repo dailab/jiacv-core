@@ -631,80 +631,86 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     if (protocol.equals(ALIVE)) {
-      refreshAgentNode(senderAddress);
+    	synchronized(nodes) {
+    		refreshAgentNode(senderAddress);
+    	}
       return;
     }
 
     else if (protocol.equals(BYE)) {
-      final String uuid = senderAddress.getName();
-      if (nodes.containsKey(uuid)) {
-        removeRemoteAgentOfNode(uuid);
-        remoteActions.remove(uuid);
-        nodes.remove(uuid);
-      }
-      dump(uuid + " says bye");
-      return;
+    	synchronized(nodes) {
+    		final String uuid = senderAddress.getName();
+    		if (nodes.containsKey(uuid)) {
+    			removeRemoteAgentOfNode(uuid);
+    			remoteActions.remove(uuid);
+    			nodes.remove(uuid);
+    		}
+    		dump(uuid + " says bye");
+    	}
+    	return;
     }
 
     else if (protocol.equals(ADVERTISE)) {
-      // refresh agent nodes
-      final Set<JMXServiceURL> connectors = ((Advertisement) message.getPayload()).getJmxURLs();
-      if (connectors != null) {
-        refreshAgentNode(senderAddress, connectors);
-      }
-      else {
-    	refreshAgentNode(senderAddress);
-      }
+    	synchronized(nodes) {
+    		// refresh agent nodes
+    		final Set<JMXServiceURL> connectors = ((Advertisement) message.getPayload()).getJmxURLs();
+    		if (connectors != null) {
+    			refreshAgentNode(senderAddress, connectors);
+    		}
+    		else {
+    			refreshAgentNode(senderAddress);
+    		}
 
-      // refresh remote actions
-      final Set<IActionDescription> actions = ((Advertisement) message.getPayload()).getActions();
-      if (log.isDebugEnabled()) {
-        log.debug("receive ADVERTISE: " + actions.size());
-      }
+    		// refresh remote actions
+    		final Set<IActionDescription> actions = ((Advertisement) message.getPayload()).getActions();
+    		if (log.isDebugEnabled()) {
+    			log.debug("receive ADVERTISE: " + actions.size());
+    		}
 
-      final Set<IActionDescription> receivedActions = new HashSet<IActionDescription>();
-      for (IActionDescription iad : actions) {
+    		final Set<IActionDescription> receivedActions = new HashSet<IActionDescription>();
+    		for (IActionDescription iad : actions) {
 
-        if (iad instanceof IServiceDescription) {
-          // special handling for service descriptions
-          final IServiceDescription isd = (IServiceDescription) iad;
-          if (isd.getOntologySource() != null) {
-            IServiceDescription tempService = null;
-            try {
-              tempService = ontologyStorage.deserializeServiceDescription(isd.getOntologySource());
+    			if (iad instanceof IServiceDescription) {
+    				// special handling for service descriptions
+    				final IServiceDescription isd = (IServiceDescription) iad;
+    				if (isd.getOntologySource() != null) {
+    					IServiceDescription tempService = null;
+    					try {
+    						tempService = ontologyStorage.deserializeServiceDescription(isd.getOntologySource());
 
-              if (tempService != null) {
-                // these fields are not filled by the
-                // ontologyStorage, so do it by hand
-                ((Action) tempService).setInputTypes(isd.getInputTypes());
-                ((Action) tempService).setResultTypes(isd.getResultTypes());
-                ((Action) tempService).setProviderDescription(isd.getProviderDescription());
-                ((Action) tempService).setScope(isd.getScope());
-              }
-            } catch (Exception ex) {
-              log.error("Caught exception when reading service description: ", ex);
-            }
+    						if (tempService != null) {
+    							// these fields are not filled by the
+    							// ontologyStorage, so do it by hand
+    							((Action) tempService).setInputTypes(isd.getInputTypes());
+    							((Action) tempService).setResultTypes(isd.getResultTypes());
+    							((Action) tempService).setProviderDescription(isd.getProviderDescription());
+    							((Action) tempService).setScope(isd.getScope());
+    						}
+    					} catch (Exception ex) {
+    						log.error("Caught exception when reading service description: ", ex);
+    					}
 
-            if (tempService != null) {
-              receivedActions.add(tempService);
-            }
-          }
+    					if (tempService != null) {
+    						receivedActions.add(tempService);
+    					}
+    				}
 
-        } else {
-          // simply add normal actions
-          receivedActions.add(iad);
-        }
-      }
+    			} else {
+    				// simply add normal actions
+    				receivedActions.add(iad);
+    			}
+    		}
 
-      remoteActions.put(senderAddress.getName(), receivedActions);
+    		remoteActions.put(senderAddress.getName(), receivedActions);
 
-      // refresh remote agents
-      final Hashtable<String, IAgentDescription> agents = ((Advertisement) message.getPayload()).getAgents();
-      for (IAgentDescription agent : agents.values()) {
-        registerAgent(agent);
-      }
+    		// refresh remote agents
+    		final Hashtable<String, IAgentDescription> agents = ((Advertisement) message.getPayload()).getAgents();
+    		for (IAgentDescription agent : agents.values()) {
+    			registerAgent(agent);
+    		}
 
-      dump("ADVERTISE " + senderAddress.getName());
+    		dump("ADVERTISE " + senderAddress.getName());
+    	}
     }
 
     else if (protocol.equals(ALL)) {
@@ -940,20 +946,22 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
       }
 
       // remove dead nodes
-      final Set<String> deadNodes = new HashSet<String>();
-      for (String key : nodes.keySet()) {
-        if (nodes.get(key).getAlive() < (System.currentTimeMillis() - 5 * aliveInterval)) {
-          deadNodes.add(key);
-        }
-      }
-      if (deadNodes.size() > 0) {
-        log.warn("removing node:\n");
-        for (String key : deadNodes) {
-          log.warn("\t" + key);
-          remoteActions.remove(key);
-          removeRemoteAgentOfNode(key);
-          nodes.remove(key);
-        }
+      synchronized(nodes) {
+    	  final Set<String> deadNodes = new HashSet<String>();
+    	  for (String key : nodes.keySet()) {
+    		  if (nodes.get(key).getAlive() < (System.currentTimeMillis() - 5 * aliveInterval)) {
+    			  deadNodes.add(key);
+    		  }
+    	  }
+    	  if (deadNodes.size() > 0) {
+    		  log.warn("removing node:\n");
+    		  for (String key : deadNodes) {
+    			  log.warn("\t" + key);
+    			  remoteActions.remove(key);
+    			  removeRemoteAgentOfNode(key);
+    			  nodes.remove(key);
+    		  }
+    	  }
       }
     }
   }

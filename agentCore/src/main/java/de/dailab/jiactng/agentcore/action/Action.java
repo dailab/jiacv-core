@@ -543,9 +543,14 @@ public class Action implements IActionDescription {
 	 * @see javax.management.openmbean.CompositeType
 	 */
 	public OpenType<?> getDescriptionType() throws OpenDataException {
-		final OpenType<?>[] itemTypes = new OpenType<?>[] { SimpleType.STRING, new ArrayType<SimpleType<String>>(SimpleType.STRING, false),
-		      new ArrayType<SimpleType<String>>(SimpleType.STRING, false), SimpleType.STRING, SimpleType.STRING,
-		      (this.providerDescription != null) ? this.providerDescription.getDescriptionType() : SimpleType.VOID, };
+		final OpenType<?>[] itemTypes = new OpenType<?>[] {
+			SimpleType.STRING, 
+			new ArrayType<SimpleType<String>>(SimpleType.STRING, false),
+			new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
+			SimpleType.STRING, 
+			SimpleType.STRING,
+			(this.providerDescription != null) ? this.providerDescription.getDescriptionType() : SimpleType.VOID, 
+		};
 
 		// use names of action items as their description
 		final String[] itemDescriptions = this.getItemNames();
@@ -564,10 +569,14 @@ public class Action implements IActionDescription {
 	 * @see javax.management.openmbean.CompositeData
 	 */
 	public Object getDescription() throws OpenDataException {
-		final Object[] itemValues = new Object[] { this.name, this.inputTypeNames.toArray(new String[this.resultTypeNames.size()]),
-		      this.resultTypeNames.toArray(new String[this.resultTypeNames.size()]), (this.scope != null) ? this.scope.toString() : null,
-		      (this.providerBean != null) ? this.providerBean.getBeanName() : null,
-		      (this.providerDescription != null) ? this.providerDescription.getDescription() : null };
+		final Object[] itemValues = new Object[] { 
+			this.name, 
+			this.inputTypeNames.toArray(new String[this.inputTypeNames.size()]),
+			this.resultTypeNames.toArray(new String[this.resultTypeNames.size()]), 
+			(this.scope != null) ? this.scope.toString() : null,
+			(this.providerBean != null) ? this.providerBean.getBeanName() : null,
+			(this.providerDescription != null) ? this.providerDescription.getDescription() : null
+		};
 
 		final CompositeType type = (CompositeType) this.getDescriptionType();
 		return new CompositeDataSupport(type, this.getItemNames(), itemValues);

@@ -4,18 +4,8 @@
 	
 	<import namespace="de.dailab.jiactng.agentcore.aamm.jms" as="jms"/>
 	
-    <!--
-       # The default Node configuration
-       # provides an empty platform definition without JMX and directory support.
-       # the platform bean may be set as parent in any other platfom definitions 
-    -->
 	<node id="Node" class="de.dailab.jiactng.agentcore.SimpleAgentNode" />
 	
-	<!--
-      # The default Node configuration
-      # provides an empty platform definition without JMX support but with a distributed agent and service directory.
-      # the platform bean may be set as parent in any other platfom definitions 
-    -->
 	<node id="NodeWithDirectory" parent="Node">
 		<list name="agentNodeBeans">
 			<refItem ref="jms:StandardJMSBroker"/>
@@ -23,36 +13,12 @@
 		</list>
 	</node>
 	
-	<!--
-      # The default AgentNode configuration
-      # provides an empty platform definition with service directory and JMX support using RMI without registry
-      # this platform bean may be set as parent in any other platfom definitions if you want to make use of inheritance
-      # other possible properties are:
-      * Agents: contains a List of Agents (interface IAgent)
-      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch wich turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
-      * AgentNodeBeans: a list of AgentNodeBeans
-      * ServiceDirectory: sets the ServiceDirectory
-      * LoggingConfig: sets the Logging configuration !needs more documentation here!
-      * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
-	-->
 	<node id="NodeWithJMX" parent="NodeWithDirectory">
 		<list name="jmxConnectors">
 			<objItem class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector" />
 		</list>
 	</node>
 
-	<!--
-      # The default AgentNode configuration
-      # provides an empty platform definition with service directory and JMX support using RMI with registry
-      # this platform bean may be set as parent in any other platfom definitions if you want to make use of inheritance
-      # other possible properties are:
-      * Agents: contains a List of Agents (interface IAgent)
-      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch wich turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
-      * AgentNodeBeans: a list of AgentNodeBeans
-      * ServiceDirectory: sets the ServiceDirectory
-      * LoggingConfig: sets the Logging configuration !needs more documentation here!
-      * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
-	-->
 	<node id="NodeWithRegistry" parent="NodeWithDirectory">
 		<list name="jmxConnectors">
 			<objItem class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector">
@@ -61,58 +27,34 @@
 		</list>
 	</node>
 	
-	<!--
-      # The default AgentNode configuration
-      # provides an empty platform definition with service directory and JMX support using RMI with an JAAS authenticator and without registry
-      # this platform bean may be set as parent in any other platfom definitions if you want to make use of inheritance
-      # other possible properties are:
-      * Agents: contains a List of Agents (interface IAgent)
-      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch wich turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
-      * AgentNodeBeans: a list of AgentNodeBeans
-      * ServiceDirectory: sets the ServiceDirectory
-      * LoggingConfig: sets the Logging configuration !needs more documentation here!
-      * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
-	-->
 	<node id="NodeWithSecuredJMX" parent="NodeWithDirectory">
 		<list name="jmxConnectors">
 			<objItem class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector">
-				<object name="authenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator">
-					<list name="configuration">
-						<objItem class="de.dailab.jiactng.agentcore.management.jmx.JaasConfigurationEntry">
-							<simple name="loginModuleName" value="com.sun.security.auth.module.Krb5LoginModule"/>
-							<simple name="controlFlag" value="required"/>
-							<map name="options">
-								<valueEntry key="debug" value="false"/>
-								<valueEntry key="useTicketCache" value="false"/>
-							</map>
-						</objItem>
-					</list>
-					<map name="systemProperties">
-						<valueEntry key="java.security.krb5.realm" value="DAI-LAB.DE"/>
-						<valueEntry key="java.security.krb5.kdc" value="birke4.dai-lab.de"/>
-					</map>
-				</object>
+				<objectRef name="authenticator" ref="JaasAuthenticator"/>
 			</objItem>
 		</list>
 	</node>
 	
+	
 	<agent id="SimpleAgent" class="de.dailab.jiactng.agentcore.Agent">
-		<simple name="executionInterval" value="10" />
+		<simple name="executionInterval" value="1" />
 		<objectRef name="memory" ref="Memory"/>
 		<objectRef name="execution" ref="SimpleExecutionCycle"/>
+		<objectRef name="communication" ref="CommunicationBean"/>
 	</agent>
 	
 	<agent id="NonBlockingAgent" parent="SimpleAgent">
 		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
 	</agent>
 	
-	<agent id="SimpleAgentWithCommunication" parent="SimpleAgent">
+	<!-- agent id="SimpleAgentWithCommunication" parent="SimpleAgent">
 		<agentElementRef ref="CommunicationBean"/>
-	</agent>
+	</agent -->
 	
-	<agent id="NonBlockingAgentWithCommunication" parent="SimpleAgentWithCommunication">
+	<!--  agent id="NonBlockingAgentWithCommunication" parent="SimpleAgentWithCommunication">
 		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
-	</agent>
+	</agent -->
+	
 	
 	<agentElement id="CommunicationBean" class="de.dailab.jiactng.agentcore.comm.CommunicationBean">
 		<list name="transports">
@@ -120,11 +62,26 @@
 		</list>
 	</agentElement>
 	
-	<!-- 
-		##################################################################
-		# Bean providing yellow and white pages functionality for agents #
-		##################################################################
-	 -->
+	
+	<object id="JaasAuthenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator">
+		<list name="configuration">
+			<refItem ref="LoginJaas"/>
+		</list>
+		<map name="systemProperties">
+			<valueEntry key="java.security.krb5.realm" value="DAI-LAB.DE"/>
+			<valueEntry key="java.security.krb5.kdc" value="birke4.dai-lab.de"/>
+		</map>
+	</object>
+	
+	<object id="LoginJaas" class="de.dailab.jiactng.agentcore.management.jmx.JaasConfigurationEntry">
+		<simple name="loginModuleName" value="com.sun.security.auth.module.Krb5LoginModule"/>
+		<simple name="controlFlag" value="required"/>
+		<map name="options">
+			<valueEntry key="debug" value="false"/>
+			<valueEntry key="useTicketCache" value="false"/>
+		</map>
+	</object>
+	
 	<object id="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean">
 		<objectRef name="messageTransport" ref="jms:StandardJMSMessageTransport"/>
 	</object>

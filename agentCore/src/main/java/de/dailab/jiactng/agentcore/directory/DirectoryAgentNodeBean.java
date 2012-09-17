@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.directory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -100,7 +101,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
 
   // TODO JMX
   /**
-   * Stores remote actions. Key is the UUID of the node. Value is a set of action that are provided on that node.
+   * Stores remote actions. Key is the message box address of the node. Value is a set of action that are provided on that node.
    */
   private Hashtable<String, Set<IActionDescription>> remoteActions     = new Hashtable<String, Set<IActionDescription>>();
 
@@ -113,7 +114,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
   private Hashtable<String, IAgentDescription>       remoteAgents      = new Hashtable<String, IAgentDescription>();
 
   // TODO JMX
-  /** Stores all known agentnodes. Key is the UUID of the node. */
+  /** Stores all known agentnodes. Key is the message box address of the node. */
   private Hashtable<String, AgentNodeDescription>    nodes             = new Hashtable<String, AgentNodeDescription>();
 
   /** Timer that schedules alive pings and advertisements. */
@@ -366,11 +367,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     else {
-      if (!remoteActions.containsKey(uuid)) {
+      if (!remoteActions.containsKey(ADDRESS_NAME + "@" + uuid)) {
         log.error("UUID unknown. Cannot register action!\n" + actionDescription.toString());
         return;
       }
-      final Set<IActionDescription> actions = remoteActions.get(uuid);
+      final Set<IActionDescription> actions = remoteActions.get(ADDRESS_NAME + "@" + uuid);
       final boolean success = actions.add(actionDescription);
       if (!success) {
         log.warn("Action to register already registered. Substituting with new action:\n"
@@ -410,7 +411,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
         log.warn("Cannot deregister action! Unknown action '" + actionDescription.getName() + "'!");
       }
     } else {
-      final Set<IActionDescription> ad = remoteActions.get(uuid);
+      final Set<IActionDescription> ad = remoteActions.get(ADDRESS_NAME + "@" + uuid);
       if (ad == null) {
         log.warn("Cannot deregister action! Unknown UUID: " + uuid);
         return;
@@ -446,7 +447,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
         log.warn("Cannot deregister action:\n" + oldDescription.toString());
       }
     } else {
-      final Set<IActionDescription> ad = remoteActions.get(uuid);
+      final Set<IActionDescription> ad = remoteActions.get(ADDRESS_NAME + "@" + uuid);
       if (ad == null) {
         log.warn("Cannot deregister action! Unknown UUID: " + uuid);
       } else {
@@ -491,8 +492,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
         }
       }
     }
-    for (String key : remoteActions.keySet()) {
-      final Set<IActionDescription> adset = remoteActions.get(key);
+    for (String nodeAddress : remoteActions.keySet()) {
+      final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
       if (adset.contains(template)) {
         for (IActionDescription ad : adset) {
           if (ad.equals(template)) {
@@ -539,8 +540,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
         }
       }
     }
-    for (String key : remoteActions.keySet()) {
-      final Set<IActionDescription> adset = remoteActions.get(key);
+    for (String nodeAddress : remoteActions.keySet()) {
+      final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
       if (adset.contains(template)) {
         for (IActionDescription ad : adset) {
           if (ad.equals(template)) {
@@ -639,13 +640,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
 
     else if (protocol.equals(BYE)) {
     	synchronized(nodes) {
-    		final String uuid = senderAddress.getName();
-    		if (nodes.containsKey(uuid)) {
-    			removeRemoteAgentOfNode(uuid);
-    			remoteActions.remove(uuid);
-    			nodes.remove(uuid);
+    		final String nodeAddress = senderAddress.getName();
+    		if (nodes.containsKey(nodeAddress)) {
+    			removeRemoteAgentOfNode(nodeAddress);
+    			remoteActions.remove(nodeAddress);
+    			nodes.remove(nodeAddress);
     		}
-    		dump(uuid + " says bye");
+    		dump(nodeAddress + " says bye");
     	}
     	return;
     }
@@ -734,8 +735,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     ICommunicationAddress ret = null;
-    if (nodes.containsKey(uuidOfNode)) {
-      final AgentNodeDescription nodeDescription = nodes.get(uuidOfNode);
+    if (nodes.containsKey(ADDRESS_NAME + "@" + uuidOfNode)) {
+      final AgentNodeDescription nodeDescription = nodes.get(ADDRESS_NAME + "@" + uuidOfNode);
       ret = nodeDescription.getAddress();
     }
 
@@ -744,31 +745,32 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
   }
 
   /**
-   * this returns all known and reachable agent nodes. this returns a list of UUIDs of all known nodes. <br>
-   * insert for agent migration (hate mails to mib).
+   * Returns the message box address of all known and reachable agent nodes.
+   * The unmodifiable set is backed by the directory, so changes in the 
+   * directory will affect this set.
    * 
-   * @return the UUID of all known agent nodes
+   * @return unmodifiable set with message box address of all known agent nodes.
    */
   public Set<String> getAllKnownAgentNodes() {
 
-    return nodes.keySet();
+    return Collections.unmodifiableSet(nodes.keySet());
 
   }
 
   private void refreshAgentNode(ICommunicationAddress node) {
-    final String uuid = node.getName();
-    if (nodes.containsKey(uuid)) {
-      nodes.get(uuid).setAlive(System.currentTimeMillis());
+    final String nodeAddress = node.getName();
+    if (nodes.containsKey(nodeAddress)) {
+      nodes.get(nodeAddress).setAlive(System.currentTimeMillis());
     } else {
       final AgentNodeDescription description = new AgentNodeDescription(node, System.currentTimeMillis());
-      nodes.put(uuid, description);
+      nodes.put(nodeAddress, description);
     }
   }
 
   private void refreshAgentNode(ICommunicationAddress node, Set<JMXServiceURL> jmxConnectors) {
-    final String uuid = node.getName();
+    final String nodeAddress = node.getName();
     refreshAgentNode(node);
-    nodes.get(uuid).setJmxURLs(jmxConnectors);
+    nodes.get(nodeAddress).setJmxURLs(jmxConnectors);
   }
 
   @Override
@@ -856,8 +858,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     // find serviceDescriptions in remote Actions
-    for (String key : remoteActions.keySet()) {
-      final Set<IActionDescription> remoteActSet = remoteActions.get(key);
+    for (String nodeAddress : remoteActions.keySet()) {
+      final Set<IActionDescription> remoteActSet = remoteActions.get(nodeAddress);
       for (IActionDescription remoteAct : remoteActSet) {
         if (remoteAct instanceof IServiceDescription) {
           ret.add((IServiceDescription) remoteAct);
@@ -955,22 +957,22 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     	  }
     	  if (deadNodes.size() > 0) {
     		  log.warn("removing node:\n");
-    		  for (String key : deadNodes) {
-    			  log.warn("\t" + key);
-    			  remoteActions.remove(key);
-    			  removeRemoteAgentOfNode(key);
-    			  nodes.remove(key);
+    		  for (String nodeAddress : deadNodes) {
+    			  log.warn("\t" + nodeAddress);
+    			  remoteActions.remove(nodeAddress);
+    			  removeRemoteAgentOfNode(nodeAddress);
+    			  nodes.remove(nodeAddress);
     		  }
     	  }
       }
     }
   }
 
-  private void removeRemoteAgentOfNode(String nodeId) {
+  private void removeRemoteAgentOfNode(String nodeAddress) {
     final ArrayList<String> keysToRemove = new ArrayList<String>();
     for (String key : remoteAgents.keySet()) {
       final IAgentDescription agent = remoteAgents.get(key);
-      if (nodeId.equals(agent.getAgentNodeUUID())) {
+      if (nodeAddress.equals(ADDRESS_NAME + "@" + agent.getAgentNodeUUID())) {
         keysToRemove.add(key);
       }
     }
@@ -1166,6 +1168,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
   }
 }
 /*
- * TODO remove* checken bzgl. ConcurrentModificationException TODO advertise agents ist im Moment etwas stiefmuetterlich
- * behandelt TODO ausfuehrliches Logging einbauen?!?
+ * TODO remove* checken bzgl. ConcurrentModificationException 
+ * TODO advertise agents ist im Moment etwas stiefmuetterlich behandelt 
+ * TODO ausfuehrliches Logging einbauen?!?
  */

@@ -14,6 +14,7 @@ public abstract class JmxConnector {
     private String _path;
     private int _port;
     private JMXAuthenticator _authenticator;
+    private String _interface;
     
     protected JmxConnector(String protocol) {
         _protocol= protocol;
@@ -39,5 +40,11 @@ public abstract class JmxConnector {
     }
     public final void setAuthenticator(JMXAuthenticator authenticator) {
         _authenticator= authenticator;
+    }
+    public final String getInterface() {
+        return _interface;
+    }
+    public final void setInterface(String ifc) {
+        _interface= ifc;
     }
 }

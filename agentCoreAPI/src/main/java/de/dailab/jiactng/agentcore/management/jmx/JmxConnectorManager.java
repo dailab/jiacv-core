@@ -64,7 +64,6 @@ public final class JmxConnectorManager extends TimerTask {
          socket.setTimeToLive(ttl);
       } catch (Exception e) {
          log.error("Unable to set time-to-live of multicast packets.");
-         // System.err.println("Unable to set time-to-live of multicast packets.");
       }
    }
 
@@ -79,7 +78,6 @@ public final class JmxConnectorManager extends TimerTask {
          networkInterfaces = NetworkInterface.getNetworkInterfaces();
       } catch (Exception e) {
          log.error("Unable to get network interfaces: " + e.getLocalizedMessage());
-         // System.err.println("Unable to get network interfaces: " + e.getLocalizedMessage());
          return;
       }
 
@@ -88,7 +86,6 @@ public final class JmxConnectorManager extends TimerTask {
          socket.joinGroup(group);
       } catch (Exception e) {
          log.error("Unable to join multicast group " + group.getHostAddress());
-         // System.err.println("Unable to join multicast group " + group.getHostAddress());
          return;
       }
 
@@ -118,27 +115,21 @@ public final class JmxConnectorManager extends TimerTask {
                   }
 
                   // check connector server for the address
-                  socket.setNetworkInterface(ifc);
-                  // FIXME !!! Find a solution that works the same on all OSs
-                  if (!(System.getProperty("os.name").startsWith("Mac"))) {
-                     System.setProperty("java.rmi.server.hostname", address.getHostAddress());
-                  }
                   if (!interfaces.containsKey(ifcName)) {
                      // connectors not yet exist for this interface
                      // => create connector servers
-                     log.info("Adding JMX connector servers for new interface " + ifcName);
-                     // System.out.println("Adding JMX connector servers for new interface " + ifcName);
+                     log.warn("Adding JMX connector servers for new interface " + ifcName + " with address " + address.getHostAddress());
                      addConnectors(ifcName, address);
                   } else if (!interfaces.get(ifcName).getAddress().equals(address)) {
                      // connectors already exist, but IP address of this interface has been changed
                      // => re-add connector servers
-                     log.info("Re-adding JMX connector servers for changed interface " + ifcName);
-                     // System.out.println("Re-adding JMX connector servers for changed interface " + ifcName);
+                     log.info("Re-adding JMX connector servers for changed interface " + ifcName);                     // System.out.println("Re-adding JMX connector servers for changed interface " + ifcName);
                      removeConnectors(ifcName);
                      addConnectors(ifcName, address);
                   }
 
                   // send multicast messages
+                  socket.setNetworkInterface(ifc);
                   for (String jmxURL : interfaces.get(ifcName).getJmxURLs()) {
                      final byte[] buffer = jmxURL.getBytes();
                      final DatagramPacket dp = new DatagramPacket(buffer, buffer.length, group, multicastPort);
@@ -146,14 +137,12 @@ public final class JmxConnectorManager extends TimerTask {
                   }
                } catch (Exception e1) {
                   log.error("Unable to send multicast message on interface " + ifcName);
-                  // System.err.println("Unable to send multicast message on interface " + ifcName);
                   e1.printStackTrace();
                }
             } else {
                // handle inactive interface
                if (interfaces.containsKey(ifcName)) {
-                  log.info("Removing JMX connector servers for deactivated interface " + ifcName);
-                  // System.out.println("Removing JMX connector servers for deactivated interface " + ifcName);
+                  log.warn("Removing JMX connector servers for deactivated interface " + ifcName);
                   removeConnectors(ifcName);
                }
             }
@@ -161,9 +150,7 @@ public final class JmxConnectorManager extends TimerTask {
             // handle unknown interface
             if (interfaces.containsKey(ifcName)) {
                log.error("Unable to get information about interface " + ifcName + ": " + e.getLocalizedMessage());
-               // System.err.println("Unable to get information about interface " + ifcName + ": " + e.getLocalizedMessage());
                log.info("Removing JMX connector servers for unknown interface " + ifcName);
-               // System.out.println("Removing JMX connector servers for unknown interface " + ifcName);
                removeConnectors(ifcName);
             }
          }
@@ -174,12 +161,10 @@ public final class JmxConnectorManager extends TimerTask {
          try {
             if (NetworkInterface.getByName(name) == null) {
                log.info("Removing JMX connector servers for removed interface " + name);
-               // System.out.println("Removing JMX connector servers for removed interface " + name);
                removeConnectors(name);
             }
          } catch (Exception e) {
             log.error("Unable to search for interface " + name + ": " + e.getLocalizedMessage());
-            // System.err.println("Unable to search for interface " + name + ": " + e.getLocalizedMessage());
          }
       }
 
@@ -188,7 +173,6 @@ public final class JmxConnectorManager extends TimerTask {
          socket.leaveGroup(group);
       } catch (Exception e) {
          log.error("Unable to leave multicast group " + group.getHostAddress());
-         // System.err.println("Unable to leave multicast group " + group.getHostAddress());
       }
    }
 
@@ -209,12 +193,17 @@ public final class JmxConnectorManager extends TimerTask {
    }
 
    private JMXConnectorServer createConnector(JmxConnector conf, InetAddress address, String ifcName) {
-      // get parameters of connector server
+	  // check interface
+	  String ifc = conf.getInterface();
+	  if ((ifc != null) && !ifc.equals(ifcName)) {
+		  return null;
+	  }
+
+	  // get parameters of connector server
       String host = address.getHostAddress();
       final String protocol = conf.getProtocol();
       if (protocol == null) {
          log.warn("WARNING: No protocol specified for a JMX connector server");
-         // System.out.println("WARNING: No protocol specified for a JMX connector server");
          return null;
       }
       int port = conf.getPort();
@@ -222,6 +211,11 @@ public final class JmxConnectorManager extends TimerTask {
       final JMXAuthenticator authenticator = conf.getAuthenticator();
 
       if (protocol.equals("rmi")) {
+         // FIXME !!! Find a solution that works the same on all OSs
+         if (!(System.getProperty("os.name").startsWith("Mac"))) {
+            System.setProperty("java.rmi.server.hostname", address.getHostAddress());
+         }
+
          // check use of RMI registry
          final int registryPort = ((RmiJmxConnector) conf).getRegistryPort();
          final String registryHost = ((RmiJmxConnector) conf).getRegistryHost();
@@ -244,32 +238,22 @@ public final class JmxConnectorManager extends TimerTask {
          log.error("WARNING: Unable to construct URL of JMX connector server.");
          log.error("It is not possible to find the local host name, or the protocol " + protocol + ", port " + port + " or path " + path + " is incorrect.");
          log.error(e.getMessage());
-         //System.err.println("WARNING: Unable to construct URL of JMX connector server.");
-         //System.err.println("It is not possible to find the local host name, or the protocol " + protocol + ", port " + port + " or path " + path + " is incorrect.");
-         //System.err.println(e.getMessage());
          return null;
       }
 
       // create connector server
       log.info("Creating JMX connector server: " + jurl);
-      //System.out.println("Creating JMX connector server: " + jurl);
       try {
          return JMXConnectorServerFactory.newJMXConnectorServer(jurl, env, mbs);
       } catch (MalformedURLException e) {
          log.error("WARNING: Unable to create JMX connector server for " + jurl);
          log.error("Missing provider implementation for the specified protocol.");
          log.error(e.getMessage());
-         //System.err.println("WARNING: Unable to create JMX connector server for " + jurl);
-         //System.err.println("Missing provider implementation for the specified protocol.");
-         //System.err.println(e.getMessage());
          return null;
       } catch (Exception e) {
          log.error("WARNING: Unable to create JMX connector server for " + jurl);
          log.error("Communication problem, or the found provider implementation for the specified protocol can not be used.");
          log.error(e.getMessage());
-         //System.err.println("WARNING: Unable to create JMX connector server for " + jurl);
-         //System.err.println("Communication problem, or the found provider implementation for the specified protocol can not be used.");
-         //System.err.println(e.getMessage());
          return null;
       }
    }
@@ -288,21 +272,17 @@ public final class JmxConnectorManager extends TimerTask {
             cs.start();
          } catch (Exception e) {
             log.error("WARNING: Start of JMX connector server failed for protocol " + conf.getProtocol());
-            //System.err.println("WARNING: Start of JMX connector server failed for protocol " + conf.getProtocol());
             if (conf instanceof RmiJmxConnector) {
                final int registryPort = ((RmiJmxConnector) conf).getRegistryPort();
                final String registryHost = ((RmiJmxConnector) conf).getRegistryHost();
                if ((registryPort > 0) || (registryHost != null)) {
                   log.error("Please ensure that a rmi registry is started on " + ((registryHost == null) ? address.getHostAddress() : registryHost) + ((registryPort > 0) ? ":" + registryPort : ""));
-                  //System.err.println("Please ensure that a rmi registry is started on " + ((registryHost == null) ? address.getHostAddress() : registryHost) + ((registryPort > 0) ? ":" + registryPort : ""));
                }
             }
             log.error(e.getMessage());
-            //System.err.println(e.getMessage());
             continue;
          }
-         log.info("JMX connector server successfully started: " + cs.getAddress());
-         //System.out.println("JMX connector server successfully started: " + cs.getAddress());
+         log.warn("JMX connector server successfully started: " + cs.getAddress());
          connectors.add(cs);
 
          // register connector server as JMX resource
@@ -311,8 +291,6 @@ public final class JmxConnectorManager extends TimerTask {
          } catch (Exception e) {
             log.error("WARNING: Unable to register JMX connector server \"" + cs.getAddress() + "\" as JMX resource.");
             log.error(e.getMessage());
-            //System.err.println("WARNING: Unable to register JMX connector server \"" + cs.getAddress() + "\" as JMX resource.");
-            //System.err.println(e.getMessage());
          }
 
       }
@@ -333,20 +311,15 @@ public final class JmxConnectorManager extends TimerTask {
          } catch (Exception e) {
             log.error("WARNING: Unable to deregister JMX connector server \"" + connector.getAddress() + "\" as JMX resource.");
             log.error(e.getMessage());
-            //System.err.println("WARNING: Unable to deregister JMX connector server \"" + connector.getAddress() + "\" as JMX resource.");
-            //System.err.println(e.getMessage());
          }
 
          // stop connector server
          log.info("Stop connector server " + connector.getAddress().toString());
-         //System.out.println("Stop connector server " + connector.getAddress().toString());
          try {
             connector.stop();
          } catch (Exception e) {
             log.error("WARNING: Unable to stop JMX connector server!");
             log.error(e.getMessage());
-            //System.err.println("WARNING: Unable to stop JMX connector server!");
-            //System.err.println(e.getMessage());
          }
       }
 

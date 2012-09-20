@@ -43,8 +43,28 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 
+/**
+ * This agent node bean is used to enable search for agents or actions of all 
+ * agent nodes of the platform. It also allows to get the JMX URLs of remote 
+ * agent nodes.
+ *
+ * This agent node bean uses the address "df@dfgroup" to send and receive 
+ * alive messages to/from all other agent nodes of the platform at alive 
+ * interval. At advertise interval an advertise message will be send with 
+ * information about local agents, actions and JMX URLs. If the bean is 
+ * stopped, a bye message will be send.
+ *  
+ * @author Jan Keiser
+ * @see de.dailab.jiactng.agentcore.Agent#searchAllActions(IActionDescription)
+ * @see de.dailab.jiactng.agentcore.Agent#searchAllAgents(IAgentDescription)
+ * @see de.dailab.jiactng.agentcore.management.jmx.client.JmxManagementClient#getURLsFromMulticast()
+ * @see de.dailab.jiactng.agentcore.management.jmx.client.JmxManagementClient#getURLsFromRegistry(String, int)
+ * @see Advertisement
+ */
 public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDirectory, IMessageTransportDelegate,
     DirectoryAgentNodeBeanMBean {
+
+  private long lastSend;
 
   private boolean                                    dump              = false;
 
@@ -168,6 +188,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
   @Override
   public void doStart() throws Exception {
     super.doStart();
+    lastSend = System.currentTimeMillis();
     timer = new Timer();
     timer.schedule(new AgentNodePinger(), aliveInterval, aliveInterval);
   }
@@ -642,6 +663,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     	synchronized(nodes) {
     		final String nodeAddress = senderAddress.getName();
     		if (nodes.containsKey(nodeAddress)) {
+    			log.warn(nodeAddress + " says bye");
     			removeRemoteAgentOfNode(nodeAddress);
     			remoteActions.remove(nodeAddress);
     			nodes.remove(nodeAddress);
@@ -760,8 +782,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
   private void refreshAgentNode(ICommunicationAddress node) {
     final String nodeAddress = node.getName();
     if (nodes.containsKey(nodeAddress)) {
+    	final long interval = System.currentTimeMillis() - nodes.get(nodeAddress).getAlive();
+    	if (interval > 2*aliveInterval) {
+    		log.warn("Measured interval of receiving alive message from " + nodeAddress + ": " + interval);
+    	}
       nodes.get(nodeAddress).setAlive(System.currentTimeMillis());
     } else {
+    	log.warn("New known node " + nodeAddress);
       final AgentNodeDescription description = new AgentNodeDescription(node, System.currentTimeMillis());
       nodes.put(nodeAddress, description);
     }
@@ -879,6 +906,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     message.setHeader("UUID", this.agentNode.getUUID());
     try {
       messageTransport.send(message, address, 0);
+      final long interval = System.currentTimeMillis()-lastSend;
+      if (interval > 2*aliveInterval) {
+    	  log.warn("Measured interval of sending alive message: " + interval);
+      }
+      lastSend = System.currentTimeMillis();      
     } catch (Exception e) {
       log.error("sendMessage failed. Message:\n" + message.toString(), e);
     }
@@ -889,8 +921,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
    */
   private void sendAdvertisement(ICommunicationAddress destination) {
     final JiacMessage adMessage = new JiacMessage();
-    adMessage.setSender(myAddress);
-    adMessage.setHeader("UUID", this.agentNode.getUUID());
     adMessage.setProtocol(ADVERTISE);
     // TODO filter global actions
 
@@ -920,12 +950,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
           + " actions=" + payload.getActions().size());
     }
 
-    try {
-      messageTransport.send(adMessage, destination, 0);
-    } catch (Exception e) {
-      log.error("sendMessage failed. Message:\n" + adMessage.toString(), e);
-    }
-
+    sendMessage(adMessage, destination);
   }
 
   class AgentNodePinger extends TimerTask {
@@ -956,7 +981,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     		  }
     	  }
     	  if (deadNodes.size() > 0) {
-    		  log.warn("removing node:\n");
+    		  log.warn("Forget nodes due to missing alive message:\n");
     		  for (String nodeAddress : deadNodes) {
     			  log.warn("\t" + nodeAddress);
     			  remoteActions.remove(nodeAddress);

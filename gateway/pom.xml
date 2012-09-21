@@ -2,13 +2,13 @@
    <parent>
       <artifactId>jiactng</artifactId>
       <groupId>de.dailab</groupId>
-      <version>5.1.3-SNAPSHOT</version>
+      <version>5.1.3</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <groupId>de.dailab.jiac.net</groupId>
    <artifactId>gateway</artifactId>
    <name>Network Gateway</name>
-   <version>5.1.3-SNAPSHOT</version>
+   <version>5.1.3</version>
    <dependencies>
       <dependency>
          <groupId>org.apache.activemq</groupId>

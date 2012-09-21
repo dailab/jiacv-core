@@ -955,7 +955,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
 
   class AgentNodePinger extends TimerTask {
 
-    private long counter = 0;
+    private long counter = advertiseInterval;
 
     @Override
     public void run() {

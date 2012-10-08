@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	
+	<bean name = "FaultyActionAgent1" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent2" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent3" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent4" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent5" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent6" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent7" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent8" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent9" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgent10" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgentBean" class = "de.dailab.jiactng.agentcore.FaultyActionAgentBean" />
+</beans>

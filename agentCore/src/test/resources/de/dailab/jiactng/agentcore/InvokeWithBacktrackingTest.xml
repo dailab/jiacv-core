@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	<!--
+	<bean name = "TestNode1NonFaulty" parent="NodeWithJMX">
+		<property name= "agents" >
+		<list>
+			<ref bean = "InvokeWithBacktrackingAgent" />
+			<ref bean = "NonFaultyActionAgent" />
+		</list>
+		</property>
+	</bean>
+	 
+	<bean name = "TestNode1NonFaulty10Faulty" parent="NodeWithJMX">
+		<property name= "agents" >
+		<list>
+			<ref bean = "InvokeWithBacktrackingAgent" />
+			<ref bean = "NonFaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+			<ref bean = "FaultyActionAgent" />
+		</list>
+		</property>
+	</bean>
+	-->
+	<bean name = "TestNode1Faulty" parent="NodeWithJMX">
+		<property name= "agents" >
+		<list>
+			<ref bean = "InvokeWithBacktrackingAgent" />
+			<ref bean = "FaultyActionAgent" />
+		</list>
+		</property>
+	</bean>
+	
+	
+	<bean name = "FaultyActionAgent" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "FaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "FaultyActionAgentBean" class = "de.dailab.jiactng.agentcore.FaultyActionAgentBean" />
+	
+	<bean name = "NonFaultyActionAgent" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "NonFaultyActionAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "NonFaultyActionAgentBean" class = "de.dailab.jiactng.agentcore.NonFaultyActionAgentBean"/>
+	
+	<bean name = "InvokeWithBacktrackingAgent" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "InvokeWithBacktrackingAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "InvokeWithBacktrackingAgentBean" class = "de.dailab.jiactng.agentcore.InvokeWithBacktrackingAgentBean" />
+</beans>

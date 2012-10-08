@@ -53,6 +53,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   public final static String TIMEOUT_MESSAGE = "Session timed out.";
   
   /**
+   * string constant for not action founding
+   */
+  public final static String NO_ACTION_FOUND = "no action found";
+  
+  /**
    * Creates an agent bean that uses lifecycle support in loose mode
    */
   public AbstractAgentBean() {
@@ -412,6 +417,63 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
     memory.write(doAct);
     return doAct.getSessionId();
   }
+  
+  /**
+   * Searches for an action and invokes it with default timeout and waits for its result. If the result is failed than another action will be searched
+   * 
+   * NOTE: This method MUST NOT be used with a blocking
+   * execution cycle (e.g. SimpleExecutionCycle).
+   * 
+   * @param template
+   *          Template of an action which is searched.
+   * @param inputParams
+   *          The values for the input parameters.
+   * @return The result of the action.
+   * @see Session#DEFAULT_TIMETOLIVE
+   */
+  protected final ActionResult invokeWithBacktracking(IActionDescription template, Serializable[] inputParams){
+	 return invokeWithBacktracking(template, inputParams, Long.valueOf(Session.DEFAULT_TIMETOLIVE));
+  }
+  
+  /**
+   * Searches for an action and invokes it with given timeout and waits for its result. If the result is failed than another action will be searched
+   * 
+   * NOTE: This method MUST NOT be used with a blocking
+   * execution cycle (e.g. SimpleExecutionCycle).
+   * 
+   * @param template
+   *          Template of an action which is searched.
+   * @param inputParams
+   *          The values for the input parameters.
+   * @param timeout
+   *          the timeout in milliseconds after this DoAction fails.
+   * @return The result of the action.
+   */
+  protected final ActionResult invokeWithBacktracking(IActionDescription template, Serializable[] inputParams, final Long timeOut){
+	  List<IActionDescription> actionDescriptions = thisAgent.searchAllActions(template);
+	  
+	  final ActionResultListener listener = new ActionResultListener();
+	  ActionResult actionResult = null;
+	  for(IActionDescription actionDescription : actionDescriptions){
+		  invoke(actionDescription, inputParams, listener, timeOut);
+		  synchronized (listener) {
+		      if(listener.getResult() == null) {
+		        try {
+		          listener.wait();
+		        } catch (Exception e) {
+		          e.printStackTrace();
+		        }
+		      }
+		    }
+		  actionResult = listener.getResult();
+		  if(actionResult != null && actionResult.getFailure() == null){
+		    return actionResult;
+		  }
+	  }
+	  return new ActionResult(new DoAction(template, null, inputParams, timeOut), NO_ACTION_FOUND);
+  }
+  
+  
 
   // protected ActionResult syncInvoke(Action a, Object[] inputParams) {
   // DoAction doAct = a.createDoAction(inputParams, null);

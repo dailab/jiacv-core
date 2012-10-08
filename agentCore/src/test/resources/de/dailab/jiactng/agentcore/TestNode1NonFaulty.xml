@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/InvokeWithBacktrackingAgent.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/NonFaultyActionAgent.xml" />
+	
+	<bean name = "TestNode1NonFaulty" parent="NodeWithJMX">
+		<property name= "agents" >
+		<list>
+			<ref bean = "InvokeWithBacktrackingAgent" />
+			<ref bean = "NonFaultyActionAgent" />
+		</list>
+		</property>
+	</bean>
+</beans>

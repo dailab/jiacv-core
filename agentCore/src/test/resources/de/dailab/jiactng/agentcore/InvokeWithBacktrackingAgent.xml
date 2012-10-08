@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+	
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	
+	<bean name = "InvokeWithBacktrackingAgent" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "InvokeWithBacktrackingAgentBean"/>
+			</list>
+		</property>
+	</bean>
+	<bean name = "InvokeWithBacktrackingAgentBean" class = "de.dailab.jiactng.agentcore.InvokeWithBacktrackingAgentBean" />
+</beans>

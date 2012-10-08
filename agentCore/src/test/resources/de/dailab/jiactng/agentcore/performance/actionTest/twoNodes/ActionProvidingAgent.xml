@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	
+	<bean name = "ActionProvidingAgent" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "ActionProvidingAgentBean"/>
+			</list>
+		</property>
+		<property name = "executionInterval" value = "1"/>
+	</bean>
+	<bean name = "ActionProvidingAgentBean" class = "de.dailab.jiactng.agentcore.performance.actionTest.twoNodes.ActionProvidingAgentBean">
+		<property name = "executeInterval" value = "1"/>
+	</bean>
+</beans>

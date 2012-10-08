@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/performance/memoryTest/TestAgent.xml" />
+	
+	<bean name = "TestNode100" parent="NodeWithJMX">
+		<property name= "agents" >
+		<list>
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+			<ref bean = "TestAgent" />
+		</list>
+		</property>
+	</bean>
+</beans>

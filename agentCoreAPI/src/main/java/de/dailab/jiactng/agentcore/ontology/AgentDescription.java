@@ -207,7 +207,27 @@ public class AgentDescription implements IAgentDescription {
         }
         
         final AgentDescription other= (AgentDescription) obj;
-        return EqualityChecker.equalsOrNull(aid, other.aid);
+        return checkWhetherEqual(aid, other.getAid()) && checkWhetherEqual(name, other.getName()) &&
+        		checkWhetherEqual(owner, other.getOwner()) &&checkWhetherEqual(messageBoxAddress, other.getMessageBoxAddress()) && 
+        		checkWhetherEqual(agentNodeUUID, other.getAgentNodeUUID());
+    }
+    
+
+    /**
+     * This method checks whether the given objects are equal. The objects are equal
+     * if one of them is null or there attributes are equal
+     * @param o1
+     * @param o2
+     * @return
+     */
+    private boolean checkWhetherEqual(Object o1, Object o2){
+    	if(o1 == null || o2 == null){
+        	return true;
+        }
+        if(!o1.equals(o2)){
+        	return false;
+        }
+        return true;
     }
 
     /**

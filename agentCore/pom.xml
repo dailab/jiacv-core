@@ -20,17 +20,17 @@
 			<version>5.1.4-SNAPSHOT</version>
 		</dependency>
 		
-		<dependency>
+		<!-- use Spring dependency from ActiveMQ to avoid multiple versions -->
+		<!--dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>3.0.3.RELEASE</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>3.0.3.RELEASE</version>
-		</dependency>
+		</dependency-->
 		
 		<dependency>
 			<groupId>de.dailab.jiac.net</groupId>

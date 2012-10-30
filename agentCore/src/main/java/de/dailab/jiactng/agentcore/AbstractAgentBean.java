@@ -302,7 +302,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          The action to be invoked.
    * @param inputParams
    *          The values for the input parameters.
-   * @return The result of the action.
+   * @return The result of the action. If an action has no result it will return 
+   * an actionResult with the content "Success".
    * @see #invokeAndWaitForResult(IActionDescription, Serializable[], Long)
    * @see Session#DEFAULT_TIMETOLIVE
    */
@@ -320,7 +321,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          The values for the input parameters.
    * @param timeout
    *          the timeout in milliseconds after this DoAction fails.
-   * @return The result of the action.
+   * @return The result of the action. If an action has no result it will return 
+   * an actionResult with the content "Success".
    * @see #invoke(IActionDescription, Serializable[], ResultReceiver, Long)
    * @see ActionResultListener#getResult()
    */
@@ -339,7 +341,12 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
         }
       }
     }
-    return listener.getResult();
+    ActionResult result = listener.getResult();
+    if(result.getResults().length == 0){
+        result.setResults(new Serializable[]{"Success"});
+        log.warn("Action: " + a.getName() + " has no return parameter");
+    }
+    return result;
   }
 
   /**
@@ -428,7 +435,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          Template of an action which is searched.
    * @param inputParams
    *          The values for the input parameters.
-   * @return The result of the action.
+   * @return The result of the action. If an action has no result it will return 
+   * an actionResult with the content "Success".
    * @see Session#DEFAULT_TIMETOLIVE
    */
   protected final ActionResult invokeWithBacktracking(IActionDescription template, Serializable[] inputParams){
@@ -447,7 +455,8 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          The values for the input parameters.
    * @param timeout
    *          the timeout in milliseconds after this DoAction fails.
-   * @return The result of the action.
+   * @return The result of the action. If an action has no result it will return 
+   * an actionResult with the content "Success".
    */
   protected final ActionResult invokeWithBacktracking(IActionDescription template, Serializable[] inputParams, final Long timeOut){
 	  List<IActionDescription> actionDescriptions = thisAgent.searchAllActions(template);
@@ -467,6 +476,10 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 		    }
 		  actionResult = listener.getResult();
 		  if(actionResult != null && actionResult.getFailure() == null){
+			  if(actionResult.getResults().length == 0){
+			        actionResult.setResults(new Serializable[]{"Success"});
+			        log.warn("Action: " + template.getName() + " has no return parameter");
+			    }
 		    return actionResult;
 		  }
 	  }

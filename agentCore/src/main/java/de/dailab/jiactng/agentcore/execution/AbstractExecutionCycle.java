@@ -85,6 +85,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
    /**
     * Performs an action request.
+    * If an action has no return parameter than it will not wait for receiving the result.
     * 
     * @param act The action invocation.
     * @see AbstractActionAuthorizationBean#authorize(DoAction)

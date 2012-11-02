@@ -12,7 +12,6 @@
   <bean name="HelloWorldAgent" parent="SimpleAgent" singleton="false">
     <property name="agentBeans">
       <list>
-        <ref bean="CommunicationBean" />
         <ref bean="helloBean"/>
       </list>
     </property>

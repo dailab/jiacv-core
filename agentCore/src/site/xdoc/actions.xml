@@ -124,12 +124,11 @@
 			  <p>
 			    <a href="apidocs/de/dailab/jiactng/agentcore/action/DoAction.html">
               DoAction</a>-object that contains the parameters and a reference to the 
-              client-bean in order to return the results. If an action does not has a 
-              return parameter it will return a result with the content "Success".
-              The simples way to do this is to use the <code>createDoAction</code>-method 
-              from the Action object. This of course requires, that you get the Action-object 
-              first. As all Actions are written to the agents memory during initialization,
-              the easiest way to retrieve an Action is this:
+              client-bean in order to return the results. The simples way to do this is
+              to use the <code>createDoAction</code>-method from the Action object. This 
+              of course requires, that you get the Action-objectfirst. As all Actions are 
+              written to the agents memory during initialization, the easiest way to retrieve 
+              an Action is this:
 			  </p>
 <pre>
 		Action a = memory.read(new Action("helloWorld", null, null, null));

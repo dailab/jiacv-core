@@ -8,5 +8,15 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
 	
 	<bean name="PerformanceAgentTemplate" parent="SimpleAgent" abstract="true">
+      <property name="agentBeans">
+	    <list>
+		  <ref bean="testBean" />
+        </list>
+	  </property>
+	</bean>
+	
+	<bean name="testBean"
+		class="de.dailab.jiactng.agentcore.action.ExampleExposingBean"
+		singleton="false">
 	</bean>
 </beans>

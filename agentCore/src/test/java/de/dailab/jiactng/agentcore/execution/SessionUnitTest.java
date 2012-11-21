@@ -96,16 +96,49 @@ public class SessionUnitTest extends TestCase {
     testBean2.setWaitWithActionB(false);
     testBean2.setWaitWithActionC(false);
 
-    testBean1.startAction(SessionTestBean.ACTION_NAME_A, "TestStringSimple", 800);
+    testBean1.startAction(SessionTestBean.ACTION_NAME_A, "TestStringSimple", 2000);
 
     try {
-      Thread.sleep(2000);
+      Thread.sleep(4000);
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
     assertEquals("TestStringSimple+A+B+C", testBean1.getFinalString());
+    checkMemoryEmpty(testAgent1.getMemory());
+    checkMemoryEmpty(testAgent2.getMemory());
+  }
+
+  public void testMassUsage() {
+    testBean1.setWaitWithActionA(false);
+    testBean1.setWaitWithActionB(false);
+    testBean1.setWaitWithActionC(false);
+    testBean2.setWaitWithActionA(false);
+    testBean2.setWaitWithActionB(false);
+    testBean2.setWaitWithActionC(false);
+
+    long startTime = System.currentTimeMillis();
+
+    for (int i = 0; i < 1000; i++) {
+      testBean2.setFinalString(null);
+      testBean2.startAction(SessionTestBean.ACTION_NAME_C, "TestStringSimple", 10000);
+
+      while (!"TestStringSimple+C".equals(testBean2.getFinalString())) {
+        try {
+          Thread.sleep(0, 5000);
+        } catch (InterruptedException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      }
+    }
+
+    long endTime = System.currentTimeMillis();
+
+    System.err.println("\n\n\tTIME FOR PERFORMANCE: " + (endTime - startTime) + "\n\n");
+
+    assertEquals("TestStringSimple+C", testBean2.getFinalString());
     checkMemoryEmpty(testAgent1.getMemory());
     checkMemoryEmpty(testAgent2.getMemory());
   }

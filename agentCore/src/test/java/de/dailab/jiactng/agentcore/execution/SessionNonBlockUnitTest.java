@@ -96,10 +96,10 @@ public class SessionNonBlockUnitTest extends TestCase {
     testBean2.setWaitWithActionB(false);
     testBean2.setWaitWithActionC(false);
 
-    testBean1.startAction(SessionTestBean.ACTION_NAME_A, "TestStringSimple", 800);
+    testBean1.startAction(SessionTestBean.ACTION_NAME_A, "TestStringSimple", 2000);
 
     try {
-      Thread.sleep(2000);
+      Thread.sleep(4000);
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

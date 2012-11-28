@@ -10,6 +10,8 @@ import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
+import org.apache.commons.logging.LogFactory;
+
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
@@ -166,7 +168,6 @@ public class JMSMessageTransport extends MessageTransport {
     */
    static Message pack(final IJiacMessage message, final Session session) throws JMSException {
       final IFact payload = message.getPayload();
-      try {
          // IFact payload= message.getPayload();
          Message result;
 
@@ -184,16 +185,7 @@ public class JMSMessageTransport extends MessageTransport {
          }
 
          return result;
-      }
-      catch (final RuntimeException re) {
-         if (payload != null) {
-            System.out.println("\n\tund das is der payload: " + payload.getClass());
-            System.out.println("\terror message: " + re.getMessage() + "\n");
-            re.printStackTrace();
-         }
-         throw re;
-      }
-   }
+     }
 
    /*
     * U S E I N G     T H E      S E N D E R
@@ -222,12 +214,11 @@ public class JMSMessageTransport extends MessageTransport {
       try {
          this.sender.send(message, commAdd, (ttl == 0) ? this.timeToLive : ttl);
       }
-      catch (final JMSException jms) {
+      catch (final Exception ex) {
          if (this.log.isErrorEnabled()) {
-            this.log.error("Sending of Message to address '" + commAdd.toUnboundAddress() + "' through JMS failed! Errorcause reads '"
-                  + jms.getCause() + "'");
-         }
-         throw new CommunicationException("error while sending message", jms);
+           this.log.error("Sending of Message to address '" + commAdd.toUnboundAddress() + "' through JMS failed!",ex);
+         } 
+         throw new CommunicationException("error while sending message", ex);
       }
    }
 

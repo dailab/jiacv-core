@@ -6,6 +6,8 @@
  */
 package de.dailab.jiactng.agentcore;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -169,6 +171,25 @@ public class IAgentTest extends TestCase {
     // fail("Exception got through. " + ex.getMessage());
     // }
     // removed because of thread-testing problems with junit
+  }
+  
+  public void testAutoExecutionService(){
+	SimpleAgentNode node = (SimpleAgentNode) new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/AutoServiceNode.xml").getBean("AutoServiceNode");
+	List<IAgent> agents = node.findAgents();
+	TestBean testBean = null;
+	for(IAgent agent : agents){
+		if(agent.getAgentName().equals("AutoServiceAgent2")){
+			testBean = (TestBean)agent.findAgentBean(TestBean.class);
+			break;
+		}
+	}
+	try {
+		Thread.sleep(1000);
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
+	
+	assertEquals(3, testBean.getSum());
   }
 
 }

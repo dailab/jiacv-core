@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -200,7 +201,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    */
   private JmxAgentNodeTimerManagementClient timerClient                    = null;
 
-  private Integer                           autoExecTimeId                 = null;
 
   private boolean                           singleExecutionsDone           = false;
 
@@ -548,7 +548,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     if (execution.getAutoExecutionServices() != null) {
       try {
         // add listener if needed
-        if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null)) {
+        if ((startTimeId == null) && (stopTimeId == null)) {
           try {
             timerClient.addTimerNotificationListener(this);
           } catch (IOException e) {
@@ -556,20 +556,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
           }
         }
 
-        // remove old timer notification
-        if (autoExecTimeId != null) {
-          try {
-            timerClient.removeNotification(autoExecTimeId);
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
-
-        // add new timer notification
-        autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()
-            + AUTO_EXECUTION_DELAY));
-      } catch (IOException e) {
-        e.printStackTrace();
       } catch (InstanceNotFoundException e) {
         e.printStackTrace();
       }
@@ -1217,7 +1203,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    *          the designated start time
    */
   private void registerStartTime(Long regStartTime) throws InstanceNotFoundException {
-    if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStartTime != null)) {
+    if ((startTimeId == null) && (stopTimeId == null) && (regStartTime != null)) {
       try {
         timerClient.addTimerNotificationListener(this);
       } catch (IOException e) {
@@ -1235,7 +1221,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
 
     // remove listener if no longer needed
-    if ((startTimeId != null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStartTime == null)) {
+    if ((startTimeId != null) && (stopTimeId == null) && (regStartTime == null)) {
       try {
         timerClient.removeTimerNotificationListener(this);
       } catch (IOException e) {
@@ -1292,7 +1278,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   private void registerStopTime(Long regStopTime) throws InstanceNotFoundException {
-    if ((startTimeId == null) && (stopTimeId == null) && (autoExecTimeId == null) && (regStopTime != null)) {
+    if ((startTimeId == null) && (stopTimeId == null) && (regStopTime != null)) {
       try {
         timerClient.addTimerNotificationListener(this);
       } catch (IOException e) {
@@ -1310,7 +1296,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
 
     // remove listener if no longer needed
-    if ((startTimeId == null) && (stopTimeId != null) && (autoExecTimeId == null) && (regStopTime == null)) {
+    if ((startTimeId == null) && (stopTimeId != null) && (regStopTime == null)) {
       try {
         timerClient.removeTimerNotificationListener(this);
       } catch (IOException e) {
@@ -1373,51 +1359,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
           e.printStackTrace();
         }
       }
-
-      // check autoExec timer
-      if (id.equals(autoExecTimeId) && getAgentState().equals(LifecycleStates.STARTED)) {
-
-        // if not continuous and one execution was done - continue;
-        if (!execution.getAutoExecutionType() && singleExecutionsDone) {
-          return;
-        }
-
-        if (execution.getAutoExecutionServices() != null) {
-          for (String serviceName : execution.getAutoExecutionServices()) {
-            final Action service = memory.read(new Action(serviceName));
-            if (service != null) {
-              if (log.isInfoEnabled()) {
-                log.info("Autoexecuting action: " + service);
-              }
-              final DoAction doAct = service.createDoAction(new Serializable[0], null);
-              doAct.getSession().setOriginalService(serviceName);
-              doAct.getSession().setOriginalProvider(this.getOwner());
-              doAct.getSession().setOriginalUser(this.getOwner());
-              memory.write(doAct);
-            } else {
-              log.warn("Could not find action for autoExecution: " + serviceName);
-            }
-          }
-          singleExecutionsDone = true;
-        }
-        if (execution.getAutoExecutionType()) {
-          // set new timer for continuous execution
-          // remove old timer notification
-          try {
-            if (autoExecTimeId != null) {
-              timerClient.removeNotification(autoExecTimeId);
-            }
-            // add new timer notification
-            autoExecTimeId = timerClient.addNotification(null, null, null, new Date(System.currentTimeMillis()
-                + CONTINUOUS_EXECUTION_INTERVAL));
-
-          } catch (IOException e) {
-            e.printStackTrace();
-          } catch (InstanceNotFoundException e) {
-            e.printStackTrace();
-          }
-        }
-      }
     }
   }
 
@@ -1425,7 +1366,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    * {@inheritDoc}
    */
   @Override
-  public final List<String> getAutoExecutionServices() {
+  public final Map<String, Map<String, Serializable>> getAutoExecutionServices() {
     if (this.execution != null) {
       return this.execution.getAutoExecutionServices();
     } else {
@@ -1437,43 +1378,8 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    * {@inheritDoc}
    */
   @Override
-  public final boolean getAutoExecutionType() {
-    if (this.execution != null) {
-      return this.execution.getAutoExecutionType();
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public final void setAutoExecutionServices(List<String> actionIds) {
-    if (this.execution != null) {
-      List<String> oldActionIds = null;
-      if (this.execution.getAutoExecutionServices() != null) {
-        oldActionIds = new ArrayList<String>();
-        oldActionIds.addAll(this.execution.getAutoExecutionServices());
-      }
-      this.execution.setAutoExecutionServices(actionIds);
-      sendAttributeChangeNotification("autoExecutionServices", "java.util.ArrayList<java.lang.String>", oldActionIds,
-          actionIds);
-
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public final void setAutoExecutionType(boolean continous) {
-    if (this.execution != null) {
-      final boolean oldValue = this.execution.getAutoExecutionType();
-      this.execution.setAutoExecutionType(continous);
-      sendAttributeChangeNotification("autoExecutionType", "java.lang.boolean", Boolean.valueOf(oldValue),
-          Boolean.valueOf(continous));
-    }
+  public final void setAutoExecutionServices(Map<String, Map<String, Serializable>> autoExecutionServices) {
+	  this.execution.setAutoExecutionServices(autoExecutionServices);
   }
 
   /**

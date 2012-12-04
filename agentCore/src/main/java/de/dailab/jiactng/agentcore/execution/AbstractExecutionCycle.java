@@ -1,6 +1,9 @@
 package de.dailab.jiactng.agentcore.execution;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.management.AttributeChangeNotification;
@@ -34,15 +37,16 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    private int queueSize = 100;
    private LinkedBlockingQueue[] queues = { new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize), new LinkedBlockingQueue<Boolean>(queueSize) };
 
-   private List<String> autoExecutionServices = null;
-
-   private boolean continousAutoExecution = false;
+   protected Map<String, Map<String, Serializable>> autoExecutionServices = null;
+   protected Map<String, Integer> servicesExecutionTimes = null;
 
    /** Class for handling remote agent actions. */
    private RemoteExecutor remoteExecutor;
 
    /** If true, RemoteExecutor will be used, if false something different. */
    private boolean useRemoteExecutor = true;
+   
+   protected long time;
 
    /**
     * During start of the execution cycle an optional remote executor will be created.
@@ -55,7 +59,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    @Override
    public void doStart() throws Exception {
       super.doStart();
-
+      time = System.currentTimeMillis();
       if (thisAgent.getCommunication() == null) {
          log.warn("Could not find CommunicationBean in this agent - RemoteExecutors are disabled!");
          useRemoteExecutor = false;
@@ -379,30 +383,20 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    /**
     * {@inheritDoc}
     */
-   public final void setAutoExecutionServices(List<String> actionIds) {
-      autoExecutionServices = actionIds;
+   public final void setAutoExecutionServices(Map<String, Map<String, Serializable>> autoExecutionServices) {
+      this.autoExecutionServices = autoExecutionServices;
+      servicesExecutionTimes = new HashMap<String, Integer>();
+      for(String actionName : autoExecutionServices.keySet()){
+    	  servicesExecutionTimes.put(actionName, 0);
+      }
    }
 
    /**
     * {@inheritDoc}
     */
-   public final List<String> getAutoExecutionServices() {
+   public final Map<String, Map<String, Serializable>> getAutoExecutionServices() {
       return autoExecutionServices;
 
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   public final void setAutoExecutionType(boolean continous) {
-      continousAutoExecution = continous;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   public final boolean getAutoExecutionType() {
-      return continousAutoExecution;
    }
 
    /**

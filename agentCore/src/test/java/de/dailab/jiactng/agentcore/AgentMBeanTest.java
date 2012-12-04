@@ -219,30 +219,6 @@ public class AgentMBeanTest extends TestCase implements NotificationListener {
 	}
 
 	/**
-	 * Tests if you get <code>null</code> for the names of automatic executed services of the agent by using the JMX interface.
-	 */
-	public void testGetAutoExecutionServices() {
-		try {
-			List<String> names = (List<String>) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "AutoExecutionServices");
-			assertNull("AgentMBean.getAutoExecutionServices is wrong", names);
-		} catch (Exception e) {
-			fail("Error while getting names of automatic executed services of the agent");
-		}
-	}
-
-	/**
-	 * Tests if you get <code>false</code> as type of automatic executed services of the agent by using the JMX interface.
-	 */
-	public void testGetAutoExecutionType() {
-		try {
-			Boolean type = (Boolean) manager.getAttributeOfAgent(nodeRef.getUUID(), agentId, "AutoExecutionType");
-			assertEquals("AgentMBean.getAutoExecutionType is wrong", Boolean.FALSE, type);
-		} catch (Exception e) {
-			fail("Error while getting type of automatic executed services of the agent");
-		}
-	}
-
-	/**
 	 * Tests if the agent can change its lifecycle state by using the JMX interface 
 	 * (stop, cleanup, init, start) and notifications are sent to the listener.
 	 * @see #doAction(String)

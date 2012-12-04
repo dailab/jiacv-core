@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	
+	<bean name = "AutoServiceAgent" parent = "SimpleAgent">
+		<property name = "autoExecutionServices">
+			<map>
+				<entry>
+ 					<key>
+ 						<value>Test</value>
+ 					</key>
+					<map>
+						<entry key = "startTime" value = "10" />
+						<entry key = "intervalTime" value = "3000" />
+						<entry>
+							<key>
+								<value>params</value>
+							</key>
+							<list>
+								<value>1</value>
+								<value>2</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+			</map>
+		</property>
+		<property name = "executionInterval" value = "1"/>
+	</bean>
+</beans>

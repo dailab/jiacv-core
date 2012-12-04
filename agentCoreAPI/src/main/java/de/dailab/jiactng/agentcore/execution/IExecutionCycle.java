@@ -6,7 +6,9 @@
  */
 package de.dailab.jiactng.agentcore.execution;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
@@ -46,24 +48,12 @@ public interface IExecutionCycle extends ILifecycle, Runnable {
 	 * Sets the actions which will be automatically executed.
 	 * @param actionIds the list of action names
 	 */
-  void setAutoExecutionServices(List<String> actionIds);
+  void setAutoExecutionServices(Map<String, Map<String, Serializable>> autoExecutionServices);
   
 	/**
 	 * Gets the actions which are automatically executed.
 	 * @return the list of action names
 	 */
-  List<String> getAutoExecutionServices();
-  
-	/**
-	 * Sets the execution type of the automatic actions.
-	 * @param continous <code>true</code> if the actions will be continuously executed.
-	 */
-  void setAutoExecutionType(boolean continous);
-  
-	/**
-	 * Gets the execution type of the automatic actions.
-	 * @return <code>true</code> if the actions are continuously executed.
-	 */
-  boolean getAutoExecutionType();
+  Map<String, Map<String, Serializable>> getAutoExecutionServices();
   
 }

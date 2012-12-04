@@ -1,6 +1,8 @@
 package de.dailab.jiactng.agentcore;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.openmbean.CompositeData;
@@ -122,25 +124,13 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	 * Sets the auto Execution service ID list.
 	 * @param actionIds IDs of actions, which should be automatically executed.
 	 */
-	void setAutoExecutionServices(List<String> actionIds);
+	void setAutoExecutionServices(Map<String, Map<String, Serializable>> autoExecutionServices);
 	
 	/**
 	 * Returns the auto execution service ID list.
 	 * @return auto execution service list
 	 */
-	List<String> getAutoExecutionServices();
-	
-	/**
-	 * Sets the auto execution type.
-	 * @param continous <code>true</code> if the automatic actions should be continuously executed.
-	 */
-	void setAutoExecutionType(boolean continous);
-	
-	/**
-	 * Gets the auto execution type.
-	 * @return the auto execution type
-	 */
-	boolean getAutoExecutionType();
+	Map<String, Map<String, Serializable>> getAutoExecutionServices();
 	
 	/**
 	 * Gets the Spring configuration XML snippet.

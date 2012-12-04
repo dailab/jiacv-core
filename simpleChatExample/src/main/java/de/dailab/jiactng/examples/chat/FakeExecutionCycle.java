@@ -6,7 +6,10 @@ package de.dailab.jiactng.examples.chat;
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
+
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marcel Patzlaff
@@ -21,20 +24,12 @@ public class FakeExecutionCycle extends AbstractAgentBean implements IExecutionC
 
     }
     
-    public void setAutoExecutionServices(List<String> actionIds) {
+    public void setAutoExecutionServices(Map<String, Map<String, Serializable>> autoExecutionServices) {
       ;
 	  }
 	    
-	  public List<String> getAutoExecutionServices() {
+	  public Map<String, Map<String, Serializable>> getAutoExecutionServices() {
 	    return null;
 	    
-	  }
-	    
-	  public void setAutoExecutionType(boolean continous) {
-	    ;
-	  }
-	    
-	  public boolean getAutoExecutionType() {
-	    return true;
 	  }
 }

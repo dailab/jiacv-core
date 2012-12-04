@@ -133,7 +133,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
   /** Store remote agents. Key is the agent identifier. */
   private Hashtable<String, IAgentDescription>       remoteAgents      = new Hashtable<String, IAgentDescription>();
 
-  // TODO JMX
+  // TODO JMX 
   /** Stores all known agentnodes. Key is the message box address of the node. */
   private Hashtable<String, AgentNodeDescription>    nodes             = new Hashtable<String, AgentNodeDescription>();
 
@@ -249,9 +249,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     if (uuid.equals(myAgentNode)) {
-      localAgents.put(agentDescription.getAid(), agentDescription);
+      synchronized(localAgents) {
+        localAgents.put(agentDescription.getAid(), agentDescription);
+      }
     } else {
-      remoteAgents.put(agentDescription.getAid(), agentDescription);
+      synchronized(remoteAgents) {
+        remoteAgents.put(agentDescription.getAid(), agentDescription);
+      }
     }
     // dump("registerAgent " + agentDescription.getAid());
   }
@@ -266,12 +270,18 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
       return;
     }
 
-    final Object agent = localAgents.remove(aid);
-    if (agent == null) {
-      remoteAgents.remove(aid);
-      // TODO deregister actions
+    synchronized(localAgents) {
+      if(localAgents.containsKey(aid)) {
+        localAgents.remove(aid);
+      } else {
+        synchronized(remoteAgents) {
+          // TODO deregister actions
+          remoteAgents.remove(aid);  
+        }
+      }
     }
     dump("deregisterAgent " + aid);
+    
   }
 
   /**
@@ -295,16 +305,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
       log.error("Cannot find agent: null!");
       return null;
     }
-    for (String key : localAgents.keySet()) {
-      final IAgentDescription agentDescription = localAgents.get(key);
-      if (agentDescription.equals(template)) {
-        return agentDescription;
+    synchronized(localAgents) {
+      for (String key : localAgents.keySet()) {
+        final IAgentDescription agentDescription = localAgents.get(key);
+        if (agentDescription.equals(template)) {
+          return agentDescription;
+        }
       }
     }
-    for (String key : remoteAgents.keySet()) {
-      final IAgentDescription agentDescription = remoteAgents.get(key);
-      if (agentDescription.equals(template)) {
-        return agentDescription;
+    synchronized(remoteAgents) {
+      for (String key : remoteAgents.keySet()) {
+        final IAgentDescription agentDescription = remoteAgents.get(key);
+        if (agentDescription.equals(template)) {
+          return agentDescription;
+        }
       }
     }
     log.warn("Cannot find agent:\n" + template.toString());
@@ -323,10 +337,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
    */
   public List<IAgentDescription> searchAllLocalAgents(IAgentDescription template) {
     final List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
-    for (String key : localAgents.keySet()) {
-      final IAgentDescription agentDescription = localAgents.get(key);
-      if (agentDescription.equals(template)) {
-        agents.add(agentDescription);
+    synchronized(localAgents) {
+      for (String key : localAgents.keySet()) {
+        final IAgentDescription agentDescription = localAgents.get(key);
+        if (agentDescription.equals(template)) {
+          agents.add(agentDescription);
+        }
       }
     }
     return agents;
@@ -338,16 +354,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
   @Override
   public List<IAgentDescription> searchAllAgents(IAgentDescription template) {
     final List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
-    for (String key : localAgents.keySet()) {
-      final IAgentDescription agentDescription = localAgents.get(key);
-      if (agentDescription.equals(template)) {
-        agents.add(agentDescription);
+    synchronized(localAgents) {
+      for (String key : localAgents.keySet()) {
+        final IAgentDescription agentDescription = localAgents.get(key);
+        if (agentDescription.equals(template)) {
+          agents.add(agentDescription);
+        }
       }
     }
-    for (String key : remoteAgents.keySet()) {
-      final IAgentDescription agentDescription = remoteAgents.get(key);
-      if (agentDescription.equals(template)) {
-        agents.add(agentDescription);
+    synchronized(remoteAgents) {
+      for (String key : remoteAgents.keySet()) {
+        final IAgentDescription agentDescription = remoteAgents.get(key);
+        if (agentDescription.equals(template)) {
+          agents.add(agentDescription);
+        }
       }
     }
     return agents;
@@ -378,27 +398,31 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     if (myAgentNode.equals(uuid)) {
-      final boolean success = localActions.add(actionDescription);
-      if (!success) {
-        log.warn("Action to register already registered. Substituting with new action:\n"
-            + actionDescription.toString());
-        localActions.remove(actionDescription);
-        localActions.add(actionDescription);
+      synchronized (localActions) {
+        final boolean success = localActions.add(actionDescription);
+        if (!success) {
+          log.warn("Action to register already registered. Substituting with new action:\n"
+              + actionDescription.toString());
+          localActions.remove(actionDescription);
+          localActions.add(actionDescription);
+        }
       }
     }
 
     else {
-      if (!remoteActions.containsKey(ADDRESS_NAME + "@" + uuid)) {
-        log.error("UUID unknown. Cannot register action!\n" + actionDescription.toString());
-        return;
-      }
-      final Set<IActionDescription> actions = remoteActions.get(ADDRESS_NAME + "@" + uuid);
-      final boolean success = actions.add(actionDescription);
-      if (!success) {
-        log.warn("Action to register already registered. Substituting with new action:\n"
-            + actionDescription.toString());
-        actions.remove(actionDescription);
-        actions.add(actionDescription);
+      synchronized(remoteActions) {
+        if (!remoteActions.containsKey(ADDRESS_NAME + "@" + uuid)) {
+          log.error("UUID unknown. Cannot register action!\n" + actionDescription.toString());
+          return;
+        }
+        final Set<IActionDescription> actions = remoteActions.get(ADDRESS_NAME + "@" + uuid);
+        final boolean success = actions.add(actionDescription);
+        if (!success) {
+          log.warn("Action to register already registered. Substituting with new action:\n"
+              + actionDescription.toString());
+          actions.remove(actionDescription);
+          actions.add(actionDescription);
+        }
       }
     }
     log.info("Registered action:\n" + actionDescription.toString());
@@ -428,17 +452,21 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     if (uuid.equals(myAgentNode)) {
-      if (!localActions.remove(actionDescription)) {
-        log.warn("Cannot deregister action! Unknown action '" + actionDescription.getName() + "'!");
+      synchronized (localActions) {
+        if (!localActions.remove(actionDescription)) {
+          log.warn("Cannot deregister action! Unknown action '" + actionDescription.getName() + "'!");
+        }
       }
     } else {
-      final Set<IActionDescription> ad = remoteActions.get(ADDRESS_NAME + "@" + uuid);
-      if (ad == null) {
-        log.warn("Cannot deregister action! Unknown UUID: " + uuid);
-        return;
-      }
-      if (!ad.remove(actionDescription)) {
-        log.warn("Cannot deregister action! Unknown action:\n" + actionDescription.toString());
+      synchronized(remoteActions) {
+        final Set<IActionDescription> ad = remoteActions.get(ADDRESS_NAME + "@" + uuid);
+        if (ad == null) {
+          log.warn("Cannot deregister action! Unknown UUID: " + uuid);
+          return;
+        }
+        if (!ad.remove(actionDescription)) {
+          log.warn("Cannot deregister action! Unknown action:\n" + actionDescription.toString());
+        }
       }
     }
     dump("deregisterAction " + actionDescription.toString());
@@ -464,16 +492,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     if (uuid.equals(myAgentNode)) {
-      if (!localActions.remove(oldDescription)) {
-        log.warn("Cannot deregister action:\n" + oldDescription.toString());
+      synchronized (localActions) {
+        if (!localActions.remove(oldDescription)) {
+          log.warn("Cannot deregister action:\n" + oldDescription.toString());
+        }
       }
     } else {
-      final Set<IActionDescription> ad = remoteActions.get(ADDRESS_NAME + "@" + uuid);
-      if (ad == null) {
-        log.warn("Cannot deregister action! Unknown UUID: " + uuid);
-      } else {
-        if (!ad.remove(oldDescription)) {
-          log.warn("Cannot deregister action! Unknown action:\n" + oldDescription.toString());
+      synchronized(remoteActions) {
+        final Set<IActionDescription> ad = remoteActions.get(ADDRESS_NAME + "@" + uuid);
+        if (ad == null) {
+          log.warn("Cannot deregister action! Unknown UUID: " + uuid);
+        } else {
+          if (!ad.remove(oldDescription)) {
+            log.warn("Cannot deregister action! Unknown action:\n" + oldDescription.toString());
+          }
         }
       }
     }
@@ -506,19 +538,23 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
       }
     }
 
-    if (localActions.contains(template)) {
-      for (IActionDescription ad : localActions) {
-        if (ad.equals(template)) {
-          return ad;
+    synchronized (localActions) {
+      if (localActions.contains(template)) {
+        for (IActionDescription ad : localActions) {
+          if (ad.equals(template)) {
+            return ad;
+          }
         }
       }
     }
-    for (String nodeAddress : remoteActions.keySet()) {
-      final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
-      if (adset.contains(template)) {
-        for (IActionDescription ad : adset) {
-          if (ad.equals(template)) {
-            return ad;
+    synchronized(remoteActions) {
+      for (String nodeAddress : remoteActions.keySet()) {
+        final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
+        if (adset.contains(template)) {
+          for (IActionDescription ad : adset) {
+            if (ad.equals(template)) {
+              return ad;
+            }
           }
         }
       }
@@ -554,19 +590,23 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
       }
     }
 
-    if (localActions.contains(template)) {
-      for (IActionDescription actionDescription : localActions) {
-        if (actionDescription.equals(template)) {
-          actions.add(actionDescription);
+    synchronized (localActions) {
+      if (localActions.contains(template)) {
+        for (IActionDescription actionDescription : localActions) {
+          if (actionDescription.equals(template)) {
+            actions.add(actionDescription);
+          }
         }
       }
     }
-    for (String nodeAddress : remoteActions.keySet()) {
-      final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
-      if (adset.contains(template)) {
-        for (IActionDescription ad : adset) {
-          if (ad.equals(template)) {
-            actions.add(ad);
+    synchronized(remoteActions) {
+      for (String nodeAddress : remoteActions.keySet()) {
+        final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
+        if (adset.contains(template)) {
+          for (IActionDescription ad : adset) {
+            if (ad.equals(template)) {
+              actions.add(ad);
+            }
           }
         }
       }
@@ -619,13 +659,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
         final String agent = ((Agent) event.getSource()).getAgentId();
 
         final List<IActionDescription> actions = new ArrayList<IActionDescription>();
-        for (IActionDescription action : localActions) {
-          if (action.getProviderDescription().getAid().equals(agent)) {
-            actions.add(action);
+        synchronized (localActions) {
+          for (IActionDescription action : localActions) {
+            if (action.getProviderDescription().getAid().equals(agent)) {
+              actions.add(action);
+            }
           }
-        }
-        for (IActionDescription action : actions) {
-          localActions.remove(action);
+          for (IActionDescription action : actions) {
+            localActions.remove(action);
+          }
         }
 
         deregisterAgent(agent);
@@ -663,10 +705,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     	synchronized(nodes) {
     		final String nodeAddress = senderAddress.getName();
     		if (nodes.containsKey(nodeAddress)) {
-    			log.warn(nodeAddress + " says bye");
-    			removeRemoteAgentOfNode(nodeAddress);
-    			remoteActions.remove(nodeAddress);
-    			nodes.remove(nodeAddress);
+    		  synchronized(remoteActions) {    		  
+      			log.warn(nodeAddress + " says bye");
+      			removeRemoteAgentOfNode(nodeAddress);
+      			remoteActions.remove(nodeAddress);
+      			nodes.remove(nodeAddress);
+    		  }
     		}
     		dump(nodeAddress + " says bye");
     	}
@@ -757,11 +801,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     ICommunicationAddress ret = null;
-    if (nodes.containsKey(ADDRESS_NAME + "@" + uuidOfNode)) {
-      final AgentNodeDescription nodeDescription = nodes.get(ADDRESS_NAME + "@" + uuidOfNode);
-      ret = nodeDescription.getAddress();
+    synchronized(nodes) {
+      if (nodes.containsKey(ADDRESS_NAME + "@" + uuidOfNode)) {
+        final AgentNodeDescription nodeDescription = nodes.get(ADDRESS_NAME + "@" + uuidOfNode);
+        ret = nodeDescription.getAddress();
+      }
     }
-
     return ret;
 
   }
@@ -774,30 +819,34 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
    * @return unmodifiable set with message box address of all known agent nodes.
    */
   public Set<String> getAllKnownAgentNodes() {
-
-    return Collections.unmodifiableSet(nodes.keySet());
-
+    synchronized(nodes) {
+      return Collections.unmodifiableSet(nodes.keySet());
+    }
   }
 
   private void refreshAgentNode(ICommunicationAddress node) {
     final String nodeAddress = node.getName();
-    if (nodes.containsKey(nodeAddress)) {
-    	final long interval = System.currentTimeMillis() - nodes.get(nodeAddress).getAlive();
-    	if (interval > 2*aliveInterval) {
-    		log.warn("Measured interval of receiving alive message from " + nodeAddress + ": " + interval);
-    	}
-      nodes.get(nodeAddress).setAlive(System.currentTimeMillis());
-    } else {
-    	log.warn("New known node " + nodeAddress);
-      final AgentNodeDescription description = new AgentNodeDescription(node, System.currentTimeMillis());
-      nodes.put(nodeAddress, description);
+    synchronized(nodes) {
+      if (nodes.containsKey(nodeAddress)) {
+      	final long interval = System.currentTimeMillis() - nodes.get(nodeAddress).getAlive();
+      	if (interval > 2*aliveInterval) {
+      		log.warn("Measured interval of receiving alive message from " + nodeAddress + ": " + interval);
+      	}
+        nodes.get(nodeAddress).setAlive(System.currentTimeMillis());
+      } else {
+      	log.warn("New known node " + nodeAddress);
+        final AgentNodeDescription description = new AgentNodeDescription(node, System.currentTimeMillis());
+        nodes.put(nodeAddress, description);
+      }
     }
   }
 
   private void refreshAgentNode(ICommunicationAddress node, Set<JMXServiceURL> jmxConnectors) {
     final String nodeAddress = node.getName();
     refreshAgentNode(node);
-    nodes.get(nodeAddress).setJmxURLs(jmxConnectors);
+    synchronized(nodes) {
+      nodes.get(nodeAddress).setJmxURLs(jmxConnectors);
+    }
   }
 
   @Override
@@ -878,18 +927,22 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     final ArrayList<IServiceDescription> ret = new ArrayList<IServiceDescription>();
 
     // find serviceDescriptions in local actions
-    for (IActionDescription localAct : localActions) {
-      if (localAct instanceof IServiceDescription) {
-        ret.add((IServiceDescription) localAct);
+    synchronized (localActions) {    
+      for (IActionDescription localAct : localActions) {
+        if (localAct instanceof IServiceDescription) {
+          ret.add((IServiceDescription) localAct);
+        }
       }
     }
 
     // find serviceDescriptions in remote Actions
-    for (String nodeAddress : remoteActions.keySet()) {
-      final Set<IActionDescription> remoteActSet = remoteActions.get(nodeAddress);
-      for (IActionDescription remoteAct : remoteActSet) {
-        if (remoteAct instanceof IServiceDescription) {
-          ret.add((IServiceDescription) remoteAct);
+    synchronized(remoteActions) {
+      for (String nodeAddress : remoteActions.keySet()) {
+        final Set<IActionDescription> remoteActSet = remoteActions.get(nodeAddress);
+        for (IActionDescription remoteAct : remoteActSet) {
+          if (remoteAct instanceof IServiceDescription) {
+            ret.add((IServiceDescription) remoteAct);
+          }
         }
       }
     }
@@ -926,22 +979,31 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
 
     // find OWL-S ServiceDescriptions and deserialize them by hand
     final Set<IActionDescription> advActions = new HashSet<IActionDescription>();
-    for (IActionDescription iad : localActions) {
-      if (iad.getScope() != ActionScope.GLOBAL) {
-    	  continue;
+    synchronized (localActions) {
+      for (IActionDescription iad : localActions) {
+        if (iad.getScope() != ActionScope.GLOBAL) {
+      	  continue;
+        }
+        if (iad instanceof IServiceDescription) {
+          final IServiceDescription isd = (IServiceDescription) iad;
+          isd.setOntologySource(ontologyStorage.serializeServiceDescription(isd));
+        }
+        advActions.add(iad);
       }
-	  if (iad instanceof IServiceDescription) {
-        final IServiceDescription isd = (IServiceDescription) iad;
-        isd.setOntologySource(ontologyStorage.serializeServiceDescription(isd));
-      }
-      advActions.add(iad);
     }
 
-    final Advertisement ad = new Advertisement(localAgents, advActions);
+    Hashtable<String, IAgentDescription> advAgents = new Hashtable<String, IAgentDescription>();
+    synchronized(localAgents) {
+      advAgents.putAll(localAgents);
+    }
+
+    final Advertisement ad = new Advertisement(advAgents, advActions);
+  
     if (agentNode.getJmxConnectors() != null) {
       ad.setJmxURLs(agentNode.getJmxURLs());
     }
     adMessage.setPayload(ad);
+    
 
     // debug
     final Advertisement payload = (Advertisement) adMessage.getPayload();
@@ -951,6 +1013,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     }
 
     sendMessage(adMessage, destination);
+    
   }
 
   class AgentNodePinger extends TimerTask {
@@ -982,11 +1045,13 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
     	  }
     	  if (deadNodes.size() > 0) {
     		  log.warn("Forget nodes due to missing alive message:\n");
-    		  for (String nodeAddress : deadNodes) {
-    			  log.warn("\t" + nodeAddress);
-    			  remoteActions.remove(nodeAddress);
-    			  removeRemoteAgentOfNode(nodeAddress);
-    			  nodes.remove(nodeAddress);
+    		  synchronized(remoteActions) {
+      		  for (String nodeAddress : deadNodes) {
+      			  log.warn("\t" + nodeAddress);
+      			  remoteActions.remove(nodeAddress);
+      			  removeRemoteAgentOfNode(nodeAddress);
+      			  nodes.remove(nodeAddress);
+      		  }
     		  }
     	  }
       }
@@ -995,14 +1060,16 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
 
   private void removeRemoteAgentOfNode(String nodeAddress) {
     final ArrayList<String> keysToRemove = new ArrayList<String>();
-    for (String key : remoteAgents.keySet()) {
-      final IAgentDescription agent = remoteAgents.get(key);
-      if (nodeAddress.equals(ADDRESS_NAME + "@" + agent.getAgentNodeUUID())) {
-        keysToRemove.add(key);
+    synchronized(remoteAgents) {
+      for (String key : remoteAgents.keySet()) {
+        final IAgentDescription agent = remoteAgents.get(key);
+        if (nodeAddress.equals(ADDRESS_NAME + "@" + agent.getAgentNodeUUID())) {
+          keysToRemove.add(key);
+        }
       }
-    }
-    for (String key : keysToRemove) {
-      remoteAgents.remove(key);
+      for (String key : keysToRemove) {
+        remoteAgents.remove(key);
+      }
     }
   }
 
@@ -1045,28 +1112,30 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
    */
   @Override
   public TabularData getKnownNodes() {
-    if (nodes.isEmpty()) {
-      return null;
-    }
-
-    final Set<Map.Entry<String, AgentNodeDescription>> entries = nodes.entrySet();
-    try {
-      final String[] itemNames = new String[] { "UUID", "description" };
-      final CompositeType nodeType = new CompositeType(entries.iterator().next().getClass().getName(),
-          "agent node description corresponding to an agent node UUID", itemNames, itemNames, new OpenType<?>[] {
-              SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType() });
-      final TabularType type = new TabularType(nodes.getClass().getName(), "node descriptions stored in the directory",
-          nodeType, new String[] { "UUID" });
-      final TabularData data = new TabularDataSupport(type);
-      for (Map.Entry<String, AgentNodeDescription> node : entries) {
-        final CompositeData nodeData = new CompositeDataSupport(nodeType, itemNames, new Object[] { node.getKey(),
-            node.getValue().getDescription() });
-        data.put(nodeData);
+    synchronized(nodes) {
+      if (nodes.isEmpty()) {
+        return null;
       }
-      return data;
-    } catch (OpenDataException e) {
-      e.printStackTrace();
-      return null;
+  
+      final Set<Map.Entry<String, AgentNodeDescription>> entries = nodes.entrySet();
+      try {
+        final String[] itemNames = new String[] { "UUID", "description" };
+        final CompositeType nodeType = new CompositeType(entries.iterator().next().getClass().getName(),
+            "agent node description corresponding to an agent node UUID", itemNames, itemNames, new OpenType<?>[] {
+                SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType() });
+        final TabularType type = new TabularType(nodes.getClass().getName(), "node descriptions stored in the directory",
+            nodeType, new String[] { "UUID" });
+        final TabularData data = new TabularDataSupport(type);
+        for (Map.Entry<String, AgentNodeDescription> node : entries) {
+          final CompositeData nodeData = new CompositeDataSupport(nodeType, itemNames, new Object[] { node.getKey(),
+              node.getValue().getDescription() });
+          data.put(nodeData);
+        }
+        return data;
+      } catch (OpenDataException e) {
+        e.printStackTrace();
+        return null;
+      }
     }
   }
 
@@ -1075,23 +1144,25 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
    */
   @Override
   public TabularData getLocalActions() {
-    if (localActions.isEmpty()) {
-      return null;
-    }
-
-    try {
-      final TabularType type = new TabularType(localActions.getClass().getName(),
-          "local actions stored in the directory", (CompositeType) localActions.iterator().next().getDescriptionType(),
-          new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTTYPES,
-              IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_AGENT });
-      final TabularData data = new TabularDataSupport(type);
-      for (IActionDescription action : localActions) {
-        data.put((CompositeData) action.getDescription());
+    synchronized (localActions) {
+      if (localActions.isEmpty()) {
+        return null;
       }
-      return data;
-    } catch (OpenDataException e) {
-      e.printStackTrace();
-      return null;
+  
+      try {
+        final TabularType type = new TabularType(localActions.getClass().getName(),
+            "local actions stored in the directory", (CompositeType) localActions.iterator().next().getDescriptionType(),
+            new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTTYPES,
+                IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_AGENT });
+        final TabularData data = new TabularDataSupport(type);
+        for (IActionDescription action : localActions) {
+          data.put((CompositeData) action.getDescription());
+        }
+        return data;
+      } catch (OpenDataException e) {
+        e.printStackTrace();
+        return null;
+      }
     }
   }
 
@@ -1100,28 +1171,30 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
    */
   @Override
   public TabularData getLocalAgents() {
-    if (localAgents.isEmpty()) {
-      return null;
-    }
-
-    final Set<Map.Entry<String, IAgentDescription>> entries = localAgents.entrySet();
-    try {
-      final String[] itemNames = new String[] { "Agent ID", "description" };
-      final CompositeType agentType = new CompositeType(entries.iterator().next().getClass().getName(),
-          "local agent description corresponding to an agent id", itemNames, itemNames, new OpenType<?>[] {
-              SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType() });
-      final TabularType type = new TabularType(localAgents.getClass().getName(),
-          "local agent descriptions stored in the directory", agentType, new String[] { "Agent ID" });
-      final TabularData data = new TabularDataSupport(type);
-      for (Map.Entry<String, IAgentDescription> agent : entries) {
-        final CompositeData agentData = new CompositeDataSupport(agentType, itemNames, new Object[] { agent.getKey(),
-            agent.getValue().getDescription() });
-        data.put(agentData);
+    synchronized(localAgents) {
+      if (localAgents.isEmpty()) {
+        return null;
       }
-      return data;
-    } catch (OpenDataException e) {
-      e.printStackTrace();
-      return null;
+  
+      final Set<Map.Entry<String, IAgentDescription>> entries = localAgents.entrySet();
+      try {
+        final String[] itemNames = new String[] { "Agent ID", "description" };
+        final CompositeType agentType = new CompositeType(entries.iterator().next().getClass().getName(),
+            "local agent description corresponding to an agent id", itemNames, itemNames, new OpenType<?>[] {
+                SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType() });
+        final TabularType type = new TabularType(localAgents.getClass().getName(),
+            "local agent descriptions stored in the directory", agentType, new String[] { "Agent ID" });
+        final TabularData data = new TabularDataSupport(type);
+        for (Map.Entry<String, IAgentDescription> agent : entries) {
+          final CompositeData agentData = new CompositeDataSupport(agentType, itemNames, new Object[] { agent.getKey(),
+              agent.getValue().getDescription() });
+          data.put(agentData);
+        }
+        return data;
+      } catch (OpenDataException e) {
+        e.printStackTrace();
+        return null;
+      }
     }
   }
 
@@ -1167,28 +1240,30 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements IDi
    */
   @Override
   public TabularData getRemoteAgents() {
-    if (remoteAgents.isEmpty()) {
-      return null;
-    }
-
-    final Set<Map.Entry<String, IAgentDescription>> entries = remoteAgents.entrySet();
-    try {
-      final String[] itemNames = new String[] { "Agent ID", "description" };
-      final CompositeType agentType = new CompositeType(entries.iterator().next().getClass().getName(),
-          "remote agent description corresponding to an agent id", itemNames, itemNames, new OpenType<?>[] {
-              SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType() });
-      final TabularType type = new TabularType(remoteAgents.getClass().getName(),
-          "remote agent descriptions stored in the directory", agentType, new String[] { "Agent ID" });
-      final TabularData data = new TabularDataSupport(type);
-      for (Map.Entry<String, IAgentDescription> agent : entries) {
-        final CompositeData agentData = new CompositeDataSupport(agentType, itemNames, new Object[] { agent.getKey(),
-            agent.getValue().getDescription() });
-        data.put(agentData);
+    synchronized(remoteAgents) {
+      if (remoteAgents.isEmpty()) {
+        return null;
       }
-      return data;
-    } catch (OpenDataException e) {
-      e.printStackTrace();
-      return null;
+  
+      final Set<Map.Entry<String, IAgentDescription>> entries = remoteAgents.entrySet();
+      try {
+        final String[] itemNames = new String[] { "Agent ID", "description" };
+        final CompositeType agentType = new CompositeType(entries.iterator().next().getClass().getName(),
+            "remote agent description corresponding to an agent id", itemNames, itemNames, new OpenType<?>[] {
+                SimpleType.STRING, entries.iterator().next().getValue().getDescriptionType() });
+        final TabularType type = new TabularType(remoteAgents.getClass().getName(),
+            "remote agent descriptions stored in the directory", agentType, new String[] { "Agent ID" });
+        final TabularData data = new TabularDataSupport(type);
+        for (Map.Entry<String, IAgentDescription> agent : entries) {
+          final CompositeData agentData = new CompositeDataSupport(agentType, itemNames, new Object[] { agent.getKey(),
+              agent.getValue().getDescription() });
+          data.put(agentData);
+        }
+        return data;
+      } catch (OpenDataException e) {
+        e.printStackTrace();
+        return null;
+      }
     }
   }
 }

@@ -1044,7 +1044,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * @return the time between to pings
 	 */
 	public long getAliveInterval(String groupName) {
-		return aliveIntervals.get(groupName);
+		if(groupName == null) {
+		    return aliveInterval;
+		} else {
+		    return aliveIntervals.get(groupName);
+		}
 	}
 
 	/**

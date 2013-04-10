@@ -234,6 +234,13 @@ public final class JiacMessage implements IJiacMessage {
 
       return null;
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   public String getGroup(){
+	   return getHeader(Header.GROUP);
+   }
 
    /**
     * {@inheritDoc}
@@ -267,6 +274,14 @@ public final class JiacMessage implements IJiacMessage {
     */
    public void setSender(ICommunicationAddress sender) {
       setHeader(Header.SENDER, sender != null ? sender.toString() : null);
+   }
+   
+   /**
+    * Set the group of this message.
+    * @param sender the communication address of the sender
+    */
+   public void setGroup(String group) {
+      setHeader(Header.GROUP, group);
    }
 
    /**

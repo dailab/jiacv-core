@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	
+	<bean name = "DirectoryNodeBean1" parent="NodeWithJMX">
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="StandardJMSBroker"/>
+				<ref bean="DirectoryNodeBean" />
+			</list>
+		</property>
+	</bean>
+	
+		<bean name="DirectoryNodeBean" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanStub" singleton="false">
+		<property name= "group" >
+			<list>
+				<value>group1</value>
+				<value>group2</value>
+			</list>
+		</property>
+		<property name="messageTransport">
+			<ref bean="StandardJMSMessageTransport" />
+		</property>
+		<property name = "aliveIntervals">
+			<map>
+				<entry key = "group1" value = "2000"/>
+				<entry key = "group2" value = "4000"/>
+			</map>
+		</property>
+		<property name = "advertiseIntervals">
+			<map>
+				<entry key = "group1" value = "7000"/>
+				<entry key = "group2" value = "8000"/>
+			</map>
+		</property>
+	</bean>
+</beans>

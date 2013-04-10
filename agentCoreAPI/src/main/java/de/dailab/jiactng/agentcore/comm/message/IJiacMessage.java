@@ -34,6 +34,9 @@ public interface IJiacMessage extends IFact, JmxDescriptionSupport {
 
     	/** Key of the message header field which defines the sender of the message. */
         String SENDER= "JiacTNGSenderAddress";
+        
+        /** Key of the message header field which defines the group of the message. */
+        String GROUP= "JiacTNGGroupAddress";
 
         /** Key of the message header field which defines the protocol of the message. */
         String PROTOCOL= "JiacTNGProtocolID";
@@ -60,6 +63,13 @@ public interface IJiacMessage extends IFact, JmxDescriptionSupport {
 	 * @return the address from where the Message is sent.
 	 */
 	ICommunicationAddress getSender();
+	
+	/**
+	 * Of which group this Message was sent?
+	 * 
+	 * @return the group address from where the Message is sent.
+	 */
+	String getGroup();
 
 	/**
 	 * Gets the address to which replies should be send.

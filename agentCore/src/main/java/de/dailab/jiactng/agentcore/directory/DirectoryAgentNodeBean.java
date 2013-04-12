@@ -951,7 +951,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			if (nodes.containsKey(nodeAddress)) {
 				final long interval = System.currentTimeMillis()
 						- nodes.get(nodeAddress).getAlive();
-				if (interval > 2 * getAliveInterval(groupAddress)) {
+				long aliveInterval = groupAddress != null? getAliveInterval(groupAddress) : getAliveInterval();
+				if (interval > 2 * aliveInterval) {
 					log.warn("Measured interval of receiving alive message from "
 							+ nodeAddress + ": " + interval);
 				}
@@ -1028,8 +1029,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	public void setAliveIntervals(HashMap<String, Long> aliveIntervals) {
 		this.aliveIntervals = new HashMap<String, Long>();
 		for (String key : aliveIntervals.keySet()) {
-			this.aliveIntervals.put("df@" + key,
-					aliveIntervals.get(key));
+			this.aliveIntervals.put("df@" + key, aliveIntervals.get(key));
 		}
 	}
 
@@ -1044,11 +1044,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * @return the time between to pings
 	 */
 	public long getAliveInterval(String groupName) {
-		if(groupName == null) {
-		    return aliveInterval;
-		} else {
-		    return aliveIntervals.get(groupName);
-		}
+		return aliveIntervals.get(groupName);
 	}
 
 	/**
@@ -1245,7 +1241,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			synchronized (nodes) {
 				final Set<String> deadNodes = new HashSet<String>();
 				for (String key : nodes.keySet()) {
-					if (nodes.get(key).getAlive() < (System.currentTimeMillis() - 5 * getAliveInterval(groupAddress.toUnboundAddress().getName()))) {
+					if (nodes.get(key).getAlive() < (System.currentTimeMillis() - 5 * getAliveInterval(groupAddress
+							.toUnboundAddress().getName()))) {
 						deadNodes.add(key);
 					}
 				}

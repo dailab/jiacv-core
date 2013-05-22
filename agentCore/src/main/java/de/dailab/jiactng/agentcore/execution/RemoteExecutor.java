@@ -77,8 +77,10 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 
 					if (message.getPayload() instanceof DoAction) {
 						final DoAction doAction = (DoAction) message.getPayload();
-						final Action localAction = (Action) memory.read(doAction.getAction());
-						
+						Action a = new Action((Action)doAction.getAction());
+						a.setProviderDescription(((Action)doAction.getAction()).getProviderDescription());
+						final Action localAction = (Action) memory.read(a);
+
 						if (localAction != null) {
 							final DoAction localDoAction = localAction.createDoAction(doAction.getSession(), doAction.getParams(), this);
 							localInvocations.put(localDoAction.getSessionId(), message);	

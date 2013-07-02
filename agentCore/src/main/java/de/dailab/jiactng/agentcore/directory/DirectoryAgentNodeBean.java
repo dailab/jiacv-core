@@ -206,13 +206,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				groupAddresses.add(groupAddress);
 				log.info("groupAddress=" + groupAddress);
 				if (aliveIntervals.get(name) == null) {
-					aliveIntervals.put("df@"
-							+ groupAddress.toUnboundAddress().getName(),
+					aliveIntervals.put(groupAddress.toUnboundAddress().getName(),
 							aliveInterval);
 				}
 				if (advertiseIntervals.get(name) == null) {
-					advertiseIntervals.put("df@"
-							+ groupAddress.toUnboundAddress().getName(),
+					advertiseIntervals.put(groupAddress.toUnboundAddress().getName(),
 							advertiseInterval);
 				}
 			}

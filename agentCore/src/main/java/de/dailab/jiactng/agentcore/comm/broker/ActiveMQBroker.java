@@ -10,7 +10,10 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
+import org.apache.activemq.network.DiscoveryNetworkConnector;
 import org.apache.activemq.network.NetworkConnector;
+import org.apache.activemq.transport.TransportFactory;
+import org.apache.activemq.transport.TransportServer;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
@@ -138,24 +141,28 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
             }
 
             log.debug("embedded broker initializing transport:: " + amtc.toString());
-            if (amtc.getNetworkURI() != null) {
+            if (amtc.getTransportURI() != null) {
+                TransportServer transportServer = TransportFactory.bind(_broker, new URI(amtc.getTransportURI()));
+                final TransportConnector connector = new TransportConnector(transportServer);
+                connector.setName(amtc.getName());
+                _broker.addConnector(connector);
+                if (amtc.getDiscoveryURI() != null) {
+                   final URI uri = new URI(amtc.getDiscoveryURI());
+                   final URI discoveryURI = new URI(amtc.getDiscoveryURI());
+                   connector.setDiscoveryUri(discoveryURI);
+                   // no such method in 5.3 connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
+                   final NetworkConnector networkConnector = new SourceAwareDiscoveryNetworkConnector(uri);
+                   networkConnector.setName(amtc.getName());
+                   networkConnector.setNetworkTTL(_networkTTL);
+                   _broker.addNetworkConnector(networkConnector);
+                }
+             }else if (amtc.getNetworkURI() != null) {
                final URI networkUri = new URI(amtc.getNetworkURI());
-               final NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
+               NetworkConnector networkConnector = new DiscoveryNetworkConnector(networkUri);
+               networkConnector.setName(amtc.getName());
                networkConnector.setDuplex(amtc.isDuplex());
                networkConnector.setNetworkTTL(amtc.getNetworkTTL());
-            }
-
-            if (amtc.getTransportURI() != null) {
-               final TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
-               if (amtc.getDiscoveryURI() != null) {
-                  final URI uri = new URI(amtc.getDiscoveryURI());
-                  final URI discoveryURI = new URI(amtc.getDiscoveryURI());
-                  connector.setDiscoveryUri(discoveryURI);
-                  // no such method in 5.3 connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
-                  final NetworkConnector networkConnector = new SourceAwareDiscoveryNetworkConnector(uri);
-                  networkConnector.setNetworkTTL(_networkTTL);
-                  _broker.addNetworkConnector(networkConnector);
-               }
+               _broker.addNetworkConnector(networkConnector);
             }
          }
 
@@ -309,7 +316,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
       // register message transport for management
       try {
-         _manager.registerAgentNodeBeanResource(this, getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE, "\"" + connector.getTransportURI() + "\"", connector);
+         _manager.registerAgentNodeBeanResource(this, getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE, "\"" + connector.getName() + ":" + connector.getTransportURI() + "\"", connector);
       } catch (Exception e) {
          if ((log != null) && (log.isErrorEnabled())) {
             log.error("WARNING: Unable to register transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.",e);

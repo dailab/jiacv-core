@@ -18,9 +18,8 @@ public class DirectoryAgentBeanGroupTest {
 	private DirectoryAgentNodeBeanStub directoryAgentNodeBeanStub2 = null;
 	private DirectoryAgentNodeBeanStub directoryAgentNodeBeanStub3 = null;
 	
-	private final String PATH_TO_NODE_CONFIG = "de/dailab/jiactng/agentcore/directory/";
+	private final static String PATH_TO_NODE_CONFIG = "de/dailab/jiactng/agentcore/directory/";
 
-	@Before
 	public void init() {
 		node1 = (SimpleAgentNode) new ClassPathXmlApplicationContext(
 				PATH_TO_NODE_CONFIG + "DirectoryNodeBean1.xml")
@@ -41,9 +40,9 @@ public class DirectoryAgentBeanGroupTest {
 		directoryAgentNodeBeanStub3 = node3.findAgentNodeBean(DirectoryAgentNodeBeanStub.class);
 	}
 	
-	
 	@Test
 	public void notLostTestAndSendingMessagesCorrect(){
+		init();
 		try {
 			Thread.sleep(10000);
 		} catch (InterruptedException e) {
@@ -181,6 +180,7 @@ public class DirectoryAgentBeanGroupTest {
 		
 		assertTrue(node3ReceivesCorrect);
 	}
+
 	
 	@After
 	public void clean(){

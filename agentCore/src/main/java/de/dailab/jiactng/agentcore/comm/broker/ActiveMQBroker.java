@@ -152,17 +152,17 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
              }
             if (amtc.getTransportURI() != null) {
             	final TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
-                if (amtc.getDiscoveryURI() != null && 
-                		_broker.getNetworkConnectorByName("SourceAwareDiscoveryNetworkConnector:" + amtc.getDiscoveryURI()) == null) {
+                if (amtc.getDiscoveryURI() != null) {
                    final URI uri = new URI(amtc.getDiscoveryURI());
                    final URI discoveryURI = new URI(amtc.getDiscoveryURI());
                    connector.setDiscoveryUri(discoveryURI);
                    // no such method in 5.3 connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
-                   final NetworkConnector networkConnector = new SourceAwareDiscoveryNetworkConnector(uri);
-                   networkConnector.setNetworkTTL(_networkTTL);
-                   _broker.addNetworkConnector(networkConnector);
+                   if(_broker.getNetworkConnectorByName("SourceAwareDiscoveryNetworkConnector:" + amtc.getDiscoveryURI()) == null){
+	                   final NetworkConnector networkConnector = new SourceAwareDiscoveryNetworkConnector(uri);
+	                   networkConnector.setNetworkTTL(_networkTTL);
+	                   _broker.addNetworkConnector(networkConnector);
+                   }
                 }
-
              }
          }
 

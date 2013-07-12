@@ -10,7 +10,10 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
+import org.apache.activemq.network.DiscoveryNetworkConnector;
 import org.apache.activemq.network.NetworkConnector;
+import org.apache.activemq.transport.TransportFactory;
+import org.apache.activemq.transport.TransportServer;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
@@ -136,27 +139,31 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
             if (agentNode.getOverwriteDiscoveryURI() != null) {
                amtc.setDiscoveryURI(agentNode.getOverwriteDiscoveryURI());
             }
-
             log.debug("embedded broker initializing transport:: " + amtc.toString());
+            
+            
             if (amtc.getNetworkURI() != null) {
-               final URI networkUri = new URI(amtc.getNetworkURI());
-               final NetworkConnector networkConnector = _broker.addNetworkConnector(networkUri);
-               networkConnector.setDuplex(amtc.isDuplex());
-               networkConnector.setNetworkTTL(amtc.getNetworkTTL());
-            }
-
+                final URI networkUri = new URI(amtc.getNetworkURI());
+                NetworkConnector networkConnector = new DiscoveryNetworkConnector(networkUri);
+                networkConnector.setName(amtc.getName());
+                networkConnector.setDuplex(amtc.isDuplex());
+                networkConnector.setNetworkTTL(amtc.getNetworkTTL());
+                _broker.addNetworkConnector(networkConnector);
+             }
             if (amtc.getTransportURI() != null) {
-               final TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
-               if (amtc.getDiscoveryURI() != null) {
-                  final URI uri = new URI(amtc.getDiscoveryURI());
-                  final URI discoveryURI = new URI(amtc.getDiscoveryURI());
-                  connector.setDiscoveryUri(discoveryURI);
-                  // no such method in 5.3 connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
-                  final NetworkConnector networkConnector = new SourceAwareDiscoveryNetworkConnector(uri);
-                  networkConnector.setNetworkTTL(_networkTTL);
-                  _broker.addNetworkConnector(networkConnector);
-               }
-            }
+            	final TransportConnector connector = _broker.addConnector(new URI(amtc.getTransportURI()));
+                if (amtc.getDiscoveryURI() != null && 
+                		_broker.getNetworkConnectorByName("SourceAwareDiscoveryNetworkConnector:" + amtc.getDiscoveryURI()) == null) {
+                   final URI uri = new URI(amtc.getDiscoveryURI());
+                   final URI discoveryURI = new URI(amtc.getDiscoveryURI());
+                   connector.setDiscoveryUri(discoveryURI);
+                   // no such method in 5.3 connector.getDiscoveryAgent().setBrokerName(_broker.getBrokerName());
+                   final NetworkConnector networkConnector = new SourceAwareDiscoveryNetworkConnector(uri);
+                   networkConnector.setNetworkTTL(_networkTTL);
+                   _broker.addNetworkConnector(networkConnector);
+                }
+
+             }
          }
 
       } catch (Exception e) {
@@ -309,7 +316,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
       // register message transport for management
       try {
-         _manager.registerAgentNodeBeanResource(this, getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE, "\"" + connector.getTransportURI() + "\"", connector);
+         _manager.registerAgentNodeBeanResource(this, getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE, "\"" + connector.getName() + ":" + connector.getTransportURI() + "\"", connector);
       } catch (Exception e) {
          if ((log != null) && (log.isErrorEnabled())) {
             log.error("WARNING: Unable to register transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.",e);

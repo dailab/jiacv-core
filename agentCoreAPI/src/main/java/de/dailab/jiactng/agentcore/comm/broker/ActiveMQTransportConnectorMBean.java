@@ -80,5 +80,17 @@ public interface ActiveMQTransportConnectorMBean {
 	 * @param newNetworkTTL the TTL to set
 	 */
 	void setNetworkTTL(int newNetworkTTL);
+	
+	/**
+	 * Get name of the network connector.
+	 * @return the name
+	 */
+	String getName();
+	
+	/**
+	 * Set name of the network connector.
+	 * @param name to set
+	 */
+	void setName(String name);
 
 }

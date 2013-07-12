@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+	
+	<bean name = "DirectoryNode2" parent="NodeWithJMX">
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="GatewayBroker"/>
+				<!-- <ref bean="StandardJMSBroker"/> -->
+				<ref bean="DirectoryNodeBean" />
+			</list>
+		</property>
+		<property name= "agents" >
+		<list>
+			<ref bean = "Agent2" />
+		</list>
+		</property>
+		<property name="overwriteDiscoveryURI" value="smartmulticast://default?group=Y" />
+	</bean>
+	
+	 	<bean name = "Agent2" parent = "SimpleAgent">
+		<property name = "agentBeans">
+			<list>
+				<ref bean = "AgentBean2"/>
+			</list>
+		</property>
+		<property name = "executionInterval" value = "1"/>
+	</bean>
+	<bean name ="AgentBean2" class = "de.dailab.jiactng.agentcore.directory.AgentBean2">
+			<property name = "executeInterval" value="1"/>
+	</bean>
+	   
+		<bean name="DirectoryNodeBean" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" singleton="false">
+		<property name= "group" >
+			<list>
+				<value>groupA</value>
+			</list>
+		</property>
+		<property name="messageTransport">
+			<ref bean="StandardJMSMessageTransport" />
+		</property>
+	</bean>
+	
+	<bean name="GatewayBroker"
+		class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker"
+		singleton="false" lazy-init="true">
+
+		<property name="persistent" value="false" />
+		<property name="connectors">
+			<set>
+				<ref bean="GatewayConnector1" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean name="GatewayConnector1"
+		class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQTransportConnector"
+		singleton="false" lazy-init="true">
+
+		<property name="networkURI" value="static:(failover:(tcp://130.149.154.43:45678))" />
+		<property name="duplex" value="true" />
+		<property name="networkTTL" value="255" />
+		<property name="transportURI" value="tcp://0.0.0.0:0" />
+	</bean>
+</beans>

@@ -13,6 +13,7 @@ public class ActiveMQTransportConnector implements ActiveMQTransportConnectorMBe
     private String transportURI= null;
     private String networkURI = null;
 	private String discoveryURI= null;
+	private String name = "NC";
 	private boolean duplex = true;
 	private int networkTTL = 20;
 
@@ -84,6 +85,22 @@ public class ActiveMQTransportConnector implements ActiveMQTransportConnectorMBe
 	 */
 	public void setNetworkTTL(int newNetworkTTL) {
 		networkTTL = newNetworkTTL;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**

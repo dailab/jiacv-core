@@ -439,7 +439,7 @@ public class Session implements IFact {
    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
      ois.defaultReadObject();
      Long timePassed = (Long)ois.readObject();
-     creationTime = Long.valueOf(System.currentTimeMillis() - timePassed);
+     creationTime = Long.valueOf(System.currentTimeMillis() - timePassed.longValue());
    }
     
    

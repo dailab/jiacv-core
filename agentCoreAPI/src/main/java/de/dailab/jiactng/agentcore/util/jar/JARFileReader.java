@@ -90,6 +90,7 @@ public class JARFileReader extends ClassLoader {
         }
       }
 
+      // FIXME: this is a potential NPE when no ".jar" is found in the current archive!
       final String pathToTmpFile = tempFile.getAbsolutePath();
       FileOutputStream out = null;
 

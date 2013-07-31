@@ -135,20 +135,20 @@ class JMSReceiver implements MessageListener {
         }
     }
 
-    /**
-     * stops receiving Messages from all enlisted Destinations.
-     */
-    public synchronized void stopListenAll() {
-        for (MessageConsumer consumer : consumers.values()) {
-            destroyConsumer(consumer);
-        }
-
-        consumers.clear();
-
-        if (log.isDebugEnabled()) {
-            log.debug("Stopped Listening to all JMS Addresses");
-        }
-    }
+//    /**
+//     * stops receiving Messages from all enlisted Destinations.
+//     */
+//    public synchronized void stopListenAll() {
+//        for (MessageConsumer consumer : consumers.values()) {
+//            destroyConsumer(consumer);
+//        }
+//
+//        consumers.clear();
+//
+//        if (log.isDebugEnabled()) {
+//            log.debug("Stopped Listening to all JMS Addresses");
+//        }
+//    }
     
     /**
      * if a message arrives it is handed over the the delegate in the superior MessageTransport.

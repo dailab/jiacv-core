@@ -149,27 +149,24 @@ public class AgentQuickStarter {
 	 * Start the Node and the Agent after preparation
 	 */
 	public void start() {
-
 		/* capsuling the configuration parameters */
 		ConfigParamters paramters = new ConfigParamters(numberOfAgents,
 				executeInterval, nodeName, agentName);
 		/* create temporary file */
-		File tempFile = null;
 		try {
-			tempFile = File.createTempFile("temp", ".xml");
+		    File tempFile = File.createTempFile("temp", ".xml");
+			tempFile.deleteOnExit();
+			
+			/* copy template file and prepare the new spring configuration */
+			TemplateHandler templateHandler = new TemplateHandler();
+			templateHandler.copyTemplateFileInTempFile(tempFile);
+			templateHandler.prepareConfiguration(tempFile, paramters, agentBeans);
+			
+			/* start the node with created spring configuration */
+			new FileSystemXmlApplicationContext("file:" + tempFile.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		tempFile.deleteOnExit();
-
-		/* copy template file and prepare the new spring configuration */
-		TemplateHandler templateHandler = new TemplateHandler();
-		templateHandler.copyTemplateFileInTempFile(tempFile);
-		templateHandler.prepareConfiguration(tempFile, paramters, agentBeans);
-
-		/* start the node with created spring configuration */
-		new FileSystemXmlApplicationContext("file:"
-				+ tempFile.getAbsolutePath());
 	}
 
 	/**
@@ -246,7 +243,9 @@ public class AgentQuickStarter {
 				e3.printStackTrace();
 			} finally {
 				try {
-					bfw.close();
+				    if(bfw != null) {
+				        bfw.close();
+				    }
 				} catch (IOException e4) {
 					e4.printStackTrace();
 				}

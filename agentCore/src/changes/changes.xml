@@ -1,165 +1,248 @@
-<document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="http://www.cs.tu-berlin.de/%7Esmarqoo/maven-changes.xsd">
+<document xmlns="http://maven.apache.org/changes/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
 	<properties>
 		<title>Changes</title>
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-    <release version="5.1.4" date="t.b.a" description="Minor release">
-    </release>	
-    <release version="5.1.3" date="2012-09-21" description="Minor release">
-  	  <action dev="keiser" type="change">
-  			  "Changed timer of advertisements for inital send of advertisements."
-  		</action>    	
-      <action dev="keiser" type="fix">
-  			  "Fixed NPE when requesting actions via JMX interface."
-  		</action>    	
-  		<action dev="keiser" type="fix">
-  			  "Fixed removal of remote agents from directory."
-  		</action>    	
-      <action dev="moekon" type="update">
-  			  "Changed Spring version to 3.0.3.RELEASE."
-  		</action>
-    	<action dev="moekon" type="add">
-  			  "Added experimental SimpleMessageTransport that works only within a JVM and allows to omit the activeMQ libraries."
-  		</action>
-    </release>
-	  <release version="5.1.2" date="2012-03-29" description="Minor release">
-  	<action dev="keiser" type="update">
-			  "Also static network connectors used for the identification of the platform name."
-		</action>
-  	<action dev="moekon" type="add">
-			  "Added logging to memory. For Loglevel.DEBUG, the memory now logs all accesses (read, write, update). There is also a new flag named logAgentcore, which enables/disables logging of accesses from agentcore."
-		</action>
-  	<action dev="luetze" type="add">
-			  "Added AgentQuickStarter Class for Bean testing"
-		</action>
-		<action dev="kuester" type="fix">
-			"added warning when using @expose tags without extending method exposing bean"
-		</action>
-		<action dev="moekon" type="change">
-			  "Changed serialization of Session.java to accomodate for time differences of machines - Serialization is incompatible with older versions"
-			</action>	
-	    <action dev="moekon" type="change">
-				"Changed default executionInterval for agents to 1ms (from 10ms)"
-			</action>	
-	    <action dev="moekon" type="fix">
-				"Fixed memory leak in RemoteExecutor"
-			</action>	
+		<release version="5.1.5" date="t.b.a" description="Minor release">
+			<action dev="masuch" type="add">
+				Added additional group configuration for DirectoryAgentNode. Now the node
+				can be in more than one group. Additionally, also the Gatewaybroker
+				can have more than one connector.
+				For more details look at:
+				https://wiki.dai-labor.de/ClusterFAC:Gruppenkonfiguration
+			</action>
+		</release>
+		<release version="5.1.4" date="2013-08-01" description="Minor release">
+		</release>
+		<release version="5.1.3" date="2012-09-21" description="Minor release">
+			<action dev="keiser" type="change">
+				"Changed timer of advertisements for
+				inital send of advertisements."
+			</action>
+			<action dev="keiser" type="fix">
+				"Fixed NPE when requesting actions
+				via JMX interface."
+			</action>
+			<action dev="keiser" type="fix">
+				"Fixed removal of remote agents from
+				directory."
+			</action>
+			<action dev="moekon" type="update">
+				"Changed Spring version to
+				3.0.3.RELEASE."
+			</action>
+			<action dev="moekon" type="add">
+				"Added experimental
+				SimpleMessageTransport that works only within a JVM
+				and allows to
+				omit the activeMQ libraries."
+			</action>
+		</release>
+		<release version="5.1.2" date="2012-03-29" description="Minor release">
+			<action dev="keiser" type="update">
+				"Also static network connectors used
+				for the identification of the
+				platform name."
+			</action>
+			<action dev="moekon" type="add">
+				"Added logging to memory. For
+				Loglevel.DEBUG, the memory now logs all
+				accesses (read, write,
+				update). There is also a new flag named
+				logAgentcore, which
+				enables/disables logging of accesses from
+				agentcore."
+			</action>
+			<action dev="luetze" type="add">
+				"Added AgentQuickStarter Class for
+				Bean testing"
+			</action>
+			<action dev="kuester" type="fix">
+				"added warning when using @expose
+				tags without extending method exposing
+				bean"
+			</action>
+			<action dev="moekon" type="change">
+				"Changed serialization of
+				Session.java to accomodate for time differences of
+				machines -
+				Serialization is incompatible with older versions"
+			</action>
+			<action dev="moekon" type="change">
+				"Changed default executionInterval
+				for agents to 1ms (from 10ms)"
+			</action>
+			<action dev="moekon" type="fix">
+				"Fixed memory leak in
+				RemoteExecutor"
+			</action>
 		</release>
 		<release version="5.1.1" date="2011-08-09" description="Minor release">
 			<action dev="moekon" type="NEW">
-				"First prototype of agentRole-usage in agents."
-			</action>	
-      <action dev="moekon" type="change">
-				"The SimpleAgent configuration now contains a CommunicationBean. The Configurations for SimpleAgentWithCommunication and NonBlockingAgentWithCommunication have been removed."
+				"First prototype of agentRole-usage
+				in agents."
 			</action>
-      <action dev="moekon" type="change">
-				"Added new property agent.communication which should be used for the CommunicationBean now. CommunicationBeans in the agentbeans-List are automatically set to this property for this version, but throw a warning. This will however be changed for further releases."
-			</action>			
-      <action dev="axle" type="fix">
-				"thisAgent.searchAction()" and "thisAgent.searchAllActions()" now also return own Actions.
+			<action dev="moekon" type="change">
+				"The SimpleAgent configuration now
+				contains a CommunicationBean. The Configurations for
+				SimpleAgentWithCommunication and NonBlockingAgentWithCommunication
+				have been removed."
 			</action>
-      <action dev="moekon" type="change">
-				"Session class no longer uses a source, all information about affected beans is now in the session-events."
+			<action dev="moekon" type="change">
+				"Added new property
+				agent.communication which should be used for the CommunicationBean
+				now. CommunicationBeans in the agentbeans-List are automatically set
+				to this property for this version, but throw a warning. This will
+				however be changed for further releases."
 			</action>
-      <action dev="moekon" type="change">
-				"Added getMemory() method to Agent-class."
+			<action dev="axle" type="fix">
+				"thisAgent.searchAction()" and
+				"thisAgent.searchAllActions()" now also return own Actions.
 			</action>
-      <action dev="moekon" type="fix">
-				"Both execution cycles now correctly process Session-Timeouts and inform all sources of doActions about the cancelation."
+			<action dev="moekon" type="change">
+				"Session class no longer uses a
+				source, all information about affected beans is now in the
+				session-events."
 			</action>
-      <action dev="moekon" type="fix">
-				"The NonBlockingExecutionCycle now checks if a CommunicationBean is present. If no CommunicationBean is found, usage of RemoteExecutors is disabled."
+			<action dev="moekon" type="change">
+				"Added getMemory() method to
+				Agent-class."
+			</action>
+			<action dev="moekon" type="fix">
+				"Both execution cycles now correctly
+				process Session-Timeouts and inform all sources of doActions about
+				the cancelation."
+			</action>
+			<action dev="moekon" type="fix">
+				"The NonBlockingExecutionCycle now
+				checks if a CommunicationBean is present. If no CommunicationBean is
+				found, usage of RemoteExecutors is disabled."
 			</action>
 		</release>
 		<release version="5.1.0" date="2010-09-29" description="Major release">
 			<action dev="marcel" type="add">
-				New AAMM-based configuration of default agent nodes, message brokers, agents, agent beans and other agent resources.
+				New AAMM-based configuration of
+				default agent nodes, message brokers, agents, agent beans and other
+				agent resources.
 			</action>
 			<action dev="keiser" type="fix">
-				Default spring configurations fixed to avoid creation of zombie agent resources.
+				Default spring configurations fixed
+				to avoid creation of zombie agent resources.
 			</action>
 			<action dev="axle" type="update">
-				Allowed to have more than one message broker per JVM.
+				Allowed to have more than one message
+				broker per JVM.
 			</action>
 			<action dev="keiser" type="add">
-				New management function to change the name of agent nodes.
+				New management function to change
+				the name of agent nodes.
 			</action>
 			<action dev="keiser" type="update">
-				The JMX names of all managed JIAC resources contains the unique ID instead the name of the corresponding agent node.
+				The JMX names of all managed JIAC
+				resources contains the unique ID instead the name of the
+				corresponding agent node.
 			</action>
 			<action dev="kaisers" type="update">
-				Renaming spring configurations of default agent nodes from "Platform" to "Node".
+				Renaming spring configurations of
+				default agent nodes from "Platform" to "Node".
 			</action>
 			<action dev="axle" type="remove">
-				Removed package "de.dailab.jiactng.agentcore.comm.wp" with old implementation of distributed agent and service directory.
+				Removed package
+				"de.dailab.jiactng.agentcore.comm.wp" with old implementation of
+				distributed agent and service directory.
 			</action>
 			<action dev="axle" type="update">
-				Agent nodes and agents use new implementation of distributed agent and service directory in package
-				"de.dailab.jiactng.agentcore.directory" and added management interface to this implementation.
+				Agent nodes and agents use new
+				implementation of distributed agent and service directory in package
+				"de.dailab.jiactng.agentcore.directory" and added management
+				interface to this implementation.
 			</action>
 			<action dev="keiser" type="fix">
-				Some minor changes and fixes (performance, use copied arrays in getters and setters instead of references, 
+				Some minor changes and fixes
+				(performance, use copied arrays in getters and setters instead of
+				references,
 				infinite recursive loop, ...).
 			</action>
 			<action dev="axle" type="update">
 				Upgrade to ActiveMQ 5.3.
 			</action>
 			<action dev="keiser" type="remove">
-				Moved all operational and management interfaces of agentCore to new module agentCoreAPI.
-				Thus, agentCore is now only the implementation of these interfaces.
+				Moved all operational and management
+				interfaces of agentCore to new module agentCoreAPI.
+				Thus, agentCore
+				is now only the implementation of these interfaces.
 			</action>
 		</release>
 		<release version="5.0.5" date="2009-12-03" description="Minor release">
 			<action dev="axle" type="add">
-				New static ActiveMQ broker and network connector configuration.
+				New static ActiveMQ broker and network
+				connector configuration.
 			</action>
 			<action dev="jakob" type="add">
-				New management function to get the description of an agent.
+				New management function to get the
+				description of an agent.
 			</action>
 			<action dev="burkhardt" type="add">
-				New message header field "SEND_TO".
+				New message header field
+				"SEND_TO".
 			</action>
 			<action dev="burkhardt" type="add">
-				New mobility flag within agent description to indicate mobile agents.
+				New mobility flag within agent
+				description to indicate mobile agents.
 			</action>
 			<action dev="jakob" type="add">
-				Added attribute change notifications for agent beans and agents.
+				Added attribute change notifications
+				for agent beans and agents.
 			</action>
 			<action dev="moekon" type="remove">
-				Removed package "de.dailab.jiactng.agentcore.servicediscovery" with old servicediscovery code.
+				Removed package
+				"de.dailab.jiactng.agentcore.servicediscovery" with old
+				servicediscovery code.
 			</action>
 			<action dev="jakob" type="add">
-				Added new management functions for getting the authorization capability of agent beans.
+				Added new management functions for
+				getting the authorization capability of agent beans.
 			</action>
 			<action dev="moekon" type="update">
-				GetActionList() of agents collects the current entries of all agent beans.
+				GetActionList() of agents collects
+				the current entries of all agent beans.
 			</action>
 			<action dev="moekon" type="update">
-				Use new directory search for remote action invocation and to find authorization action.
+				Use new directory search for remote
+				action invocation and to find authorization action.
 			</action>
 			<action dev="moekon" type="fix">
-				Return same hash code for all actions.
+				Return same hash code for all
+				actions.
 			</action>
 			<action dev="jakob" type="update">
-				Start and stop time property of agents is now configurable via Spring.
+				Start and stop time property of
+				agents is now configurable via Spring.
 			</action>
 			<action dev="moekon" type="fix">
-				Do not start agents with an explicit start time when starting agent node.
+				Do not start agents with an explicit
+				start time when starting agent node.
 			</action>
 			<action dev="axle" type="fix">
-				Broker name is unique in the network by using SecureRandom instead of hashCode.
+				Broker name is unique in the network
+				by using SecureRandom instead of hashCode.
 			</action>
 			<action dev="axle" type="remove">
-				Removed classes "DoRemoteAction", "RemoteAction" and "RemoteActionResult".
+				Removed classes "DoRemoteAction",
+				"RemoteAction" and "RemoteActionResult".
 			</action>
 			<action dev="axle" type="add">
 				Added scope of actions.
 			</action>
 			<action dev="axle" type="add">
-				Added package "de.dailab.jiactng.agentcore.directory" with new implementation of distributed agent and service directory
-				containing also service matcher and ontology storage.
+				Added package
+				"de.dailab.jiactng.agentcore.directory" with new implementation of
+				distributed agent and service directory
+				containing also service
+				matcher and ontology storage.
 			</action>
 			<action dev="moekon" type="add">
 				Automatic action invocation.
@@ -167,69 +250,99 @@
 		</release>
 		<release version="5.0.4" date="2009-01-27" description="Minor release">
 			<action dev="keiser" type="update">
-				ActionPerformedNotification contains also the state, result, original user, original provider and original service
-				of the action invocation and overwrites the methods equals() and hashCode().
+				ActionPerformedNotification contains
+				also the state, result, original user, original provider and
+				original service
+				of the action invocation and overwrites the methods
+				equals() and hashCode().
 			</action>
 			<action dev="loeffelholz" type="fix">
-				Revised refreshment of stored agents within service directory.
+				Revised refreshment of stored
+				agents within service directory.
 			</action>
 			<action dev="moekon" type="fix">
-				Service directory uses action template instead of action for checking action presence in memory.
+				Service directory uses action
+				template instead of action for checking action presence in memory.
 			</action>
 			<action dev="marcel" type="new">
-				ActiveMQ broker uses the new network gateway implementation.
+				ActiveMQ broker uses the new network
+				gateway implementation.
 			</action>
 			<action dev="moekon" type="add">
-				Added depth counter to session stack in order to ensure stable handling of sessions in memory.
+				Added depth counter to session stack
+				in order to ensure stable handling of sessions in memory.
 			</action>
 			<action dev="moekon" type="add">
-				Added methods for remote action invocation.
+				Added methods for remote action
+				invocation.
 			</action>
 			<action dev="keiser" type="add">
-				Timer-based start and stop of agents using new integrated TimerMBean of agent node.
+				Timer-based start and stop of agents
+				using new integrated TimerMBean of agent node.
 			</action>
 			<action dev="keiser" type="add">
-				Flexible token-based authorisation for JIAC action invocations.
+				Flexible token-based authorisation
+				for JIAC action invocations.
 			</action>
 			<action dev="keiser" type="update">
-				Creation of agents does not automatically initializes these agents.
+				Creation of agents does not
+				automatically initializes these agents.
 			</action>
 			<action dev="keiser" type="fix">
-				Write session object into memory before and not after invoking doAction().
+				Write session object into memory
+				before and not after invoking doAction().
 			</action>
 			<action dev="keiser" type="add">
-				New package "de.dailab.jiactng.agentcore.execution" also with a non-blocking execution cycle to support 
-				parallel action execution and synchronous action invocation.
+				New package
+				"de.dailab.jiactng.agentcore.execution" also with a non-blocking
+				execution cycle to support
+				parallel action execution and synchronous
+				action invocation.
 			</action>
 			<action dev="keiser" type="add">
-				New management interface for agent workload measurement.
+				New management interface for agent
+				workload measurement.
 			</action>
 			<action dev="keiser" type="add">
-				New package "de.dailab.jiactng.agentcore.management.jmx.client" with extensible management client API for easy management
-				of local or remote JIAC TNG resources.
+				New package
+				"de.dailab.jiactng.agentcore.management.jmx.client" with extensible
+				management client API for easy management
+				of local or remote JIAC TNG
+				resources.
 			</action>
 			<action dev="moekon" type="update">
-				Added new name for logging configuration to avoid conflicts.
+				Added new name for logging
+				configuration to avoid conflicts.
 			</action>
 			<action dev="keiser" type="fix">
-				Remove sessions from memory also for actions without result receiver.
+				Remove sessions from memory also for
+				actions without result receiver.
 			</action>
 			<action dev="marcel" type="fix">
-				AbstractMethodExposingBean writes action results for "void" actions and SimpleExecutionCycle writes action results 
+				AbstractMethodExposingBean writes
+				action results for "void" actions and SimpleExecutionCycle writes
+				action results
 				with failures in case of an exception.
 			</action>
 			<action dev="loeffelholz" type="add">
-				Services are now reliably discovered by using the service directory if they are there, also cross-node.
+				Services are now reliably
+				discovered by using the service directory if they are there, also
+				cross-node.
 			</action>
 			<action dev="keiser" type="add">
-				New Spring property allowing to list the name of actions which should be registered automatically within the service directory.
+				New Spring property allowing to list
+				the name of actions which should be registered automatically within
+				the service directory.
 			</action>
 			<action dev="keiser" type="fix">
-				Disable management of old items and enable management of new items when changing memory, execution cycle or 
+				Disable management of old items and
+				enable management of new items when changing memory, execution cycle
+				or
 				list of agent beans.
 			</action>
 			<action dev="moekon" type="fix">
-				SessionIds are now passed down to sub-services during service usage.
+				SessionIds are now passed down to
+				sub-services during service usage.
 			</action>
 		</release>
 		<release version="5.0.3" date="2008-07-07" description="Minor release">
@@ -238,7 +351,8 @@
 		</release>
 		<release version="5.0.1" date="2007-11-08" description="First release">
 			<action dev="joachim" type="add">
-				Strict mode support added to "de.dailab.jiactng.agentcore.lifecycle.DefaultLifecycleHandler".
+				Strict mode support added to
+				"de.dailab.jiactng.agentcore.lifecycle.DefaultLifecycleHandler".
 			</action>
 		</release>
 	</body>

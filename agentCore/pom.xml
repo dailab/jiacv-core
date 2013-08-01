@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.dailab</groupId>
 		<artifactId>jiactng</artifactId>
-		<version>5.1.4-SNAPSHOT</version>
+		<version>5.1.5-SNAPSHOT</version>
 		</parent>
 	
 	<groupId>de.dailab.jiactng</groupId>
@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>de.dailab.jiactng</groupId>
 			<artifactId>agentCoreAPI</artifactId>
-			<version>5.1.4-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<!-- use Spring dependency from ActiveMQ to avoid multiple versions -->
@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>de.dailab.jiac.net</groupId>
 			<artifactId>gateway</artifactId>
-			<version>5.1.4-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>

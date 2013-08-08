@@ -13,8 +13,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-core</artifactId>
-			<version>5.5.0</version>
+			<artifactId>activemq-all</artifactId>
+			<version>${activemq.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

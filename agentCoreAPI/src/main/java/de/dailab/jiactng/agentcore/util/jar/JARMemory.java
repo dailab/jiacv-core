@@ -8,6 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -24,7 +28,9 @@ public class JARMemory implements JAR, Serializable {
 
     /** Data of jar. * */
     private byte[] jar= new byte[0];
-
+    
+    private Set<String> knownEntries = new TreeSet<String>();
+    
     /**
      * Creates a JAR memory from a JAR file.
      * @param file The JAR file to read from.
@@ -78,6 +84,22 @@ public class JARMemory implements JAR, Serializable {
         }
         
         jar= temp.toByteArray();
+        
+        try {
+            final JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jar));
+            
+            while (jis.available() != 0) {
+                final JarEntry je = jis.getNextJarEntry();
+                if(je != null) {
+                    final String jarEntryName = je.getName();
+                    this.knownEntries.add(jarEntryName);
+                }
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        
+        
     }
 
     /**
@@ -120,21 +142,7 @@ public class JARMemory implements JAR, Serializable {
      * @return <code>true</code> if the entry exists.
      */
     public boolean constainsResource(String resource) {
-        try {
-            final JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jar));
-            
-            while (jis.available() != 0) {
-                final JarEntry je = jis.getNextJarEntry();
-
-                if ((je != null) && je.getName().equals(resource)) {
-                    return true;
-                }
-            }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        }
-        
-        return false;
+        return knownEntries.contains(resource);
     }
 
 	/**
@@ -179,4 +187,5 @@ public class JARMemory implements JAR, Serializable {
     public String toString() {
         return "JARMemory :: " + getJarName();
     }
-}
+    
+ }

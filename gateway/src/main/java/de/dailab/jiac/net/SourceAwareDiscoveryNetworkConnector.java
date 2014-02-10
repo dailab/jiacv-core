@@ -9,7 +9,6 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
-import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.Map;
 

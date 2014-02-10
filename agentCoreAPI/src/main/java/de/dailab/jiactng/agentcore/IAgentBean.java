@@ -49,6 +49,7 @@ public interface IAgentBean extends ILifecycle {
 	String getBeanName();
 
 	/**
+	 * @deprecated
 	 * Getter for Interval by which the execute()-method of the bean is called.
 	 * If non-positive, the execute-method is never called.
 	 * 
@@ -57,6 +58,7 @@ public interface IAgentBean extends ILifecycle {
 	int getExecuteInterval();
 
 	/**
+	 * @deprecated
 	 * Setter for Interval by which the execute()-method of the bean is called.
 	 * If non-positive, the execute-method is never called.
 	 * 
@@ -66,6 +68,25 @@ public interface IAgentBean extends ILifecycle {
 	 */
 	void setExecuteInterval(int newExecuteInterval);
 
+    /**
+     * Getter for Interval by which the execute()-method of the bean is called.
+     * If non-positive, the execute-method is never called.
+     * 
+     * @return the time interval between two calls of the execute()-method.
+     */
+    int getExecutionInterval();
+
+    /**
+     * Setter for Interval by which the execute()-method of the bean is called.
+     * If non-positive, the execute-method is never called.
+     * 
+     * @param newExecuteInterval
+     *            the time interval between two calls of the execute()-method.
+     *            If negative, the method is never called.
+     */
+    void setExecutionInterval(int newExecuteInterval);
+	
+	
 	/**
 	 * The stub for the execute method, that should be implemented by all beans.
 	 * Note: this stub is likely to change, when the Sensor/Effector structure

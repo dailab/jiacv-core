@@ -8,13 +8,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
-import java.util.Set;
 
 import junit.framework.TestCase;
-
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**

@@ -434,7 +434,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     return space.readAll();
   }
 
-  private void logMemoryAccess(String methodName, Class clazz) {
+  private void logMemoryAccess(String methodName, Class<?> clazz) {
     if (log == null) {
       return;
     }

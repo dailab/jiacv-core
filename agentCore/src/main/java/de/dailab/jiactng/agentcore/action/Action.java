@@ -131,14 +131,14 @@ public class Action implements IActionDescription {
         this.setInputTypes(inputTypes);
         if (inputTypes != null) {
             this.inputTypeNames = new ArrayList<String>();
-            for (Class type : inputTypes) {
+            for (Class<?> type : inputTypes) {
                 this.inputTypeNames.add(type.getName());
             }
         }
         this.setResultTypes(resultTypes);
         if (resultTypes != null) {
             this.resultTypeNames = new ArrayList<String>();
-            for (Class type : resultTypes) {
+            for (Class<?> type : resultTypes) {
                 this.resultTypeNames.add(type.getName());
             }
         }

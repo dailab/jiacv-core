@@ -1,7 +1,6 @@
 package de.dailab.jiactng.agentcore;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
-import de.dailab.jiactng.agentcore.action.IMethodExposingBean.Expose;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 
 public class NonFaultyActionAgentBean extends AbstractMethodExposingBean{

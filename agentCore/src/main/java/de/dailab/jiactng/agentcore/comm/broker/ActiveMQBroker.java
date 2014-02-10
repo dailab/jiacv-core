@@ -12,8 +12,6 @@ import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
 import org.apache.activemq.network.DiscoveryNetworkConnector;
 import org.apache.activemq.network.NetworkConnector;
-import org.apache.activemq.transport.TransportFactory;
-import org.apache.activemq.transport.TransportServer;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;

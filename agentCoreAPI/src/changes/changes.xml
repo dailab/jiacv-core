@@ -7,6 +7,15 @@
 	</properties>
 	<body>
 		<release version="5.1.5" date="t.b.a" description="Minor release">
+			<action dev="moekon" type="change">
+				"Changed property for AgentBean execution interval. Name changed from executeInterval to executionInterval - old methods are stil present but deprecated."
+			</action>
+			<action dev="moekon" type="change">
+				"Improved performance of containsResource in the JarMemory class - this should improve classloading for agents that are installed from jars."
+			</action>
+			<action dev="keiser" type="change">
+				"Upgrade log4j dependency from version 1.2.8 to 1.2.17 to be compliant with log4j used by org.eclipse.xtext version 0.7.2."
+			</action>            
 		</release>
 		<release version="5.1.4" date="2013-08-01" description="Minor release">
 		</release>

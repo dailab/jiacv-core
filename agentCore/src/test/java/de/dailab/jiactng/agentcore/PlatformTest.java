@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -105,7 +106,7 @@ public class PlatformTest extends TestCase {
                     builder.append(path);
                 }
             } catch (Exception e) {
-                System.err.println("have to leave out: " + urls);
+                System.err.println("have to leave out: " + Arrays.asList(urls));
             }
         }
 

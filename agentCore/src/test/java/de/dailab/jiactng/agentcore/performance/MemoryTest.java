@@ -100,6 +100,8 @@ public class MemoryTest {
 					"jiactng" + File.separator + "agentcore" + File.separator + "performance" + File.separator 
 					+ "memoryTest" + File.separator + "TestNode1000.xml").getBean("TestNode1000");
 					break;
+			default:
+			    // should not happen
 		}
 	}
 	

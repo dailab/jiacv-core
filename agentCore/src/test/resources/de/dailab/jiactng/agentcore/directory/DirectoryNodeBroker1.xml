@@ -32,7 +32,7 @@
 		<property name="executionInterval" value="1" />
 	</bean>
 	<bean name="AgentBean1" class="de.dailab.jiactng.agentcore.directory.AgentBean1">
-		<property name = "executeInterval" value="1"/>
+		<property name = "executionInterval" value="1"/>
 	</bean>
 
 

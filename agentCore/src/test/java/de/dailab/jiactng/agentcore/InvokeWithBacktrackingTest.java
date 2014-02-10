@@ -56,6 +56,9 @@ public class InvokeWithBacktrackingTest {
 				break;
 			case ONE_FAULTY_AGENT:
 				testNode = "TestNode1Faulty";
+				break;
+			default:
+			    // should not happen
 			
 		}
 		node = (SimpleAgentNode) new ClassPathXmlApplicationContext(PATH_TO_NODE_CONFIG + testNode + ".xml").getBean(testNode);

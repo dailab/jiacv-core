@@ -788,7 +788,10 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     case STARTED:
     case STOPPING:
     case STOPPED:
-    	memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, agentname, null, null, null, null));
+        memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, agentname, null, null, null, null));
+        break;
+    default:        
+        // do nothing
     }
 
     // send notification
@@ -920,6 +923,9 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     case STOPPING:
     case STOPPED:
     	memory.update(new ThisAgentDescription(), new ThisAgentDescription(null, null, owner, null, null, null));
+    	break;
+    default:
+        // do nothing
     }
 
     // send notification

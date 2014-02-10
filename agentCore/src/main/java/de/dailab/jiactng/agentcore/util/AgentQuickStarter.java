@@ -494,8 +494,10 @@ public class AgentQuickStarter {
 				e.printStackTrace();
 			} finally {
 				try {
-					writer.flush();
-					writer.close();
+                    if (writer != null) {
+                        writer.flush();
+					    writer.close();
+                    }
 					System.out.println("Configuration completed!");
 				} catch (IOException e2) {
 					e2.printStackTrace();

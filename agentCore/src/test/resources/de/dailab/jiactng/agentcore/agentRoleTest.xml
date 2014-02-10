@@ -77,7 +77,7 @@
 
 
 	<bean name="NoRoleTestBean" class="de.dailab.jiactng.agentcore.roletest.NoRoleBean"	singleton="false">
-		<property name="executeInterval" value="10"/>
+		<property name="executionInterval" value="10"/>
 	</bean>
 
 	<bean name="RoleTestBeanA" class="de.dailab.jiactng.agentcore.roletest.RoleTestBeanA" singleton="false">

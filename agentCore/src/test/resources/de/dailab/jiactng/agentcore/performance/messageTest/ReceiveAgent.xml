@@ -13,6 +13,6 @@
 		<property name = "executionInterval" value = "1"/>
 	</bean>
 	<bean name = "ReceiveAgentBean" class = "de.dailab.jiactng.agentcore.performance.messageTest.ReceiveAgentBean">
-		<property name = "executeInterval" value = "1"/>
+		<property name = "executionInterval" value = "1"/>
 	</bean>
 </beans>

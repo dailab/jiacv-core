@@ -304,6 +304,8 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
                 }
             }
         }
+        default:
+            // TODO: should not happen         
         }
     }
 

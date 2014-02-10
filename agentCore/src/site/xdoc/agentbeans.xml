@@ -92,8 +92,8 @@
 				</p>
 				<p>
 					AgentBean activated by defining the execution interval through the configuration or by calling
-					<a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBean.html#setExecuteInterval(int)">
-						<code>setExecuteInterval(int)</code>
+					<a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBean.html#setExecutionInterval(int)">
+						<code>setExecutionInterval(int)</code>
 					</a>
 					Active AgentBeans should also override the
 					<a href="apidocs/de/dailab/jiactng/agentcore/AbstractAgentBean.html#execute()">

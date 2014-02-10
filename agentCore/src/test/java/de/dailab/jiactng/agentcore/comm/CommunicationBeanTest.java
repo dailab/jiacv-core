@@ -241,7 +241,10 @@ public class CommunicationBeanTest extends TestCase {
         		assertEquals("Address 2", order._address, _addressList.get(2));
         		assertEquals("Selector 1", order._selector, _selectors.get(1));
         		break;
+        	default:
+        	    // should not happen
         	}
+        	
         }
         
         // now check that all 5 orders are registrationorders and there was no

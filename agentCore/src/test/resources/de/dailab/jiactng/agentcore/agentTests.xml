@@ -31,7 +31,7 @@
 
 	<bean name="dummyBean" class="de.dailab.jiactng.agentcore.DummyBean"
 		singleton="false">
-		<property name="executeInterval" value="500"/>
+		<property name="executionInterval" value="500"/>
 	</bean>
 
 </beans>

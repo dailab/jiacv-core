@@ -543,6 +543,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
                      }
                   }
                   break;
+              default:
+                  // do nothing
             }
          }
       }

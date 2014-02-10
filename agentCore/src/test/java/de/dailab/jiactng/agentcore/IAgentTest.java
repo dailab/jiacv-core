@@ -189,6 +189,7 @@ public class IAgentTest extends TestCase {
 		e.printStackTrace();
 	}
 	
+	assertNotNull(testBean);
 	assertEquals(3, testBean.getSum());
   }
 

@@ -25,11 +25,11 @@ public class AgentRoleUnitTest extends TestCase {
 
   private final static String NODE_NAME        = "AgentRoleTestNode";
 
-  private final static String FIRST_AGENT_NAME = "RoleTestAgent1";
-
-  private final static String SECOND_AGENT_NAME = "RoleTestAgent2";
-  
-  private final static String THIRD_AGENT_NAME = "RoleTestAgent3";
+//  private final static String FIRST_AGENT_NAME = "RoleTestAgent1";
+//
+//  private final static String SECOND_AGENT_NAME = "RoleTestAgent2";
+//  
+//  private final static String THIRD_AGENT_NAME = "RoleTestAgent3";
 
   private SimpleAgentNode     san              = null;
 

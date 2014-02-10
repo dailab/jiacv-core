@@ -8,9 +8,8 @@ import org.springframework.beans.factory.BeanNameAware;
 import de.dailab.jiactng.agentcore.IAgent;
 
 public class AgentGroup implements IAgentGroup, BeanNameAware {
-	private static final long serialVersionUID = 4180693496889986338L;
-
-	private String name;
+	
+    private String name;
 
 	List<IAgent> members = new ArrayList<IAgent>();
 	List<AgentRoleCardinality> structure = new ArrayList<AgentRoleCardinality>();

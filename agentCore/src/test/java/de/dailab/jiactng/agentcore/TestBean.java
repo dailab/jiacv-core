@@ -7,7 +7,10 @@ import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 
 public class TestBean extends AbstractMethodExposingBean implements Serializable{
 
-	private int sum;
+	/** Serial UID */
+    private static final long serialVersionUID = -1605652567777259449L;
+    
+    private int sum;
 	
 	@Expose (name ="Test", scope = ActionScope.GLOBAL)
 	public void method(int a, int b){

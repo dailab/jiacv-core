@@ -124,14 +124,26 @@ public class Action implements IActionDescription {
 	 * @param scope
 	 *           the scope of this action
 	 */
-	public Action(final String name, final IEffector providerBean, final List<Class<?>> inputTypes, final List<Class<?>> resultTypes,
-	      final ActionScope scope) {
-		this.setName(name);
-		this.setProviderBean(providerBean);
-		this.setInputTypes(inputTypes);
-		this.setResultTypes(resultTypes);
-		this.setScope(scope);
-	}
+    public Action(final String name, final IEffector providerBean, final List<Class<?>> inputTypes,
+            final List<Class<?>> resultTypes, final ActionScope scope) {
+        this.setName(name);
+        this.setProviderBean(providerBean);
+        this.setInputTypes(inputTypes);
+        if (inputTypes != null) {
+            this.inputTypeNames = new ArrayList<String>();
+            for (Class type : inputTypes) {
+                this.inputTypeNames.add(type.getName());
+            }
+        }
+        this.setResultTypes(resultTypes);
+        if (resultTypes != null) {
+            this.resultTypeNames = new ArrayList<String>();
+            for (Class type : resultTypes) {
+                this.resultTypeNames.add(type.getName());
+            }
+        }
+        this.setScope(scope);
+    }
 
 	/**
 	 * Copying constructor
@@ -220,7 +232,7 @@ public class Action implements IActionDescription {
 	 * {@inheritDoc}
 	 */
 	public final List<String> getInputTypeNames() {
-		return this.inputTypeNames;
+	    return this.inputTypeNames;
 	}
 
 	/**

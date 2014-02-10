@@ -135,25 +135,24 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 		memory.write(sendDoAction);
 		remoteInvocations.put(doAction.getSessionId(), doAction);
 		
-		final Action act = (Action)doAction.getAction();
+        final Action act = (Action) doAction.getAction();
         try {
-			if ((act.getResultTypes() != null)
-					&& (act.getResultTypes().size() > 0)) {
-				final Session session = doAction.getSession();
-				if (session.getCurrentCallDepth() == null) {
-					session.setCurrentCallDepth(1);
-				} else {
-					session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
-				}
- 	      if(log.isInfoEnabled()) {
-          log.info("Writing session for "+act.getName()+" to memory: "+doAction.getSessionId()+" ("+session.getCurrentCallDepth()+")");
-        }				
-				memory.write(doAction.getSession());
-			}
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            if ((act.getResultTypeNames() != null) && (act.getResultTypeNames().size() > 0)) {
+                final Session session = doAction.getSession();
+                if (session.getCurrentCallDepth() == null) {
+                    session.setCurrentCallDepth(1);
+                } else {
+                    session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
+                }
+                if (log.isInfoEnabled()) {
+                    log.info("Writing session for " + act.getName() + " to memory: " + doAction.getSessionId() + " ("
+                            + session.getCurrentCallDepth() + ")");
+                }
+                memory.write(doAction.getSession());
+            }
+        } catch (Exception e) {
+            log.error("Exception when forwarding remote action: "+act,e);
+        }
 
 	}
 

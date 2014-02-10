@@ -14,6 +14,19 @@
 				For more details look at:
 				https://wiki.dai-labor.de/ClusterFAC:Gruppenkonfiguration
 			</action>
+			<action dev="moekon" type="change">
+        "Changed property for AgentBean execution interval. Name changed from 
+        executeInterval to executionInterval - old methods are stil present but 
+        deprecated."			
+      </action>
+			<action dev="moekon" type="change">
+        "Changed parameter checks in executionCycle from returnTypes to 
+        returnTypeNames to avoid problems with classloading."			
+      </action>
+			<action dev="moekon" type="change">
+        "Changed constructor of Action to make sure that typeNames are always 
+        set for input and output."			
+      </action>
 		</release>
 		<release version="5.1.4" date="2013-08-01" description="Minor release">
 		</release>

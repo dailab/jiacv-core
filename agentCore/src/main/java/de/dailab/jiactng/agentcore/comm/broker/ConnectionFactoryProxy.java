@@ -49,15 +49,18 @@ public final class ConnectionFactoryProxy implements ConnectionFactory {
       return connectionFactory.createConnection(userName, password);
    }
 
-   private void checkConnectionFactory() {
-      if (connectionFactory == null) {
-         synchronized (this) {
-            if (connectionFactory == null) {
-               ActiveMQBroker.initialiseProxy(this);
+    private void checkConnectionFactory() {
+        if (connectionFactory == null) {
+            synchronized (this) {
+                if (connectionFactory == null) {
+                    // TODO: this uses a static method of the ActiveMQBroker
+                    // without checking whether this broker is actually used.
+                    // Needs to be reworked.
+                    ActiveMQBroker.initialiseProxy(this);
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
    public boolean isPersistent() {
       return persistent;

@@ -290,7 +290,8 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getAgentBeanNames()
 	 */
-	public final List<String> getAgentBeanNames() throws IOException, InstanceNotFoundException {
+	@SuppressWarnings("unchecked")
+    public final List<String> getAgentBeanNames() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("AgentBeanNames");
 	}
 
@@ -303,6 +304,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.AgentMBean#getActionNames()
 	 */
+	@SuppressWarnings("unchecked")
 	public final List<String> getActionNames() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("ActionNames");
 	}
@@ -443,6 +445,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 */
+	@SuppressWarnings("unchecked")
 	public final List<String> getAutoExecutionServices() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("AutoExecutionServices");
 	}
@@ -494,6 +497,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node.
 	 * @throws IOException A communication problem occurred when getting the attribute value of the remote agent.
 	 */
+	@SuppressWarnings("unchecked")
 	public List<String> getJarNames() throws InstanceNotFoundException, IOException {
 		return (List<String>) getAttribute("JarNames");
 	}

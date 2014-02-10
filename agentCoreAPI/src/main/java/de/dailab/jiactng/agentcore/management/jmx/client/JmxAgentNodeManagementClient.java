@@ -211,6 +211,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
 	 * @throws InstanceNotFoundException The agent node does not exist.
 	 */
+	@SuppressWarnings("unchecked")
 	public final Set<JMXServiceURL> getJmxURLs() throws IOException, InstanceNotFoundException {
 		return (Set<JMXServiceURL>) getAttribute("JmxURLs");
 	}
@@ -237,6 +238,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#getAgents()
 	 */
+	@SuppressWarnings("unchecked")
 	public final List<String> getAgents() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("Agents");
 	}
@@ -252,6 +254,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @throws SecurityException if the operation cannot be invoked for security reasons.
 	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#addAgents(byte[], List, String)
 	 */
+	@SuppressWarnings("unchecked")
 	public final List<String> addAgents(byte[] configuration, List<JARMemory> libraries, String owner) throws IOException, InstanceNotFoundException {
 		return (List<String>) invokeOperation("addAgents", new Object[] {configuration, libraries, owner}, new String[] {"[B","java.util.List","java.lang.String"});
 	}
@@ -290,6 +293,7 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#getAgentNodeBeanClasses()
 	 */
+	@SuppressWarnings("unchecked")
 	public final List<String> getAgentNodeBeanClasses() throws IOException, InstanceNotFoundException {
 		return (List<String>) getAttribute("AgentNodeBeanClasses");
 	}

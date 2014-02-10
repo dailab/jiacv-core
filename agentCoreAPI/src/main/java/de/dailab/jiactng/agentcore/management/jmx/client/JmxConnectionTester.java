@@ -85,6 +85,7 @@ public class JmxConnectionTester {
 		/**
 		 * Tries to create the JMX connection and optional to find other JMX URLs.
 		 */
+		@SuppressWarnings("unchecked")
 		public void run() {
 			try {
 				// test JMX connection

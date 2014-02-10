@@ -41,7 +41,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   /**
    * Interval by which the execute()-method of the bean is called. If negative, the execute-method is never called.
    */
-  private int  executeInterval   = -1;
+  private int  executionInterval   = -1;
 
   /**
    * Used by the execution cycle to determine the next execution time when <code>executeInterval</code> is greater
@@ -240,32 +240,59 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   }
 
   /**
+   * @deprecated
    * {@inheritDoc}
    */
-  public final int getExecuteInterval() {
-    return executeInterval;
+    public final int getExecuteInterval() {
+        if (log != null) {
+            log.warn("Method \'getExecuteInterval\' is deprecated - please use \'getExecutionInterval\' instead.");
+        } else {
+            System.err
+                    .println("Method \'getExecuteInterval\' is deprecated - please use \'getExecutionInterval\' instead.");
+        }
+        return getExecutionInterval();
+    }
+
+  /**
+   * @deprecated
+   * {@inheritDoc}
+   */
+  public final void setExecuteInterval(int newExecuteInterval) {
+      if(log != null) {
+          log.warn("Property \'executeInterval\' is deprecated - please use \'executionInterval\' instead.");
+      } else {
+          System.err.println("Property \'executeInterval\' is deprecated - please use \'executionInterval\' instead.");
+      }
+      setExecutionInterval(newExecuteInterval);
   }
 
   /**
    * {@inheritDoc}
    */
-  public final void setExecuteInterval(int newExecuteInterval) {
+  public final int getExecutionInterval() {
+    return executionInterval;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public final void setExecutionInterval(int newExecutionInterval) {
     try {
-      if (newExecuteInterval <= 0) {
+      if (newExecutionInterval <= 0) {
         nextExecutionTime = 0;
         return;
       }
       // new execute Interval > 0, schedule/reschedule bean
       if (nextExecutionTime > 0) {
-        nextExecutionTime = nextExecutionTime - executeInterval + newExecuteInterval;
+        nextExecutionTime = nextExecutionTime - executionInterval + newExecutionInterval;
       } else {
-        nextExecutionTime = System.currentTimeMillis() + newExecuteInterval;
+        nextExecutionTime = System.currentTimeMillis() + newExecutionInterval;
       }
     } finally {
-      executeInterval = newExecuteInterval;
+      executionInterval = newExecutionInterval;
     }
-  }
-
+  }  
+  
   /**
    * {@inheritDoc}
    */

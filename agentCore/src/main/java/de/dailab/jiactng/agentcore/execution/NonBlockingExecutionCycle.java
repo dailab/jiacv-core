@@ -88,7 +88,7 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 				}
 
 				// check if bean has cyclic behavior, if not --> reject
-				if (bean.getExecuteInterval() <= 0) {
+				if (bean.getExecutionInterval() <= 0) {
 					continue;
 				}
 
@@ -117,7 +117,7 @@ public final class NonBlockingExecutionCycle extends AbstractExecutionCycle
 				// reschedule bean
 				minBean
 						.setNextExecutionTime(now
-								+ minBean.getExecuteInterval());
+								+ minBean.getExecutionInterval());
 			}
 			updateWorkload(EXECUTION, executionDone);
 

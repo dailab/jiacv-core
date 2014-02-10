@@ -92,7 +92,7 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
       }
 
       // check if bean has cyclic behavior, if not --> reject
-      if (bean.getExecuteInterval() <= 0) {
+      if (bean.getExecutionInterval() <= 0) {
         continue;
       }
 
@@ -121,7 +121,7 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
       }
 
       // reschedule bean
-      minBean.setNextExecutionTime(now + minBean.getExecuteInterval());
+      minBean.setNextExecutionTime(now + minBean.getExecutionInterval());
     }
 
     updateWorkload(EXECUTION, executionDone);

@@ -122,7 +122,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       final IEffector providerBean = ((Action) act.getAction()).getProviderBean();
       if (providerBean != null) {
          try {
-            if ((act.getAction().getResultTypes() != null) && (act.getAction().getResultTypes().size() > 0)) {
+            if ((act.getAction().getResultTypeNames() != null) && (act.getAction().getResultTypeNames().size() > 0)) {
                final Session session = act.getSession();
                if (session.getCurrentCallDepth() == null) {
                   session.setCurrentCallDepth(1);

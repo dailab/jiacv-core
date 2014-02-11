@@ -41,7 +41,7 @@
 				<configuration>
 					<links>
 						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://commons.apache.org/logging/commons-logging-1.1/apidocs/</link>
+						<link>http://commons.apache.org/proper/commons-logging/apidocs//</link>
 						<link>http://repositories.dai-labor.de/sites/SimpleSpace/SimpleSpaceCore/apidocs/</link>
 					</links>
 					<quiet>true</quiet>

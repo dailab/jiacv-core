@@ -1,15 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<artifactId>jiactng</artifactId>
 		<groupId>de.dailab</groupId>
-		<version>5.1.5-SNAPSHOT</version>
+		<version>5.1.5</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab.jiac.net</groupId>
 	<artifactId>gateway</artifactId>
 	<name>Network Gateway</name>
-	<version>5.1.5-SNAPSHOT</version>
+	<version>5.1.5</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>

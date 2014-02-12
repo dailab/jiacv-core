@@ -6,7 +6,9 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.1.5" date="t.b.a" description="Minor release">
+		<release version="5.1.6" date="t.b.a" description="Minor release">
+		</release>
+		<release version="5.1.5" date="2014-02-12" description="Minor release">
 			<action dev="masuch" type="add">
 				Added additional group configuration for DirectoryAgentNode. Now the node
 				can be in more than one group. Additionally, also the Gatewaybroker

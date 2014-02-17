@@ -317,10 +317,10 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
          _manager.registerAgentNodeBeanResource(this, getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE, "\"" + connector.getName() + ":" + connector.getTransportURI() + "\"", connector);
       } catch (Exception e) {
          if ((log != null) && (log.isErrorEnabled())) {
-            log.error("WARNING: Unable to register transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.",e);
+            log.error("WARNING: Unable to register transport connector " + connector.getName() + ":" + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.",e);
             log.error(e.getMessage());
          } else {
-            System.err.println("WARNING: Unable to register transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.");
+            System.err.println("WARNING: Unable to register transport connector " + connector.getName() + ":" + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.");
             System.err.println(e.getMessage());
          }
       }
@@ -339,13 +339,13 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
       // unregister transport connector from management
       try {
-         _manager.unregisterAgentNodeBeanResource(this, getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE, "\"" + connector.getTransportURI() + "\"");
+         _manager.unregisterAgentNodeBeanResource(this, getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE, "\"" + connector.getName() + ":" + connector.getTransportURI() + "\"");
       } catch (Exception e) {
          if ((log != null) && (log.isErrorEnabled())) {
-            log.error("WARNING: Unable to deregister transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.");
+            log.error("WARNING: Unable to deregister transport connector " + connector.getName() + ":" + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.");
             log.error(e.getMessage());
          } else {
-            System.err.println("WARNING: Unable to deregister transport connector " + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.");
+            System.err.println("WARNING: Unable to deregister transport connector " + connector.getName() + ":" + connector.getTransportURI() + " of the broker of agent node " + getAgentNode().getName() + " as JMX resource.");
             System.err.println(e.getMessage());
          }
       }

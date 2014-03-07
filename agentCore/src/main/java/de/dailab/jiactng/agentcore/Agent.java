@@ -250,46 +250,19 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    * {@inheritDoc}
    */
   public final void setAgentBeans(List<IAgentBean> agentbeans) {
-    // look for communicationBean in list
-    // TODO: remove in next release
-    Iterator<IAgentBean> beanListIterator = agentbeans.iterator();
+    // add agent beans
+	addAgentBeans(agentbeans);
+  }
 
-    while (beanListIterator.hasNext()) {
-      IAgentBean iab = beanListIterator.next();
-      if (iab instanceof ICommunicationBean) {
-        if (this.communication == null) {
-          this.communication = (ICommunicationBean) iab;
-        }
-        beanListIterator.remove();
-        System.err
-            .println("\n\nWARNING: Agents now have an own property for the CommunicationBean (communication). Please use that property for configuration. For now, the CommunicationBean will be used correctly, but further releases of JIAC will no longer support a CommunicationBean in the agentbeans property.\n\n");
+  private final void addAgentBeans(List<IAgentBean> agentbeans) {
+	this.agentBeans.addAll(agentbeans);
 
-        break;
-      }
-    }
-
-    // if(this.communication!=null) {
-    // agentbeans.add(this.communication);
-    // }
-
-    // disable management of all old agent beans
-    if (isManagementEnabled() && (this.agentBeans != null)) {
-      for (IAgentBean ab : this.agentBeans) {
-        ab.disableManagement();
-      }
-    }
-
-    // change agent beans
-    this.agentBeans.clear();
-    this.agentBeans.addAll(agentbeans);
-
-    // set references for all new agent beans and
-    // enable management of all new agent beans
-    for (IAgentBean ab : this.agentBeans) {
-      if (isManagementEnabled()) {
-        ab.enableManagement(_manager);
-      }
-    }
+	// enable management of all new agent beans
+	for (IAgentBean ab : this.agentBeans) {
+	  if (isManagementEnabled()) {
+	    ab.enableManagement(_manager);
+	  }
+	}	  
   }
 
   /**
@@ -448,11 +421,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
 
     final IAgentDescription myDescription = getAgentDescription();
-
-    // add agentBeans from roles to this agent
-    for (IAgentRole role : this.agentRoles) {
-      this.agentBeans.addAll(role.getAgentBeans());
-    }
 
     // initialize all agent beans
     for (IAgentBean ab : this.agentBeans) {
@@ -1582,6 +1550,11 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   @Override
   public void setRoles(List<IAgentRole> roles) {
     this.agentRoles = collectIncludedRoles(roles);
+
+    // add agentBeans from roles to this agent
+    for (IAgentRole role : this.agentRoles) {
+      addAgentBeans(role.getAgentBeans());
+    }
   }
 
   private List<IAgentRole> collectIncludedRoles(List<IAgentRole> roles) {

@@ -50,6 +50,23 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	void setOwner(String newOwner);
 
 	/**
+	 * Getter for the executionInterval timer.
+	 * 
+	 * @return the time interval between two calls of the executionCycle
+	 *          in milliseconds.
+	 */
+	int getExecutionInterval();
+
+	/**
+	 * Setter for the executionInterval timer.
+	 * 
+	 * @param newExecutionInterval
+	 *          the time interval between two calls of the executionCycle
+	 *          in milliseconds.
+	 */
+	void setExecutionInterval(int newExecutionInterval);
+
+	/**
 	 * Returns the timeout after which the execution of a bean of the managed agent will be stopped.
 	 * @return the timeout in milliseconds
 	 */

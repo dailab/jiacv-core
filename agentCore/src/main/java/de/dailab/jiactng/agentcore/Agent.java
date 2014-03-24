@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +46,6 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
 import de.dailab.jiactng.agentcore.environment.IEffector;
 import de.dailab.jiactng.agentcore.execution.IExecutionCycle;
-import de.dailab.jiactng.agentcore.group.IAgentGroup;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
@@ -131,8 +129,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
   private List<IAgentRole>                  agentRoles                     = new ArrayList<IAgentRole>();
   
-  private List<IAgentGroup>                 agentGroups                    = new ArrayList<IAgentGroup>();
-
   /**
    * activity Flag (could be replaced by state check)
    */
@@ -200,8 +196,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    */
   private JmxAgentNodeTimerManagementClient timerClient                    = null;
 
-
-  private boolean                           singleExecutionsDone           = false;
 
   /**
    * Public default constructor, creating the agent identifier.
@@ -511,7 +505,6 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 
     this.execution.start();
 
-    singleExecutionsDone = false;
     if (execution.getAutoExecutionServices() != null) {
       try {
         // add listener if needed
@@ -1130,19 +1123,14 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   }
 
   /**
-   * Getter for the executionInterval timer
-   * 
-   * @return the be nice timer between to calls to the executionCycle
+   * {@inheritDoc}
    */
   public final int getExecutionInterval() {
     return executionInterval;
   }
 
   /**
-   * Setter for the executionInterval timer
-   * 
-   * @param newExecutionInterval
-   *          the be nice timer between to calls to the executionCycle
+   * {@inheritDoc}
    */
   public final void setExecutionInterval(int newExecutionInterval) {
     final int oldInterval = executionInterval;

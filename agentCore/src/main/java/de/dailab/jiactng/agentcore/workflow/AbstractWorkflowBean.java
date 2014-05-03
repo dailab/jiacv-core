@@ -105,7 +105,7 @@ public abstract class AbstractWorkflowBean extends AbstractMethodExposingBean {
 	
 	protected IJiacMessage receiveMessage(Class<?> payloadClass, String groupName, long timeout) {
 		long start = System.currentTimeMillis();
-		while (timeout <= 0 || System.currentTimeMillis() - start > timeout) {
+		while (timeout <= 0 || System.currentTimeMillis() - start < timeout) {
 			if (checkInterrupted()) return null;
 			for (JiacMessage msg : memory.readAll(new JiacMessage())) {
 				// check payload
@@ -252,13 +252,38 @@ public abstract class AbstractWorkflowBean extends AbstractMethodExposingBean {
 		
 		public MessageEventHandler(Thread toStop, String channel, Class<?> payloadType) {
 			super(toStop);
-			this.groupAddress = CommunicationAddressFactory.createGroupAddress(channel);
+			this.groupAddress = channel != null ? CommunicationAddressFactory.createGroupAddress(channel) : null;
 			this.payloadClass = payloadType;
 		}
 		
 		public void run() {
 			memory.attach(this, new JiacMessage());
-			invoke(joinAction, new Serializable[] {groupAddress});
+			if (groupAddress != null) {
+				invoke(joinAction, new Serializable[] {groupAddress});
+			}
+			
+			// FIXME memory observer seems not to work properly...
+			// works fine for receving the initial message, though...
+			while (! isInterrupted()) {
+//				System.out.println("checking...");
+				for (JiacMessage msg : memory.readAll(new JiacMessage())) {
+					// check payload
+					if ((payloadClass == null || payloadClass.isInstance(msg.getPayload()))) {
+						// check group address, if any
+						if (groupAddress == null || msg.getHeader(IJiacMessage.Header.SEND_TO).equalsIgnoreCase(groupAddress.getName())) {
+							memory.remove(msg);
+							received = msg.getPayload();
+							setTriggered();
+						}
+					}
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					log.debug("Receive interrupted");
+					Thread.currentThread().interrupt();
+				}
+			}
 		}
 		
 		public void notify(SpaceEvent<? extends IFact> event) {
@@ -267,8 +292,9 @@ public abstract class AbstractWorkflowBean extends AbstractMethodExposingBean {
 				if (wce.getObject() instanceof IJiacMessage) {
 					IJiacMessage msg= (IJiacMessage) wce.getObject();
 					
-					if ((payloadClass == null || payloadClass.isInstance(msg.getPayload()))
-							&& msg.getHeader(IJiacMessage.Header.SEND_TO).equalsIgnoreCase(groupAddress.getName())){
+					if ((payloadClass == null || payloadClass.isInstance(msg.getPayload())) && 
+							(groupAddress == null || msg.getHeader(IJiacMessage.Header.SEND_TO).
+														equalsIgnoreCase(groupAddress.getName()))) {
 						memory.remove(msg);
 						received = msg.getPayload();
 						setTriggered();

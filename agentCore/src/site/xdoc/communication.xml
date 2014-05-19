@@ -409,6 +409,11 @@ public void notify(SpaceEvent&lt;? extends IFact&gt; event) {
 	}
 }					
 					</source>
+					<p>
+						Please note, that the observer mechanism is not multi-threaded.
+						This means that the space event must be handled in a non-blocking way.
+						E.g. for synchronous invocation of actions an own thread must be created.
+					</p>
 					
 				</subsection>
 				

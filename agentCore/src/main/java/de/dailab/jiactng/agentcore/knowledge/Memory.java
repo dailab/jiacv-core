@@ -276,7 +276,16 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
   }
 
   /**
-   * {@inheritDoc}
+   * <code>attach</code> adds an observer. After this call, the observer
+   * will receive <code>SpaceEvent</code>s from this memory.
+   * <br />
+   * Please note, that the observer mechanism is not multi-threaded.
+   * This means that the space event must be handled in a non-blocking way.
+   * E.g. for synchronous invocation of actions an own thread must be created.
+   * 
+   * @param observer
+   * 				new space observer
+   * @throws RuntimeException if the memory has not yet been initialized
    */
   public void attach(SpaceObserver<? super IFact> observer) {
     if (space == null) {
@@ -286,7 +295,27 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
   }
 
   /**
-   * {@inheritDoc}
+   * <code>attach</code> allows an observer to specify a template, which
+   * defines what entries the observer wants to be specified about. In other
+   * words, the observer will only receive events about entries which match
+   * the <code>template</code> parameter.
+   * <br />
+   * Please note, that it is not possible to attach the same observer with
+   * multiple templates. In such case template from the last attach call will
+   * be used for the observer.
+   * <br />
+   * Please also note, that the observer mechanism is not multi-threaded.
+   * This means that the space event must be handled in a non-blocking way.
+   * E.g. for synchronous invocation of actions an own thread must be created.
+   * <br />
+   * <code>attach(observer, null)</code> yields the same behavior as
+   * {@link #attach(SpaceObserver)}. 
+   * 
+   * @param observer
+   * 				new space observer
+   * @param template
+   *              defines entries interesting for the observer
+   * @throws RuntimeException if the memory has not yet been initialized
    */
   public void attach(SpaceObserver<? super IFact> observer, IFact template) {
     if (space == null) {

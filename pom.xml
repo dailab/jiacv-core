@@ -615,6 +615,7 @@
 		<module>jiacSecurity</module>
 		<module>bdiAgent</module>
 		<module>ruleEngine</module>
+		<module>tomcatStarter</module>
 		<module>basicServices</module>
 		<module>examples</module>
 		<module>tools</module>

@@ -34,9 +34,6 @@ public class ActionPerformedNotification extends Notification {
 	/** The type of the performed action. */
 	private String actionType;
 
-	/** The description of the performed action. */
-	private String action;
-
 	/** The description of the action parameters. */
 	private Object[] actionParameters;
 
@@ -78,7 +75,6 @@ public class ActionPerformedNotification extends Notification {
 		sessionId = action.getSessionId();
 		owner = action.getOwner();
 		actionType = action.getAction().getClass().getSimpleName();
-		this.action = action.toString();
 		this.state = state;
 		if (action.getSession() != null) {
 			originalUser = action.getSession().getOriginalUser();
@@ -151,15 +147,6 @@ public class ActionPerformedNotification extends Notification {
 	 */
 	public final String getActionType() {
 		return actionType;
-	}
-
-	/**
-	 * Gets the description of the performed action.
-	 * @return The description of the performed action.
-	 * @see Object#toString()
-	 */
-	public final String getAction() {
-		return action;
 	}
 
 	/**

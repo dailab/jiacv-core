@@ -33,7 +33,7 @@ public interface IWebserviceAction extends IActionDescription{
 	/**
 	 * Sets the Name of the Service this Action should be published in
 	 * 
-	 * @param the servicename
+	 * @param servicename the name of the service
 	 */
 	public void setServiceName(String servicename);
 	

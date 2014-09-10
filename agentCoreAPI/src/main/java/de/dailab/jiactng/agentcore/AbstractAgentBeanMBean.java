@@ -33,7 +33,7 @@ public interface AbstractAgentBeanMBean extends AbstractLifecycleMBean {
 	 * Setter for Interval by which the execute()-method of the bean is called.
 	 * If non-positive, the execute-method is never called.
 	 * 
-	 * @param newExecuteInterval
+	 * @param newExecutionInterval
 	 *            the time interval between two calls of the execute()-method
 	 *            in milliseconds. If negative, the method is never called.
 	 */

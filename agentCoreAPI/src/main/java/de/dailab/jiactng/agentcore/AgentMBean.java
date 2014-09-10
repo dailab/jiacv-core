@@ -138,8 +138,8 @@ public interface AgentMBean extends AbstractLifecycleMBean {
 	void setStopTime(Long newStopTime) throws InstanceNotFoundException;
 
 	/**
-	 * Sets the auto Execution service ID list.
-	 * @param actionIds IDs of actions, which should be automatically executed.
+	 * Sets the auto Execution services.
+	 * @param autoExecutionServices Actions, which should be automatically executed.
 	 */
 	void setAutoExecutionServices(Map<String, Map<String, Serializable>> autoExecutionServices);
 	

@@ -64,8 +64,7 @@ public class Session implements IFact {
    private IAgentDescription originalAgentDescription = null;
 
    /**
-    * The history of the session. This list contains all sessionevents of the session (i.E. of actions, results, etc.) in order of appearance. TODO should be of type
-    * ArrayList<SessionEvent>
+    * The history of the session. This list contains all session events of the session (i.E. of actions, results, etc.) in order of appearance.
     */
    private ArrayList<SessionEvent> history;
 
@@ -423,7 +422,7 @@ public class Session implements IFact {
    /**
     * Sets the communication address of the agent that has invoked the corresponding action
     * 
-    * @param originalAgent the communication address of the Agent that has invoked the corresponding action.
+    * @param originalAgentDescription the description of the Agent that has invoked the corresponding action.
     */
    public final void setOriginalAgentDescription(IAgentDescription originalAgentDescription) {
       this.originalAgentDescription = originalAgentDescription;

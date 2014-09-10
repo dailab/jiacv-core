@@ -22,7 +22,7 @@ public final class JmxMulticastSender extends TimerTask {
 	 * Creates a multicast socket for a given port and a given time to live.
 	 * @param port The port of the multicast socket to use.
 	 * @param netaddr The group (multicast address) to join before sending packets.
-	 * @param ttl The time-to-live for the packets to control the scope (0 <= ttl <= 255).
+	 * @param ttl The time-to-live for the packets to control the scope (0 &le; ttl &le; 255).
 	 * @param jmxURLs The messages to be sent via multicast.
 	 */
 	public JmxMulticastSender(int port, String netaddr, int ttl, String[] jmxURLs) {

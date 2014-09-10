@@ -465,7 +465,7 @@ public final class JmxManager implements Manager {
 	 * @throws MalformedObjectNameException One of the parameters contains an illegal character or does not follow the rules for quoting.
 	 * @throws InstanceNotFoundException The agent node bean resource is not registered in the MBean server.
 	 * @throws MBeanRegistrationException The preDeregister ((MBeanRegistration interface) method of the agent node bean resource has thrown an exception.
-	 * @see #getMgmtNameOfAgentNodeBean(String, String, String, String)
+	 * @see #getMgmtNameOfAgentNodeBean(String, String)
 	 * @see MBeanServer#unregisterMBean(ObjectName)
 	 */
 	public void unregisterAgentNodeBeanResource(IAgentNodeBean agentNodeBean, IAgentNode agentNode, String resourceType, String resourceName) throws MalformedObjectNameException, InstanceNotFoundException, MBeanRegistrationException {
@@ -802,7 +802,6 @@ public final class JmxManager implements Manager {
 	 * Creates all specified connector server for remote management, registers
 	 * them in the MBean server and announces them via multicast periodically.
 	 * @param node the agent node
-	 * @return The URLs of all created connector server.
 	 * @see IAgentNode#getJmxConnectors()
 	 * @see JmxConnectorManager
 	 * @see Timer#schedule(java.util.TimerTask, long, long)

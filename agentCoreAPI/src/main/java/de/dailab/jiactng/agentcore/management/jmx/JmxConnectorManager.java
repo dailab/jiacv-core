@@ -49,7 +49,7 @@ public final class JmxConnectorManager extends TimerTask {
     * @param node The agent node, which will provide the connectors.
     * @param port The port of the multicast socket to use.
     * @param netaddr The group (multicast address) to join before sending packets.
-    * @param ttl The time-to-live for the packets to control the scope (0 <= ttl <= 255).
+    * @param ttl The time-to-live for the packets to control the scope (0 &le; ttl &le; 255).
     * @throws UnknownHostException if the multicast address is unknown.
     * @throws IOException if creating multicast socket on given port failed.
     */

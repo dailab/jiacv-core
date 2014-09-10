@@ -45,7 +45,7 @@ public interface IExecutionCycle extends ILifecycle, Runnable {
   
 	/**
 	 * Sets the actions which will be automatically executed.
-	 * @param actionIds the list of action names
+	 * @param autoExecutionServices the actions
 	 */
   void setAutoExecutionServices(Map<String, Map<String, Serializable>> autoExecutionServices);
   

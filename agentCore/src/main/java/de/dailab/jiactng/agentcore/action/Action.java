@@ -53,6 +53,9 @@ public class Action implements IActionDescription {
 
 	/** The scope of the action, i.e. which agent will it know or can it use. */
 	private ActionScope scope;
+	
+	/** The IRI link to a semantic service description 	 */
+	private String semanticServiceDescriptionIRI;
 
 	/**
 	 * The type of this action. This field is designed to store information about the type of the action. By default,
@@ -250,6 +253,13 @@ public class Action implements IActionDescription {
 			return null;
 		}
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public String getSemanticServiceDescriptionIRI() {
+		return this.semanticServiceDescriptionIRI;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -287,6 +297,8 @@ public class Action implements IActionDescription {
 			return null;
 		}
 	}
+	
+	
 
 	/**
 	 * Sets the name of this action.
@@ -333,10 +345,20 @@ public class Action implements IActionDescription {
 			this.inputTypeNames = null;
 		}
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setSemanticServiceDescriptionURI(String iri) {
+		this.semanticServiceDescriptionIRI = iri;
+		
+	}
 
 	public String getActionType() {
 		return this.actionType;
 	}
+	
+	
 
 	public void setActionType(final String actionType) {
 		this.actionType = actionType;

@@ -28,6 +28,8 @@ import javax.management.openmbean.TabularType;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
+import de.dailab.jiactng.agentcore.directory.IOntologyStorage;
+import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 
 /**
  * An abstract Bean which exposes accessible methods which are marked with the
@@ -40,6 +42,10 @@ import de.dailab.jiactng.agentcore.action.scope.ActionScope;
  */
 public abstract class AbstractMethodExposingBean extends AbstractActionAuthorizationBean implements IMethodExposingBean, AbstractMethodExposingBeanMBean {
     
+	private IOntologyStorage ontologyStorage = null;
+	
+	private int counter = 0;
+	
 	static String getServicename(Method method){
 		String servicename= method.getAnnotation(Expose.class).servicename();
 		
@@ -69,6 +75,32 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         }
         
         return name;
+    }
+    
+    /**
+     * Checks if a semantic analysis for the method is necessary. 
+     * Reads the attribute semantify.
+     * 
+     * @see IMethodExposingBean.Expose
+     * 
+     * @param method Method to be checked
+     * @return True if tag semantify is set to true, false otherwise.
+     */
+    static boolean isSemanticRequested(Method method) {
+    	final boolean semantify = method.getAnnotation(Expose.class).semantify();
+    	
+    	return semantify;
+    }
+    
+    /**
+     * Checks if an URI for the semantic description of the service is set
+     * 
+     * @param method Method to be checked.
+     * @return The URI to the semantic description as a string, if available.
+     */
+    static String getSemanticURI(Method method) {
+    	final String semanticURI = method.getAnnotation(Expose.class).semanticURI();
+    	return semanticURI;
     }
     
     static ActionScope getScope(Method method) {
@@ -217,12 +249,16 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 	 */
     public final List<? extends Action> getActions() {
         final ArrayList<Action> actions= new ArrayList<Action>();
+        this.ontologyStorage = thisAgent.getAgentNode().findAgentNodeBean(IOntologyStorage.class);
+        
         
         for(Method method : getExposedPublicMethods(getClass())) {
             // check for Expose annotation
             final Class<?>[] returnTypes= getReturnTypes(method);
             final String name= getName(method);
             final ActionScope scope = getScope(method);
+            final String semanticURI = getSemanticURI(method);
+            
             // build the action object
             final Action act = new Action(
                 name,
@@ -230,6 +266,14 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
                 method.getParameterTypes(),
                 returnTypes
             );
+            
+            if (ontologyStorage != null) {
+        	if (semanticURI != null && !semanticURI.equals("")) {
+		    act.setSemanticServiceDescriptionURI(semanticURI);
+		}
+            }
+            
+            
             act.setScope(scope);
             
             String servicename = getServicename(method);

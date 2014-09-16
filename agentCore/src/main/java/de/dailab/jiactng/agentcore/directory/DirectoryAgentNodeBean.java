@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.directory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -608,21 +610,33 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
-		if (template instanceof IServiceDescription) {
-			if (this.serviceMatcher != null) {
-				final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
-				final IServiceDescription matcherResult = this.serviceMatcher
-						.findBestMatch((IServiceDescription) template,
-								serviceDescList);
-
-				if ((matcherResult != null)) {
-					return matcherResult;
-				} else {
-					log.warn("Matcher found no result, trying normal template matching...");
+		if (template.getSemanticServiceDescriptionIRI() != null && template.getSemanticServiceDescriptionIRI() != ""){
+			if (this.serviceMatcher != null && this.ontologyStorage != null){
+				
+				IServiceDescription templateSD = null;
+				
+				try {
+					templateSD = this.ontologyStorage.
+							loadServiceDescriptionFromOntology(new URI(template.getSemanticServiceDescriptionIRI()));
+				} catch (URISyntaxException e) {
+					log.error("Semantic IRI of action " + template.getName() 
+							+ " incorrect: " + template.getSemanticServiceDescriptionIRI());
 				}
+				
+				if (templateSD != null){
+					final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
+					IServiceDescription matcherResult = this.serviceMatcher
+							.findBestMatch(templateSD,
+									serviceDescList);
 
+					if (matcherResult != null) {
+						return matcherResult;
+					} else {
+						log.warn("Matcher found no result, trying normal template matching...");
+					}
+				}
 			} else {
-				log.error("This agentnode has no servicematcher - no complex matching possible!");
+				log.error("This agentnode has no servicematcher and / or ontology storage - no complex matching possible!");
 			}
 		}
 
@@ -662,21 +676,34 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
-		if (template instanceof IServiceDescription) {
-			if (this.serviceMatcher != null) {
-				final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
-				final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
-						.findAllMatches((IServiceDescription) template,
-								serviceDescList);
-
-				if ((matcherResults != null) && (matcherResults.size() > 0)) {
-					actions.addAll(matcherResults);
-				} else {
-					log.warn("Matcher found no result, trying normal template matching...");
+		if (template.getSemanticServiceDescriptionIRI() != null && template.getSemanticServiceDescriptionIRI() != ""){
+			if (this.serviceMatcher != null && this.ontologyStorage != null){
+				
+				IServiceDescription templateSD = null;
+				
+				try {
+					templateSD = this.ontologyStorage.
+							loadServiceDescriptionFromOntology(new URI(template.getSemanticServiceDescriptionIRI()));
+				} catch (URISyntaxException e) {
+					log.error("Semantic IRI of action " + template.getName() 
+							+ " incorrect: " + template.getSemanticServiceDescriptionIRI());
 				}
+				
+				if (templateSD != null){
+					final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
+					final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
+							.findAllMatches(templateSD,
+									serviceDescList);
 
+					if ((matcherResults != null) && (matcherResults.size() > 0)) {
+						actions.addAll(matcherResults);
+						return actions;
+					} else {
+						log.warn("Matcher found no result, trying normal template matching...");
+					}
+				}
 			} else {
-				log.error("This agentnode has no servicematcher - no complex matching possible!");
+				log.error("This agentnode has no servicematcher and / or ontology storage - no complex matching possible!");
 			}
 		}
 
@@ -837,47 +864,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 
 				final Set<IActionDescription> receivedActions = new HashSet<IActionDescription>();
-				for (IActionDescription iad : actions) {
-
-					if (iad instanceof IServiceDescription) {
-						// special handling for service descriptions
-						final IServiceDescription isd = (IServiceDescription) iad;
-						if (isd.getOntologySource() != null) {
-							IServiceDescription tempService = null;
-							try {
-								tempService = ontologyStorage
-										.deserializeServiceDescription(isd
-												.getOntologySource());
-
-								if (tempService != null) {
-									// these fields are not filled by the
-									// ontologyStorage, so do it by hand
-									((Action) tempService).setInputTypes(isd
-											.getInputTypes());
-									((Action) tempService).setResultTypes(isd
-											.getResultTypes());
-									((Action) tempService)
-											.setProviderDescription(isd
-													.getProviderDescription());
-									((Action) tempService).setScope(isd
-											.getScope());
-								}
-							} catch (Exception ex) {
-								log.error(
-										"Caught exception when reading service description: ",
-										ex);
-							}
-
-							if (tempService != null) {
-								receivedActions.add(tempService);
-							}
-						}
-
-					} else {
-						// simply add normal actions
-						receivedActions.add(iad);
-					}
-				}
+				
+				receivedActions.addAll(actions);
 
 				remoteActions.put(senderAddress.getName(), receivedActions);
 
@@ -1096,9 +1084,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		// find serviceDescriptions in local actions
 		synchronized (localActions) {
 			for (IActionDescription localAct : localActions) {
-				if (localAct instanceof IServiceDescription) {
-					ret.add((IServiceDescription) localAct);
+			    if (localAct.getSemanticServiceDescriptionIRI() != null && localAct.getSemanticServiceDescriptionIRI() != ""){
+					try {
+						IServiceDescription sd = ontologyStorage.
+								loadServiceDescriptionFromOntology(new URI(localAct.getSemanticServiceDescriptionIRI()));
+						ret.add(sd);
+					} catch (URISyntaxException e) {
+						log.error("Semantic IRI of action " + localAct.getName() 
+								+ " incorrect: " + localAct.getSemanticServiceDescriptionIRI());
+					}
 				}
+				
 			}
 		}
 
@@ -1108,8 +1104,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				final Set<IActionDescription> remoteActSet = remoteActions
 						.get(nodeAddress);
 				for (IActionDescription remoteAct : remoteActSet) {
-					if (remoteAct instanceof IServiceDescription) {
-						ret.add((IServiceDescription) remoteAct);
+				    if (remoteAct.getSemanticServiceDescriptionIRI() != null && remoteAct.getSemanticServiceDescriptionIRI() != ""){
+						try {
+							IServiceDescription sd = ontologyStorage.
+									loadServiceDescriptionFromOntology(new URI(remoteAct.getSemanticServiceDescriptionIRI()));
+							ret.add(sd);
+						} catch (URISyntaxException e) {
+							log.error("Semantic IRI of action " + remoteAct.getName() 
+									+ " incorrect: " + remoteAct.getSemanticServiceDescriptionIRI());
+						}
 					}
 				}
 			}
@@ -1152,17 +1155,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		// find OWL-S ServiceDescriptions and deserialize them by hand
 		final Set<IActionDescription> advActions = new HashSet<IActionDescription>();
 		synchronized (localActions) {
-			for (IActionDescription iad : localActions) {
-				if (iad.getScope() != ActionScope.GLOBAL) {
-					continue;
-				}
-				if (iad instanceof IServiceDescription) {
-					final IServiceDescription isd = (IServiceDescription) iad;
-					isd.setOntologySource(ontologyStorage
-							.serializeServiceDescription(isd));
-				}
-				advActions.add(iad);
-			}
+		    advActions.addAll(localActions);
 		}
 
 		Hashtable<String, IAgentDescription> advAgents = new Hashtable<String, IAgentDescription>();

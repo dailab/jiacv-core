@@ -119,6 +119,14 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 * @return a string representation of the applied technology on which the action implementation is based on.
 	 */
 	String getActionType();
+	
+	/**
+	 * Returns a String which holds an IRI to a semantic service description. Actually, this service description should be
+	 * an OWL-S conform description. This attribute is not mandatory. 
+	 * 
+	 * @return
+	 */
+	String getSemanticServiceDescriptionIRI();
 
 	/**
 	 * Sets the type of this action. If the provider publishes an action based on a distinct technology, the provider
@@ -128,6 +136,14 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 *           a string representation of the applied technology on which the action implementation is based on.
 	 */
 	void setActionType(String type);
+	
+	
+	/**
+	 * Sets the IRI link to the semantic service description of the respective action.
+	 * 
+	 * @param iri a string representation of the IRI to a semantic service description 
+	 */
+	void setSemanticServiceDescriptionURI(String iri);
 
 	/**
 	 * Sets the agent bean which provides this action.
@@ -184,5 +200,6 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 * @return a new DoAction-object that can be used (by writing it to the memory) to call the action.
 	 */
 	DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source);
-
+	
+	
 }

@@ -61,6 +61,18 @@ public interface IMethodExposingBean {
          * Unused?
          */
         String url() default "";
+        
+        /** 
+         * Keyword to create a OWL-S semantic service description 
+         * automatically from the method header 
+         */
+        boolean semantify() default false;
+        
+        /**
+         * Indicates the URI location of the semantic service description 
+         * in order to load it into the Directory 
+         */
+        String semanticURI() default "";
 
     }
     

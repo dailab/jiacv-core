@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.directory;
 
 import java.net.URI;
 
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 
 /**
@@ -40,6 +41,16 @@ public interface IOntologyStorage {
    * @return The ServiceDescription object.
    */
   IServiceDescription deserializeServiceDescription(String serviceString);
+  
+  /**
+   * Integrates the pure information of the action with the semantic service description.
+   * 
+   * @param action The action description object
+   * @param serviceDescription the semantically service description object
+   * @return semantic Service Description Object with the IActionDerscriptionInformation
+   */
+  IServiceDescription mergeServiceDescriptionWithAction(IActionDescription action, IServiceDescription serviceDescription);
+
 
   /**
    * TODO: java.lang.Object should be replaced with the Ontology-Class, once a definite Library has been found

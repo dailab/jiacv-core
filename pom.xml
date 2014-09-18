@@ -619,14 +619,14 @@
 		<module>agentCoreAPI</module>
 		<module>gateway</module>
 		<module>agentCore</module>
-		<module>protocol</module>
-		<module>jiacSecurity</module>
-		<module>bdiAgent</module>
-		<module>ruleEngine</module>
-		<module>tomcatStarter</module>
-		<module>basicServices</module>
-		<module>examples</module>
-		<module>tools</module>
+<!-- 		<module>protocol</module> -->
+<!-- 		<module>jiacSecurity</module> -->
+<!-- 		<module>bdiAgent</module> -->
+<!-- 		<module>ruleEngine</module> -->
+<!-- 		<module>tomcatStarter</module> -->
+<!-- 		<module>basicServices</module> -->
+<!-- 		<module>examples</module> -->
+<!-- 		<module>tools</module> -->
 	</modules>
 
 	<profiles>

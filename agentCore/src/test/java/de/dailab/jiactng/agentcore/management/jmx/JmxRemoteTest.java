@@ -63,7 +63,7 @@ public class JmxRemoteTest extends TestCase {
     public void testJmxRemote() throws Exception {
         // launch node
         ApplicationContext ac= new ApplicationContext("de.dailab.jiactng.agentcore.management.jmx.jmxremote");
-        final IAgentNode node= (IAgentNode) ac.getBean("NodeWithRemoteJMX");
+        final IAgentNode node= (IAgentNode) ac.getBean("de.dailab.jiactng.agentcore.management.jmx.jmxremote#NodeWithRemoteJMX");
 
         // wait 5 seconds to ensure creation and registration of the JMX connector server
         Thread.sleep(5000);

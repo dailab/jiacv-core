@@ -12,6 +12,9 @@ Es enthält folgende Module
 Maintainer
 ==========
 
-# gateway - Axel Heßler, Jan Keiser
-# agentCoreAPI - Axel Heßler, Jan Keiser
-# agentCore - Axel Heßler, Jan Keiser
+* gateway - Axel Heßler, Jan Keiser
+
+* agentCoreAPI - Axel Heßler, Jan Keiser
+
+* agentCore - Axel Heßler, Jan Keiser
+

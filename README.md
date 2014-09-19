@@ -6,7 +6,8 @@ Es enthält folgende Module
 * agentCoreAPI - Nachrichten und Schnittstellen
 * agentCore - Implementierung
 
-= Maintainer =
+Maintainer
+==========
 
 gateway - Axel Heßler, Jan Keiser
 agentCoreAPI - Axel Heßler, Jan Keiser

@@ -28,14 +28,14 @@ public interface IWebserviceAction extends IActionDescription{
 	 * 
 	 * @return the servicename
 	 */
-	public String getServiceName();
+	String getServiceName();
 	
 	/**
 	 * Sets the Name of the Service this Action should be published in
 	 * 
 	 * @param servicename the name of the service
 	 */
-	public void setServiceName(String servicename);
+	void setServiceName(String servicename);
 	
 	/**
 	 * Gets the OperationName this Action should be associated with,
@@ -43,7 +43,7 @@ public interface IWebserviceAction extends IActionDescription{
 	 * 
 	 * @return the OperationName this Action is mapped to
 	 */
-	public String getOperationName();
+	String getOperationName();
 	
 	/**
 	 * Sets the OperationName this Action should be associated with,
@@ -51,6 +51,6 @@ public interface IWebserviceAction extends IActionDescription{
 	 *  
 	 * @param operationname this action should be mapped to (if possible)
 	 */
-	public void setOperationName(String operationname);
+	void setOperationName(String operationname);
 	
 }

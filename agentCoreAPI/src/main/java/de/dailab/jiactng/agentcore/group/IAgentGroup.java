@@ -11,43 +11,43 @@ public interface IAgentGroup {
 	 * 
 	 * @return the name of the group
 	 */
-	public abstract String getName();
+	String getName();
 
 	/**
 	 * Sets the name of the group.
 	 * 
 	 * @param name the name of the group to set
 	 */
-	public abstract void setName(String name);
+	void setName(String name);
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public abstract void addMember(IAgent member);
+	void addMember(IAgent member);
 
 	/**
 	 * TODO remove from staffing and reduce cardinality
 	 * @param member
 	 * @return
 	 */
-	public abstract boolean removeMember(IAgent member);
+	boolean removeMember(IAgent member);
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public abstract List<IAgent> getMembers();
+	List<IAgent> getMembers();
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public abstract void setMembers(List<IAgent> members);
+	void setMembers(List<IAgent> members);
 
-	public abstract List<AgentRoleCardinality> getStructure();
+	List<AgentRoleCardinality> getStructure();
 
-	public abstract void setStructure(List<AgentRoleCardinality> structure);
+	void setStructure(List<AgentRoleCardinality> structure);
 
-	public abstract List<Staffing> getStaff();
+	List<Staffing> getStaff();
 
-	public abstract void setStaff(List<Staffing> staff);
+	void setStaff(List<Staffing> staff);
 
 }

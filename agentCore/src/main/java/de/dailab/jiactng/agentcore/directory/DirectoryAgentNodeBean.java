@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Map.Entry;
 
 import javax.management.openmbean.ArrayType;
 import javax.management.openmbean.CompositeData;
@@ -1012,8 +1013,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 */
 	public void setAliveIntervals(HashMap<String, Long> aliveIntervals) {
 		this.aliveIntervals = new HashMap<String, Long>();
-		for (String key : aliveIntervals.keySet()) {
-			this.aliveIntervals.put("df@" + key, aliveIntervals.get(key));
+		for (Entry<String, Long> entry : aliveIntervals.entrySet()) {
+			this.aliveIntervals.put("df@" + entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -1043,9 +1044,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 */
 	public void setAdvertiseIntervals(HashMap<String, Long> advertiseIntervals) {
 		this.advertiseIntervals = new HashMap<String, Long>();
-		for (String key : advertiseIntervals.keySet()) {
-			this.advertiseIntervals.put("df@" + key,
-					advertiseIntervals.get(key));
+		for (Entry<String, Long> entry : advertiseIntervals.entrySet()) {
+			this.advertiseIntervals.put("df@" + entry.getKey(), entry.getValue());
 		}
 	}
 

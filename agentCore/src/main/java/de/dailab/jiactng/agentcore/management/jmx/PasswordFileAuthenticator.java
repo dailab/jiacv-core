@@ -61,7 +61,9 @@ public class PasswordFileAuthenticator implements JMXAuthenticator {
 	 */
 	public void setPasswordFile(String filename) throws IOException {
 		passwords = new Properties();
-		passwords.load(new FileReader(filename));
+		FileReader reader = new FileReader(filename);
+		passwords.load(reader);
+		reader.close();
 	}
 	
 	/**

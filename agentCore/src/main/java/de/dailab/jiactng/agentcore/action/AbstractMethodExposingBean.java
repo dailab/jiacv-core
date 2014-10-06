@@ -87,9 +87,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * @return True if tag semantify is set to true, false otherwise.
      */
     static boolean isSemanticRequested(Method method) {
-    	final boolean semantify = method.getAnnotation(Expose.class).semantify();
-    	
-    	return semantify;
+    	return method.getAnnotation(Expose.class).semantify();
     }
     
     /**
@@ -99,14 +97,11 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * @return The URI to the semantic description as a string, if available.
      */
     static String getSemanticURI(Method method) {
-    	final String semanticURI = method.getAnnotation(Expose.class).semanticURI();
-    	return semanticURI;
+    	return method.getAnnotation(Expose.class).semanticURI();
     }
     
     static ActionScope getScope(Method method) {
-      final ActionScope scope = method.getAnnotation(Expose.class).scope();
-            
-      return scope;
+      return method.getAnnotation(Expose.class).scope();
     }
     
     static Class<?>[] getReturnTypes(Method method) {
@@ -321,7 +316,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
             final List<Class<?>> mpar= Arrays.asList(method.getParameterTypes());
             
             if(mpar.size() == parameters.size()) {
-                if(exposeAnno.name().equals(originalName) || (assumedMethodName != null && method.getName().equals(assumedMethodName))) {
+                if(exposeAnno.name().equals(originalName) || method.getName().equals(assumedMethodName)) {
                     if(mpar.equals(parameters)) {
                         return method;
                     }

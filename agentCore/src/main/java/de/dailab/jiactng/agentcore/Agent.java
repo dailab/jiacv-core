@@ -1591,7 +1591,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
 	JAR[] jars = classLoader.getJARs();
 	for (int i=0; i<jars.length; i++) {
 		String jarName = jars[i].getJarName();
-		names.add(jarName.substring(Math.max(jarName.lastIndexOf("/"), jarName.lastIndexOf("\\")) + 1));
+		names.add(jarName.substring(Math.max(jarName.lastIndexOf('/'), jarName.lastIndexOf('\\')) + 1));
 	}
 	return names;
   }

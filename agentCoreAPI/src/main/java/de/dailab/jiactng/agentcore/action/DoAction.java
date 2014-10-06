@@ -200,7 +200,7 @@ public class DoAction extends SessionEvent {
       } else {
         sb.append("action="+getAction()+", ");
       }
-	    sb.append("params="+Arrays.asList(params));
+	    sb.append("params=").append(Arrays.asList(params));
 	    sb.append(")");
 	    return sb.toString();
 	}

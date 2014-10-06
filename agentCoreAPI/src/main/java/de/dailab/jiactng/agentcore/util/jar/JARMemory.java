@@ -93,6 +93,7 @@ public class JARMemory implements JAR, Serializable {
                     this.knownEntries.add(jarEntryName);
                 }
             }
+            jis.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

@@ -611,7 +611,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
-		if (template.getSemanticServiceDescriptionIRI() != null && template.getSemanticServiceDescriptionIRI() != ""){
+		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().equals("")){
 			if (this.serviceMatcher != null && this.ontologyStorage != null){
 				
 				IServiceDescription templateSD = null;
@@ -677,7 +677,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
-		if (template.getSemanticServiceDescriptionIRI() != null && template.getSemanticServiceDescriptionIRI() != ""){
+		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().equals("")){
 			if (this.serviceMatcher != null && this.ontologyStorage != null){
 				
 				IServiceDescription templateSD = null;
@@ -1084,7 +1084,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		// find serviceDescriptions in local actions
 		synchronized (localActions) {
 			for (IActionDescription localAct : localActions) {
-			    if (localAct.getSemanticServiceDescriptionIRI() != null && localAct.getSemanticServiceDescriptionIRI() != ""){
+			    if (localAct.getSemanticServiceDescriptionIRI() != null && ! localAct.getSemanticServiceDescriptionIRI().equals("")){
 					try {
 						IServiceDescription sd = ontologyStorage.
 								loadServiceDescriptionFromOntology(new URI(localAct.getSemanticServiceDescriptionIRI()));
@@ -1104,7 +1104,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				final Set<IActionDescription> remoteActSet = remoteActions
 						.get(nodeAddress);
 				for (IActionDescription remoteAct : remoteActSet) {
-				    if (remoteAct.getSemanticServiceDescriptionIRI() != null && remoteAct.getSemanticServiceDescriptionIRI() != ""){
+				    if (remoteAct.getSemanticServiceDescriptionIRI() != null && ! remoteAct.getSemanticServiceDescriptionIRI().equals("")){
 						try {
 							IServiceDescription sd = ontologyStorage.
 									loadServiceDescriptionFromOntology(new URI(remoteAct.getSemanticServiceDescriptionIRI()));

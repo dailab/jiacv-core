@@ -307,9 +307,10 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       final MBeanNotificationInfo[] parent = super.getNotificationInfo();
       final int size = parent.length;
       final MBeanNotificationInfo[] result = new MBeanNotificationInfo[size + 1];
-      for (int i = 0; i < size; i++) {
-         result[i] = parent[i];
-      }
+//      for (int i = 0; i < size; i++) {
+//         result[i] = parent[i];
+//      }
+      System.arraycopy(parent, 0, result, 0, size);
 
       final String[] types = new String[] { ActionPerformedNotification.ACTION_PERFORMED };
       final String name = ActionPerformedNotification.class.getName();

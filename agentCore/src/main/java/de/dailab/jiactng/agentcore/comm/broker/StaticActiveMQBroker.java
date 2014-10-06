@@ -15,7 +15,7 @@ public class StaticActiveMQBroker extends ActiveMQBroker {
       // throw new IllegalStateException("only one instance of broker per VM is allowed\ninstanceof = " + INSTANCE.getClass());
       // }
 
-	   ActiveMQBroker.INSTANCE = this;
+	   ActiveMQBroker.instance = this;
    }
 
    @Override

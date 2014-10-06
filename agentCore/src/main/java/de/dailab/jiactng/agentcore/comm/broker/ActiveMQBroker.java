@@ -28,7 +28,7 @@ import de.dailab.jiactng.agentcore.management.Manager;
 public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBrokerMBean {
 
    /** The ActiveMQ broker used by all agent nodes of the local JVM. */
-   protected static ActiveMQBroker INSTANCE = null;
+   protected static ActiveMQBroker instance = null;
 
    /**
     * Initializes the given connection factory proxy with a new ActiveMQ connection factory using the name of the broker of this JVM.
@@ -39,14 +39,14 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
     * @throws IllegalStateException if no broker is running in this JVM
     */
    static void initialiseProxy(ConnectionFactoryProxy proxy) {
-      if (INSTANCE == null) {
+      if (instance == null) {
          throw new IllegalStateException("no broker is running");
       } 
       //since a new broker is created upon the first connection, we need to set the persistence flag here too, otherwise kahadb is always used for this broker
       if (proxy.isPersistent()) {         
-         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName());
+         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + instance.getBrokerName());
       } else {
-         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + INSTANCE.getBrokerName() + "?broker.persistent=false");
+         proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + instance.getBrokerName() + "?broker.persistent=false");
       }
    }
 
@@ -68,8 +68,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
          // throw new IllegalStateException("only on instance per VM is allowed");
          // }
          //
-         if (INSTANCE == null) {
-            INSTANCE = this;
+         if (instance == null) {
+            instance = this;
          }
       }
    }

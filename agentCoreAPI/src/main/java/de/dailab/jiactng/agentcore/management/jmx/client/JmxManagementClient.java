@@ -99,35 +99,36 @@ public class JmxManagementClient {
 		// activate multicast socket
 		final InetAddress group = InetAddress.getByName("226.6.6.7");
 		final MulticastSocket socket = new MulticastSocket(9999);
-    socket.setSoTimeout((int)(JmxManager.MULTICAST_PERIOD+CONNECTION_TESTER_TIMEOUT));
+		socket.setSoTimeout((int)(JmxManager.MULTICAST_PERIOD+CONNECTION_TESTER_TIMEOUT));
 		socket.setTimeToLive(1);
 		final DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
 		socket.joinGroup(group);
 
 		try {
-      // read multicast packets
-      while (System.currentTimeMillis() < endTime) {
-        // read message
-        dp.setLength(MAX_MULTICAST_MESSAGE_LENGTH); 
-        socket.receive(dp);
-        buffer = dp.getData();
-        final String message = new String(buffer, 0, dp.getLength());
+			// read multicast packets
+			while (System.currentTimeMillis() < endTime) {
+				// read message
+				dp.setLength(MAX_MULTICAST_MESSAGE_LENGTH);
+				socket.receive(dp);
+				buffer = dp.getData();
+				final String message = new String(buffer, 0, dp.getLength());
 
-        // add converted message to list of URLs
-        try {
-          JMXServiceURL url = new JMXServiceURL(message);
-          // replace localhost within URL path
-          if (url.getURLPath().contains("localhost")) {
-            url = new JMXServiceURL(message.replace("localhost", url.getHost()));
-          }
-          tester.addURL(url);
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    } catch (SocketTimeoutException ste) {
-      ste.printStackTrace();
-    }
+				// add converted message to list of URLs
+				try {
+					JMXServiceURL url = new JMXServiceURL(message);
+					// replace localhost within URL path
+					if (url.getURLPath().contains("localhost")) {
+						url = new JMXServiceURL(message.replace("localhost", url.getHost()));
+					}
+					tester.addURL(url);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (SocketTimeoutException ste) {
+			ste.printStackTrace();
+		}
+		socket.close();
 
 		return tester.getResult();
 	}

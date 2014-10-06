@@ -161,7 +161,7 @@ public class ActionResult extends SessionEvent {
 			builder.append("null");
 		}
 		if (failure != null) {
-			builder.append("\n failure=" + String.valueOf(failure));
+			builder.append("\n failure=").append(String.valueOf(failure));
 		}
 		builder.append('\n');
 		return builder.toString();

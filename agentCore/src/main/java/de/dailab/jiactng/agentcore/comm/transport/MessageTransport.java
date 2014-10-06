@@ -26,7 +26,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  * @version $Revision$
  */
 public abstract class MessageTransport implements MessageTransportMBean {
-    public static interface IMessageTransportDelegate {
+    public interface IMessageTransportDelegate {
         /**
          * This method is called from a transport when a communication 
          * or administration exception occurred.

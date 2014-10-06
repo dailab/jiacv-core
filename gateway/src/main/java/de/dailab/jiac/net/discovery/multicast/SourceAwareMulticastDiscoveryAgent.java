@@ -268,10 +268,12 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent, Runna
             if (group == null || group.length() == 0) {
                 throw new IOException("You must specify a group to discover");
             }
+            // XXX type is never used here, thus appending a point is pointless
+            // also, type will always have a point, becuase it's part of the final TYPE_SUFFIX
             String type = getType();
             if (!type.endsWith(".")) {
                 LOG.warn("The type '" + type + "' should end with '.' to be a valid Discovery type");
-                type += ".";
+                // type += "."; // commented because it does not do anything
             }
             
             if (discoveryURI == null) {

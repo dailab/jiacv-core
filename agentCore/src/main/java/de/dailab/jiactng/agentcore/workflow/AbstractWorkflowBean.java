@@ -282,7 +282,7 @@ public abstract class AbstractWorkflowBean extends AbstractMethodExposingBean {
 
 		protected IGroupAddress groupAddress;
 		protected Class<?> payloadClass;
-		protected Object received = null;
+		protected IFact received = null;
 		
 		public MessageEventHandler(Thread toStop, String channel, Class<?> payloadType) {
 			super(toStop);

@@ -51,7 +51,7 @@ public class BinaryContent implements IFact {
             return true;
         }
         
-        if(obj == null || !(obj instanceof BinaryContent)) {
+        if (! (obj instanceof BinaryContent)) {
             return false;
         }
         

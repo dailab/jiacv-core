@@ -437,7 +437,7 @@ public class Action implements IActionDescription {
 	 */
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null || !(obj instanceof Action)) {
+		if (! (obj instanceof Action)) {
 			return false;
 		}
 

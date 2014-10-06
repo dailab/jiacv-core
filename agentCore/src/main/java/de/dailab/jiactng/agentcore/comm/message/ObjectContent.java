@@ -60,7 +60,7 @@ public class ObjectContent implements IFact {
                 return true;
             }
             
-            if(obj == null || !(obj instanceof ObjectContent)) {
+            if (! (obj instanceof ObjectContent)) {
                 return false;
             }
             

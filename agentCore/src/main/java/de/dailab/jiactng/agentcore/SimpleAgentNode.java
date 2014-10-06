@@ -944,7 +944,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
     * {@inheritDoc}
     */
    public final String getDirectoryName() {
-      if (directory != null && directory instanceof AbstractAgentNodeBean) {
+      if (directory instanceof AbstractAgentNodeBean) {
          return ((AbstractAgentNodeBean) directory).getBeanName();
       }
       return null;

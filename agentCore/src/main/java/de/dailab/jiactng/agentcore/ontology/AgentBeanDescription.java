@@ -74,7 +74,7 @@ public class AgentBeanDescription implements IFact {
             return true;
         }
         
-        if(obj == null || !(obj instanceof AgentBeanDescription)) {
+        if (! (obj instanceof AgentBeanDescription)) {
             return false;
         }
 

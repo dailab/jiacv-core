@@ -169,7 +169,7 @@ public class JMSMessageTransport extends MessageTransport {
          // IFact payload= message.getPayload();
          Message result;
 
-         if (payload != null && payload instanceof BinaryContent) {
+         if (payload instanceof BinaryContent) {
             result = session.createBytesMessage();
             ((BytesMessage) result).writeBytes(((BinaryContent) payload).getData());
          }

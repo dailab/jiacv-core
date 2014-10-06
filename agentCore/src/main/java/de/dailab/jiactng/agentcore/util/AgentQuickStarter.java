@@ -73,7 +73,7 @@ public class AgentQuickStarter {
 	/** The number of generic agents, default is one */
 	private int numberOfAgents = 1;
 
-	private final String template = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+	private static final String TEMPLATE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<!DOCTYPE beans PUBLIC \"-//SPRING//DTD BEAN//EN\" \"http://www.springframework.org/dtd/spring-beans.dtd\">\n\n"
 			+ "<!-- This is a Spring application context. There are imports to other Spring\n"
 			+ "\tconfigurations and configured beans. -->\n"
@@ -237,7 +237,7 @@ public class AgentQuickStarter {
 			BufferedWriter bfw = null;
 			try {
 				bfw = new BufferedWriter(new FileWriter(tempFile));
-				bfw.write(template);
+				bfw.write(TEMPLATE);
 				bfw.flush();
 			} catch (IOException e3) {
 				e3.printStackTrace();
@@ -274,18 +274,18 @@ public class AgentQuickStarter {
 
 	class ConfigXmlParser {
 
-		final String ELEMENT_BEAN_LABEL = "bean";
-		final String ELEMENT_BEANS_LABEL = "beans";
-		final String ELEMENT_PROPERTY_LABEL = "property";
+		static final String ELEMENT_BEAN_LABEL = "bean";
+		static final String ELEMENT_BEANS_LABEL = "beans";
+		static final String ELEMENT_PROPERTY_LABEL = "property";
 
-		final String ATTRIBUT_CLASS_LABEL = "class";
-		final String ATTRIBUT_NAME_LABEL = "name";
+		static final String ATTRIBUT_CLASS_LABEL = "class";
+		static final String ATTRIBUT_NAME_LABEL = "name";
 
-		final String ATTRIBUT_VALUE_LABEL = "value";
-		final String ATTRIBUT_SINGELTON_LABEL = "singleton";
+		static final String ATTRIBUT_VALUE_LABEL = "value";
+		static final String ATTRIBUT_SINGELTON_LABEL = "singleton";
 
-		final String PROPERTY_ATTRIBUT_EXECINTERVAL_NAME_VALUE = "executeInterval";
-		final String PROPERTY_ATTRIBUT_LOGLEVEL_NAME_VALUE = "logLevel";
+		static final String PROPERTY_ATTRIBUT_EXECINTERVAL_NAME_VALUE = "executeInterval";
+		static final String PROPERTY_ATTRIBUT_LOGLEVEL_NAME_VALUE = "logLevel";
 
 		File configFile;
 		ConfigParamters paramters;

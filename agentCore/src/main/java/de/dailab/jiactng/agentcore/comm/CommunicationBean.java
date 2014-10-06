@@ -864,7 +864,7 @@ class ListenerContext {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof ListenerContext)) {
+        if (! (obj instanceof ListenerContext)) {
             return false;
         }
 

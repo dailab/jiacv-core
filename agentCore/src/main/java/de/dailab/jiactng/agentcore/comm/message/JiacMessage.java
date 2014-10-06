@@ -140,7 +140,7 @@ public final class JiacMessage implements IJiacMessage {
          recursionDetected = true;
          if (obj == this) { return true; }
 
-         if (obj == null || !(obj instanceof JiacMessage)) { return false; }
+         if (! (obj instanceof JiacMessage)) { return false; }
 
          final JiacMessage other = (JiacMessage) obj;
          final Set<String> otherKeys = other.getHeaderKeys();

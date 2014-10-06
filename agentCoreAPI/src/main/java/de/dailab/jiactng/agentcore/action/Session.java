@@ -309,7 +309,7 @@ public class Session implements IFact {
     */
    @Override
    public boolean equals(Object obj) {
-      if (obj == null || !(obj instanceof Session)) {
+      if (! (obj instanceof Session)) {
          return false;
       }
       final Session other = (Session) obj;

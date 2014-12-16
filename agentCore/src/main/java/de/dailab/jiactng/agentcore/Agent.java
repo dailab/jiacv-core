@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1441,15 +1440,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    */
   @Override
   public final List<IActionDescription> searchAllActions(IActionDescription template) {
-    Set<IActionDescription> actionDescriptions = new HashSet<IActionDescription>();
+    List<IActionDescription> actionDescriptions = new ArrayList<IActionDescription>();
     if (memory != null) {
       actionDescriptions.addAll(memory.readAll(template));
     }
 
     if (directory != null) {
-      actionDescriptions.addAll(directory.searchAllActions(template));
+      List<IActionDescription> directoryActions = directory.searchAllActions(template);
+      for (IActionDescription act : directoryActions){
+    	  if (!actionDescriptions.contains(act)) actionDescriptions.add(act);
+      }
     }
-    return new ArrayList<IActionDescription>(actionDescriptions);
+    return actionDescriptions;
   }
 
   /**

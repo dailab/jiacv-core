@@ -940,15 +940,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
       System.out.println("Socket appender removed.");
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   public final String getDirectoryName() {
-      if (directory instanceof AbstractAgentNodeBean) {
-         return ((AbstractAgentNodeBean) directory).getBeanName();
-      }
-      return null;
-   }
+	/**
+	 * {@inheritDoc}
+	 */
+	public final String getDirectoryName() {
+		if (directory != null && directory instanceof AbstractAgentNodeBean) {
+			return ((AbstractAgentNodeBean) directory).getBeanName();
+		}
+		return null;
+	}
 
    /**
     * {@inheritDoc}

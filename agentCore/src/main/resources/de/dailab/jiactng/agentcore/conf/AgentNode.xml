@@ -15,6 +15,9 @@
       * ServiceDirectory: sets the ServiceDirectory
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
+      # For ssl usage, set the attribute boolean sslInUse to true. Other (optional) ssl relevant string properties are
+      # keyStore (path to an existing keystore), keyStorePassword, keyStoreType (standard: "JKS"),
+      # trustStore (path to an existing truststore), trustStorePassword, trustStoreType (standard: "JKS").
    -->
    <bean name="NodeWithJMX" parent="NodeWithDirectory" abstract="true">
       <property name="jmxConnectors">
@@ -35,6 +38,9 @@
       * ServiceDirectory: sets the ServiceDirectory
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
+      # For ssl usage, set the attribute boolean sslInUse to true. Other (optional) ssl relevant string properties are
+      # keyStore (path to an existing keystore), keyStorePassword, keyStoreType (standard: "JKS"),
+      # trustStore (path to an existing truststore), trustStorePassword, trustStoreType (standard: "JKS").
    -->
    <bean name="NodeWithSecuredJMX" parent="NodeWithDirectory" abstract="true">
       <property name="jmxConnectors">
@@ -86,6 +92,9 @@
       * ServiceDirectory: sets the ServiceDirectory
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
+      # For ssl usage, set the attribute boolean sslInUse to true. Other (optional) ssl relevant string properties are
+      # keyStore (path to an existing keystore), keyStorePassword, keyStoreType (standard: "JKS"),
+      # trustStore (path to an existing truststore), trustStorePassword, trustStoreType (standard: "JKS").
    -->
    <bean name="NodeWithRegistry" parent="NodeWithDirectory" abstract="true">
       <property name="jmxConnectors">
@@ -100,7 +109,10 @@
    <!--
       # The default AgentNode Spring configuration
       # provides an empty platform definition without JMX support but with a distributed agent and service directory.
-      # the platform bean may be set as parent in any other platfom definitions 
+      # the platform bean may be set as parent in any other platfom definitions. 
+      # For ssl usage, set the attribute boolean sslInUse to true. Other (optional) ssl relevant string properties are
+      # keyStore (path to an existing keystore), keyStorePassword, keyStoreType (standard: "JKS"),
+      # trustStore (path to an existing truststore), trustStorePassword, trustStoreType (standard: "JKS").
       
    -->
    <bean name="NodeWithDirectory" parent="Node" abstract="true">

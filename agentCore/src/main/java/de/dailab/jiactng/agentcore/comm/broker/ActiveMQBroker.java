@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.comm.broker;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import org.apache.activemq.network.NetworkConnector;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
+import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.management.Manager;
 
 /**
@@ -30,15 +32,13 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	protected static ActiveMQBroker instance = null;
 
 	/**
-	 * Initializes the given connection factory proxy with a new ActiveMQ
-	 * connection factory using the name of the broker of this JVM.
+	 * Initializes the given connection factory proxy with a new ActiveMQ connection factory using the name of the broker
+	 * of this JVM.
 	 * 
-	 * @param proxy
-	 *          the connection factory proxy
+	 * @param proxy the connection factory proxy
 	 * @see ConnectionFactoryProxy#connectionFactory
 	 * @see ActiveMQConnectionFactory#ActiveMQConnectionFactory(String)
-	 * @throws IllegalStateException
-	 *           if no broker is running in this JVM
+	 * @throws IllegalStateException if no broker is running in this JVM
 	 */
 	static void initialiseProxy(final ConnectionFactoryProxy proxy) {
 		if (instance == null) {
@@ -49,9 +49,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 		// broker
 		if (proxy.isPersistent()) {
 			proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + instance.getBrokerName());
-		}
-		else {
-			proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + instance.getBrokerName() + "?broker.persistent=false");
+		} else {
+			proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + instance.getBrokerName()
+																							+ "?broker.persistent=false");
 		}
 	}
 
@@ -64,8 +64,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	protected String _dataDirectory = null;
 
 	/**
-	 * Creates an empty ActiveMQ broker and initializes the static variable
-	 * <code>INSTANCE</code> with this broker if not yet set.
+	 * Creates an empty ActiveMQ broker and initializes the static variable <code>INSTANCE</code> with this broker if not
+	 * yet set.
 	 */
 	public ActiveMQBroker() {
 		synchronized (ActiveMQBroker.class) {
@@ -108,19 +108,37 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	// Lifecyclemethods:
 
 	/**
-	 * Initialize this broker by instantiating and starting the ActiveMQ broker
-	 * service. Three connectors (network URI, transport URI, discovery URI) are
-	 * added to the broker service for each specified transport connector. The
-	 * discovery URI defined by the agent node will be preferred.
+	 * Initialize this broker by instantiating and starting the ActiveMQ broker service. Three connectors (network URI,
+	 * transport URI, discovery URI) are added to the broker service for each specified transport connector. The discovery
+	 * URI defined by the agent node will be preferred.
 	 * 
-	 * @throws Exception
-	 *           if an error occurs during initialization
+	 * @throws Exception if an error occurs during initialization
 	 * @see BrokerService
 	 * @see #setConnectors(Set)
 	 */
 	@Override
 	public void doInit() throws Exception {
 		this.log.debug("initializing embedded broker");
+
+		boolean useSsl = false;
+		try {
+			useSsl = Boolean.parseBoolean(System.getProperty(SimpleAgentNode.SSL_USAGE_IDENTIFIER));
+		} catch (Exception e) {
+			log.warn("Could not read ssl state!", e);
+			useSsl = false;
+		}
+		if (useSsl && _connectors != null) {
+			// change transport connectors from tcp to ssl
+			Iterator<ActiveMQTransportConnector> it = _connectors.iterator();
+			while (it.hasNext()) {
+				ActiveMQTransportConnector c = it.next();
+				String transportUri = c.getTransportURI();
+				if (transportUri.toLowerCase().startsWith("tcp:")) {
+					transportUri = "ssl:" + transportUri.substring(4);
+					c.setTransportURI(transportUri);
+				}
+			}
+		}
 
 		this._brokerName = this.agentNode.getUUID() + this.getBeanName();
 		this._broker = new BrokerService();
@@ -141,8 +159,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 			context.setJmxDomainName("de.dailab.jiactng");
 			context.setCreateConnector(false);
 			this._broker.setManagementContext(context);
-		}
-		else {
+		} else {
 			this._broker.setUseJmx(false);
 		}
 
@@ -178,8 +195,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 				}
 			}
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			this.log.error(e.toString(), e);
 		}
 
@@ -190,8 +206,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	/**
 	 * Cleanup this broker by stopping the ActiveMQ broker service.
 	 * 
-	 * @throws Exception
-	 *           if an error occurs during stop of the broker service
+	 * @throws Exception if an error occurs during stop of the broker service
 	 * @see BrokerService#stop()
 	 */
 	@Override
@@ -213,12 +228,9 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
 	/**
 	 * Indicates whether messages should be stored in a data base or not.<br/>
-	 * as default ActiveMQ uses KahaDB to store message. KahaDB is included in the
-	 * activeMQ dependency
+	 * as default ActiveMQ uses KahaDB to store message. KahaDB is included in the activeMQ dependency
 	 * 
-	 * @param persistent
-	 *          <code>true</code> to store messages and <code>false</code>
-	 *          otherwise.
+	 * @param persistent <code>true</code> to store messages and <code>false</code> otherwise.
 	 */
 	public void setPersistent(final boolean persistent) {
 		this._persistent = persistent;
@@ -233,9 +245,8 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	}
 
 	/**
-	 * Get the location of the activeMQ data directory used as persistence store
-	 * the directory applies only when a persistency adapter other than
-	 * MemoryAdapter is used, e.g. when persistency is switched on
+	 * Get the location of the activeMQ data directory used as persistence store the directory applies only when a
+	 * persistency adapter other than MemoryAdapter is used, e.g. when persistency is switched on
 	 * 
 	 * @return the location of the message store as a String
 	 */
@@ -244,29 +255,24 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	}
 
 	/**
-	 * sets the location of the Message store, e.g. the activeMQ persistency data
-	 * base<br/>
+	 * sets the location of the Message store, e.g. the activeMQ persistency data base<br/>
 	 * the location is expected to be a folder represented as String<br/>
 	 * the default location is /$userhome/activemq-data/
 	 * 
-	 * @param _dataDirectory
-	 *          the location of the message store as a String
+	 * @param _dataDirectory the location of the message store as a String
 	 */
 	public void setDataDirectory(final String _dataDirectory) {
 		this._dataDirectory = _dataDirectory;
 	}
 
 	/**
-	 * Setter for the set of connectors. Connectors are entry points to the broker
-	 * that accept remote connections. By default, every broker has a logical
-	 * vm-connector which permits the inner-vm-message exchange.
-	 * 
+	 * Setter for the set of connectors. Connectors are entry points to the broker that accept remote connections. By
+	 * default, every broker has a logical vm-connector which permits the inner-vm-message exchange.
 	 * <p>
 	 * This method should be called before this bean is initialised!
 	 * </p>
 	 * 
-	 * @param connectors
-	 *          the set of connectors
+	 * @param connectors the set of connectors
 	 */
 	public void setConnectors(final Set<ActiveMQTransportConnector> connectors) {
 		this._connectors = connectors;
@@ -280,8 +286,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	 * Get the name of the ActiveMQ broker service.
 	 * 
 	 * @return the name
-	 * @throws IllegalStateException
-	 *           if the broker service is not initialized
+	 * @throws IllegalStateException if the broker service is not initialized
 	 */
 	protected String getBrokerName() {
 		if (this._brokerName == null) {
@@ -294,8 +299,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	/**
 	 * Register the broker and all transport connectors for management
 	 * 
-	 * @param manager
-	 *          the manager to be used for registration
+	 * @param manager the manager to be used for registration
 	 */
 	@Override
 	public void enableManagement(final Manager manager) {
@@ -336,8 +340,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	/**
 	 * Register a transport connector for management.
 	 * 
-	 * @param connector
-	 *          the transport connector to be registered
+	 * @param connector the transport connector to be registered
 	 */
 	private void registerConnector(final ActiveMQTransportConnector connector) {
 		// do nothing if management is not enabled
@@ -347,18 +350,20 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
 		// register message transport for management
 		try {
-			this._manager.registerAgentNodeBeanResource(this, this.getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE,
-					"\"" + connector.getName() + ":" + connector.getTransportURI() + "\"", connector);
-		}
-		catch (Exception e) {
+			this._manager.registerAgentNodeBeanResource(this, this.getAgentNode(),
+																							ActiveMQTransportConnectorMBean.RESOURCE_TYPE,
+																							"\"" + connector.getName() + ":" + connector.getTransportURI() + "\"",
+																							connector);
+		} catch (Exception e) {
 			if ((this.log != null) && (this.log.isErrorEnabled())) {
-				this.log.error("WARNING: Unable to register transport connector " + connector.getName() + ":" + connector.getTransportURI()
-						+ " of the broker of agent node " + this.getAgentNode().getName() + " as JMX resource.", e);
+				this.log.error("WARNING: Unable to register transport connector " + connector.getName() + ":"
+																								+ connector.getTransportURI() + " of the broker of agent node "
+																								+ this.getAgentNode().getName() + " as JMX resource.", e);
 				this.log.error(e.getMessage());
-			}
-			else {
-				System.err.println("WARNING: Unable to register transport connector " + connector.getName() + ":" + connector.getTransportURI()
-						+ " of the broker of agent node " + this.getAgentNode().getName() + " as JMX resource.");
+			} else {
+				System.err.println("WARNING: Unable to register transport connector " + connector.getName() + ":"
+																								+ connector.getTransportURI() + " of the broker of agent node "
+																								+ this.getAgentNode().getName() + " as JMX resource.");
 				System.err.println(e.getMessage());
 			}
 		}
@@ -367,8 +372,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	/**
 	 * Unregister a transport connector from management.
 	 * 
-	 * @param connector
-	 *          the transport connector to be unregistered
+	 * @param connector the transport connector to be unregistered
 	 */
 	private void unregisterConnector(final ActiveMQTransportConnector connector) {
 		// do nothing if management is not enabled
@@ -378,18 +382,19 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 
 		// unregister transport connector from management
 		try {
-			this._manager.unregisterAgentNodeBeanResource(this, this.getAgentNode(), ActiveMQTransportConnectorMBean.RESOURCE_TYPE,
-					"\"" + connector.getName() + ":" + connector.getTransportURI() + "\"");
-		}
-		catch (Exception e) {
+			this._manager.unregisterAgentNodeBeanResource(this, this.getAgentNode(),
+																							ActiveMQTransportConnectorMBean.RESOURCE_TYPE,
+																							"\"" + connector.getName() + ":" + connector.getTransportURI() + "\"");
+		} catch (Exception e) {
 			if ((this.log != null) && (this.log.isErrorEnabled())) {
-				this.log.error("WARNING: Unable to deregister transport connector " + connector.getName() + ":" + connector.getTransportURI()
-						+ " of the broker of agent node " + this.getAgentNode().getName() + " as JMX resource.");
+				this.log.error("WARNING: Unable to deregister transport connector " + connector.getName() + ":"
+																								+ connector.getTransportURI() + " of the broker of agent node "
+																								+ this.getAgentNode().getName() + " as JMX resource.");
 				this.log.error(e.getMessage());
-			}
-			else {
-				System.err.println("WARNING: Unable to deregister transport connector " + connector.getName() + ":" + connector.getTransportURI()
-						+ " of the broker of agent node " + this.getAgentNode().getName() + " as JMX resource.");
+			} else {
+				System.err.println("WARNING: Unable to deregister transport connector " + connector.getName() + ":"
+																								+ connector.getTransportURI() + " of the broker of agent node "
+																								+ this.getAgentNode().getName() + " as JMX resource.");
 				System.err.println(e.getMessage());
 			}
 		}

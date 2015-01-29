@@ -255,12 +255,26 @@ public final class JmxConnectorManager extends TimerTask {
 			}
 			if (useSsl) {
 				// set ssl environments within environment map for jmx
-				env.put("javax.net.ssl.keyStore", System.getProperties().get("javax.net.ssl.keyStore"));
-				env.put("javax.net.ssl.keyStoreType", System.getProperties().get("javax.net.ssl.keyStoreType"));
-				env.put("javax.net.ssl.keyStorePassword", System.getProperties().get("javax.net.ssl.keyStorePassword"));
-				env.put("javax.net.ssl.trustStore", System.getProperties().get("javax.net.ssl.trustStore"));
-				env.put("javax.net.ssl.trustStoreType", System.getProperties().get("javax.net.ssl.trustStoreType"));
-				env.put("javax.net.ssl.trustStorePassword", System.getProperties().get("javax.net.ssl.trustStorePassword"));
+				Object ks = System.getProperties().get("javax.net.ssl.keyStore");
+				Object ksPwd = System.getProperties().get("javax.net.ssl.keyStorePassword");
+				Object ksType = System.getProperties().get("javax.net.ssl.keyStoreType");
+				if (ksType == null)
+					ksType = "JKS";
+				if (ks != null && ksPwd != null) {
+					env.put("javax.net.ssl.keyStore", ks);
+					env.put("javax.net.ssl.keyStoreType", ksType);
+					env.put("javax.net.ssl.keyStorePassword", ksPwd);
+				}
+				Object ts = System.getProperties().get("javax.net.ssl.trustStore");
+				Object tsPwd = System.getProperties().get("javax.net.ssl.trustStorePassword");
+				Object tsType = System.getProperties().get("javax.net.ssl.trustStoreType");
+				if (tsType == null)
+					tsType = "JKS";
+				if (ts != null && tsPwd != null) {
+					env.put("javax.net.ssl.trustStore", ts);
+					env.put("javax.net.ssl.trustStoreType", tsType);
+					env.put("javax.net.ssl.trustStorePassword", tsPwd);
+				}
 				env.put("com.sun.management.jmxremote.registry.ssl", true);
 				env.put("com.sun.management.jmxremote.ssl.need.client.auth", true);
 				env.put("com.sun.management.jmxremote.ssl", true);

@@ -653,8 +653,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		start();
 	}
 
-	private void setSslContext() {
-		log.info("Initializing ssl context");
+	private void setSslContext() throws Exception {
+
+		log.info("Initializing ssl context (V0.1)");
 
 		// Keystore
 		File ks = null;
@@ -665,25 +666,29 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			System.setProperty("javax.net.ssl.keyStoreType", keyStoreType);
 			ks = new File(keyStore);
 			if (!ks.exists() && !ks.canRead()) {
-				log.warn("Could not find keystore file! Using system environment variables only.");
-			} else {
-				InputStream inKs = null;
-				try {
-					inKs = new FileInputStream(ks);
-					KeyStore keystore = KeyStore.getInstance(keyStoreType);
-					keystore.load(inKs, keyStorePassword.toCharArray());
-					kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-					kmf.init(keystore, keyStorePassword.toCharArray());
-					log.info("Keystore initiated (" + ks.getAbsolutePath() + ")");
-				} catch (Exception e) {
-					log.error("Could not read keystore. Please check exception message: " + e.getLocalizedMessage(), e);
-				}
-				if (inKs != null) {
-					try {
-						inKs.close();
-					} catch (Exception e) {}
-				}
+				// log.warn("Could not find keystore file! Using system environment variables only.");
+				throw new IOException("Could not load desired keystore file (" + ks.getAbsolutePath() + ")!");
 			}
+			// ks file readable
+			InputStream inKs = null;
+			try {
+				inKs = new FileInputStream(ks);
+				KeyStore keystore = KeyStore.getInstance(keyStoreType);
+				keystore.load(inKs, keyStorePassword.toCharArray());
+				kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+				kmf.init(keystore, keyStorePassword.toCharArray());
+				log.info("Keystore initiated (" + ks.getAbsolutePath() + ")");
+			} catch (Exception e) {
+				log.error("Could not read keystore. Please check exception message: " + e.getLocalizedMessage(), e);
+				closeStream(inKs);
+				throw e;
+			}
+			closeStream(inKs);
+		} else {
+			// keystore settings not set. use empty instead.
+			kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			kmf.init(null, null);
+			log.info("Empty keystore initiated");
 		}
 
 		// Truststore
@@ -695,49 +700,45 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			System.setProperty("javax.net.ssl.trustStoreType", trustStoreType);
 			ts = new File(trustStore);
 			if (!ts.exists() && !ts.canRead()) {
-				log.warn("Could not find truststore file! Trying to set system environment variables.");
-			} else {
-				InputStream inTs = null;
-				try {
-					inTs = new FileInputStream(ts);
-					KeyStore truststore = KeyStore.getInstance(trustStoreType);
-					truststore.load(inTs, trustStorePassword.toCharArray());
-					tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-					tmf.init(truststore);
-					log.info("Truststore initiated (" + ts.getAbsolutePath() + ")");
-				} catch (Exception e) {
-					log.error("Could not read truststore. Please check exception message: " + e.getLocalizedMessage(), e);
-				}
-				if (inTs != null) {
-					try {
-						inTs.close();
-					} catch (Exception e) {}
-				}
+				// log.warn("Could not find truststore file! Trying to set system environment variables.");
+				throw new IOException("Could not load desired truststore file (" + ts.getAbsolutePath() + ")!");
 			}
-		}
-
-		if (kmf != null && tmf != null) {
+			InputStream inTs = null;
 			try {
-
-				// if (kmf == null) {
-				// kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-				// }
-				// if (tmf == null) {
-				// tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-				// }
-				SSLContext sslContext = SSLContext.getInstance("TLS");
-				// initiate with keystore and truststore items
-				sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-				SSLContext.setDefault(sslContext);
-
-				log.debug("set ssl context");
-
-			} catch (final Exception e) {
-				log.warn("could not set ssl context environment", e);
-				e.printStackTrace();
+				inTs = new FileInputStream(ts);
+				KeyStore truststore = KeyStore.getInstance(trustStoreType);
+				truststore.load(inTs, trustStorePassword.toCharArray());
+				tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+				tmf.init(truststore);
+				log.info("Truststore initiated (" + ts.getAbsolutePath() + ")");
+			} catch (Exception e) {
+				log.error("Could not read truststore. Please check exception message: " + e.getLocalizedMessage(), e);
+				closeStream(inTs);
+				throw e;
 			}
+			closeStream(inTs);
+		} else {
+			// truststore settings not set. use standard java truststore instead.
+			tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			KeyStore keyStore = null;
+			tmf.init(keyStore);
 		}
 
+		SSLContext sslContext = SSLContext.getInstance("TLS");
+		// initiate with keystore and truststore items
+		sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+		SSLContext.setDefault(sslContext);
+
+		log.debug("Set ssl context");
+
+	}
+
+	private void closeStream(InputStream in) {
+		if (in != null) {
+			try {
+				in.close();
+			} catch (Exception e) {}
+		}
 	}
 
 	/**

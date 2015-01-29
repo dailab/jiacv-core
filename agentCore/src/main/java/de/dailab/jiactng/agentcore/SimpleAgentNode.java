@@ -657,6 +657,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 		log.info("Initializing ssl context (V0.1)");
 
+		boolean acceptJdkKeystores = false;
+
 		// Keystore
 		File ks = null;
 		KeyManagerFactory kmf = null;
@@ -686,6 +688,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			closeStream(inKs);
 		} else {
 			// keystore settings not set. use empty instead.
+			if (!acceptJdkKeystores) {
+				throw new IOException("Either path to keystore or keystore password not set!");
+			}
 			kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 			kmf.init(null, null);
 			log.info("Empty keystore initiated");
@@ -719,9 +724,13 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			closeStream(inTs);
 		} else {
 			// truststore settings not set. use standard java truststore instead.
+			if (!acceptJdkKeystores) {
+				throw new IOException("Either path to truststore or truststore password not set!");
+			}
 			tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 			KeyStore keyStore = null;
 			tmf.init(keyStore);
+			log.info("Standard truststore initiated");
 		}
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -729,7 +738,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 		SSLContext.setDefault(sslContext);
 
-		log.debug("Set ssl context");
+		log.info("Set ssl context");
 
 	}
 

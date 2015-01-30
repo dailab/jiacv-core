@@ -58,6 +58,7 @@ import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.AgentGroupDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
+import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 import de.dailab.jiactng.agentcore.util.jar.JAR;
@@ -1439,6 +1440,18 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
    * {@inheritDoc}
    */
   @Override
+  public final IActionDescription searchAction(IServiceDescription template) {
+    IActionDescription myAction = null;
+    if (myAction == null && directory != null) {
+      myAction = directory.searchAction(template);
+    }
+    return myAction;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public final List<IActionDescription> searchAllActions(IActionDescription template) {
     List<IActionDescription> actionDescriptions = new ArrayList<IActionDescription>();
     if (memory != null) {
@@ -1453,7 +1466,23 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
     }
     return actionDescriptions;
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public final List<IActionDescription> searchAllActions(IServiceDescription template) {
+    List<IActionDescription> actionDescriptions = new ArrayList<IActionDescription>();
 
+    if (directory != null) {
+      List<IActionDescription> directoryActions = directory.searchAllActions(template);
+      for (IActionDescription act : directoryActions){
+    	  if (!actionDescriptions.contains(act)) actionDescriptions.add(act);
+      }
+    }
+    return actionDescriptions;
+  }
+  
   /**
    * {@inheritDoc}
    */

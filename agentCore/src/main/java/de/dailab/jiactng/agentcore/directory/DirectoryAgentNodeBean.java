@@ -666,6 +666,32 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		log.warn("Cannot find action:\n" + template);
 		return null;
 	}
+	
+	@Override
+	public IServiceDescription searchAction(IServiceDescription template) {
+		if (template == null) {
+			log.error("Cannot find action: null!");
+			return null;
+		}
+
+		if (this.serviceMatcher != null && this.ontologyStorage != null){	
+			final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
+			IServiceDescription matcherResult = this.serviceMatcher
+					.findBestMatch(template,
+							serviceDescList);
+
+			if (matcherResult != null) {
+				return matcherResult;
+			} else {
+				log.warn("Matcher found no result, trying normal template matching...");
+			}
+			
+		} else {
+			log.error("This agentnode has no servicematcher and / or ontology storage - no complex matching possible!");
+		}
+		log.warn("Cannot find action:\n" + template);
+		return null;
+	}
 
 	@Override
 	public List<IActionDescription> searchAllActions(IActionDescription template) {
@@ -729,6 +755,34 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 					}
 				}
 			}
+		}
+		return actions;
+	}
+	
+	@Override
+	public List<IActionDescription> searchAllActions(IServiceDescription template) {
+		final ArrayList<IActionDescription> actions = new ArrayList<IActionDescription>();
+
+		if (template == null) {
+			log.error("Cannot find action: null!");
+			return actions;
+		}
+
+		if (this.serviceMatcher != null && this.ontologyStorage != null){	
+			final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
+			final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
+					.findAllMatches(template,
+							serviceDescList);
+
+			if ((matcherResults != null) && (matcherResults.size() > 0)) {
+				actions.addAll(matcherResults);
+				return actions;
+			} else {
+				log.warn("Matcher found no result, trying normal template matching...");
+			}
+			
+		} else {
+			log.error("This agentnode has no servicematcher and / or ontology storage - no complex matching possible!");
 		}
 		return actions;
 	}

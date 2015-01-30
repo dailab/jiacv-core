@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.directory;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
+import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 
 /**
  * This interface describes the way how to access the directory.
@@ -55,5 +56,27 @@ public interface IDirectoryAccess {
 	 * @return all actions that match the template or an empty list
 	 *         if none could be found
 	 */
-	List<IActionDescription> searchAllActions(IActionDescription template);
+	List<IActionDescription> searchAllActions(IActionDescription template);	
+	
+	/**
+	 * Returns an action that matches the given service description.
+	 * Usually it is the first that can be found or <code>null</code>
+	 * if none could be found.
+	 * 
+	 * @param template a service description template that will be used 
+	 *        to find such an action in the directory
+	 * @return the action that matches the template or <code>null</code>
+	 *         if none could be found
+	 */
+	IActionDescription searchAction(IServiceDescription template);
+
+	/**
+	 * Returns all actions that match the given service description.
+	 * 
+	 * @param template a service description template that will be used 
+	 *        to find such actions in the directory
+	 * @return all actions that match the template or an empty list
+	 *         if none could be found
+	 */
+	List<IActionDescription> searchAllActions(IServiceDescription template);
 }

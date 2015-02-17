@@ -6,14 +6,11 @@
  */
 package de.dailab.jiactng.agentcore;
 
-import java.util.List;
-
-import junit.framework.TestCase;
-
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
+import java.util.List;
+import junit.framework.TestCase;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class IAgentTest extends TestCase {
 

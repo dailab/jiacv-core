@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.dailab</groupId>
 		<artifactId>jiactng</artifactId>
-		<version>5.1.6-SNAPSHOT</version>
+		<version>5.1.6-SNAPSHOT-MQ11</version>
 		</parent>
 	
 	<groupId>de.dailab.jiactng</groupId>
@@ -21,16 +21,16 @@
 		</dependency>
 		
 		<!-- use Spring dependency from ActiveMQ to avoid multiple versions -->
-		<!--dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>3.0.3.RELEASE</version>
+			<version>3.2.13.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>3.0.3.RELEASE</version>
-		</dependency-->
+			<version>3.2.13.RELEASE</version>
+                </dependency>
 		
 		<dependency>
 			<groupId>de.dailab.jiac.net</groupId>

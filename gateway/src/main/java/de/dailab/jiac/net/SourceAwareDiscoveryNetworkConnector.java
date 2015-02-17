@@ -4,6 +4,7 @@
 package de.dailab.jiac.net;
 
 
+import de.dailab.jiac.net.discovery.SourceAwareDiscoveryEvent;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
@@ -11,13 +12,17 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Map;
-
 import javax.management.ObjectName;
-
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.SslContext;
 import org.apache.activemq.command.DiscoveryEvent;
-import org.apache.activemq.network.*;
+import org.apache.activemq.network.DemandForwardingBridge;
+import org.apache.activemq.network.DiscoveryNetworkConnector;
+import org.apache.activemq.network.MBeanNetworkListener;
+import org.apache.activemq.network.NetworkBridge;
+import org.apache.activemq.network.NetworkBridgeFactory;
+import org.apache.activemq.network.NetworkBridgeListener;
+import org.apache.activemq.network.NetworkConnector;
 import org.apache.activemq.transport.Transport;
 import org.apache.activemq.transport.TransportDisposedIOException;
 import org.apache.activemq.transport.TransportFactory;
@@ -30,8 +35,6 @@ import org.apache.activemq.util.ServiceSupport;
 import org.apache.activemq.util.URISupport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import de.dailab.jiac.net.discovery.SourceAwareDiscoveryEvent;
 
 /**
  * This class is mainly a clone of {@link DiscoveryNetworkConnector}!
@@ -242,9 +245,9 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     protected NetworkBridge createBridge(Transport localTransport, Transport remoteTransport, final DiscoveryEvent event) {
         class DiscoverNetworkBridgeListener extends MBeanNetworkListener {
 
-            public DiscoverNetworkBridgeListener(BrokerService brokerService, NetworkBridgeConfiguration networkBridgeConfiguration, ObjectName connectorName) {
+            public DiscoverNetworkBridgeListener(BrokerService brokerService, ObjectName connectorName) {
                 //super(brokerService, connectorName);
-                super(brokerService, networkBridgeConfiguration, connectorName);
+                super(brokerService, SourceAwareDiscoveryNetworkConnector.this, connectorName);
             }
 
             public void bridgeFailed() {
@@ -257,6 +260,8 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
 
             }
         }
+        
+        
         NetworkBridgeListener listener = new DiscoverNetworkBridgeListener(getBrokerService(), getObjectName());
 
         DemandForwardingBridge result = NetworkBridgeFactory.createBridge(this, localTransport, remoteTransport, listener);

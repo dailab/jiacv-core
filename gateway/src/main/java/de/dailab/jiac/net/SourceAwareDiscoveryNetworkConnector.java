@@ -17,13 +17,7 @@ import javax.management.ObjectName;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.SslContext;
 import org.apache.activemq.command.DiscoveryEvent;
-import org.apache.activemq.network.DemandForwardingBridge;
-import org.apache.activemq.network.DiscoveryNetworkConnector;
-import org.apache.activemq.network.MBeanNetworkListener;
-import org.apache.activemq.network.NetworkBridge;
-import org.apache.activemq.network.NetworkBridgeFactory;
-import org.apache.activemq.network.NetworkBridgeListener;
-import org.apache.activemq.network.NetworkConnector;
+import org.apache.activemq.network.*;
 import org.apache.activemq.transport.Transport;
 import org.apache.activemq.transport.TransportDisposedIOException;
 import org.apache.activemq.transport.TransportFactory;
@@ -248,8 +242,9 @@ public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector imple
     protected NetworkBridge createBridge(Transport localTransport, Transport remoteTransport, final DiscoveryEvent event) {
         class DiscoverNetworkBridgeListener extends MBeanNetworkListener {
 
-            public DiscoverNetworkBridgeListener(BrokerService brokerService, ObjectName connectorName) {
-                super(brokerService, connectorName);
+            public DiscoverNetworkBridgeListener(BrokerService brokerService, NetworkBridgeConfiguration networkBridgeConfiguration, ObjectName connectorName) {
+                //super(brokerService, connectorName);
+                super(brokerService, networkBridgeConfiguration, connectorName);
             }
 
             public void bridgeFailed() {

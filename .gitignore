@@ -1,6 +1,8 @@
 .settings
 .classpath
 .project
+.idea
 target
 *.log
+*.iml
 agentCore/src/main/java/de/dailab/jiactng/Version.java

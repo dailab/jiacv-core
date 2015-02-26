@@ -40,6 +40,7 @@ public final class JmxConnectorManager extends TimerTask {
 
 	/** SSL identifier */
 	private static final String SSL_USAGE_IDENTIFIER = "de.dailab.jiactng.agentcore.sslInUse";
+	private static final String SSL_LIMITED_CIPHER_SUITES = "de.dailab.jiactng.agentcore.limitedCipherSuites";
 
 	private JmxManager manager;
 	private IAgentNode node;
@@ -268,6 +269,7 @@ public final class JmxConnectorManager extends TimerTask {
 				Object ts = System.getProperties().get("javax.net.ssl.trustStore");
 				Object tsPwd = System.getProperties().get("javax.net.ssl.trustStorePassword");
 				Object tsType = System.getProperties().get("javax.net.ssl.trustStoreType");
+				String commaDelimitedList = System.getProperty(SSL_LIMITED_CIPHER_SUITES);
 				if (tsType == null)
 					tsType = "JKS";
 				if (ts != null && tsPwd != null) {
@@ -278,6 +280,8 @@ public final class JmxConnectorManager extends TimerTask {
 				env.put("com.sun.management.jmxremote.registry.ssl", true);
 				env.put("com.sun.management.jmxremote.ssl.need.client.auth", true);
 				env.put("com.sun.management.jmxremote.ssl", true);
+				if (commaDelimitedList != null)
+					env.put("com.sun.management.jmxremote. ssl.enabled.cipher.suites", commaDelimitedList);
 				SslRMIClientSocketFactory csf = new SslRMIClientSocketFactory();
 				SslRMIServerSocketFactory ssf = new SslRMIServerSocketFactory();
 				env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, csf);

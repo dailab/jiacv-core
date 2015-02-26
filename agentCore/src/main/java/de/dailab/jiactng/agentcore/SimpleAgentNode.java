@@ -73,6 +73,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** SSL identifier */
 	public static final String SSL_USAGE_IDENTIFIER = "de.dailab.jiactng.agentcore.sslInUse";
+	public static final String SSL_LIMITED_CIPHER_SUITES = "de.dailab.jiactng.agentcore.limitedCipherSuites";
 
 	/** The threadPool object */
 	private ExecutorService threadPool = null;
@@ -132,6 +133,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	/** For SSL use: use ssl (standard: false) */
 	private boolean sslInUse = false;
+
+	/** For SSL use: comma delimeted list of ciphers to use (standard: null = all available) */
+	private String cipherSuitesToUse = null;
 
 	/** Shutdown thread to be started when JVM was killed */
 	private Thread shutdownhook = new Thread() {
@@ -612,6 +616,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		log.warn("Agentnode is: " + this.getName() + " (" + this.getUUID() + ") with owner: " + this.getOwner());
 
 		System.setProperty(SSL_USAGE_IDENTIFIER, "" + sslInUse);
+		if (cipherSuitesToUse != null) {
+			cipherSuitesToUse = cipherSuitesToUse.replace(" ", "");
+			System.setProperty(SSL_LIMITED_CIPHER_SUITES, "" + cipherSuitesToUse);
+		}
 		if (sslInUse) {
 			setSslContext();
 		}
@@ -655,7 +663,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 
 	private void setSslContext() throws Exception {
 
-		log.info("Initializing ssl context (V0.1)");
+		log.info("Initializing ssl context (V0.2)");
 
 		boolean acceptJdkKeystores = false;
 
@@ -1337,6 +1345,20 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public void setSslInUse(boolean sslInUse) {
 		this.sslInUse = sslInUse;
+	}
+
+	/**
+	 * @return the cipherSuitesToUse
+	 */
+	public String getCipherSuitesToUse() {
+		return cipherSuitesToUse;
+	}
+
+	/**
+	 * @param cipherSuitesToUse the cipherSuitesToUse to set
+	 */
+	public void setCipherSuitesToUse(String cipherSuitesToUse) {
+		this.cipherSuitesToUse = cipherSuitesToUse;
 	}
 
 	/**

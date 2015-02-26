@@ -127,7 +127,15 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 			log.warn("Could not read ssl state!", e);
 			useSsl = false;
 		}
+
 		if (useSsl && _connectors != null) {
+			String cipherSuite = null;
+			try {
+				cipherSuite = System.getProperty(SimpleAgentNode.SSL_LIMITED_CIPHER_SUITES);
+			} catch (Exception e) {
+				log.warn("Could not read ssl cipherSuite state!", e);
+				cipherSuite = null;
+			}
 			// change transport connectors from tcp to ssl
 			Iterator<ActiveMQTransportConnector> it = _connectors.iterator();
 			while (it.hasNext()) {
@@ -135,6 +143,15 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 				String transportUri = c.getTransportURI();
 				if (transportUri.toLowerCase().startsWith("tcp:")) {
 					transportUri = "ssl:" + transportUri.substring(4);
+					if (cipherSuite != null) {
+						// add cipher suite limitation to transport uri
+						int index = transportUri.lastIndexOf("?");
+						if (index < 0) {
+							transportUri += "?transport.enabledCipherSuites=" + cipherSuite;
+						} else {
+							transportUri += "&transport.enabledCipherSuites=" + cipherSuite;
+						}
+					}
 					c.setTransportURI(transportUri);
 				}
 			}

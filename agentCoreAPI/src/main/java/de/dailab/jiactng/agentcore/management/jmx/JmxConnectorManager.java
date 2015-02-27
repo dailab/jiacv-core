@@ -281,7 +281,7 @@ public final class JmxConnectorManager extends TimerTask {
 				env.put("com.sun.management.jmxremote.ssl.need.client.auth", true);
 				env.put("com.sun.management.jmxremote.ssl", true);
 				if (commaDelimitedList != null)
-					env.put("com.sun.management.jmxremote. ssl.enabled.cipher.suites", commaDelimitedList);
+					env.put("com.sun.management.jmxremote.ssl.enabled.cipher.suites", commaDelimitedList);
 				SslRMIClientSocketFactory csf = new SslRMIClientSocketFactory();
 				SslRMIServerSocketFactory ssf = new SslRMIServerSocketFactory();
 				env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE, csf);

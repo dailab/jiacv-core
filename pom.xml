@@ -32,6 +32,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Sonar -->
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+		<sonar.jacoco.itreportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itreportPath>
 	</properties>
 
 	<developers>
@@ -674,5 +679,53 @@
 				</pluginManagement>
 			</build>
 		</profile>
+			<profile>
+				<id>sonar-coverage</id>
+				<activation>
+					<activeByDefault>true</activeByDefault>
+				</activation>
+				<build>
+					<pluginManagement>
+						<plugins>
+							<plugin>
+								<groupId>org.jacoco</groupId>
+								<artifactId>jacoco-maven-plugin</artifactId>
+								<version>0.7.4.201502262128</version>
+							</plugin>
+						</plugins>
+					</pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.jacoco</groupId>
+							<artifactId>jacoco-maven-plugin</artifactId>
+							<configuration>
+								<destFile>${sonar.jacoco.reportPath}</destFile>
+								<append>true</append>
+							</configuration>
+							<executions>
+								<execution>
+									<id>agent-for-ut</id>
+									<goals>
+										<goal>prepare-agent</goal>
+									</goals>
+								</execution>
+								<execution>
+									<id>agent-for-it</id>
+									<goals>
+										<goal>prepare-agent-integration</goal>
+									</goals>
+								</execution>
+								<execution>
+									<id>jacoco-site</id>
+									<phase>site</phase>
+									<goals>
+										<goal>report</goal>
+									</goals>
+								</execution>
+							</executions>
+						</plugin>
+					</plugins>
+				</build>
+			</profile>
 	</profiles>
 </project>

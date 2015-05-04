@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -97,7 +98,7 @@ public class ActionTesterNode {
 			final int bytesread = cfis.read(byteconfig, 0, cfis.available());
 
 			if (this.log.isDebugEnabled()) {
-				this.log.debug("Read " + bytesread + " bytes. The byteconfig content is:" + byteconfig.toString());
+				this.log.debug("Read " + bytesread + " bytes. The byteconfig content is:" + Arrays.toString(byteconfig));
 			}
 
 			// add InvokeActionAgent

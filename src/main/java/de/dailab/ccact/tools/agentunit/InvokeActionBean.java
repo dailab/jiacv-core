@@ -1,6 +1,7 @@
 package de.dailab.ccact.tools.agentunit;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -92,7 +93,7 @@ public final class InvokeActionBean extends AbstractAgentBean {
 	public Serializable[] invokeAction(final String serviceName, Serializable[] input) {
 
 		if (log.isDebugEnabled()) {
-			log.debug("Invoking action " + serviceName + " with input " + input);
+			log.debug("Invoking action " + serviceName + " with input " + Arrays.toString(input));
 		}
 		
 		Action tpl = new Action(serviceName);

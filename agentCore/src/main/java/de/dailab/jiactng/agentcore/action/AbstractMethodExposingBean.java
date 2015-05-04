@@ -46,7 +46,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 	
 	private int counter = 0;
 	
-	static String getServicename(Method method){
+	public static String getServicename(Method method){
 		String servicename= method.getAnnotation(Expose.class).servicename();
 		
 		if (servicename.isEmpty()){
@@ -56,7 +56,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 		return servicename;
 	}
 	
-	static String getOperationname(Method method){
+	public static String getOperationname(Method method){
 		String operationname= method.getAnnotation(Expose.class).operationname();
 		
 		if (operationname.isEmpty()){
@@ -67,7 +67,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 	}
 	
 	
-    static String getName(Method method) {
+    public static String getName(Method method) {
         String name= method.getAnnotation(Expose.class).name();
         
         if(name.length() == 0) {
@@ -86,7 +86,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * @param method Method to be checked
      * @return True if tag semantify is set to true, false otherwise.
      */
-    static boolean isSemanticRequested(Method method) {
+    public static boolean isSemanticRequested(Method method) {
     	return method.getAnnotation(Expose.class).semantify();
     }
     
@@ -96,15 +96,15 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * @param method Method to be checked.
      * @return The URI to the semantic description as a string, if available.
      */
-    static String getSemanticURI(Method method) {
+    public static String getSemanticURI(Method method) {
     	return method.getAnnotation(Expose.class).semanticURI();
     }
     
-    static ActionScope getScope(Method method) {
+    public static ActionScope getScope(Method method) {
       return method.getAnnotation(Expose.class).scope();
     }
     
-    static Class<?>[] getReturnTypes(Method method) {
+    public static Class<?>[] getReturnTypes(Method method) {
         final Expose expAnno= method.getAnnotation(Expose.class);
         final Class<?> returnType= method.getReturnType();
         Class<?>[] returnTypes;
@@ -187,7 +187,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * @param b the second method
      * @return the result of equality check
      */
-    static boolean equalsPublicMethod(Method a, Method b) {
+    public static boolean equalsPublicMethod(Method a, Method b) {
         if(!a.getName().equals(b.getName())) {
             return false;
         }
@@ -242,7 +242,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 	/**
 	 * {@inheritDoc}
 	 */
-    public final List<? extends Action> getActions() {
+    public List<? extends Action> getActions() {
         final ArrayList<Action> actions= new ArrayList<Action>();
         this.ontologyStorage = thisAgent.getAgentNode().findAgentNodeBean(IOntologyStorage.class);
         

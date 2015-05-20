@@ -301,7 +301,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 
     protected List<? extends Action> overrideGetActions() {return Collections.emptyList();}
     
-    private Method searchMethod(String name, List<Class<?>> parameters) {
+    protected Method searchMethod(String name, List<Class<?>> parameters) {
         final String originalName= name;
         String assumedMethodName= null;
         // check for hashmark

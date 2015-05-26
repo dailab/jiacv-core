@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 
+import de.dailab.jiactng.agentcore.action.Action;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -62,7 +63,7 @@ public class InvokeWithBacktrackingTest {
 			
 		}
 		node = (SimpleAgentNode) new ClassPathXmlApplicationContext(PATH_TO_NODE_CONFIG + testNode + ".xml").getBean(testNode);
-	
+
 		List<IAgent> agents = node.findAgents();
 		
 		for(IAgent agent : agents){
@@ -79,21 +80,21 @@ public class InvokeWithBacktrackingTest {
 	@Test
 	public void OneNonFaultyAgent(){
 		startNode(ONE_NON_FAULTY_AGENT);
-		boolean resulted = testAgent.callMethod();
+		boolean resulted = testAgent.callMethod(1);
 		assertTrue(resulted);
 	}
 	
 	@Test
 	public void OneNonFaultyAgentTenFaultyAgents(){
 		startNode(ONE_NON_FAULTY_AGENT_TEN_FAULTY_AGENTS);
-		boolean resulted = testAgent.callMethod();
+		boolean resulted = testAgent.callMethod(11);
 		assertTrue(resulted);
 	}
 	
 	@Test
 	public void OneFaultyAgent(){
 		startNode(ONE_FAULTY_AGENT);
-		boolean resulted = testAgent.callMethod();
+		boolean resulted = testAgent.callMethod(1);
 		assertFalse(resulted);
 	}
 	

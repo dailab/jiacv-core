@@ -476,16 +476,16 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    *          Template of an action which is searched.
    * @param inputParams
    *          The values for the input parameters.
-   * @param timeout
+   * @param timeOut
    *          the timeout in milliseconds after this DoAction fails.
    * @return The result of the action.
    */
   protected final ActionResult invokeWithBacktracking(IActionDescription template, Serializable[] inputParams, final Long timeOut){
 	  List<IActionDescription> actionDescriptions = thisAgent.searchAllActions(template);
-	  
-	  final ActionResultListener listener = new ActionResultListener();
+
 	  ActionResult actionResult = null;
 	  for(IActionDescription actionDescription : actionDescriptions){
+          final ActionResultListener listener = new ActionResultListener();
 		  invoke(actionDescription, inputParams, listener, timeOut);
 		  synchronized (listener) {
 		      if(listener.getResult() == null) {

@@ -4,8 +4,7 @@
 	
 	<import namespace="de.dailab.jiactng.agentcore.aamm.default" as="default"/>
 
-	<!-- parent="default:Node" not working -->
-	<node id="NodeWithRemoteJMX" class="de.dailab.jiactng.agentcore.SimpleAgentNode">
+	<node id="NodeWithRemoteJMX" parent="default:Node">
 		<list name="jmxConnectors">
 			<objItem class="de.dailab.jiactng.agentcore.management.jmx.RmiJmxConnector">
 				<object name="authenticator" class="de.dailab.jiactng.agentcore.management.jmx.PasswordFileAuthenticator">

@@ -145,7 +145,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 					transportUri = "ssl:" + transportUri.substring(4);
 					if (cipherSuite != null) {
 						// add cipher suite limitation to transport uri
-						int index = transportUri.lastIndexOf("?");
+						int index = transportUri.lastIndexOf('?');
 						if (index < 0) {
 							transportUri += "?transport.enabledCipherSuites=" + cipherSuite;
 						} else {

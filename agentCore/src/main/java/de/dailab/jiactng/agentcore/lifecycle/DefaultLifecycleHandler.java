@@ -13,6 +13,8 @@ import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.U
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.lf5.viewer.LogFactor5ErrorDialog;
+
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 
 /**
@@ -234,9 +236,15 @@ public class DefaultLifecycleHandler {
     					lifecycle.init();
     					break;
     				} catch (Exception e) {
-						// do nothing, because prepare start also if a previous init failed 
+						// do nothing, because prepare start also if a previous init failed
+    					// but we should at least propagate the exception instead of stating that we are in state STARTED, which we aren't
+    					throw new IllegalStateException("Initialization failed due to Exception in init()", e);
     				}
-    			default: throw new IllegalStateException("Lifecycle is already in state STARTED.");
+    			case STARTED:
+    				throw new IllegalStateException("Lifecycle is already in state STARTED.");
+    			default: 
+    				// transitional states, like INITIALIZING, STARTING, etc. ... 
+    				throw new IllegalStateException("Can not start when in state " + getState());
     		}
 //    	}
 

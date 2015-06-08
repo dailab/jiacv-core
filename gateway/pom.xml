@@ -2,19 +2,38 @@
 	<parent>
 		<artifactId>jiactng</artifactId>
 		<groupId>de.dailab</groupId>
-		<version>5.1.6-SNAPSHOT</version>
+		<version>5.1.6-SNAPSHOT-MQ11</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab.jiac.net</groupId>
 	<artifactId>gateway</artifactId>
 	<name>Network Gateway</name>
-	<version>5.1.6-SNAPSHOT</version>
+	<version>5.1.6-SNAPSHOT-MQ11</version>
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-core</artifactId>
-			<version>5.7.0</version>
-		</dependency>
+        <!--
+            activemq-core has been replaced with activemq-client and activemq-broker since release 5.8.0
+            @see http://activemq.apache.org/activemq-580-release.html
+        -->
+<!--        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>5.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>5.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-spring</artifactId>
+            <version>5.11.0</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-all</artifactId>
+            <version>5.11.1</version>
+        </dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

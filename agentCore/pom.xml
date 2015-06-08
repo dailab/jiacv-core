@@ -4,14 +4,17 @@
 	<parent>
 		<groupId>de.dailab</groupId>
 		<artifactId>jiactng</artifactId>
-		<version>5.1.6-SNAPSHOT-MQ11</version>
+		<version>5.1.6-SNAPSHOT</version>
 		</parent>
 	
 	<groupId>de.dailab.jiactng</groupId>
 	<artifactId>agentCore</artifactId>
 	<packaging>jar</packaging>
 	<name>Agent Core</name>
-	
+
+	<properties>
+		<spring.version>3.2.13.RELEASE</spring.version>
+	</properties>
 	
 	<dependencies>
 		<dependency>
@@ -19,19 +22,18 @@
 			<artifactId>agentCoreAPI</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-		<!-- use Spring dependency from ActiveMQ to avoid multiple versions -->
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>3.2.13.RELEASE</version>
+			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>3.2.13.RELEASE</version>
-                </dependency>
-		
+			<version>${spring.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>de.dailab.jiac.net</groupId>
 			<artifactId>gateway</artifactId>

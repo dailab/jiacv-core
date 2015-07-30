@@ -2,9 +2,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+        <groupId>de.dailab.jiactng</groupId>
+        <artifactId>examples</artifactId>
+        <version>5.1.6-SNAPSHOT</version>
+    </parent>
+
 	<groupId>de.dailab.asgard.tls</groupId>
 	<artifactId>pingPong_WithTLS</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>pingPong_WithTLS</name>
@@ -15,12 +20,12 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>de.dailab.jiactng</groupId>
-			<artifactId>agentCore</artifactId>
-			<version>5.1.6-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
+  		<dependency>
+  			<groupId>de.dailab.jiactng</groupId>
+  			<artifactId>agentCore</artifactId>
+  			<version>${project.version}</version>
+  		</dependency>
+  	</dependencies>
 
 	<repositories>
 		<repository>
@@ -31,7 +36,7 @@
 				<enabled>true</enabled>
 			</releases>
 			<snapshots>
-				<enabled>false</enabled>
+				<enabled>true</enabled>
 			</snapshots>
 		</repository>
 	</repositories>

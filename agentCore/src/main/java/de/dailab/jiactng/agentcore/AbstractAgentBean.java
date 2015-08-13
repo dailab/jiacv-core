@@ -507,7 +507,39 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 	  return new ActionResult(new DoAction(template, null, inputParams, timeOut), NO_ACTION_FOUND);
   }
   
-  
+	/**
+	 * Find and invoke action, throw exception in case of failures, return result.
+	 * 
+	 * This is intended as a simpler way for finding actions, synchronously invoking 
+	 * those actions, and checking the results for failures, all in one go. It will 
+	 * just find and invoke the first action by that name (if any), no further checks 
+	 * for e.g. action provider or backtracking. If you need any of those, you are 
+	 * obviously a more seasoned JIAC developer and can use one of the other methods.
+	 * 
+	 * @param actionName	the name of the action to invoke
+	 * @param timeout		the timeout in milliseconds; if <= 0, use the default
+	 * @param parameters	parameters of the action, if any
+	 * @return 				the action result values (the complete array, not just the first one)
+	 * @throws Exception	in case anything went wrong (action not found, or failure)
+	 */
+	public Serializable[] invokeAction(String actionName, long timeout, Serializable... parameters) throws Exception {
+	    IActionDescription action = thisAgent.searchAction(new Action(actionName));
+	    if (action == null) {
+	        throw new Exception("Could not find Action with name " + actionName);
+	    }
+	    if (timeout <= 0) {
+	    	timeout = Session.DEFAULT_TIMETOLIVE;
+	    }
+	    ActionResult result = invokeAndWaitForResult(action, parameters, timeout);
+	    if (result.getFailure() != null) {
+	    	if (result.getFailure() instanceof Exception) {
+	    		throw (Exception) result.getFailure();
+	    	} else {
+	    		throw new Exception("Action returned with Failure" + result.getFailure().toString());
+	    	}
+	    }
+	    return result.getResults();
+	}
 
   // protected ActionResult syncInvoke(Action a, Object[] inputParams) {
   // DoAction doAct = a.createDoAction(inputParams, null);

@@ -522,7 +522,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 	 * @return 				the action result values (the complete array, not just the first one)
 	 * @throws Exception	in case anything went wrong (action not found, or failure)
 	 */
-	public Serializable[] invokeAction(String actionName, long timeout, Serializable... parameters) throws Exception {
+	protected Serializable[] invokeAction(String actionName, long timeout, Serializable... parameters) throws Exception {
 	    IActionDescription action = thisAgent.searchAction(new Action(actionName));
 	    if (action == null) {
 	        throw new Exception("Could not find Action with name " + actionName);

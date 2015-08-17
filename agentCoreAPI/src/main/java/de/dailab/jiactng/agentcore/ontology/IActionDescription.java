@@ -201,5 +201,14 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 */
 	DoAction createDoAction(Session parent, Serializable[] newParams, ResultReceiver source);
 	
-	
+
+	/**
+	 * This method is supposed to be used instead of equals in DirectoryAgentNodeBean.
+	 * An action matches a template if all the attributes in the template are either 
+	 * equal to those in the action, or null.
+	 * 
+	 * @param template	the other action (the template)
+	 * @return			whether this action matches the template
+	 */
+	boolean matches(IActionDescription template);
 }

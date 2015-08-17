@@ -642,11 +642,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		synchronized (localActions) {
-			if (localActions.contains(template)) {
-				for (IActionDescription ad : localActions) {
-					if (ad.equals(template)) {
-						return ad;
-					}
+			for (IActionDescription ad : localActions) {
+				if (ad.matches(template)) {
+					return ad;
 				}
 			}
 		}
@@ -654,11 +652,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			for (String nodeAddress : remoteActions.keySet()) {
 				final Set<IActionDescription> adset = remoteActions
 						.get(nodeAddress);
-				if (adset.contains(template)) {
-					for (IActionDescription ad : adset) {
-						if (ad.equals(template)) {
-							return ad;
-						}
+				for (IActionDescription ad : adset) {
+					if (ad.matches(template)) {
+						return ad;
 					}
 				}
 			}
@@ -735,11 +731,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		synchronized (localActions) {
-			if (localActions.contains(template)) {
-				for (IActionDescription actionDescription : localActions) {
-					if (actionDescription.equals(template)) {
-						actions.add(actionDescription);
-					}
+			for (IActionDescription actionDescription : localActions) {
+				if (actionDescription.matches(template)) {
+					actions.add(actionDescription);
 				}
 			}
 		}
@@ -747,11 +741,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			for (String nodeAddress : remoteActions.keySet()) {
 				final Set<IActionDescription> adset = remoteActions
 						.get(nodeAddress);
-				if (adset.contains(template)) {
-					for (IActionDescription ad : adset) {
-						if (ad.equals(template)) {
-							actions.add(ad);
-						}
+				for (IActionDescription ad : adset) {
+					if (ad.matches(template)) {
+						actions.add(ad);
 					}
 				}
 			}

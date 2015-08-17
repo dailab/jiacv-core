@@ -421,14 +421,14 @@ public class Action implements IActionDescription {
 	 */
 	@Override
 	public int hashCode() {
-		final int hash = Action.class.hashCode();
-		// hash ^= _name != null ? _name.hashCode() : 0;
+		int hash = Action.class.hashCode();
+		hash ^= name != null ? name.hashCode() : 0;
 		return hash;
 	}
 
 	/**
-	 * Checks the equality of two actions. The actions are equal if their names, input types, and result types are equal
-	 * or null. The actions are not equal if they are provided by different agents.
+	 * Checks the equality of two actions. The actions are equal if their 
+	 * provider, names, input types, and result types are equal.
 	 * 
 	 * @param obj
 	 *           the other action
@@ -451,14 +451,34 @@ public class Action implements IActionDescription {
 		final IAgentDescription otherAgent = other.getProviderDescription();
 
 		if ((myAgent != null) && (otherAgent != null)) {
-			if (!EqualityChecker.equalsOrNull(myAgent.getAid(), otherAgent.getAid())) {
+			if (! EqualityChecker.equals(myAgent.getAid(), otherAgent.getAid())) {
 				return false;
 			}
 		}
 
-		return EqualityChecker.equalsOrNull(this.getName(), other.getName())
-		      && EqualityChecker.equalsOrNull(this.getInputTypeNames(), other.getInputTypeNames())
-		      && EqualityChecker.equalsOrNull(this.getResultTypeNames(), other.getResultTypeNames());
+		return EqualityChecker.equals(this.getName(), other.getName())
+		      && EqualityChecker.equals(this.getInputTypeNames(), other.getInputTypeNames())
+		      && EqualityChecker.equals(this.getResultTypeNames(), other.getResultTypeNames());
+	}
+	
+	@Override
+	public boolean matches(final IActionDescription template) {
+		if (this == template) {
+			return true;
+		}
+
+		final IAgentDescription myAgent = this.getProviderDescription();
+		final IAgentDescription otherAgent = template.getProviderDescription();
+
+		if ((myAgent != null) && (otherAgent != null)) {
+			if (! EqualityChecker.equalsOrNull(myAgent.getAid(), otherAgent.getAid())) {
+				return false;
+			}
+		}
+
+		return EqualityChecker.equalsOrNull(this.getName(), template.getName())
+		      && EqualityChecker.equalsOrNull(this.getInputTypeNames(), template.getInputTypeNames())
+		      && EqualityChecker.equalsOrNull(this.getResultTypeNames(), template.getResultTypeNames());
 	}
 
 	/**

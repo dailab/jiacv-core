@@ -1,0 +1,59 @@
+﻿<?xml version="1.0"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+	<properties>
+		<title>Concept</title>
+		<author email="jiactng-dev@dai-labor.de">JIAC TNG team</author>
+	</properties>
+	<body>
+		<section name="JIAC TNG - Concept">
+			<subsection name="Overview">
+				<p>Add executive summery here</p>
+			</subsection>
+			<subsection name="Detailed Concept">
+				<p>		         
+					<a href="images/JIAC-TNG.png">
+						<img src="images/JIAC-TNG.png" alt="JIAC-TNG Concept"/>
+					</a>
+				</p>
+			</subsection>
+			<subsection name="Technologies">
+				<p>The used technologies are:</p>
+				<ul>
+					<li>Java J2SE 1.5 or higher (incl. JMX)</li>
+					<li>Spring 2.0.6</li>
+					<li>ActiveMQ 5.3.0</li>
+					<li>Simple Space 2.5</li>
+					<li>Commons Logging 1.1</li>
+					<li>XText 0.7.1</li>
+					<li>EODM 1.5</li>
+					<li>SWT 3.3.0-v3346</li>
+					<li>OWL API 2.1.1</li>
+					<li>Pellet 2.0.0-rc7</li>
+					<li>JDOM 1.1</li>
+					<li>Drools 4.0.7</li>
+					<li>OpenID4Java 0.9.3</li>
+					<li>BouncyCastle 140</li>
+					<li>Hibernate 3.2.6</li>
+					<li>Axis2 1.3</li>
+					<li>Jetty 6.1.1</li>
+					<li>JME 2.0.1</li>
+				</ul>
+			</subsection>
+			<subsection name="Requirements">
+				<p>The hosts should have</p>
+				<ul>
+					<li>1 GHz CPU</li>
+					<li>512 MB RAM</li>
+					<li>been registered in the DNS</li>
+					<li>the possibility for multicast on port 6155 and 9999</li>
+					<li>the possibility for communication on two additional ports</li>
+					<li>installed JRE 1.5 or higher</li>
+					<li>set the environment variable JAVA_HOME</li>
+					<li>installed Maven 2.2.1 or higher</li>
+				</ul>
+			</subsection>
+		</section>
+	</body>
+</document>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://maven.apache.org/maven-1.x/plugins/faq/faq.xsd" title="Frequently Asked Questions" toplink="false">
+    <part id="general">
+        <title>General</title>
+        <faq id="what">
+        	<question>What the hell is JIAC V?</question>
+        	<answer>A big bunch of Maven modules!</answer>
+        </faq>
+    </part>
+    <part id="install">
+        <title>Installation</title>
+        <faq id="how-install">
+            <question>How do I install JIAC TNG?</question>
+            <answer>
+                <p>You only have to install Sun JDK version 1.5 or higher and Apache Maven version 2.2 or higher, 
+                if you want to use Maven2 as project build environment.</p>
+            </answer>
+        </faq>
+        <faq id="build-hangs-up">
+            <question>The command "mvn install" doesn't run further after message "Check for updates from ...".
+                What should I do?</question>
+            <answer>
+                <p>The specified repository is not reachable in the moment. Please put in comments the description
+                of the specified repository in "pom.xml" of your project and/or in ".m2/settings.xml" of your home
+                directory.</p>
+            </answer>
+        </faq>
+    </part>
+</faqs>

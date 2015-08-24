@@ -7,6 +7,7 @@
             <item name="Startup Procedure" href="index.html#Startup_Procedure" />
             <item name="Agent Lifecycle" href="index.html#Agent_Lifecycle" />
             <item name="Measurement data" href="index.html#Measurement_data" />
+            <item name="JIAC with TLS" href="index.html#JIAC_with_TLS" />
          </item> 
          <item name="Management Interface" href="management.html">
             <item name="Management Client" href="management.html#Management_Client" />
@@ -41,6 +42,11 @@
             <item name="Introduction" href="DirectoryOfServices.html#Introduction" />
             <item name="Getting started" href="DirectoryOfServices.html#Getting_started" />
             <item name="How to use" href="DirectoryOfServices.html#Usage_-_How_to..." />
+         </item>
+         <item name="JIAC with TLS" href="JIACWithTLS.html">
+            <item name="Overview" href="JIACWithTLS.html#Overview" />
+            <item name="Creating keys, certificates and stores" href="JIACWithTLS.html#Creating_keys,_certificates_and_stores" />
+            <item name="Agent Node Configuration" href="JIACWithTLS.html#Agent_Node_Configuration" />
          </item>
          <item name="FAQ" href="faq.html" />
       </menu>

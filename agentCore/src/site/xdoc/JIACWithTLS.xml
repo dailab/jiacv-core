@@ -6,19 +6,25 @@
 		<author email="sandor.selowski@dai-labor.de">Sandor Selowski</author>
 	</properties>
 	<body>
-		<section name="Overview">
-			<p>
-				As of version 5.1.6, it is possible to secure safety-critical
-				communication channels used by JIAC Agent Nodes. This security
-				measure is implemented with TLS (formerly known as SSL). This work
-				was conducted as part of the AuVeGoS project at the DAI-Labor. It
-				could be helpful and informative to have a look into the technical
-				documentation of the AuVeGoS project, which gives an even deeper
-				insight into the technical background of JIAC and TLS.
-			</p>
-			<p>
-				The protectable communication channels include:
-			</p>
+	<section name="Overview">
+	<p>
+		As of version 5.1.6, it is possible to secure safety-critical
+		communication channels used by JIAC Agent Nodes. This security
+		measure
+		is implemented with TLS (formerly known as SSL). This work
+		was
+		conducted as part of the AuVeGoS project at the DAI-Labor to achieve
+		the security goals confidentiality, integrity and authenticity for the
+		agent communication. It
+		could be helpful and informative to have a look
+		into the technical
+		documentation of the AuVeGoS project, which gives an
+		even deeper
+		insight into the technical background of JIAC and TLS.
+	</p>
+		<p>
+			The protectable communication channels include:
+		</p>
 			<ul>
 				<li>
 					<strong>Implicit messaging:</strong>
@@ -31,7 +37,7 @@
 				</li>
 				<li>
 					<strong>Explicit messaging:</strong>
-					This messaging is triggered by an Agents, if it wants to
+					This messaging is triggered by an Agent, if it wants to
 					communicate with other Agents. Usually this explicit messaging is
 					implemented with ActiveMQ. In the case, the communication partners
 					(the Agents) are located within the same JVM, no network-related
@@ -44,11 +50,10 @@
 			</ul>
 			<p>
 				A third communication channel,
-				<strong>multicast messaging</strong>
-				, is not
+				<strong>multicast messaging</strong>, is not
 				protected with TLS. This channel is used merely to identify
-				active
-				Agent Nodes. Beyond that no other confidential information is
+				active Agent Nodes and to receive the Agent Node's JMX service URL. 
+				Beyond that no other confidential information is
 				transmitted via this channel.
 			</p>
 			<p>

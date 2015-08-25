@@ -48,24 +48,25 @@
 					a network.
 				</li>
 			</ul>
-			<p>
-				A third communication channel,
-				<strong>multicast messaging</strong>, is not
-				protected with TLS. This channel is used merely to identify
-				active Agent Nodes and to receive the Agent Node's JMX service URL. 
-				Beyond that no other confidential information is
-				transmitted via this channel.
-			</p>
-			<p>
-				In JIAC&#160;V TLS is also used for authentication between all
-				communication nodes (these include Agent Nodes and optionally the
-				monitoring and management application ASGARD).
-			</p>
-			<p>
-				The following to chapters give a brief overview of what steps are
-				required to implement and execute a JIAC MAS with TLS support and
-				what keys and certificates are needed therefor.
-			</p>
+	<p>
+		A third communication channel,
+		<strong>multicast messaging</strong>
+		, is not
+		protected with TLS. This channel is used merely to identify
+		active Agent Nodes and to receive the Agent Node's JMX service URL.
+		Beyond that no other confidential information is
+		transmitted via this channel.
+	</p>
+	<p>
+		In JIAC&#160;V TLS is also used for authentication between all
+		communication nodes (these include Agent Nodes and optionally the
+		monitoring and management application ASGARD).
+	</p>
+	<p>
+		The following chapters give a brief overview of what steps are
+		required to implement and execute a JIAC MAS with TLS support and
+		what keys and certificates are needed therefor.
+	</p>
 
 			<subsection
 				name="Implementing and executing a JIAC&#160;V MAS with TLS support">

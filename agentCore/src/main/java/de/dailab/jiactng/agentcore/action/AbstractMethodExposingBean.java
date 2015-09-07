@@ -262,11 +262,11 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
                 returnTypes
             );
             
-            if (ontologyStorage != null) {
+            
         	if (semanticURI != null && !semanticURI.equals("")) {
-		    act.setSemanticServiceDescriptionURI(semanticURI);
-		}
-            }
+        		act.setSemanticServiceDescriptionURI(semanticURI);
+        	}
+            
             
             
             act.setScope(scope);

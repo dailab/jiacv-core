@@ -39,6 +39,9 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 
 	/** Item name which can be used to get the providing agent of the JMX-based action description. */
 	String ITEMNAME_AGENT = "agent";
+	
+	/** Item name which can be used to get the semantic service description URI for the current action*/
+	String ITEMNAME_SEMURI = "semuri";
 
 	/**
 	 * This method returns the name of the action this description refers to.

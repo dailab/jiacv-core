@@ -11,7 +11,7 @@ done
 export CLASSPATH='.:'$CLASSPATH':'$DYNCLASSPATH
 
 # Java Options
-JAVA_OPTIONS='-Dcom.sun.management.jmxremote -cp '$CLASSPATH':../conf/'
+JAVA_OPTIONS='-Dcom.sun.management.jmxremote -cp '$CLASSPATH':../resources/'
 # echo 'Java Options: '$JAVA_OPTIONS
 
 # Main Class

@@ -15,9 +15,7 @@ import javax.swing.JTextField;
 
 import ontology.Ping;
 import ontology.Pong;
-
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
-import de.dailab.jiactng.agentcore.knowledge.Tuple;
 
 /**
  * One of the Beans for the local PingPong example. This bean creates a GUI

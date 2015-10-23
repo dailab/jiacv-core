@@ -1,8 +1,5 @@
 /*
  * Created on 16.02.2007
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 package de.dailab.jiactng.examples.pingPong;
 
@@ -18,9 +15,7 @@ import javax.swing.JTextField;
 
 import ontology.Ping;
 import ontology.Pong;
-
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
-import de.dailab.jiactng.agentcore.knowledge.Tuple;
 
 /**
  * One of the Beans for the local PingPong example. This bean creates a GUI
@@ -78,15 +73,6 @@ public class PongPingBean extends AbstractAgentBean implements ActionListener {
   }
 
   /**
-   * Stopping of PongBean. Disposes frame.
-   * 
-   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
-   */
-  public void doStop() {
-    pongFrame.dispose();
-  }
-
-  /**
    * Execution of the PongBean. Tries to read a ping and shows it in the GUI if
    * successful.
    * 
@@ -103,8 +89,23 @@ public class PongPingBean extends AbstractAgentBean implements ActionListener {
     }
   }
 
+  /**
+   * Stopping of PongBean. Disposes frame.
+   * 
+   * @see de.dailab.jiactng.agentcore.AbstractAgentBean#doInit()
+   */
+  public void doStop() {
+    pongFrame.dispose();
+  }
+
+  /**
+   * ActionListener for the Ping-Button.
+   * 
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
   public void actionPerformed(ActionEvent e) {
     // write 'pong' into queue
     this.memory.write(new Pong("pong_" + (count++)));
   }
+
 }

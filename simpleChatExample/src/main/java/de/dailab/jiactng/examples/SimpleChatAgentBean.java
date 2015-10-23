@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
+import org.sercho.masp.space.event.WriteCallEvent;
 
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
@@ -12,8 +13,9 @@ import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.examples.SimpleChatUI.MessageHandler;
 
-public class SimpleChatAgentBean extends AbstractAgentBean {
+public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHandler {
 
 	/**
 	 * A constant for a common communication group. This constant will be used as
@@ -28,7 +30,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean {
 	 * write, update, remove. Within of every event is the information about the
 	 * changes.
 	 * 
-	 * Handle this 'notify' method to get the contained changes and
+	 * Handle this 'notify' method to get events and the contained changes.
 	 */
 	private final SpaceObserver<IFact> chatMessageSpaceObserver = new SpaceObserver<IFact>() {
 
@@ -40,9 +42,28 @@ public class SimpleChatAgentBean extends AbstractAgentBean {
 			 * Get notified about new chat messages, now deliver these messages to the
 			 * GUI.
 			 */
+			if (arg0 instanceof WriteCallEvent) {
+				WriteCallEvent<IFact> write = (WriteCallEvent<IFact>) arg0;
+				IFact iFact = write.getObject();
+				if (iFact instanceof ChatMessage) {
+					SimpleChatAgentBean.this.simpleChatUI.addMessage((ChatMessage) iFact);
+				}
+				else {
+					SimpleChatAgentBean.this.log.warn("the space observer was notified on a different type as 'ChatMessage', currently got: "
+							+ iFact.getClass().getCanonicalName());
+				}
+			}
+			else {
+				if (SimpleChatAgentBean.this.log.isDebugEnabled()) {
+					SimpleChatAgentBean.this.log.debug("other events except WriteCallEvent we don't react on, currently called: "
+							+ arg0.getClass().getCanonicalName());
+				}
+			}
 		}
 
 	};
+
+	private SimpleChatUI simpleChatUI = null;
 
 	@Override
 	public void doInit() throws Exception {
@@ -52,6 +73,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean {
 		 * observer, that will be notified.
 		 */
 		this.memory.attach(this.chatMessageSpaceObserver, new ChatMessage());
+		this.simpleChatUI = SimpleChatUI.createInstance(this);
 	};
 
 	@Override
@@ -97,7 +119,8 @@ public class SimpleChatAgentBean extends AbstractAgentBean {
 	 * @param message
 	 *          a text message to be send
 	 */
-	private void sendMessage(final String message) {
+	@Override
+	public void sendMessage(final String message) {
 		/*
 		 * Maybe you can save some line of code, if you move some lines to other
 		 * methods. But we want wo present an example. Therefore we throw efficiency
@@ -124,7 +147,4 @@ public class SimpleChatAgentBean extends AbstractAgentBean {
 
 	}
 
-	private void displayMessage(final ChatMessage message) {
-
-	}
 }

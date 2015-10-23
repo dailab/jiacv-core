@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- - Application context definition for usage within CommunicationBean related tests and examples -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+
+	<bean name="CommunicationPlatform" parent="NodeWithJMX">
+		<property name="overwriteDiscoveryURI" value="smartmulticast://default?group=SimpleChat" />
+		<property name="agents">
+			<list>
+				<ref bean="SimpleChatAgent" />
+			</list>
+		</property>
+
+	</bean>
+
+	<bean name="SimpleChatAgent" parent="SimpleAgent">
+		<property name="agentBeans">
+			<list>
+				<bean name="SimpleChatAgentBean" class="de.dailab.jiactng.examples.SimpleChatAgentBean" />
+			</list>
+		</property>
+		<property name="beanExecutionTimeout" value="10000" />
+	</bean>
+</beans>

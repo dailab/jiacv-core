@@ -94,6 +94,7 @@ public class SimpleChatUI extends JFrame {
 			public void run() {
 				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				frame.setVisible(true);
+				// XXX currently, this brings the node to a rather harsh stop...
 			}
 		});
 		return frame;

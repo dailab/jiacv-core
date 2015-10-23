@@ -11,6 +11,7 @@ import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.examples.SimpleChatUI.MessageHandler;
@@ -45,10 +46,14 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 			if (arg0 instanceof WriteCallEvent) {
 				WriteCallEvent<IFact> write = (WriteCallEvent<IFact>) arg0;
 				IFact iFact = write.getObject();
-				if (iFact instanceof ChatMessage) {
-					SimpleChatAgentBean.this.simpleChatUI.addMessage((ChatMessage) iFact);
+				if (iFact instanceof IJiacMessage) {
+					Object payload = ((IJiacMessage) iFact).getPayload();
+					if (payload instanceof ChatMessage) {
+						SimpleChatAgentBean.this.simpleChatUI.addMessage((ChatMessage) payload);
+					}
 				}
 				else {
+					// XXX this can never be called, as this handler only reacts to JiacMessages
 					SimpleChatAgentBean.this.log.warn("the space observer was notified on a different type as 'ChatMessage', currently got: "
 							+ iFact.getClass().getCanonicalName());
 				}
@@ -72,7 +77,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 		 * second parameter will be used as template. The first parameter is the
 		 * observer, that will be notified.
 		 */
-		this.memory.attach(this.chatMessageSpaceObserver, new ChatMessage());
+		this.memory.attach(this.chatMessageSpaceObserver, new JiacMessage());
 		this.simpleChatUI = SimpleChatUI.createInstance(this);
 	};
 

@@ -15,11 +15,24 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
 public class ChatMessage implements IFact {
 
 	private static final long serialVersionUID = -245679977354931415L;
+	/*
+	 * a chat message for a 'global' chat contains three important information:
+	 * sender's name, sender's timestamp and the message. Therefor this IFact
+	 * contains these three fields.
+	 * 
+	 * There is no need to update the fields, therefor the fields are final. To
+	 * save lines of code, we set the fields public and avoid methods to access
+	 * the field's content.
+	 */
 	public final String sendername;
 	public final String message;
 	public final Long sendtimestamp;
 
 	public ChatMessage() {
+		/*
+		 * To avoid uninitialized field, this constructor calls the paramized
+		 * constructor with null values.
+		 */
 		this(null, null, null);
 	}
 
@@ -31,6 +44,10 @@ public class ChatMessage implements IFact {
 
 	@Override
 	public String toString() {
+		/*
+		 * maybe a little bit complex, this toString method is intended to be used
+		 * in debugging cases.
+		 */
 		StringBuilder sb = new StringBuilder();
 		sb.append("ChatMessage[sender=");
 		sb.append(this.sendername);

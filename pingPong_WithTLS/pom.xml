@@ -11,8 +11,7 @@
 	<groupId>de.dailab.asgard.tls</groupId>
 	<artifactId>pingPong_WithTLS</artifactId>
 	<packaging>jar</packaging>
-
-	<name>pingPong_WithTLS</name>
+	<name>${project.artifactId}</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

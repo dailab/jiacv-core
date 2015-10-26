@@ -38,7 +38,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 	 * observer will be called on any event, that changes the agent's memory -
 	 * write, update, remove. Within of every event is the information about the
 	 * changes.
-	 * 
+	 *
 	 * Handle this 'notify' method to get events and the contained changes.
 	 */
 	private final SpaceObserver<IFact> chatMessageSpaceObserver = new SpaceObserver<IFact>() {
@@ -62,9 +62,11 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 					}
 				}
 				else {
-					// XXX this can never be called, as this handler only reacts to
-					// JiacMessages
-					SimpleChatAgentBean.this.log.warn("the space observer was notified on a different type as 'ChatMessage', currently got: "
+					/*
+					 * This can never be called, as this handler only reacts to
+					 * JiacMessages
+					 */
+					SimpleChatAgentBean.this.log.warn("the space observer was notified on a different type as 'JiacMessage', currently got: "
 							+ iFact.getClass().getCanonicalName());
 				}
 			}
@@ -87,7 +89,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 		 * second parameter will be used as template. The first parameter is the
 		 * observer, that will be notified.
 		 */
-		this.memory.attach(this.chatMessageSpaceObserver, new JiacMessage());
+		this.memory.attach(this.chatMessageSpaceObserver, new JiacMessage(new ChatMessage()));
 		this.simpleChatUI = SimpleChatUI.createInstance(this);
 	};
 

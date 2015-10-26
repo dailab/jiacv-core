@@ -19,7 +19,7 @@ public class ChatMessage implements IFact {
 	 * a chat message for a 'global' chat contains three important information:
 	 * sender's name, sender's timestamp and the message. Therefor this IFact
 	 * contains these three fields.
-	 * 
+	 *
 	 * There is no need to update the fields, therefor the fields are final. To
 	 * save lines of code, we set the fields public and avoid methods to access
 	 * the field's content.
@@ -60,7 +60,6 @@ public class ChatMessage implements IFact {
 			sb.append(sdf.format(new Date(this.sendtimestamp)));
 		}
 		sb.append(": ").append(this.message);
-		String ret = sb.append(']').toString();
-		return ret;
+		return sb.append(']').toString();
 	}
 }

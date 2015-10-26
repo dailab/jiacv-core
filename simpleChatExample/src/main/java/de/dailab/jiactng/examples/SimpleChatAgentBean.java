@@ -16,6 +16,14 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.examples.SimpleChatUI.MessageHandler;
 
+/**
+ * This is a agent's agent bean to send and receive messages. It can be seen as
+ * sensor and actor of the agent. The core functionality is written within of
+ * this class.
+ *
+ * @author mib
+ *
+ */
 public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHandler {
 
 	/**
@@ -30,7 +38,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 	 * observer will be called on any event, that changes the agent's memory -
 	 * write, update, remove. Within of every event is the information about the
 	 * changes.
-	 * 
+	 *
 	 * Handle this 'notify' method to get events and the contained changes.
 	 */
 	private final SpaceObserver<IFact> chatMessageSpaceObserver = new SpaceObserver<IFact>() {
@@ -44,6 +52,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 			 * GUI.
 			 */
 			if (arg0 instanceof WriteCallEvent) {
+				@SuppressWarnings("unchecked")
 				WriteCallEvent<IFact> write = (WriteCallEvent<IFact>) arg0;
 				IFact iFact = write.getObject();
 				if (iFact instanceof IJiacMessage) {
@@ -53,8 +62,11 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 					}
 				}
 				else {
-					// XXX this can never be called, as this handler only reacts to JiacMessages
-					SimpleChatAgentBean.this.log.warn("the space observer was notified on a different type as 'ChatMessage', currently got: "
+					/*
+					 * This can never be called, as this handler only reacts to
+					 * JiacMessages
+					 */
+					SimpleChatAgentBean.this.log.warn("the space observer was notified on a different type as 'JiacMessage', currently got: "
 							+ iFact.getClass().getCanonicalName());
 				}
 			}
@@ -77,7 +89,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 		 * second parameter will be used as template. The first parameter is the
 		 * observer, that will be notified.
 		 */
-		this.memory.attach(this.chatMessageSpaceObserver, new JiacMessage());
+		this.memory.attach(this.chatMessageSpaceObserver, new JiacMessage(new ChatMessage()));
 		this.simpleChatUI = SimpleChatUI.createInstance(this);
 	};
 

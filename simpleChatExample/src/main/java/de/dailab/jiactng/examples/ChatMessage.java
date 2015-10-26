@@ -19,29 +19,58 @@ public class ChatMessage implements IFact {
 	 * a chat message for a 'global' chat contains three important information:
 	 * sender's name, sender's timestamp and the message. Therefor this IFact
 	 * contains these three fields.
-	 * 
+	 *
 	 * There is no need to update the fields, therefor the fields are final. To
 	 * save lines of code, we set the fields public and avoid methods to access
 	 * the field's content.
 	 */
+	/**
+	 * The senders display name.
+	 */
 	public final String sendername;
+	/**
+	 * The message to display.
+	 */
 	public final String message;
+	/**
+	 * The creation date of the message at sender's host.
+	 */
 	public final Long sendtimestamp;
 
+	/**
+	 * Empty constructor used for template creation. This constructor uses the
+	 * parameterized constructor with <code>null</code>.
+	 */
 	public ChatMessage() {
 		/*
-		 * To avoid uninitialized field, this constructor calls the paramized
+		 * To avoid uninitialized field, this constructor calls the parameterized
 		 * constructor with null values.
 		 */
 		this(null, null, null);
 	}
 
+	/**
+	 * The full parameterized constructor for constructive chat messages.
+	 *
+	 * @param name
+	 *          the sender's name
+	 * @param msg
+	 *          the sender's message
+	 * @param time
+	 *          the senders's timestamp
+	 */
 	public ChatMessage(final String name, final String msg, final Long time) {
 		this.sendername = name;
 		this.message = msg;
 		this.sendtimestamp = time;
 	}
 
+	/**
+	 * This is a method to print chat messages in console for debugging use. It is
+	 * slightly expensive, so don't use this just in debugging cases.
+	 *
+	 * @return a formatted print of a chat message
+	 */
 	@Override
 	public String toString() {
 		/*
@@ -60,7 +89,6 @@ public class ChatMessage implements IFact {
 			sb.append(sdf.format(new Date(this.sendtimestamp)));
 		}
 		sb.append(": ").append(this.message);
-		String ret = sb.append(']').toString();
-		return ret;
+		return sb.append(']').toString();
 	}
 }

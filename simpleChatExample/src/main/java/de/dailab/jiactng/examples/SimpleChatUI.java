@@ -61,6 +61,11 @@ public final class SimpleChatUI extends JFrame {
 		this.pack();
 	}
 
+	/**
+	 * Returns a default window size, currently 400x300 pixel
+	 *
+	 * @return a default dimension size of 400x300 pixel
+	 */
 	@Override
 	public Dimension getPreferredSize() {
 		return new Dimension(400, 300);
@@ -112,12 +117,21 @@ public final class SimpleChatUI extends JFrame {
 	 */
 	public interface MessageHandler {
 
+		/**
+		 * Implement this method to handle messages that should be send.
+		 *
+		 * @param message
+		 *          a text message to send
+		 */
 		void sendMessage(String message);
 
 	}
 
-	/*
+	/**
 	 * Testing...
+	 *
+	 * @param args
+	 *          ignored parameters
 	 */
 	public static void main(final String[] args) throws Exception {
 		final SimpleChatUI[] ui = new SimpleChatUI[1];

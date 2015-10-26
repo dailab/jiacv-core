@@ -16,6 +16,14 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.examples.SimpleChatUI.MessageHandler;
 
+/**
+ * This is a agent's agent bean to send and receive messages. It can be seen as
+ * sensor and actor of the agent. The core functionality is written within of
+ * this class.
+ *
+ * @author mib
+ *
+ */
 public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHandler {
 
 	/**
@@ -44,6 +52,7 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 			 * GUI.
 			 */
 			if (arg0 instanceof WriteCallEvent) {
+				@SuppressWarnings("unchecked")
 				WriteCallEvent<IFact> write = (WriteCallEvent<IFact>) arg0;
 				IFact iFact = write.getObject();
 				if (iFact instanceof IJiacMessage) {
@@ -53,7 +62,8 @@ public class SimpleChatAgentBean extends AbstractAgentBean implements MessageHan
 					}
 				}
 				else {
-					// XXX this can never be called, as this handler only reacts to JiacMessages
+					// XXX this can never be called, as this handler only reacts to
+					// JiacMessages
 					SimpleChatAgentBean.this.log.warn("the space observer was notified on a different type as 'ChatMessage', currently got: "
 							+ iFact.getClass().getCanonicalName());
 				}

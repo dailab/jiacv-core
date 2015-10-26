@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities;
  *
  * @author kuester
  */
-public class SimpleChatUI extends JFrame {
+public final class SimpleChatUI extends JFrame {
 
 	private static final long serialVersionUID = 7968115785141545541L;
 

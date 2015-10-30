@@ -27,9 +27,6 @@ public class MessageExchangeNotification extends Notification {
 	/** The address of the message receiver. */
 	private String receiver;
 
-	/** The description of the exchanged message. */
-	private Object message;
-
 	/** The used message transport mechanism. */
 	private String transport;
 
@@ -71,9 +68,9 @@ public class MessageExchangeNotification extends Notification {
 		this.sender = (jiacMessage.getSender()==null)? null:jiacMessage.getSender().getName();
 		this.receiver = (receiver==null)? null:receiver.getName();
 		try {
-			this.message = ((JmxDescriptionSupport)jiacMessage).getDescription();
+			this.setUserData(((JmxDescriptionSupport)jiacMessage).getDescription());
 		} catch (Exception e) {
-			this.message = jiacMessage.toString();
+			this.setUserData(jiacMessage.toString());
 		}
 		this.transport = transport;
 		this.groupMessage = receiver instanceof IGroupAddress;
@@ -111,7 +108,7 @@ public class MessageExchangeNotification extends Notification {
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
 	public final Object getJiacMessage() {
-		return message;
+		return getUserData();
 	}
 
 	/**
@@ -129,4 +126,16 @@ public class MessageExchangeNotification extends Notification {
 	public final boolean isGroupMessage() {
 		return groupMessage;
 	}
+
+    /**
+     * Returns a String representation of this notification.
+     *
+     * @return A String representation of this notification.
+     */
+    @Override
+    public String toString() {
+        return super.toString()+"[action="+action+"][sender="+sender+"][receiver="+receiver+
+        		"][transport="+transport+"][groupMessage="+groupMessage+"]";
+    }
+
 }

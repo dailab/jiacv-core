@@ -278,4 +278,17 @@ public class ActionPerformedNotification extends Notification {
 		return hash;
 	}
 
+    /**
+     * Returns a String representation of this notification.
+     *
+     * @return A String representation of this notification.
+     */
+    @Override
+    public String toString() {
+        return super.toString()+"[actionName="+actionName+"][actionType="+actionType+
+        		"][sessionId="+sessionId+"][owner="+owner+"][state="+state+
+        		"][agentbeanName="+agentbeanName+"][originalUser="+originalUser+
+        		"][originalProvider="+originalProvider+"][originalService="+originalService+"]";
+    }
+
 }

@@ -3,7 +3,6 @@
   <body>
     <menu name="${project.name}">
       <item name="Overview" href="index.html"/>
-      <item name="Webstart" href="jnlp/helloworld.jnlp"/>
     </menu>
   </body>
 </project>

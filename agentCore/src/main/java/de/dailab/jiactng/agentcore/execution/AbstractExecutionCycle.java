@@ -291,7 +291,24 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     * @param result The result or failure of the action execution or <code>null</code> if the execution is not yet finished.
     */
    public void actionPerformed(DoAction action, DoActionState state, Object[] result) {
-      final Notification n = new ActionPerformedNotification(this, sequenceNumber++, System.currentTimeMillis(), "Action performed", action, state, result);
+	  String msg;
+	  switch (state) {
+	  case invoked:
+		  msg = "Action invoked";
+		  break;
+	  case started:
+		  msg = "Action started";
+		  break;
+	  case success:
+		  msg = "Action succeeded";
+		  break;
+	  case failed:
+		  msg = "Action failed";
+		  break;
+	  default:
+		  msg = "Action performed";
+	  }
+      final Notification n = new ActionPerformedNotification(this, sequenceNumber++, System.currentTimeMillis(), msg, action, state, result);
 
       sendNotification(n);
    }

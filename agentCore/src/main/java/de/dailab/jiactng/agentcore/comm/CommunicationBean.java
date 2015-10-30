@@ -815,12 +815,22 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
     public void messageExchanged(MessageExchangeAction action, 
 			ICommunicationAddress receiver, IJiacMessage jiacMessage,
 			String transport) {
-        final Notification n =
+    	String msg;
+    	switch (action) {
+    	case SEND:
+    		msg = "Message sent";
+    		break;
+    	case RECEIVE:
+    		msg = "Message received";
+    		break;
+    	default:
+    		msg = "Message exchanged";
+    	}
+    	final Notification n =
                 new MessageExchangeNotification(this,
                 sequenceNumber++,
                 System.currentTimeMillis(),
-                "Message exchanged",
-                action, receiver, jiacMessage, transport);
+                msg, action, receiver, jiacMessage, transport);
         
         sendNotification(n);
     }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- - Application context definition for usage within CommunicationBean related tests and examples -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+
+	<bean name="JIACExampleNode" parent="NodeWithJMX">
+		<property name="agents">
+			<list>
+				<ref bean="LocalAgent" />
+			</list>
+		</property>
+
+	</bean>
+
+	<bean name="LocalAgent" parent="SimpleAgent">
+		<property name="agentBeans">
+			<list>
+				<bean name="PingMemoryBean" class="de.dailab.jiactng.examples.pingpong.memory.PingMemoryBean">
+					<property name="executionInterval" value="1000" />
+					<property name="logLevel" value="info" />
+				</bean>
+				<bean name="PongMemoryBean" class="de.dailab.jiactng.examples.pingpong.memory.PongMemoryBean">
+					<property name="executionInterval" value="1000" />
+					<property name="logLevel" value="info" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+</beans>

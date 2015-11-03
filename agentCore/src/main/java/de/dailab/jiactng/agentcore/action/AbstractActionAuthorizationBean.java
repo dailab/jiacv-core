@@ -119,8 +119,9 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
                      try {
                         doAction.getSession().setOriginalUser((String) results[0]);
                         doAction(doAction);
-                     } catch (Exception e) {
-                        e.printStackTrace();
+                     } catch (Throwable t) {
+                        returnFailure(doAction, t);
+                        log.error("--- action failed: " + doAction.getAction().getName() + " (" + doAction.getSessionId() + ")", t);
                      }
                   } else {
                      // user is not authorized

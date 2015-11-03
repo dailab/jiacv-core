@@ -3,6 +3,12 @@ package de.dailab.jiactng.agentcore.management.jmx;
 import java.util.Arrays;
 
 import javax.management.Notification;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
 
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
@@ -67,7 +73,6 @@ public class ActionPerformedNotification extends Notification {
 		super(ACTION_PERFORMED, source, sequenceNumber, timeStamp, msg);
 		actionName = action.getAction().getName();
 		if(((IActionDescription)action.getAction()).getProviderBean() == null) {
-//		  System.err.println("\n-- "+((IActionDescription)action.getAction()).getName()+" / "+((IActionDescription)action.getAction()).getProviderBean() + " / " + state);
 		  agentbeanName = "null";
 		} else {
 		  agentbeanName = ((IActionDescription)action.getAction()).getProviderBean().getBeanName();
@@ -82,29 +87,73 @@ public class ActionPerformedNotification extends Notification {
 			originalService = action.getSession().getOriginalService();
 		}
 
-		// extract parameters
+		// get parameters
 		final Object[] params = action.getParams();
 		final int paramSize = params.length;
 		actionParameters = new Object[paramSize];
+
+		// get result
+		int resultSize = 0;
+		if (result != null) {
+			resultSize = result.length;
+			actionResult = new Object[resultSize];
+		}
+
+		// create data based on JMX open types
+		final int userDataSize = paramSize + resultSize + 2;
+		String[] itemNames = new String[userDataSize];
+		itemNames[0] = "name";
+		itemNames[1] = "session";
+		Object[] itemValues = new Object[userDataSize];
+		itemValues[0] = actionName;
+		itemValues[1] = sessionId;
+		OpenType<?>[] itemTypes = new OpenType<?>[userDataSize];
+		itemTypes[0] = SimpleType.STRING;
+		itemTypes[1] = SimpleType.STRING;
+
+		// extract parameters
 		for (int i=0; i<paramSize; i++) {
+			Object value;
 			try {
-				actionParameters[i] = ((JmxDescriptionSupport)params[i]).getDescription();
-			} catch (Exception e) {
-				actionParameters[i] = "" + params[i];
+				final JmxDescriptionSupport param = (JmxDescriptionSupport)params[i];
+				value = param.getDescription();
+				itemTypes[i+2] = param.getDescriptionType();
+			} 
+			catch (Exception e) {
+				value = String.valueOf(params[i]);
+				itemTypes[i+2] = SimpleType.STRING;
 			}
+			actionParameters[i] = value;
+			itemNames[i+2] = "param" + (i+1);
+			itemValues[i+2] = value;
 		}
 
 		// extract result
-		if (result != null) {
-			final int resultSize = result.length;
-			actionResult = new Object[resultSize];
-			for (int i=0; i<resultSize; i++) {
-				try {
-					actionResult[i] = ((JmxDescriptionSupport)result[i]).getDescription();
-				} catch (Exception e) {
-					actionResult[i] = String.valueOf(result[i]);
-				}
+		for (int i=0; i<resultSize; i++) {
+			Object value;
+			try {
+				final JmxDescriptionSupport res = (JmxDescriptionSupport)result[i];
+				value = res.getDescription();
+				itemTypes[i+paramSize+2] = res.getDescriptionType();
+			} 
+			catch (Exception e) {
+				value = String.valueOf(result[i]);
+				itemTypes[i+paramSize+2] = SimpleType.STRING;
 			}
+			actionResult[i] = value;
+			itemNames[i+paramSize+2] = "result" + (i+1);
+			itemValues[i+paramSize+2] = value;
+		}
+
+		// set user data
+		try {
+			final CompositeType type = new CompositeType((DoAction.class).getName(), 
+					"performed action and result", itemNames, itemNames, itemTypes);
+			final CompositeData data = new CompositeDataSupport(type, itemNames, itemValues);
+			setUserData(data);
+		}
+		catch (OpenDataException e) {
+			System.err.println("Unable to create open data for ActionPerformedNotification: " + e.getLocalizedMessage());
 		}
 	}
 

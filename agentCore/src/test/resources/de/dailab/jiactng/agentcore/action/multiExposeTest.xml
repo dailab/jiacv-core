@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+    <import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+    <import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+    <import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+    <bean name="MultiExposeNode" parent="NodeWithJMX">
+        <property name="agents">
+            <list>
+			    <bean name="MultiExposeAgent" parent="SimpleAgent">
+					<property name="agentBeans">
+						<list>
+							<bean class="de.dailab.jiactng.agentcore.action.ExposeMultiReturnBean" singleton="false" />
+						</list>
+					</property>
+				</bean>
+            </list>
+        </property>
+    </bean>
+    
+</beans>
+

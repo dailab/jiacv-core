@@ -275,7 +275,7 @@ public abstract class AbstractWorkflowBean extends AbstractMethodExposingBean {
 
 		protected IGroupAddress groupAddress;
 		protected Class<?> payloadClass;
-		protected IFact received = null;
+		protected IJiacMessage received = null;
 		
 		public MessageEventHandler(Thread toStop, String channel, Class<?> payloadType) {
 			super(toStop);
@@ -292,17 +292,8 @@ public abstract class AbstractWorkflowBean extends AbstractMethodExposingBean {
 			// FIXME memory observer seems not to work properly...
 			// works fine for receiving the initial message, though...
 			while (! isInterrupted()) {
-//				System.out.println("checking...");
 				for (JiacMessage msg : memory.readAll(new JiacMessage())) {
-					// check payload
-					if ((payloadClass == null || payloadClass.isInstance(msg.getPayload()))) {
-						// check group address, if any
-						if (groupAddress == null || msg.getHeader(IJiacMessage.Header.SEND_TO).equalsIgnoreCase(groupAddress.getName())) {
-							memory.remove(msg);
-							received = msg.getPayload();
-							setTriggered();
-						}
-					}
+					checkMessage(msg);
 				}
 				try {
 					Thread.sleep(1000);
@@ -317,16 +308,18 @@ public abstract class AbstractWorkflowBean extends AbstractMethodExposingBean {
 			if (event instanceof WriteCallEvent<?>) {
 				WriteCallEvent<?> wce = ((WriteCallEvent<?>) event);
 				if (wce.getObject() instanceof IJiacMessage) {
-					IJiacMessage msg= (IJiacMessage) wce.getObject();
-					
-					if ((payloadClass == null || payloadClass.isInstance(msg.getPayload())) && 
-							(groupAddress == null || msg.getHeader(IJiacMessage.Header.SEND_TO).
-														equalsIgnoreCase(groupAddress.getName()))) {
-						memory.remove(msg);
-						received = msg.getPayload();
-						setTriggered();
-					}
+					checkMessage((IJiacMessage) wce.getObject());
 				}
+			}
+		}
+		
+		private void checkMessage(IJiacMessage msg) {
+			boolean payloadOkay = payloadClass == null || payloadClass.isInstance(msg.getPayload());
+			boolean groupOkay = groupAddress == null || msg.getHeader(IJiacMessage.Header.SEND_TO).equalsIgnoreCase(groupAddress.getName());
+			if (payloadOkay && groupOkay) {
+				memory.remove(msg);
+				received = msg;
+				setTriggered();
 			}
 		}
 
@@ -337,7 +330,7 @@ public abstract class AbstractWorkflowBean extends AbstractMethodExposingBean {
 //			invoke(leaveAction, new Serializable[]{groupAddress});
 		}
 		
-		public Object getReceived() {
+		public IJiacMessage getReceived() {
 			return received;
 		}
 		

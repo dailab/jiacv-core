@@ -242,9 +242,11 @@
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.2.1</version>
+<!--
 				<configuration>
 					<tagBase>https://cvs.dai-labor.de/jiac/jiac-tng/tags</tagBase>
 				</configuration>
+-->
 			</plugin>
 
 			<plugin>
@@ -672,7 +674,12 @@
 		<url>https://cvs.dai-labor.de/jiac/jiac-tng/trunk</url>
 	</scm>
 -->
-
+	<scm>
+		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
+		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
+		<url>https://git.dai-labor.de/jiac-v/core</url>
+	</scm>
+	
 	<modules>
 		<!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->
 		<module>agentCoreAPI</module>

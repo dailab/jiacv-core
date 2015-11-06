@@ -1204,14 +1204,18 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	private void sendAdvertisement(ICommunicationAddress destination) {
 		final JiacMessage adMessage = new JiacMessage();
 		adMessage.setProtocol(ADVERTISE);
-		// TODO filter global actions
 
-		// find OWL-S ServiceDescriptions and deserialize them by hand
+		// collect all local actions with scope GLOBAL or WEBSERVICE for the advertisement
 		final Set<IActionDescription> advActions = new HashSet<IActionDescription>();
 		synchronized (localActions) {
-		    advActions.addAll(localActions);
+			for (IActionDescription localAction : localActions) {
+				if (localAction.getScope().contains(ActionScope.GLOBAL)) {
+					advActions.add(localAction);
+				}
+			}
 		}
 
+		// collect all local agents for the advertisement
 		Hashtable<String, IAgentDescription> advAgents = new Hashtable<String, IAgentDescription>();
 		synchronized (localAgents) {
 			advAgents.putAll(localAgents);
@@ -1219,6 +1223,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		final Advertisement ad = new Advertisement(advAgents, advActions);
 
+		// add JMX service URLs of the agent node to the advertisement
 		if (agentNode.getJmxConnectors() != null) {
 			ad.setJmxURLs(agentNode.getJmxURLs());
 		}

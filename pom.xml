@@ -7,9 +7,9 @@
 	<version>5.1.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Java-based Intelligent Agent Componentware TNG</name>
+	<name>Java-based Intelligent Agent Componentware, Version 5</name>
 	<description>
-      JIAC TNG is a framework to fast and efficiently develop agent-based applications and services.
+      JIAC V is a framework to fast and efficiently develop agent-based applications and services.
    </description>
 	<url>http://repositories.dai-labor.de/sites/jiactng/${project.version}/</url>
 	<inceptionYear>2006</inceptionYear>
@@ -629,6 +629,8 @@
 		</snapshotRepository>
 	</distributionManagement>
 
+<!--
+	Commented, because Continuum is no longer used.
 	<ciManagement>
 		<system>Continuum</system>
 		<url>http://130.149.154.198:8765/continuum/</url>
@@ -640,17 +642,20 @@
 				<sendOnError>true</sendOnError>
 				<sendOnWarning>true</sendOnWarning>
 				<configuration>
-					<!-- <address>axle@dai-lab.de</address> -->
 					<address>jiactng-dev@dai-labor.de</address>
 				</configuration>
 			</notifier>
 		</notifiers>
 	</ciManagement>
+-->
 
+<!--
+	Commented because Mantis is no longer used
 	<issueManagement>
 		<system>Mantis</system>
 		<url>http://130.149.154.84/bt</url>
 	</issueManagement>
+-->
 
 	<mailingLists>
 		<mailingList>
@@ -659,11 +664,14 @@
 		</mailingList>
 	</mailingLists>
 
+<!--
+	Commented because SVN is no longer used. If this should be updated to Git, and you know how, go for it.
 	<scm>
 		<connection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/trunk</connection>
 		<developerConnection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/trunk</developerConnection>
 		<url>https://cvs.dai-labor.de/jiac/jiac-tng/trunk</url>
 	</scm>
+-->
 
 	<modules>
 		<!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->

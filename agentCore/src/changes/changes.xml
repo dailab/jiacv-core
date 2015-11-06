@@ -6,6 +6,8 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
+		<release version="5.2.1" date="t.b.a." description="Minot release">
+		</release>
 		<release version="5.2.0" date="2015-11-06" description="Major release">
 			<action dev="kuester" type="fix">
 				enabled multiple return values for actions using @Expose annotation

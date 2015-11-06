@@ -18,7 +18,7 @@
 
 	<bean name="generics" class="de.dailab.jiactng.agentcore.conf.GenericAgentProperties" singleton="false">
 		<property name="count" value="10" />
-		<property name="agentNamePattern" value="agent_#{count}" />
+		<property name="agentNamePattern" value="agent_%d" />
 		<property name="agentBeanName" value="TestAgent" />
 		<property name="agentConfig" value="de/dailab/jiactng/agentcore/conf/genericAgentDefinition.xml" />
 	</bean>

@@ -58,7 +58,7 @@ public class JmxAgentManagementClientTest extends TestCase implements Notificati
 		// get management client and check for agent node
 		JmxManagementClient client = new JmxManagementClient();
 		Set<String> nodes = client.getAgentNodeUUIDs();
-		assertEquals("JmxManagementClient.getAgentNodeNames() found wrong number of agent nodes", nodes.size(), 1);
+		assertEquals("JmxManagementClient.getAgentNodeNames() found wrong number of agent nodes", 1, nodes.size());
 		String nodeId = nodes.toArray(new String[nodes.size()])[0];
 		assertEquals("JmxManagementClient.getAgentNodeNames() is wrong", nodeRef.getUUID(), nodeId);
 

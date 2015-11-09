@@ -26,12 +26,16 @@ public class NoRoleBean extends AbstractAgentBean implements IEffector {
   public void execute() {
     setExecutionInterval(0);
     StringBuffer sb = new StringBuffer();
+//    sb.append("Agent: ").append(thisAgent.getAgentName());
+//    sb.append("\nRoles: ").append(thisAgent.getRoles());
+//    sb.append("\nBeans: ").append(thisAgent.getAgentBeans());
+//    sb.append("\nActions: ").append(thisAgent.getActionList());
+//    sb.append("\n");
     sb.append("Agent: ").append(thisAgent.getAgentName());
-    sb.append("\nRoles: ").append(thisAgent.getRoles());
-    sb.append("\nBeans: ").append(thisAgent.getAgentBeans());
-    sb.append("\nActions: ").append(thisAgent.getActionList());
-    sb.append("\n");
-    log.error(sb.toString());
+    sb.append("; Roles: ").append(thisAgent.getRoles().size());
+    sb.append("; Beans: ").append(thisAgent.getAgentBeans().size());
+    sb.append("; Actions: ").append(thisAgent.getActionList().size());
+    log.info(sb.toString());
   }
 
   /*

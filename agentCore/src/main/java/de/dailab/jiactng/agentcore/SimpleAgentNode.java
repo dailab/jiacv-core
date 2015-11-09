@@ -159,12 +159,20 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * Main method for starting JIAC-TNG. Loads a spring-configuration file denoted by the first argument and uses a
 	 * ClassPathXmlApplicationContext to instantiate its contents
 	 * 
-	 * @param args the first argument is interpreted as a classpath-relative name of a spring configurations file. Other
-	 *          arguments are ignored.
+	 * @param args the first argument is interpreted as a classpath-relative name of a spring configurations file. 
+	 *             The second argument, if present, is interpreted as the name of the log4j.properties file to use.
 	 * @see org.springframework.context.support.ClassPathXmlApplicationContext
 	 */
-	public static void main(String[] args) {
-		System.setProperty("log4j.configuration", "jiactng_log4j.properties");
+	public static void main(String... args) {
+		if (args == null || args.length == 0) {
+			throw new IllegalArgumentException("String[] args must hold the node configuration file "
+					+ "and (optionally) the log4j properties file.");
+		}
+		if (args.length > 1) {
+			System.setProperty("log4j.configuration", args[1]);
+		} else {
+			System.setProperty("log4j.configuration", "jiactng_log4j.properties");
+		}
 		System.setProperty("spring.rootconfigfile", args[0]);
 		new ClassPathXmlApplicationContext(args[0]);
 	}

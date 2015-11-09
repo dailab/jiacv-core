@@ -49,6 +49,12 @@ public class SessionNonBlockUnitTest extends TestCase {
     initNode();
   }
 
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		san.shutdown();
+	}  
+  
   protected void initNode() {
 
     System.setProperty("log4j.configuration", "jiactng_log4j.properties");

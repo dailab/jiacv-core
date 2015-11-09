@@ -42,6 +42,12 @@ public class AgentRoleUnitTest extends TestCase {
     super.setUp();
     initNode();
   }
+  
+  @Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+		san.shutdown();
+	}
 
   protected void initNode() {
 

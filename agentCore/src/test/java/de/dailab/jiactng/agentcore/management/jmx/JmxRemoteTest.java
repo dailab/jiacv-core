@@ -81,7 +81,9 @@ public class JmxRemoteTest extends TestCase {
         Process clientProcess= createClientProcess(JmxClient.class, serviceUrl);
         new StreamPumper(clientProcess.getInputStream(), "JmxClient.STDOUT").start();
         new StreamPumper(clientProcess.getErrorStream(), "JmxClient.STDERR").start();
-        assertEquals("client failed", 0, clientProcess.waitFor());
+        int result = clientProcess.waitFor();
+        ac.close();
+        assertEquals("client failed", 0, result);
     }
 
     private Process createClientProcess(Class<?> mainClass, String... mainArgs) throws Exception {
@@ -90,18 +92,32 @@ public class JmxRemoteTest extends TestCase {
         // do we have a URL class loader?
         try {
             ClassLoader loader= mainClass.getClassLoader();
+            System.out.println("JmxClient.class has a " + loader.getClass().getSimpleName());
 
             if(loader instanceof URLClassLoader) {
                 urls= ((URLClassLoader) loader).getURLs();
+                System.out.println("Got URLs of class loader: " + Arrays.asList(urls));
+                for (URL url : urls) {
+                	URLClassLoader cl = new URLClassLoader(new URL[] {url});
+                	try {
+                		cl.loadClass("de.dailab.jiactng.agentcore.management.jmx.JmxClient");
+                    	System.out.println("JmxClient contained in " + url);
+                    	cl.close();
+                	}
+                	catch (ClassNotFoundException e) {
+                    	System.out.println("JmxClient not contained in " + url);
+                	}
+                }
             }
         } catch (Exception e) {
-            System.out.println("could not loader urls: " + e.getMessage());
+            System.out.println("could not load urls: " + e.getMessage());
         }
 
         if(urls == null) {
             // get code location for test class only
             try {
                 URL url= mainClass.getProtectionDomain().getCodeSource().getLocation();
+                System.out.println("Got code source location: " + url);
                 if(url != null) {
                     urls= new URL[] {url};
                 }

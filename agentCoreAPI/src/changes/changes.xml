@@ -37,9 +37,6 @@
 				Removed string representation of doAction in ActionPerformedNotification
 				of management interface due to Java memory problems.
 			</action>
-			<action dev="schulz" type="fix">
-				Fixed error in SourceAwareDiscoveryNetworkConnector.
-			</action>
 		</release>
 		<release version="5.1.5" date="2014-02-12" description="Minor release">
 			<action dev="moekon" type="change">

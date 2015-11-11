@@ -170,7 +170,7 @@ public class IAgentTest extends TestCase {
     // removed because of thread-testing problems with junit
   }
   
-  public void testAutoExecutionService(){
+  public void testAutoExecutionService() throws Exception {
 	SimpleAgentNode node = (SimpleAgentNode) new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/AutoServiceNode.xml").getBean("AutoServiceNode");
 	List<IAgent> agents = node.findAgents();
 	TestBean testBean = null;
@@ -185,9 +185,11 @@ public class IAgentTest extends TestCase {
 	} catch (InterruptedException e) {
 		e.printStackTrace();
 	}
-	
+
 	assertNotNull(testBean);
 	assertEquals(3, testBean.getSum());
+
+	node.shutdown();
   }
 
 }

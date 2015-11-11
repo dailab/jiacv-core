@@ -6,7 +6,29 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.1.6" date="t.b.a" description="Minor release">
+		<release version="5.2.1" date="t.b.a" description="Minor release">
+		</release>
+		<release version="5.2.0" date="t.b.a" description="Major release">
+			<action dev="arik" type="add">
+				SSL functionality for management interface and agent 
+				communication.
+			</action>
+			<action dev="masuch" type="add">
+				Semantic annotation and matching of actions.
+			</action>
+			<action dev="kuester" type="add">
+				Multiple return types for exposed methods.
+			</action>
+			<action dev="mattu" type="update">
+				ActiveMQ version updated.
+			</action>
+			<action dev="keiser" type="add">
+				 Structured information about exchanged messages and
+				 performed actions, which are available in jConsole.
+			</action>
+			<action dev="keiser" type="fix">
+				Several bugs fixed.
+			</action>
 		</release>
 		<release version="5.1.5" date="2014-2-12" description="Minor release">
 		</release>

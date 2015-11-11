@@ -124,11 +124,14 @@ public class JmxRemoteTest extends TestCase {
                     builder.append(File.pathSeparatorChar);
                 }
 
-                if(path.indexOf(' ') > 0) {
-                    builder.append('"').append(path).append('"');
-                } else {
-                    builder.append(path);
-                }
+                path.replace(" ", "\\ ");
+                builder.append(path);
+                
+//                if(path.indexOf(' ') > 0) {
+//                    builder.append('"').append(path).append('"');
+//                } else {
+//                    builder.append(path);
+//                }
             } catch (Exception e) {
                 System.err.println("have to leave out: "+ Arrays.asList(urls));
             }

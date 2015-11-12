@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab</groupId>
 	<artifactId>jiactng</artifactId>
-	<version>5.2.0</version>
+	<version>5.2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Java-based Intelligent Agent Componentware, Version 5</name>
@@ -698,7 +698,7 @@
 -->
 		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
 		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
-	  <tag>jiactng-5.2.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 <!--
 	<scm>

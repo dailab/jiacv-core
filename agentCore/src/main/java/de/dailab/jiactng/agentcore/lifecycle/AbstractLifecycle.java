@@ -38,7 +38,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	/** 
 	 * The configured log level. 
 	 */
-	private String logLevel = null;
+	private Level intendedLogLevel = null;
 
 	/** 
 	 * The manager of the agent node 
@@ -324,19 +324,39 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 * {@inheritDoc}
 	 */
 	public final String getLogLevel() {
-		if (log != null && (log instanceof Log4JLogger)) {
-			logLevel = ((Log4JLogger)log).getLogger().getEffectiveLevel().toString();
+		if (log != null) {
+			if (log.isTraceEnabled()) {
+				return Level.TRACE.toString();
+			}
+			else if (log.isDebugEnabled()) {
+				return Level.DEBUG.toString();
+			}
+			else if (log.isInfoEnabled()) {
+				return Level.INFO.toString();
+			}
+			else if (log.isWarnEnabled()) {
+				return Level.WARN.toString();
+			}
+			else if (log.isErrorEnabled()) {
+				return Level.ERROR.toString();
+			}
+			else if (log.isFatalEnabled()) {
+				return Level.FATAL.toString();
+			}
+			else {
+				return Level.OFF.toString();
+			}
 		}
-		return logLevel;
+		return null;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public final void setLogLevel(String level) {
-		logLevel = level;
-		if (log != null && (log instanceof Log4JLogger)) {
-			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
+		intendedLogLevel = Level.toLevel(level, intendedLogLevel);
+		if (log != null && (intendedLogLevel != null) && (log instanceof Log4JLogger)) {
+			((Log4JLogger)log).getLogger().setLevel(intendedLogLevel);
 		}
 	}
 
@@ -347,8 +367,8 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 */
 	protected final void setLog(Log newLog) {
 		log = newLog;
-		if ((log != null) && (logLevel != null) && (log instanceof Log4JLogger)) {
-			((Log4JLogger)log).getLogger().setLevel(Level.toLevel(logLevel));
+		if ((log != null) && (intendedLogLevel != null) && (log instanceof Log4JLogger)) {
+			((Log4JLogger)log).getLogger().setLevel(intendedLogLevel);
 		}
 	}
 

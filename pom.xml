@@ -174,8 +174,52 @@
 		</developer>
 		<developer>
 			<id>luetze</id>
-			<name>Marco Lutzenberger</name>
+			<name>Marco Luetzenberger</name>
 			<email>marco.luetzenberger@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>arik</id>
+			<name>Arik Messerman</name>
+			<email>arik.messerman@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>rakow</id>
+			<name>Christian Rakow</name>
+			<email>christian.rakow@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>mattu</id>
+			<name>Marius Schulz</name>
+			<email>marius.schulz@dai-labor.de</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<organization>DAI-Labor</organization>
+			<organizationUrl>http://www.dai-labor.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>stjung</id>
+			<name>Stefan Junghans</name>
+			<email>stefan.junghans@dai-labor.de</email>
 			<roles>
 				<role>Developer</role>
 			</roles>
@@ -631,33 +675,15 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-<!--
-	Commented, because Continuum is no longer used.
 	<ciManagement>
-		<system>Continuum</system>
-		<url>http://130.149.154.198:8765/continuum/</url>
-		<notifiers>
-			<notifier>
-				<type>mail</type>
-				<sendOnFailure>true</sendOnFailure>
-				<sendOnSuccess>true</sendOnSuccess>
-				<sendOnError>true</sendOnError>
-				<sendOnWarning>true</sendOnWarning>
-				<configuration>
-					<address>jiactng-dev@dai-labor.de</address>
-				</configuration>
-			</notifier>
-		</notifiers>
+		<system>Jenkins</system>
+		<url>http://jenkins.dai-lab.de/job/JIAC%20V%20Core/</url>
 	</ciManagement>
--->
 
-<!--
-	Commented because Mantis is no longer used
 	<issueManagement>
-		<system>Mantis</system>
-		<url>http://130.149.154.84/bt</url>
+		<system>Redmine</system>
+		<url>https://redmine.dai-labor.de/redmine/projects/jiac</url>
 	</issueManagement>
--->
 
 	<mailingLists>
 		<mailingList>
@@ -666,19 +692,18 @@
 		</mailingList>
 	</mailingLists>
 
-<!--
-	Commented because SVN is no longer used. If this should be updated to Git, and you know how, go for it.
 	<scm>
-		<connection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/trunk</connection>
-		<developerConnection>scm:svn:https://cvs.dai-labor.de/jiac/jiac-tng/trunk</developerConnection>
-		<url>https://cvs.dai-labor.de/jiac/jiac-tng/trunk</url>
+		<connection>scm:git:https://git.dai-labor.de/jiac-v/core/</connection>
+		<developerConnection>scm:git:https://git.dai-labor.de/jiac-v/core/</developerConnection>
+		<url>https://git.dai-labor.de/jiac-v/core/</url>
 	</scm>
--->
+<!--
 	<scm>
 		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
 		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
 		<url>https://git.dai-labor.de/jiac-v/core</url>
 	</scm>
+-->
 	
 	<modules>
 		<!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->

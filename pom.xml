@@ -285,11 +285,6 @@
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.5.3</version>
-<!--
-				<configuration>
-					<tagBase>https://cvs.dai-labor.de/jiac/jiac-tng/tags</tagBase>
-				</configuration>
--->
 			</plugin>
 
 			<plugin>
@@ -692,35 +687,16 @@
 	</mailingLists>
 
 	<scm>
-<!--
-		<connection>scm:git:https://git.dai-labor.de/jiac-v/core/</connection>
-		<developerConnection>scm:git:https://git.dai-labor.de/jiac-v/core/</developerConnection>
--->
 		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
 		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
 	  <tag>HEAD</tag>
   </scm>
-<!--
-	<scm>
-		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
-		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
-		<url>https://git.dai-labor.de/jiac-v/core</url>
-	</scm>
--->
 	
 	<modules>
 		<!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->
 		<module>agentCoreAPI</module>
 		<module>gateway</module>
 		<module>agentCore</module>
-		<!-- <module>protocol</module> -->
-		<!-- <module>jiacSecurity</module> -->
-		<!-- <module>bdiAgent</module> -->
-		<!-- <module>ruleEngine</module> -->
-		<!-- <module>tomcatStarter</module> -->
-		<!-- <module>basicServices</module> -->
-		<!-- <module>examples</module> -->
-		<!-- <module>tools</module> -->
 	</modules>
 
 	<profiles>

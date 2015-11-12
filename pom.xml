@@ -693,9 +693,12 @@
 	</mailingLists>
 
 	<scm>
+<!--
 		<connection>scm:git:https://git.dai-labor.de/jiac-v/core/</connection>
 		<developerConnection>scm:git:https://git.dai-labor.de/jiac-v/core/</developerConnection>
-		<url>https://git.dai-labor.de/jiac-v/core/</url>
+-->
+		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
+		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
 	</scm>
 <!--
 	<scm>

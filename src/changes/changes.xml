@@ -6,9 +6,7 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.2.1" date="t.b.a" description="Minor release">
-		</release>
-		<release version="5.2.0" date="t.b.a" description="Major release">
+		<release version="5.2.0" date="2015-11-12" description="Major release">
 			<action dev="arik" type="add">
 				SSL functionality for management interface and agent 
 				communication.

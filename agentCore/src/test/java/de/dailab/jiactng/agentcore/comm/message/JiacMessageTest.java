@@ -1,97 +1,94 @@
 package de.dailab.jiactng.agentcore.comm.message;
 
-import javax.jms.Destination;
-
 import junit.framework.TestCase;
-import de.dailab.jiactng.agentcore.comm.helpclasses.FakeDestination;
+import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
+import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.message.IJiacMessage.Header;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
+import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 
 /**
- * tests for different construction and getting the jiacDestination
+ * Tests for different constructions of JIAC message.
  * 
- * @author Martin Loeffelholz
- *
+ * @author Jan Keiser
  */
-
 public class JiacMessageTest extends TestCase {
-	private static String operation = "testOperation";
-	private static Destination replyTo = new FakeDestination("replyTo");
-	private static IFact payload = null;
+
+	private static ICommunicationAddress sender = CommunicationAddressFactory.createMessageBoxAddress("myAddress");
+	private static ICommunicationAddress replyTo = CommunicationAddressFactory.createGroupAddress("replyToAddress");
+	private static IFact payload = new AgentDescription();
+	private static String group = "myGroup";
+	private static String protocol = "myProtocol";
+	private static String headerKey = "myKey";
+	private static String headerValue = "myValue";
 	
-	protected void setUp() throws Exception {
-		super.setUp();
+	public void testJiacMessage() {
+		// create JIAC message and set all attributes
+		JiacMessage jMsg = new JiacMessage(payload, replyTo);
+		jMsg.setGroup(group);
+		jMsg.setProtocol(protocol);
+		jMsg.setSender(sender);
+		jMsg.setHeader(headerKey, headerValue);
+
+		// test attribute values
+		assertEquals(payload, jMsg.getPayload());
+		assertEquals(replyTo, jMsg.getReplyToAddress());
+		assertEquals(group, jMsg.getGroup());
+		assertEquals(protocol, jMsg.getProtocol());
+		assertEquals(sender, jMsg.getSender());
+		assertTrue(jMsg.getHeaderKeys().contains(headerKey));
+		assertEquals(headerValue, jMsg.getHeader(headerKey));
+
+		// test message headers
+		assertNull(jMsg.getHeader(Header.SEND_TO));
+		assertEquals(replyTo.toString(), jMsg.getHeader(Header.REPLY_TO));
+		assertEquals(group, jMsg.getHeader(Header.GROUP));
+		assertEquals(protocol, jMsg.getHeader(Header.PROTOCOL));
+		assertEquals(sender.toString(), jMsg.getHeader(Header.SENDER));
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	public void testDefaultValues() {
+		// create empty JIAC message
+		JiacMessage jMsg = new JiacMessage();
+
+		// test attribute values and message header
+		assertNull(jMsg.getPayload());
+		assertNull(jMsg.getReplyToAddress());
+		assertNull(jMsg.getGroup());
+		assertNull(jMsg.getProtocol());
+		assertNull(jMsg.getSender());
+		assertTrue(jMsg.getHeaderKeys().isEmpty());
+		assertNull(jMsg.getHeader(headerKey));
 	}
-	/* Function set to private
-	public void testJiacMessageStringIJiacContentIEndPoint() {
-		JiacMessage jMsg = new JiacMessage(operation, payload, recipient );
-		assertEquals(operation, jMsg.getOperation());
-		assertEquals(payload, jMsg.getPayload());
-		assertEquals(recipient, jMsg.getEndPoint());
+
+	public void testNullParameters() {
+		// create JIAC message with null values
+		JiacMessage jMsg = new JiacMessage(null, null);
+		jMsg.setGroup(null);
+		jMsg.setProtocol(null);
+		jMsg.setSender(null);
+		jMsg.setHeader(headerKey, headerValue);
+		jMsg.setHeader(headerKey, null);
+
+		// test NullPointerException
+		try {
+			jMsg.setHeader(null, headerValue);
+			TestCase.fail();
+		} catch (NullPointerException e) {}
+
+		// test attribute values
+		assertNull(jMsg.getPayload());
+		assertNull(jMsg.getReplyToAddress());
+		assertNull(jMsg.getGroup());
+		assertNull(jMsg.getProtocol());
+		assertNull(jMsg.getSender());
+		assertTrue(jMsg.getHeaderKeys().isEmpty());
+		assertNull(jMsg.getHeader(headerKey));
+
+		// test NullPointerException
+		try {
+			jMsg.getHeader(null);
+			TestCase.fail();
+		} catch (NullPointerException e) {}
 	}
-	*/
-//
-//	public void testJiacMessageStringIJiacContentIEndPointIEndPointDestination() {
-//		JiacMessage jMsg = new JiacMessage(operation, payload, recipient, startPoint, replyTo );
-//		assertEquals(operation, jMsg.getOperation());
-//		assertEquals(payload, jMsg.getPayload());
-//		assertEquals(recipient, jMsg.getEndPoint());
-//		assertEquals(startPoint, jMsg.getStartPoint());
-//		assertEquals(replyTo, jMsg.getSender());
-//	}
-//
-//	public void testGetJiacDestination(){
-//		JiacMessage jMsg = new JiacMessage(operation, payload, recipient, startPoint, replyTo );
-//		EndPoint platformRecipient = (EndPoint) EndPointFactory.createEndPoint("testPlatform");
-//		
-//		assertEquals(recipient.getUniversalId() , jMsg.getJiacDestination());
-//		
-//		platformRecipient.setLocalId(platformRecipient.getLocalId() + JiacMessage.PLATFORM_ENDPOINT_EXTENSION);
-//		jMsg = new JiacMessage(operation, payload, platformRecipient, startPoint, replyTo);
-//		
-//		assertEquals(platformRecipient.toString(), jMsg.getJiacDestination());
-//		
-//		platformRecipient.setLocalId("local");
-//		platformRecipient.setUniversalId("universal");
-//		jMsg = new JiacMessage(operation, payload, platformRecipient, startPoint, replyTo);
-//		System.out.println(jMsg.getJiacDestination());
-//		
-//	}
-//	
-//	public void testNullPointerException(){
-//		boolean caught = false;
-//		try {
-//			JiacMessage jMsg = new JiacMessage(operation, payload, null, startPoint, replyTo);
-//		} catch (NullPointerException e) {
-//			caught = true;
-//		} finally {
-//			assertTrue("No Recipient declared", caught);
-//		}
-//		
-//		caught = false;
-//		try {
-//			JiacMessage jMsg = new JiacMessage(operation, payload, recipient, null, replyTo);
-//		} catch (NullPointerException e) {
-//			caught = true;
-//		} finally {
-//			assertTrue("No StartPoint declared", caught);
-//		}
-//		
-//		caught = false;
-//		try {
-//			JiacMessage jMsg = new JiacMessage(operation, payload, null, null, replyTo);
-//		} catch (NullPointerException e) {
-//			caught = true;
-//		} finally {
-//			assertTrue("No Endpoints declared", caught);
-//		}
-//	}
-	
-	public void testOverride(){
-		assertTrue(true);
-	}
-	
 }

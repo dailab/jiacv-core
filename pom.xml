@@ -701,6 +701,7 @@
 		<module>agentCoreAPI</module>
 		<module>gateway</module>
 		<module>agentCore</module>
+		<module>AgentUnit</module>
 		<!-- <module>protocol</module> -->
 		<!-- <module>jiacSecurity</module> -->
 		<!-- <module>bdiAgent</module> -->

@@ -466,7 +466,8 @@ public class Action implements IActionDescription {
 
 		return EqualityChecker.equals(this.getName(), other.getName())
 		      && EqualityChecker.equals(this.getInputTypeNames(), other.getInputTypeNames())
-		      && EqualityChecker.equals(this.getResultTypeNames(), other.getResultTypeNames());
+		      && EqualityChecker.equals(this.getResultTypeNames(), other.getResultTypeNames())
+		      && EqualityChecker.equals(this.getSemanticServiceDescriptionIRI(), other.getSemanticServiceDescriptionIRI());
 	}
 	
 	@Override
@@ -486,7 +487,8 @@ public class Action implements IActionDescription {
 
 		return EqualityChecker.equalsOrNull(this.getName(), template.getName())
 		      && EqualityChecker.equalsOrNull(this.getInputTypeNames(), template.getInputTypeNames())
-		      && EqualityChecker.equalsOrNull(this.getResultTypeNames(), template.getResultTypeNames());
+		      && EqualityChecker.equalsOrNull(this.getResultTypeNames(), template.getResultTypeNames())
+		      && EqualityChecker.equalsOrNull(this.getSemanticServiceDescriptionIRI(), template.getSemanticServiceDescriptionIRI());
 	}
 
 	/**

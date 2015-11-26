@@ -631,7 +631,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 									serviceDescList);
 
 					if (matcherResult != null) {
-						return matcherResult;
+						// use matcher result as new template and continue with regular matching
+						template = matcherResult;
 					} else {
 						log.warn("Matcher found no result, trying normal template matching...");
 					}

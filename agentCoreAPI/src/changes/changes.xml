@@ -6,21 +6,51 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.1.6" date="t.b.a" description="Minor release">
+		<release version="5.2.1" date="t.b.a" description="Minor release">
+		</release>
+		<release version="5.2.0" date="t.b.a" description="Major release">
+			<action dev="arik" type="add">
+				SSL functionality for management interface.
+			</action>
+			<action dev="masuch" type="add">
+				New expose tags and action description attributes for semantic 
+				annotation of actions.
+			</action>
+			<action dev="stjung" type="add">
+				Directory provides interface to search for semantic service descriptions
+				by using the semantic service matcher.
+			</action>
+			<action dev="keiser" type="add">
+				Added method to management interface to get and set
+				the execution interval of agents and agent beans.
+			</action>
+			<action dev="keiser" type="update">
+				Use attribute userData of JMX notifications to make structured 
+				information about content of exchanged messages and parameters/results 
+				of performed actions available in jConsole.
+			</action>
+			<action dev="keiser" type="remove">
+				Removed action state STARTED in ActionPerformedNotification
+				due to similarity to state INVOKED.
+			</action>
+			<action dev="keiser" type="remove">
+				Removed string representation of doAction in ActionPerformedNotification
+				of management interface due to Java memory problems.
+			</action>
 		</release>
 		<release version="5.1.5" date="2014-02-12" description="Minor release">
 			<action dev="moekon" type="change">
 				"Changed property for AgentBean execution interval. Name changed from 
-        executeInterval to executionInterval - old methods are stil present but 
-        deprecated."
+				executeInterval to executionInterval - old methods are stil present but 
+				deprecated."
 			</action>
 			<action dev="moekon" type="change">
 				"Improved performance of containsResource in the JarMemory class - this 
-        should improve classloading for agents that are installed from jars."
+				should improve classloading for agents that are installed from jars."
 			</action>
 			<action dev="keiser" type="change">
 				"Upgrade log4j dependency from version 1.2.8 to 1.2.17 to be compliant 
-        with log4j used by org.eclipse.xtext version 0.7.2."
+				with log4j used by org.eclipse.xtext version 0.7.2."
 			</action>            
 		</release>
 		<release version="5.1.4" date="2013-08-01" description="Minor release">

@@ -29,7 +29,6 @@ import javax.management.openmbean.TabularType;
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.directory.IOntologyStorage;
-import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
 
 /**
  * An abstract Bean which exposes accessible methods which are marked with the
@@ -227,7 +226,32 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         		log.debug("action processed and about to write result...");
         	}
             if(method.getReturnType() != void.class) {
-                memory.write(action.createActionResult(doAction, new Serializable[] { result }));
+            	if (action.getResultTypes().size() == 1) {
+            		memory.write(action.createActionResult(doAction, new Serializable[] { result }));
+            	} else {
+            		if (result instanceof Serializable[]) {
+            			Serializable[] results = (Serializable[]) result;
+            			List<Class<?>> expected = action.getResultTypes();
+            			// check whether number of results match
+            			if (results.length != expected.size()) {
+            				log.warn(String.format("Number of Results does not match number given in ActionDescription. "
+            						+ "Expected %d, but got %d", expected.size(), results.length));
+            			}
+            			// check whether result types match
+            			for (int i = 0; i < Math.min(results.length, expected.size()); i++) {
+            				if (! action.getResultTypes().get(i).isInstance(results[i])) {
+            					log.warn(String.format("Action result does not match expected type. Expected %s, but got %s", 
+            							expected.get(i).getName(), results[i].getClass().getName()));
+            				}
+            			}
+            			// return unpacked results
+            			memory.write(action.createActionResult(doAction, results));
+            		} else {
+            			// just return the single result
+            			log.warn("Action @Exposed with multiple return type should return Serializable[], but got " + result.getClass().getName());
+            			memory.write(action.createActionResult(doAction, new Serializable[] { result }));
+            		}
+            	}
             } else {
                 memory.write(action.createActionResult(doAction, new Serializable[0]));
             }
@@ -262,11 +286,11 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
                 returnTypes
             );
             
-            if (ontologyStorage != null) {
+            
         	if (semanticURI != null && !semanticURI.equals("")) {
-		    act.setSemanticServiceDescriptionURI(semanticURI);
-		}
-            }
+        		act.setSemanticServiceDescriptionURI(semanticURI);
+        	}
+            
             
             
             act.setScope(scope);

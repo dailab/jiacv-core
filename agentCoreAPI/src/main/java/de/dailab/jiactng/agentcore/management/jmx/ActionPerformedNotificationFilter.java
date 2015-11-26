@@ -13,7 +13,7 @@ import javax.management.NotificationFilter;
  *
  * It manages a list of enabled action names and agent bean names. Methods allow 
  * users to enable/disable as many action names and agent bean names as required
- * as well as all invoked, started, successful and failed actions. 
+ * as well as all invoked, successful and failed actions. 
  *  
  * @author Jan Keiser
  */
@@ -35,9 +35,6 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 
 	/** Indicates if notifications will be sent for invoked actions. */
 	private boolean invokedEnabled = true;
-
-	/** Indicates if notifications will be sent for started actions. */
-	private boolean startedEnabled = true;
 
 	/** Indicates if notifications will be sent for successful actions. */
 	private boolean successEnabled = true;
@@ -67,9 +64,6 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 		// check state of action
 		final DoActionState state = ((ActionPerformedNotification) notification).getState();
 		if (state.equals(DoActionState.invoked) && !invokedEnabled) {
-			return false;
-		}
-		if (state.equals(DoActionState.started) && !startedEnabled) {
 			return false;
 		}
 		if (state.equals(DoActionState.success) && !successEnabled) {
@@ -234,13 +228,6 @@ public class ActionPerformedNotificationFilter implements NotificationFilter {
 	 */
 	public final void disableInvokedActions() {
 		invokedEnabled = false;
-	}
-
-	/**
-	 * Disables all started action executions.
-	 */
-	public final void disableStartedActions() {
-		startedEnabled = false;
 	}
 
 	/**

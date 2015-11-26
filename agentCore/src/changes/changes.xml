@@ -6,7 +6,73 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.1.6" date="t.b.a" description="Minor release">
+		<release version="5.2.1" date="t.b.a" description="Minor release">
+		</release>
+		<release version="5.2.0" date="t.b.a" description="Major release">
+			<action dev="arik" type="add">
+				SSL functionality for agent communication.
+			</action>
+			<action dev="kuester" type="add">
+				AbstractMethodExposingBean supports multiple return types for 
+				exposed actions.
+			</action>
+			<action dev="masuch" type="add">
+				Uses semantic IRI and ontology storage for service matchmaking
+				when searching for actions based on semantic service template.
+			</action>
+			<action dev="stjung" type="fix">
+				Get an ordered and not duplicated list when searching for actions.
+			</action>
+			<action dev="moekon" type="change">
+				Changed default execution interval of agents from 1 to 5 ms 
+				to reduce CPU load in idle mode.
+			</action>
+			<action dev="keiser" type="fix">
+				Providing a reference to the agent also for these agent beans, 
+				which are part of an agent role instead of an agent directly.
+			</action>
+			<action dev="keiser" type="fix">
+				Advertise local actions with scope WEBSERVICE to other agent nodes.
+			</action>
+			<action dev="keiser" type="fix">
+				Missing action result in case of a failed action after user authorization.
+			</action>
+			<action dev="keiser" type="fix">
+				Using correct JMX name for deregistration of JMX connectors.
+			</action>
+			<action dev="keiser" type="change">
+				Create notification message specific for the state of action execution
+				and direction of communication. Removed ActionPerformedNotification
+				with state STARTED due to similarity to state INVOKED.
+			</action>
+			<action dev="kuester" type="add">
+				AbstractAgentBean and AbstractWorkflowBean provides new helper method 
+				to search and invoke actions in one step.
+			</action>
+			<action dev="kuester" type="change">
+				Changed return type of message event handler in AbstractWorkflowBean.
+			</action>
+			<action dev="kuester" type="fix">
+				Some fixes for VSDT export in AbstractWorkflowBean.
+			</action>
+			<action dev="rakow" type="change">
+				Methods accessibility in AbstractMethodExposingBean changed.
+			</action>
+			<action dev="kuester" type="fix">
+				Fixed confusing error message when having exception in initialization
+				of agent node bean.
+			</action>
+			<action dev="kuester" type="fix">
+				Fixed expected template in GenericAgentProperties.
+			</action>
+			<action dev="kuester" type="change">
+				Optional parameter for logging configuration in SimpleAgentNode.main.
+			</action>
+			<action dev="keiser" type="change">
+				Getter of log level provides the actual level instead of the 
+				configured level. Setter does not change the level if the
+				parameter is not correct.
+			</action>
 		</release>
 		<release version="5.1.5" date="2014-02-12" description="Minor release">
 			<action dev="masuch" type="add">
@@ -17,21 +83,21 @@
 				https://wiki.dai-labor.de/ClusterFAC:Gruppenkonfiguration
 			</action>
 			<action dev="moekon" type="change">
-        "Changed property for AgentBean execution interval. Name changed from 
-        executeInterval to executionInterval - old methods are stil present but 
-        deprecated."			
-      </action>
+				"Changed property for AgentBean execution interval. Name changed from 
+				executeInterval to executionInterval - old methods are stil present but 
+				deprecated."			
+			</action>
 			<action dev="moekon" type="change">
-        "Changed parameter checks in executionCycle from returnTypes to 
-        returnTypeNames to avoid problems with classloading."			
-      </action>
+				"Changed parameter checks in executionCycle from returnTypes to 
+				returnTypeNames to avoid problems with classloading."			
+			</action>
 			<action dev="moekon" type="change">
-        "Changed constructor of Action to make sure that typeNames are always 
-        set for input and output."			
-      </action>
+				"Changed constructor of Action to make sure that typeNames are always 
+				set for input and output."			
+			</action>
 			<action dev="moekon" type="change">
-        "Removed log4j.properties to avoid problems with reconfiguration of log4j."			
-      </action>      
+				"Removed log4j.properties to avoid problems with reconfiguration of log4j."			
+			</action>      
 		</release>
 		<release version="5.1.4" date="2013-08-01" description="Minor release">
 		</release>

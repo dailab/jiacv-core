@@ -1,0 +1,262 @@
+<document xmlns="http://maven.apache.org/changes/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
+	<properties>
+		<title>Changes</title>
+		<author email="axle.hessler@dai-labor.de">axle</author>
+	</properties>
+	<body>
+		<release version="5.2.1" date="t.b.a" description="Minor release">
+		</release>
+		<release version="5.2.0" date="t.b.a" description="Major release">
+			<action dev="arik" type="add">
+				SSL functionality for management interface and agent 
+				communication.
+			</action>
+			<action dev="masuch" type="add">
+				Semantic annotation and matching of actions.
+			</action>
+			<action dev="kuester" type="add">
+				Multiple return types for exposed methods.
+			</action>
+			<action dev="mattu" type="update">
+				ActiveMQ version updated.
+			</action>
+			<action dev="keiser" type="add">
+				 Structured information about exchanged messages and
+				 performed actions, which are available in jConsole.
+			</action>
+			<action dev="keiser" type="fix">
+				Several bugs fixed.
+			</action>
+		</release>
+		<release version="5.1.5" date="2014-2-12" description="Minor release">
+		</release>
+		<release version="5.1.4" date="2013-08-01" description="Minor release">
+		</release>
+		<release version="5.1.3" date="2012-09-21" description="Minor release">
+		</release>
+		<release version="5.1.1" date="2011-08-09" description="Minor release">
+		</release>
+		<release version="5.1.0" date="2010-10-01" description="Major release">
+			<action dev="moekon" type="add">
+				MAMS demonstrator - Contains the
+				scheduled deployment of JADL services by consideration of the load
+				of the agent nodes.
+			</action>
+			<action dev="jakob" type="update">
+				New release of ASGARD with new
+				features and a changed module structure.
+			</action>
+			<action dev="kuester" type="add">
+				Auction example - Usage of VSDT,
+				AWE, JADL, and Rules.
+			</action>
+			<action dev="keiser" type="update">
+				The JMX names of all managed JIAC
+				resources contains the unique ID instead the name of the
+				corresponding agent node.
+			</action>
+			<action dev="keiser" type="add">
+				New module agentCoreAPI which
+				contains all operational and management interfaces of agentCore.
+				Thus, agentCore is now only the implementation of this interfaces.
+			</action>
+		</release>
+		<release version="5.0.5" date="2009-12-03" description="Minor release">
+			<action dev="jakob" type="add">
+				ASGARD - JIAC V Agent Platform
+				Monitor - 3D!
+			</action>
+			<action dev="kaisers" type="add">
+				AgentUnit - Unit testing of JIAC V
+				agent services made easier.
+			</action>
+			<action dev="burkhardt" type="add">
+				New agent migration allows an
+				agent to migrate from one agent node to another.
+			</action>
+			<action dev="kaisers" type="add">
+				Deployment of JADL scripts now uses
+				load distribution.
+			</action>
+			<action dev="moekon" type="add">
+				New module with first implementation
+				of BDI control.
+			</action>
+			<action dev="moekon" type="add">
+				Service matcher example - Searching
+				for semantically described services.
+			</action>
+			<action dev="jakob" type="add">
+				User management example - Use of the
+				usermanagement services and user authorization for service
+				invocations.
+			</action>
+			<action dev="axle" type="update">
+				Reimplementation of the distributed
+				service directory.
+			</action>
+			<action dev="kaisers" type="update">
+				Load measurement more robust.
+			</action>
+			<action dev="kaisers" type="update">
+				Load distribution during starttime.
+			</action>
+			<action dev="burkhardt" type="update">
+				JADL++ improved!!: based on
+				Eclipse TMF v0.7.1; services published in IDirectory;
+				new headers
+				(import, include, mapping, define); new modifier for numeric
+				datatypes;
+				new events (message, time); new control flow
+				(switch-case); new commands (listen, receive, send).
+			</action>
+		</release>
+		<release version="5.0.4" date="2009-01-27" description="Minor release">
+			<action dev="jakob" type="add">
+				New agent persistence provides an
+				agent node bean to make agent node configurations persistent.
+			</action>
+			<action dev="kaisers" type="add">
+				New agent scheduler provides an
+				agent bean to schedule new agents on available agent nodes based on
+				load info
+				and some load related services.
+			</action>
+			<action dev="loeffelholz" type="add">
+				Integration of IRML user
+				management as basic service module with flexible user agent
+				authentication
+				and authorisation of JIAC actions.
+			</action>
+			<action dev="keiser" type="add">
+				New ParlayX client providing an
+				agent bean with actions for accessing IMS/SIP services via ParlayX
+				web services.
+			</action>
+			<action dev="keiser" type="add">
+				Timer-based start and stop of
+				agents.
+			</action>
+			<action dev="keiser" type="add">
+				Flexible token-based authorisation
+				for JIAC action invocations.
+			</action>
+			<action dev="marcel" type="add">
+				A gateway for reliable host name
+				resolution for agent discovery and inter-agent communication.
+			</action>
+			<action dev="burkhardt" type="add">
+				OWL support in JADL++ interpreter
+				and service matcher.
+			</action>
+			<action dev="masuch" type="add">
+				A service matcher matching OWL-S
+				service descriptions.
+			</action>
+			<action dev="burkhardt" type="update">
+				Improvement of JADL++
+				interpreter.
+			</action>
+			<action dev="kuester" type="update">
+				Rule engine API and Drools support
+				has been extracted from JIAC and established as own independent
+				module
+				for use in other DAI-Labor projects without JIAC. Integration
+				of ruleengine into JIAC agents is now build on
+				top of it.
+			</action>
+			<action dev="keiser" type="add">
+				Non-blocking execution cycle
+				supports parallel action execution and synchronous action
+				invocation.
+			</action>
+			<action dev="keiser" type="add">
+				New extensible management client API
+				for easy management of local or remote JIAC TNG resources.
+			</action>
+			<action dev="loeffelholz" type="add">
+				Services are now reliably
+				discovered by using the service directory if they are there, also
+				cross-node.
+			</action>
+			<action dev="moekon" type="fix">
+				SessionIds are now passed down to
+				sub-services during service usage.
+			</action>
+		</release>
+		<release version="5.0.3" date="2008-07-07" description="Minor release">
+			<action dev="kaisers" type="add">
+				New load measurement provides an
+				agent bean and java classes for measuring system load on an agent
+				node.
+			</action>
+			<action dev="moekon" type="update">
+				Some improvements and changes on the
+				web server module.
+			</action>
+			<action dev="tuguldur" type="add">
+				RuleEngineMonitor - Tool for
+				remote monitoring and control of JIAC rule engines.
+			</action>
+			<action dev="keiser" type="update">
+				Several new features added to the
+				agent node monitor.
+			</action>
+			<action dev="kuester" type="add">
+				New rule engine support for JIAC
+				agents.
+			</action>
+			<action dev="burkhardt" type="add">
+				Interpreter example - Use of a
+				JADL++ Interpreter to execute composed services.
+			</action>
+			<action dev="thiele" type="add">
+				Ping Pong example - Communication
+				between agents of an agent node by using message bus and directory
+				service.
+			</action>
+		</release>
+		<release version="5.0.2" date="" description="Minor release">
+			<action dev="keiser" type="add">
+				AgentNodeMonitor - Comprehensive
+				graphical tool for remote monitoring and control of agent nodes and
+				agents.
+			</action>
+		</release>
+		<release version="5.0.1" date="2007-11-08" description="First release">
+			<action dev="keiser" type="add">
+				New web server beans with services
+				for enabling and disabling web applications.
+			</action>
+			<action dev="loeffelholz" type="add">
+				Simple chat example -
+				Communication between agents and dynamic creation of agents.
+			</action>
+			<action dev="axle" type="add">
+				Hello World example - Invocation of an
+				action between loosely coupled components of an agent.
+			</action>
+			<action dev="axle" type="add">
+				Additionally to the normal source and
+				test code structure
+				a site will be created which provides basic
+				information about the module on the one
+				hand, and information about
+				the quality of the module on the other.
+			</action>
+			<action dev="axle" type="add">
+				You may now log your changes in a
+				ChangeLog using
+				this changes.xml. A report will be generated
+				automatically and integrated
+				in the site.
+			</action>
+			<action dev="joachim" type="add">
+				Strict mode support added to
+				"de.dailab.jiactng.agentcore.lifecycle.DefaultLifecycleHandler".
+			</action>
+		</release>
+	</body>
+</document>

@@ -348,12 +348,20 @@ public class Action implements IActionDescription {
 	
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @deprecated Inconsistent name of setter; problems with TupleSpace/GetterSetterFinder, use {@link #setSemanticServiceDescriptionIRI(String)} instead
 	 */
+	@Deprecated
 	public void setSemanticServiceDescriptionURI(String iri) {
 		this.semanticServiceDescriptionIRI = iri;
 		
 	}
 
+	public void setSemanticServiceDescriptionIRI(String iri) {
+		this.semanticServiceDescriptionIRI = iri;
+		
+	}
+	
 	public String getActionType() {
 		return this.actionType;
 	}
@@ -584,7 +592,7 @@ public class Action implements IActionDescription {
 	private String[] getItemNames() {
 		return new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTTYPES,
 		      IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_SCOPE, IActionDescription.ITEMNAME_BEAN,
-		      IActionDescription.ITEMNAME_AGENT };
+		      IActionDescription.ITEMNAME_AGENT, IActionDescription.ITEMNAME_SEMURI };
 	}
 
 	/**
@@ -603,7 +611,8 @@ public class Action implements IActionDescription {
 			new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
 			SimpleType.STRING, 
 			SimpleType.STRING,
-			(this.providerDescription != null) ? this.providerDescription.getDescriptionType() : SimpleType.VOID, 
+			(this.providerDescription != null) ? this.providerDescription.getDescriptionType() : SimpleType.VOID,
+			SimpleType.STRING
 		};
 
 		// use names of action items as their description
@@ -629,7 +638,8 @@ public class Action implements IActionDescription {
 			this.resultTypeNames.toArray(new String[this.resultTypeNames.size()]), 
 			(this.scope != null) ? this.scope.toString() : null,
 			(this.providerBean != null) ? this.providerBean.getBeanName() : null,
-			(this.providerDescription != null) ? this.providerDescription.getDescription() : null
+			(this.providerDescription != null) ? this.providerDescription.getDescription() : null,
+			(this.semanticServiceDescriptionIRI != null) ? this.semanticServiceDescriptionIRI.toString() : null
 		};
 
 		final CompositeType type = (CompositeType) this.getDescriptionType();

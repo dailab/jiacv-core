@@ -81,6 +81,12 @@ public interface SimpleAgentNodeMBean extends AbstractLifecycleMBean {
 	String getJiacVersion();
 	
 	/**
+	 * Getter for attribute "SslInUse" of the managed agent node.
+	 * @return <CODE>true</CODE> if SSL/TLS is enabled in this agent node.
+	 */
+	boolean isSslInUse();
+	
+	/**
 	 * Getter for attribute "JiacVendor" of the managed agent node.
 	 * @return the vendor of JIAC TNG used by this agent node
 	 */

@@ -1,0 +1,830 @@
+<?xml version="1.0"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+	<properties>
+		<title>Directory of Agents and Services</title>
+		<author email="sandor.selowski@dai-labor.de">Sandor Selowski</author>
+	</properties>
+	<body>
+	<section name="Overview">
+	<p>
+		As of version 5.1.6, it is possible to secure safety-critical
+		communication channels used by JIAC Agent Nodes. This security
+		measure
+		is implemented with TLS (formerly known as SSL). This work
+		was
+		conducted as part of the AuVeGoS project at the DAI-Labor to achieve
+		the security goals confidentiality, integrity and authenticity for the
+		agent communication. It
+		could be helpful and informative to have a look
+		into the technical
+		documentation of the AuVeGoS project, which gives an
+		even deeper
+		insight into the technical background of JIAC and TLS.
+	</p>
+		<p>
+			The protectable communication channels include:
+		</p>
+			<ul>
+				<li>
+					<strong>Implicit messaging:</strong>
+					This channel is used for coordination reasons and it is
+					implemented with JMX. Each Agent Node starts a JMX server to be
+					traceable for other Agent Nodes. The Agent Nodes are allowed to
+					exchange confidential information about themselves, but also
+					information about the hosting Agents and meta information like the
+					owner of an Agent, the available functionalities and much more.
+				</li>
+				<li>
+					<strong>Explicit messaging:</strong>
+					This messaging is triggered by an Agent, if it wants to
+					communicate with other Agents. Usually this explicit messaging is
+					implemented with ActiveMQ. In the case, the communication partners
+					(the Agents) are located within the same JVM, no network-related
+					infrastructure is used for communication and therefor no risks
+					about confidentially and integrity issues is given. But in the case
+					where two communicating Agents are located within two different
+					Agent Nodes on different machines, information is transmitted over
+					a network.
+				</li>
+			</ul>
+	<p>
+		A third communication channel,
+		<strong>multicast messaging</strong>
+		, is not
+		protected with TLS. This channel is used merely to identify
+		active Agent Nodes and to receive the Agent Node's JMX service URL.
+		Beyond that no other confidential information is
+		transmitted via this channel.
+	</p>
+	<p>
+		In JIAC&#160;V TLS is also used for authentication between all
+		communication nodes (these include Agent Nodes and optionally the
+		monitoring and management application ASGARD).
+	</p>
+	<p>
+		The following chapters give a brief overview of what steps are
+		required to implement and execute a JIAC MAS with TLS support and
+		what keys and certificates are needed therefor.
+	</p>
+
+			<subsection
+				name="Implementing and executing a JIAC&#160;V MAS with TLS support">
+				<p>
+					To implement and execute a JIAC&#160;V multi-agent-system following
+					steps must be performed:
+				</p>
+				<ol type="1">
+					<li>For each communication node (Agent Nodes, ASGARD) a Java trust-
+						and keystore have to be provided, containing proper keys and
+						certificates. This can be done with tools like the Java keytool,
+						OpenSSL and the keyStoreGenerator. The keyStoreGenerator is an
+						application implemented and provided by the DAI-Labor.
+					</li>
+
+					<li>Each communication node must be informed of the paths to the
+						stores and the store‘s passwords. For JIAC‘s Agent Nodes this is
+						done by adding properties to the Agent Node Configuration file.
+						For ASGARD this is done by setting environment variables in its
+						JVM (for this, please refer to the ASGARD documentation).
+						Important note: It is not possible to monitor or manage a TLS
+						protected JIAC MAS with ASGARD as long ASGARD is not configured to
+						support TLS.
+					</li>
+				</ol>
+				<p>The first point takes some manual effort. The second point is
+					easy to manage.
+				</p>
+			</subsection>
+
+			<subsection name="Required keys and certificates">
+				<p>This list gives a summery of what keys and certificates are
+					required for each communication node:
+				</p>
+				<ul>
+					<li>
+						An
+						<strong>own key pair</strong>
+						comprising a public and private key.
+						In Java these keys are stored
+						usually in a keystore.
+					</li>
+					<li>
+						An
+						<strong>own public key certificate</strong>
+						. This certificate is
+						issued by a CA (certification authority) and
+						used to prove the
+						ownership of a public key. The issuing CA has to
+						be trusted by
+						other communication nodes of the MAS. Generally
+						speaking, the key
+						pair and the public key certificate are needed by
+						each
+						communication node for TLS authentication as well as to
+						communicate with each other Node via TLS. ASGARD however needs a
+						key pair and the public key certificate only for TLS
+						authentication, but not to be reachable for other Nodes.
+						In Java
+						the own public key certificate is stored usually in a
+						keystore.
+					</li>
+					<li>
+						One or more
+						<strong>public key certificates belonging to CAs</strong>
+						associated within a chain of trust. All JIAC MAS Nodes that want
+						to communicate with each other must have at least one common
+						trusted CA. This can be for instance the root CA (also known as
+						trust anchor) or the CA that signed the certificates for the
+						communication nodes. These CA's certificates are needed to check
+						the authenticity of other communication node's public key
+						certificates. In Java certificates that are trusted are usually
+						stored in a truststore (alternatively also in the keystore).
+					</li>
+				</ul>
+			</subsection>
+		</section>
+
+		<section name="Creating keys, certificates and stores">
+
+			<p>Commonly a key pair is created by the user itself to keep the
+				private key really private. A public key certificate can be received
+				from a CA. While commercial CAs charge to issue certificates, some
+				CAs issue certificates to the public at no cost. Large institutions
+				may have their own CAs.
+			</p>
+			<p>This manual explains how to simulate own CAs that issues
+				certificates. The chain of trust, which is presented here, consists
+				of a root CA (the trust anchor) and of an intermediate CA
+				(hereinafter called master CA). The master CA is responsible to sign
+				and issue public key certificates to all communication nodes of a
+				JIAC MAS.
+			</p>
+
+			<subsection name="Preliminary work">
+				<ul>
+					<li>Because of the many participants (different CAs and
+						communication nodes) and associated files (keys, certificates,
+						stores etc.), it would be of advantage to create a folder for each
+						CA and node. The folders could be named as followed: ca_root,
+						ca_master, asgard, node1, node2 etc.
+					</li>
+					<li>Following tools are required: OpenSSL, Java keytool and
+						DAI-Laboratory's keyStoreGenerator.
+					</li>
+					<li>Your JIAC MAS application must have a dependency to
+						de.dailab.jiactng.agentCore with at least version 5.1.6.
+					</li>
+					<li>In the event, you want to use ASGARD to monitor and manage the
+						TLS protected MAS, please use either version 2.5, or better 2.6					
+						(from version&#160;2.6 on JConsole, that you can execute out of ASGARD,
+						supports TLS).
+					</li>
+					<li>
+						In the following sections several configuration files and scripts
+						are listed that are meant to create the needed files (keys etc.).
+						The keyStoreGenerator provides these files for different operating
+						sytsems within the folder
+						<em>bin/docs/scripts_and_templates</em>
+						. Maybe it would facilitate your work to use these scripts and
+						templates instead of copying them out of this document.
+					</li>
+				</ul>
+			</subsection>
+
+			<subsection name="Simulating the root CA (trust anchor)">
+				<p>Simulating a root CA means to create a key pair and a self-signed
+					X.509 certificate for the use of the root CA.
+				</p>
+				<p>
+					Two configuration files have to be written for the root CA:
+					<strong>ca_root.info</strong>
+					and
+					<strong>ca_root.cfg</strong>
+					. These files facilitates the creation of a self-signed certificate
+					for the root CA. The values of the certificate attributes should be
+					adapted where appropriate. In principle the certificate attributes
+					can be freely chosen. For both files template files are provided.
+				</p>
+
+				<p>
+					<strong>Certificate attributes:</strong>
+					CN: CommonName; OU: OrganizationalUnit; O: Organization; L:
+					Locality; ST: StateOrProvinceName; C: CountryName.
+				</p>
+				<p>
+					<strong>ca_root.info</strong>
+					(please adapt where necessary):
+				</p>
+				<source>					
+RANDFILE               	= $ENV::HOME/.rnd
+
+ [ req ]
+ default_bits           = 2048
+ default_keyfile        = keyfile.pem
+ distinguished_name     = req_distinguished_name
+ attributes             = req_attributes
+ prompt                 = no
+ output_password        = change
+
+ [ req_distinguished_name ]
+ C                      = DE
+ ST                     = Berlin
+ L                      = Berlin
+ O                      = TU-Berlin
+ OU                     = JIAC_VERISIGN
+ CN                     = JIAC-CA
+ [ req_attributes ]
+				</source>
+
+				<p>
+					<strong>ca_root.cfg</strong>
+					(please adapt where necessary):
+				</p>
+				<source>
+[ v3_ca ]
+
+ subjectKeyIdentifier=hash
+ authorityKeyIdentifier=keyid:always,issuer
+ basicConstraints = CA:true, pathlen:1
+				</source>
+
+				<p>After that we can create a key pair and a self-signed certificate
+					for the root CA by typing following commands into a shell or by
+					executing the appropriate batch or shell script (here shown for
+					Linux).
+				</p>
+
+				<p>
+					Creates a self-signed certificate for root CA (file:
+					<strong>1-createRootCA</strong>
+					)
+				</p>
+				<source>
+<![CDATA[#!/bin/bash
+
+# =======================================================================
+# > > > !!! Please adapt these variables to your needs !!! < < <
+#
+# Folder name of the root CA
+ROOT_CA_FOLDER=ca_root
+# Certificate file name to create
+ROOT_CA_CERT_FILE_NAME=ca_root
+# Name of the info file
+ROOT_CA_INFO=ca_root.info
+# Name of the config file
+ROOT_CA_CFG=ca_root.cfg
+# Root CA's key passphrase
+ROOT_CA_PWD=12345
+# Valide days of the certificate
+VALID_DAYS=3650
+#
+# =======================================================================
+#
+# Output:
+#
+#	- One key pair for the root CA within a key file.
+#	- One csr file file with a certificate signing request
+#	- One self-signed certificate
+#
+# =======================================================================
+
+# creates a key pair within a key file
+openssl genrsa -des3 -passout pass:$ROOT_CA_PWD -out $ROOT_CA_FOLDER/$ROOT_CA_CERT_FILE_NAME.key 2048
+
+# creates certificate signing request in csr file
+openssl req -new -key $ROOT_CA_FOLDER/$ROOT_CA_CERT_FILE_NAME.key -passin pass:$ROOT_CA_PWD -out $ROOT_CA_FOLDER/$ROOT_CA_CERT_FILE_NAME.csr -config $ROOT_CA_FOLDER/$ROOT_CA_INFO
+
+# optionally #oves password from private key in key file
+# only required in case of using a pass phrase a)
+# copy $ROOT_CA_FOLDER/$ROOT_CA_CERT_FILE_NAME.key $ROOT_CA_FOLDER/$ROOT_CA_CERT_FILE_NAME.org
+# openssl rsa -in $ROOT_CA_CERT_FILE_NAME.org -out $ROOT_CA_CERT_FILE_NAME.key
+
+# self signs the root certificate
+openssl x509 -req -days $VALID_DAYS -in $ROOT_CA_FOLDER/$ROOT_CA_CERT_FILE_NAME.csr -signkey $ROOT_CA_FOLDER/$ROOT_CA_CERT_FILE_NAME.key -passin pass:$ROOT_CA_PWD -extfile $ROOT_CA_FOLDER/$ROOT_CA_CFG -extensions v3_ca -out $ROOT_CA_FOLDER/$ROOT_CA_CERT_FILE_NAME.crt]]>
+				</source>
+			</subsection>
+
+			<subsection name="Simulating an issuing CA (intermediate CA / master CA)">
+				<p>Simulating the master CA (intermediate CA) means to create a key
+					pair and a public key certificate (issued by the root CA) for the
+					use of the master CA.
+				</p>
+				<p>
+					For the master CA as well we need to write two configuration files:
+					<strong>ca_master.info</strong>
+					and
+					<strong>ca_master.cfg</strong>
+					. The values of the certificate attributes should be adapted where
+					appropriate. In principle the certificate attributes can be freely
+					chosen. Template files are provided for both configuration files.
+				</p>
+				
+				<p><strong>ca_master.info</strong> (please adapt where necessary)</p>
+				<source>
+RANDFILE               	= $ENV::HOME/.rnd
+
+ [ req ]
+ default_bits           = 2048
+ default_keyfile        = keyfile.pem
+ distinguished_name     = req_distinguished_name
+ attributes             = req_attributes
+ prompt                 = no
+ output_password        = change
+
+ [ req_distinguished_name ]
+ C                      = DE
+ ST                     = Berlin
+ L                      = Berlin
+ O                      = TU-Berlin
+ OU                     = DAI-Laboratory
+ CN                     = MASTER_JIAC
+ [ req_attributes ]
+				</source>
+
+	<p>
+		<strong>ca_master.cfg</strong>
+		(no adaptation necessary):
+	</p>
+				<source>
+[ v3_ca ]
+
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer
+basicConstraints = CA:true, pathlen:0
+				</source>
+
+	<p>After that we can create a key pair and a public key certificate for
+		the master CA (signed by the root CA) by typing following commands
+		into a shell or by executing the appropriate batch or shell script
+		(here shown for Linux).
+	</p>
+	
+	<p>
+	Creates a key pair and a public key certificate for the master CA (file: <strong>2-createMasterCA</strong>):
+	</p>
+	<source>
+<![CDATA[#!/bin/sh
+
+# =======================================================================
+# > > > !!! Please adapt these variables to your needs !!! < < <
+#
+# The master CA ist the intermediate CA that issues certificates to all communication participant of the JIAC MAS.
+# Folder name of the master CA
+MASTER_FOLDER=ca_master
+# Certificate file name to be created
+MASTER_CERT_FILE_NAME=ca_master
+# Name of the info file
+MASTER_INFO=ca_master.info
+# Name of the config file
+MASTER_CFG=ca_master.cfg
+# Master CA's (intermediates) key passphrase
+MASTER_PWD=test123
+# Valide days of the certificate
+VALID_DAYS=3650
+
+# Folder name of the root CA
+ROOT_CA_FOLDER=ca_root
+# Reference to the ca certificate
+ROOT_CA_CERT_FILE=$ROOT_CA_FOLDER/ca_root.crt
+# Reference to the ca key file
+ROOT_CA_KEY_FILE=$ROOT_CA_FOLDER/ca_root.key
+# Root CA's key passphrase
+ROOT_CA_PWD=12345
+#
+# =======================================================================
+#
+# Output:
+#
+#	- One key pair for the master CA within a key file in crt format.
+#	- One key pair for the master CA within a key file in pkcs8 format.
+#	- One csr file with a certificate signing request
+#	- One public key certificate signed by the root CA
+#
+# =======================================================================
+
+# creates a key pair within a key file
+# a) pass phrase protected 
+# openssl genrsa -out $MASTER_CERT_FILE_NAME.key -passout pass:changeit -des3 2048
+# b) not protected
+openssl genrsa -des3 -passout pass:$MASTER_PWD -out $MASTER_FOLDER/$MASTER_CERT_FILE_NAME.key 2048
+
+# creates certificate signing request in csr file
+openssl req -new -key $MASTER_FOLDER/$MASTER_CERT_FILE_NAME.key -passin pass:$MASTER_PWD -out $MASTER_FOLDER/$MASTER_CERT_FILE_NAME.csr -config $MASTER_FOLDER/$MASTER_INFO
+
+# process the request for the subordinate CA certificate and get it signed by the root CA. You will be asked to enter the CA's secret.
+openssl x509 -req -days $VALID_DAYS -in $MASTER_FOLDER/$MASTER_CERT_FILE_NAME.csr -CA $ROOT_CA_CERT_FILE -CAkey $ROOT_CA_KEY_FILE -passin pass:$ROOT_CA_PWD -set_serial 01 -extfile $MASTER_FOLDER/$MASTER_CFG -extensions v3_ca -out $MASTER_FOLDER/$MASTER_CERT_FILE_NAME.crt
+
+# creates key in PKCS8 format
+openssl pkcs8 -topk8 -inform PEM -outform DER -in $MASTER_FOLDER/$MASTER_CERT_FILE_NAME.key -passin pass:$MASTER_PWD -nocrypt > $MASTER_FOLDER/$MASTER_CERT_FILE_NAME-pkcs8.key]]>
+    </source>
+		    </subsection>
+
+			<subsection
+				name="Create stores with proper content for communication nodes">
+	<h4>Truststores</h4>
+	
+	<p>
+		Each communication node has to trust the root CA's self signed
+		certificate. This is done by creating a truststore for each
+		communication node that stores this certificate. These truststores at
+		best differ in their password. In the case they have the same password
+		it will be sufficient to create only one truststore and to copy it for
+		all nodes.
+	</p>
+	<p>
+		Creates a truststore with the root CA's self signed certificate (file:
+		<strong>3-generateTruststore</strong>
+		- please adapt where neccessary)
+	</p>
+
+	<source>
+<![CDATA[#!/bin/sh
+
+# =======================================================================
+# > > > !!! Please adapt these variables to your needs !!! < < <
+# Alias name under which the root CA certificate is stored.
+ALIAS_NAME=jiac-ca-root
+# Path and file name to the root CA's certificate
+ROOT_CA_CERT_FILE=ca_root/ca_root.crt
+# Truststores password
+STORE_PWD=changeit
+#  Path and file name of the truststore 
+TRUSTSTORE_FILE_NAME=stores/truststore.jks
+# =======================================================================
+#
+# Output:
+#
+#	- One Java truststore with the root CA's self signed certificate
+#
+# =======================================================================
+
+keytool -import -alias $ALIAS_NAME -file $ROOT_CA_CERT_FILE -keystore $TRUSTSTORE_FILE_NAME -storepass $STORE_PWD]]>
+	</source>
+	
+	<h4>Keystores</h4>
+	
+	<p>
+	Each communication node has its own keystore with an individual content. You can create these keystores by using tools like OpenSSL and keytool, or you decide to use a more automatic and easier approach to create the keystores with the KeyStoreGenerator. In the following, the use of the KeyStoreGenerator will be explained.
+	</p>
+
+	<p>The KeyStoreGenerator is for generating a keystore for each
+		communication node. The content of a generated keystore is:</p>
+
+	<ul>
+		<li>Private and public key pair belonging to the communication node
+		</li>
+		<li>
+			Certificate chain:
+			<ul>
+				<li>Public key certificate for the own key</li>
+				<li>Public key certificate of the issuing CA (master CA)</li>
+			</ul>
+		</li>
+		<li>
+			Trusted certificate:
+			<ul>
+				<li>
+					Public key certificate of the issuing CA (master CA, the same as in the
+					certificate chain listed above)
+				</li>
+			</ul>
+		</li>
+	</ul>
+
+	<p>You have to use parameters to call the KeyStoreGenerator. </p>
+
+	<p>
+		<strong>Abbreviations</strong>
+		used by the KeyStoreGenerator for parameters:
+	<br/>
+		cn: CommonName; ou: OrganizationalUnit; o: Organization; l: Locality;
+		S: StateOrProvinceName; c: CountryName; a: alias name for the node
+		used in the keystore; p: path to signer certificate (e.g.
+		master-ca.crt) ; kp: path to keyfile (pkcs8); v: validity days; sr:
+		serial number file name (automatically generated if it doesn't exist);
+		k: path and name of the keystore; kpass: keystore password.
+	</p>
+
+	<p>
+		<strong>Important notes:</strong>
+	</p>
+	<ul>
+		<li>The parameters cn, ou, o, l, s, c are meant to specify the
+			communication node.</li>
+		<li>Except from parameters p and kp (which both should point to
+			already existing files) you can chose the values freely.</li>
+		<li>A file with serial numbers (parameter \emph{sr}) is generated if
+			it doesn't exist. This file stores unique serial numbers which are
+			intended to use for the creation of the certificates. In order to
+			insure the uniqueness of the serial numbers it is imperative to use
+			the same serial number file during the generation of the keystores
+			for the communication nodes within the MAS.</li>
+	</ul>
+	
+	<p>Parameterized call of KeyStoreGenerator:</p>
+	<source>
+&lt;PATH&gt;/keyStoreGenerator \
+cn=node1.jiac.com \
+ou=DAI-Laboratory \
+o=TU-Berlin \
+l=Berlin \
+s=Berlin \
+c=DE \
+a=jiac_node \
+p=ca_master/ca_master.crt \
+kp=ca_master/ca_master-pkcs8.key \
+v=3650 \
+sr=serial.dat
+k="stores/node1/keystore.jks" \
+kpass=changeit \
+	</source>
+
+	<h4>Check stores for validity</h4>
+
+	<p>
+		You can check the content of both stores for validity using the keytool.
+		For this please execute this command in your shell: <em>keytool -v
+		-list -keystore &lt;PATH_TO_STORE&gt;</em>.
+	</p>
+<p>Your truststore should contain one entry: the public key certificate
+	of the root CA. (In Java terminology the truststore sometimes is called
+	keystore as well, so don't be confused of it.)</p>
+	<p>Your keystore should contain two entries: The trusted master CA's
+		public key certificate and additionally a certification chain of
+		length two (the own public key certificate and the master CA's public
+		key certificate).</p>
+	<p>You could compare the keytool's output with the following to
+		listings. The attribute values (alias name, node names etc.) could
+		differ depending on your input.</p>
+	<p>
+		Example for
+		<strong>truststore.jks</strong>:
+	</p>
+	<source>
+<![CDATA[Keystore type: JKS
+Keystore provider: SUN
+
+Your keystore contains 1 entry
+
+Alias name: ca_root
+Creation date: 09-Jul-2015
+Entry type: trustedCertEntry
+
+Owner: CN=ROOT-CA-JIAC, OU=JIAC_VERISIGN, O=TU-Berlin, L=Berlin, ST=Berlin, C=DE
+Issuer: CN=ROOT-CA-JIAC, OU=JIAC_VERISIGN, O=TU-Berlin, L=Berlin, ST=Berlin, C=DE
+Serial number: f1fb59f61d2d2bcf
+Valid from: Thu Jul 09 14:25:23 CEST 2015 until: Sun Jul 06 14:25:23 CEST 2025
+Certificate fingerprints:
+	 MD5:  2D:4E:04:70:23:4E:B4:F6:20:32:C9:E1:0D:75:32:33
+	 SHA1: F7:A4:A1:5F:B5:1B:C6:14:D4:E3:51:8B:4F:CC:DF:9B:E1:0C:3A:9B
+	 SHA256: E2:36:B3:D8:30:B6:B7:4C:3E:E4:81:7B:CB:31:14:BE:9B:38:F0:4A:AD:B3:76:86:89:B3:D3:B6:26:E6:2D:3E
+	 Signature algorithm name: SHA1withRSA
+	 Version: 3
+
+Extensions: 
+
+#1: ObjectId: 2.5.29.35 Criticality=false
+AuthorityKeyIdentifier [
+KeyIdentifier [
+0000: 6C 5B 93 B8 C9 DE 81 3C   8B 2A CC 74 BF 68 5E FA  l[.....<.*.t.h^.
+0010: 5B FA B3 91                                        [...
+]
+]
+
+#2: ObjectId: 2.5.29.19 Criticality=false
+BasicConstraints:[
+  CA:true
+  PathLen:1
+]
+
+#3: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: 6C 5B 93 B8 C9 DE 81 3C   8B 2A CC 74 BF 68 5E FA  l[.....<.*.t.h^.
+0010: 5B FA B3 91                                        [...
+]
+]
+
+
+
+*******************************************
+*******************************************
+]]>
+	</source>
+	
+	<p>Example for <strong>keystore.jks</strong>:</p>
+
+	<source>
+<![CDATA[Keystore type: JKS
+Keystore provider: SUN
+
+Your keystore contains 2 entries
+
+Alias name: issuer_alias
+Creation date: 09-Jul-2015
+Entry type: trustedCertEntry
+
+Owner: CN=MASTER-CA-JIAC, OU=DAI-Laboratory, O=TU-Berlin, L=Berlin, ST=Berlin, C=DE
+Issuer: CN=ROOT-CA-JIAC, OU=JIAC_VERISIGN, O=TU-Berlin, L=Berlin, ST=Berlin, C=DE
+Serial number: 1
+Valid from: Thu Jul 09 14:37:53 CEST 2015 until: Sun Jul 06 14:37:53 CEST 2025
+Certificate fingerprints:
+	 MD5:  5B:54:91:03:C5:30:34:44:A6:9D:37:EE:9D:49:BA:37
+	 SHA1: CA:4E:15:9B:49:7F:F7:83:8B:F7:14:D1:06:91:87:7A:99:94:33:56
+	 SHA256: 35:F8:9C:35:FD:33:06:A6:82:CA:9B:07:63:CA:6E:4D:4A:5D:77:A4:95:9D:6E:B1:8F:FA:C0:E4:2C:91:B7:1A
+	 Signature algorithm name: SHA1withRSA
+	 Version: 3
+
+Extensions: 
+
+#1: ObjectId: 2.5.29.35 Criticality=false
+AuthorityKeyIdentifier [
+KeyIdentifier [
+0000: 6C 5B 93 B8 C9 DE 81 3C   8B 2A CC 74 BF 68 5E FA  l[.....<.*.t.h^.
+0010: 5B FA B3 91                                        [...
+]
+]
+
+#2: ObjectId: 2.5.29.19 Criticality=false
+BasicConstraints:[
+  CA:true
+  PathLen:0
+]
+
+#3: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: F3 DA 41 A0 FE FE DD B6   28 60 57 58 A5 69 A6 2E  ..A.....(`WX.i..
+0010: 8C E1 9C B1                                        ....
+]
+]
+
+
+
+*******************************************
+*******************************************
+
+
+Alias name: node1
+Creation date: 09-Jul-2015
+Entry type: PrivateKeyEntry
+Certificate chain length: 2
+Certificate[1]:
+Owner: CN=node1.jiac.com, OU=DAI-Laboratory, O=TU-Berlin, L=Berlin, ST=Berlin, C=DE
+Issuer: CN=MASTER-CA-JIAC, OU=DAI-Laboratory, O=TU-Berlin, L=Berlin, ST=Berlin, C=DE
+Serial number: 204fce5e3e25026110000001
+Valid from: Thu Jul 09 15:18:34 CEST 2015 until: Sun Jul 06 15:18:34 CEST 2025
+Certificate fingerprints:
+	 MD5:  FD:0E:F0:DE:62:97:CC:F9:61:AD:B9:41:E6:6E:3A:30
+	 SHA1: AF:BB:35:CE:A6:F8:81:25:23:AA:B5:24:B2:76:64:C9:6D:25:3A:EF
+	 SHA256: 30:FF:37:09:76:53:50:B8:DC:55:30:ED:87:FC:DC:98:EA:D0:BD:38:EB:C0:27:49:7E:3C:D7:61:A5:DA:51:70
+	 Signature algorithm name: SHA1withRSA
+	 Version: 3
+Certificate[2]:
+Owner: CN=MASTER-CA-JIAC, OU=DAI-Laboratory, O=TU-Berlin, L=Berlin, ST=Berlin, C=DE
+Issuer: CN=ROOT-CA-JIAC, OU=JIAC_VERISIGN, O=TU-Berlin, L=Berlin, ST=Berlin, C=DE
+Serial number: 1
+Valid from: Thu Jul 09 14:37:53 CEST 2015 until: Sun Jul 06 14:37:53 CEST 2025
+Certificate fingerprints:
+	 MD5:  5B:54:91:03:C5:30:34:44:A6:9D:37:EE:9D:49:BA:37
+	 SHA1: CA:4E:15:9B:49:7F:F7:83:8B:F7:14:D1:06:91:87:7A:99:94:33:56
+	 SHA256: 35:F8:9C:35:FD:33:06:A6:82:CA:9B:07:63:CA:6E:4D:4A:5D:77:A4:95:9D:6E:B1:8F:FA:C0:E4:2C:91:B7:1A
+	 Signature algorithm name: SHA1withRSA
+	 Version: 3
+
+Extensions: 
+
+#1: ObjectId: 2.5.29.35 Criticality=false
+AuthorityKeyIdentifier [
+KeyIdentifier [
+0000: 6C 5B 93 B8 C9 DE 81 3C   8B 2A CC 74 BF 68 5E FA  l[.....<.*.t.h^.
+0010: 5B FA B3 91                                        [...
+]
+]
+
+#2: ObjectId: 2.5.29.19 Criticality=false
+BasicConstraints:[
+  CA:true
+  PathLen:0
+]
+
+#3: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: F3 DA 41 A0 FE FE DD B6   28 60 57 58 A5 69 A6 2E  ..A.....(`WX.i..
+0010: 8C E1 9C B1                                        ....
+]
+]
+
+
+
+*******************************************
+*******************************************
+]]>
+	</source>
+		</subsection>
+
+	</section>
+
+	<section name="Agent Node Configuration">
+		<p>To make a JIAC&#160;V MAS fit for TLS some additional TLS related
+			properties have to be set in the Agent Configuration file. Each Agent
+			Node within the MAS should have its own key- and truststore. And for
+			each Agent Node TLS should be activated.
+		</p>
+
+		<p>The additional properties must be added directly within the Agent
+			Node bean of the Agent Node Configuration file.
+		</p>
+
+		<p>The new TLS related properties are:</p>
+
+		<ul>
+			<li>
+				sslInUse: A boolean value (true/false); standard: false. Signalizes the use
+				of
+				SSL/TLS.
+			</li>
+			<li>
+				keyStore: A string value. Path to an existing keystore.
+			</li>
+			<li>
+				keyStorePassword: A string value. Passphrase of the keystore.
+			</li>
+			<li>
+				keyStoreType: A string value; standard: JKS. The keystore type.
+			</li>
+			<li>
+				trustStore: A string value. Path to an existing truststore.
+			</li>
+			<li>
+				trustStorePassword: A string value. Passphrase of the truststore.
+			</li>
+			<li>
+				trustStoreType: A string value; standard: JKS. The truststore type.
+			</li>
+			<li>
+				cipherSuitesToUse: A string value; standard: null. A comma delimitated string with
+				enabled cipher algorithms. If not used, all available algorithms
+				will be enabled for usage. The usage of one of enabled algorithms will be
+				determined during the SSL/TLS handshake between two communication
+				partners. In case where both communication partners doesn't share at
+				least one cipher algorithm, the communication
+				handshake will fail.
+			</li>
+		</ul>
+		
+		<p>The following listing shows an exemplary <strong>Agent Node Configuration</strong>:</p>
+		<source>
+			<![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+
+	<!-- Agent Node -->
+	<bean name="Node1" parent="NodeWithJMX">
+		<property name="agents">
+			<list>
+				<ref bean="Agent1" />
+			</list>
+		</property>
+
+		<!-- TLS properties (necessary) -->
+		<property name="sslInUse" value="true" />
+		<property name="keyStore" value="stores/node1/keystore.jks" />
+		<property name="keyStorePassword" value="changeit" />
+		<property name="trustStore" value="stores/node1/truststore.jks" />
+		<property name="trustStorePassword" value="changeit" />
+		
+		<!-- TLS properties (optional) -->
+		<!-- property name="keyStoreType" value="JKS" / -->
+		<!-- property name="trustStoreType" value="JKS" / -->
+		<!-- property name="cipherSuitesToUse" value="TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256" 
+			/ -->
+	</bean>
+	...
+	
+</beans>]]>
+		</source>
+
+	<p>
+		Now that we are in possession of key- and truststores for each
+		communication node, filled with proper keys and certificates, and
+		after we have set up the Agent Node Configuration file, we are able to
+		execute the JIAC&#160;V MAS.
+	</p>
+
+	<p>
+		It might be useful to start with a small JIAC&#160;V MAS for testing
+		purpose.
+		You will find a Ping-Pong MAS using TLS in the JIAC examples.
+	</p>
+
+	</section>
+	</body>
+
+</document>

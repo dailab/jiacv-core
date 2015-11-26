@@ -99,7 +99,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       if (act.getSession().isTimeout()) {
          log.warn("Session " + act.getSessionId() + " for DoAction " + act.getAction().getName() + " is timed out, returning failure.");
          memory.write(new ActionResult(act, new TimeoutException(TIMEOUT_MESSAGE)));
-         // actionPerformed(act, DoActionState.failed, null);
+         actionPerformed(act, DoActionState.failed, new Object[] { "Session timed out" });
          return;
       }
 
@@ -157,8 +157,6 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
                }
                providerBean.doAction(act);
             }
-
-            actionPerformed(act, DoActionState.started, null);
          } catch (Throwable t) {
             memory.write(new ActionResult(act, t));
             log.error("--- action failed: " + act.getAction().getName() + " (" + act.getSessionId() + ")", t);
@@ -291,7 +289,21 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     * @param result The result or failure of the action execution or <code>null</code> if the execution is not yet finished.
     */
    public void actionPerformed(DoAction action, DoActionState state, Object[] result) {
-      final Notification n = new ActionPerformedNotification(this, sequenceNumber++, System.currentTimeMillis(), "Action performed", action, state, result);
+	  String msg;
+	  switch (state) {
+	  case invoked:
+		  msg = "Action invoked";
+		  break;
+	  case success:
+		  msg = "Action succeeded";
+		  break;
+	  case failed:
+		  msg = "Action failed";
+		  break;
+	  default:
+		  msg = "Action performed";
+	  }
+      final Notification n = new ActionPerformedNotification(this, sequenceNumber++, System.currentTimeMillis(), msg, action, state, result);
 
       sendNotification(n);
    }

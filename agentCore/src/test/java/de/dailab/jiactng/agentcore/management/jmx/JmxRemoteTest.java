@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.management.remote.JMXServiceURL;
@@ -24,37 +25,30 @@ import de.dailab.jiactng.agentcore.IAgentNode;
  * @version $Revision$
  */
 public class JmxRemoteTest extends TestCase {
-    private class StreamPumper extends Thread {
+
+	private class StreamPumper extends Thread {
         private final BufferedReader _reader;
         private final String _prefix;
-        private final boolean _fail;
 
-        StreamPumper(InputStream in, String prefix, boolean fail) {
+        StreamPumper(InputStream in, String prefix) {
             _reader= new BufferedReader(new InputStreamReader(in), 1024);
             _prefix= prefix;
-            _fail= fail;
         }
 
         @Override
         public void run() {
-            boolean read= false;
             try {
                 String s;
-
                 while((s= _reader.readLine()) != null) {
-                    if(s.length() > 0) {
-                        read= true;
-                    }
-                    System.out.println(_prefix + ": " + s);
+                	// ignore warnings from URL tester
+                	if (!s.startsWith("Unable to connect to ")) {
+                		System.out.println(_prefix + ": " + s);
+                	}
                 }
             } catch (Throwable t) {
                 // ignore
             } finally {
                 try {_reader.close();} catch (IOException e) {}
-            }
-
-            if(read && _fail) {
-                fail("client failed");
             }
         }
     }
@@ -73,16 +67,23 @@ public class JmxRemoteTest extends TestCase {
         node.addLifecycleListener(listener);
         assertTrue("node did not start properly", listener.ensureStarted(2000L));
 
-        // get one of the service URLs
+        // get one of the service URLs, but ignore 127.0.0.1 if other URL exists
         Set<JMXServiceURL> jmxURLs = node.getJmxURLs();
         assertTrue("no connector found", !jmxURLs.isEmpty());
-        String serviceUrl= jmxURLs.iterator().next().toString();
+        Iterator<JMXServiceURL> i = jmxURLs.iterator();
+        JMXServiceURL url = i.next();
+        if (url.getHost().equals("127.0.0.1") && i.hasNext()) {
+        	url = i.next();
+        }
+        String serviceUrl= url.toString();
 
         // test connecting to service URL without error
         Process clientProcess= createClientProcess(JmxClient.class, serviceUrl);
-        new StreamPumper(clientProcess.getInputStream(), "JmxClient.STDOUT", false).start();
-        new StreamPumper(clientProcess.getErrorStream(), "JmxClient.STDERR", true).start();
-        clientProcess.waitFor();
+        new StreamPumper(clientProcess.getInputStream(), "JmxClient.STDOUT").start();
+        new StreamPumper(clientProcess.getErrorStream(), "JmxClient.STDERR").start();
+        int result = clientProcess.waitFor();
+        ac.close();
+        assertEquals("client failed", 0, result);
     }
 
     private Process createClientProcess(Class<?> mainClass, String... mainArgs) throws Exception {
@@ -91,18 +92,32 @@ public class JmxRemoteTest extends TestCase {
         // do we have a URL class loader?
         try {
             ClassLoader loader= mainClass.getClassLoader();
+            System.out.println("JmxClient.class has a " + loader.getClass().getSimpleName());
 
             if(loader instanceof URLClassLoader) {
                 urls= ((URLClassLoader) loader).getURLs();
+                System.out.println("Got URLs of class loader: " + Arrays.asList(urls));
+                for (URL url : urls) {
+                	URLClassLoader cl = new URLClassLoader(new URL[] {url});
+                	try {
+                		cl.loadClass("de.dailab.jiactng.agentcore.management.jmx.JmxClient");
+                    	System.out.println("JmxClient contained in " + url);
+                    	cl.close();
+                	}
+                	catch (ClassNotFoundException e) {
+                    	System.out.println("JmxClient not contained in " + url);
+                	}
+                }
             }
         } catch (Exception e) {
-            System.out.println("could not loader urls: " + e.getMessage());
+            System.out.println("could not load urls: " + e.getMessage());
         }
 
         if(urls == null) {
             // get code location for test class only
             try {
                 URL url= mainClass.getProtectionDomain().getCodeSource().getLocation();
+                System.out.println("Got code source location: " + url);
                 if(url != null) {
                     urls= new URL[] {url};
                 }
@@ -125,11 +140,14 @@ public class JmxRemoteTest extends TestCase {
                     builder.append(File.pathSeparatorChar);
                 }
 
-                if(path.indexOf(' ') > 0) {
-                    builder.append('"').append(path).append('"');
-                } else {
-                    builder.append(path);
-                }
+                path.replace(" ", "\\ ");
+                builder.append(path);
+                
+//                if(path.indexOf(' ') > 0) {
+//                    builder.append('"').append(path).append('"');
+//                } else {
+//                    builder.append(path);
+//                }
             } catch (Exception e) {
                 System.err.println("have to leave out: "+ Arrays.asList(urls));
             }
@@ -142,6 +160,13 @@ public class JmxRemoteTest extends TestCase {
         cmdL[2]= builder.toString();
         cmdL[3]= mainClass.getName();
         System.arraycopy(mainArgs, 0, cmdL, 4, mainArgs.length);
+
+        // debug
+        StringBuilder msg = new StringBuilder("Starting client process: ");
+        for (String s : cmdL) {
+        	msg.append(s).append(" ");
+        }
+        System.out.println(msg.toString());
 
         // create client process
         return Runtime.getRuntime().exec(cmdL);

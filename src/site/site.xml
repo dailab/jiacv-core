@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+  <bannerLeft>
+    <name>DAI-Labor</name>
+    <src>http://www.dai-labor.de/img/logo1.jpg</src>
+    <href>http://www.dai-labor.de/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>http://www.dai-labor.de/img/logo2.jpg</src>
+  </bannerRight>
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-default-skin</artifactId>
+    <version>1.0</version>
+  </skin>
+  
+  <body>
+    <breadcrumbs>
+      <item name="${project.name}" href="index.html"/>
+    </breadcrumbs>
+    <links>
+      <item name="DAI-Labor" href="http://www.dai-labor.de"/>
+      <item name="JIAC TNG Overview" href="index.html"/>
+      <item name="JIAC TNG Wiki" href="http://wiki.dai-labor.de/ClusterFAC:JIACTNG-Overview"/>
+      <item name="JIAC TNG Community" href="http://www.jiac.de/phpBB2/"/>
+      <item name="Mantis (bug report)" href="http://130.149.154.84/bt/"/>
+    </links>
+    <menu name="${project.name}">
+      <item name="Overview" href="index.html">
+        <item name="Introduction" href="index.html#Introduction"/>
+        <item name="Vision" href="index.html#Vision"/>
+        <item name="Architecture" href="index.html#Architecture"/>
+        <item name="Module Structure" href="index.html#Module_Structure"/>
+      </item>
+      <item name="Concept" href="new-concept.html">
+        <item name="Overview" href="new-concept.html#Overview"/>
+        <item name="Detailed Concept" href="new-concept.html#Detailed_Concept"/>
+        <item name="Technologies" href="new-concept.html#Technologies"/>
+        <item name="Requirements" href="new-concept.html#Requirements"/>
+      </item>
+      <item name="FAQ" href="faq.html"/>
+    </menu>
+    <menu ref="reports" inherit="bottom"/>
+    <menu ref="modules" inherit="bottom"/>
+    <menu ref="parent" inherit="bottom"/>
+    <menu name="Links" inherit="bottom">
+      <item name="JIAC TNG Overview" href="index.html" />
+      <item name="JIAC TNG in DAI-Wiki" href="http://wiki.dai-labor.de/ClusterFAC:JIACTNG-Overview"/>
+      <item name="JIAC TNG Community" href="http://www.jiac.de/phpBB2/"/>
+      <item name="Mantis (bug report)" href="http://130.149.154.84/bt/"/>
+    </menu>
+  </body>
+</project>

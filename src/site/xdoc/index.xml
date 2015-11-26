@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Overview</title>
+        <author email="axel.hessler@dai-labor.de">axle</author>
+        <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
+    </properties>
+    <body>
+    <section name="JIAC TNG - Overview">
+        <p>
+            <strong>Java-based Intelligent Agent Componentware The Next Generation</strong> (JIAC TNG) project is directed towards 
+            the development of agent-based applications and services. It is a Java based agent framework with its emphasis on industrial 
+            requirements such as software standards, security, management, and scalability. It has been developed within industry-
+            and government-funded projects since 2006. JIAC combines agent technology with a service oriented approach.
+        </p>
+        <p>
+            JIAC TNG is aimed at the easy and efficient development of large scale and high performance multi-agent systems. It provides 
+            a scalable single-agent model and is built on state-of-the-art standard technologies. The main focus rests on usability, 
+            meaning that a developer can use it easily and that the development process is supported by tools.
+        </p>
+        <p>
+            The framework also incorporates concepts of service oriented architectures such as an explicit notion of service as well as 
+            the integration of service interpreters in agents. Interpreters can provide different degrees of intelligence and autonomy, 
+            allowing technologies like semantic service matching or service composition. JIAC TNG supports the user with a built-in 
+            administration and management interface, which allows deployment and configuration of agents at runtime.
+        </p>
+        <p>
+            The JIAC TNG methodology is based on the JIAC TNG meta-model and derived from the JIAC IV methodology. JIAC TNG has explicit 
+            notions of rules, actions and services. Composed services are modelled in BPMN and transformed to Jadl++. We distinguish 
+            between composed services and infrastructure services. The former can be considered a service orchestration with some 
+            enhancements (e.g. service matching) whereas the latter describes special services that agents, composed services, or basic 
+            actions can use, e.g. user management, communication or directory services. Rules may trigger actions, services or updates 
+            of fact base entries. Basic actions are exposed by AgentBeans and constitute agent roles, which are plugged into standard
+            JIAC TNG agents. The standard JIAC TNG agent is already capable of finding other JIAC TNG agents and their services, using 
+            infrastructure services, and it provides a number of security and management features.
+        </p>
+
+        <subsection name="Introduction">
+          <p>
+            The design of JIAC TNG was guided by the simple paradigm to take the successful features of its predecessor JIAC IV and 
+            rebuild them with modern software-libraries and technologies. However, while the technologies and technical details may
+            have changed, most features of JIAC IV are still present. Nevertheless, we made some deliberate design changes to the 
+            agent architecture. This was mainly aimed at simplifying things for the programmer, as we felt that usability was the 
+            aspect that needed the most improvements. The main objectives of JIACs architecture are:
+          </p>
+          <ul>
+            <li>Transparent distribution</li>
+            <li>Service based interaction</li>
+            <li>Semantic Service Descriptions (based on ontologies)</li>
+            <li>Generic Security, Management and AAA mechanisms</li>
+            <li>Support for flexible and dynamic reconfiguration in distributed environments (component exchange, strong migration, 
+                fault tolerance)</li>
+          </ul>
+          <p>
+            JIAC TNG agents are programmed using Jadl++ which is the successor of JADL (JIAC Agent Description Language). This new 
+            language features knowledge or facts based on the ontology language OWL as well as an imperative scripting part that is 
+            used for the implementation of plans and protocols. Moreover, it allows to semantically describe services in terms of
+            preconditions and effects, which is used by the architecture to implement features such as semantic service matching and 
+            planning from first principles. The architecture implements dynamic service discovery and selection, and thus the programmer 
+            does not have to distinguish between remote services and local actions.
+          </p>
+          <p>
+            The JIAC TNG agent model is embedded in a flexible component framework that supports component exchange during runtime. 
+            Every agent is constructed of a number of components that either perform basic functionalities (such as communication, 
+            memory or the execution cycle of an agent) or implement abilities and access to the environment of an agent. These components
+            are bundled into an agent by plugging them into the superstructure of the agent.
+          </p>
+          <p>
+            During runtime, all parts of an agent, i.e. all components as well as the agent itself, can be monitored and controlled via 
+            a generic management framework. This allows either the agent itself or an outside entity such as an administrator to evaluate 
+            the performance of an agent. Furthermore, it allows the modification of an agent up to the point where whole components can be
+            exchanged during runtime.
+          </p>
+          <p>
+            The execution cycle of an agent supports the BDI metaphor and thus realises a goal oriented behaviour for the agents. This 
+            behaviour can be extended with agent abilities like planning, monitoring of rules, or components for e.g. handling of security 
+            certificates.
+          </p>
+          <p>
+            Finally, communication between JIAC TNG agents is based around the service metaphor. This metaphor was already the central point 
+            in the design of the JIAC TNG architecture. However, JIAC TNG extends the rather restricted service concept of JIAC IV to include 
+            multiple types of services, thereby allowing to integrate all kinds of technologies, ranging from simple Java-methods to semantic 
+            service described in OWL-S.
+          </p>
+          <p>
+            JIAC TNG comes also with a workflow editor called VSDT that allows to create diagrams using the Business Process Modeling Notation 
+            (BPMN) and compile them into JIAC TNG. While the main intent behind the VSDT was to enable a transformation from BPMN to executable 
+            languages it has by now evolved to a mature BPMN modelling tool. Unlike most other BPMN editors, it is not tightly coupled to BPEL, 
+            but instead provides a transformation framework that can be extended with transformations to and from any executable language. As 
+            the framework provides modules for separate stages of the transformation (Validation, Normalisation, Structure Mapping, Element 
+            Mapping, and Clean-Up), parts of it can be reused (or if necessary refined) for new transformation, which has proven especially 
+            useful for the challenging transformation of the process diagram's graph structure to a block structure. Thus, a new transformation 
+            feature can easily be implemented and plugged into the tool - in fact, the only stage that has to be implemented is the element 
+            mapping. Further, the meta model does provide enough information so that a detailed process diagram can be exported to readily 
+            executable code, provided that the respective transformation can handle all of these details, too.
+          </p>
+        </subsection>
+
+        <subsection name="Vision">
+            <p> Add vision here
+            </p>
+        </subsection>
+
+        <subsection name="Architecture">
+            <p>
+               The basic structure of a JIAC platform as shown in the next figure is composed of a host of Agent Nodes (essentially a JVM 
+               with the basic environment for running agents), which each contain a number of agents. These agents include some basic 
+               functionalities and in turn a host of configurable Agent Beans. These Agent Beans are the concrete level on which functionalities 
+               like basic services are implemented by the developers.
+            </p>
+
+            <p>		         
+                <a href="images/ComponentStructure.png">
+	            <img src="images/ComponentStructure.png" alt="Component Structure"/>
+	        </a>
+	    </p>
+
+            <p>
+               The core of a JIAC TNG agent consists of an interpreter that is responsible for executing services (see next figure).
+               Our approach is based on a common architecture for single agents in which the agent uses an adaptor concept to interact with 
+               the outside world. There exists a local memory for each agent to achieve statefulness, and each agent has dedicated components 
+               (or component groups) that are responsible for decision making and execution.
+            </p>
+            <p>
+               In JIAC, the adaptor concept is used not only for data transmission, but also for accessing different service technologies that 
+               are available today. Thus, any call to a service that is not provided by the agent itself can be pictured as a call to an 
+               appropriate effector. Furthermore, the agents' interpreter allows to execute a set of different services. These services' 
+               bodies may also contain calls to different services or subprograms. Consequently, an agent is an execution engine for service 
+               compositions.
+            </p>
+
+            <p>		         
+                <a href="images/AgentArchitecture.png">
+	            <img src="images/AgentArchitecture.png" alt="Agent Architecture"/>
+	        </a>
+	    </p>
+
+            <p>
+               In the following, we will give you a brief explanation of the function of each component:
+            </p>
+            <ul>
+              <li><strong>Matcher:</strong> The Matcher is responsible to match the invoke commands against the list of known services, 
+                and thus find a list of applicable services for a given invoke. The service templates within the invoke commands may
+                differ in completeness, i.e. a template may contain a specific name of a service together with the appropriate provider, 
+                while others may just contain a condition or the set of parameters. Once the matcher has identified the list of applicable 
+                services, it is up to the interpreter to select a service that is executed. Note that this selection process includes trial
+                and error strategies in the case of failing services.</li>
+              <li><strong>Memory:</strong> The interpreter uses the agent's memory to manage the calls to services as well as the parameters. 
+                We use a simple Linda-like tuple space for coordination between the components of an agent. Additionally, the current state 
+                of the execution can be watched in the memory any time by simply reading the complete contents of the tuple space, allowing 
+                for simple solutions for monitoring and debugging.</li>
+              <li><strong>KnowledgeBase:</strong> The knowledge base provides functionalities for reasoning and inferences within an agent. 
+                All declarative expressions within either a service description or an action invocation are evaluated against this knowledge 
+                base. In contrast to the Memory above, the knowledge base is a semantic memory rather than a simple object store and has a
+                consistent world model.</li>
+              <li><strong>Interpreter:</strong> The interpreter is the core for service execution. It has to be able to interpret and execute 
+                services that are written in Jadl++. Essentially, all atomic actions that can be used within the language are connected to 
+                services from either the interpreter or the effectors of the agent.</li>
+              <li><strong>Adaptor:</strong> The adaptors are the agent's connection to the outside world. This is a sensor/effector concept 
+                in which all actions that an agent can execute on an environment (via the appropriate effector) are explicitly represented 
+                by an action declaration and optionally a service declaration that is accessible for the matcher. Thus, all actions may have 
+                service descriptions that are equivalent to those used for actual services.</li>
+           </ul>
+            <p>
+               In terms of standards, JIAC TNG has changed considerably from its predecessors, as we focussed on the use of software standards 
+               heavily. However, as of today one important standard, the FIPA speech act, is not explicitly supported. It is of course possible 
+               to design messages that comply with the standard but it is not a requirement. However, the underlying technologies are all based 
+               on today's industry standards, such as OWL and OWL-S for ontologies, but also JMX for management functionality, JMS for message 
+               delivery, and web service integration.
+            </p>
+            <p>You will find a detailed and technical view on the architecture <a href="new-concept.html#Detailed Concept">here</a>.</p>
+        </subsection>
+
+        <subsection name="Module Structure">
+            <p>
+               JIAC TNG consists of several modules and submodules. The next figure shows all implemented modules and their dependencies. 
+               The main modules and module groups are given in parentheses and described afterwards.
+            </p>
+
+            <p>		         
+               <a href="images/JIAC-modules.png">
+	              <img src="images/JIAC-modules.png" alt="JIAC-modules"/>
+	           </a>
+	        </p>
+
+            <ul>
+              <li>
+			    <strong><a href="agentCoreAPI/index.html">Agent Core API</a></strong> - This module contains the
+                   programming and management interface of JIAC. It defines lifecycle states and transitions as well as interfaces
+                   of agent nodes, agent node beans, agents, memory and execution cycle of agents and agent beans. Also data structures
+                   like actions, messages and other ontologies are defined.
+              </li>
+              <li>
+			     <strong><a href="agentCore/index.html">Agent Core</a></strong> - The core part of JIAC is implemented in the module
+                 "<strong>Agent Core</strong>" that provides both simple manageable and lifecycle-aware agents with memory, execution
+                 cycle, and other components and simple agent nodes as agent's infrastructure with thread pool, communication
+                 broker, and connectors for remote management. This module does not consider services.
+              </li>
+              <li>
+               <strong><a href="bdiAgent/index.html">BDI Agent</a></strong> - The module "<strong>BDI Agent</strong>"
+               supports the behaviour of agents according to the BDI model (Belief-Desire-Intention). To
+               enable agents to choose and invoke intentions, this module supports the implementation, 
+            		deployment, matching, and execution of composed services in DFL
+            		(Declarative Formal Language) as well as the compilation of BPEL (Business Process
+             		Execution Language) scripts to DFL services.
+            	</li>
+            	<li>
+            		<strong><a href="basicServices/index.html">Basic Services</a></strong> - Domain independent services (e.g. user management) 
+                        which can be used for the composition of application services are implemented in the module "<strong>Basic Services</strong>".
+            	</li>
+            	<li>
+            		<strong><a href="gateway/index.html">Network Gateway</a></strong> - This module enables communication between agent nodes 
+                        running in networks of different organizations.
+            	</li>
+            	<li>
+            		<strong><a href="ruleEngine/index.html">Rule Engine</a></strong> - This module wraps a rule engine which allows the (un)deployment 
+                        and (de)activation of rules based on RuleML as well as the management of facts to trigger rules.
+            	</li>
+           	<li>
+            		<strong><a href="jiacSecurity/index.html">Security</a></strong> - This module considers different security aspects (e.g. 
+                        identity management) of JIAC TNG.
+            	</li>
+<!--            	<li><p>-->
+<!--            		<strong><a href="ontologies/index.html">ontologies</a></strong> - The module "<strong>ontologies</strong>" contains-->
+<!--            		JIAC-independent ontologies that can be reused in different applications.-->
+<!--            	</p></li>-->
+            	<li>
+            		<strong><a href="tools/index.html">Tools</a></strong> - This module contains different tools (e.g. an agent node monitor) for JIAC TNG.
+            	</li>
+            	<li>
+            		<strong><a href="examples/index.html">Examples</a></strong> - Last but not least the module "<strong>Examples</strong>"
+            		contains several small examples for certain aspects of JIAC TNG.
+            	</li>
+            </ul>
+        </subsection>
+
+    </section>
+    </body>
+</document>

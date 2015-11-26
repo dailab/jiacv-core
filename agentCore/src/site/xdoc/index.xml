@@ -1,136 +1,165 @@
 <?xml version="1.0"?>
-<document xmlns="http://maven.apache.org/XDOC/2.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
-  <properties>
-    <title>Overview</title>
-    <author email="axel.hessler@dai-labor.de">axle</author>
-    <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
-  </properties>
-  <body>
-  <section name="AgentCore - Overview"> 
-    <p>This section provides an overview about agentCore.</p>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+	<properties>
+		<title>Overview</title>
+		<author email="axel.hessler@dai-labor.de">axle</author>
+		<author email="jan.keiser@dai-labor.de">Jan Keiser</author>
+	</properties>
+	<body>
+		<section name="AgentCore - Overview">
+			<p>This section provides an overview about agentCore.</p>
 
-    <subsection name="Static Structure">
-      <p>The next figure gives an overview about the hierarchy of
-         classes and interfaces related to all lifecycle-aware and
-         manageable elements (agent nodes, agents and agent beans) of JIAC TNG.
-         It contains all methods specified by the interfaces, all
-         attributes of the classes and all methods implemented by the 
-         classes additional to their implemented interfaces. The type
-         of attributes and the type of method results are given after
-         the colon. Input parameters are ignored in this view. The
-         character before the name of attributes and methods describes
-         their visibility (-private, #protected, +public).</p>
+			<subsection name="Static Structure">
+				<p>The next figure gives an overview about the hierarchy of
+					classes and interfaces related to all lifecycle-aware and
+					manageable elements (agent nodes, agents and agent beans) of JIAC TNG.
+					It contains all methods specified by the interfaces, all
+					attributes of the classes and all methods implemented by the
+					classes additional to their implemented interfaces. The type
+					of attributes and the type of method results are given after
+					the colon. Input parameters are ignored in this view. The
+					character before the name of attributes and methods describes
+					their visibility (-private, #protected, +public).
+				</p>
 
-      <p>		         
-         <a href="images/StaticStructure.png">
-	      <img src="images/StaticStructure.png" alt="Static Structure"/>
-	 </a>
-      </p>
-    </subsection>
+				<p>
+					<a href="images/StaticStructure.png">
+						<img src="images/StaticStructure.png" alt="Static Structure" />
+					</a>
+				</p>
+			</subsection>
 
-    <subsection name="Startup Procedure">     
-      <p>The next figure shows the startup procedure of a JIAC TNG
-         application. Firstly the spring framework creates the agent node,
-         agents and agent beans and sets the properties of these elements
-         according to the application context. Afterwards it invokes the
-         method afterPropertiesSet() of the agent node, which enables the
-         management, and initializes and starts all elements.</p>
+			<subsection name="Startup Procedure">
+				<p>The next figure shows the startup procedure of a JIAC TNG
+					application. Firstly the spring framework creates the agent node,
+					agents and agent beans and sets the properties of these elements
+					according to the application context. Afterwards it invokes the
+					method afterPropertiesSet() of the agent node, which enables the
+					management, and initializes and starts all elements.
+				</p>
 
-      <p>
-         <a href="images/Startup.png">
-	      <img src="images/Startup.png" alt="Startup"/>
-	 </a>
-      </p>
-    </subsection>
+				<p>
+					<a href="images/Startup.png">
+						<img src="images/Startup.png" alt="Startup" />
+					</a>
+				</p>
+			</subsection>
 
-    <subsection name="Agent Lifecycle">
-        <p>The following graph shows the possible lifecycle states and state
-           transitions of agent nodes, agents and agent beans. Each transition
-           is triggered by the corresponding method of interface
-           <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/ILifecycle.html">
-           <code>ILifecycle</code></a>, which optional checks the current state,
-           switches to the intermediate state, invokes the corresponding method of
-           the abstract class 
-           <a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
-           <code>AbstractLifecycle</code></a> and switches to the final state.
-           In case of a failed doInit() or doStart() method the state of this 
-           resource will be changed back to the original state.</p>
+			<subsection name="Agent Lifecycle">
+				<p>
+					The following graph shows the possible lifecycle states and state
+					transitions of agent nodes, agents and agent beans. Each transition
+					is triggered by the corresponding method of interface
+					<a href="apidocs/de/dailab/jiactng/agentcore/lifecycle/ILifecycle.html">
+						<code>ILifecycle</code>
+					</a>
+					, which optional checks the current state,
+					switches to the intermediate state, invokes the corresponding method of
+					the abstract class
+					<a
+						href="apidocs/de/dailab/jiactng/agentcore/lifecycle/AbstractLifecycle.html">
+						<code>AbstractLifecycle</code>
+					</a>
+					and switches to the final state.
+					In case of a failed doInit() or doStart() method the state of this
+					resource will be changed back to the original state.
+				</p>
 
-        <p>
-           <a href="images/Lifecycle.png">
-	        <img src="images/Lifecycle.png" alt="Lifecycle"/>
-	   </a>
-        </p>
+				<p>
+					<a href="images/Lifecycle.png">
+						<img src="images/Lifecycle.png" alt="Lifecycle" />
+					</a>
+				</p>
 
-        <p>During each state transition of an agent node, the same transition is
-           automatically executed by all agents and other resources of this agent
-           node. The state transition of an agent in turn executes the same
-           transition on all agent beans and other resources of this agent.
-        </p>
-    </subsection>
+				<p>During each state transition of an agent node, the same
+					transition is
+					automatically executed by all agents and other resources of this agent
+					node. The state transition of an agent in turn executes the same
+					transition on all agent beans and other resources of this agent.
+				</p>
+			</subsection>
 
-    <subsection name="Measurement data">
-        <p>The data below are measured by using the test class <code>SetupMeasurement</code> with the following environment:</p>
-	      <ul>
-	        <li>Processor: Intel Centrino Duo 2.00GHz</li>
-	        <li>Memory: 1.00GB RAM</li>
-	        <li>Operating system: Windows XP Professional 2002 SP2</li>
-	        <li>Java version: JRE 1.6.0_03</li>
-	      </ul>
-	<table>
-	      <tr>
-	        <td>Scenario</td>
-	        <td>Setup time (ms)</td>
-	        <td>Heap memory usage (kB)</td>
-	        <td>Non-heap memory usage (kB)</td>
-	        <td>Number of live threads</td>
-	        <td>Number of loaded classes</td>
-	      </tr>
-              <tr>
-	        <td>JVM without any application</td>
-	        <td>-</td>
-	        <td>262</td>
-	        <td>12395</td>
-	        <td>5</td>
-	        <td>337</td>
-	      </tr>
-	      <tr>
-	        <td>Agent node without any features</td>
-	        <td>765</td>
-	        <td>1290</td>
-	        <td>15990</td>
-	        <td>5</td>
-                <td>1313</td>
-	      </tr>
-	      <tr>
-	        <td>Agent node only with one small agent</td>
-	        <td>884</td>
-	        <td>1373</td>
-	        <td>16326</td>
-	        <td>7</td>
-                <td>1392</td>
-	      </tr>
-	      <tr>
-	        <td>Agent node only with RMI connector</td>
-	        <td>1072</td>
-	        <td>933</td>
-	        <td>16649</td>
-	        <td>9</td>
-                <td>1550</td>
-	      </tr>
-	      <tr>
-	        <td>Agent node only with communication</td>
-	        <td>1327</td>
-	        <td>1361</td>
-	        <td>17326</td>
-	        <td>9</td>
-	        <td>1632</td>
-	      </tr>
-	</table>
-    </subsection>
+			<subsection name="Measurement data">
+				<p>
+					The data below are measured by using the test class
+					<code>SetupMeasurement</code>
+					with the following environment:
+				</p>
+				<ul>
+					<li>Processor: Intel Centrino Duo 2.00GHz</li>
+					<li>Memory: 1.00GB RAM</li>
+					<li>Operating system: Windows XP Professional 2002 SP2</li>
+					<li>Java version: JRE 1.6.0_03</li>
+				</ul>
+				<table>
+					<tr>
+						<td>Scenario</td>
+						<td>Setup time (ms)</td>
+						<td>Heap memory usage (kB)</td>
+						<td>Non-heap memory usage (kB)</td>
+						<td>Number of live threads</td>
+						<td>Number of loaded classes</td>
+					</tr>
+					<tr>
+						<td>JVM without any application</td>
+						<td>-</td>
 
-    </section>
-  </body>
+						<td>262</td>
+						<td>12395</td>
+						<td>5</td>
+						<td>337</td>
+					</tr>
+					<tr>
+						<td>Agent node without any features</td>
+						<td>765</td>
+						<td>1290</td>
+						<td>15990</td>
+						<td>5</td>
+						<td>1313</td>
+					</tr>
+					<tr>
+						<td>Agent node only with one small agent</td>
+						<td>884</td>
+						<td>1373</td>
+						<td>16326</td>
+						<td>7</td>
+						<td>1392</td>
+					</tr>
+					<tr>
+						<td>Agent node only with RMI connector</td>
+						<td>1072</td>
+						<td>933</td>
+						<td>16649</td>
+						<td>9</td>
+						<td>1550</td>
+					</tr>
+					<tr>
+						<td>Agent node only with communication</td>
+						<td>1327</td>
+						<td>1361</td>
+						<td>17326</td>
+						<td>9</td>
+						<td>1632</td>
+					</tr>
+				</table>
+			</subsection>
+
+			<subsection name="JIAC with TLS">
+				<p>As of version 5.1.6, it is possible to secure safety-critical
+					communication channels used
+					by JIAC Agent Nodes. This security measure
+					is implemented with TLS
+					(formerly known
+					as SSL).
+				</p>
+
+				<p>Implementing a TLS-secured multi-agent system with JIAC requires
+					a number of steps, in particular due to the necessity of creating
+					and handling key-pairs and certificates. You will find a detailed
+					manual <a href="JIACWithTLS.html">here</a>.</p>
+			</subsection>
+
+		</section>
+	</body>
 </document>

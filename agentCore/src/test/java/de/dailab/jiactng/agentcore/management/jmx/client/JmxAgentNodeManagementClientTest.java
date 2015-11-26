@@ -63,12 +63,10 @@ public class JmxAgentNodeManagementClientTest extends TestCase implements Notifi
 		// get management client and check for agent node
 		JmxManagementClient client = new JmxManagementClient();
 		Set<String> nodes = client.getAgentNodeUUIDs();
-		assertEquals("JmxManagementClient.getAgentNodeNames() found wrong number of agent nodes", nodes.size(), 1);
-		String nodeId = nodes.toArray(new String[nodes.size()])[0];
-		assertEquals("JmxManagementClient.getAgentNodeNames() is wrong", nodeRef.getUUID(), nodeId);
+		assertTrue("JmxManagementClient.getAgentNodeUUIDs() did not found test node", nodes.contains(nodeRef.getUUID()));
 
 		// add listener for change of agent node's lifecycle state and agent list
-		nodeClient = client.getAgentNodeManagementClient(nodeId);
+		nodeClient = client.getAgentNodeManagementClient(nodeRef.getUUID());
 		nodeClient.addAgentsListener(this);
 		nodeClient.addLifecycleStateListener(this);
 	}

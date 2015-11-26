@@ -351,6 +351,19 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
+	 * Determines whether SSL/TLS is enabled in the managed agent node.
+	 * @return <CODE>true</CODE> if SSL/TLS is enabled in the managed agent node.
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent node.
+	 * @throws InstanceNotFoundException The agent node does not exist.
+	 * @throws SecurityException if the agent node's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.SimpleAgentNodeMBean#isSslInUse()
+	 */
+	public boolean isSslInUse() throws IOException, InstanceNotFoundException {
+		return (boolean) getAttribute("SslInUse");
+	}
+
+	/**
 	 * Adds a socket appender to the logger of the managed agent node, agent node beans
 	 * and agents, which connects to the local server at specified port.
 	 * @param port The port of the local logging server.
@@ -486,5 +499,4 @@ public class JmxAgentNodeManagementClient extends JmxAbstractManagementClient {
 			}
 		}
 	}
-
 }

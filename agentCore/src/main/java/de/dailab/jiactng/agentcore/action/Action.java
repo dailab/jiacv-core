@@ -348,12 +348,20 @@ public class Action implements IActionDescription {
 	
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @deprecated Inconsistent name of setter; problems with TupleSpace/GetterSetterFinder, use {@link #setSemanticServiceDescriptionIRI(String)} instead
 	 */
+	@Deprecated
 	public void setSemanticServiceDescriptionURI(String iri) {
 		this.semanticServiceDescriptionIRI = iri;
 		
 	}
 
+	public void setSemanticServiceDescriptionIRI(String iri) {
+		this.semanticServiceDescriptionIRI = iri;
+		
+	}
+	
 	public String getActionType() {
 		return this.actionType;
 	}

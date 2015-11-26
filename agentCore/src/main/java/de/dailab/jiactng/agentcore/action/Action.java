@@ -470,6 +470,10 @@ public class Action implements IActionDescription {
 		      && EqualityChecker.equals(this.getSemanticServiceDescriptionIRI(), other.getSemanticServiceDescriptionIRI());
 	}
 	
+	/**
+     * XXX This is symmetric (and already was before I changed it), i.e. Agent(123) matches
+     * template Agent(null), but Agent(null) also matches template Agent(123). Is this intended?
+	 */
 	@Override
 	public boolean matches(final IActionDescription template) {
 		if (this == template) {

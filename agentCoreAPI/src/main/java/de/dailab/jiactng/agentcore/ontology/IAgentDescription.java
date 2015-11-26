@@ -86,4 +86,14 @@ public interface IAgentDescription extends IFact, JmxDescriptionSupport {
      * @return <code>true</code> if the agent is able to migrate to other agent nodes.
      */
     Boolean isMobile();
+
+    /**
+     * Check whether two agent descriptions match. They match if their attributes
+     * are pairwise equal of if one is null. This is used by the Directory to search
+     * for agents.
+     * 
+     * @param template		template, optionally with some null fields
+     * @return				whether this agent matches the template
+     */
+    boolean matches(IAgentDescription template);
 }

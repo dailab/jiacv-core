@@ -191,7 +191,7 @@ public class AgentDescription implements IAgentDescription {
 
 	/**
 	 * Checks the equality of two agent descriptions. The descriptions are equal
-	 * if their unique identifiers are equal or null.
+	 * if their unique identifiers are equal.
 	 * @param obj the other agent description
 	 * @return the result of the equality check
 	 * @see EqualityChecker#equalsOrNull(Object, Object)
@@ -207,27 +207,29 @@ public class AgentDescription implements IAgentDescription {
         }
         
         final AgentDescription other= (AgentDescription) obj;
-        return checkWhetherEqual(aid, other.getAid()) && checkWhetherEqual(name, other.getName()) &&
-        		checkWhetherEqual(owner, other.getOwner()) &&checkWhetherEqual(messageBoxAddress, other.getMessageBoxAddress()) && 
-        		checkWhetherEqual(agentNodeUUID, other.getAgentNodeUUID());
+        return EqualityChecker.equals(aid, other.getAid()) && 
+        		EqualityChecker.equals(name, other.getName()) &&
+        		EqualityChecker.equals(owner, other.getOwner()) &&
+        		EqualityChecker.equals(messageBoxAddress, other.getMessageBoxAddress()) && 
+        		EqualityChecker.equals(agentNodeUUID, other.getAgentNodeUUID());
     }
     
-
     /**
-     * This method checks whether the given objects are equal. The objects are equal
-     * if one of them is null or there attributes are equal
-     * @param o1
-     * @param o2
-     * @return
+     * XXX This is symmetric (and already was before I changed it), i.e. Agent(123) matches
+     * template Agent(null), but Agent(null) also matches template Agent(123). Is this intended?
      */
-    private boolean checkWhetherEqual(Object o1, Object o2){
-    	if(o1 == null || o2 == null){
-        	return true;
+    @Override
+    public boolean matches(IAgentDescription template) {
+    	if(this == template) {
+            return true;
         }
-        if(!o1.equals(o2)){
-        	return false;
-        }
-        return true;
+        
+        final AgentDescription other= (AgentDescription) template;
+        return EqualityChecker.equalsOrNull(aid, other.getAid()) && 
+        		EqualityChecker.equalsOrNull(name, other.getName()) &&
+        		EqualityChecker.equalsOrNull(owner, other.getOwner()) &&
+        		EqualityChecker.equalsOrNull(messageBoxAddress, other.getMessageBoxAddress()) && 
+        		EqualityChecker.equalsOrNull(agentNodeUUID, other.getAgentNodeUUID());
     }
 
     /**

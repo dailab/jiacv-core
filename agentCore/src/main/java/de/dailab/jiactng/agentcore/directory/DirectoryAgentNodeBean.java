@@ -376,18 +376,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return null;
 		}
 		synchronized (localAgents) {
-			for (String key : localAgents.keySet()) {
-				final IAgentDescription agentDescription = localAgents.get(key);
-				if (agentDescription.equals(template)) {
+			for (IAgentDescription agentDescription : localAgents.values()) {
+				if (agentDescription.matches(template)) {
 					return agentDescription;
 				}
 			}
 		}
 		synchronized (remoteAgents) {
-			for (String key : remoteAgents.keySet()) {
-				final IAgentDescription agentDescription = remoteAgents
-						.get(key);
-				if (agentDescription.equals(template)) {
+			for (IAgentDescription agentDescription : remoteAgents.values()) {
+				if (agentDescription.matches(template)) {
 					return agentDescription;
 				}
 			}
@@ -407,12 +404,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 *            the template for searching local agents
 	 * @return description of all local agents, which are equal to the template
 	 */
-	public List<IAgentDescription> searchAllLocalAgents(
-			IAgentDescription template) {
+	public List<IAgentDescription> searchAllLocalAgents(IAgentDescription template) {
 		final List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
 		synchronized (localAgents) {
-			for (String key : localAgents.keySet()) {
-				final IAgentDescription agentDescription = localAgents.get(key);
+			for (IAgentDescription agentDescription : localAgents.values()) {
 				if (agentDescription.equals(template)) {
 					agents.add(agentDescription);
 				}
@@ -428,18 +423,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	public List<IAgentDescription> searchAllAgents(IAgentDescription template) {
 		final List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
 		synchronized (localAgents) {
-			for (String key : localAgents.keySet()) {
-				final IAgentDescription agentDescription = localAgents.get(key);
-				if (agentDescription.equals(template)) {
+			for (IAgentDescription agentDescription : localAgents.values()) {
+				if (agentDescription.matches(template)) {
 					agents.add(agentDescription);
 				}
 			}
 		}
 		synchronized (remoteAgents) {
-			for (String key : remoteAgents.keySet()) {
-				final IAgentDescription agentDescription = remoteAgents
-						.get(key);
-				if (agentDescription.equals(template)) {
+			for (IAgentDescription agentDescription : remoteAgents.values()) {
+				if (agentDescription.matches(template)) {
 					agents.add(agentDescription);
 				}
 			}

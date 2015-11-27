@@ -8,6 +8,7 @@ import java.util.Calendar;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.IAgentDescription;
+import de.dailab.jiactng.agentcore.util.EqualityChecker;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**
@@ -298,7 +299,9 @@ public class Session implements IFact {
     */
    @Override
    public int hashCode() {
-      return sessionId.hashCode();
+	   int hashcode = Session.class.hashCode();
+	   if (sessionId != null) hashcode ^= sessionId.hashCode();
+      return hashcode;
    }
 
    /**
@@ -313,11 +316,7 @@ public class Session implements IFact {
          return false;
       }
       final Session other = (Session) obj;
-      if (this.sessionId == null || other.sessionId == null) {
-         return true;
-      } else {
-         return this.sessionId.equals(other.sessionId);
-      }
+      return EqualityChecker.equals(this.sessionId, other.sessionId);
    }
 
    /**

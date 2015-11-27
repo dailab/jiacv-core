@@ -692,6 +692,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
+		List<IActionDescription> allTemplates = new ArrayList<>();
+		allTemplates.add(template);
 		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().equals("")){
 			if (this.serviceMatcher != null && this.ontologyStorage != null){
 				
@@ -712,8 +714,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 									serviceDescList);
 
 					if ((matcherResults != null) && (matcherResults.size() > 0)) {
-						actions.addAll(matcherResults);
-						return actions;
+						// SeMa returns un-grounded service descriptions -> use those to match agains actual actions
+						allTemplates.clear();
+						allTemplates.addAll(matcherResults);
 					} else {
 						log.warn("Matcher found no result, trying normal template matching...");
 					}
@@ -725,18 +728,21 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		synchronized (localActions) {
 			for (IActionDescription actionDescription : localActions) {
-				if (actionDescription.matches(template)) {
-					actions.add(actionDescription);
+				for (IActionDescription template2 : allTemplates) {
+					if (actionDescription.matches(template2)) {
+						actions.add(actionDescription);
+					}
 				}
 			}
 		}
 		synchronized (remoteActions) {
 			for (String nodeAddress : remoteActions.keySet()) {
-				final Set<IActionDescription> adset = remoteActions
-						.get(nodeAddress);
+				final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
 				for (IActionDescription ad : adset) {
-					if (ad.matches(template)) {
-						actions.add(ad);
+					for (IActionDescription template2 : allTemplates) {
+						if (ad.matches(template2)) {
+							actions.add(ad);
+						}
 					}
 				}
 			}

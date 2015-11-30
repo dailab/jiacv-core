@@ -89,8 +89,8 @@ public interface IAgentDescription extends IFact, JmxDescriptionSupport {
 
     /**
      * Check whether two agent descriptions match. They match if their attributes
-     * are pairwise equal of if one is null. This is used by the Directory to search
-     * for agents.
+     * are pairwise equal of if the one of the template is null. This is used by 
+     * the Directory to search for agents.
      * 
      * @param template		template, optionally with some null fields
      * @return				whether this agent matches the template

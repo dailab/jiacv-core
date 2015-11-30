@@ -194,7 +194,6 @@ public class AgentDescription implements IAgentDescription {
 	 * if their unique identifiers are equal.
 	 * @param obj the other agent description
 	 * @return the result of the equality check
-	 * @see EqualityChecker#equalsOrNull(Object, Object)
 	 */
     @Override
     public boolean equals(Object obj) {
@@ -214,22 +213,16 @@ public class AgentDescription implements IAgentDescription {
         		EqualityChecker.equals(agentNodeUUID, other.getAgentNodeUUID());
     }
     
-    /**
-     * XXX This is symmetric (and already was before I changed it), i.e. Agent(123) matches
-     * template Agent(null), but Agent(null) also matches template Agent(123). Is this intended?
-     */
     @Override
     public boolean matches(IAgentDescription template) {
-    	if(this == template) {
+    	if (this == template || template == null) {
             return true;
         }
-        
-        final AgentDescription other= (AgentDescription) template;
-        return EqualityChecker.equalsOrNull(aid, other.getAid()) && 
-        		EqualityChecker.equalsOrNull(name, other.getName()) &&
-        		EqualityChecker.equalsOrNull(owner, other.getOwner()) &&
-        		EqualityChecker.equalsOrNull(messageBoxAddress, other.getMessageBoxAddress()) && 
-        		EqualityChecker.equalsOrNull(agentNodeUUID, other.getAgentNodeUUID());
+        return EqualityChecker.equalsOrOtherNull(aid, template.getAid()) && 
+        		EqualityChecker.equalsOrOtherNull(name, template.getName()) &&
+        		EqualityChecker.equalsOrOtherNull(owner, template.getOwner()) &&
+        		EqualityChecker.equalsOrOtherNull(messageBoxAddress, template.getMessageBoxAddress()) && 
+        		EqualityChecker.equalsOrOtherNull(agentNodeUUID, template.getAgentNodeUUID());
     }
 
     /**

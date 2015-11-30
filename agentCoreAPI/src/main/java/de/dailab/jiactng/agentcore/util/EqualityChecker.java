@@ -30,18 +30,33 @@ public final class EqualityChecker {
      * @return the equality of the two objects
      */
     public static boolean equalsOrNull(Object a, Object b) {
-    	if(a == b) {
+    	if (a == b) {
     		return true;
     	}
     	
-    	if(a == null) {
+    	if (a == null) {
     		return true;
     	}
     	
-    	if(b == null) {
+    	if (b == null) {
     		return true;
     	}
     	
     	return a.equals(b);
     }    
+
+    /**
+     * Check whether the first and second object are equal, or the other (second)
+     * object is null. This can be used for template matching, where the second
+     * argument is the template. The first object matches the template iff the
+     * template is null or both are equal.
+     * 
+     * @param obj			the object to be matched
+     * @param template		the template to match against
+     * @return				whether the object matches the template
+     */
+    public static boolean equalsOrOtherNull(Object obj, Object template) {
+    	return template == null || template.equals(obj);
+    }
+
 }

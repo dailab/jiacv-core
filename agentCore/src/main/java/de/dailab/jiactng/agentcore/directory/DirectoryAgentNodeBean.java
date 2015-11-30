@@ -408,7 +408,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		final List<IAgentDescription> agents = new ArrayList<IAgentDescription>();
 		synchronized (localAgents) {
 			for (IAgentDescription agentDescription : localAgents.values()) {
-				if (agentDescription.equals(template)) {
+				if (agentDescription.matches(template)) {
 					agents.add(agentDescription);
 				}
 			}
@@ -603,7 +603,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
-		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().equals("")){
+		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().isEmpty()){
 			if (this.serviceMatcher != null && this.ontologyStorage != null){
 				
 				IServiceDescription templateSD = null;
@@ -619,8 +619,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				if (templateSD != null){
 					final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 					IServiceDescription matcherResult = this.serviceMatcher
-							.findBestMatch(templateSD,
-									serviceDescList);
+							.findBestMatch(templateSD, serviceDescList);
 
 					if (matcherResult != null) {
 						// use matcher result as new template and continue with regular matching
@@ -666,8 +665,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		if (this.serviceMatcher != null && this.ontologyStorage != null){	
 			final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 			IServiceDescription matcherResult = this.serviceMatcher
-					.findBestMatch(template,
-							serviceDescList);
+					.findBestMatch(template, serviceDescList);
 
 			if (matcherResult != null) {
 				return matcherResult;
@@ -694,7 +692,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		// use Matcher for matching if possible
 		List<IActionDescription> allTemplates = new ArrayList<>();
 		allTemplates.add(template);
-		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().equals("")){
+		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().isEmpty()){
 			if (this.serviceMatcher != null && this.ontologyStorage != null){
 				
 				IServiceDescription templateSD = null;
@@ -710,11 +708,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				if (templateSD != null){
 					final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 					final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
-							.findAllMatches(templateSD,
-									serviceDescList);
+							.findAllMatches(templateSD, serviceDescList);
 
 					if ((matcherResults != null) && (matcherResults.size() > 0)) {
-						// SeMa returns un-grounded service descriptions -> use those to match agains actual actions
+						// SeMa returns un-grounded service descriptions -> use those to match against actual actions
 						allTemplates.clear();
 						allTemplates.addAll(matcherResults);
 					} else {
@@ -762,8 +759,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		if (this.serviceMatcher != null && this.ontologyStorage != null){	
 			final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 			final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
-					.findAllMatches(template,
-							serviceDescList);
+					.findAllMatches(template, serviceDescList);
 
 			if ((matcherResults != null) && (matcherResults.size() > 0)) {
 				actions.addAll(matcherResults);
@@ -1129,7 +1125,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		// find serviceDescriptions in local actions
 		synchronized (localActions) {
 			for (IActionDescription localAct : localActions) {
-			    if (localAct.getSemanticServiceDescriptionIRI() != null && ! localAct.getSemanticServiceDescriptionIRI().equals("")){
+			    if (localAct.getSemanticServiceDescriptionIRI() != null && ! localAct.getSemanticServiceDescriptionIRI().isEmpty()){
 					try {
 						IServiceDescription sd = ontologyStorage.
 								loadServiceDescriptionFromOntology(new URI(localAct.getSemanticServiceDescriptionIRI()));
@@ -1149,7 +1145,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				final Set<IActionDescription> remoteActSet = remoteActions
 						.get(nodeAddress);
 				for (IActionDescription remoteAct : remoteActSet) {
-				    if (remoteAct.getSemanticServiceDescriptionIRI() != null && ! remoteAct.getSemanticServiceDescriptionIRI().equals("")){
+				    if (remoteAct.getSemanticServiceDescriptionIRI() != null && ! remoteAct.getSemanticServiceDescriptionIRI().isEmpty()){
 						try {
 							IServiceDescription sd = ontologyStorage.
 									loadServiceDescriptionFromOntology(new URI(remoteAct.getSemanticServiceDescriptionIRI()));

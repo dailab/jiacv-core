@@ -11,7 +11,7 @@ public class WebserviceAction extends Action implements IWebserviceAction {
 	public WebserviceAction(Action action){
 		super(action);
 		this.setProviderDescription(action.getProviderDescription());
-
+		this.setSemanticServiceDescriptionIRI(action.getSemanticServiceDescriptionIRI());
 		if (action instanceof IWebserviceAction){
 			IWebserviceAction wsAction = (IWebserviceAction) action;
 			
@@ -29,6 +29,7 @@ public class WebserviceAction extends Action implements IWebserviceAction {
 		this.setResultTypeNames(ad.getResultTypeNames());		
 		this.setName(ad.getName());
 		this.setScope(ad.getScope());
+		this.setSemanticServiceDescriptionIRI(ad.getSemanticServiceDescriptionIRI());
 		
 		try {
 			this.setInputTypes(ad.getInputTypes());

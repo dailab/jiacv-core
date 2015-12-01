@@ -288,7 +288,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
             
             
         	if (semanticURI != null && !semanticURI.equals("")) {
-        		act.setSemanticServiceDescriptionURI(semanticURI);
+        		act.setSemanticServiceDescriptionIRI(semanticURI);
         	}
             
             

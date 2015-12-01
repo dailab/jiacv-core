@@ -1133,6 +1133,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 					} catch (URISyntaxException e) {
 						log.error("Semantic IRI of action " + localAct.getName() 
 								+ " incorrect: " + localAct.getSemanticServiceDescriptionIRI());
+					} catch (Exception e) {
+						log.error("Semantic service description for action " + localAct.getName() 
+								+ " could not be loaded. Semantic URI: " + localAct.getSemanticServiceDescriptionIRI());
 					}
 				}
 				
@@ -1153,6 +1156,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 						} catch (URISyntaxException e) {
 							log.error("Semantic IRI of action " + remoteAct.getName() 
 									+ " incorrect: " + remoteAct.getSemanticServiceDescriptionIRI());
+						} catch (Exception e) {
+							log.error("Semantic service description for action " + remoteAct.getName() 
+									+ " could not be loaded. Semantic URI: " + remoteAct.getSemanticServiceDescriptionIRI());
 						}
 					}
 				}

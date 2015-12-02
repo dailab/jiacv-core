@@ -622,8 +622,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 							.findBestMatch(templateSD, serviceDescList);
 
 					if (matcherResult != null) {
-						// use matcher result as new template and continue with regular matching
-						template = matcherResult;
+						return matcherResult;
 					} else {
 						log.warn("Matcher found no result, trying normal template matching...");
 					}
@@ -690,8 +689,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
-		List<IActionDescription> allTemplates = new ArrayList<>();
-		allTemplates.add(template);
 		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().isEmpty()){
 			if (this.serviceMatcher != null && this.ontologyStorage != null){
 				
@@ -711,9 +708,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 							.findAllMatches(templateSD, serviceDescList);
 
 					if ((matcherResults != null) && (matcherResults.size() > 0)) {
-						// SeMa returns un-grounded service descriptions -> use those to match against actual actions
-						allTemplates.clear();
-						allTemplates.addAll(matcherResults);
+						actions.addAll(matcherResults);
+						return actions;
 					} else {
 						log.warn("Matcher found no result, trying normal template matching...");
 					}
@@ -725,10 +721,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		synchronized (localActions) {
 			for (IActionDescription actionDescription : localActions) {
-				for (IActionDescription template2 : allTemplates) {
-					if (actionDescription.matches(template2)) {
+				if (actionDescription.matches(template)) {
 						actions.add(actionDescription);
-					}
 				}
 			}
 		}
@@ -736,10 +730,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			for (String nodeAddress : remoteActions.keySet()) {
 				final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
 				for (IActionDescription ad : adset) {
-					for (IActionDescription template2 : allTemplates) {
-						if (ad.matches(template2)) {
-							actions.add(ad);
-						}
+					if (ad.matches(template)) {
+						actions.add(ad);
 					}
 				}
 			}
@@ -1129,6 +1121,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 					try {
 						IServiceDescription sd = ontologyStorage.
 								loadServiceDescriptionFromOntology(new URI(localAct.getSemanticServiceDescriptionIRI()));
+						sd = this.setActionParametersOnServiceDescription(sd, localAct);
 						ret.add(sd);
 					} catch (URISyntaxException e) {
 						log.error("Semantic IRI of action " + localAct.getName() 
@@ -1152,6 +1145,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 						try {
 							IServiceDescription sd = ontologyStorage.
 									loadServiceDescriptionFromOntology(new URI(remoteAct.getSemanticServiceDescriptionIRI()));
+							sd = this.setActionParametersOnServiceDescription(sd, remoteAct);
 							ret.add(sd);
 						} catch (URISyntaxException e) {
 							log.error("Semantic IRI of action " + remoteAct.getName() 
@@ -1159,6 +1153,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 						} catch (Exception e) {
 							log.error("Semantic service description for action " + remoteAct.getName() 
 									+ " could not be loaded. Semantic URI: " + remoteAct.getSemanticServiceDescriptionIRI());
+							log.error(e.getMessage());
+							
 						}
 					}
 				}
@@ -1167,6 +1163,33 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		return ret;
 	}
+	
+	private IServiceDescription setActionParametersOnServiceDescription(IServiceDescription isd, IActionDescription iad) {
+		
+		isd.setName(iad.getName());
+		isd.setActionType(iad.getActionType());
+		
+		isd.setInputTypeNames(iad.getInputTypeNames());
+		isd.setResultTypeNames(iad.getResultTypeNames());
+		
+		try {
+			isd.setInputTypes(iad.getInputTypes());
+			isd.setResultTypes(iad.getResultTypes());
+		} catch (ClassNotFoundException e) {
+			log.error("Input/Result Types of action " + iad.getName() + " could not be loaded.");
+			log.error(e.getStackTrace());
+		}
+		
+		
+		isd.setProviderBean(iad.getProviderBean());
+		isd.setProviderDescription(iad.getProviderDescription());
+				
+		isd.setScope(iad.getScope());
+		
+		return isd;
+	}
+	
+
 
 	// #########################################
 	// Communication

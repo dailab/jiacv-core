@@ -49,6 +49,13 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 * @return the name or <code>null</code> if not set
 	 */
 	String getName();
+	
+	/**
+	 * Sets the name of the action.
+	 * 
+	 * @param newName the name of the action this description refers to
+	 */
+	void setName(String newName);
 
 	/**
 	 * This method returns the type names of the input parameters that the action accepts.
@@ -61,6 +68,13 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 * @return the unmodifiable list of input parameter type names or <code>null</code> if not set
 	 */
 	List<String> getInputTypeNames();
+	
+	/**
+	 * Sets the type names of the input parameters that the action accepts
+	 * 
+	 * @param newInputTypeNames an unmodifiable list of input parameter type names
+	 */
+	void setInputTypeNames(List<String> newInputTypeNames);
 
 	/**
 	 * This method returns the result type names of the described action.
@@ -73,6 +87,13 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 * @return the unmodifiable list of result type names or <code>null</code> if not set
 	 */
 	List<String> getResultTypeNames();
+	
+	/**
+	 * Sets the type names of the result parameters that the action accepts
+	 * 
+	 * @param newResultTypeNames an unmodifiable list of result parameter type names
+	 */
+	void setResultTypeNames(List<String> newResultTypeNames);
 
 	/**
 	 * This method returns the types of the input parameters that the action accepts.
@@ -85,6 +106,14 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	List<Class<?>> getInputTypes() throws ClassNotFoundException;
 
 	/**
+	 * Sets the types of the input parameters that the action accepts
+	 * 
+	 * @param newInputTypes a created list of input parameter types or <code>null</code> if corresponding list of parameter type names
+	 *         is not set
+	 */
+	void setInputTypes(List<Class<?>> newInputTypes);
+	
+	/**
 	 * This method returns the result types of the described action.
 	 * 
 	 * @return a created list of result types or <code>null</code> if corresponding list of result type names is not set
@@ -92,6 +121,13 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 *            if one of the classes is unknown.
 	 */
 	List<Class<?>> getResultTypes() throws ClassNotFoundException;
+	
+	/**
+	 * Sets the return types of the described action
+	 * 
+	 * @param newResultTypes a created list of result types or <code>null</code> if corresponding list of result type names is not set
+	 */
+	void setResultTypes(final List<Class<?>> newResultTypes);
 
 	/**
 	 * This method returns the agent description of the agent that provides the action.
@@ -107,6 +143,14 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 * @see ActionScope
 	 */
 	ActionScope getScope();
+	
+	/**
+	 * Sets the scope of the action
+	 * 
+	 * @param newScope scope of the action
+	 * @see ActionScope
+	 */
+	void setScope(ActionScope newScope);
 
 	/**
 	 * Getter for the component that holds the functionality of this action.

@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.management.openmbean.ArrayType;
@@ -497,10 +496,8 @@ public class Action implements IActionDescription {
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Action:\n name='").append(this.name).append("'");
-		builder.append("\n parameters=");
-		this.prettyPrintArray(builder, this.inputTypeNames);
-		builder.append("\n results=");
-		this.prettyPrintArray(builder, this.resultTypeNames);
+		builder.append("\n parameters=").append(this.inputTypeNames);
+		builder.append("\n results=").append(this.resultTypeNames);
 		builder.append("\n bean=");
 		builder.append(this.providerBean);
 
@@ -512,6 +509,7 @@ public class Action implements IActionDescription {
 			builder.append(this.providerDescription);
 		}
 		builder.append("\n scope=").append(this.scope);
+		builder.append("\n IRI=").append(this.semanticServiceDescriptionIRI);
 		builder.append("\n");
 
 		return builder.toString();
@@ -519,24 +517,25 @@ public class Action implements IActionDescription {
 
 	/*
 	 * Utility-method for a nicely formatted output
+	 * XXX this is doing exactly the same thing as ArrayList.toString is doing anyway 
 	 */
-	private void prettyPrintArray(final StringBuilder builder, final List<String> list) {
-		if (list == null) {
-			builder.append("null");
-		}
-		else {
-			builder.append('[');
-			for (final Iterator<String> iter = list.iterator(); iter.hasNext();) {
-				builder.append(iter.next());
-
-				if (iter.hasNext()) {
-					builder.append("; ");
-				}
-			}
-
-			builder.append(']');
-		}
-	}
+//	private void prettyPrintArray(final StringBuilder builder, final List<String> list) {
+//		if (list == null) {
+//			builder.append("null");
+//		}
+//		else {
+//			builder.append('[');
+//			for (final Iterator<String> iter = list.iterator(); iter.hasNext();) {
+//				builder.append(iter.next());
+//
+//				if (iter.hasNext()) {
+//					builder.append("; ");
+//				}
+//			}
+//
+//			builder.append(']');
+//		}
+//	}
 
 	private Class<?> getClassForName(final String type) throws ClassNotFoundException {
 		if (type.equals("boolean")) {

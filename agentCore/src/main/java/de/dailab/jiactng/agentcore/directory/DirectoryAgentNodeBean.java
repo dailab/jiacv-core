@@ -1180,6 +1180,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			log.error(e.getStackTrace());
 		}
 		
+		isd.setSemanticServiceDescriptionURI(iad.getSemanticServiceDescriptionIRI());
 		
 		isd.setProviderBean(iad.getProviderBean());
 		isd.setProviderDescription(iad.getProviderDescription());

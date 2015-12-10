@@ -27,6 +27,10 @@ public class MessageExchangeNotification extends Notification {
 	/** The address of the message receiver. */
 	private String receiver;
 
+	/** The description of the exchanged message. 
+	 * @deprecated */
+	private Object message; // only for backward compatibility
+
 	/** The used message transport mechanism. */
 	private String transport;
 
@@ -108,6 +112,9 @@ public class MessageExchangeNotification extends Notification {
 	 * @see JmxDescriptionSupport#getDescription()
 	 */
 	public final Object getJiacMessage() {
+		if (message != null) {
+			return message; // only for backward compatibility
+		}
 		return getUserData();
 	}
 

@@ -19,6 +19,10 @@
 			<action dev="kuester" type="add">
 				Multiple return types for exposed methods.
 			</action>
+			<action dev="keiser" type="add">
+				ReactiveExecutionCycle for handling action requests and action 
+				results immediately.
+			</action>
 			<action dev="mattu" type="update">
 				ActiveMQ version updated.
 			</action>

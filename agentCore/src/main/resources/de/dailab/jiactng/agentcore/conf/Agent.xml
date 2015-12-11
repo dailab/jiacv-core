@@ -35,6 +35,10 @@
       <property name="execution" ref="NonBlockingExecutionCycle" />
    </bean>
 
+   <bean name="ReactiveAgent" parent="NonBlockingAgent" abstract="true">
+      <property name="execution" ref="ReactiveExecutionCycle" />
+   </bean>
+
    <!--bean name="SimpleAgentWithCommunication" parent="SimpleAgent" abstract="true">
       <property name="communication" ref="CommunicationBean" />
    </bean-->

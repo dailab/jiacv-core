@@ -20,6 +20,13 @@
 				Uses semantic IRI and ontology storage for service matchmaking
 				when searching for actions based on semantic service template.
 			</action>
+			<action dev="keiser" type="add">
+				The new ReactiveExecutionCycle uses a memory observer to handle 
+				action requests and action results immediately and independent 
+				from the agent's execution interval. Only bean executions, 
+				auto-execution services and session timeouts are periodically 
+				handled within this cycle.
+			</action>
 			<action dev="stjung" type="fix">
 				Get an ordered and not duplicated list when searching for actions.
 			</action>

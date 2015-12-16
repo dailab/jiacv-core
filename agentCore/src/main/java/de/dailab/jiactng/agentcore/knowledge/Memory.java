@@ -22,7 +22,7 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.security.auth.DestroyFailedException;
 
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.sercho.masp.space.ObjectMatcher;
 import org.sercho.masp.space.ObjectUpdater;
 import org.sercho.masp.space.SimpleObjectSpace;
@@ -344,7 +344,7 @@ public class Memory extends AbstractLifecycle implements IMemory, MemoryMBean {
     thisAgent = agent;
 
     // update logger
-    setLog(LogFactory.getLog(thisAgent.getAgentNode().getUUID() + "." + thisAgent.getAgentId() + ".Memory"));
+    setLog(Logger.getLogger(thisAgent.getAgentNode().getUUID() + "." + thisAgent.getAgentId() + ".Memory"));
   }
 
   /**

@@ -26,8 +26,7 @@ import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 import javax.management.remote.JMXServiceURL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.Agent;
@@ -868,7 +867,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				final String nodeAddress = senderAddress.getName();
 				if (nodes.containsKey(nodeAddress)) {
 					synchronized (remoteActions) {
-						log.warn(nodeAddress + " says bye");
+						log.info(nodeAddress + " says bye");
 						removeRemoteAgentOfNode(nodeAddress);
 						remoteActions.remove(nodeAddress);
 						nodes.remove(nodeAddress);
@@ -976,7 +975,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 				nodes.get(nodeAddress).setAlive(System.currentTimeMillis());
 			} else {
-				log.warn("New known node " + nodeAddress);
+				log.info("New known node " + nodeAddress);
 				final AgentNodeDescription description = new AgentNodeDescription(
 						node, System.currentTimeMillis());
 				nodes.put(nodeAddress, description);
@@ -994,10 +993,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	@Override
-	public Log getLog(String extension) {
+	public Logger getLog(String extension) {
 		// TODO Creating a method within the AgentNode to get a log for
 		// AgentNodeBeans and use it here
-		return LogFactory.getLog(getClass().getName() + "." + extension);
+		return Logger.getLogger(getClass().getName() + "." + extension);
 	}
 
 	@Override

@@ -15,7 +15,8 @@ import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -74,13 +75,13 @@ class JMSReceiver implements MessageListener {
      * 
      */
    
-    protected final Log log;
+    protected final Logger log;
 
     private Session session;
     private JMSMessageTransport parent;
     private Map<String, MessageConsumer> consumers;
 
-    public JMSReceiver(Connection connection, JMSMessageTransport parent, Log log) throws JMSException {
+    public JMSReceiver(Connection connection, JMSMessageTransport parent, Logger log) throws JMSException {
         this.parent = parent;
         this.log = log;
         session= connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -100,7 +101,7 @@ class JMSReceiver implements MessageListener {
         final String selector= templateToSelector(selectorTemplate);
         final String key = getStringRepresentation(address, selector);
         if (consumers.containsKey(key)) {
-            if (log.isWarnEnabled()) {
+            if (log.isEnabledFor(Level.WARN)) {
                 log.warn("there is already a listener for '" + key + "' registered");
             }
             return;
@@ -176,7 +177,7 @@ class JMSReceiver implements MessageListener {
             
             parent.delegateMessage(JMSMessageTransport.unpack(message), at);
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
+            if (log.isEnabledFor(Level.ERROR)) {
                 log.error("An error receiving a message occured. Cause is '" + e.getCause() + "'");
             }
             parent.delegateException(e);
@@ -205,7 +206,7 @@ class JMSReceiver implements MessageListener {
             consumer = session.createConsumer(dest, selector == null ? null : selector);
             consumer.setMessageListener(this);
         } catch (JMSException e) {
-            if (log.isErrorEnabled()) {
+            if (log.isEnabledFor(Level.ERROR)) {
                 log.error("Listener couldn't be initialized cause of '" + e.getCause() + "'");
                 log.error("Listener will be destroyed");
             }
@@ -223,7 +224,7 @@ class JMSReceiver implements MessageListener {
             try {
                 consumer.close();
             } catch (JMSException e) {
-                if (log.isErrorEnabled()) {
+                if (log.isEnabledFor(Level.ERROR)) {
                     log.error("Couldn't destroy consumer cause of '" + e.getCause() + "'");
                 }
             }

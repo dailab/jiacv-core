@@ -23,7 +23,8 @@ import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
@@ -89,7 +90,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             processMessage(source, message, saveCast(at.toUnboundAddress(), CommunicationAddress.class));
         }
 
-        public Log getLog(String extension) {
+        public Logger getLog(String extension) {
             return thisAgent.getLog(CommunicationBean.this, extension);
         }
     }
@@ -169,7 +170,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
                 try {
                     transport.doCleanup();
                 } catch (Exception e) {
-                    if (log.isWarnEnabled()) {
+                    if (log.isEnabledFor(Level.WARN)) {
                         log.warn("transport '" + transport.getTransportIdentifier() + "' did not cleanup correctly", e);
                     }
                 }
@@ -205,7 +206,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             try {
                 transport.doInit();
             } catch (Exception e) {
-                if (log.isErrorEnabled()) {
+                if (log.isEnabledFor(Level.ERROR)) {
                     log.error("transport '" + transport.getTransportIdentifier()
                             + "' did not initialised correctly -> will be removed", e);
                 }
@@ -278,7 +279,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         final MessageTransport transport = transports.remove(transportIdentifier);
 
         if (transport == null) {
-            if (log.isWarnEnabled()) {
+            if (log.isEnabledFor(Level.WARN)) {
                 log.warn("Transport '" + transportIdentifier + "' not found to remove from CommunicationBean");
             }
             return;
@@ -299,7 +300,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             try {
                 transport.doCleanup();
             } catch (Exception e) {
-                if (log.isWarnEnabled()) {
+                if (log.isEnabledFor(Level.WARN)) {
                     log.warn("transport '" + transportIdentifier + "' did not cleanup correctly", e);
                 }
             }
@@ -460,7 +461,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      */
     protected void processError(MessageTransport source, Exception error) {
         // TODO: error handling
-        if (log.isErrorEnabled()) {
+        if (log.isEnabledFor(Level.ERROR)) {
             log.error("message transport '" + source.getTransportIdentifier() + "' threw an exception", error);
         }
     }
@@ -610,7 +611,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         }
 
         if (registeredContexts == null) {
-            if (log.isWarnEnabled()) {
+            if (log.isEnabledFor(Level.WARN)) {
                 log.warn("Aborted Unregister: There is no listener registered for this address '" + address + "'");
             }
             return;
@@ -641,7 +642,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             
         } else {
         	// there doesn't exist a registration for this combination 
-            if(log.isWarnEnabled()) {
+            if(log.isEnabledFor(Level.WARN)) {
                 log.warn("Aborted Unregister: There is no listener registered for this address '" + address + "' and selector '" + selectorTemplate + "'");
             }
         }
@@ -719,7 +720,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             _manager.registerAgentBeanResource(this, thisAgent, "MessageTransport", transport.getTransportIdentifier(),
                     transport);
         } catch (Exception e) {
-            if ((log != null) && (log.isErrorEnabled())) {
+            if ((log != null) && (log.isEnabledFor(Level.ERROR))) {
                 log.error("WARNING: Unable to register message transport " + transport.getTransportIdentifier()
                         + " of agent bean " + beanName + " of agent " + thisAgent.getAgentName() + " of agent node "
                         + thisAgent.getAgentNode().getName() + " as JMX resource.");
@@ -750,7 +751,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         try {
             _manager.unregisterAgentBeanResource(this, thisAgent, "MessageTransport", transportId);
         } catch (Exception e) {
-            if ((log != null) && (log.isErrorEnabled())) {
+            if ((log != null) && (log.isEnabledFor(Level.ERROR))) {
                 log.error("WARNING: Unable to deregister message transport " + transportId + " of agent bean "
                         + beanName + " of agent " + thisAgent.getAgentName() + " of agent node "
                         + thisAgent.getAgentNode().getName() + " as JMX resource.");

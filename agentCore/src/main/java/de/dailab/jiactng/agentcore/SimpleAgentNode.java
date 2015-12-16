@@ -30,9 +30,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.Log4JLogger;
+import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -184,7 +182,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	/** Constructor. Creates the UUID for the agent node. */
 	public SimpleAgentNode() {
 		uuid = IdFactory.createAgentNodeId(this.hashCode());
-		setLog(LogFactory.getLog(uuid));
+		setLog(Logger.getLogger(uuid));
 		agentNodeBeans = new ArrayList<IAgentNodeBean>();
 		agents = new ArrayList<IAgent>();
 		groups = new ArrayList<IAgentGroup>();
@@ -195,8 +193,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		timer.start();
 
 		// make sure JIAC version appears on console/logging
-		log.warn("JIAC version: " + getJiacVersion() + " (" + getJiacVendor() + ")");
-		System.err.println("JIAC version: " + getJiacVersion() + " (" + getJiacVendor() + ")");
+		log.info("JIAC version: " + getJiacVersion() + " (" + getJiacVendor() + ")");
+		System.out.println("JIAC version: " + getJiacVersion() + " (" + getJiacVendor() + ")");
 	}
 
 	/**
@@ -390,32 +388,32 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
-	public Log getLog(IAgentNodeBean nodeBean) {
-		return LogFactory.getLog(getUUID() + "." + nodeBean.getBeanName());
+	public Logger getLog(IAgentNodeBean nodeBean) {
+		return Logger.getLogger(getUUID() + "." + nodeBean.getBeanName());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 
-	public Log getLog(IAgent agent) {
-		return LogFactory.getLog(getUUID() + "." + agent.getAgentId());
+	public Logger getLog(IAgent agent) {
+		return Logger.getLogger(getUUID() + "." + agent.getAgentId());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 
-	public Log getLog(IAgent agent, IAgentBean bean) {
-		return LogFactory.getLog(getUUID() + "." + agent.getAgentId() + "." + bean.getBeanName());
+	public Logger getLog(IAgent agent, IAgentBean bean) {
+		return Logger.getLogger(getUUID() + "." + agent.getAgentId() + "." + bean.getBeanName());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 
-	public Log getLog(IAgent agent, IAgentBean bean, String extension) {
-		return LogFactory.getLog(getUUID() + "." + agent.getAgentId() + "." + bean.getBeanName() + "." + extension);
+	public Logger getLog(IAgent agent, IAgentBean bean, String extension) {
+		return Logger.getLogger(getUUID() + "." + agent.getAgentId() + "." + bean.getBeanName() + "." + extension);
 	}
 
 	/**
@@ -621,7 +619,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		log.warn("Agentnode is: " + this.getName() + " (" + this.getUUID() + ") with owner: " + this.getOwner());
+		log.info("Agentnode is: " + this.getName() + " (" + this.getUUID() + ") with owner: " + this.getOwner());
 
 		System.setProperty(SSL_USAGE_IDENTIFIER, "" + sslInUse);
 		if (cipherSuitesToUse != null) {
@@ -1071,12 +1069,12 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 	public final void addLog4JSocketAppender(String address, int port) {
-		System.out.println("Add socket appender for " + address + ":" + port + " ...");
+		final String appenderName = address + ":" + port;
+		System.out.println("Add socket appender for " + appenderName + " ...");
 
 		// add appender for logger of the agent node
 		final SocketAppender appender = new SocketAppender(address, port);
-		appender.setName(address + ":" + port);
-		((Log4JLogger) log).getLogger().addAppender(appender);
+		log.addAppender(appender);
 
 		System.out.println("Socket appender added.");
 	}
@@ -1091,7 +1089,9 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 					addLog4JSocketAppender(address.getHostAddress(), port);
 					return address;
 				}
-			} catch (IOException e) {}
+			} catch (Exception e) {
+				log.error("Unable to create socket appender!", e);
+			}
 		}
 		return null;
 	}
@@ -1100,10 +1100,15 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 	public final void removeLog4JSocketAppender(String address, int port) {
-		System.out.println("Remove socket appender for " + address + ":" + port + " ...");
+		final String appenderName = address + ":" + port;
+		System.out.println("Remove socket appender for " + appenderName + " ...");
 
 		// remove appender from logger of the agent node
-		((Log4JLogger) log).getLogger().removeAppender(address + ":" + port);
+		try {
+			log.removeAppender(appenderName);
+		} catch (Exception e) {
+			log.error("Unable to remove socket appender!", e);
+		}
 
 		System.out.println("Socket appender removed.");
 	}

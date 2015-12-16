@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.management.remote.JMXServiceURL;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
@@ -94,7 +94,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * 		 node bean.
    * @see org.apache.commons.logging.Log
    */
-  Log getLog(IAgentNodeBean nodeBean);
+  Logger getLog(IAgentNodeBean nodeBean);
 
   /**
    * Getter for a log-instance that heeds the hierarchy of the agent node, i.e
@@ -106,7 +106,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    * @return a log-object that contains the UUID of the agent node and the name of the agent.
    * @see org.apache.commons.logging.Log
    */
-  Log getLog(IAgent agent);
+  Logger getLog(IAgent agent);
 
   /**
    * Getter for a log-instance that heeds the hierarchy of the agent node and
@@ -123,7 +123,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *         and the name of the agent bean.
    * @see org.apache.commons.logging.Log
    */
-  Log getLog(IAgent agent, IAgentBean bean);
+  Logger getLog(IAgent agent, IAgentBean bean);
   
   /**
    * Getter for a log-instance that heeds the hierarchy of the agent node,
@@ -142,7 +142,7 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *         the name of the agent bean and the extension.
    * @see org.apache.commons.logging.Log
    */
-  Log getLog(IAgent agent, IAgentBean bean, String extension);
+  Logger getLog(IAgent agent, IAgentBean bean, String extension);
 
   /**
    * Getter for the global thread pool for this agent node. All threads should be

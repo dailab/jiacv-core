@@ -23,6 +23,11 @@
 				ReactiveExecutionCycle for handling action requests and action 
 				results immediately.
 			</action>
+			<action dev="keiser" type="change">
+				Logging framework changed from CommonsLogging to Log4j to
+				ensure that log level of agent nodes can be changed and 
+				socket appender can be added at runtime.
+			</action>
 			<action dev="mattu" type="update">
 				ActiveMQ version updated.
 			</action>

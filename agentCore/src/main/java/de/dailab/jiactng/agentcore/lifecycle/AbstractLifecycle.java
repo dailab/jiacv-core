@@ -11,9 +11,8 @@ import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.management.Manager;
 
@@ -33,7 +32,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	/** 
 	 * The logger to be used. 
 	 */
-	protected Log log = null;
+	protected Logger log = null;
 
 	/** 
 	 * The configured log level. 
@@ -325,6 +324,8 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 */
 	public final String getLogLevel() {
 		if (log != null) {
+			return log.getEffectiveLevel().toString();
+/*
 			if (log.isTraceEnabled()) {
 				return Level.TRACE.toString();
 			}
@@ -346,6 +347,7 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 			else {
 				return Level.OFF.toString();
 			}
+*/
 		}
 		return null;
 	}
@@ -355,8 +357,8 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 */
 	public final void setLogLevel(String level) {
 		intendedLogLevel = Level.toLevel(level, intendedLogLevel);
-		if (log != null && (intendedLogLevel != null) && (log instanceof Log4JLogger)) {
-			((Log4JLogger)log).getLogger().setLevel(intendedLogLevel);
+		if (log != null && (intendedLogLevel != null)) {
+			log.setLevel(intendedLogLevel);
 		}
 	}
 
@@ -365,10 +367,10 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	 * of this logger if it was preassigned with method <code>setLogLevel</code>.
 	 * @param newLog The logger instance.
 	 */
-	protected final void setLog(Log newLog) {
+	protected final void setLog(Logger newLog) {
 		log = newLog;
-		if ((log != null) && (intendedLogLevel != null) && (log instanceof Log4JLogger)) {
-			((Log4JLogger)log).getLogger().setLevel(intendedLogLevel);
+		if ((log != null) && (intendedLogLevel != null)) {
+			log.setLevel(intendedLogLevel);
 		}
 	}
 
@@ -379,16 +381,16 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 		if (log == null) {
 			return null;
 		}
-		final String[] itemNames = new String[] { "class", "debug", "error", "fatal", "info", "trace", "warn" };
+		final String[] itemNames = new String[] { "class", "fatal", "error", "warn", "info", "debug", "trace" };
 		try {
-			final CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] { "Implementation of the logger instance", "debug",
-					"error", "fatal", "info", "trace", "warn" }, new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN,
+			final CompositeType type = new CompositeType("javax.management.openmbean.CompositeDataSupport", "Logger information", itemNames, new String[] { "Implementation of the logger instance",
+					"fatal", "error", "warn", "info", "debug", "trace" }, new OpenType[] { SimpleType.STRING, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN, SimpleType.BOOLEAN,
 					SimpleType.BOOLEAN, SimpleType.BOOLEAN });
 			return new CompositeDataSupport(type, itemNames, new Object[] {
-			        log.getClass().getName(), Boolean.valueOf(log.isDebugEnabled()),
-			        Boolean.valueOf(log.isErrorEnabled()), Boolean.valueOf(log.isFatalEnabled()),
-			        Boolean.valueOf(log.isInfoEnabled()), Boolean.valueOf(log.isTraceEnabled()),
-			        Boolean.valueOf(log.isWarnEnabled()) });
+			        log.getClass().getName(), Boolean.valueOf(log.isEnabledFor(Level.FATAL)),
+			        Boolean.valueOf(log.isEnabledFor(Level.ERROR)), Boolean.valueOf(log.isEnabledFor(Level.WARN)),
+			        Boolean.valueOf(log.isInfoEnabled()), Boolean.valueOf(log.isDebugEnabled()),
+			        Boolean.valueOf(log.isTraceEnabled()) });
 		} catch (OpenDataException e) {
 			e.printStackTrace();
 			return null;

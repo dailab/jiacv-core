@@ -80,6 +80,11 @@
 				configured level. Setter does not change the level if the
 				parameter is not correct.
 			</action>
+			<action dev="keiser" type="change">
+				Logging framework changed from CommonsLogging to Log4j to
+				ensure that log level of agent nodes can be changed and 
+				socket appender can be added at runtime.
+			</action>
 		</release>
 		<release version="5.1.5" date="2014-02-12" description="Minor release">
 			<action dev="masuch" type="add">

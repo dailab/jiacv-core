@@ -12,8 +12,8 @@
 			<action dev="mattu" type="update">
 				Updated ActiveMQ version from 5.7.0 to 5.11.1.
 			</action>
-			<action dev="rakow" type="update">
-				Updated SLF4J version from 1.6.1 to 1.7.12.
+			<action dev="keiser" type="change">
+				Logging framework changed from CommonsLogging to Log4j.
 			</action>
 		</release>
 		<release version="5.1.5" date="2014-2-12" description="Minor release">

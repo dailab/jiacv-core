@@ -9,6 +9,8 @@ import javax.management.AttributeChangeNotification;
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 
+import org.apache.log4j.Level;
+
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBean;
 import de.dailab.jiactng.agentcore.action.Action;
@@ -182,7 +184,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
       if ((doAct.getAction().getResultTypeNames() != null) && (doAct.getAction().getResultTypeNames().size() > 0)) {
          if (session.getCurrentCallDepth() == null) {
-            if (log.isWarnEnabled()) {
+            if (log.isEnabledFor(Level.WARN)) {
                log.warn("Found session with call-depth null. Setting calldepth to 1 for: " + doAct.getAction().getName() + " (" + session.getSessionId() + ")");
             }
             session.setCurrentCallDepth(1);

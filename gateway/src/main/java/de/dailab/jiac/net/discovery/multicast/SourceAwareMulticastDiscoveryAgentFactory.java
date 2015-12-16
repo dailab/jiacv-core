@@ -12,8 +12,7 @@ import org.apache.activemq.transport.discovery.DiscoveryAgentFactory;
 import org.apache.activemq.util.IOExceptionSupport;
 import org.apache.activemq.util.IntrospectionSupport;
 import org.apache.activemq.util.URISupport;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This class is a clone of
@@ -24,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
  * @version $Revision$
  */
 public class SourceAwareMulticastDiscoveryAgentFactory extends DiscoveryAgentFactory {
-    private static final Log LOG = LogFactory.getLog(SourceAwareMulticastDiscoveryAgentFactory.class);
+	private static final Logger LOG = Logger.getLogger(SourceAwareMulticastDiscoveryAgentFactory.class);
 
     protected DiscoveryAgent doCreateDiscoveryAgent(URI uri) throws IOException {
         try {

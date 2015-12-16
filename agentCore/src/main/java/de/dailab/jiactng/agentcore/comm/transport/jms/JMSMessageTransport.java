@@ -10,6 +10,8 @@ import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.Session;
 
+import org.apache.log4j.Level;
+
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
@@ -213,7 +215,7 @@ public class JMSMessageTransport extends MessageTransport {
          this.sender.send(message, commAdd, (ttl == 0) ? this.timeToLive : ttl);
       }
       catch (final Exception ex) {
-         if (this.log.isErrorEnabled()) {
+         if (this.log.isEnabledFor(Level.ERROR)) {
            this.log.error("Sending of Message to address '" + commAdd.toUnboundAddress() + "' through JMS failed!",ex);
          } 
          throw new CommunicationException("error while sending message", ex);
@@ -243,7 +245,7 @@ public class JMSMessageTransport extends MessageTransport {
          this.receiver.listen(address, selector);
       }
       catch (final JMSException jms) {
-         if (this.log.isErrorEnabled()) {
+         if (this.log.isEnabledFor(Level.ERROR)) {
             this.log.error("Listening to address '" + address.toUnboundAddress() + "' through JMS failed!");
             this.log.error("Errorcause reads '" + jms.getCause() + "'");
          }

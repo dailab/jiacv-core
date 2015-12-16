@@ -13,12 +13,11 @@
 	<name>Agent Core API</name>
 
 	<dependencies>
-		<!-- dependency> <groupId>commons-logging</groupId> <artifactId>commons-logging</artifactId> <version>1.1</version> </dependency -->
-		<dependency>
+		<!--dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.2</version>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>

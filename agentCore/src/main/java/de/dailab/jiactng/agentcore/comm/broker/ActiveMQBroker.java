@@ -13,6 +13,7 @@ import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
 import org.apache.activemq.network.DiscoveryNetworkConnector;
 import org.apache.activemq.network.NetworkConnector;
+import org.apache.log4j.Level;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
@@ -372,7 +373,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 																							"\"" + connector.getName() + ":" + connector.getTransportURI() + "\"",
 																							connector);
 		} catch (Exception e) {
-			if ((this.log != null) && (this.log.isErrorEnabled())) {
+			if ((this.log != null) && (this.log.isEnabledFor(Level.ERROR))) {
 				this.log.error("WARNING: Unable to register transport connector " + connector.getName() + ":"
 																								+ connector.getTransportURI() + " of the broker of agent node "
 																								+ this.getAgentNode().getName() + " as JMX resource.", e);
@@ -403,7 +404,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 																							ActiveMQTransportConnectorMBean.RESOURCE_TYPE,
 																							"\"" + connector.getName() + ":" + connector.getTransportURI() + "\"");
 		} catch (Exception e) {
-			if ((this.log != null) && (this.log.isErrorEnabled())) {
+			if ((this.log != null) && (this.log.isEnabledFor(Level.ERROR))) {
 				this.log.error("WARNING: Unable to deregister transport connector " + connector.getName() + ":"
 																								+ connector.getTransportURI() + " of the broker of agent node "
 																								+ this.getAgentNode().getName() + " as JMX resource.");

@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import junit.framework.TestCase;
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
@@ -21,11 +21,7 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  * interact and these of agent nodes with different discovery URIs are not.
  * @author Jan Keiser
  */
-public class PlatformTest extends TestCase {
-
-	static {
-		System.setProperty("log4j.configuration", "myLog4j.properties");
-	}
+public class PlatformTest extends JIACTestForJUnit3 {
 
 	private Process process = null;
 	private String nodeId = null;
@@ -135,7 +131,7 @@ public class PlatformTest extends TestCase {
         
         for (String log = reader.readLine(); (log != null) && (nodeId == null); log = reader.readLine()){
         	int startIndex = log.indexOf(IdFactory.IdPrefix.Node.toString());
-        	int stopIndex = log.indexOf(".", startIndex);
+        	int stopIndex = log.indexOf(" ", startIndex);
         	try {
         		nodeId = log.substring(startIndex, stopIndex);
         	}
@@ -143,7 +139,6 @@ public class PlatformTest extends TestCase {
         }
         reader.close();
         in.close();
-        err.close();
 
 		super.setUp();
 	}

@@ -9,6 +9,7 @@
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 
 	<bean name="myNode" parent="NodeWithDirectory">
+		<property name="logLevel" value="INFO" />
 	</bean>
 
 </beans>

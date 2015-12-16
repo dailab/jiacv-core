@@ -3,10 +3,9 @@
  */
 package de.dailab.jiactng.agentcore.comm.jms;
 
-import junit.framework.TestCase;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
@@ -18,7 +17,7 @@ import de.dailab.jiactng.agentcore.comm.IGroupAddress;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class PingPongTestCase extends TestCase {
+public class PingPongTestCase extends JIACTestForJUnit3 {
     public static final String DUMMY_ADDRESS= "dummyAddress";
     public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.ICommunicationBean#send";
 

@@ -6,9 +6,10 @@ import org.junit.After;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit4;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 
-public class DirectoryAgentBeanGroupTest {
+public class DirectoryAgentBeanGroupTest extends JIACTestForJUnit4 {
 
 	private SimpleAgentNode node1 = null;
 	private SimpleAgentNode node2 = null;

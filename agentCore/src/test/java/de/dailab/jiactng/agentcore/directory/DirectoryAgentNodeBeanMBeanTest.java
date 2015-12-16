@@ -4,17 +4,16 @@ import javax.management.openmbean.TabularData;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
-
-import junit.framework.TestCase;
 
 /**
  * This testcase tests the JMX based management interface of an agent.
  *
  * @author Jan Keiser
  */
-public class DirectoryAgentNodeBeanMBeanTest extends TestCase {
+public class DirectoryAgentNodeBeanMBeanTest extends JIACTestForJUnit3 {
 
 	private final String nodeName = "myNode";
 	private final String beanName = "IDirectory";

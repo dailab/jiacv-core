@@ -8,7 +8,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -16,7 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import de.dailab.jiactng.agentcore.IAgent;
+import de.dailab.jiactng.JIACTestForJUnit4;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
@@ -26,7 +25,7 @@ import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
  * @author Hilmi Yildirim
  *
  */
-public class MemoryTest {
+public class MemoryTest extends JIACTestForJUnit4 {
 
 	/**
 	 * constant for a node with one agent
@@ -129,8 +128,6 @@ public class MemoryTest {
 		int numberOfThreads = ManagementFactory.getThreadMXBean().getThreadCount();
 		
 		generateCsvOutput(1, usedHeap, usedNonHeap, 10, numberOfThreads);
-		
-		List<IAgent> agents = node.findAgents();
 	}
 	
 	@Test

@@ -6,14 +6,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.List;
 
-import de.dailab.jiactng.agentcore.action.Action;
+import de.dailab.jiactng.JIACTestForJUnit4;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.lifecycle.LifecycleException;
 
-public class InvokeWithBacktrackingTest {
+public class InvokeWithBacktrackingTest extends JIACTestForJUnit4 {
 	
 	/**
 	 * config id of node with one non faulty agent

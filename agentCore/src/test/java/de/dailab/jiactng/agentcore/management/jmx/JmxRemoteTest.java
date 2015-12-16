@@ -16,7 +16,7 @@ import java.util.Set;
 
 import javax.management.remote.JMXServiceURL;
 
-import junit.framework.TestCase;
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.aamm.ApplicationContext;
 import de.dailab.jiactng.agentcore.IAgentNode;
 
@@ -24,7 +24,7 @@ import de.dailab.jiactng.agentcore.IAgentNode;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class JmxRemoteTest extends TestCase {
+public class JmxRemoteTest extends JIACTestForJUnit3 {
 
 	private class StreamPumper extends Thread {
         private final BufferedReader _reader;
@@ -92,22 +92,8 @@ public class JmxRemoteTest extends TestCase {
         // do we have a URL class loader?
         try {
             ClassLoader loader= mainClass.getClassLoader();
-            System.out.println("JmxClient.class has a " + loader.getClass().getSimpleName());
-
             if(loader instanceof URLClassLoader) {
                 urls= ((URLClassLoader) loader).getURLs();
-                System.out.println("Got URLs of class loader: " + Arrays.asList(urls));
-                for (URL url : urls) {
-                	URLClassLoader cl = new URLClassLoader(new URL[] {url});
-                	try {
-                		cl.loadClass("de.dailab.jiactng.agentcore.management.jmx.JmxClient");
-                    	System.out.println("JmxClient contained in " + url);
-                    	cl.close();
-                	}
-                	catch (ClassNotFoundException e) {
-                    	System.out.println("JmxClient not contained in " + url);
-                	}
-                }
             }
         } catch (Exception e) {
             System.out.println("could not load urls: " + e.getMessage());

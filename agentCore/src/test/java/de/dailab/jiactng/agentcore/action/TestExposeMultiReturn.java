@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit4;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.SimpleAgentNodeMBean;
 import de.dailab.jiactng.agentcore.action.IMethodExposingBean.Expose;
@@ -19,7 +20,7 @@ import de.dailab.jiactng.agentcore.action.IMethodExposingBean.Expose;
  * 
  * @author kuester
  */
-public class TestExposeMultiReturn {
+public class TestExposeMultiReturn extends JIACTestForJUnit4 {
 
 	static IAgentNode node;
 	static ExposeMultiReturnBean bean;

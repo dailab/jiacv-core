@@ -8,8 +8,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Set;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import junit.framework.TestCase;
+import de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean;
 import de.dailab.jiactng.agentcore.util.IdFactory;
 
 /**
@@ -18,6 +22,10 @@ import de.dailab.jiactng.agentcore.util.IdFactory;
  * @author Jan Keiser
  */
 public class PlatformTest extends TestCase {
+
+	static {
+		System.setProperty("log4j.configuration", "myLog4j.properties");
+	}
 
 	private Process process = null;
 	private String nodeId = null;
@@ -121,15 +129,17 @@ public class PlatformTest extends TestCase {
         new StreamPumper(err).start();
         InputStream in = process.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in), 1024);
-        String log = reader.readLine();
         
         // just a workaround to avoid fixing some problems with the input reader right now
         // TODO Do we need these tests anymore? If so, please find a solution to timing and inputstream issue
         
-        if (log != null){
+        for (String log = reader.readLine(); (log != null) && (nodeId == null); log = reader.readLine()){
         	int startIndex = log.indexOf(IdFactory.IdPrefix.Node.toString());
-        	int stopIndex = log.indexOf(" ", startIndex);
-        	nodeId = log.substring(startIndex, stopIndex);
+        	int stopIndex = log.indexOf(".", startIndex);
+        	try {
+        		nodeId = log.substring(startIndex, stopIndex);
+        	}
+        	catch (Exception e) {}
         }
         reader.close();
         in.close();
@@ -158,28 +168,28 @@ public class PlatformTest extends TestCase {
 	 */
 	public void testNonOverwriteDiscoveryURI() throws Exception {
         // launch node
-//		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/defaultPlatformNode.xml");
-//        final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
-//
-//        // wait 20 seconds to ensure synchronization of directories
-//        try {
-//        	Thread.sleep(20000);
-//        }
-//        catch(InterruptedException e) {
-//        	e.printStackTrace();
-//        }
-//
-//        // search for other node
-//        for (IAgentNodeBean bean : node.getAgentNodeBeans()) {
-//        	if (bean instanceof DirectoryAgentNodeBean) {
-//        		Set<String> nodes = ((DirectoryAgentNodeBean)bean).getAllKnownAgentNodes();
-//        		assertTrue("other agent node not found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
-//        	}
-//        }
-//
-//        // shutdown node
-//        node.shutdown();
-//        ac.close();
+		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/defaultPlatformNode.xml");
+        final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
+
+        // wait 15 seconds to ensure synchronization of directories
+        try {
+        	Thread.sleep(15000);
+        }
+        catch(InterruptedException e) {
+        	e.printStackTrace();
+        }
+
+        // search for other node
+        for (IAgentNodeBean bean : node.getAgentNodeBeans()) {
+        	if (bean instanceof DirectoryAgentNodeBean) {
+        		Set<String> nodes = ((DirectoryAgentNodeBean)bean).getAllKnownAgentNodes();
+        		assertTrue("other agent node not found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
+        	}
+        }
+
+        // shutdown node
+        node.shutdown();
+        ac.close();
     }
 
 	/**
@@ -189,28 +199,28 @@ public class PlatformTest extends TestCase {
 	 */
     public void testOverwriteDiscoveryURI() throws Exception {
         // launch node
-//		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/otherPlatformNode.xml");
-//        final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
-//
-//        // wait 20 seconds to ensure synchronization of directories
-//        try {
-//        	Thread.sleep(20000);
-//        }
-//        catch(InterruptedException e) {
-//        	e.printStackTrace();
-//        }
-//
-//        // search for other node
-//        for (IAgentNodeBean bean : node.getAgentNodeBeans()) {
-//        	if (bean instanceof DirectoryAgentNodeBean) {
-//        		Set<String> nodes = ((DirectoryAgentNodeBean)bean).getAllKnownAgentNodes();
-//        		assertFalse("other agent node found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
-//        	}
-//        }
-//
-//        // shutdown node
-//        node.shutdown();
-//        ac.close();
+		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/otherPlatformNode.xml");
+        final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
+
+        // wait 15 seconds to ensure synchronization of directories
+        try {
+        	Thread.sleep(15000);
+        }
+        catch(InterruptedException e) {
+        	e.printStackTrace();
+        }
+
+        // search for other node
+        for (IAgentNodeBean bean : node.getAgentNodeBeans()) {
+        	if (bean instanceof DirectoryAgentNodeBean) {
+        		Set<String> nodes = ((DirectoryAgentNodeBean)bean).getAllKnownAgentNodes();
+        		assertFalse("other agent node found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
+        	}
+        }
+
+        // shutdown node
+        node.shutdown();
+        ac.close();
     }
 
 }

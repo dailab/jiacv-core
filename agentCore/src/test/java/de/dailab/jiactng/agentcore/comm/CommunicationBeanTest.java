@@ -5,12 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
@@ -21,7 +20,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
-public class CommunicationBeanTest extends TestCase {
+public class CommunicationBeanTest extends JIACTestForJUnit3 {
 
 	public static final String ACTION_NAME= "de.dailab.jiactng.agentcore.comm.CommunicationBean#send";
 	private static IAgentNode _communicationPlatform;

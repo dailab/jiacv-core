@@ -3,8 +3,6 @@ package de.dailab.jiactng.agentcore.comm;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sercho.masp.space.event.SpaceEvent;
@@ -12,6 +10,7 @@ import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.IAgentNode;
@@ -26,7 +25,7 @@ import de.dailab.jiactng.agentcore.knowledge.IMemory;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 
 @SuppressWarnings("serial")
-public class CommunicationBeanMessagingTest extends TestCase implements SpaceObserver<IFact>{
+public class CommunicationBeanMessagingTest extends JIACTestForJUnit3 implements SpaceObserver<IFact>{
     
     private static final long MAX_TIMEOUT= 2000;
     
@@ -167,8 +166,6 @@ public class CommunicationBeanMessagingTest extends TestCase implements SpaceObs
 	
 	public void notify(SpaceEvent<? extends IFact> event) {
 		IJiacMessage message = null;
-		ICommunicationAddress at = null;
-		ICommunicationAddress from = null;
 		
 		if(event instanceof WriteCallEvent) {
 			WriteCallEvent<IJiacMessage> wce= (WriteCallEvent<IJiacMessage>) event;

@@ -326,7 +326,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				remoteAgents.put(agentDescription.getAid(), agentDescription);
 			}
 		}
-		// dump("registerAgent " + agentDescription.getAid());
+		if (log.isInfoEnabled()) {
+			log.info("Registered agent:\n" + agentDescription.toString());
+		}
+		dump("registerAgent " + agentDescription.getAid());
 	}
 
 	/**
@@ -495,7 +498,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 			}
 		}
-		log.info("Registered action:\n" + actionDescription.toString());
+		if (log.isInfoEnabled()) {
+			log.info("Registered action:\n" + actionDescription.toString());
+		}
 		dump("registerAction " + actionDescription.getName());
 
 		// TODO register agents that provides this action
@@ -994,9 +999,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	@Override
 	public Logger getLog(String extension) {
-		// TODO Creating a method within the AgentNode to get a log for
-		// AgentNodeBeans and use it here
-		return Logger.getLogger(getClass().getName() + "." + extension);
+		if (agentNode == null) {
+			return null;
+		}
+		return agentNode.getLog(this, extension);
 	}
 
 	@Override
@@ -1280,7 +1286,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		public AgentNodePinger(ICommunicationAddress groupAddress,
 				long aliveInterval, long advertiseInterval) {
 			this.aliveInterval = aliveInterval;
-			this.counter = aliveInterval;
+			this.counter = advertiseInterval;
 			this.advertiseInterval = advertiseInterval;
 			this.groupAddress = groupAddress;
 		}

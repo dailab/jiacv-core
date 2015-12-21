@@ -184,8 +184,55 @@ public class DirectoryAgentBeanGroupTest extends JIACTestForJUnit4 {
 	
 	@After
 	public void clean(){
+		// stop all nodes
 		try {
+			node3.stop();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node2.stop();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node1.stop();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 
+		// wait 3 seconds
+		try {
+			Thread.sleep(3000);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// cleanup all nodes
+		try {
+			node3.cleanup();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node2.cleanup();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node1.cleanup();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+/*		
+		try {
 			node1.doStop();
 			node2.doStop();
 			node3.doStop();
@@ -196,6 +243,6 @@ public class DirectoryAgentBeanGroupTest extends JIACTestForJUnit4 {
 		} catch (Exception e){
 			//do nothing
 		}
-
+*/
 	}
 }

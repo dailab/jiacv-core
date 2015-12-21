@@ -396,8 +396,24 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 * {@inheritDoc}
 	 */
 
+	public Logger getLog(IAgentNodeBean nodeBean, String extension) {
+		return Logger.getLogger(getUUID() + "." + nodeBean.getBeanName() + "." + extension);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+
 	public Logger getLog(IAgent agent) {
 		return Logger.getLogger(getUUID() + "." + agent.getAgentId());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+
+	public Logger getLog(IAgent agent, String extension) {
+		return Logger.getLogger(getUUID() + "." + agent.getAgentId() + "." + extension);
 	}
 
 	/**

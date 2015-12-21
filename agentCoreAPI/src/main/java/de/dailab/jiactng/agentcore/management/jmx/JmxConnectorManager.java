@@ -81,7 +81,7 @@ public final class JmxConnectorManager extends TimerTask {
 	 * via the network interface.
 	 */
 	@Override
-	public void run() {
+	public synchronized void run() {
 		// get all network interfaces
 		Enumeration<NetworkInterface> networkInterfaces;
 		try {
@@ -191,7 +191,7 @@ public final class JmxConnectorManager extends TimerTask {
 	/**
 	 * Removes connector servers of all network interfaces.
 	 */
-	public void removeAll() {
+	public synchronized void removeAll() {
 		// create set of interface names to avoid ConcurrentModificationException
 		Set<String> ifcNames = new HashSet<String>();
 		for (String ifcName : interfaces.keySet()) {

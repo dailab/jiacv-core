@@ -252,7 +252,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		for (ICommunicationAddress groupAddress : groupAddresses) {
 			long aliveInterval = aliveIntervals.get(groupAddress
 					.toUnboundAddress().getName());
-			long advertiseInterval = aliveIntervals.get(groupAddress
+			long advertiseInterval = advertiseIntervals.get(groupAddress
 					.toUnboundAddress().getName());
 			timer.schedule(new AgentNodePinger(groupAddress, aliveInterval,
 					advertiseInterval), aliveInterval, aliveInterval);

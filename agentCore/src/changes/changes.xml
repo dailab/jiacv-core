@@ -42,6 +42,9 @@
 				Advertise local actions with scope WEBSERVICE to other agent nodes.
 			</action>
 			<action dev="keiser" type="fix">
+				Directory has wrongly used alive interval for sending advertisements.
+			</action>
+			<action dev="keiser" type="fix">
 				Missing action result in case of a failed action after user authorization.
 			</action>
 			<action dev="keiser" type="fix">

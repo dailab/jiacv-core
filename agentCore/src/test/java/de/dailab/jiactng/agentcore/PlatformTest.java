@@ -138,15 +138,18 @@ public class PlatformTest extends JIACTestForJUnit3 {
         
         for (String log = reader.readLine(); (log != null) && (nodeId == null); log = reader.readLine()){
         	final int startIndex = log.indexOf(IdFactory.IdPrefix.Node.toString());
-        	int stopIndex = log.length();
-        	for (int i=startIndex+IdFactory.IdPrefix.Node.toString().length(); i<log.length(); i++) {
-        		if (!Character.isLetterOrDigit(log.charAt(i))) {
-        			stopIndex = i;
-        			break;
+        	if (startIndex > -1) {
+        		int stopIndex = log.length();
+        		for (int i=startIndex+IdFactory.IdPrefix.Node.toString().length(); i<log.length(); i++) {
+        			if (!Character.isLetterOrDigit(log.charAt(i))) {
+        				stopIndex = i;
+        				break;
+        			}
         		}
+        		nodeId = log.substring(startIndex, stopIndex);
+        		System.out.println("Other agent node is " + nodeId);
+        		break;
         	}
-        	nodeId = log.substring(startIndex, stopIndex);
-        	System.out.println("Other agent node is " + nodeId);
         }
         reader.close();
         //in.close();
@@ -174,7 +177,7 @@ public class PlatformTest extends JIACTestForJUnit3 {
 	 */
 	public void testNonOverwriteDiscoveryURI() throws Exception {
         // launch node
-		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/defaultPlatformNode.xml");
+		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/defaultNode.xml");
         final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
 
         // wait 15 seconds to ensure synchronization of directories

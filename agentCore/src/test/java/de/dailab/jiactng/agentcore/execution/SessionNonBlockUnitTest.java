@@ -185,8 +185,8 @@ public class SessionNonBlockUnitTest extends TestCase {
     Set<ActionResult> memoryResults = agentMemory.readAll(actResultTemplate);
     assertTrue("Memory contains unexpected ActionResult", memoryResults.size() == 0);
 
-    SessionEvent eventTemplate = new SessionEvent(null);
-    Set<SessionEvent> memoryEvents = agentMemory.readAll(eventTemplate);
+    SessionEvent<Object> eventTemplate = new SessionEvent<>(null);
+    Set<SessionEvent<Object>> memoryEvents = agentMemory.readAll(eventTemplate);
     assertTrue("Memory contains unexpected SessionEvent", memoryEvents.size() == 0);
   }
 

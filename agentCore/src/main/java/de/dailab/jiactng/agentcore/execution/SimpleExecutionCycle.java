@@ -173,11 +173,11 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
           // session has timeout
           log.warn(TIMEOUT_MESSAGE + session);
 
-          final ArrayList<SessionEvent> history = session.getHistory();
+          final ArrayList<SessionEvent<?>> history = session.getHistory();
 
           // Does Session is related to DoAction?
           boolean doActionFound = false;
-          for (SessionEvent event : history) {
+          for (SessionEvent<?> event : history) {
             if (event instanceof DoAction) {
               // doAction found
               doActionFound = true;
@@ -204,9 +204,9 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
                   result = new ActionResult(doAction, new TimeoutException(TIMEOUT_MESSAGE));
                 }
                 
-                if ((doAction.getSource() != null) && (doAction.getSource() instanceof ResultReceiver)) {
+                if (doAction.getSource() != null) {
                   log.debug("sending timeout Result to source of DoAction " + doAction);
-                  final ResultReceiver receiver = (ResultReceiver)doAction.getSource();
+                  final ResultReceiver receiver = doAction.getSource();
 
                   receiver.receiveResult(result);
                 } else {

@@ -190,9 +190,9 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 				}
 			}
 
-			if ((doAction.getSource() != null) && (doAction.getSource() instanceof ResultReceiver)) {
+			if (doAction.getSource() != null) {
 				log.debug("sending timeout Result to source of Session " + session);
-				final ResultReceiver receiver = (ResultReceiver)doAction.getSource();
+				final ResultReceiver receiver = doAction.getSource();
 		
 				receiver.receiveResult(result);
 			} else {
@@ -444,11 +444,11 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 					// session has timeout
 					log.warn(TIMEOUT_MESSAGE + session);
 
-					final ArrayList<SessionEvent> history = session.getHistory();
+					final ArrayList<SessionEvent<?>> history = session.getHistory();
 
 					// Does Session is related to DoAction?
 					boolean doActionFound = false;
-					for (SessionEvent event : history) {
+					for (SessionEvent<?> event : history) {
 						if (event instanceof DoAction) {
 							// doAction found
 							doActionFound = true;

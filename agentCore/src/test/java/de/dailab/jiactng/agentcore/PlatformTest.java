@@ -28,9 +28,11 @@ public class PlatformTest extends JIACTestForJUnit3 {
 
     private class StreamPumper extends Thread {
         private final BufferedReader _reader;
+        private final boolean _errorStream;
 
-        StreamPumper(InputStream in) {
+        StreamPumper(InputStream in, boolean errorStream) {
             _reader = new BufferedReader(new InputStreamReader(in), 1024);
+            _errorStream = errorStream;
         }
 
         @Override
@@ -39,7 +41,8 @@ public class PlatformTest extends JIACTestForJUnit3 {
                 String s;
 
                 while((s = _reader.readLine()) != null) {
-                    if(s.length() > 0) {
+                    if(s.length() > 0 && (_errorStream || s.contains("ERROR"))) {
+                    	System.out.println("Other agent node failed with message: " + s);
                     	fail("Other agent node failed with message: " + s);
                     }
                 }
@@ -99,11 +102,14 @@ public class PlatformTest extends JIACTestForJUnit3 {
                     builder.append(File.pathSeparatorChar);
                 }
 
-                if(path.indexOf(' ') > 0) {
-                    builder.append('"').append(path).append('"');
-                } else {
-                    builder.append(path);
-                }
+                path.replace(" ", "\\ ");
+                builder.append(path);
+
+//                if(path.indexOf(' ') > 0) {
+//                    builder.append('"').append(path).append('"');
+//                } else {
+//                    builder.append(path);
+//                }
             } catch (Exception e) {
                 System.err.println("have to leave out: " + Arrays.asList(urls));
             }
@@ -122,8 +128,9 @@ public class PlatformTest extends JIACTestForJUnit3 {
 
         // read node ID from stdout
         InputStream err = process.getErrorStream();
-        new StreamPumper(err).start();
+        new StreamPumper(err, true).start();
         InputStream in = process.getInputStream();
+        new StreamPumper(in, false).start();
         BufferedReader reader = new BufferedReader(new InputStreamReader(in), 1024);
         
         // just a workaround to avoid fixing some problems with the input reader right now
@@ -134,11 +141,12 @@ public class PlatformTest extends JIACTestForJUnit3 {
         	int stopIndex = log.indexOf(" ", startIndex);
         	try {
         		nodeId = log.substring(startIndex, stopIndex);
+        		System.out.println("Other agent node is " + nodeId);
         	}
         	catch (Exception e) {}
         }
         reader.close();
-        in.close();
+        //in.close();
 
 		super.setUp();
 	}
@@ -165,6 +173,8 @@ public class PlatformTest extends JIACTestForJUnit3 {
         // launch node
 		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/defaultPlatformNode.xml");
         final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
+        final DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) ac.getBean("IDirectory");
+        directory.setLogLevel("DEBUG");
 
         // wait 15 seconds to ensure synchronization of directories
         try {
@@ -178,6 +188,7 @@ public class PlatformTest extends JIACTestForJUnit3 {
         for (IAgentNodeBean bean : node.getAgentNodeBeans()) {
         	if (bean instanceof DirectoryAgentNodeBean) {
         		Set<String> nodes = ((DirectoryAgentNodeBean)bean).getAllKnownAgentNodes();
+        		System.out.println(nodes.size() + " known agent nodes");
         		assertTrue("other agent node not found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         	}
         }

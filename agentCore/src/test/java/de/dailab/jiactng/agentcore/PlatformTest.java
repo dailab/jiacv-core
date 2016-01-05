@@ -188,10 +188,15 @@ public class PlatformTest extends JIACTestForJUnit3 {
         for (IAgentNodeBean bean : node.getAgentNodeBeans()) {
         	if (bean instanceof DirectoryAgentNodeBean) {
         		Set<String> nodes = ((DirectoryAgentNodeBean)bean).getAllKnownAgentNodes();
-        		System.out.println(nodes.size() + " known agent nodes");
+        		System.out.println("Known agent nodes:");
+        		for (String id : nodes) {
+            		System.out.println("\t"+id);
+        		}
+        		System.out.println("Other agent node " + DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId + " found: " + nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         		assertTrue("other agent node not found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         	}
         }
+        System.out.println("testNonOverwriteDiscoveryURI finished");
 
         // shutdown node
         node.shutdown();
@@ -207,6 +212,8 @@ public class PlatformTest extends JIACTestForJUnit3 {
         // launch node
 		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/otherPlatformNode.xml");
         final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
+        final DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) ac.getBean("IDirectory");
+        directory.setLogLevel("DEBUG");
 
         // wait 15 seconds to ensure synchronization of directories
         try {
@@ -220,9 +227,15 @@ public class PlatformTest extends JIACTestForJUnit3 {
         for (IAgentNodeBean bean : node.getAgentNodeBeans()) {
         	if (bean instanceof DirectoryAgentNodeBean) {
         		Set<String> nodes = ((DirectoryAgentNodeBean)bean).getAllKnownAgentNodes();
+        		System.out.println("Known agent nodes:");
+        		for (String id : nodes) {
+            		System.out.println("\t"+id);
+        		}
+        		System.out.println("Other agent node " + DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId + " found: " + nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         		assertFalse("other agent node found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         	}
         }
+        System.out.println("testOverwriteDiscoveryURI finished");
 
         // shutdown node
         node.shutdown();

@@ -41,7 +41,7 @@ public class PlatformTest extends JIACTestForJUnit3 {
                 String s;
 
                 while((s = _reader.readLine()) != null) {
-                    if(s.length() > 0 && (_errorStream || s.contains("ERROR"))) {
+                    if(s.length() > 0 && (_errorStream || s.contains("FATAL")|| s.contains("ERROR"))) {
                     	System.out.println("Other agent node failed with message: " + s);
                     	fail("Other agent node failed with message: " + s);
                     }
@@ -137,13 +137,16 @@ public class PlatformTest extends JIACTestForJUnit3 {
         // TODO Do we need these tests anymore? If so, please find a solution to timing and inputstream issue
         
         for (String log = reader.readLine(); (log != null) && (nodeId == null); log = reader.readLine()){
-        	int startIndex = log.indexOf(IdFactory.IdPrefix.Node.toString());
-        	int stopIndex = log.indexOf(" ", startIndex);
-        	try {
-        		nodeId = log.substring(startIndex, stopIndex);
-        		System.out.println("Other agent node is " + nodeId);
+        	final int startIndex = log.indexOf(IdFactory.IdPrefix.Node.toString());
+        	int stopIndex = log.length();
+        	for (int i=startIndex+IdFactory.IdPrefix.Node.toString().length(); i<log.length(); i++) {
+        		if (!Character.isLetterOrDigit(log.charAt(i))) {
+        			stopIndex = i;
+        			break;
+        		}
         	}
-        	catch (Exception e) {}
+        	nodeId = log.substring(startIndex, stopIndex);
+        	System.out.println("Other agent node is " + nodeId);
         }
         reader.close();
         //in.close();
@@ -173,8 +176,6 @@ public class PlatformTest extends JIACTestForJUnit3 {
         // launch node
 		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/defaultPlatformNode.xml");
         final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
-        final DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) ac.getBean("IDirectory");
-        directory.setLogLevel("DEBUG");
 
         // wait 15 seconds to ensure synchronization of directories
         try {
@@ -192,11 +193,9 @@ public class PlatformTest extends JIACTestForJUnit3 {
         		for (String id : nodes) {
             		System.out.println("\t"+id);
         		}
-        		System.out.println("Other agent node " + DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId + " found: " + nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         		assertTrue("other agent node not found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         	}
         }
-        System.out.println("testNonOverwriteDiscoveryURI finished");
 
         // shutdown node
         node.shutdown();
@@ -212,8 +211,6 @@ public class PlatformTest extends JIACTestForJUnit3 {
         // launch node
 		ClassPathXmlApplicationContext ac = new ClassPathXmlApplicationContext("de/dailab/jiactng/agentcore/otherPlatformNode.xml");
         final SimpleAgentNode node = (SimpleAgentNode) ac.getBean("myNode");
-        final DirectoryAgentNodeBean directory = (DirectoryAgentNodeBean) ac.getBean("IDirectory");
-        directory.setLogLevel("DEBUG");
 
         // wait 15 seconds to ensure synchronization of directories
         try {
@@ -231,11 +228,9 @@ public class PlatformTest extends JIACTestForJUnit3 {
         		for (String id : nodes) {
             		System.out.println("\t"+id);
         		}
-        		System.out.println("Other agent node " + DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId + " found: " + nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         		assertFalse("other agent node found", nodes.contains(DirectoryAgentNodeBean.ADDRESS_NAME+"@"+nodeId));
         	}
         }
-        System.out.println("testOverwriteDiscoveryURI finished");
 
         // shutdown node
         node.shutdown();

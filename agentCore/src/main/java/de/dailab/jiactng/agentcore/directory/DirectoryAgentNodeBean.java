@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -644,9 +645,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			}
 		}
 		synchronized (remoteActions) {
-			for (String nodeAddress : remoteActions.keySet()) {
-				final Set<IActionDescription> adset = remoteActions
-						.get(nodeAddress);
+			for (Set<IActionDescription> adset : remoteActions.values()) {
 				for (IActionDescription ad : adset) {
 					if (ad.matches(template)) {
 						return ad;
@@ -731,8 +730,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			}
 		}
 		synchronized (remoteActions) {
-			for (String nodeAddress : remoteActions.keySet()) {
-				final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
+			for (Set<IActionDescription> adset : remoteActions.values()) {
 				for (IActionDescription ad : adset) {
 					if (ad.matches(template)) {
 						actions.add(ad);
@@ -1142,9 +1140,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		// find serviceDescriptions in remote Actions
 		synchronized (remoteActions) {
-			for (String nodeAddress : remoteActions.keySet()) {
-				final Set<IActionDescription> remoteActSet = remoteActions
-						.get(nodeAddress);
+			for (Set<IActionDescription> remoteActSet : remoteActions.values()) {
 				for (IActionDescription remoteAct : remoteActSet) {
 				    if (remoteAct.getSemanticServiceDescriptionIRI() != null && ! remoteAct.getSemanticServiceDescriptionIRI().isEmpty()){
 						try {
@@ -1332,17 +1328,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	private void removeRemoteAgentOfNode(String nodeAddress) {
-		final ArrayList<String> keysToRemove = new ArrayList<String>();
 		synchronized (remoteAgents) {
-			for (String key : remoteAgents.keySet()) {
-				final IAgentDescription agent = remoteAgents.get(key);
-				if (nodeAddress.equals(ADDRESS_NAME + "@"
-						+ agent.getAgentNodeUUID())) {
-					keysToRemove.add(key);
+			for (final Iterator<IAgentDescription> entries = remoteAgents.values().iterator(); entries.hasNext(); ) {
+				final IAgentDescription agent = entries.next();
+				if (nodeAddress.equals(ADDRESS_NAME + "@" + agent.getAgentNodeUUID())) {
+					entries.remove();
 				}
-			}
-			for (String key : keysToRemove) {
-				remoteAgents.remove(key);
 			}
 		}
 	}
@@ -1359,8 +1350,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			System.out.println("Registered local actions:  "
 					+ localActions.size());
 			int actions = 0;
-			for (String key : remoteActions.keySet()) {
-				actions += remoteActions.get(key).size();
+			for (Set<IActionDescription> actionSet : remoteActions.values()) {
+				actions += actionSet.size();
 			}
 			System.out.println("Registered remote agents:  "
 					+ remoteAgents.size());

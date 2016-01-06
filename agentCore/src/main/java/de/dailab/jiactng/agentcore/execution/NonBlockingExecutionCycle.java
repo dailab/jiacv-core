@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Future;
@@ -297,100 +298,6 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 		}
 		updateWorkload(ACTION_RESULT, resultProcessed);
 	}
-
-	/**
-	 * Handles auto-invocation of actions.
-	 * @see de.dailab.jiactng.agentcore.AbstractAgentBean#invoke(IActionDescription, Serializable[])
-	 */
-	protected void processAutoExecutionServices(){
-		  if(autoExecutionServices != null){
-			  List<String> trash = new ArrayList<String>();
-			  for(String actionName : autoExecutionServices.keySet()){
-				  Map<String, Serializable> config = autoExecutionServices.get(actionName);
-				  Object startTimeO = config.get("startTime");
-				  Object intervalTimeO = config.get("intervalTime");
-				  String providerName = (String) config.get("provider");
-				  Integer startTime = null;
-				  Integer intervalTime = null;
-				  if(startTimeO != null){
-					  startTime = Integer.parseInt(startTimeO.toString());
-				  }if(intervalTimeO != null){
-					 intervalTime = Integer.parseInt(intervalTimeO.toString());
-				  }
-				  if(startTime != null){
-					  if(startTime > (System.currentTimeMillis() - time)){
-						  continue;
-					  }
-					  
-					  if(intervalTime == null ){
-						  if(servicesExecutionTimes.get(actionName) >= 1){
-							  trash.add(actionName);
-							  continue;
-						  }
-					  }else if((System.currentTimeMillis() - time - startTime) / intervalTime < servicesExecutionTimes.get(actionName)){
-						  continue;
-					  }
-				  }else{
-					 if(intervalTime == null){
-						 if(servicesExecutionTimes.get(actionName) >= 1){
-							 trash.add(actionName);
-							 continue;
-						 }
-					 }else if((System.currentTimeMillis() - time) / intervalTime < servicesExecutionTimes.get(actionName)){
-						  continue;					  
-					  }
-				  }
-				  servicesExecutionTimes.put(actionName, servicesExecutionTimes.get(actionName) + 1);
-				  Action action = new Action(actionName);
-				  IActionDescription actionD = null;
-				  if(providerName == null){
-					  actionD = thisAgent.searchAction(action);
-				  }else{
-					  List<IActionDescription> actions = thisAgent.searchAllActions(action);
-					  for(IActionDescription a : actions){
-						  if(a.getProviderDescription().getName().equals(providerName)){
-							  actionD = a;
-						  }
-					  }
-				  }
-				  if(actionD == null){
-					  log.warn("Action: " + actionName + " not found");
-					  continue;
-				  }
-				  List<Serializable> params = (List<Serializable>) config.get("params");
-				  Serializable[] p = null;
-				  if(params != null){
-					  List<Class<?>> paramTypes = null;
-					  try {
-							paramTypes = actionD.getInputTypes();
-						} catch (ClassNotFoundException e) {
-							e.printStackTrace();
-						}
-					  p = new Serializable[params.size()];
-					  for(int i = 0; i < params.size(); i++){
-						  Class<?> inputType = paramTypes.get(i);
-						  String inputTypeAsString = inputType.toString();
-						  if(inputTypeAsString.equals("int") || inputTypeAsString.equals("class java.lang.Integer")){
-							  p[i] = (Serializable) Integer.parseInt((String)params.get(i));
-						  }else if(inputTypeAsString.equals("double") || inputTypeAsString.equals("class java.lang.Double")){
-							  p[i] = (Serializable) Double.parseDouble((String)params.get(i));
-						  }else if(inputTypeAsString.equals("boolean") || inputTypeAsString.equals("class java.lang.Boolean")){
-							  p[i] = (Serializable) Boolean.parseBoolean((String)params.get(i));
-						  }else{
-							  p[i] = (Serializable) inputType.cast(params.get(i));
-						  }
-						 
-					  }
-				  }
-				  invoke(actionD, p);
-
-			  }
-			  for(String actionName : trash){
-				  autoExecutionServices.remove(actionName);
-				  servicesExecutionTimes.remove(actionName);
-			  }
-		  }
-	  }
 
 	/**
 	 * Cancels all threads, which timeout was reached, 

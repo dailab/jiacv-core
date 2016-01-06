@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.management.MBeanNotificationInfo;
@@ -591,9 +592,9 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             log.info("Registering all addresses and listeners on transport '" + transport.getTransportIdentifier()
                     + "'");
         }
-        for (ICommunicationAddress address : addressToListenerMap.keySet()) {
-            for (ListenerContext context : addressToListenerMap.get(address)) {
-                transport.listen(address, context.selector);
+        for (Entry<ICommunicationAddress, List<ListenerContext>> entry : addressToListenerMap.entrySet()) {
+            for (ListenerContext context : entry.getValue()) {
+                transport.listen(entry.getKey(), context.selector);
             }
         }
     }
@@ -768,19 +769,18 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
 	/**
 	 * {@inheritDoc}
 	 */
-    @SuppressWarnings("unchecked")
     public CompositeData getSelectorsOfAddresses() {
         CompositeData data = null;
         final int size = addressToListenerMap.size();
         final String[] itemNames = new String[size];
-        final OpenType[] itemTypes = new OpenType[size];
+        final OpenType<?>[] itemTypes = new OpenType[size];
         final Object[] itemValues = new Object[size];
         final Object[] addresses = addressToListenerMap.keySet().toArray();
         try {
             for (int i = 0; i < size; i++) {
                 final ICommunicationAddress address = (ICommunicationAddress) addresses[i];
                 itemNames[i] = address.getName();
-                itemTypes[i] = new ArrayType(1, SimpleType.STRING);
+                itemTypes[i] = new ArrayType<String>(1, SimpleType.STRING);
                 final List<ListenerContext> values = addressToListenerMap.get(address);
                 final String[] value = new String[values.size()];
                 final Iterator<ListenerContext> it = values.iterator();

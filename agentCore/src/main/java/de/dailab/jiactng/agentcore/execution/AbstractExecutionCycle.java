@@ -2,7 +2,10 @@ package de.dailab.jiactng.agentcore.execution;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.management.AttributeChangeNotification;
@@ -22,6 +25,7 @@ import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.ActionPerformedNotification;
 import de.dailab.jiactng.agentcore.management.jmx.DoActionState;
+import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * Super class for all implementations of JIAC TNG agent execution cycles.
@@ -393,6 +397,99 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
          super(s);
       }
    }
+
+	/**
+	 * Handles auto-invocation of actions.
+	 * @see de.dailab.jiactng.agentcore.AbstractAgentBean#invoke(IActionDescription, Serializable[])
+	 */
+	protected void processAutoExecutionServices(){
+		if(autoExecutionServices != null){
+			for(final Iterator<Entry<String, Map<String, Serializable>>> entries = autoExecutionServices.entrySet().iterator(); entries.hasNext(); ){
+				final Entry<String, Map<String, Serializable>> entry = entries.next();
+				final String actionName = entry.getKey();
+				final Map<String, Serializable> config = entry.getValue();
+				Object startTimeO = config.get("startTime");
+				Object intervalTimeO = config.get("intervalTime");
+				String providerName = (String) config.get("provider");
+				Integer startTime = null;
+				Integer intervalTime = null;
+				if(startTimeO != null){
+					startTime = Integer.parseInt(startTimeO.toString());
+				}if(intervalTimeO != null){
+					intervalTime = Integer.parseInt(intervalTimeO.toString());
+				}
+				if(startTime != null){
+					if(startTime > (System.currentTimeMillis() - time)){
+						continue;
+					}
+
+					if(intervalTime == null ){
+						if(servicesExecutionTimes.get(actionName) >= 1){
+							servicesExecutionTimes.remove(actionName);
+							entries.remove();
+							continue;
+						}
+					}else if((System.currentTimeMillis() - time - startTime) / intervalTime < servicesExecutionTimes.get(actionName)){
+						continue;
+					}
+				}else{
+					if(intervalTime == null){
+						if(servicesExecutionTimes.get(actionName) >= 1){
+							servicesExecutionTimes.remove(actionName);
+							entries.remove();
+							continue;
+						}
+					}else if((System.currentTimeMillis() - time) / intervalTime < servicesExecutionTimes.get(actionName)){
+						continue;					  
+					}
+				}
+				servicesExecutionTimes.put(actionName, servicesExecutionTimes.get(actionName) + 1);
+				Action action = new Action(actionName);
+				IActionDescription actionD = null;
+				if(providerName == null){
+					actionD = thisAgent.searchAction(action);
+				}else{
+					List<IActionDescription> actions = thisAgent.searchAllActions(action);
+					for(IActionDescription a : actions){
+						if(a.getProviderDescription().getName().equals(providerName)){
+							actionD = a;
+						}
+					}
+				}
+				if(actionD == null){
+					log.warn("Action: " + actionName + " not found");
+					continue;
+				}
+				List<Serializable> params = (List<Serializable>) config.get("params");
+				Serializable[] p = null;
+				if(params != null){
+					List<Class<?>> paramTypes = null;
+					try {
+						paramTypes = actionD.getInputTypes();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+					p = new Serializable[params.size()];
+					for(int i = 0; i < params.size(); i++){
+						Class<?> inputType = paramTypes.get(i);
+						String inputTypeAsString = inputType.toString();
+						if(inputTypeAsString.equals("int") || inputTypeAsString.equals("class java.lang.Integer")){
+							p[i] = (Serializable) Integer.parseInt((String)params.get(i));
+						}else if(inputTypeAsString.equals("double") || inputTypeAsString.equals("class java.lang.Double")){
+							p[i] = (Serializable) Double.parseDouble((String)params.get(i));
+						}else if(inputTypeAsString.equals("boolean") || inputTypeAsString.equals("class java.lang.Boolean")){
+							p[i] = (Serializable) Boolean.parseBoolean((String)params.get(i));
+						}else{
+							p[i] = (Serializable) inputType.cast(params.get(i));
+						}
+
+					}
+				}
+				invoke(actionD, p);
+
+			}
+		}
+	}
 
    /**
     * {@inheritDoc}

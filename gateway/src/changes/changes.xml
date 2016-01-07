@@ -6,14 +6,17 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.2.1" date="t.b.a" description="Minor release">
+		<release version="5.2.1" date="2016-01-07" description="Minor release">
+			<action dev="keiser" type="change">
+				Logging framework changed from CommonsLogging to Log4j.
+			</action>
 		</release>
-		<release version="5.2.0" date="t.b.a" description="Major release">
+		<release version="5.2.0" date="2015-11-12" description="Major release">
 			<action dev="mattu" type="update">
 				Updated ActiveMQ version from 5.7.0 to 5.11.1.
 			</action>
-			<action dev="keiser" type="change">
-				Logging framework changed from CommonsLogging to Log4j.
+			<action dev="rakow" type="update">
+				Updated SLF4J version from 1.6.1 to 1.7.12.
 			</action>
 		</release>
 		<release version="5.1.5" date="2014-2-12" description="Minor release">

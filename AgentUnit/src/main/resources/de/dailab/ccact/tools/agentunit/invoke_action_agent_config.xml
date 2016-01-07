@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+	<bean name="InvokeActionAgent" parent="NonBlockingAgent">
+		<property name="agentBeans">
+			<list>
+				<ref bean="InvokeActionBean" />
+			</list>
+		</property>
+	</bean>
+	<bean name="InvokeActionBean" class="de.dailab.ccact.tools.agentunit.InvokeActionBean"
+		singleton="false">
+		<property name="logLevel" value="WARN" />
+	</bean>
+</beans>

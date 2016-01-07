@@ -705,6 +705,7 @@
 		<module>agentCoreAPI</module>
 		<module>gateway</module>
 		<module>agentCore</module>
+		<module>AgentUnit</module>
 	</modules>
 
 	<profiles>

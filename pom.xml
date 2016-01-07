@@ -653,15 +653,23 @@
 			<id>dai-repository</id>
 			<url>scp://repositories.dai-labor.de/export/home/local/maven/sites/jiactng/${project.version}</url>
 		</site>
+<!--	Deployment on Release and Edu not necessary, since Open is accessible by all.
 		<repository>
 			<id>dai-releases</id>
 			<name>dai-releases</name>
 			<url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
 		</repository>
-		<!-- <repository> <id>dai-open</id> <name>DAI Open</name> <url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url> 
-			</repository> -->
-		<!-- <repository> <id>edu-releases</id> <name>Edu Repository</name> <url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> 
-			</repository> -->
+		<repository>
+			<id>edu-releases</id>
+			<name>Edu Repository</name>
+			<url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> 
+		</repository>
+-->
+		<repository>
+			<id>dai-open</id>
+			<name>DAI Open</name>
+			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url> 
+		</repository>
 		<snapshotRepository>
 			<id>dai-snapshots</id>
 			<name>dai-snapshots</name>
@@ -689,8 +697,8 @@
 	<scm>
 		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
 		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 	
 	<modules>
 		<!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->

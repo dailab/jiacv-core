@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.dailab</groupId>
 		<artifactId>jiactng</artifactId>
-		<version>5.2.1-SNAPSHOT</version>
+		<version>5.2.1</version>
 		</parent>
 	
 	<groupId>de.dailab.jiactng</groupId>

@@ -171,6 +171,10 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		} else {
 			System.setProperty("log4j.configuration", "jiactng_log4j.properties");
 		}
+		// to prevent java.net.SocketException: Can't assign requested address on Mac
+		// see https://redmine.dai-labor.de/redmine/issues/13040
+		System.setProperty("java.net.preferIPv4Stack", "true");
+		
 		System.setProperty("spring.rootconfigfile", args[0]);
 		new ClassPathXmlApplicationContext(args[0]);
 	}

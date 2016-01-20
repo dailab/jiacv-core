@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.activemq.command.DiscoveryEvent;
 import org.apache.activemq.transport.discovery.DiscoveryAgent;
 import org.apache.activemq.transport.discovery.DiscoveryListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiac.net.discovery.SourceAwareDiscoveryEvent;
 
@@ -44,7 +44,7 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent, Runna
     public static final String DEFAULT_HOST_IP  = System.getProperty("activemq.partition.discovery", "239.255.2.3"); 
     public static final int    DEFAULT_PORT  = 6155; 
         
-    private static final Log LOG = LogFactory.getLog(SourceAwareMulticastDiscoveryAgent.class);
+	private static final Logger LOG = Logger.getLogger(SourceAwareMulticastDiscoveryAgent.class);
     private static final String TYPE_SUFFIX = "ActiveMQ-4.";
     private static final String ALIVE = "alive.";
     private static final String DEAD = "dead.";
@@ -434,7 +434,7 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent, Runna
                 fireServiceAddEvent(data);
                 doAdvertizeSelf();
             } else {
-                if(!data.sourceAddress.equals(source) && LOG.isWarnEnabled()) {
+                if(!data.sourceAddress.equals(source) && LOG.isEnabledFor(Level.WARN)) {
                     LOG.warn("Received ALIVE message from remote broker '" + brokerName + "/" + service + "(" + data.sourceAddress + ") from different address: " + source);
                     // FIXME ignore the packet?
                 }
@@ -451,7 +451,7 @@ public class SourceAwareMulticastDiscoveryAgent implements DiscoveryAgent, Runna
         if (!service.equals(selfService)) {
             RemoteBrokerData data = brokersByService.remove(service);
             if (data != null && !data.isFailed()) {
-                if(!data.sourceAddress.equals(source) && LOG.isWarnEnabled()) {
+                if(!data.sourceAddress.equals(source) && LOG.isEnabledFor(Level.WARN)) {
                     LOG.warn("Received DEAD message from remote broker '" + data.brokerName + "/" + service + "(" + data.sourceAddress + ") from different address: " + source);
                     // FIXME ignore the packet?
                 }

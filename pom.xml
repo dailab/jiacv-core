@@ -1,15 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab</groupId>
 	<artifactId>jiactng</artifactId>
-	<version>5.1.6-SNAPSHOT</version>
+	<version>5.2.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Java-based Intelligent Agent Componentware TNG</name>
+	<name>Java-based Intelligent Agent Componentware, Version 5</name>
 	<description>
-      JIAC TNG is a framework to fast and efficiently develop agent-based applications and services.
+      JIAC V is a framework to fast and efficiently develop agent-based applications and services.
    </description>
 	<url>http://repositories.dai-labor.de/sites/jiactng/${project.version}/</url>
 	<inceptionYear>2006</inceptionYear>
@@ -285,10 +284,7 @@
 
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.2.1</version>
-				<configuration>
-					<tagBase>https://cvs.dai-labor.de/jiac/jiac-tng/tags</tagBase>
-				</configuration>
+				<version>2.5.3</version>
 			</plugin>
 
 			<plugin>
@@ -657,15 +653,23 @@
 			<id>dai-repository</id>
 			<url>scp://repositories.dai-labor.de/export/home/local/maven/sites/jiactng/${project.version}</url>
 		</site>
+<!--	Deployment on Release and Edu not necessary, since Open is accessible by all.
 		<repository>
 			<id>dai-releases</id>
 			<name>dai-releases</name>
 			<url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
 		</repository>
-		<!-- <repository> <id>dai-open</id> <name>DAI Open</name> <url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url> 
-			</repository> -->
-		<!-- <repository> <id>edu-releases</id> <name>Edu Repository</name> <url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> 
-			</repository> -->
+		<repository>
+			<id>edu-releases</id>
+			<name>Edu Repository</name>
+			<url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> 
+		</repository>
+-->
+		<repository>
+			<id>dai-open</id>
+			<name>DAI Open</name>
+			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url> 
+		</repository>
 		<snapshotRepository>
 			<id>dai-snapshots</id>
 			<name>dai-snapshots</name>
@@ -691,24 +695,17 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:https://git.dai-labor.de/jiac-v/core/</connection>
-		<developerConnection>scm:git:https://git.dai-labor.de/jiac-v/core/</developerConnection>
-		<url>https://git.dai-labor.de/jiac-v/core/</url>
+		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
+		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
+		<tag>HEAD</tag>
 	</scm>
-
+	
 	<modules>
 		<!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->
 		<module>agentCoreAPI</module>
 		<module>gateway</module>
 		<module>agentCore</module>
-		<!-- <module>protocol</module> -->
-		<!-- <module>jiacSecurity</module> -->
-		<!-- <module>bdiAgent</module> -->
-		<!-- <module>ruleEngine</module> -->
-		<!-- <module>tomcatStarter</module> -->
-		<!-- <module>basicServices</module> -->
-		<!-- <module>examples</module> -->
-		<!-- <module>tools</module> -->
+		<module>AgentUnit</module>
 	</modules>
 
 	<profiles>

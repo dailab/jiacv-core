@@ -33,8 +33,7 @@ import org.apache.activemq.util.IntrospectionSupport;
 import org.apache.activemq.util.ServiceStopper;
 import org.apache.activemq.util.ServiceSupport;
 import org.apache.activemq.util.URISupport;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This class is mainly a clone of {@link DiscoveryNetworkConnector}!
@@ -44,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  * @version $Revision$
  */
 public class SourceAwareDiscoveryNetworkConnector extends NetworkConnector implements DiscoveryListener {
-    private static final Log LOG = LogFactory.getLog(SourceAwareDiscoveryNetworkConnector.class);
+	private static final Logger LOG = Logger.getLogger(SourceAwareDiscoveryNetworkConnector.class);
 
     private DiscoveryAgent discoveryAgent;
     

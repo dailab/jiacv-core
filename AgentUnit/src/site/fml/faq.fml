@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://maven.apache.org/maven-1.x/plugins/faq/faq.xsd" title="Frequently Asked Questions" toplink="false">
+    <part id="general">
+        <title>General</title>
+        <faq id="whats-moduletemplate">
+            <question>What is ModuleTemplate?</question>
+            <answer>
+                <p>It is a <a href="http://maven.apache.org">Maven</a> module template for JIAC TNG.
+                </p>
+            </answer>
+        </faq>
+    </part>
+    <part id="how-to">
+        <title>How to use ModuleTemplate</title>
+        <faq id="how-use">
+            <question>How do I use ModuleTemplate?</question>
+            <answer>
+                <p>Just copy it and rename all <i>ModuleTemplate</i> occurrences. Adapt it to your needs.</p>
+            </answer>
+        </faq>
+    </part>
+</faqs>

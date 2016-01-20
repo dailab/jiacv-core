@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+	<bean name="ActionTesterNodeTestNode" parent="Node">
+
+		<property name="agents">
+			<list>
+				<ref bean="TestAgent" />
+			</list>
+		</property>
+
+		<property name="agentNodeBeans">
+			<list>
+				<ref bean="StandardJMSBroker" />
+				<ref bean="iDirectory" />
+			</list>
+		</property>
+
+	</bean>
+
+
+	<bean name="TestAgent" parent="NonBlockingAgent">
+		<property name="agentBeans">
+			<list>
+				<ref bean="TestMethodExposingBean" />
+				<ref bean="CommunicationBean" />
+			</list>
+		</property>
+	</bean>
+
+	<bean name="TestMethodExposingBean"
+		class="de.dailab.ccact.tools.agentunit.TestMethodExposingBean"
+		singleton="false">
+		<property name="logLevel" value="WARN" />
+		<!-- property name="registeredActions">
+			<set>
+				<value>testAction</value>
+			</set>
+		</property-->
+	</bean>
+
+	<bean name="iDirectory"
+		class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean"
+		singleton="false">
+		<property name="messageTransport">
+			<ref bean="StandardJMSMessageTransport" />
+		</property>
+	</bean>
+
+
+</beans>

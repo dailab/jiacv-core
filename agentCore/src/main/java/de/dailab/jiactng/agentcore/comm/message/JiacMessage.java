@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.management.openmbean.CompositeData;
@@ -205,9 +206,9 @@ public final class JiacMessage implements IJiacMessage {
          builder.append("[Headers: {");
          int counter = headers.size() - 1;
 
-         for (final Iterator<String> keys = headers.keySet().iterator(); keys.hasNext(); --counter) {
-            final String key = keys.next();
-            builder.append(key).append("=>").append(headers.get(key));
+         for (final Iterator<Entry<String,String>> entries = headers.entrySet().iterator(); entries.hasNext(); --counter) {
+            final Entry<String,String> entry = entries.next();
+            builder.append(entry.getKey()).append("=>").append(entry.getValue());
 
             if (counter > 0) {
                builder.append(";");

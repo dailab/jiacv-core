@@ -13,6 +13,7 @@ import org.apache.activemq.broker.TransportConnector;
 import org.apache.activemq.broker.jmx.ManagementContext;
 import org.apache.activemq.network.DiscoveryNetworkConnector;
 import org.apache.activemq.network.NetworkConnector;
+import org.apache.log4j.Level;
 
 import de.dailab.jiac.net.SourceAwareDiscoveryNetworkConnector;
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
@@ -217,7 +218,12 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 		}
 
 		this._broker.start();
-		this.log.debug("started broker");
+		if (this._broker.waitUntilStarted()) {
+			this.log.info("Broker successfully started");
+		}
+		else {
+			this.log.error("Broker NOT started!");
+		}
 	}
 
 	/**
@@ -228,10 +234,32 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 	 */
 	@Override
 	public void doCleanup() throws Exception {
-		this.log.debug("stopping broker");
+		this.log.debug("Stopping broker");
+
+		// stopping all connectors
+		for (TransportConnector connector : this._broker.getTransportConnectors()) {
+			try {
+				this.log.debug("Stopping transport connector " + connector.getName());
+				connector.stop();
+			}
+			catch (Exception e) {
+				this.log.error("Unable to stop transport connector " + connector.getName());
+			}
+		}
+		for (NetworkConnector connector : this._broker.getNetworkConnectors()) {
+			try {
+				this.log.debug("Stopping network connector " + connector.getName());
+				connector.stop();
+			}
+			catch (Exception e) {
+				this.log.error("Unable to stop network connector " + connector.getName());
+			}
+		}
+
+		// stopping broker service
 		this._broker.stop();
 		// _broker.waitUntilStopped();
-		this.log.debug("stopping broker done");
+		this.log.info("Broker has been stopped");
 		this._broker = null;
 	}
 
@@ -372,7 +400,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 																							"\"" + connector.getName() + ":" + connector.getTransportURI() + "\"",
 																							connector);
 		} catch (Exception e) {
-			if ((this.log != null) && (this.log.isErrorEnabled())) {
+			if ((this.log != null) && (this.log.isEnabledFor(Level.ERROR))) {
 				this.log.error("WARNING: Unable to register transport connector " + connector.getName() + ":"
 																								+ connector.getTransportURI() + " of the broker of agent node "
 																								+ this.getAgentNode().getName() + " as JMX resource.", e);
@@ -403,7 +431,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 																							ActiveMQTransportConnectorMBean.RESOURCE_TYPE,
 																							"\"" + connector.getName() + ":" + connector.getTransportURI() + "\"");
 		} catch (Exception e) {
-			if ((this.log != null) && (this.log.isErrorEnabled())) {
+			if ((this.log != null) && (this.log.isEnabledFor(Level.ERROR))) {
 				this.log.error("WARNING: Unable to deregister transport connector " + connector.getName() + ":"
 																								+ connector.getTransportURI() + " of the broker of agent node "
 																								+ this.getAgentNode().getName() + " as JMX resource.");

@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
@@ -68,8 +69,8 @@ public class SimpleMessageTransport extends MessageTransport {
       }
 
       // check the templates for each listener
-      for (SimpleMessageTransport destination : listenerToSelectorMap.keySet()) {
-        Set<IJiacMessage> selectorSet = listenerToSelectorMap.get(destination);
+      for (Entry<SimpleMessageTransport, Set<IJiacMessage>> entry : listenerToSelectorMap.entrySet()) {
+        Set<IJiacMessage> selectorSet = entry.getValue();
 
         if (selectorSet == null) {
           // no selectors found - should not really happen, as empty selectors
@@ -100,7 +101,7 @@ public class SimpleMessageTransport extends MessageTransport {
               bais.close();
 
               // call receiver with message
-              destination.delegateMessage(newMessage, address);
+              entry.getKey().delegateMessage(newMessage, address);
               messageDelegated = true;
 
             } catch (Exception ex) {

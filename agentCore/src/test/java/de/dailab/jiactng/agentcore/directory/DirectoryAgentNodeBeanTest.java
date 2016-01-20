@@ -4,15 +4,15 @@ import java.util.List;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 import de.dailab.jiactng.agentcore.ontology.AgentDescription;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
-import junit.framework.TestCase;
 
-public class DirectoryAgentNodeBeanTest extends TestCase {
+public class DirectoryAgentNodeBeanTest extends JIACTestForJUnit3 {
 	private final String nodeName = "myNode";
 	private final String beanName = "IDirectory";
 	private final String actionBeanName = "AgentBeanWithActions";

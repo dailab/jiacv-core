@@ -5,15 +5,15 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.IAgentBean;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
-import junit.framework.TestCase;
 
 /**
  * This testcase tests if the non-blocking execution cycle allows the synchronously invocation of actions.
  * @author Jan Keiser
  */
-public class NonBlockingExecutionCycleTest extends TestCase {
+public class NonBlockingExecutionCycleTest extends JIACTestForJUnit3 {
 
 	private final String nodeName = "myNode";
 	private ClassPathXmlApplicationContext context = null;

@@ -7,7 +7,7 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
 import de.dailab.jiactng.agentcore.comm.IGroupAddress;
@@ -20,12 +20,12 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
  *
  */
 class JMSSender {
-	private final Log log;
+	private final Logger log;
 	
 	private final Session _session;
 	private final MessageProducer _producer;
 
-	public JMSSender(Connection connection, Log log) throws JMSException {
+	public JMSSender(Connection connection, Logger log) throws JMSException {
         this.log= log;
         _session= connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         _producer= _session.createProducer(null);

@@ -47,6 +47,10 @@
 		<objectRef name="execution" ref="NonBlockingExecutionCycle"/>
 	</agent>
 	
+	<agent id="ReactiveAgent" parent="NonBlockingAgent">
+		<objectRef name="execution" ref="ReactiveExecutionCycle"/>
+	</agent>
+	
 	<!-- agent id="SimpleAgentWithCommunication" parent="SimpleAgent">
 		<agentElementRef ref="CommunicationBean"/>
 	</agent -->
@@ -91,4 +95,6 @@
 	<object id="SimpleExecutionCycle" class="de.dailab.jiactng.agentcore.execution.SimpleExecutionCycle" />
 	
 	<object id="NonBlockingExecutionCycle" class="de.dailab.jiactng.agentcore.execution.NonBlockingExecutionCycle" />
+	
+	<object id="ReactiveExecutionCycle" class="de.dailab.jiactng.agentcore.execution.ReactiveExecutionCycle" />
 </configuration>

@@ -18,16 +18,15 @@ import javax.management.relation.MBeanServerNotificationFilter;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
-
-import junit.framework.TestCase;
 
 /**
  * This testcase tests the JMX based management interface of an agent.
  *
  * @author Jan Keiser
  */
-public class AgentMBeanTest extends TestCase implements NotificationListener {
+public class AgentMBeanTest extends JIACTestForJUnit3 implements NotificationListener {
 
 	private final String nodeName = "myNode";
 	private final String agentName = "TestAgent";

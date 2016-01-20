@@ -15,12 +15,11 @@ import javax.management.ObjectName;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
 import de.dailab.jiactng.agentcore.util.jar.JARMemory;
 
-import junit.framework.TestCase;
-
-public class SimpleAgentNodeMBeanTest extends TestCase implements NotificationListener {
+public class SimpleAgentNodeMBeanTest extends JIACTestForJUnit3 implements NotificationListener {
 
 	private final String nodeName = "myNode";
 	private final String agentName = "TestAgent";

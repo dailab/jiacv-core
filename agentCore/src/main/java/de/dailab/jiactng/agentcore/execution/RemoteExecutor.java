@@ -3,7 +3,7 @@ package de.dailab.jiactng.agentcore.execution;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
@@ -35,7 +35,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 	private IMemory memory;
 
 	/** The logger of this remote executor. */
-	private Log log;
+	private Logger log;
 
 	/** sendAction of CommunicationBean */
 	private Action sendAction;
@@ -52,7 +52,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 	 * @param memory the space to listen to
 	 * @see IMemory
 	 */
-	public RemoteExecutor(IMemory memory, Log log) {
+	public RemoteExecutor(IMemory memory, Logger log) {
 		this.memory = memory;
 		this.log = log;
 		

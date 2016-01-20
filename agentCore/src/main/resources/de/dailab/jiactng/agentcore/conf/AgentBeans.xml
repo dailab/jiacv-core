@@ -37,6 +37,10 @@
 <!--	lazy-init="true">-->
 	</bean>
 
+	<bean name="ReactiveExecutionCycle" class="de.dailab.jiactng.agentcore.execution.ReactiveExecutionCycle" singleton="false" >
+<!--	lazy-init="true">-->
+	</bean>
+
 
 	<!--
 		###########################################################################

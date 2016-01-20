@@ -6,10 +6,9 @@ package de.dailab.jiactng.agentcore.action;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.SimpleAgentNodeMBean;
@@ -18,7 +17,7 @@ import de.dailab.jiactng.agentcore.SimpleAgentNodeMBean;
  * @author Marcel Patzlaff
  * @version $Revision$
  */
-public class MethodExposingBeanTest extends TestCase {
+public class MethodExposingBeanTest extends JIACTestForJUnit3 {
     private IAgentNode _node;
     private IAgent _agent;
     private ExampleExposingBean _testBean;

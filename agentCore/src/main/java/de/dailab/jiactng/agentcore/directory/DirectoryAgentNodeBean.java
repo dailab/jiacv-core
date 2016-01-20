@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,8 +27,7 @@ import javax.management.openmbean.TabularDataSupport;
 import javax.management.openmbean.TabularType;
 import javax.management.remote.JMXServiceURL;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.AbstractAgentNodeBean;
 import de.dailab.jiactng.agentcore.Agent;
@@ -253,7 +253,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		for (ICommunicationAddress groupAddress : groupAddresses) {
 			long aliveInterval = aliveIntervals.get(groupAddress
 					.toUnboundAddress().getName());
-			long advertiseInterval = aliveIntervals.get(groupAddress
+			long advertiseInterval = advertiseIntervals.get(groupAddress
 					.toUnboundAddress().getName());
 			timer.schedule(new AgentNodePinger(groupAddress, aliveInterval,
 					advertiseInterval), aliveInterval, aliveInterval);
@@ -327,7 +327,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				remoteAgents.put(agentDescription.getAid(), agentDescription);
 			}
 		}
-		// dump("registerAgent " + agentDescription.getAid());
+		if (log.isInfoEnabled()) {
+			log.info("Registered agent:\n" + agentDescription.toString());
+		}
+		dump("registerAgent " + agentDescription.getAid());
 	}
 
 	/**
@@ -496,7 +499,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 			}
 		}
-		log.info("Registered action:\n" + actionDescription.toString());
+		if (log.isInfoEnabled()) {
+			log.info("Registered action:\n" + actionDescription.toString());
+		}
 		dump("registerAction " + actionDescription.getName());
 
 		// TODO register agents that provides this action
@@ -640,9 +645,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			}
 		}
 		synchronized (remoteActions) {
-			for (String nodeAddress : remoteActions.keySet()) {
-				final Set<IActionDescription> adset = remoteActions
-						.get(nodeAddress);
+			for (Set<IActionDescription> adset : remoteActions.values()) {
 				for (IActionDescription ad : adset) {
 					if (ad.matches(template)) {
 						return ad;
@@ -727,8 +730,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			}
 		}
 		synchronized (remoteActions) {
-			for (String nodeAddress : remoteActions.keySet()) {
-				final Set<IActionDescription> adset = remoteActions.get(nodeAddress);
+			for (Set<IActionDescription> adset : remoteActions.values()) {
 				for (IActionDescription ad : adset) {
 					if (ad.matches(template)) {
 						actions.add(ad);
@@ -868,7 +870,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				final String nodeAddress = senderAddress.getName();
 				if (nodes.containsKey(nodeAddress)) {
 					synchronized (remoteActions) {
-						log.warn(nodeAddress + " says bye");
+						log.info(nodeAddress + " says bye");
 						removeRemoteAgentOfNode(nodeAddress);
 						remoteActions.remove(nodeAddress);
 						nodes.remove(nodeAddress);
@@ -976,7 +978,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 				nodes.get(nodeAddress).setAlive(System.currentTimeMillis());
 			} else {
-				log.warn("New known node " + nodeAddress);
+				log.info("New known node " + nodeAddress);
 				final AgentNodeDescription description = new AgentNodeDescription(
 						node, System.currentTimeMillis());
 				nodes.put(nodeAddress, description);
@@ -994,10 +996,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	@Override
-	public Log getLog(String extension) {
-		// TODO Creating a method within the AgentNode to get a log for
-		// AgentNodeBeans and use it here
-		return LogFactory.getLog(getClass().getName() + "." + extension);
+	public Logger getLog(String extension) {
+		if (agentNode == null) {
+			return null;
+		}
+		return agentNode.getLog(this, extension);
 	}
 
 	@Override
@@ -1137,9 +1140,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		// find serviceDescriptions in remote Actions
 		synchronized (remoteActions) {
-			for (String nodeAddress : remoteActions.keySet()) {
-				final Set<IActionDescription> remoteActSet = remoteActions
-						.get(nodeAddress);
+			for (Set<IActionDescription> remoteActSet : remoteActions.values()) {
 				for (IActionDescription remoteAct : remoteActSet) {
 				    if (remoteAct.getSemanticServiceDescriptionIRI() != null && ! remoteAct.getSemanticServiceDescriptionIRI().isEmpty()){
 						try {
@@ -1281,7 +1282,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		public AgentNodePinger(ICommunicationAddress groupAddress,
 				long aliveInterval, long advertiseInterval) {
 			this.aliveInterval = aliveInterval;
-			this.counter = aliveInterval;
+			this.counter = advertiseInterval;
 			this.advertiseInterval = advertiseInterval;
 			this.groupAddress = groupAddress;
 		}
@@ -1327,17 +1328,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	private void removeRemoteAgentOfNode(String nodeAddress) {
-		final ArrayList<String> keysToRemove = new ArrayList<String>();
 		synchronized (remoteAgents) {
-			for (String key : remoteAgents.keySet()) {
-				final IAgentDescription agent = remoteAgents.get(key);
-				if (nodeAddress.equals(ADDRESS_NAME + "@"
-						+ agent.getAgentNodeUUID())) {
-					keysToRemove.add(key);
+			for (final Iterator<IAgentDescription> entries = remoteAgents.values().iterator(); entries.hasNext(); ) {
+				final IAgentDescription agent = entries.next();
+				if (nodeAddress.equals(ADDRESS_NAME + "@" + agent.getAgentNodeUUID())) {
+					entries.remove();
 				}
-			}
-			for (String key : keysToRemove) {
-				remoteAgents.remove(key);
 			}
 		}
 	}
@@ -1354,8 +1350,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			System.out.println("Registered local actions:  "
 					+ localActions.size());
 			int actions = 0;
-			for (String key : remoteActions.keySet()) {
-				actions += remoteActions.get(key).size();
+			for (Set<IActionDescription> actionSet : remoteActions.values()) {
+				actions += actionSet.size();
 			}
 			System.out.println("Registered remote agents:  "
 					+ remoteAgents.size());

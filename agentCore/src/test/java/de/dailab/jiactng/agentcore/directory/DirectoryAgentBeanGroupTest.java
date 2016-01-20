@@ -6,9 +6,10 @@ import org.junit.After;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit4;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 
-public class DirectoryAgentBeanGroupTest {
+public class DirectoryAgentBeanGroupTest extends JIACTestForJUnit4 {
 
 	private SimpleAgentNode node1 = null;
 	private SimpleAgentNode node2 = null;
@@ -183,8 +184,55 @@ public class DirectoryAgentBeanGroupTest {
 	
 	@After
 	public void clean(){
+		// stop all nodes
 		try {
+			node3.stop();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node2.stop();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node1.stop();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 
+		// wait 3 seconds
+		try {
+			Thread.sleep(3000);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// cleanup all nodes
+		try {
+			node3.cleanup();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node2.cleanup();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			node1.cleanup();
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+/*		
+		try {
 			node1.doStop();
 			node2.doStop();
 			node3.doStop();
@@ -195,6 +243,6 @@ public class DirectoryAgentBeanGroupTest {
 		} catch (Exception e){
 			//do nothing
 		}
-
+*/
 	}
 }

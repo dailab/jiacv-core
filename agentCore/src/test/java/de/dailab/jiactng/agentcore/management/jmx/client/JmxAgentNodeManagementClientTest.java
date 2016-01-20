@@ -13,18 +13,17 @@ import javax.management.NotificationListener;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.dailab.jiactng.JIACTestForJUnit3;
 import de.dailab.jiactng.agentcore.IAgent;
 import de.dailab.jiactng.agentcore.SimpleAgentNode;
 import de.dailab.jiactng.agentcore.util.jar.JARMemory;
-
-import junit.framework.TestCase;
 
 /**
  * This testcase tests the JMX based management client for an agent node.
  *
  * @author Jan Keiser
  */
-public class JmxAgentNodeManagementClientTest extends TestCase implements NotificationListener {
+public class JmxAgentNodeManagementClientTest extends JIACTestForJUnit3 implements NotificationListener {
 
 	private final String nodeName = "myNode";
 	private final String agentName = "TestAgent";

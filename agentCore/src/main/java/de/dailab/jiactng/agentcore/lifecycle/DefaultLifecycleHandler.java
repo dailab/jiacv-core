@@ -13,8 +13,6 @@ import static de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates.U
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.lf5.viewer.LogFactor5ErrorDialog;
-
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle.LifecycleStates;
 
 /**

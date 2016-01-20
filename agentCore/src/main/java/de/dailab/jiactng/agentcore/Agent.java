@@ -35,7 +35,8 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.timer.TimerNotification;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanNameAware;
 
 import de.dailab.jiactng.agentcore.action.Action;
@@ -282,7 +283,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
           }
         }
       } catch (Exception e) {
-        if ((log != null) && (log.isErrorEnabled())) {
+        if ((log != null) && (log.isEnabledFor(Level.ERROR))) {
           log.error("Critical error in controlcycle of agent: " + getAgentName() + ". Stopping Agent! Exception: ", e);
         } else {
           System.err.println("Critical error in controlcycle of agent: " + getAgentName()
@@ -895,7 +896,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   /**
    * {@inheritDoc}
    */
-  public final Log getLog(IAgentBean bean) {
+  public final Logger getLog(IAgentBean bean) {
     if (agentNode == null) {
       return null;
     }
@@ -905,7 +906,7 @@ public class Agent extends AbstractLifecycle implements IAgent, AgentMBean, Bean
   /**
    * {@inheritDoc}
    */
-  public final Log getLog(IAgentBean bean, String extension) {
+  public final Logger getLog(IAgentBean bean, String extension) {
     if (agentNode == null) {
       return null;
     }

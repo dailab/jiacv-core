@@ -5,7 +5,7 @@ package de.dailab.jiactng.agentcore.comm.transport;
 
 import java.net.URI;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationException;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -53,13 +53,13 @@ public abstract class MessageTransport implements MessageTransportMBean {
          * @param extension     the name extension for the logger
          * @return the named logger
          */
-        Log getLog(String extension);
+        Logger getLog(String extension);
     }
     
     private final String transportIdentifier;
     private IMessageTransportDelegate delegate;
     
-    protected Log log;
+    protected Logger log;
 
 	/* 0 means no timeout */
 	public static final long DEFAULT_TIMEOUT = 0;
@@ -208,7 +208,7 @@ public abstract class MessageTransport implements MessageTransportMBean {
         delegate.onMessage(this, message, at);
     }
     
-    protected Log createChildLog(String name) {
+    protected Logger createChildLog(String name) {
         return delegate.getLog(transportIdentifier + "." + name);
     }
 

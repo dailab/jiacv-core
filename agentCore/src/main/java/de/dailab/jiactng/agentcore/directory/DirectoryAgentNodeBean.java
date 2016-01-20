@@ -614,6 +614,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				IServiceDescription templateSD = null;
 				
 				try {
+					/** 
+					 * Since template URIs might be used multiple times with different 
+					 * content, we remove the old one before matching; otherwise there would
+					 * be no update on the service request for the matcher
+					 */
+					this.ontologyStorage.removeOntology(new URI(template.getSemanticServiceDescriptionIRI()));
 					templateSD = this.ontologyStorage.
 							loadServiceDescriptionFromOntology(new URI(template.getSemanticServiceDescriptionIRI()));
 				} catch (URISyntaxException e) {
@@ -698,6 +704,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				IServiceDescription templateSD = null;
 				
 				try {
+					/** 
+					 * Since template URIs might be used multiple times with different 
+					 * content, we remove the old one before matching; otherwise there would
+					 * be no update on the service request for the matcher
+					 */
+					this.ontologyStorage.removeOntology(new URI(template.getSemanticServiceDescriptionIRI()));
 					templateSD = this.ontologyStorage.
 							loadServiceDescriptionFromOntology(new URI(template.getSemanticServiceDescriptionIRI()));
 				} catch (URISyntaxException e) {

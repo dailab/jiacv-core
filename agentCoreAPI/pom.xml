@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.dailab</groupId>
 		<artifactId>jiactng</artifactId>
-		<version>5.1.6-SNAPSHOT</version>
+		<version>5.2.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>de.dailab.jiactng</groupId>
@@ -13,12 +13,11 @@
 	<name>Agent Core API</name>
 
 	<dependencies>
-		<!-- dependency> <groupId>commons-logging</groupId> <artifactId>commons-logging</artifactId> <version>1.1</version> </dependency -->
-		<dependency>
+		<!--dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.2</version>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>

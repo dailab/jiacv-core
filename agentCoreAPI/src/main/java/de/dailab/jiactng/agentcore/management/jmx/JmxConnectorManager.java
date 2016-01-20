@@ -24,8 +24,7 @@ import javax.management.remote.rmi.RMIConnectorServer;
 import javax.rmi.ssl.SslRMIClientSocketFactory;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.IAgentNode;
 
@@ -49,7 +48,7 @@ public final class JmxConnectorManager extends TimerTask {
 	private MulticastSocket socket;
 	private HashMap<String, MulticastInterface> interfaces = new HashMap<String, MulticastInterface>();
 	private MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-	private Log log = null;
+	private static Logger log = null;
 
 	/**
 	 * Constructor for JMX connector manager. It creates a multicast socket for a given port and a given time to live for
@@ -66,7 +65,7 @@ public final class JmxConnectorManager extends TimerTask {
 																					IOException {
 		manager = new JmxManager();
 		this.node = node;
-		log = LogFactory.getLog(node.getUUID() + "." + getClass().getSimpleName());
+		log = Logger.getLogger(node.getUUID() + "." + getClass().getSimpleName());
 		multicastPort = port;
 		group = InetAddress.getByName(netaddr);
 		socket = new MulticastSocket(multicastPort);
@@ -82,7 +81,7 @@ public final class JmxConnectorManager extends TimerTask {
 	 * via the network interface.
 	 */
 	@Override
-	public void run() {
+	public synchronized void run() {
 		// get all network interfaces
 		Enumeration<NetworkInterface> networkInterfaces;
 		try {
@@ -129,7 +128,7 @@ public final class JmxConnectorManager extends TimerTask {
 						if (!interfaces.containsKey(ifcName)) {
 							// connectors not yet exist for this interface
 							// => create connector servers
-							log.warn("Adding JMX connector servers for new interface " + ifcName + " with address "
+							log.info("Adding JMX connector servers for new interface " + ifcName + " with address "
 																											+ address.getHostAddress());
 							addConnectors(ifcName, address);
 						} else if (!interfaces.get(ifcName).getAddress().equals(address)) {
@@ -170,7 +169,7 @@ public final class JmxConnectorManager extends TimerTask {
 		}
 
 		// removing connectors of old network interface
-		for (String name : interfaces.keySet()) {
+		for (String name : new HashSet<String>(interfaces.keySet())) {
 			try {
 				if (NetworkInterface.getByName(name) == null) {
 					log.info("Removing JMX connector servers for removed interface " + name);
@@ -192,7 +191,7 @@ public final class JmxConnectorManager extends TimerTask {
 	/**
 	 * Removes connector servers of all network interfaces.
 	 */
-	public void removeAll() {
+	public synchronized void removeAll() {
 		// create set of interface names to avoid ConcurrentModificationException
 		Set<String> ifcNames = new HashSet<String>();
 		for (String ifcName : interfaces.keySet()) {
@@ -344,7 +343,7 @@ public final class JmxConnectorManager extends TimerTask {
 				log.error(e.getMessage());
 				continue;
 			}
-			log.warn("JMX connector server successfully started: " + cs.getAddress());
+			log.info("JMX connector server successfully started: " + cs.getAddress());
 			connectors.add(cs);
 
 			// register connector server as JMX resource

@@ -3,7 +3,7 @@ package de.dailab.jiactng.agentcore;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.comm.ICommunicationBean;
 import de.dailab.jiactng.agentcore.directory.IDirectory;
@@ -154,7 +154,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    *         the bean name.
    * @see org.apache.commons.logging.Log
    */
-  Log getLog(IAgentBean bean);
+  Logger getLog(IAgentBean bean);
 
   /**
    * Getter for a log-instance that heeds the hierarchy of the agent node,
@@ -168,7 +168,7 @@ public interface IAgent extends ILifecycleListener, Runnable,
    * @return a log-object that contains the agent node's name, the agents name,
    *         the bean name and the extension or <code>null</code> if the agent node is unknown.
    */
-  Log getLog(IAgentBean bean, String extension);
+  Logger getLog(IAgentBean bean, String extension);
   
   /**
    * Returns the agent description of this agent.

@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.management.remote.JMXServiceURL;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycle;
 import de.dailab.jiactng.agentcore.lifecycle.ILifecycleListener;
@@ -92,26 +92,54 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *          the node bean for which the logger shall be instantiated.
    * @return a log-object that contains the UUID of the agent node and the name of the 
    * 		 node bean.
-   * @see org.apache.commons.logging.Log
    */
-  Log getLog(IAgentNodeBean nodeBean);
+  Logger getLog(IAgentNodeBean nodeBean);
+
+  /**
+   * Getter for a log-instance that heeds the hierarchy of the agent node and the 
+   * agent node bean, i.e the name of the logger consists of the UUID of 
+   * the agent node, the name of the agent node bean and the extension.
+   * 
+   * @param nodeBean
+   *          the node bean that contains the node bean part for which the 
+   *          logger shall be instantiated.
+   * @param extension
+   *          the node bean part for which the logger shall be instantiated.
+   * @return a log-object that contains the UUID of the agent node, the name 
+   *          of the agent node bean and the extension.
+   */
+  Logger getLog(IAgentNodeBean nodeBean, String extension);
 
   /**
    * Getter for a log-instance that heeds the hierarchy of the agent node, i.e
-   * the name of the logger consists of the UUID of the agent node and the name of the
-   * agent.
+   * the name of the logger consists of the UUID of the agent node and the ID
+   * of the agent.
    * 
    * @param agent
    *          the agent for which the logger shall be instantiated.
-   * @return a log-object that contains the UUID of the agent node and the name of the agent.
-   * @see org.apache.commons.logging.Log
+   * @return a log-object that contains the UUID of the agent node and the ID of the agent.
    */
-  Log getLog(IAgent agent);
+  Logger getLog(IAgent agent);
+
+  /**
+   * Getter for a log-instance that heeds the hierarchy of the agent node and
+   * the agent, i.e the name of the logger consists of the UUID of 
+   * the agent node, the ID of the agent and the extension.
+   * 
+   * @param agent
+   *          the agent that contains the agent part for which the 
+   *          logger shall be instantiated.
+   * @param extension
+   *          the agent part for which the logger shall be instantiated.
+   * @return a log-object that contains the UUID of the agent node, the ID 
+   *          of the agent and the extension.
+   */
+  Logger getLog(IAgent agent, String extension);
 
   /**
    * Getter for a log-instance that heeds the hierarchy of the agent node and
    * the agent, i.e the name of the logger consists of the UUID of the agent node,
-   * the name of the agent and the name of the agent bean.
+   * the ID of the agent and the name of the agent bean.
    * 
    * 
    * @param agent
@@ -119,16 +147,15 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *          instantiated.
    * @param bean
    *          the bean for which the logger shall be instantiated.
-   * @return a log-object that contains the UUID of the agent node, the name of the agent
+   * @return a log-object that contains the UUID of the agent node, the ID of the agent
    *         and the name of the agent bean.
-   * @see org.apache.commons.logging.Log
    */
-  Log getLog(IAgent agent, IAgentBean bean);
+  Logger getLog(IAgent agent, IAgentBean bean);
   
   /**
    * Getter for a log-instance that heeds the hierarchy of the agent node,
    * the agent and the agent bean, i.e the name of the logger consists of the UUID of 
-   * the agent node, the name of the agent, the name of the agent bean and the extension.
+   * the agent node, the ID of the agent, the name of the agent bean and the extension.
    * 
    * 
    * @param agent
@@ -138,11 +165,10 @@ public interface IAgentNode extends ILifecycle, ILifecycleListener {
    *          the bean that contains the bean part for which the logger shall be instantiated.
    * @param extension
    *          the bean part for which the logger shall be instantiated.
-   * @return a log-object that contains the UUID of the agent node, the name of the agent,
+   * @return a log-object that contains the UUID of the agent node, the ID of the agent,
    *         the name of the agent bean and the extension.
-   * @see org.apache.commons.logging.Log
    */
-  Log getLog(IAgent agent, IAgentBean bean, String extension);
+  Logger getLog(IAgent agent, IAgentBean bean, String extension);
 
   /**
    * Getter for the global thread pool for this agent node. All threads should be

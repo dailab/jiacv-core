@@ -51,13 +51,21 @@ public interface IOntologyStorage {
    */
   IServiceDescription mergeServiceDescriptionWithAction(IActionDescription action, IServiceDescription serviceDescription);
 
-
+  /**
+   * Removes an ontology from the local ontologyManager. This might be important for dynamic ontologies, 
+   * such as the service templates for matching purposes.
+   * 
+   * @param ontoURI {@link URI} reference to the ontology
+   * @return true if ontology existed before and has now been deleted, false otherwise
+   */
+  boolean removeOntology(URI ontoURI);
+  
+  
   /**
    * TODO: java.lang.Object should be replaced with the Ontology-Class, once a definite Library has been found
    */
   // void addOntology(URI ontoURI);
   //
-  // void removeOntology(URI ontoURI);
   //
   // Object findOntology(URI ontoURI);
   //

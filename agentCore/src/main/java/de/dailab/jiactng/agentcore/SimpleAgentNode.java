@@ -35,6 +35,7 @@ import org.apache.log4j.net.SocketAppender;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
@@ -166,8 +167,26 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			throw new IllegalArgumentException("String[] args must hold the node configuration file "
 					+ "and (optionally) the log4j properties file.");
 		}
-		if (args.length > 1) {
-			System.setProperty("log4j.configuration", args[1]);
+		startAgentNode(args[0], args.length > 1 ? args[1] : null);
+	}
+
+	/**
+	 * Start Agent Node and return the ApplicationContext, which can be used for e.g. getting
+	 * a reference to the started node and it's agents and beans.
+	 * 
+	 * This also sets some useful system properties, such as the logger configuration,
+	 * and a fix for some WLAN problem on Mac computers.
+	 * 
+	 * @param nodeConfigLocation	location of the spring configuration file
+	 * @param logConfigLocation		location of the log configuration (optional, can be null)
+	 * @return						reference to the newly started application context
+	 */
+	public static ApplicationContext startAgentNode(String nodeConfigLocation, String logConfigLocation) {
+		if (nodeConfigLocation == null) {
+			throw new IllegalArgumentException("Node Config Location must not be null");
+		}
+		if (logConfigLocation != null) {
+			System.setProperty("log4j.configuration", logConfigLocation);
 		} else {
 			System.setProperty("log4j.configuration", "jiactng_log4j.properties");
 		}
@@ -175,8 +194,8 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 		// see https://redmine.dai-labor.de/redmine/issues/13040
 		System.setProperty("java.net.preferIPv4Stack", "true");
 		
-		System.setProperty("spring.rootconfigfile", args[0]);
-		new ClassPathXmlApplicationContext(args[0]);
+		System.setProperty("spring.rootconfigfile", nodeConfigLocation);
+		return new ClassPathXmlApplicationContext(nodeConfigLocation);
 	}
 
 	/**

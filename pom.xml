@@ -321,9 +321,11 @@
 				<version>2.10</version>
 				<dependencies>
 					<dependency>
+						<!-- If we use ${project.version} here, then this will 
++						mess up all projects that have a different version -->
 						<groupId>de.dailab.jiactng</groupId>
 						<artifactId>agentCoreAPI</artifactId>
-						<version>${project.version}</version>
+						<version>5.1.5</version>
 					</dependency>
 				</dependencies>
 				<configuration>

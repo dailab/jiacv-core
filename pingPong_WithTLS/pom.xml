@@ -22,23 +22,8 @@
   		<dependency>
   			<groupId>de.dailab.jiactng</groupId>
   			<artifactId>agentCore</artifactId>
-  			<version>${project.version}</version>
   		</dependency>
   	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>dai-open</id>
-			<name>DAI Open</name>
-			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 
 	<build>
 		<plugins>

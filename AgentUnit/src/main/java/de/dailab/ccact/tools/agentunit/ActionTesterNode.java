@@ -10,10 +10,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.dailab.jiactng.agentcore.IAgent;
@@ -62,7 +60,8 @@ public class ActionTesterNode {
 	/**
 	 * default agent node logger
 	 */
-	protected Log log = LogFactory.getLog(ActionTesterNode.class);
+//	protected Log log = LogFactory.getLog(ActionTesterNode.class);
+	protected Logger log = Logger.getLogger(ActionTesterNode.class);
 
 	/**
 	 * Creates an ActionTesterNode from the given configuration file
@@ -82,7 +81,7 @@ public class ActionTesterNode {
 		// fetch Agent Node handle
 		this.agentNode = (SimpleAgentNode) this.context.getBean(nodename, SimpleAgentNode.class);
 
-		((Log4JLogger) this.log).getLogger().setLevel(Level.toLevel(this.agentNode.getLogLevel()));
+		this.log.setLevel(Level.toLevel(this.agentNode.getLogLevel()));
 
 		// Add InvokeActionAgent to AgentNode
 		try {

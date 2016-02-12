@@ -213,7 +213,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 	/**
 	 * {@inheritDoc}
 	 */
-	public final void doAction(DoAction doAction) throws Exception {
+	public void doAction(DoAction doAction) throws Exception {
     	if (log.isDebugEnabled()) {
     		log.debug("typechecking is '" + doAction.typeCheck() + "'");
     	}

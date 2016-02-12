@@ -384,7 +384,7 @@
 									<link>http://docs.oracle.com/javase/8/docs/api/</link>
 									<link>http://docs.jboss.org/jbpm/v5.2/javadocs/</link>
 									<link>http://help.eclipse.org/help33/topic/org.eclipse.platform.doc.isv/reference/api/</link>
-									<link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link>
+									<!--<link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link>-->
 									<!--link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCoreAPI/apidocs/</link> 
 										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCore/apidocs/</link> 
 										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/basicServices/Loadmeasurement/apidocs/</link> 
@@ -403,7 +403,7 @@
 									<link>http://docs.spring.io/spring/docs/3.0.3.RELEASE/api/</link>
 									<link>http://ws.apache.org/axis/java/apiDocs/</link>
 									<link>http://www.jdom.org/docs/apidocs/</link>
-									<link>http://www.jmonkeyengine.com/doc/</link>
+									<!--<link>http://www.jmonkeyengine.com/doc/</link>-->
 									<!--link>http://java.sun.com/products/servlet/2.3/javadoc/</link -->
 								</links>
 								<quiet>true</quiet>

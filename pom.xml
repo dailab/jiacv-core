@@ -322,7 +322,7 @@
 				<dependencies>
 					<dependency>
 						<!-- If we use ${project.version} here, then this will 
-+						mess up all projects that have a different version -->
+						mess up all projects that have a different version -->
 						<groupId>de.dailab.jiactng</groupId>
 						<artifactId>agentCoreAPI</artifactId>
 						<version>5.1.5</version>
@@ -457,7 +457,7 @@
 						<plugin>
 							<groupId>org.codehaus.mojo</groupId>
 							<artifactId>jdepend-maven-plugin</artifactId>
-							<version>2.0-beta-2</version>
+							<version>2.0</version>
 						</plugin>
 						<plugin>
 							<groupId>org.codehaus.mojo</groupId>

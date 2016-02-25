@@ -21,7 +21,7 @@
       this template should be inherited when declaring other agents
       possible properties are
       * AgentBeans: a list of AgentBeans this agent will contain (components of the agent)
-      * owner: sets the owner of this agent, e.g. the platform provider. needed for usermanagement
+      * owner: sets the owner of this agent, e.g. the platform provider. needed for user management
       * BeanExecutionTimeout: sets the timeout for the execution of this agent. only relevant for certain execution types (needs more documentation here about the proper context)
    -->
    <bean name="SimpleAgent" class="de.dailab.jiactng.agentcore.Agent" abstract="true">

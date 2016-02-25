@@ -7,15 +7,15 @@
    <!--
       # The default AgentNode configuration
       # provides an empty platform definition with service directory and JMX support using RMI without registry
-      # this platform bean may be set as parent in any other platfom definitions if you want to make use of inheritance
+      # this platform bean may be set as parent in any other platform definitions if you want to make use of inheritance
       # other possible properties are:
       * Agents: contains a List of Agents (interface IAgent)
-      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch wich turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
+      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch which turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
       * AgentNodeBeans: a list of AgentNodeBeans
       * ServiceDirectory: sets the ServiceDirectory
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
-      # For ssl usage, set the attribute boolean sslInUse to true. Other (optional) ssl relevant string properties are
+      # For SSL/TLS usage, set the attribute boolean sslInUse to true. Other (optional) SSL/TLS relevant string properties are
       # keyStore (path to an existing keystore), keyStorePassword, keyStoreType (standard: "JKS"),
       # trustStore (path to an existing truststore), trustStorePassword, trustStoreType (standard: "JKS").
    -->
@@ -30,15 +30,15 @@
    <!--
       # The default AgentNode configuration
       # provides an empty platform definition with service directory and JMX support using RMI with an JAAS authenticator and without registry
-      # this platform bean may be set as parent in any other platfom definitions if you want to make use of inheritance
+      # this platform bean may be set as parent in any other platform definitions if you want to make use of inheritance
       # other possible properties are:
       * Agents: contains a List of Agents (interface IAgent)
-      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch wich turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
+      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch which turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
       * AgentNodeBeans: a list of AgentNodeBeans
       * ServiceDirectory: sets the ServiceDirectory
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
-      # For ssl usage, set the attribute boolean sslInUse to true. Other (optional) ssl relevant string properties are
+      # For SSL/TLS usage, set the attribute boolean sslInUse to true. Other (optional) SSL/TLS relevant string properties are
       # keyStore (path to an existing keystore), keyStorePassword, keyStoreType (standard: "JKS"),
       # trustStore (path to an existing truststore), trustStorePassword, trustStoreType (standard: "JKS").
    -->
@@ -84,15 +84,15 @@
    <!--
       # The default AgentNode configuration
       # provides an empty platform definition with service directory and JMX support using RMI with registry
-      # this platform bean may be set as parent in any other platfom definitions if you want to make use of inheritance
+      # this platform bean may be set as parent in any other platform definitions if you want to make use of inheritance
       # other possible properties are:
       * Agents: contains a List of Agents (interface IAgent)
-      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch wich turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
+      * EmbeddedBroker: sets an JmsBrokerAMQ (maybe we can introduce a switch which turns on embedded broker stuff or use a bean for this to be configurable or something) see JMSMessaging.xml for more documentation
       * AgentNodeBeans: a list of AgentNodeBeans
       * ServiceDirectory: sets the ServiceDirectory
       * LoggingConfig: sets the Logging configuration !needs more documentation here!
       * AuthorizationPolicyFilename: sets the file for the java security policy property and activates the security manager
-      # For ssl usage, set the attribute boolean sslInUse to true. Other (optional) ssl relevant string properties are
+      # For SSL/TLS usage, set the attribute boolean sslInUse to true. Other (optional) SSL/TLS relevant string properties are
       # keyStore (path to an existing keystore), keyStorePassword, keyStoreType (standard: "JKS"),
       # trustStore (path to an existing truststore), trustStorePassword, trustStoreType (standard: "JKS").
    -->
@@ -109,8 +109,8 @@
    <!--
       # The default AgentNode Spring configuration
       # provides an empty platform definition without JMX support but with a distributed agent and service directory.
-      # the platform bean may be set as parent in any other platfom definitions. 
-      # For ssl usage, set the attribute boolean sslInUse to true. Other (optional) ssl relevant string properties are
+      # the platform bean may be set as parent in any other platform definitions. 
+      # For SSL/TLS usage, set the attribute boolean sslInUse to true. Other (optional) SSL/TLS relevant string properties are
       # keyStore (path to an existing keystore), keyStorePassword, keyStoreType (standard: "JKS"),
       # trustStore (path to an existing truststore), trustStorePassword, trustStoreType (standard: "JKS").
       
@@ -127,7 +127,7 @@
    <!--
       # The default AgentNode Spring configuration
       # provides an empty platform definition without JMX and directory support.
-      # the platform bean may be set as parent in any other platfom definitions 
+      # the platform bean may be set as parent in any other platform definitions 
       
    -->
    <bean name="Node" class="de.dailab.jiactng.agentcore.SimpleAgentNode" abstract="true">

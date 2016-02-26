@@ -6,6 +6,11 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
+		<release version="5.2.2" date="T.B.A." description="Minor release">
+			<action dev="keiser" type="fix">
+				"JARMemory must close streams after reading jar file to unlock file."
+			</action>
+		</release>
 		<release version="5.2.1" date="2016-01-07" description="Minor release">
 		</release>
 		<release version="5.2.0" date="2015-11-12" description="Major release">

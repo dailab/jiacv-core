@@ -68,6 +68,11 @@ public class JARMemory implements JAR, Serializable {
     public JARMemory(String name, InputStream in) throws IOException {
         this.name= name;
         readJAR(in);
+        try {
+        	in.close();
+        } catch (IOException ioe) {
+        	ioe.printStackTrace();
+        }
     }
 
     /** Read jar from stream. * */
@@ -82,6 +87,11 @@ public class JARMemory implements JAR, Serializable {
         }
         
         jar= temp.toByteArray();
+        try {
+        	temp.close();
+        } catch (IOException ioe) {
+        	ioe.printStackTrace();
+        }
         
         try {
             final JarInputStream jis = new JarInputStream(new ByteArrayInputStream(jar));
@@ -97,8 +107,6 @@ public class JARMemory implements JAR, Serializable {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        
-        
     }
 
     /**

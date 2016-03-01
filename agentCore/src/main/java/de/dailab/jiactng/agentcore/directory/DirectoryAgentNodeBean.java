@@ -319,22 +319,22 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		String aid = agentDescription.getAid();
-		boolean isNewAgent = ! localAgents.containsKey(aid) && ! remoteAgents.containsKey(aid);
+		IAgentDescription old = null;
 		if (uuid.equals(myAgentNode)) {
 			synchronized (localAgents) {
-				localAgents.put(aid, agentDescription);
+				old = localAgents.put(aid, agentDescription);
 			}
 		} else {
 			synchronized (remoteAgents) {
-				remoteAgents.put(aid, agentDescription);
+				old = remoteAgents.put(aid, agentDescription);
 			}
 		}
-		if (log.isInfoEnabled()) {
-			if (isNewAgent) {
-				log.info("Registered new agent:\n" + agentDescription.toString());
-			} else {
-				log.debug("Registered already known agent:\n" + agentDescription.toString());
-			}
+		if (old == null) {
+			log.info("Registered new agent:\n" + agentDescription.toString());
+		} else if (! old.equals(agentDescription)) {
+			log.info("Registered updated agent:\n" + agentDescription.toString());
+		} else {
+			log.debug("Registered known agent:\n" + agentDescription.toString());
 		}
 		dump("registerAgent " + agentDescription.getAid());
 	}

@@ -318,17 +318,23 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return;
 		}
 
+		String aid = agentDescription.getAid();
+		boolean isNewAgent = ! localAgents.containsKey(aid) && ! remoteAgents.containsKey(aid);
 		if (uuid.equals(myAgentNode)) {
 			synchronized (localAgents) {
-				localAgents.put(agentDescription.getAid(), agentDescription);
+				localAgents.put(aid, agentDescription);
 			}
 		} else {
 			synchronized (remoteAgents) {
-				remoteAgents.put(agentDescription.getAid(), agentDescription);
+				remoteAgents.put(aid, agentDescription);
 			}
 		}
 		if (log.isInfoEnabled()) {
-			log.info("Registered agent:\n" + agentDescription.toString());
+			if (isNewAgent) {
+				log.info("Registered new agent:\n" + agentDescription.toString());
+			} else {
+				log.debug("Registered already known agent:\n" + agentDescription.toString());
+			}
 		}
 		dump("registerAgent " + agentDescription.getAid());
 	}

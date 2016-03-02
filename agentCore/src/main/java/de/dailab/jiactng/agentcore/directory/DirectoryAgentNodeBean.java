@@ -350,13 +350,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		synchronized (localAgents) {
+			IAgentDescription old = null;
 			if (localAgents.containsKey(aid)) {
-				localAgents.remove(aid);
+				old = localAgents.remove(aid);
 			} else {
 				synchronized (remoteAgents) {
 					// TODO deregister actions
-					remoteAgents.remove(aid);
+					old = remoteAgents.remove(aid);
 				}
+			}
+			if (old != null) {
+				log.info("Deregistered agent:\n" + aid);
 			}
 		}
 		dump("deregisterAgent " + aid);
@@ -928,6 +932,20 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 						.getPayload()).getAgents();
 				for (IAgentDescription agent : agents.values()) {
 					registerAgent(agent);
+				}
+
+				// remove killed remote agents
+				synchronized (remoteAgents) {
+					Iterator<IAgentDescription> i = remoteAgents.values().iterator();
+					while (i.hasNext()) {
+						final IAgentDescription a = i.next();
+						if (!agents.containsKey(a.getAid()) && senderAddress.getName().equals( ADDRESS_NAME + "@" + a.getAgentNodeUUID())) {
+							// remote agent belongs to the advertised node but is not included in the advertisement anymore
+							// => remote agent was killed, so its description must be removed from directory
+							i.remove();
+							log.info("Deregistered agent:\n" + a.getAid());
+						}
+					}
 				}
 
 				dump("ADVERTISE " + senderAddress.getName());

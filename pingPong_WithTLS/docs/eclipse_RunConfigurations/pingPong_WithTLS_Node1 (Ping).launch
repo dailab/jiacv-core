@@ -11,4 +11,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.dailab.asgard.withTLS.pingPong.Main"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="/agentConfiguration/pingPong_WithTLS_node1.xml PingPong_WithTLS_Node1"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="pingPong_WithTLS"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 </launchConfiguration>

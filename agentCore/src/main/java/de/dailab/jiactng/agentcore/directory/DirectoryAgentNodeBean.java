@@ -1213,8 +1213,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			isd.setInputTypes(iad.getInputTypes());
 			isd.setResultTypes(iad.getResultTypes());
 		} catch (ClassNotFoundException e) {
-			log.error("Input/Result Types of action " + iad.getName() + " could not be loaded.");
-			log.error(e.getStackTrace());
+			// actions from different node might use classes not on the class path
+			log.warn("Input/Result Types of action " + iad.getName() + " could not be loaded: " + e.getMessage());
 		}
 		
 		isd.setSemanticServiceDescriptionURI(iad.getSemanticServiceDescriptionIRI());

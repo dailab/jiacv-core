@@ -1,0 +1,302 @@
+<?xml version="1.0"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+	<properties>
+		<title>JIAC MAS's External Interfaces</title>
+		<author email="jiactng-dev@dai-labor.de">JIAC TNG team</author>
+	</properties>
+
+	<body>
+		<section name="JIAC MAS's External Interfaces">
+			<p>This chapter gives a brief overview of external interfaces offered
+				or required by an executed JIAC MAS (multi-agent system). External
+				interface in this context means, the interface is published and can
+				be seen from outside of a JIAC MAS that is executed. JIAC
+				framework's published API, which is used mainly for implementation
+				work during development, is not focus of this article. Other
+				articles in this Maven sites of the JIAC project will give an even
+				deeper insight into JIAC's components and its interfaces and how to
+				use them.
+			</p>
+			<p>Why is it important to know about a JIAC MAS's external
+				interfaces?
+			</p>
+			<ul>
+				<li>As for all software components and applications, knowledge of
+					interfaces (and thus of possible inputs and outputs) is a necessary
+					prerequisite to use a software as well as for further development
+					and maintenance.
+				</li>
+				<li>JIAC framework and tools are open source. You are free to use
+					and modify JIAC for your purposes.
+				</li>
+				<li>JIAC's framework is component based and extensible by individual
+					components (AgentNodeBeans and AgentBeans), which can realize
+					individual defined external interfaces (provided or required
+					interfaces).
+				</li>
+				<li>A MAS is embedded into an environment. Agents need to interact
+					or communicate with their environment, for this they can have
+					sensors and effectors, which technically also comprise interfaces.
+				</li>
+				<li>Agents in a multi-agent system usually communicate with each
+					other, e.g. for coordination and interoperation reasons. This
+					communication is pass through interfaces.
+				</li>
+				<li>A JIAC MAS can be deployed as a distributed system, which makes
+					a communication through interfaces necessary.
+				</li>
+				<li>Sending information over an insecure channel raises the wish to
+					protect communication and access to interfaces.
+				</li>
+				<li>Monitoring and managing a MAS requires interfaces.</li>
+				<li>Maybe you will come up with more important aspects ...</li>
+			</ul>
+
+			<subsection name="Overvivew">
+				<p>		         
+					<a href="images/External-Interfaces.png">
+						<img src="images/External-Interfaces.png" alt="JIAC MAS's External Interfaces"/>
+					</a>
+				</p>
+				
+				<p>This UML component analysis diagram depicts a JIAC AgentNode's
+					external interfaces that are used during execution. A JIAC MAS is
+					composed of one or many of those AgentNodes. In the diagram,
+					representing a single AgentNode, these external interfaces are
+					represented by provided and required interface UML notations
+					protruding over the system boundary. Furthermore, this diagram
+					should be interpreted as analysis diagram, outlining the concepts
+					of JIAC's interfaces. Consequentially, classes and components
+					realizing the depicted components and interfaces in the source code
+					could be named differently. Of course a JIAC AgentNode is composed
+					of more components than illustrated in this diagram; this diagram
+					focuses on the external interfaces. Apart from that, some
+					components in this diagram don't have any external interfaces, but
+					they are still part of the diagram to support further explanations.
+				</p>
+				<p>Important note: It depends on a JIAC MAS's individual
+					configuration of what components the MAS is composed of. Thus, a
+					JIAC MAS can have a different number and types of external
+					interfaces. But if you are using the predefined Spring-based
+					configurations (e.g., SimpleAgent, NodeWithDirectory, NodeWithJMX)
+					your JIAC MAS will have all or a subset of the depicted external
+					interfaces, or a superset when using individual components.
+				</p>
+				<p>The concepts of the depicted components and interfaces are
+					described below. If you want to learn more about a certain
+					component or functionality and know how to use them, we recommend
+					you to dive into a particular chapter of this JIAC documentation
+					describing this component or functionality. Please note that each
+					JIAC project (e.g. jiactng, agentCore and agentCoreAPI) has its own
+					documentation.
+				</p>
+			</subsection>
+
+			<subsection
+				name="AgentBeans, AgentNodeBeans and Other Individual Components">
+				<p>Adding individual or predefined (by the JIAC developing team or
+					by third-party-providers) components to a JIAC MAS is a easy and
+					common way to extend the behaviour of a JIAC MAS. To plug in
+					components is easy because of the component-based architecture of
+					the JIAC framework. Adding AgentBeans and AgentNodeBeans is the
+					intended way to extend the behaviour of Agents and AgentNodes.
+					Configuration is usually done via a Spring-based agent
+					configuration XML file. However, the current implementation (JIAC
+					5.2.1) doesn't provide the functionality to plug in components,
+					e.g. AgentBeans, during runtime via external interfaces, even this
+					would be technically possible. Thus, the bean plug-in mechanism is
+					not covered by this article – currently it's more an functionality
+					provided by an API used in the implementation phase.
+				</p>
+				<p>But these individual or predefined components may use, but are
+					not obliged to provide external interfaces. Individual components
+					also can use JIAC's internal services, e.g., an AgentBean usually
+					uses the CommunicationBean (which internally provides access to the
+					MessageBroker) to send messages to other Agents.
+				</p>
+				<p>AgentBeans can provide services (aka. actions), accessible by
+					other JIAC components (e.g. Agents) and external clients. As any
+					other individual component, an AgentBean is free to provide own
+					external interfaces to access these services (usually for non-JIAC
+					components). However, JIAC implements a build-in mechanism that
+					makes it possible to publish and access services with the help of
+					the Directory (it holds information about other Agents and their
+					services on the local AgentNode, and globally in the platform) and
+					the MessageBroker; this scenario, using the Directory and
+					MessageBroker to publish services is mainly for using services by
+					other JIAC components, rather than by external clients. That's why
+					many AgentBeans that provides actions don't have own external
+					interfaces.
+				</p>
+				<p>Because the existence and nature of external interfaces that are
+					provided or required by individual components (including AgentBeans
+					and AgentNodeBeans) depends on the developers implementation, there
+					is nothing more to say about the interfaces of individual
+					components.
+				</p>
+			</subsection>
+
+			<subsection name="MessageBroker">
+				<p>An AgentNode can be equipped with a MessageBroker (which is
+					technically an AgentNodeBean). The MessageBroker supplies messaging
+					between JIAC components via a message bus. It can be used e.g. for
+					inter-Agent communication between Agents located either on the same
+					AgentNode or on other AgentNodes. And the Directory component needs
+					the MessageBroker to connect to external Directories for
+					synchronizing its entries. The CommunicationBean provides access to
+					the message bus.
+				</p>
+				<p>Configuration of the MessageBroker (as for other JIAC components)
+					is done with the agent configuration file. The predefined JIAC
+					Agent configurations NodeWithDirectory and its specializations
+					NodeWithJMX, NodeWithSecuredJMX and NodeWithRegistry already comes
+					with a MessageBroker realized with ActiveMQ. Whereas the
+					CommunicationBean already comes with the predefined configuration
+					SimpleAgent. So, usually your JIAC MAS will have a MessageBroker
+					and a CommunicationBean as depicted in the UML diagram. This
+					predefined MessageBroker provides an external interface for
+					receiving messages that are send on the message bus and it requires
+					an interface (e.g. a network interface) for sending messages on the
+					message bus. These interfaces are part of ActiveMQ. Messages are
+					addressed by a so called transport URI.
+				</p>
+				<p>The predefined MessageBroker also provides several discovery
+					mechanisms. The intention of a discovery mechanism is, that
+					communication partners (e.g. Agents) residing on different
+					AgentNodes and maybe on different computers will find each other
+					automatically to be able to communicate. In JIAC 5.2.1 two
+					discovery mechanisms are implemented:
+				</p>
+				<ul>
+					<li>Multicast discovery messages.</li>
+					<li>Discovery via gateways.</li>
+				</ul>
+				<p>Multicast discovery messages, containing the transport URI, are
+					send periodically over a predefined multicast socket for discovery.
+					The predefined discovery URI is
+					smartmulticast://default?group=jiac-tng. ActiveMQ-Broker will build
+					a network-of-brokers with other brokers within the network (due to
+					technical limitations of multicast messages usually this means
+					inside an IP subnet) that are sharing the same logical discovery
+					multicast-address. This is what is called in JIAC a Platform.
+				</p>
+				<p>Discovery via gateways is used for scenarios where multicast
+					discovery doesn't work:
+				</p>
+				<ul>
+					<li>If communication partners (or MessageBroker) are in different
+						subnets.
+					</li>
+					<li>If certain network nodes (e.g. routers) doesn't support
+						multicast properly.
+					</li>
+				</ul>
+				<p>In cases multicast is not working, several MessageBrokers can be
+					connected via Gateways. A Gateway can be realized with an AgentNode
+					using a ActiveMQBroker configured as Gateway. The intention of
+					using gateways is similar to the intention of using a RMI registry,
+					which is used if the JMX multicast discovery mechanism of the JMX
+					management interface is not working.
+				</p>
+				<p>Both discovery mechanisms can be combined in order to link
+					different network-of-brokers to one large network-of-brokers
+					connected by gateways, which also becomes handy for discovering
+					remote services.
+				</p>
+				<p>By default messages send by the MessageBroker are not encrypted
+					and the interface doesn't use authentication. JIAC provides a way
+					to secure the MessageBroker's transport channel with SSL/TLS using
+					certificates. Technically, the protocol of the
+					ActiveMQTransportConnector's transport URI is set from TCP to SSL.
+					The multicast discovery is not protected by SSL/TLS, because the
+					multicast messages just carry the transport URI as payload.
+				</p>
+			</subsection>
+
+			<subsection name="Management Interface">
+				<p>JIAC's Management Interface component is realized with JMX and
+					allows remote (but also local) management and monitoring of
+					manageable JIAC components via a JMX interface. The predefined JIAC
+					configuration NodeWithDirectory doesn't have the Management
+					Interface activated, but NodeWithJMX, NodeWithSecuredJMX and
+					NodeWithRegistry do have (by providing a RMI JMX connector).
+				</p>
+				<p>An activated Management Interface component establishes a
+					management channel. This comprises multicast discovery mechanisms
+					and the JMX management interface accessible (remote or local) over
+					RMI.
+				</p>
+				<p>The Management Interface provides two discovery mechanisms
+					(similar to the MessageBroker component):
+				</p>
+				<ul>
+					<li>Multicast discovery messages (UDP datagrams).</li>
+					<li>Discovery via RMI Registry.</li>
+				</ul>
+				<p>
+					The multicast discovery messages (datagram packages via UPD) are
+					sent periodically over a multicast socket using the default
+					discovery URI multicast://226.6.6.7:9999. The datagrams contains a
+					JMX RMI URI (service:jmx:rmi://
+					&lt;IP&gt;
+					/
+					&lt;path&gt;) which is necessary to connect successfully to a certain
+					Management Interface component (technically to a RMI connector
+					server). Sending multicast discovery messages containing the JMX
+					RMI URI is an own implementation and not provided by JMX.
+				</p>
+				<p>The RMI registry is realized with ja Java tool of the same name.
+					Note: By default the RMI registry has to be on the same computer
+					where the MBean server is executed within the JVM. But the
+					management client that is using the RMI registry (e.g.
+					JMXManagementClient or ASGARD) is allowed to be on a remote
+					computer.
+				</p>
+				<p>The Management Interface provides an external interface following
+					the pull (a command-query-interface) and push (by inversion of
+					control with observers) technique. This interface is implemented
+					using standard JMX technology.
+				</p>
+				<p>Which JIAC components are manageable when JMX is activated? Every
+					class (or component) implementing ILifecycle also implements the
+					interface Manageable, this are: Agent, AgentBean, AgentNode,
+					AgentNodeBean, Memory, ExecutionCycle. These components and
+					specialisation are manageable. But all these manageable components
+					of a JIAC MAS are accessed in a centralized way through their
+					related AgentNode.
+				</p>
+				<p>Technically JMX realizes the access to manageable components via
+					RMI with so-called RMI connector servers, which enables management
+					clients like JConsole to manage and monitor the MBeans remotely
+					over a network. In JIAC, only an AgentNode has JMX connector
+					servers. An AgentNode can have multiple JMX connector server, one
+					for a combination of a protocol (e.g. RMI, HTTP/SOAP – but
+					currently JIAC is using just RMI) and for a network interface (e.g.
+					wlan0, eth0). During an AgentNode's runtime these connector servers
+					are created or deleted, e.g., depending of available network
+					interfaces on the host computer. Thus, only an AgentNode is sending
+					periodically multicast discovery messages, each of them containing
+					the JMX RMI URI of one of the many JMX connector servers an
+					AgentNodes possesses.
+				</p>
+				<p>By default, the communication is not encrypted and the interface
+					doesn't use authentication. SSL/TLS can be activated to secure the
+					transport. Multicast discovery messages are not secured with
+					SSL/TLS, because they just contain a JMX RMI URI. Furthermore the
+					JMX management interface can be secured by using authentication
+					with a user name and password.
+				</p>
+				<p>JIAC provides the library JMXManagementClient that provides a
+					convenient Java API for managing and monitoring a JIAC MAS with
+					activated JMX Management Interface. For instance the management and
+					monitoring application ASGARD is using this library.
+				</p>
+
+
+			</subsection>
+
+		</section>
+	</body>
+</document>

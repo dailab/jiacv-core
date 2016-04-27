@@ -1,11 +1,8 @@
 package de.dailab.jiactng.agentcore.execution;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Future;
@@ -16,8 +13,6 @@ import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.action.SessionEvent;
-import de.dailab.jiactng.agentcore.environment.ResultReceiver;
-import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * A non-blocking ExecutionCycle implementation. This class executes active agentbeans
@@ -169,37 +164,7 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 		}
 
 		public void run() {
-			final Action action = (Action) doAction.getAction();
-			log.debug("canceling DoAction " + doAction);
-
-			ActionResult result = null;
-			if ((action == null)) {
-				log.warn("Found doAction with missing action:" + doAction);
-			} else if (action.getProviderBean() == null) {
-				// TODO: this happens always with transmitted doActions due to transient fields. Is there a better solution?
-				if(thisAgent.getAgentDescription().getAid().equals(action.getProviderDescription().getAid())) {
-					log.info("Found doAction with missing providerBean:" + doAction);
-				}
-			} else {
-				result = action.getProviderBean().cancelAction(doAction);
-			}
-
-			// if no result was created, use TimeoutExecption as default result
-			if (result == null) {
-				if(doAction.getSource()!=null) {
-					result = new ActionResult(doAction, new TimeoutException(TIMEOUT_MESSAGE));
-				}
-			}
-
-			if ((doAction.getSource() != null) && (doAction.getSource() instanceof ResultReceiver)) {
-				log.debug("sending timeout Result to source of Session " + session);
-				final ResultReceiver receiver = (ResultReceiver)doAction.getSource();
-		
-				receiver.receiveResult(result);
-			} else {
-			  // TODO: this happens always with transmitted doActions due to transient fields. Is there a better solution? 
-				log.info("Session without Result-Receiver Source: DoAction had to be canceled due to sessiontimeout " + doAction);
-			}
+			processSessionTimeout(session, doAction);
 		}
 		
 	}

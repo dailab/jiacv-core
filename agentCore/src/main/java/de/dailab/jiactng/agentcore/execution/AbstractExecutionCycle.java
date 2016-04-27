@@ -227,6 +227,48 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
    }
 
    /**
+    * Handle session timeout of DoAction. This will (try to) invoke the cancelAction method
+    * of the provider bean, if any, or if that method returned null, just create the
+    * standard timeout action result.
+    *  
+    * @param session		the session
+    * @param doAction		the do-action to cancel
+    */
+   protected void processSessionTimeout(Session session, DoAction doAction) {
+	   final Action action = (Action) doAction.getAction();
+		log.info("Canceling DoAction " + doAction);
+
+		ActionResult result = null;
+		if ((action == null)) {
+			log.warn("Found doAction with missing action:" + doAction);
+		} else if (action.getProviderBean() == null) {
+			// TODO: this happens always with transmitted doActions due to transient fields. Is there a better solution?
+			if(thisAgent.getAgentDescription().getAid().equals(action.getProviderDescription().getAid())) {
+				log.info("Found doAction with missing providerBean:" + doAction);
+			}
+		} else {
+			result = action.getProviderBean().cancelAction(doAction);
+		}
+
+		// if no result was created, use TimeoutExecption as default result
+		if (result == null) {
+			if(doAction.getSource()!=null) {
+				result = new ActionResult(doAction, new TimeoutException(TIMEOUT_MESSAGE));
+			}
+		}
+
+		if ((doAction.getSource() != null) && (doAction.getSource() instanceof ResultReceiver)) {
+			log.debug("sending timeout Result to source of Session " + session);
+			final ResultReceiver receiver = (ResultReceiver)doAction.getSource();
+	
+			receiver.receiveResult(result);
+		} else {
+		  // TODO: this happens always with transmitted doActions due to transient fields. Is there a better solution? 
+			log.info("Session without Result-Receiver Source: DoAction had to be canceled due to sessiontimeout " + doAction);
+		}
+   }
+   
+   /**
     * {@inheritDoc}
     */
    public int getExecutionWorkload() {

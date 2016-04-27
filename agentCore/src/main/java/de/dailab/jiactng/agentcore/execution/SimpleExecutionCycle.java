@@ -6,20 +6,14 @@
  */
 package de.dailab.jiactng.agentcore.execution;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import de.dailab.jiactng.agentcore.IAgentBean;
-import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.action.SessionEvent;
-import de.dailab.jiactng.agentcore.environment.ResultReceiver;
-import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
  * A simple ExecutionCycle implementation. This class executes active agentbeans (those agentbeans where the
@@ -184,35 +178,7 @@ public final class SimpleExecutionCycle extends AbstractExecutionCycle {
               final DoAction doAction = (DoAction) event;
               memory.remove(doAction);
 
-              if (doAction.getAction() instanceof Action) {
-                // Got an Action, so let's cancel this doAction
-
-                final Action action = (Action) doAction.getAction();
-                log.info("Canceling DoAction " + doAction);
-
-                ActionResult result = null;
-                if ((action == null)) {
-                  log.warn("Found doAction with missing action:" + doAction);
-                } else if (action.getProviderBean() == null) {
-                  log.warn("Found doAction with missing providerBean:" + action);
-                } else {
-                  result = action.getProviderBean().cancelAction(doAction);
-                }
-
-                // if no result was created, use TimeoutExecption as default result
-                if (result == null) {
-                  result = new ActionResult(doAction, new TimeoutException(TIMEOUT_MESSAGE));
-                }
-                
-                if ((doAction.getSource() != null) && (doAction.getSource() instanceof ResultReceiver)) {
-                  log.debug("sending timeout Result to source of DoAction " + doAction);
-                  final ResultReceiver receiver = (ResultReceiver)doAction.getSource();
-
-                  receiver.receiveResult(result);
-                } else {
-                  log.warn("DoAction without ResultReceiver-Source: DoAction had to be canceled due to sessiontimeout " + doAction);
-                }
-              }
+              processSessionTimeout(session, doAction);
             }
           }
 

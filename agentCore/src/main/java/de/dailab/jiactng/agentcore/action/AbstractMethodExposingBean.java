@@ -288,6 +288,12 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
             
             
         	if (semanticURI != null && !semanticURI.equals("")) {
+        		try {
+        			Class.forName("de.dailab.jiactng.owlsdescription.ServiceDescription");
+        		} catch (ClassNotFoundException e) {
+        			log.warn("Exposing Action with semantic service IRI without having access to "
+        					+ "ServiceDescription class to handle invocations of the service.");
+        		}
         		act.setSemanticServiceDescriptionIRI(semanticURI);
         	}
             

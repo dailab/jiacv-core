@@ -643,7 +643,17 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 							.findBestMatch(templateSD, serviceDescList);
 
 					if (matcherResult != null) {
-						return matcherResult;
+						
+						IActionDescription iad = this.findActionDescription(matcherResult);
+						
+						if (iad != null){
+							
+							return iad;
+						
+						} else {
+							log.warn("Matcher found result, however the respective was not found afterwards. Trying normal template matching.");
+						}
+						
 					} else {
 						log.warn("Matcher found no result, trying normal template matching...");
 					}
@@ -1141,6 +1151,64 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	public List<String> getGroupNames() {
 		return groupAddressNames;
+	}
+
+	
+	/**
+	 * Searches for the respective ActionDescription for a given ServiceDescription. The 
+	 * ActionDescription can then be used for the invocation part. This ensures that the provider 
+	 * side does not have to include the ServiceDescription libraries within the JIAC environment. 
+	 * 
+	 * 
+	 * @param isd The ServiceDescription for which the respective ActionDescription is missing 
+	 * @return The respective ActionDescription, if still running. Otherwise null.
+	 */
+	private IActionDescription findActionDescription(IServiceDescription isd){
+		// find serviceDescription in local actions
+		synchronized (localActions) {
+			for (IActionDescription localAct : localActions) {
+			    
+	
+				if (compare(localAct, isd)){
+					return localAct;
+				}
+						
+			}
+		}
+		
+		// find serviceDescription in remote Actions
+		synchronized (remoteActions) {
+			for (Set<IActionDescription> remoteActSet : remoteActions.values()) {
+				for (IActionDescription remoteAct : remoteActSet) {
+				    if (compare(remoteAct, isd)){
+				    	return remoteAct;
+				    }
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Compares two actions with each other
+	 * 
+	 * @param iad ActionDescription
+	 * @param isd ServiceDescription
+	 * @return
+	 */
+	private boolean compare(IActionDescription iad, IServiceDescription isd) {
+		
+		if(iad.getName().equals(isd.getName()) &&
+				iad.getSemanticServiceDescriptionIRI().equals(isd.getSemanticServiceDescriptionIRI()) &&
+				iad.getProviderDescription().equals(isd.getProviderBean()) &&
+				iad.getScope().equals(isd.getScope())){
+		
+			return true;
+		
+		}
+		
+		return false;
 	}
 
 	/**

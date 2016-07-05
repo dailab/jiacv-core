@@ -162,6 +162,33 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	}
 
 	/**
+	 * Checks if the managed agent has its own log level or inherits the log level from the agent node.
+	 * @return true if the log level of the agent node is used.
+	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent.
+	 * @throws SecurityException if the agent's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#getLogLevelInheritance()
+	 */
+	public final Boolean getAgentLogLevelInheritance() throws IOException, InstanceNotFoundException {
+		return (Boolean) getAttribute("LogLevelInheritance");
+	}
+
+	/**
+	 * Deactivates or activates the inheritance of the log level of the managed agent from the agent node.
+	 * @param inheritance true to use the log level of the agent node.
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
+	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent.
+	 * @throws SecurityException if the agent's attribute cannot be changed for security reasons.
+	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
+	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#setLogLevelInheritance(boolean)
+	 */
+	public final void setAgentLogLevelInheritance(boolean inheritance) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+		setAttribute("LogLevelInheritance", (Boolean) inheritance);
+	}
+
+	/**
 	 * Gets detailed information about the current logger of the managed agent.
 	 * @return Information about the agent's logger.
 	 * @throws InstanceNotFoundException The agent does not exist on the managed agent node. 

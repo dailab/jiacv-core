@@ -325,29 +325,6 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 	public final String getLogLevel() {
 		if (log != null) {
 			return log.getEffectiveLevel().toString();
-/*
-			if (log.isTraceEnabled()) {
-				return Level.TRACE.toString();
-			}
-			else if (log.isDebugEnabled()) {
-				return Level.DEBUG.toString();
-			}
-			else if (log.isInfoEnabled()) {
-				return Level.INFO.toString();
-			}
-			else if (log.isWarnEnabled()) {
-				return Level.WARN.toString();
-			}
-			else if (log.isErrorEnabled()) {
-				return Level.ERROR.toString();
-			}
-			else if (log.isFatalEnabled()) {
-				return Level.FATAL.toString();
-			}
-			else {
-				return Level.OFF.toString();
-			}
-*/
 		}
 		return null;
 	}
@@ -359,6 +336,40 @@ public abstract class AbstractLifecycle extends NotificationBroadcasterSupport i
 		intendedLogLevel = Level.toLevel(level, intendedLogLevel);
 		if (log != null && (intendedLogLevel != null)) {
 			log.setLevel(intendedLogLevel);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public final Boolean getLogLevelInheritance() {
+		if (log != null) {
+			// log level is inherited from parent logger if the log level of the own logger is null
+			return (log.getParent() != null) && (log.getLevel() == null);
+		}
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public final void setLogLevelInheritance(Boolean inheritance) {
+		if ((log == null) || (inheritance == null)) {
+			return;
+		}
+		if (log.getParent() != null) {
+			if (inheritance) {
+				// activate inheritance by setting log level of the logger to null
+				intendedLogLevel = null;
+			}
+			else {
+				// deactivate inheritance by setting log level of the logger different to null
+				intendedLogLevel = log.getEffectiveLevel();
+			}
+			log.setLevel(intendedLogLevel);
+		}
+		else {
+			log.error("Unable to set log level inheritance of a root logger!");
 		}
 	}
 

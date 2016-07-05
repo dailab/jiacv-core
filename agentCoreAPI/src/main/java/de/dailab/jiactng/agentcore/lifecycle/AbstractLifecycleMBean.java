@@ -79,4 +79,22 @@ public interface AbstractLifecycleMBean {
 	 */
 	void setLogLevel(String level);
 
+	/**
+	 * Checks if the logger has an own log level or inherits the log level 
+	 * from the parent logger.
+	 * @return <code>null</code> if the logger is not initialized, 
+	 * 		<code>true</code> if the logger is not a root logger and does not 
+	 * 		have an own log level, <code>false</code> otherwise
+	 */
+	Boolean getLogLevelInheritance();
+
+	/**
+	 * Deactivates log level inheritance by setting a log level of the logger, 
+	 * or activates log level inheritance by removing the log level of the
+	 * logger. Nothing will happen if the logger is a root logger or the 
+	 * parameter is null.
+	 * @param inheritance <code>true</code> to activate inheritance from parent
+	 * 		logger and <code>false</code> to deactivate inheritance
+	 */
+	void setLogLevelInheritance(Boolean inheritance);
 }

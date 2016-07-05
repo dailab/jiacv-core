@@ -1109,13 +1109,14 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public final void addLog4JSocketAppender(String address, int port) {
 		final String appenderName = address + ":" + port;
-		System.out.println("Add socket appender for " + appenderName + " ...");
+		log.info("Add socket appender for " + appenderName + " ...");
 
 		// add appender for logger of the agent node
 		final SocketAppender appender = new SocketAppender(address, port);
+		appender.setName(appenderName);
 		log.addAppender(appender);
 
-		System.out.println("Socket appender added.");
+		log.info("Socket appender added.");
 	}
 
 	/**
@@ -1140,7 +1141,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 	 */
 	public final void removeLog4JSocketAppender(String address, int port) {
 		final String appenderName = address + ":" + port;
-		System.out.println("Remove socket appender for " + appenderName + " ...");
+		log.info("Remove socket appender for " + appenderName + " ...");
 
 		// remove appender from logger of the agent node
 		try {
@@ -1149,7 +1150,7 @@ public class SimpleAgentNode extends AbstractLifecycle implements IAgentNode, In
 			log.error("Unable to remove socket appender!", e);
 		}
 
-		System.out.println("Socket appender removed.");
+		log.info("Socket appender removed.");
 	}
 
 	/**

@@ -36,6 +36,7 @@ import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.comm.CommunicationAddressFactory;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
@@ -249,6 +250,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	public void doStart() throws Exception {
 		super.doStart();
 		lastSend = System.currentTimeMillis();
+
+		// send ALL message to each DF-group to get advertisements from all nodes
+		final JiacMessage allMessage = new JiacMessage();
+		allMessage.setProtocol(ALL);
+		for (ICommunicationAddress groupAddress : groupAddresses) {
+			sendMessage(allMessage, groupAddress);
+		}
+
+		// start timer for each DF-group to send ALIVE and ADVERTISE messages periodically
 		timer = new Timer();
 		for (ICommunicationAddress groupAddress : groupAddresses) {
 			long aliveInterval = aliveIntervals.get(groupAddress
@@ -1308,13 +1318,15 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		message.setHeader("UUID", this.agentNode.getUUID());
 		try {
 			messageTransport.send(message, address, 0);
-			final long interval = System.currentTimeMillis() - lastSend;
-			if (interval > 2 * getAliveInterval(address.toUnboundAddress()
-					.getName())) {
-				log.warn("Measured interval of sending alive message: "
-						+ interval);
+			if (address instanceof IGroupAddress) {
+				final long interval = System.currentTimeMillis() - lastSend;
+				if (interval > 2 * getAliveInterval(address.toUnboundAddress()
+						.getName())) {
+					log.warn("Measured interval of sending alive message: "
+							+ interval);
+				}
+				lastSend = System.currentTimeMillis();
 			}
-			lastSend = System.currentTimeMillis();
 		} catch (Exception e) {
 			log.error("sendMessage failed. Message:\n" + message.toString(), e);
 		}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
+import de.dailab.jiactng.agentcore.comm.IGroupAddress;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
@@ -31,10 +32,12 @@ public class DirectoryAgentNodeBeanStub extends DirectoryAgentNodeBean{
 	@Override
 	protected void sendMessage(JiacMessage message,
 			ICommunicationAddress address) {
-		
-		//deletes df@
-		String cleanName = address.toUnboundAddress().getName().split("@")[1];
-		sendMessagesToGroup.add(cleanName);
+
+		if (address instanceof IGroupAddress) {
+			//deletes df@
+			String cleanName = address.toUnboundAddress().getName().split("@")[1];
+			sendMessagesToGroup.add(cleanName);
+		}
 		
 		super.sendMessage(message, address);
 	}

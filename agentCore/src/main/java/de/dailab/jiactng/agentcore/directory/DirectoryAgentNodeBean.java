@@ -1211,7 +1211,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		
 		if(iad.getName().equals(isd.getName()) &&
 				iad.getSemanticServiceDescriptionIRI().equals(isd.getSemanticServiceDescriptionIRI()) &&
-				iad.getProviderDescription().equals(isd.getProviderBean()) &&
+				iad.getProviderDescription().equals(isd.getProviderDescription()) &&
 				iad.getScope().equals(isd.getScope())){
 		
 			return true;

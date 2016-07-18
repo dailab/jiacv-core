@@ -10,6 +10,10 @@
 			<action dev="keiser" type="fix">
 				"JARMemory must close streams after reading jar file to unlock file."
 			</action>
+			<action dev="keiser" type="add">
+				New getter and setter to manage inheritance of log level 
+				between node, agent and bean.
+			</action>
 		</release>
 		<release version="5.2.1" date="2016-01-07" description="Minor release">
 		</release>

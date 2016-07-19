@@ -1025,12 +1025,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		final String nodeAddress = node.getName();
 		synchronized (nodes) {
 			if (nodes.containsKey(nodeAddress)) {
-				final long interval = System.currentTimeMillis()
-						- nodes.get(nodeAddress).getAlive();
-				long aliveInterval = groupAddress != null? getAliveInterval(groupAddress) : getAliveInterval();
-				if (interval > 2 * aliveInterval) {
-					log.warn("Measured interval of receiving alive message from "
-							+ nodeAddress + ": " + interval);
+				if (groupAddress != null) {
+					final long interval = System.currentTimeMillis()
+							- nodes.get(nodeAddress).getAlive();
+					long aliveInterval = getAliveInterval(groupAddress);
+					if (interval > 2 * aliveInterval) {
+						log.warn("Measured interval of receiving alive message from "
+								+ nodeAddress + ": " + interval);
+					}
 				}
 				nodes.get(nodeAddress).setAlive(System.currentTimeMillis());
 			} else {
@@ -1314,7 +1316,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	protected void sendMessage(JiacMessage message,
 			ICommunicationAddress address) {
 		message.setSender(myAddress);
-		message.setGroup(address.toUnboundAddress().getName());
+		if (address instanceof IGroupAddress) {
+			message.setGroup(address.toUnboundAddress().getName());
+		}
 		message.setHeader("UUID", this.agentNode.getUUID());
 		try {
 			messageTransport.send(message, address, 0);

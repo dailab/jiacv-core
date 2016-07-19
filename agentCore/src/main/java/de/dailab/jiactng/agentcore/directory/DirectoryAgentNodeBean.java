@@ -888,7 +888,8 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			ICommunicationAddress at) {
 
 		final ICommunicationAddress senderAddress = message.getSender();
-		final String groupAddress = message.getGroup();
+		//final String groupAddress = message.getGroup();
+		final String groupAddress = (at instanceof IGroupAddress)? at.toUnboundAddress().getName() : null;
 
 		// own message, do nothing
 		if (senderAddress == null || senderAddress.equals(myAddress)) {
@@ -1028,8 +1029,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				if (groupAddress != null) {
 					final long interval = System.currentTimeMillis()
 							- nodes.get(nodeAddress).getAlive();
-					long aliveInterval = getAliveInterval(groupAddress);
-					if (interval > 2 * aliveInterval) {
+					if (interval > 2 * getAliveInterval(groupAddress)) {
 						log.warn("Measured interval of receiving alive message from "
 								+ nodeAddress + ": " + interval);
 					}

@@ -54,6 +54,7 @@ public class ActiveMQBroker extends AbstractAgentNodeBean implements ActiveMQBro
 			proxy.connectionFactory = new ActiveMQConnectionFactory("vm://" + instance.getBrokerName()
 																							+ "?broker.persistent=false");
 		}
+		((ActiveMQConnectionFactory)proxy.connectionFactory).setTrustAllPackages(true);
 	}
 
 	protected String _brokerName = null;

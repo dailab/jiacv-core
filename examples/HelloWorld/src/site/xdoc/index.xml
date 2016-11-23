@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+  <properties>
+    <title>Overview</title>
+    <author email="jan.keiser@dai-labor.de">Jan Keiser</author>
+  </properties>
+  <body>
+  <section name="Hello World - Overview">
+    <subsection name="Goals"> 
+       <p>
+          This smallest example will introduce the following JIAC TNG components and concepts:
+       </p>
+       <ul>
+         <li>AgentNode</li>
+         <li>AgentBean</li>
+         <li>Memory</li>
+         <li>Action</li>
+         <li>Logging</li>
+         <li>Configuration</li>
+       </ul>
+
+       <p>You will learn how to use Actions, how to print log
+          messages, how to use the memory and how to
+          configure all neccessary components, namely AgentBeans, Agents and
+          AgentsNodes, in order to start the application.
+       </p>
+
+    </subsection>
+
+    <subsection name="Scenario">
+       <p>
+          In this scenario, three agents print the log message "Hello World" during the
+          change to the lifecycle state "STARTED" by using the generic action mechanism. 
+          All agents reside on the same node.
+       </p>
+    </subsection>
+
+    <subsection name="Implementation">
+       <p>
+          In the first step we have to implement an agent bean which provides the action
+          and another agent bean which triggers this action.
+       </p>
+        
+       <p>
+          To provide an action we annotate the method as exposed and give this action a name.
+          This action creates a log message at the level "INFO".
+       </p>
+        
+	   <source>
+public class HelloProviderBean extends AbstractMethodExposingBean {
+
+	@Expose(name = "helloWorld")
+	public void helloWorld() {
+		log.info("Hello World");
+	}
+}</source>
+
+       <p>
+          To trigger the action during the start of the agent we extend the lifecycle method 
+          doStart() with searching for an action with name "helloWorld" in the agent's knowledge 
+          base and putting an invocation of the action into the knowledge base.
+       </p>
+        
+	   <source>
+public class HelloUserBean extends AbstractAgentBean {
+
+	public void doStart() throws Exception {
+		super.doStart();
+		Action a = memory.read(new Action("helloWorld"));
+		memory.write(a.createDoAction(new Class[0], null));
+	}
+}</source>
+
+       <p>
+          In the second step we have to define a Spring-based configuration of the
+          agent node, the agents and the agent beans.
+       </p>
+
+	   <source>
+&lt;beans&gt;
+   &lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" /&gt;
+   &lt;import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" /&gt;
+
+   &lt;bean name="HelloWorldNode" parent="Platform"&gt;    
+      &lt;property name="agents"&gt;
+         &lt;list&gt;
+            &lt;ref bean="HelloWorldAgent" /&gt;
+            &lt;ref bean="HelloWorldAgent" /&gt;
+            &lt;ref bean="HelloWorldAgent" /&gt;
+         &lt;/list&gt;
+      &lt;/property&gt;
+   &lt;/bean&gt;
+
+   &lt;bean name="HelloWorldAgent" parent="SimpleAgent" singleton="false"&gt;
+      &lt;property name="agentBeans"&gt;
+         &lt;list&gt;
+            &lt;ref bean="ProviderBean" /&gt;
+            &lt;ref bean="UserBean" /&gt;
+         &lt;/list&gt;
+      &lt;/property&gt;
+   &lt;/bean&gt;
+
+   &lt;bean name="ProviderBean" class="de.dailab.jiactng.examples.helloWorld.HelloProviderBean" singleton="false"&gt;
+      &lt;property name="logLevel" value="INFO" /&gt;
+   &lt;/bean&gt;
+
+   &lt;bean name="UserBean" class="de.dailab.jiactng.examples.helloWorld.HelloUserBean" singleton="false" /&gt;
+&lt;/beans&gt;</source>
+
+    </subsection>
+
+    <subsection name="Running the example">
+       <p>
+          The Maven assembly process provides start skripts in the folder target/appassembler/bin. 
+          By using an IDE you can alternatively start this example with the class HelloWorldStarter.
+          By using the tool ASGARD you can also
+       </p>
+       <ul>
+          <li>get information about the agents and executed actions with jConsole,</li>
+          <li>stop and restart agents to trigger action invocations, and</li>
+          <li>view log messages with LogFactor5.</li>
+       </ul>
+    </subsection>
+  </section>
+  </body>
+</document>

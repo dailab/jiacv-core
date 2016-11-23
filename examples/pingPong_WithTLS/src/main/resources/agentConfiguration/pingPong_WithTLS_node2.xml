@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
+
+	<!-- Agent Node -->
+	<bean name="PingPong_WithTLS_Node2" parent="NodeWithJMX">
+		<property name="agents">
+			<list>
+				<ref bean="PongAgent1" />
+			</list>
+		</property>
+		
+		<property name="overwriteDiscoveryURI" value="smartmulticast://default?group=test_TLS" />
+
+		<!-- TLS features -->
+		<property name="sslInUse" value="true" />
+		<property name="keyStore" value="docs/stores/node2/keystore.jks" />
+		<property name="keyStorePassword" value="changeit" />
+		<property name="trustStore" value="docs/stores/node2/truststore.jks" />
+		<property name="trustStorePassword" value="changeit" />
+		
+		<!-- Optional TLS properties -->
+		<!-- property name="keyStoreType" value="JKS" / -->
+		<!-- property name="trustStoreType" value="JKS" / -->
+		<!-- property name="cipherSuitesToUse" value="TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256" 
+			/ -->
+	</bean>
+
+	<!-- Agents -->
+	<bean name="PongAgent1" parent="SimpleAgent" singleton="false">
+		<property name="agentBeans">
+			<list>
+				<ref bean="PongBean" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- AgentBeans -->
+	<bean name="PongBean" class="de.dailab.asgard.withTLS.pingPong.PongBean"
+		singleton="false">
+		<property name="executionInterval" value="2000" />
+		<property name="logLevel" value="INFO" />
+	</bean>
+
+</beans>

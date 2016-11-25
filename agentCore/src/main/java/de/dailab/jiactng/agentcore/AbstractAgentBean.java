@@ -42,6 +42,9 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
    * Interval by which the execute()-method of the bean is called. If negative, the execute-method is never called.
    */
   private int  executionInterval   = -1;
+  
+  /** Whether the bean's first execution should be 'now' or 'now + executionInterval' */
+  private boolean executeImmediately = false;
 
   /**
    * Used by the execution cycle to determine the next execution time when <code>executeInterval</code> is greater
@@ -286,12 +289,39 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
       if (nextExecutionTime > 0) {
         nextExecutionTime = nextExecutionTime - executionInterval + newExecutionInterval;
       } else {
-        nextExecutionTime = System.currentTimeMillis() + newExecutionInterval;
+    	  if (executeImmediately) {
+    		  nextExecutionTime = System.currentTimeMillis();
+    	  } else {
+    		  nextExecutionTime = System.currentTimeMillis() + newExecutionInterval;
+    	  }
       }
     } finally {
       executionInterval = newExecutionInterval;
     }
   }  
+  
+
+	/**
+	 * Whether this bean will execute immediately after being started,
+	 * or only after waiting for `executionInterval` milliseconds first
+	 *
+	 * @param executeImmediately	first execution immediately after start?
+	 */
+	public void setExecuteImmediately(boolean executeImmediately) {
+		this.executeImmediately = executeImmediately;
+		// if execution time set, set it to "right now"
+		if (nextExecutionTime > 0) {
+			nextExecutionTime = System.currentTimeMillis();
+		}
+	}
+
+	/**
+	 * @return Whether this bean will execute immediately after being started,
+	 *         or only after waiting for `executionInterval` milliseconds first
+	 */
+	public boolean isExecuteImmediately() {
+		return executeImmediately;
+	}
   
   /**
    * {@inheritDoc}

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <!-- Generic application context definition. -->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
    <!--
       # The default AgentNode configuration
@@ -54,7 +57,7 @@
       </property>
    </bean>
 
-   <bean name="JaasAuthenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator" singleton="false">
+   <bean name="JaasAuthenticator" class="de.dailab.jiactng.agentcore.management.jmx.JaasAuthenticator" scope="prototype">
 <!--    lazy-init="true">-->
       <property name="configuration">
          <list>
@@ -69,7 +72,7 @@
       </property>
    </bean>
 
-   <bean name="LoginJaas" class="de.dailab.jiactng.agentcore.management.jmx.JaasConfigurationEntry" singleton="false">
+   <bean name="LoginJaas" class="de.dailab.jiactng.agentcore.management.jmx.JaasConfigurationEntry" scope="prototype">
 <!--    lazy-init="true">-->
       <property name="loginModuleName" value="com.sun.security.auth.module.Krb5LoginModule"/>
       <property name="controlFlag" value="required"/>
@@ -139,7 +142,7 @@
 		##################################################################
 	 -->
 
-	<bean name="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" singleton="true" lazy-init="true"> 
+	<bean name="IDirectory" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" scope="singleton" lazy-init="true"> 
 		<property name="messageTransport">
 			<ref bean="StandardJMSMessageTransport" />
 		</property>

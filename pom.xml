@@ -697,8 +697,9 @@
 	</mailingLists>
 
 	<scm>
-		<connection>scm:git:git://git.dai-labor.de:jiac-v/core.git</connection>
-		<developerConnection>scm:git:git@git.dai-labor.de:jiac-v/core.git</developerConnection>
+		<url>https://gitlab.tubit.tu-berlin.de/jiac-devs/core-new</url>
+		<connection>scm:git:git://gitlab.tubit.tu-berlin.de:jiac-devs/core-new.git</connection>
+		<developerConnection>scm:git:git@gitlab.tubit.tu-berlin.de:jiac-devs/core-new.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	

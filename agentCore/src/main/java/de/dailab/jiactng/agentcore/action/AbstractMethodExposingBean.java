@@ -124,6 +124,13 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
      * @return			parameters, if set, or null
      */
     public static List<String> getInputNames(Method method) {
+    	// if specified, use annotated parameter names from @Expose
+    	Expose expAnno = method.getAnnotation(Expose.class);
+    	String[] annotatedParamNames = expAnno.paramNames();
+    	if (annotatedParamNames != null && annotatedParamNames.length > 0) {
+    		return Arrays.asList(annotatedParamNames);
+    	}
+    	// otherwise, try to use reflection to get parameter names
     	/*
     	 * Method.getParameters is only available in Java 8, thus using reflection to
     	 * use reflection... this should later be replaced with regular method calls.

@@ -42,6 +42,9 @@ public class Action implements IActionDescription {
 	/** The component that holds the functionality for this action */
 	private transient IEffector providerBean = null;
 
+	/** the names of the input parameters of this action */
+	private List<String> inputNames;
+	
 	/** The class names of the input-parameters of this action */
 	private List<String> inputTypeNames;
 
@@ -233,6 +236,13 @@ public class Action implements IActionDescription {
 	/**
 	 * {@inheritDoc}
 	 */
+	public final List<String> getInputNames() {
+		return this.inputNames;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	public final List<String> getInputTypeNames() {
 	    return this.inputTypeNames;
 	}
@@ -309,6 +319,13 @@ public class Action implements IActionDescription {
 		this.name = newName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	public final void setInputNames(List<String> newInputNames) {
+		this.inputNames = newInputNames;
+	}
+	
 	/**
 	 * Sets the input types of this action.
 	 * 

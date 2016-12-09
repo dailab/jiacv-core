@@ -514,6 +514,7 @@ public class Action implements IActionDescription {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Action:\n name='").append(this.name).append("'");
 		builder.append("\n parameters=").append(this.inputTypeNames);
+		builder.append("\n paramNames=").append(this.inputNames);
 		builder.append("\n results=").append(this.resultTypeNames);
 		builder.append("\n bean=");
 		builder.append(this.providerBean);

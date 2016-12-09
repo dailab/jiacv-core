@@ -36,6 +36,9 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 	/** Last update received. */
 	private long alive;
 
+	/** The alive interval of the node's directory for this group */
+	private long aliveInterval;
+
 	/**
 	 * Constructor for setting address and alive time of the agent node.
 	 * @param address the messageBox address of the agent node
@@ -127,18 +130,35 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 		alive = newAlive;
 	}
 
+	/**
+	 * Gets the interval in which the node reports alive.
+	 * @return the interval in milliseconds
+	 */
+	public final long getAliveInterval() {
+		return aliveInterval;
+	}
+
+	/**
+	 * Sets the interval in which the node reports alive.
+	 * @param aliveInterval the interval in milliseconds
+	 */
+	public final void setAliveInterval(long aliveInterval) {
+		this.aliveInterval = aliveInterval;
+	}
+
 	private String[] getItemNames() {
 		return new String[] {
 				ITEMNAME_ADDRESS,
 				ITEMNAME_JMXURLS,
-				ITEMNAME_ALIVE
+				ITEMNAME_ALIVE,
+				ITEMNAME_ALIVE_INTERVAL
 	    };
 	}
 
 	/**
 	 * Gets the type of JIAC agent node descriptions based on JMX open types.
 	 * 
-	 * @return A composite type containing agent node address, JMX URLs and last time of alive.
+	 * @return A composite type containing agent node address, JMX URLs, last time of alive, and alive interval.
 	 * @throws OpenDataException
 	 *             if an error occurs during the creation of the type.
 	 * @see javax.management.openmbean.CompositeType
@@ -147,7 +167,8 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 		final OpenType<?>[] itemTypes = new OpenType<?>[] {
 				SimpleType.STRING,
 				ArrayType.getArrayType(SimpleType.STRING),
-				SimpleType.STRING
+				SimpleType.STRING,
+				SimpleType.LONG
 		};
 
 		// use names of agent node description items as their description
@@ -160,7 +181,7 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 	/**
 	 * Gets the description of this JIAC agent node description based on JMX open types.
 	 * 
-	 * @return Composite data containing agent node address, JMX URLs and last time of alive.
+	 * @return Composite data containing agent node address, JMX URLs, last time of alive, and alive interval.
 	 * @throws OpenDataException
 	 *             if an error occurs during the creation of the data.
 	 * @see javax.management.openmbean.CompositeData
@@ -177,7 +198,8 @@ public class AgentNodeDescription implements IAgentNodeDescription {
 		final Object[] itemValues = new Object[] {
 				(address != null)? address.getName():null,
 				urls,
-				new Date(alive).toString()
+				new Date(alive).toString(),
+				aliveInterval
 		};
 
 		final CompositeType type = (CompositeType) getDescriptionType();

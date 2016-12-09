@@ -25,7 +25,10 @@ public class DirectoryAgentNodeBeanStub extends DirectoryAgentNodeBean{
 	public void onMessage(MessageTransport source, IJiacMessage message,
 			ICommunicationAddress at) {
 		
-		receivedMessagesFromGroup.add(message.getGroup());
+		if (message.getGroup() != null) {
+			receivedMessagesFromGroup.add(message.getGroup());
+		}
+
 		super.onMessage(source, message, at);
 	}
 	

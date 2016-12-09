@@ -7,8 +7,11 @@
 	</properties>
 	<body>
 		<release version="5.2.2" date="T.B.A." description="Minor release">
+			<action dev="keiser" type="change">
+				Changed interfaces for management of directory intervals.
+			</action>
 			<action dev="keiser" type="fix">
-				"JARMemory must close streams after reading jar file to unlock file."
+				JARMemory must close streams after reading jar file to unlock file.
 			</action>
 			<action dev="keiser" type="add">
 				New getter and setter to manage inheritance of log level 

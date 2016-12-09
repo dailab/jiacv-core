@@ -19,21 +19,24 @@ public class Advertisement implements IFact {
 
 	private Set<JMXServiceURL> jmxURLs = new HashSet<JMXServiceURL>();
 
-	public Advertisement(Hashtable<String, IAgentDescription> agents) {
-		this(agents, null);
+	private long aliveInterval;
+
+	public Advertisement(Hashtable<String, IAgentDescription> agents, long aliveInterval) {
+		this(agents, null, aliveInterval);
 	}
 	
-	public Advertisement(Set<IActionDescription> actions) {
-		this(null, actions);
+	public Advertisement(Set<IActionDescription> actions, long aliveInterval) {
+		this(null, actions, aliveInterval);
 	}
 
-	public Advertisement(Hashtable<String, IAgentDescription> agents, Set<IActionDescription> actions) {
+	public Advertisement(Hashtable<String, IAgentDescription> agents, Set<IActionDescription> actions, long aliveInterval) {
 		if (agents != null) {
 			this.agents.putAll(agents);
 		}
 		if (actions != null) {
 			this.actions.addAll(actions);
 		}
+		this.aliveInterval = aliveInterval;
 	}
 	
 	public final Set<IActionDescription> getActions() {
@@ -66,5 +69,13 @@ public class Advertisement implements IFact {
 	 */
 	public final void setJmxURLs(Set<JMXServiceURL> newJmxURLs) {
 		jmxURLs.addAll(newJmxURLs);
+	}
+
+	/**
+	 * Gets the interval of sending alive messages by the node's directory.
+	 * @return the interval in milliseconds
+	 */
+	public final long getAliveInterval() {
+		return aliveInterval;
 	}
 }

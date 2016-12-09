@@ -42,16 +42,30 @@ public class DirectoryAgentNodeBeanTest extends JIACTestForJUnit3 {
 		nodeRef = null;
 	}
 	
-	public void testGetterSetter() {
-		//advertiseInterval
-		assertEquals(10800, directoryRef.getAdvertiseInterval());
-		directoryRef.setAdvertiseInterval(20000);
-		assertEquals(20000, directoryRef.getAdvertiseInterval());
+	public void testGetterSetter() throws Exception {
+		//advertiseIntervals
+		assertEquals(180000, directoryRef.getAdvertiseInterval("df@dfgroup"));
+		directoryRef.setAdvertiseInterval(120000);
+		directoryRef.cleanup();
+		directoryRef.start();
+		assertEquals(120000, directoryRef.getAdvertiseInterval("df@dfgroup"));
 		
-		//aliveInterval
-		assertEquals(2000, directoryRef.getAliveInterval());
-		directoryRef.setAliveInterval(1000);
-		assertEquals(1000, directoryRef.getAliveInterval());
+		//aliveIntervals
+		assertEquals(15000, directoryRef.getAliveInterval("df@dfgroup"));
+		directoryRef.setAliveInterval(10000);
+		directoryRef.cleanup();
+		directoryRef.start();
+		assertEquals(10000, directoryRef.getAliveInterval("df@dfgroup"));
+
+		//allowedAliveDelay
+		assertEquals(10000, directoryRef.getAllowedAliveDelay());
+		directoryRef.setAllowedAliveDelay(5000);
+		assertEquals(5000, directoryRef.getAllowedAliveDelay());
+		
+		//maxAliveDelay
+		assertEquals(20000, directoryRef.getMaxAliveDelay());
+		directoryRef.setMaxAliveDelay(15000);
+		assertEquals(15000, directoryRef.getMaxAliveDelay());
 	}
 
 	public void test() throws Exception{

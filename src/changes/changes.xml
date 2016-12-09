@@ -7,9 +7,13 @@
 	</properties>
 	<body>
 		<release version="5.2.2" date="T.B.A." description="Minor release">
-			<action dev="keiser" type="add">
-				Directory sends message ALL during start to get advertisement 
-				from all nodes immediately.
+			<action dev="keiser" type="change">
+				Directories synchronize faster, even if the advertisement 
+				interval is increased to save resources.
+			</action>
+			<action dev="keiser" type="change">
+				Alive and advertisement intervals may differ between nodes of 
+				the same platform.
 			</action>
 			<action dev="keiser" type="add">
 				New getter and setter to manage inheritance of log level 

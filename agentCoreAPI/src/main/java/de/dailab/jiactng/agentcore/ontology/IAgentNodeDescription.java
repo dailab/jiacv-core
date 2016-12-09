@@ -24,6 +24,9 @@ public interface IAgentNodeDescription extends IFact, JmxDescriptionSupport {
 	/** Item name which can be used to get the time of last alive of the agent node. */
     String ITEMNAME_ALIVE = "alive";
 
+	/** Item name which can be used to get the alive interval of the agent node. */
+    String ITEMNAME_ALIVE_INTERVAL = "aliveInterval";
+
     /**
 	 * Returns the messageBox address of the agent node.
 	 * @return the messageBox address of the agent node
@@ -42,4 +45,10 @@ public interface IAgentNodeDescription extends IFact, JmxDescriptionSupport {
 	 * @return the last time the agent node has sent a sign of life
 	 */
 	long getAlive();
+
+	/**
+	 * Returns the interval in which the node reports alive.
+	 * @return the interval in milliseconds
+	 */
+	long getAliveInterval();
 }

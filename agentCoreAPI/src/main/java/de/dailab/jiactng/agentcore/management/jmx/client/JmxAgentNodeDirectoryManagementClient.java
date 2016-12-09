@@ -1,6 +1,7 @@
 package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.InvalidAttributeValueException;
@@ -36,6 +37,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAliveInterval()
+	 * @deprecated
 	 */
 	public final long getAliveInterval() throws IOException, InstanceNotFoundException {
 		return ((Long) getAttribute("AliveInterval")).longValue();
@@ -49,9 +51,36 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAdvertiseInterval()
+	 * @deprecated
 	 */
 	public final long getAdvertiseInterval() throws IOException, InstanceNotFoundException {
 		return ((Long) getAttribute("AdvertiseInterval")).longValue();
+	}
+
+	/**
+	 * Get the intervals for each group the node sends an alive message in milliseconds.
+	 * @return mapping from group name (df@...) to the time between two alive messages in milliseconds for this group
+	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
+	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAliveInterval()
+	 */
+	public final Map<String, Long> getAliveIntervals() throws IOException, InstanceNotFoundException {
+		return (Map<String, Long>) getAttribute("AliveIntervals");
+	}
+
+	/**
+	 * Get the interval for each group the node sends an advertisement in milliseconds.
+	 * @return mapping from group name (df@...) to the time between two advertisements in milliseconds for this group
+	 * @throws InstanceNotFoundException The directory does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote directory.
+	 * @throws SecurityException if the directory's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAdvertiseInterval()
+	 */
+	public final Map<String, Long> getAdvertiseIntervals() throws IOException, InstanceNotFoundException {
+		return (Map<String, Long>) getAttribute("AdvertiseIntervals");
 	}
 
 	/**
@@ -141,6 +170,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#setAliveInterval(long)
+	 * @deprecated
 	 */
 	public final void setAliveInterval(long aliveInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("AliveInterval", Long.valueOf(aliveInterval));
@@ -155,6 +185,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @throws SecurityException if the directory's attribute cannot be changed for security reasons.
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#setAdvertiseInterval(long)
+	 * @deprecated
 	 */
 	public final void setAdvertiseInterval(long advertiseInterval) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("AdvertiseInterval", Long.valueOf(advertiseInterval));

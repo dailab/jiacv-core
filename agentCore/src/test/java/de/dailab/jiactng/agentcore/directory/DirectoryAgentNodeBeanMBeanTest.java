@@ -1,5 +1,7 @@
 package de.dailab.jiactng.agentcore.directory;
 
+import java.util.Map;
+
 import javax.management.openmbean.TabularData;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -55,8 +57,8 @@ public class DirectoryAgentNodeBeanMBeanTest extends JIACTestForJUnit3 {
 	 */
 	public void testGetAliveInterval() {
 		try {
-			Long interval = (Long) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "AliveInterval");
-			assertEquals("AgentMBean.getAliveInterval is wrong", Long.valueOf(2000), interval);
+			Map<String, Long> intervals = (Map<String, Long>) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "AliveIntervals");
+			assertEquals("AgentMBean.getAliveInterval is wrong", Long.valueOf(15000), intervals.get("df@dfgroup"));
 		} catch (Exception e) {
 			fail("Error while getting alive interval: "+e.getLocalizedMessage());
 		}
@@ -67,8 +69,8 @@ public class DirectoryAgentNodeBeanMBeanTest extends JIACTestForJUnit3 {
 	 */
 	public void testGetAdvertiseInterval() {
 		try {
-			Long interval = (Long) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "AdvertiseInterval");
-			assertEquals("AgentMBean.getAdvertiseInterval is wrong", Long.valueOf(10800), interval);
+			Map<String, Long> intervals = (Map<String, Long>) manager.getAttributeOfAgentNodeBean(nodeRef.getUUID(), beanName, "AdvertiseIntervals");
+			assertEquals("AgentMBean.getAdvertiseInterval is wrong", Long.valueOf(180000), intervals.get("df@dfgroup"));
 		} catch (Exception e) {
 			fail("Error while getting advertise interval: "+e.getLocalizedMessage());
 		}

@@ -7,9 +7,15 @@
 	</properties>
 	<body>
 		<release version="5.2.2" date="T.B.A." description="Minor release">
+			<action dev="keiser" type="change">
+				Directory sends amendment immediately after list of locally 
+				started agents changed. It also sends back an advertisement
+				to new nodes. These changes allows to use greater intervals
+				and although to synchronize faster.
+			</action>
 			<action dev="keiser" type="add">
-				Directory sends message ALL during start to get advertisement 
-				from all nodes immediately.
+				Advertisements of the directory contain the alive interval,
+				thus interval may differ between nodes of a platform.
 			</action>
 			<action dev="keiser" type="add">
 				New getter and setter to manage inheritance of log level 

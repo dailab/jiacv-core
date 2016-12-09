@@ -53,11 +53,14 @@ import de.dailab.jiactng.agentcore.ontology.IServiceDescription;
  * agent nodes of the platform. It also allows to get the JMX URLs of remote
  * agent nodes.
  * 
- * This agent node bean uses the address "df@dfgroup" to send and receive alive
- * messages to/from all other agent nodes of the platform at alive interval. At
- * advertise interval an advertise message will be send with information about
- * local agents, actions and JMX URLs. If the bean is stopped, a bye message
- * will be send.
+ * This agent node bean uses the default address "df@dfgroup" or corresponding 
+ * addresses of the defined groups to send and receive alive messages to/from 
+ * all other agent nodes of these groups at the given alive interval for the 
+ * specific group. At advertise interval an advertise message will be send to 
+ * each group with information about local agents, actions and JMX URLs. 
+ * An amendment with information about the started or stopped agent will be 
+ * send immediately after the list of locally started agents has been changed. 
+ * If the bean is stopped, a bye message will be send.
  * 
  * @author Jan Keiser
  * @see de.dailab.jiactng.agentcore.Agent#searchAllActions(IActionDescription)
@@ -81,29 +84,43 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 */
 	public static final String ADDRESS_NAME = "df";
 
-	/** Protocol for saying hello and still there to other agentnodes. */
+	/** Protocol for saying hello and still there to other agent nodes. */
 	public static final String ALIVE = ADDRESS_NAME + ":alive";
 
 	/** Protocol to stop being present. */
 	public static final String BYE = ADDRESS_NAME + ":bye";
 
-	/** Protocol to announce my actions. */
+	/** Protocol to announce my actions and agents. */
 	public static final String ADVERTISE = ADDRESS_NAME + ":advertise";
 
-	/** Protocol to request actions of other agentnodes. */
+	/** Protocol to amend my actions and agents. */
+	public static final String AMEND = ADDRESS_NAME + ":amend";
+
+	/** Protocol to request actions and agents of other agent nodes. */
 	public static final String ALL = ADDRESS_NAME + ":all";
 
 	/**
 	 * Interval for group address to send alive message to group if only one
-	 * group address exists. In milliseconds. Default is 2000.
+	 * group address exists. In milliseconds. Default is 15000.
 	 */
-	private long aliveInterval = 2000;
+	private long aliveInterval = 15000;
 
 	/**
 	 * Interval for group addresses to send alive message to group. In
-	 * milliseconds. Default is 2000.
+	 * milliseconds. Default is 15000.
 	 */
 	private HashMap<String, Long> aliveIntervals = null;
+
+	/** 
+	 * Exceeding this delay for sending or receiving alive messages leads to 
+	 * a warning log message. In milliseconds. Default is 10000.
+	 */
+	private long allowedAliveDelay = 10000;
+
+	/** 
+	 * Exceeding this delay for receiving alive messages leads to a removal of 
+	 * the remote node from the directory. In milliseconds. Default is 20000.*/
+	private long maxAliveDelay = 20000;
 
 	/** reference to the service Matcher if it exists */
 	private IServiceMatcher serviceMatcher = null;
@@ -116,7 +133,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * greater than aliveInterval to avoid spamming around. Default is 3
 	 * minutes.
 	 */
-	private long advertiseInterval = 10800;
+	private long advertiseInterval = 180000;
 
 	/**
 	 * Interval for every group address to send advertise message to group. In
@@ -125,7 +142,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 */
 	private HashMap<String, Long> advertiseIntervals = null;
 
-	/** The UUID of this agentnode. */
+	/** The UUID of this agent node. */
 	private String myAgentNode;
 
 	/** The inbox of this bean. */
@@ -134,7 +151,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	private List<String> groupAddressNames;
 
 	/** The group address of all directories. */
-	List<ICommunicationAddress> groupAddresses;
+	Set<ICommunicationAddress> groupAddresses;
 
 	/** The communication handling for sending and receiving messages. */
 	private MessageTransport messageTransport;
@@ -159,8 +176,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	private Hashtable<String, IAgentDescription> remoteAgents = new Hashtable<String, IAgentDescription>();
 
 	// TODO JMX
-	/** Stores all known agentnodes. Key is the message box address of the node. */
+	/** Stores all known agent nodes. Key is the message box address of the node. */
 	private Hashtable<String, AgentNodeDescription> nodes = new Hashtable<String, AgentNodeDescription>();
+
+	/** Stores the message box address of all missing nodes */
+	private Set<String> missingNodes = new HashSet<String>();
 
 	/** Timer that schedules alive pings and advertisements. */
 	private Timer timer;
@@ -184,7 +204,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		myAddress = CommunicationAddressFactory
 				.createMessageBoxAddress(ADDRESS_NAME + "@" + myAgentNode);
 		log.info("myAddress=" + myAddress);
-		groupAddresses = new ArrayList<ICommunicationAddress>();
+		groupAddresses = new HashSet<ICommunicationAddress>();
 
 		if (aliveIntervals == null) {
 			aliveIntervals = new HashMap<String, Long>();
@@ -251,13 +271,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		super.doStart();
 		lastSend = System.currentTimeMillis();
 
-		// send ALL message to each DF-group to get advertisements from all nodes
-		final JiacMessage allMessage = new JiacMessage();
-		allMessage.setProtocol(ALL);
-		for (ICommunicationAddress groupAddress : groupAddresses) {
-			sendMessage(allMessage, groupAddress);
-		}
-
 		// start timer for each DF-group to send ALIVE and ADVERTISE messages periodically
 		timer = new Timer();
 		for (ICommunicationAddress groupAddress : groupAddresses) {
@@ -266,7 +279,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			long advertiseInterval = advertiseIntervals.get(groupAddress
 					.toUnboundAddress().getName());
 			timer.schedule(new AgentNodePinger(groupAddress, aliveInterval,
-					advertiseInterval), aliveInterval, aliveInterval);
+					advertiseInterval), 3000, aliveInterval);
 		}
 	}
 
@@ -854,6 +867,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 					log.warn("Agent: " + agent.getAgentId()
 							+ " has no AgentBeans?!?");
 				}
+
+				// send advertisement with description of a single started agent
+				if (agentNode.getState() == LifecycleStates.STARTED) {
+					sendAmendment(agent.getAgentId(), true);
+				}
 			}
 		}
 
@@ -875,6 +893,11 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 
 				deregisterAgent(agent);
+
+				// send advertisement with ID of a single stopped agent
+				if (agentNode.getState() == LifecycleStates.STARTED) {
+					sendAmendment(agent, false);
+				}
 			}
 		}
 	}
@@ -898,12 +921,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		final String protocol = message.getProtocol();
 		if (log.isDebugEnabled()) {
-			log.debug("sender=" + senderAddress + " protocol=" + protocol);
+			log.debug("Received message with protocol " + protocol + " from " + senderAddress);
 		}
 
 		if (protocol.equals(ALIVE)) {
 			synchronized (nodes) {
-				refreshAgentNode(senderAddress, groupAddress);
+				refreshAgentNode(senderAddress, groupAddress, false);
 			}
 			return;
 		}
@@ -917,6 +940,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 						removeRemoteAgentOfNode(nodeAddress);
 						remoteActions.remove(nodeAddress);
 						nodes.remove(nodeAddress);
+						log.info(nodeAddress + " removed");
 					}
 				}
 				dump(nodeAddress + " says bye");
@@ -926,14 +950,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		else if (protocol.equals(ADVERTISE)) {
 			synchronized (nodes) {
-				// refresh agent nodes
-				final Set<JMXServiceURL> connectors = ((Advertisement) message
-						.getPayload()).getJmxURLs();
-				if (connectors != null) {
-					refreshAgentNode(senderAddress, groupAddress, connectors);
-				} else {
-					refreshAgentNode(senderAddress, groupAddress);
-				}
+				// refresh agent node
+				final Advertisement payload = (Advertisement) message.getPayload();
+				refreshAgentNode(senderAddress, groupAddress, payload.getJmxURLs(), payload.getAliveInterval());
 
 				// refresh remote actions
 				final Set<IActionDescription> actions = ((Advertisement) message
@@ -973,8 +992,86 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			}
 		}
 
+		else if (protocol.equals(AMEND)) {
+			final Amendment am = (Amendment) message.getPayload();
+			if (am instanceof AgentStarted) {
+				final AgentStarted started = (AgentStarted)am;
+
+				// add started remote agent
+				final IAgentDescription agent = started.getAgent();
+				synchronized (remoteAgents) {
+					if (remoteAgents.put(agent.getAid(), agent) == null) {
+						log.info("Registered remote agent: " + agent.getAid());
+					}
+					else {
+						// started agent was already registered
+						log.warn("Updated remote agent: " + agent.getAid());						
+					}
+				}
+
+				// add actions of the started remote agent
+				synchronized (remoteActions) {
+					Set<IActionDescription> actions = remoteActions.get(senderAddress.getName());
+					if (actions == null) {
+						remoteActions.put(senderAddress.getName(), started.getActions());
+					}
+					else {
+						// replace action descriptions of the started agent
+						Iterator<IActionDescription> i = actions.iterator();
+						while (i.hasNext()) {
+							final IAgentDescription provider = i.next().getProviderDescription();
+							if (provider.getAid().equals(agent.getAid())) {
+								i.remove();
+							}
+						}
+						actions.addAll(started.getActions());
+					}
+
+					if (log.isDebugEnabled()) {
+						log.debug("Registered actions of remote agent: " + started.getActions().size());
+					}
+				}
+			}
+			else if (am instanceof AgentStopped) {
+				final AgentStopped stopped = (AgentStopped)am;
+
+				// remove actions of the stopped remote agent
+				synchronized (remoteActions) {
+					Set<IActionDescription> actions = remoteActions.get(senderAddress.getName());
+					if (actions != null) {
+						int counter = 0;
+						Iterator<IActionDescription> i = actions.iterator();
+						while (i.hasNext()) {
+							final IAgentDescription provider = i.next().getProviderDescription();
+							if (provider.getAid().equals(stopped.getAgentId())) {
+								i.remove();
+								counter++;
+							}
+						}
+
+						if (log.isDebugEnabled()) {
+							log.debug("Deregistered actions of remote agent: " + counter);
+						}
+					}
+				}
+
+				// remove stopped remote agent
+				synchronized (remoteAgents) {
+					if (remoteAgents.remove(stopped.getAgentId()) == null) {
+						// stopped agent was not registered
+						log.warn("Remote agent already deregistered: " + stopped.getAgentId());						
+					}
+					else {
+						log.info("Deregistered remote agent: " + stopped.getAgentId());						
+					}
+				}
+			}
+
+			dump("AMEND " + senderAddress.getName());
+		}
+
 		else if (protocol.equals(ALL)) {
-			sendAdvertisement(senderAddress);
+			sendAdvertisement(senderAddress, getAliveInterval(message.getGroup()));
 		}
 	}
 
@@ -1022,34 +1119,63 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	private void refreshAgentNode(ICommunicationAddress node,
-			String groupAddress) {
+			String groupAddress, boolean advertisement) {
 		final String nodeAddress = node.getName();
 		synchronized (nodes) {
-			if (nodes.containsKey(nodeAddress)) {
+			final AgentNodeDescription description = nodes.get(nodeAddress);
+			if (description != null) {
+				// node is already known
 				if (groupAddress != null) {
+					// check delay of periodical message
 					final long interval = System.currentTimeMillis()
-							- nodes.get(nodeAddress).getAlive();
-					if (interval > 2 * getAliveInterval(groupAddress)) {
+							- description.getAlive();
+					if (interval > (description.getAliveInterval() + allowedAliveDelay)) {
 						log.warn("Measured interval of receiving alive message from "
-								+ nodeAddress + ": " + interval);
+								+ nodeAddress + ": " + interval + "ms instead of " + description.getAliveInterval() + "ms");
 					}
 				}
-				nodes.get(nodeAddress).setAlive(System.currentTimeMillis());
+				description.setAlive(System.currentTimeMillis());
 			} else {
-				log.info("New known node " + nodeAddress);
-				final AgentNodeDescription description = new AgentNodeDescription(
+				// node was still unknown or forgotten due to excessive delay of periodical message
+				if (advertisement) {
+					final AgentNodeDescription newDescription = new AgentNodeDescription(
 						node, System.currentTimeMillis());
-				nodes.put(nodeAddress, description);
+					nodes.put(nodeAddress, newDescription);
+					if (missingNodes.contains(nodeAddress)) {
+						// got advertisement of forgotten node => node is known again
+						log.warn("Got new information from missing node " + nodeAddress);
+						missingNodes.remove(nodeAddress);
+					}
+					else {
+						// node was unknown so far, because the remote or the local node is new
+						log.info("New known node " + nodeAddress);
+						if (groupAddress != null) {
+							// got advertisement from a new node => send back an advertisement immediately
+							sendAdvertisement(node, getAliveInterval(groupAddress));
+						}
+					}
+				}
+				else {
+					if (missingNodes.contains(nodeAddress)) {
+						// got alive message from a forgotten node => request for advertisement
+						final JiacMessage allMessage = new JiacMessage();
+						allMessage.setProtocol(ALL);
+						allMessage.setGroup(groupAddress);
+						sendMessage(allMessage, node);
+					}
+				}
 			}
 		}
 	}
 
 	private void refreshAgentNode(ICommunicationAddress node,
-			String groupAddress, Set<JMXServiceURL> jmxConnectors) {
+			String groupAddress, Set<JMXServiceURL> jmxConnectors, long aliveInterval) {
 		final String nodeAddress = node.getName();
-		refreshAgentNode(node, groupAddress);
+		refreshAgentNode(node, groupAddress, true);
 		synchronized (nodes) {
-			nodes.get(nodeAddress).setJmxURLs(jmxConnectors);
+			final AgentNodeDescription description = nodes.get(nodeAddress);
+			description.setJmxURLs(jmxConnectors);
+			description.setAliveInterval(aliveInterval);
 		}
 	}
 
@@ -1112,9 +1238,19 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 	}
 
-	@Override
+	/**
+	 * @deprecated
+	 */
 	public long getAliveInterval() {
 		return aliveInterval;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Map<String, Long> getAliveIntervals() {
+		return aliveIntervals;
 	}
 
 	/**
@@ -1144,10 +1280,18 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @deprecated
 	 */
 	public long getAdvertiseInterval() {
 		return advertiseInterval;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Map<String, Long> getAdvertiseIntervals() {
+		return advertiseIntervals;
 	}
 
 	/**
@@ -1163,6 +1307,38 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	public List<String> getGroupNames() {
 		return groupAddressNames;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getAllowedAliveDelay() {
+		return allowedAliveDelay;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setAllowedAliveDelay(long allowedAliveDelay) {
+		this.allowedAliveDelay = allowedAliveDelay;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getMaxAliveDelay() {
+		return maxAliveDelay;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setMaxAliveDelay(long maxAliveDelay) {
+		this.maxAliveDelay = maxAliveDelay;
 	}
 
 	
@@ -1322,12 +1498,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		message.setHeader("UUID", this.agentNode.getUUID());
 		try {
 			messageTransport.send(message, address, 0);
+			if (log.isDebugEnabled()) {
+				log.debug("Sent message with protocol " + message.getProtocol() + " to " + address.toUnboundAddress().getName());
+			}
 			if (address instanceof IGroupAddress) {
 				final long interval = System.currentTimeMillis() - lastSend;
-				if (interval > 2 * getAliveInterval(address.toUnboundAddress()
-						.getName())) {
+				if (interval > (getAliveInterval(address.toUnboundAddress().getName()) + allowedAliveDelay)) {
 					log.warn("Measured interval of sending alive message: "
-							+ interval);
+							+ interval + "ms instead of " + getAliveInterval(address.toUnboundAddress().getName()) + "ms");
 				}
 				lastSend = System.currentTimeMillis();
 			}
@@ -1339,7 +1517,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	/**
 	 * Send all actions, agents and JMX URLs this agent node is providing.
 	 */
-	private void sendAdvertisement(ICommunicationAddress destination) {
+	private void sendAdvertisement(ICommunicationAddress destination, long aliveInterval) {
 		final JiacMessage adMessage = new JiacMessage();
 		adMessage.setProtocol(ADVERTISE);
 
@@ -1359,7 +1537,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			advAgents.putAll(localAgents);
 		}
 
-		final Advertisement ad = new Advertisement(advAgents, advActions);
+		final Advertisement ad = new Advertisement(advAgents, advActions, aliveInterval);
 
 		// add JMX service URLs of the agent node to the advertisement
 		if (agentNode.getJmxConnectors() != null) {
@@ -1378,6 +1556,55 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 		sendMessage(adMessage, destination);
 
+	}
+
+	/**
+	 * Send description of the started agent or ID of the stopped agent.
+	 */
+	private void sendAmendment(String agentId, boolean started) {
+		final JiacMessage amMessage = new JiacMessage();
+		amMessage.setProtocol(AMEND);
+
+		if (started) {
+			// collect all actions of the started agent with scope GLOBAL or WEBSERVICE for the amendment
+			final Set<IActionDescription> amActions = new HashSet<IActionDescription>();
+			synchronized (localActions) {
+				for (IActionDescription localAction : localActions) {
+					IAgentDescription provider = localAction.getProviderDescription();
+					if (localAction.getScope().contains(ActionScope.GLOBAL) && (provider != null) && provider.getAid().equals(agentId)) {
+						amActions.add(localAction);
+					}
+				}
+			}
+
+			final Amendment am = new AgentStarted(localAgents.get(agentId), amActions);
+			amMessage.setPayload(am);
+
+			// debug
+			final Amendment payload = (Amendment) amMessage.getPayload();
+			if (log.isDebugEnabled()) {
+				log.debug("sendAmendment: agent="
+						+ ((AgentStarted)payload).getAgent().getAid() + " actions="
+						+ ((AgentStarted)payload).getActions().size());
+			}
+		}
+
+		else {
+			final Amendment am = new AgentStopped(agentId);
+			amMessage.setPayload(am);
+
+			// debug
+			final Amendment payload = (Amendment) amMessage.getPayload();
+			if (log.isDebugEnabled()) {
+				log.debug("sendAmendment: agent="
+						+ ((AgentStopped)payload).getAgentId());
+			}
+
+		}
+
+		for (ICommunicationAddress groupAddress : groupAddresses) {
+			sendMessage(amMessage, groupAddress);
+		}
 	}
 
 	class AgentNodePinger extends TimerTask {
@@ -1419,16 +1646,16 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 				counter += aliveInterval;
 			} else {
-				counter = 0;
-				sendAdvertisement(groupAddress);
+				counter -= advertiseInterval;
+				sendAdvertisement(groupAddress, aliveInterval);
 			}
 
 			// remove dead nodes
 			synchronized (nodes) {
 				final Set<String> deadNodes = new HashSet<String>();
 				for (String key : nodes.keySet()) {
-					if (nodes.get(key).getAlive() < (System.currentTimeMillis() - 5 * getAliveInterval(groupAddress
-							.toUnboundAddress().getName()))) {
+					final AgentNodeDescription description = nodes.get(key);
+					if (description.getAlive() < (System.currentTimeMillis() - (description.getAliveInterval() + maxAliveDelay))) {
 						deadNodes.add(key);
 					}
 				}
@@ -1440,6 +1667,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 							remoteActions.remove(nodeAddress);
 							removeRemoteAgentOfNode(nodeAddress);
 							nodes.remove(nodeAddress);
+							missingNodes.add(nodeAddress);
 						}
 					}
 				}
@@ -1697,9 +1925,12 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<String> getMissingNodes() {
+		return missingNodes;
+	}
+
 }
-/*
- * TODO remove* checken bzgl. ConcurrentModificationException TODO advertise
- * agents ist im Moment etwas stiefmuetterlich behandelt TODO ausfuehrliches
- * Logging einbauen?!?
- */

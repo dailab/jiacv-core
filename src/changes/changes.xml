@@ -7,6 +7,9 @@
 	</properties>
 	<body>
 		<release version="5.2.2" date="T.B.A." description="Minor release">
+			<action dev="keiser" type="add">
+				New methods to invoke actions in parallel.
+			</action>
 			<action dev="keiser" type="change">
 				Directories synchronize faster, even if the advertisement 
 				interval is increased to save resources.

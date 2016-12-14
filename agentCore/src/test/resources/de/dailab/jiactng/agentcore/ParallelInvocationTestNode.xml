@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/InvokeParallelAgent.xml" />
+	<import resource ="classpath:de/dailab/jiactng/agentcore/NonFaultyActionAgent.xml" />
+
+	<bean name = "TestNode" parent="NodeWithJMX">
+		<property name= "agents" >
+		<list>
+			<ref bean = "InvokeParallelAgent" />
+			<ref bean = "NonFaultyActionAgent" />
+			<ref bean = "NonFaultyActionAgent" />
+			<ref bean = "NonFaultyActionAgent" />
+		</list>
+		</property>
+	</bean>
+</beans>

@@ -7,6 +7,9 @@
 	</properties>
 	<body>
 		<release version="5.2.2" date="T.B.A." description="Minor release">
+			<action dev="keiser" type="add">
+				New methods to invoke actions in parallel.
+			</action>
 			<action dev="keiser" type="change">
 				Directory sends amendment immediately after list of locally 
 				started agents changed. It also sends back an advertisement

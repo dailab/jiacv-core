@@ -8,7 +8,9 @@ package de.dailab.jiactng.agentcore;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.management.AttributeChangeNotification;
 import javax.management.Notification;
@@ -19,6 +21,7 @@ import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.action.ActionResult;
 import de.dailab.jiactng.agentcore.action.ActionResultListener;
+import de.dailab.jiactng.agentcore.action.ActionResultsListener;
 import de.dailab.jiactng.agentcore.action.DoAction;
 import de.dailab.jiactng.agentcore.action.Session;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
@@ -575,6 +578,70 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
   // DoAction doAct = a.createDoAction(inputParams, null);
   // return ((Agent)thisAgent).syncInvoke(doAct);
   // }
+
+	/**
+	 * Invokes all actions in parallel which match a given template.
+	 * NOTE: This method MUST NOT be used with a blocking execution cycle (e.g. SimpleExecutionCycle).
+	 * 
+	 * @param template the action template used to search for all actions to be invoked
+	 * @param inputParams the input parameters of the action invocations
+	 * @param timeout the timeout for waiting for the action results in milliseconds
+	 * @return the received action results
+	 * @see Agent#searchAllActions(IActionDescription)
+	 * @see #invokeParallel(List, Serializable[], Long)
+	 */
+	protected final List<ActionResult> invokeParallel(IActionDescription template, Serializable[] inputParams, Long timeout) {
+		final List<IActionDescription> actions = thisAgent.searchAllActions(template);
+		return invokeParallel(actions, inputParams, timeout);
+	}
+
+	/**
+	 * Invokes a given list of actions with same input parameters in parallel.
+	 * NOTE: This method MUST NOT be used with a blocking execution cycle (e.g. SimpleExecutionCycle).
+	 * 
+	 * @param actions the list of actions which will be invoked
+	 * @param inputParams the input parameters of all action invocations
+	 * @param timeout the timeout for waiting for the action results in milliseconds
+	 * @return the received action results
+	 * @see #invokeParallel(Map, Long)
+	 */
+	protected final List<ActionResult> invokeParallel(List<IActionDescription> actions, Serializable[] inputParams, Long timeout) {
+		final Map<IActionDescription,Serializable[]> doActions = new HashMap<IActionDescription,Serializable[]>();
+		for (IActionDescription action : actions) {
+			doActions.put(action, inputParams);
+		}
+		return invokeParallel(doActions, timeout);
+	}
+
+	/**
+	 * Invokes a given list of actions with different input parameters in parallel.
+	 * NOTE: This method MUST NOT be used with a blocking execution cycle (e.g. SimpleExecutionCycle).
+	 * 
+	 * @param doActions the actions with corresponding input parameters which will be invoked
+	 * @param timeout the timeout for waiting for the action results in milliseconds
+	 * @return the received action results
+	 * @see ActionResultsListener
+	 */
+	protected final List<ActionResult> invokeParallel(Map<IActionDescription,Serializable[]> doActions, Long timeout) {
+	    // invoke actions
+	    final ActionResultsListener listener = new ActionResultsListener(doActions.size());
+	    for (Map.Entry<IActionDescription,Serializable[]> doAction : doActions.entrySet()) {
+	    	invoke(doAction.getKey(), doAction.getValue(), listener, timeout);
+	    }
+
+	    // wait for results
+	    synchronized (listener) {
+	      if (!listener.isFinished()) {
+	        try {
+	          listener.wait(timeout);
+	        } catch (Exception e) {
+	          e.printStackTrace();
+	        }
+	      }
+	    }
+
+	    return listener.getResults();
+	}
 
   /**
    * Sends back the results of an action.

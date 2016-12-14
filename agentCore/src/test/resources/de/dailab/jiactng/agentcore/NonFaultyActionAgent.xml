@@ -5,7 +5,7 @@
 	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
 	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
 
-	<bean name = "NonFaultyActionAgent" parent = "SimpleAgent">
+	<bean name = "NonFaultyActionAgent" parent = "SimpleAgent" singleton="false">
 		<property name = "agentBeans">
 			<list>
 				<ref bean = "NonFaultyActionAgentBean"/>

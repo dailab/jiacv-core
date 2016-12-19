@@ -623,8 +623,11 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 	 * @see ActionResultsListener
 	 */
 	protected final List<ActionResult> invokeParallel(Map<IActionDescription,Serializable[]> doActions, Long timeout) {
+		final int numberRequests = doActions.size();
+	    final ActionResultsListener listener = new ActionResultsListener(numberRequests);
+	    final long startTime = System.currentTimeMillis();
+
 	    // invoke actions
-	    final ActionResultsListener listener = new ActionResultsListener(doActions.size());
 	    for (Map.Entry<IActionDescription,Serializable[]> doAction : doActions.entrySet()) {
 	    	invoke(doAction.getKey(), doAction.getValue(), listener, timeout);
 	    }
@@ -640,7 +643,17 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 	      }
 	    }
 
-	    return listener.getResults();
+	    // check number of results
+	    final long endTime = System.currentTimeMillis();
+	    final List<ActionResult> results = listener.getResults();
+	    if (listener.isFinished()) {
+	    	log.info("All " + numberRequests + " parallel action requests are processed within " + (endTime - startTime) + " milliseconds");
+	    } 
+	    else {
+	    	log.warn((numberRequests - results.size()) + " of " + numberRequests + " parallel action requests did not return within " + (endTime - startTime) + " milliseconds");
+	    }
+
+	    return results;
 	}
 
   /**

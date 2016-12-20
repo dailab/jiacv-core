@@ -29,7 +29,7 @@
    <bean name="SimpleAgent" class="de.dailab.jiactng.agentcore.Agent" abstract="true">
       <property name="memory" ref="Memory" />
       <property name="execution" ref="SimpleExecutionCycle" />
-      <property name="executionInterval" value="5"/>
+      <property name="executionInterval" value="10"/>
       <property name="communication" ref="CommunicationBean" />
    </bean>
 
@@ -39,6 +39,7 @@
 
    <bean name="ReactiveAgent" parent="NonBlockingAgent" abstract="true">
       <property name="execution" ref="ReactiveExecutionCycle" />
+      <property name="executionInterval" value="1000"/>
    </bean>
 
    <!--bean name="SimpleAgentWithCommunication" parent="SimpleAgent" abstract="true">

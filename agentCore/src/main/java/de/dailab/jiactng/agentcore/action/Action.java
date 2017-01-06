@@ -323,7 +323,9 @@ public class Action implements IActionDescription {
 	 * {@inheritDoc}
 	 */
 	public final void setInputNames(List<String> newInputNames) {
-		this.inputNames = newInputNames;
+		this.inputNames = newInputNames != null
+				? Collections.unmodifiableList(new ArrayList<>(newInputNames))
+				: null;
 	}
 	
 	/**

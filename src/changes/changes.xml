@@ -7,6 +7,10 @@
 	</properties>
 	<body>
 		<release version="5.2.2" date="T.B.A." description="Minor release">
+            <action dev="kuester" type="add">
+				Added input names to action descriptions and @Expose (reflection
+                works only with Java 8 and if compiled with '-parameters' flag).
+			</action>
 			<action dev="keiser" type="add">
 				New methods to invoke actions in parallel.
 			</action>

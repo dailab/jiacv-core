@@ -117,6 +117,51 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
     }
     
     /**
+     * Try to get the input parameter names from the method. The respective methods
+     * are only available in Java 8, and only if compiled with '-parameters' flag.
+     *
+     * @param method	some method
+     * @return			parameters, if set, or null
+     */
+    public static List<String> getInputNames(Method method) {
+    	// if specified, use annotated parameter names from @Expose
+    	Expose expAnno = method.getAnnotation(Expose.class);
+    	String[] annotatedParamNames = expAnno.paramNames();
+    	if (annotatedParamNames != null && annotatedParamNames.length > 0) {
+    		return Arrays.asList(annotatedParamNames);
+    	}
+    	// otherwise, try to use reflection to get parameter names
+    	/*
+    	 * Method.getParameters is only available in Java 8, thus using reflection to
+    	 * use reflection... this should later be replaced with regular method calls.
+    	 * Also, sources have to be compiled with "javac -parameters".
+    	 */
+    	try {
+			Method getParameters = Method.class.getMethod("getParameters");
+			Object[] parameters = (Object[]) getParameters.invoke(method);
+			List<String> names = new ArrayList<>();
+			for (Object param : parameters) {
+				Method hasName = param.getClass().getMethod("isNamePresent");
+				if (hasName.invoke(param).equals(Boolean.TRUE)) {
+					Method getName = param.getClass().getMethod("getName");
+					String name = (String) getName.invoke(param);
+					names.add(name);
+				} else {
+					// no action names available without '-parameters' compiler flag
+					break;
+				}
+			}
+			return Collections.unmodifiableList(names);
+    	} catch (NoSuchMethodError e) {
+    		// getParameters not available in Java 7
+		} catch (Exception e) {
+			// something else went wrong
+			e.printStackTrace();
+		}
+    	return null;
+    }
+    
+    /**
      * Utility method which collects all exposed methods along the given hierarchy.
      * Methods which are annotated in more specialised classes will have precedence. 
      * 
@@ -297,7 +342,8 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         		act.setSemanticServiceDescriptionIRI(semanticURI);
         	}
             
-            
+            // add input parameter names, if those are set, or 'arg0', 'arg1', etc.
+        	act.setInputNames(getInputNames(method));
             
             act.setScope(scope);
             

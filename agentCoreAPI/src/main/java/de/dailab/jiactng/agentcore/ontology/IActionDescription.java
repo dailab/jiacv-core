@@ -58,6 +58,23 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	void setName(String newName);
 
 	/**
+	 * This method returns the names of the input parameters that the action accepts.
+	 *
+	 * Note: Actual input parameter names are only available when compiled with Java 8
+	 * with compiler flag '-parameters'. Otherwise, names are 'arg0', 'arg1', ....
+	 *
+	 * @return the unmodifiable list of input parameter names, or null if not set
+	 */
+	List<String> getInputNames();
+	
+	/**
+	 * Sets the names of the input parameters that the action accepts
+	 *
+	 * @param newInputNames	list of new input parameter names
+	 */
+	void setInputNames(List<String> newInputNames);
+	
+	/**
 	 * This method returns the type names of the input parameters that the action accepts.
 	 * 
 	 * <p>

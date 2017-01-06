@@ -39,6 +39,9 @@ public interface IMethodExposingBean {
 
         /** The action result types to be used for the exposed method. */
         Class<?>[] returnTypes() default {};
+        
+        /** the action parameter names; can also be read via reflection, but only with special compiler flag */
+        String[] paramNames() default {};
 
         /** The action scope to be used for the exposed method. */
         ActionScope scope() default ActionScope.AGENT;

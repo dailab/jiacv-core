@@ -568,7 +568,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 	    	if (result.getFailure() instanceof Exception) {
 	    		throw (Exception) result.getFailure();
 	    	} else {
-	    		throw new Exception("Action returned with Failure" + result.getFailure().toString());
+	    		throw new Exception("Action returned with Failure: " + result.getFailure().toString());
 	    	}
 	    }
 	    return result.getResults();

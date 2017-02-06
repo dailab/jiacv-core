@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+        <groupId>de.dailab.jiactng</groupId>
+        <artifactId>examples</artifactId>
+        <version>5.2.2-SNAPSHOT</version>
+    </parent>
+
+	<groupId>de.dailab.asgard.tls</groupId>
+	<artifactId>pingPong_WithTLS</artifactId>
+	<packaging>jar</packaging>
+	<name>${project.artifactId}</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<preparation.directory>${project.build.directory}/appassembler</preparation.directory>
+	</properties>
+
+	<dependencies>
+  		<dependency>
+  			<groupId>de.dailab.jiactng</groupId>
+  			<artifactId>agentCore</artifactId>
+  		</dependency>
+  	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+				<version>3.3</version>
+			</plugin>
+
+			<plugin>
+				<!-- creating start scripts -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>generate start scripts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+						<configuration>
+							<repositoryLayout>flat</repositoryLayout>
+							<useWildcardClassPath>true</useWildcardClassPath>
+							<configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
+							<copyConfigurationDirectory>true</copyConfigurationDirectory>
+							<programs>
+								<program>
+									<id>pingPong_withTLS_node1</id>
+									<mainClass>de.dailab.asgard.withTLS.pingPong.Main</mainClass>
+									<commandLineArguments>
+										<commandLineArgument>/agentConfiguration/pingPong_WithTLS_node1.xml</commandLineArgument>
+										<commandLineArgument>PingPong_WithTLS_Node1</commandLineArgument>
+									</commandLineArguments>
+								</program>
+								<program>
+									<id>pingPong_withTLS_node2</id>
+									<mainClass>de.dailab.asgard.withTLS.pingPong.Main</mainClass>
+									<commandLineArguments>
+										<commandLineArgument>/agentConfiguration/pingPong_WithTLS_node2.xml</commandLineArgument>
+										<commandLineArgument>PingPong_WithTLS_Node2</commandLineArgument>
+									</commandLineArguments>
+								</program>
+							</programs>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.5</version>
+				<configuration>
+					<descriptors>
+						<descriptor>${project.basedir}/directory-assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>

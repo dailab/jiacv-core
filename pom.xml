@@ -709,6 +709,7 @@
 		<module>gateway</module>
 		<module>agentCore</module>
 		<module>AgentUnit</module>
+        <module>examples</module>
 	</modules>
 
 	<profiles>

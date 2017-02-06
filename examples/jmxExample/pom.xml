@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.dailab.jiactng</groupId>
+		<artifactId>examples</artifactId>
+		<version>5.2.2-SNAPSHOT</version>
+	</parent>
+
+	<groupId>de.dailab.jiactng.examples</groupId>
+	<artifactId>jmxExample</artifactId>  	
+	<packaging>jar</packaging>  	
+	<name>JMX Example</name>   	
+	<description>
+		An example for remote management of JIAC applications.
+	</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.dailab.jiactng</groupId>
+			<artifactId>agentCoreAPI</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<id>generate start scripts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<repositoryLayout>flat</repositoryLayout>
+					<programs>
+						<program>
+							<mainClass>de.dailab.jiactng.examples.jmxExample.ShowLocalAgents</mainClass>
+							<name>ShowLocalAgents</name>
+						</program>
+						<program>
+							<mainClass>de.dailab.jiactng.examples.jmxExample.ShowMessages</mainClass>
+							<name>ShowMessages</name>
+						</program>
+					</programs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

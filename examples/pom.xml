@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.dailab</groupId>
+        <artifactId>jiactng</artifactId>
+        <version>5.2.2-SNAPSHOT</version>
+    </parent>
+
+    <groupId>de.dailab.jiactng</groupId>
+    <artifactId>examples</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Examples</name>
+    <description>Some examples for JIAC V</description>
+
+    <modules>
+        <module>HelloWorld</module>
+        <module>jmxExample</module>
+        <module>pingPong_WithTLS</module>
+        <module>simpleChatExample</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>de.dailab.jiactng</groupId>
+                <artifactId>agentCoreAPI</artifactId>
+                <version>[5.2.0,5.2.99]</version>
+            </dependency>
+            <dependency>
+                <groupId>de.dailab.jiactng</groupId>
+                <artifactId>agentCore</artifactId>
+                <version>[5.2.0,5.2.99]</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+</project>

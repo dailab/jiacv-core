@@ -152,7 +152,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 				}
 			}
 			return Collections.unmodifiableList(names);
-    	} catch (NoSuchMethodError e) {
+    	} catch (NoSuchMethodError | NoSuchMethodException e) {
     		// getParameters not available in Java 7
 		} catch (Exception e) {
 			// something else went wrong

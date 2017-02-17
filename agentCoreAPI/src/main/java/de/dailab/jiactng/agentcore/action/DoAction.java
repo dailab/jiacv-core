@@ -18,7 +18,7 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  * @author Thomas Konnerth
  * 
  */
-public class DoAction extends SessionEvent {
+public class DoAction extends SessionEvent<ResultReceiver> {
 
 	/**
 	 * 

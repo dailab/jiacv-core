@@ -9,8 +9,10 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  * result of.
  * 
  * @author axle
+ * 
+ * @param<T>	type of the source of the event
  */
-public class SessionEvent implements IFact {
+public class SessionEvent<T> implements IFact {
 
 	/** SerialVersionUID for Serialization */
 	private static final long serialVersionUID = 2754758742968423185L;
@@ -25,7 +27,7 @@ public class SessionEvent implements IFact {
 	private IActionDescription action;
 
 	/** The object that created this event. */
-	private transient Object source;
+	private transient T source;
 
 	private Object metaData;
 
@@ -41,7 +43,7 @@ public class SessionEvent implements IFact {
 	 * @param source
 	 *            the originator of this event
 	 */
-	public SessionEvent(Session session, IActionDescription action, Object source) {
+	public SessionEvent(Session session, IActionDescription action, T source) {
 		if (session != null) {
 			session.addToSessionHistory(this);
 			this.sessionId = session.getSessionId();
@@ -55,16 +57,19 @@ public class SessionEvent implements IFact {
 	/**
 	 * Constructor to set the session and action of a session event
 	 * corresponding to an action request.
+	 * 
+	 * XXX shouldn't this be moved to ActionResult and this class be made abstract?
+	 * 
 	 * @param source the action request.
 	 */
-	public SessionEvent(DoAction source) {
+	public SessionEvent(T source) {
 		this(null, null, source);
-		if (source != null) {
-			this.session = source.getSession();
+		if (source instanceof DoAction) {
+			this.session = ((DoAction) source).getSession();
 			if (this.session != null) {
 				this.sessionId = this.session.getSessionId();
 			}
-			this.action = source.getAction();
+			this.action = ((DoAction) source).getAction();
 		}
 	}
 
@@ -89,7 +94,7 @@ public class SessionEvent implements IFact {
 	 * Gets the object which creates this session event.
 	 * @return the source
 	 */
-	public final Object getSource() {
+	public final T getSource() {
 		return source;
 	}
 
@@ -98,7 +103,7 @@ public class SessionEvent implements IFact {
 	 * @param newSource
 	 *            the source to set
 	 */
-	public final void setSource(Object newSource) {
+	public final void setSource(T newSource) {
 		source = newSource;
 	}
 

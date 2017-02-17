@@ -8,7 +8,7 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 /**
  * This class represents the result or a failure of an action.
  */
-public class ActionResult extends SessionEvent {
+public class ActionResult extends SessionEvent<DoAction> {
 
 	/**
 	 * 

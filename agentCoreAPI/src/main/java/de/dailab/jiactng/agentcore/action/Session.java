@@ -67,7 +67,7 @@ public class Session implements IFact {
    /**
     * The history of the session. This list contains all session events of the session (i.E. of actions, results, etc.) in order of appearance.
     */
-   private ArrayList<SessionEvent> history;
+   private ArrayList<SessionEvent<?>> history;
 
    private transient Integer currentCallDepth = null;
 
@@ -75,7 +75,7 @@ public class Session implements IFact {
     * Constructor for a new session. Creates a session with a unique id, so not all fields are null.
     */
    public Session() {
-      this(IdFactory.createSessionId(new Object().hashCode()), Long.valueOf(System.currentTimeMillis()), new ArrayList<SessionEvent>());
+      this(IdFactory.createSessionId(new Object().hashCode()), Long.valueOf(System.currentTimeMillis()), new ArrayList<SessionEvent<?>>());
    }
 
    /**
@@ -84,7 +84,7 @@ public class Session implements IFact {
     * @param timeToLive time to live in milliseconds
     */
    public Session(long timeToLive) {
-      this(IdFactory.createSessionId(new Object().hashCode()), Long.valueOf(System.currentTimeMillis()), new ArrayList<SessionEvent>());
+      this(IdFactory.createSessionId(new Object().hashCode()), Long.valueOf(System.currentTimeMillis()), new ArrayList<SessionEvent<?>>());
       this.timeToLive = Long.valueOf(timeToLive);
    }
 
@@ -97,7 +97,7 @@ public class Session implements IFact {
     * @param timeToLive time until timeout if 0 it will be set to null
     * 
     */
-   public Session(String id, Long creationTime, ArrayList<SessionEvent> history, Long timeToLive) {
+   public Session(String id, Long creationTime, ArrayList<SessionEvent<?>> history, Long timeToLive) {
       this.sessionId = id;
       this.creationTime = creationTime;
       this.history = history;
@@ -118,7 +118,7 @@ public class Session implements IFact {
     *        Note: TimeToLive will keep at default of 60 seconds
     * 
     */
-   public Session(String id, Long creationTime, ArrayList<SessionEvent> history) {
+   public Session(String id, Long creationTime, ArrayList<SessionEvent<?>> history) {
       this.sessionId = id;
       this.creationTime = creationTime;
       this.history = history;
@@ -208,10 +208,8 @@ public class Session implements IFact {
     * 
     * @return a list containing the history.
     */
-   public final ArrayList<SessionEvent> getHistory() {
-      final ArrayList<SessionEvent> copy = new ArrayList<SessionEvent>();
-      copy.addAll(history);
-      return copy;
+   public final ArrayList<SessionEvent<?>> getHistory() {
+      return new ArrayList<>(history);
    }
 
    // /**
@@ -227,9 +225,9 @@ public class Session implements IFact {
     * 
     * @param event the object to add to history
     */
-   public final void addToSessionHistory(SessionEvent event) {
+   public final void addToSessionHistory(SessionEvent<?> event) {
       if (history == null) {
-         history = new ArrayList<SessionEvent>();
+         history = new ArrayList<SessionEvent<?>>();
       }
       history.add(event);
    }
@@ -240,7 +238,7 @@ public class Session implements IFact {
     * @param index the index of the object to remove
     * @return the removed object
     */
-   public final SessionEvent removeFromSessionHistory(int index) {
+   public final SessionEvent<?> removeFromSessionHistory(int index) {
       return history.remove(index);
    }
 
@@ -250,7 +248,7 @@ public class Session implements IFact {
     * @param o the object to remove
     * @return true, if history contained the given object
     */
-   public final boolean removeFromSessionHistory(SessionEvent o) {
+   public final boolean removeFromSessionHistory(SessionEvent<?> o) {
       return history.remove(o);
    }
 

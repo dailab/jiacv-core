@@ -316,11 +316,11 @@ public class NonBlockingExecutionCycle extends AbstractExecutionCycle
 					// session has timeout
 					log.warn(TIMEOUT_MESSAGE + session);
 
-					final ArrayList<SessionEvent> history = session.getHistory();
+					final ArrayList<SessionEvent<?>> history = session.getHistory();
 
 					// Does Session is related to DoAction?
 					boolean doActionFound = false;
-					for (SessionEvent event : history) {
+					for (SessionEvent<?> event : history) {
 						if (event instanceof DoAction) {
 							// doAction found
 							doActionFound = true;

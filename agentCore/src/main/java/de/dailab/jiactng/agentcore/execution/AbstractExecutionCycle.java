@@ -181,7 +181,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     * @see #actionPerformed(DoAction, DoActionState, Object[])
     */
    protected void processResult(ActionResult actionResult) {
-      final DoAction doAct = (DoAction) actionResult.getSource();
+      final DoAction doAct = actionResult.getSource();
       actionPerformed(doAct, (actionResult.getFailure() == null) ? DoActionState.success : DoActionState.failed, (actionResult.getFailure() == null) ? actionResult.getResults() : new Object[] { actionResult.getFailure() });
 
       final Session session = doAct.getSession();
@@ -220,7 +220,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
             log.debug("Skipping result of " + actionResult.getAction().getName() + " (" + actionResult.getSessionId() + ") due to session timeout");
 
          } else {
-            ((ResultReceiver) doAct.getSource()).receiveResult(actionResult);
+            doAct.getSource().receiveResult(actionResult);
             log.debug("ResultReceiver informed about result of action " + doAct.getAction().getName() + " (" + doAct.getSessionId() + ")");
          }
       }

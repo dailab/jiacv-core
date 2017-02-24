@@ -72,7 +72,16 @@ public abstract class BasicExecutionCycle extends AbstractExecutionCycle {
 		if (minBean != null) {
 			executionDone = true;
 
-			performExecutionCycleProcess(new ExecutionHandler(minBean));
+			final IAgentBean finalMinBean = minBean;
+			performExecutionCycleProcess(new Runnable() {
+				public void run() {
+					try {
+						finalMinBean.execute();
+					} catch (Exception ex) {
+						log.error("Error when executing bean \'" + finalMinBean.getBeanName() + "\'", ex);
+					}
+				}
+			});
 
 			// reschedule bean
 			minBean.setNextExecutionTime(now + minBean.getExecutionInterval());
@@ -86,12 +95,16 @@ public abstract class BasicExecutionCycle extends AbstractExecutionCycle {
 	 * @see DoActionHandler
 	 * @see AbstractExecutionCycle#updateWorkload(int, boolean)
 	 */
-	protected void processDoAction(DoAction act) {
+	protected void processDoAction(final DoAction act) {
 		boolean actionPerformed = false;
 		if (act != null) {
 			actionPerformed = true;
 			
-			performExecutionCycleProcess(new DoActionHandler(act));
+			performExecutionCycleProcess(new Runnable() {
+				public void run() {
+					performDoAction(act);
+				}
+			});
 		}
 		updateWorkload(DO_ACTION, actionPerformed);		
 	}
@@ -102,12 +115,16 @@ public abstract class BasicExecutionCycle extends AbstractExecutionCycle {
 	 * @see ActionResultHandler
 	 * @see AbstractExecutionCycle#updateWorkload(int, boolean)
 	 */
-	protected void processActionResult(ActionResult result) {
+	protected void processActionResult(final ActionResult result) {
 		boolean resultProcessed = false;
 		if (result != null) {
 			resultProcessed = true;
 			
-			performExecutionCycleProcess(new ActionResultHandler(result));
+			performExecutionCycleProcess(new Runnable() {
+				public void run() {
+					processResult(result);
+				}
+			});
 		}
 		updateWorkload(ACTION_RESULT, resultProcessed);
 	}
@@ -122,7 +139,7 @@ public abstract class BasicExecutionCycle extends AbstractExecutionCycle {
 	protected void processSessionTimeouts() {
 		synchronized (memory) {
 			final Set<Session> sessions = memory.readAll(SESSION_TEMPLATE);
-			for (Session session : sessions){
+			for (final Session session : sessions){
 				if (session.isTimeout()){
 					// session has timeout
 					log.warn(TIMEOUT_MESSAGE + session);
@@ -140,7 +157,11 @@ public abstract class BasicExecutionCycle extends AbstractExecutionCycle {
 							
 							if (doAction.getAction() instanceof Action) {
 								// Got an Action, so let's cancel this doAction
-								performExecutionCycleProcess(new SessionTimeoutHandler(session, doAction));
+								performExecutionCycleProcess(new Runnable() {
+									public void run() {
+										processSessionTimeout(session, doAction);
+									}
+								});
 							}
 						}
 					}
@@ -153,85 +174,6 @@ public abstract class BasicExecutionCycle extends AbstractExecutionCycle {
 				}
 			}
 		}		
-	}
-	
-	/*
-	 * HELPER CLASSES FOR EXECUTING DIFFERENT THINGS
-	 * (those could also be replaced with anonymous inner classes or lambdas)
-	 */
-
-	/**
-	 * A handler for processing one bean execution within an own thread.
-	 * @author Jan Keiser
-	 * @see IAgentBean#execute()
-	 */
-	private class ExecutionHandler implements Runnable {
-		private IAgentBean minBean;
-
-		public ExecutionHandler(IAgentBean minBean) {
-			this.minBean = minBean;
-		}
-
-		public void run() {
-			try {
-				minBean.execute();
-			} catch (Exception ex) {
-				log.error("Error when executing bean \'" + minBean.getBeanName() + "\'", ex);
-			}
-		}
-	}
-
-	/**
-	 * A handler for processing one DoAction within an own thread.
-	 * @author Jan Keiser
-	 * @see AbstractExecutionCycle#performDoAction(DoAction)
-	 */
-	private class DoActionHandler implements Runnable {
-		private DoAction act;
-
-		public DoActionHandler(DoAction act) {
-			this.act = act;
-		}
-
-		public void run() {
-			performDoAction(act);
-		}
-	}
-
-	/**
-	 * A handler for processing one ActionResult within an own thread.
-	 * @author Jan Keiser
-	 * @see AbstractExecutionCycle#processResult(ActionResult)
-	 */
-	private class ActionResultHandler implements Runnable {
-		private ActionResult actionResult;
-
-		public ActionResultHandler(ActionResult actionResult) {
-			this.actionResult = actionResult;
-		}
-
-		public void run() {
-			processResult(actionResult);
-		}
-	}
-
-	/**
-	 * A handler for processing the cancellation of one DoAction within an own thread.
-	 * @author Jan Keiser
-	 * {@link de.dailab.jiactng.agentcore.environment.IEffector#cancelAction(DoAction)}
-	 */
-	private class SessionTimeoutHandler implements Runnable {
-		private Session session;
-		private DoAction doAction;
-
-		public SessionTimeoutHandler(Session session, DoAction doAction) {
-			this.session = session;
-			this.doAction = doAction;
-		}
-
-		public void run() {
-			processSessionTimeout(session, doAction);
-		}
 	}
 	
 }

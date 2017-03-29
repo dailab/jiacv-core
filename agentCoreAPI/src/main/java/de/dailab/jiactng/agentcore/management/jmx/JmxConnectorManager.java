@@ -1,5 +1,6 @@
 package de.dailab.jiactng.agentcore.management.jmx;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.DatagramPacket;
@@ -12,6 +13,7 @@ import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
 
@@ -27,6 +29,7 @@ import javax.rmi.ssl.SslRMIServerSocketFactory;
 import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.IAgentNode;
+import de.dailab.jiactng.agentcore.util.sec.CryptoRSA;
 
 /**
  * This class supports the periodically management of the JMX connector servers. This includes getting the actual list
@@ -36,6 +39,9 @@ import de.dailab.jiactng.agentcore.IAgentNode;
  * @author Jan Keiser
  */
 public final class JmxConnectorManager extends TimerTask {
+
+	public static final String CHAR_ENC = "ISO-8859-1";
+	public static final String REGISTRY_PREFIX = "/jndi/";
 
 	/** SSL identifier */
 	private static final String SSL_USAGE_IDENTIFIER = "de.dailab.jiactng.agentcore.sslInUse";
@@ -87,7 +93,7 @@ public final class JmxConnectorManager extends TimerTask {
 		try {
 			networkInterfaces = NetworkInterface.getNetworkInterfaces();
 		} catch (Exception e) {
-			log.error("Unable to get network interfaces: " + e.getLocalizedMessage());
+			log.error("Unable to get network interfaces: " + e.getMessage());
 			return;
 		}
 
@@ -134,22 +140,19 @@ public final class JmxConnectorManager extends TimerTask {
 						} else if (!interfaces.get(ifcName).getAddress().equals(address)) {
 							// connectors already exist, but IP address of this interface has been changed
 							// => re-add connector servers
-							log.info("Re-adding JMX connector servers for changed interface " + ifcName); // System.out.println("Re-adding JMX connector servers for changed interface "
-																																														// + ifcName);
+							log.info("Re-adding JMX connector servers for changed interface " + ifcName);
 							removeConnectors(ifcName);
 							addConnectors(ifcName, address);
 						}
 
 						// send multicast messages
 						socket.setNetworkInterface(ifc);
-						for (String jmxURL : interfaces.get(ifcName).getJmxURLs()) {
-							final byte[] buffer = jmxURL.getBytes();
+						for (byte[] buffer : interfaces.get(ifcName).getJmxURLs()) {
 							final DatagramPacket dp = new DatagramPacket(buffer, buffer.length, group, multicastPort);
 							socket.send(dp);
 						}
 					} catch (Exception e1) {
-						log.error("Unable to send multicast message on interface " + ifcName);
-						e1.printStackTrace();
+						log.error("Unable to send multicast message on interface " + ifcName, e1);
 					}
 				} else {
 					// handle inactive interface
@@ -161,7 +164,7 @@ public final class JmxConnectorManager extends TimerTask {
 			} catch (Exception e) {
 				// handle unknown interface
 				if (interfaces.containsKey(ifcName)) {
-					log.error("Unable to get information about interface " + ifcName + ": " + e.getLocalizedMessage());
+					log.error("Unable to get information about interface " + ifcName + ": " + e.getMessage());
 					log.info("Removing JMX connector servers for unknown interface " + ifcName);
 					removeConnectors(ifcName);
 				}
@@ -176,7 +179,7 @@ public final class JmxConnectorManager extends TimerTask {
 					removeConnectors(name);
 				}
 			} catch (Exception e) {
-				log.error("Unable to search for interface " + name + ": " + e.getLocalizedMessage());
+				log.error("Unable to search for interface " + name + ": " + e.getMessage());
 			}
 		}
 
@@ -222,19 +225,33 @@ public final class JmxConnectorManager extends TimerTask {
 		String path = conf.getPath();
 		final JMXAuthenticator authenticator = conf.getAuthenticator();
 
-		if (protocol.equals("rmi")) {
+		if (conf instanceof RmiJmxConnector) {
 			// FIXME !!! Find a solution that works the same on all OSs
 			if (!(System.getProperty("os.name").startsWith("Mac"))) {
 				System.setProperty("java.rmi.server.hostname", address.getHostAddress());
 			}
 
 			// check use of RMI registry
-			final int registryPort = ((RmiJmxConnector) conf).getRegistryPort();
-			final String registryHost = ((RmiJmxConnector) conf).getRegistryHost();
-			if ((registryPort > 0) || (registryHost != null)) {
-				path = "/jndi/rmi://" + ((registryHost == null) ? address.getHostAddress() : registryHost)
-																								+ ((registryPort > 0) ? ":" + registryPort : "") + "/" + node.getUUID()
-																								+ "/" + ifcName;
+			if (conf.useRmiRegistry()) {
+				// encrypt path suffix of JMX URL
+				String suffix = node.getUUID() + "/" + ifcName;
+				if (conf.getPrivateKeyFile() != null) {
+					try {
+						final byte[] bytes = CryptoRSA.encrypt(new FileInputStream(conf.getPrivateKeyFile()), suffix.getBytes(CHAR_ENC));
+						suffix = CryptoRSA.toHexString(bytes);
+					}
+					catch (Exception e) {
+						log.error("Unable to encrypt path suffix of JMX URL for RMI registry", e);
+					}
+				}
+
+				final int registryPort = ((RmiJmxConnector) conf).getRegistryPort();
+				String registryHost = ((RmiJmxConnector) conf).getRegistryHost();
+				if (registryHost == null) {
+					registryHost = address.getHostAddress();
+				}
+				path = REGISTRY_PREFIX + "rmi://" + registryHost
+						+ ((registryPort > 0) ? ":" + registryPort : "") + "/" + suffix;
 			}
 		}
 
@@ -318,7 +335,7 @@ public final class JmxConnectorManager extends TimerTask {
 	}
 
 	private void addConnectors(String ifcName, InetAddress address) {
-		Set<JMXConnectorServer> connectors = new HashSet<JMXConnectorServer>();
+		Map<JMXConnectorServer,byte[]> connectors = new HashMap<JMXConnectorServer,byte[]>();
 		for (JmxConnector conf : node.getJmxConnectors()) {
 			// create connector server
 			JMXConnectorServer cs = createConnector(conf, address, ifcName);
@@ -331,30 +348,60 @@ public final class JmxConnectorManager extends TimerTask {
 				cs.start();
 			} catch (Exception e) {
 				log.error("WARNING: Start of JMX connector server failed for protocol " + conf.getProtocol());
-				if (conf instanceof RmiJmxConnector) {
+				if (conf.useRmiRegistry()) {
 					final int registryPort = ((RmiJmxConnector) conf).getRegistryPort();
 					final String registryHost = ((RmiJmxConnector) conf).getRegistryHost();
-					if ((registryPort > 0) || (registryHost != null)) {
-						log.error("Please ensure that a rmi registry is started on "
-																										+ ((registryHost == null) ? address.getHostAddress() : registryHost)
-																										+ ((registryPort > 0) ? ":" + registryPort : ""));
-					}
+					log.error("Please ensure that a rmi registry is started on "
+								+ ((registryHost == null) ? address.getHostAddress() : registryHost)
+								+ ((registryPort > 0) ? ":" + registryPort : ""));
 				}
 				log.error(e.getMessage());
 				continue;
 			}
-			log.info("JMX connector server successfully started: " + cs.getAddress());
-			connectors.add(cs);
+			final String jmxURL = cs.getAddress().toString();
+			log.info("JMX connector server successfully started: " + jmxURL);
+
+			// encrypt JMX URL for multicast
+			byte[] multicast = null;
+			try {
+				multicast = jmxURL.getBytes(CHAR_ENC);
+				if ((conf.getPrivateKeyFile() != null) && !conf.useRmiRegistry()) {
+					if (multicast.length > CryptoRSA.ENCRYPTION_INPUT_LENGTH) {
+						// encrypt only last 245 bytes
+						final byte[] input = multicast;
+						final int nonEncryptionLength = multicast.length - CryptoRSA.ENCRYPTION_INPUT_LENGTH;
+
+						// copy non-encrypted prefix to result
+						final int multicastLength = nonEncryptionLength + CryptoRSA.ENCRYPTION_OUTPUT_LENGTH;
+						multicast = new byte[multicastLength];
+						for (int i=0; i<nonEncryptionLength; i++) {
+							multicast[i] = input[i];
+						}
+
+						// encrypt suffix
+						final int encryptionOutputLength = CryptoRSA.encrypt(new FileInputStream(conf.getPrivateKeyFile()), input, nonEncryptionLength, CryptoRSA.ENCRYPTION_INPUT_LENGTH, multicast, nonEncryptionLength);
+						if (encryptionOutputLength != CryptoRSA.ENCRYPTION_OUTPUT_LENGTH) {
+							log.error("Wrong size of encryption result");
+						}
+					}
+					else {
+						// encrypt full URL
+						multicast = CryptoRSA.encrypt(new FileInputStream(conf.getPrivateKeyFile()), multicast);
+					}
+				}
+			}
+			catch (Exception e) {
+				log.error("Unable to encrypt JMX URL for multicast", e);
+			}
+			connectors.put(cs, multicast);
 
 			// register connector server as JMX resource
 			try {
-				manager.registerAgentNodeResource(node, JmxManager.CATEGORY_JMX_CONNECTOR_SERVER,
-																								"\"" + cs.getAddress() + "\"", cs);
+				manager.registerAgentNodeResource(node, JmxManager.CATEGORY_JMX_CONNECTOR_SERVER, "\"" + jmxURL + "\"", cs);
 			} catch (Exception e) {
-				log.error("WARNING: Unable to register JMX connector server \"" + cs.getAddress() + "\" as JMX resource.");
+				log.error("WARNING: Unable to register JMX connector server \"" + jmxURL + "\" as JMX resource.");
 				log.error(e.getMessage());
 			}
-
 		}
 
 		// add all connector servers

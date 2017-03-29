@@ -1,13 +1,18 @@
 package de.dailab.jiactng.agentcore.management.jmx.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.security.Key;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,9 +29,13 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import org.apache.log4j.Logger;
+
 import de.dailab.jiactng.agentcore.comm.CommunicationBeanMBean;
+import de.dailab.jiactng.agentcore.management.jmx.JmxConnectorManager;
 import de.dailab.jiactng.agentcore.management.jmx.JmxManager;
 import de.dailab.jiactng.agentcore.util.IdFactory;
+import de.dailab.jiactng.agentcore.util.sec.CryptoRSA;
 
 /**
  * This JMX client enables the remote management of a JVM.
@@ -39,6 +48,8 @@ public class JmxManagementClient {
 
 	/** The maximum length of multicast messages is 1,000 bytes. */
 	public static final int MAX_MULTICAST_MESSAGE_LENGTH = 1000;
+
+	protected final static Logger log = Logger.getLogger(JmxManagementClient.class);
 
 	/** The connection to the MBeanServer of a JVM used to manage its resources. */
 	protected MBeanServerConnection mbsc = null;
@@ -56,19 +67,64 @@ public class JmxManagementClient {
 	 * @see JmxConnectionTester
 	 */
 	public static List<JMXServiceURL> getURLsFromRegistry(String host, int port) throws RemoteException {
-		final JmxConnectionTester tester = new JmxConnectionTester(true);
+		return getURLsFromRegistry( host, port, null);
+	}
+
+	/**
+	 * Gets the URL of all JMX connector server of the owner of a given key, 
+	 * which are registered in a RMI registry and are reachable by the client. 
+	 * @param host The host of the registry.
+	 * @param port The port used by the registry.
+	 * @param publicKey the stream of the public RSA key
+	 * @return The list of found JMX URLs of the key owner.
+	 * @throws RemoteException if remote communication with the registry failed. If exception is a <code>ServerException</code> containing an <code>AccessException</code>, then the registry denies the caller access to perform this operation.
+	 * @see java.rmi.registry.Registry#list()
+	 * @see JMXServiceURL#JMXServiceURL(String, String, int, String)
+	 * @see JmxConnectionTester
+	 * @see CryptoRSA
+	 */
+	public static List<JMXServiceURL> getURLsFromRegistry(String host, int port, InputStream publicKey) throws RemoteException {
+		Key key = null;
+		if (publicKey != null) {
+			// extract public RSA key
+			key = null;
+			try {
+				key = CryptoRSA.getKey(publicKey);
+			}
+			catch (Exception e) {
+				log.error("Unable to get public RSA key from stream", e);
+				return new ArrayList<JMXServiceURL>();
+			}
+		}
+
+		// check encrypted IDs from registry
+		final JmxConnectionTester tester = new JmxConnectionTester(false);
 		final Iterator<String> nodeIdIterator = Arrays.asList(LocateRegistry.getRegistry(host, port).list()).iterator();
 		while (nodeIdIterator.hasNext()) {
-			final String nodeId = nodeIdIterator.next();
+			final String encryptedNodeId = nodeIdIterator.next();
+			String nodeId = encryptedNodeId;
+			if (key != null) {
+				// decrypt ID from registry
+				try {
+					final byte[] input = CryptoRSA.fromHexString(encryptedNodeId);
+					nodeId = new String(CryptoRSA.decrypt(key, input), Charset.forName(JmxConnectorManager.CHAR_ENC));
+				}
+				catch (Exception e) {
+					log.debug("Decryption of the path suffix of a JMX URL failed: " + e.getLocalizedMessage());
+					continue;
+				}
+			}
+
+			// create URL from ID and add to list of URLs
 			if (nodeId.startsWith(IdFactory.IdPrefix.Node.toString())) {
 				try {
-					final JMXServiceURL url = new JMXServiceURL("rmi", null, 0, "/jndi/rmi://" + host + ":" + port + "/" + nodeId);
+					final JMXServiceURL url = new JMXServiceURL("rmi", null, 0, JmxConnectorManager.REGISTRY_PREFIX + "rmi://" + host + ":" + port + "/" + encryptedNodeId);
 					tester.addURL(url);
 				}
 				catch (Exception e) {
-					e.printStackTrace();
+					log.error("Unable to create JMX URL from RMI registry entry: " + encryptedNodeId, e);
 				}
-			}
+			}				
 		}
 
 		// wait for connection tests
@@ -76,7 +132,7 @@ public class JmxManagementClient {
 			Thread.sleep(CONNECTION_TESTER_TIMEOUT);
 		}
 		catch (InterruptedException e) {
-			e.printStackTrace();
+			log.warn("JMX connection tester was interrupted", e);
 		}
 
 		return tester.getResult();
@@ -92,7 +148,35 @@ public class JmxManagementClient {
 	 * @see JmxConnectionTester
 	 */
 	public static List<JMXServiceURL> getURLsFromMulticast() throws IOException {
-		final JmxConnectionTester tester = new JmxConnectionTester(true);
+		return getURLsFromMulticast(null);
+	}
+
+	/**
+	 * Gets the URL of all JMX connector server of the owner of a given key, 
+	 * which are announced by multicast messages and are reachable by 
+	 * the client.
+	 * @param publicKey the stream of the public RSA key
+	 * @return The list of found JMX URLs.
+	 * @throws IOException A communication problem occurred when creating a multicast socket or receiving multicast packets.
+	 * @see MulticastSocket#receive(DatagramPacket)
+	 * @see JmxConnectionTester
+	 * @see CryptoRSA
+	 */
+	public static List<JMXServiceURL> getURLsFromMulticast(InputStream publicKey) throws IOException {
+		Key key = null;
+		if (publicKey != null) {
+			// extract public RSA key
+			try {
+				key = CryptoRSA.getKey(publicKey);
+			}
+			catch (Exception e) {
+				log.error("Unable to get public RSA key from stream", e);
+				return new ArrayList<JMXServiceURL>();
+			}
+		}
+
+		// check encrypted URLs from multicast
+		final JmxConnectionTester tester = new JmxConnectionTester(false);
 		byte[] buffer = new byte[MAX_MULTICAST_MESSAGE_LENGTH];
 		final long endTime = System.currentTimeMillis() + JmxManager.MULTICAST_PERIOD + CONNECTION_TESTER_TIMEOUT;
 
@@ -111,7 +195,42 @@ public class JmxManagementClient {
 				dp.setLength(MAX_MULTICAST_MESSAGE_LENGTH);
 				socket.receive(dp);
 				buffer = dp.getData();
-				final String message = new String(buffer, 0, dp.getLength());
+
+				// get message from multicast
+				String message = null;
+				if (key != null) {
+					try {
+						if (dp.getLength() > CryptoRSA.ENCRYPTION_OUTPUT_LENGTH) {
+							// decrypt only message suffix
+							final int nonEncryptionLength = dp.getLength() - CryptoRSA.ENCRYPTION_OUTPUT_LENGTH;
+
+							// copy non-encrypted prefix to result
+							final byte[] output = new byte[nonEncryptionLength + CryptoRSA.ENCRYPTION_OUTPUT_LENGTH];
+							for (int i=0; i<nonEncryptionLength; i++) {
+								output[i] = buffer[i];
+							}
+
+							// decrypt suffix
+							final int decryptionOutputLength = CryptoRSA.decrypt(key, buffer, nonEncryptionLength, CryptoRSA.ENCRYPTION_OUTPUT_LENGTH, output, nonEncryptionLength);
+							if (decryptionOutputLength != CryptoRSA.ENCRYPTION_INPUT_LENGTH) {
+								log.error("Wrong size of decryption result");
+							}
+
+							message = new String(output, 0, nonEncryptionLength+decryptionOutputLength, Charset.forName(JmxConnectorManager.CHAR_ENC));
+						}
+						else {
+							// decrypt full message
+							message = new String(CryptoRSA.decrypt(key, buffer), Charset.forName(JmxConnectorManager.CHAR_ENC));
+						}
+					}
+					catch (Exception e) {
+						log.debug("Decryption of a JMX URL failed: " + e.getLocalizedMessage());
+						continue;
+					}
+				}
+				else {
+					message = new String(buffer, 0, dp.getLength());
+				}
 
 				// add converted message to list of URLs
 				try {
@@ -122,11 +241,11 @@ public class JmxManagementClient {
 					}
 					tester.addURL(url);
 				} catch (Exception e) {
-					e.printStackTrace();
-				}
+					log.error("Got multicast message with wrong JMX URL format", e);
+				}					
 			}
 		} catch (SocketTimeoutException ste) {
-			ste.printStackTrace();
+			log.error("Timeout for reading multicast packets", ste);
 		}
 		socket.close();
 
@@ -237,11 +356,32 @@ public class JmxManagementClient {
 	 * @see MBeanServerConnection#queryNames(ObjectName, javax.management.QueryExp)
 	 */
 	public final String getAgentNodeUUID(JMXServiceURL url) throws IOException, MalformedObjectNameException {
-		final Set<ObjectName> connectorServers = mbsc.queryNames(new JmxManager().getMgmtNameOfAgentNodeResource("*", "JMXConnectorServer", "\"" + url + "\""), null);
-		if (connectorServers.isEmpty()) {
-			return null;
+		final Set<ObjectName> connectorServers = mbsc.queryNames(new JmxManager().getMgmtNameOfAgentNodeResource("*", "JMXConnectorServer", "*"), null);
+		if (url.getURLPath().startsWith(JmxConnectorManager.REGISTRY_PREFIX)) {
+			// registry JMX URL
+			final String id = new URL(url.getURLPath().substring(JmxConnectorManager.REGISTRY_PREFIX.length()).replaceFirst("[a-z]*:", "http:")).getPath();
+			for (ObjectName server : connectorServers) {
+				final String quotedServerUrl = server.getKeyProperty("resource");
+				final JMXServiceURL serverUrl = new JMXServiceURL(quotedServerUrl.substring(1, quotedServerUrl.length()-1));
+				if (serverUrl.getURLPath().startsWith(JmxConnectorManager.REGISTRY_PREFIX)) {
+					final String serverId = new URL(serverUrl.getURLPath().substring(JmxConnectorManager.REGISTRY_PREFIX.length()).replaceFirst("[a-z]*:", "http:")).getPath();
+					if (id.equals(serverId)) {
+						return server.getKeyProperty("agentnode");
+					}
+				}
+			}
 		}
-		return connectorServers.iterator().next().getKeyProperty("agentnode");
+		else {
+			// multicast JMX URL
+			for (ObjectName server : connectorServers) {
+				final String quotedServerUrl = server.getKeyProperty("resource");
+				final JMXServiceURL serverUrl = new JMXServiceURL(quotedServerUrl.substring(1, quotedServerUrl.length()-1));
+				if (url.equals(serverUrl)) {
+					return server.getKeyProperty("agentnode");					
+				}
+			}			
+		}
+		return null;
 	}
 
 	/**

@@ -7,6 +7,11 @@
 	</properties>
 	<body>
 		<release version="5.2.2" date="T.B.A." description="Minor release">
+			<action dev="keiser" type="add">
+				JMX URLs or part of them can optionally be encrypted with a 
+				private key. This enables clients to ensure that this JMX URL 
+				belongs to the expected owner by using its public key.
+			</action>
 			<action dev="keiser" type="change">
 				Changed interfaces for management of directory intervals.
 			</action>

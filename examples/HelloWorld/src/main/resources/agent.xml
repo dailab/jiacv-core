@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
-<!--
-  - Application context definition for "example" DispatcherServlet.
-  -->
-<beans>
-
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
   <import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
 
   <!--bean name="HelloWorldAgent" parent="NonBlockingAgent" singleton="false"-->
-  <bean name="HelloWorldAgent" parent="SimpleAgent" singleton="false">
+  <bean name="HelloWorldAgent" parent="SimpleAgent" scope="prototype">
     <property name="agentBeans">
       <list>
         <ref bean="helloBean"/>
@@ -17,7 +15,7 @@
     </property>
   </bean>
 
-  <bean name="helloBean" class="de.dailab.jiactng.examples.helloWorld.HelloBean" singleton="false">
+  <bean name="helloBean" class="de.dailab.jiactng.examples.helloWorld.HelloBean" scope="prototype">
     <property name="logLevel" value="INFO"/>
   </bean>
 

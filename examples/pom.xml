@@ -18,6 +18,7 @@
     <modules>
         <module>HelloWorld</module>
         <module>jmxExample</module>
+        <module>PingPong</module>
         <module>pingPong_WithTLS</module>
         <module>simpleChatExample</module>
     </modules>

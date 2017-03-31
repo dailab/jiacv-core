@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
-<!--
-	- Application context definition for "example" DispatcherServlet.
--->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
@@ -19,7 +17,7 @@
 	</bean>
 
 
-	<bean name="SessionTestAgent1" parent="SimpleAgent" singleton="false">
+	<bean name="SessionTestAgent1" parent="SimpleAgent" scope="prototype">
 		<property name="agentBeans">
 			<list>
 				<ref bean="SessionTestBean1" />
@@ -27,7 +25,7 @@
 		</property>
 	</bean>
 
-	<bean name="SessionTestAgent2" parent="SimpleAgent" singleton="false">
+	<bean name="SessionTestAgent2" parent="SimpleAgent" scope="prototype">
 		<property name="agentBeans">
 			<list>
 				<ref bean="SessionTestBean2" />
@@ -35,14 +33,14 @@
 		</property>
 	</bean>
 
-	<bean name="SessionTestBean1" class="de.dailab.jiactng.agentcore.execution.SessionTestBean"	singleton="false">
+	<bean name="SessionTestBean1" class="de.dailab.jiactng.agentcore.execution.SessionTestBean"	scope="prototype">
 		<property name="waitTimer" value="1000"/>
 		<property name="offerActionA" value="true"/>
 		<property name="offerActionB" value="true"/>
 		<property name="offerActionC" value="false"/>
 	</bean>
 
-	<bean name="SessionTestBean2" class="de.dailab.jiactng.agentcore.execution.SessionTestBean"	singleton="false">
+	<bean name="SessionTestBean2" class="de.dailab.jiactng.agentcore.execution.SessionTestBean"	scope="prototype">
 		<property name="waitTimer" value="1000"/>
 		<property name="offerActionA" value="false"/>
 		<property name="offerActionB" value="false"/>

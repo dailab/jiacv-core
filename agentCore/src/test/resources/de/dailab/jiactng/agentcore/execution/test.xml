@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
-<!--
-  - Application context definition for "example" DispatcherServlet.
-  -->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
   <import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
@@ -17,7 +15,7 @@
     </property>
   </bean>
 
-  <bean name="TestAgent" parent="NonBlockingAgent" singleton="false">
+  <bean name="TestAgent" parent="NonBlockingAgent" scope="prototype">
     <property name="agentBeans">
       <list>
         <ref bean="TestBean"/>
@@ -25,7 +23,7 @@
     </property>
   </bean>
 
-  <bean name="TestBean" class="de.dailab.jiactng.agentcore.execution.TestBean" singleton="false">
+  <bean name="TestBean" class="de.dailab.jiactng.agentcore.execution.TestBean" scope="prototype">
   </bean>
 
 </beans>

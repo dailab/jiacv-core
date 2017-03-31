@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-<beans>
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentBeans.xml"/>
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml"/>
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml"/>
@@ -39,9 +41,9 @@
 		</property>
 	</bean>
 	
-	<bean name="LocalJMSBroker" parent="ActiveMQBroker" singleton="true"/>
+	<bean name="LocalJMSBroker" parent="ActiveMQBroker" scope="singleton"/>
 	
-	<bean name="FloodAgent" parent="SimpleAgent" singleton="false">
+	<bean name="FloodAgent" parent="SimpleAgent" scope="prototype">
 		<property name="agentBeans">
 			<list>
 				<ref bean="CommunicationBean" />
@@ -51,7 +53,7 @@
 		<property name="executionInterval" value="0" />
 	</bean>
 
-	<bean name="FloodReader" parent="SimpleAgent" singleton="false">
+	<bean name="FloodReader" parent="SimpleAgent" scope="prototype">
 		<property name="agentBeans">
 			<list>
 				<ref bean="CommunicationBean" />
@@ -60,34 +62,34 @@
 		</property>
 	</bean>
 	
-	<bean name="FloodReader01" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader02" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader03" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader04" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader05" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader06" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader07" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader08" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader09" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader10" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader11" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader12" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader13" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader14" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader15" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader16" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader17" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader18" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader19" parent="FloodReader" singleton="false"/>
-	<bean name="FloodReader20" parent="FloodReader" singleton="false"/>
+	<bean name="FloodReader01" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader02" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader03" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader04" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader05" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader06" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader07" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader08" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader09" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader10" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader11" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader12" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader13" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader14" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader15" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader16" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader17" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader18" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader19" parent="FloodReader" scope="prototype"/>
+	<bean name="FloodReader20" parent="FloodReader" scope="prototype"/>
 	
 
-	<bean name="MessageFlooderBean" class="de.dailab.jiactng.agentcore.comm.perf.MessageFlooderBean" singleton="false">
+	<bean name="MessageFlooderBean" class="de.dailab.jiactng.agentcore.comm.perf.MessageFlooderBean" scope="prototype">
 		<property name="groupName" value="flooders" />
 		<property name="max" value="800" />
 	</bean>
 	
-	<bean name="MessageReaderBean" class="de.dailab.jiactng.agentcore.comm.perf.MessageReaderBean" singleton="false" >
+	<bean name="MessageReaderBean" class="de.dailab.jiactng.agentcore.comm.perf.MessageReaderBean" scope="prototype">
 		<property name="groupName" value="flooders" />
 		<property name="max" value="800" />
 	</bean>

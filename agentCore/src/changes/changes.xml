@@ -6,7 +6,12 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.2.2" date="T.B.A." description="Minor release">
+		<release version="5.2.2" date="2017-04-06" description="Minor release">
+            <action dev="kuester" type="add">
+				Added parameter names to exposed actions, either via reflection
+                (requires Java 8 and special compile flag) or via the @Expose
+                annotation.
+			</action>
 			<action dev="keiser" type="add">
 				New methods to invoke actions in parallel.
 			</action>

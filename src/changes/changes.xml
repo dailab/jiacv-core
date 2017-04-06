@@ -6,10 +6,18 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
-		<release version="5.2.2" date="T.B.A." description="Minor release">
+		<release version="5.2.3" date="T.B.A." description="Minor release">
+            <action dev="kuester" type="change">
+				Changed Spring version to 4 and Java to 8.
+			</action>
+		</release>
+		<release version="5.2.2" date="2017-04-06" description="Minor release">
             <action dev="kuester" type="add">
 				Added input names to action descriptions and @Expose (reflection
                 works only with Java 8 and if compiled with '-parameters' flag).
+			</action>
+            <action dev="kuester" type="change">
+				Revised repository structure, moved examples to core repository.
 			</action>
 			<action dev="keiser" type="add">
 				New methods to invoke actions in parallel.

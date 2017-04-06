@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab</groupId>
 	<artifactId>jiactng</artifactId>
-	<version>5.2.2-SNAPSHOT</version>
+	<version>5.2.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Java-based Intelligent Agent Componentware, Version 5</name>

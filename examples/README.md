@@ -1,24 +1,25 @@
 JIAC V Core Example
 ===================
 
-Dieses Modul enthält einige Examples zu JIAC V Core Funktionalitäten.
+This modules contains some examples concerning JIAC V core functionalities.
 
 HelloWorld
 ---
-Ein Minimalbeispiel von JIAC V
+A minimal JIAC V example just printing "Hello World" to the console.
 
 jmxExample
 ---
-Beispiel zur Verwendung von JMX um von außen mit einer JIAC-Platform zu komminuzieren; _Jan Kaiser_
+Example on usage of JMX for communicating with a JIAC node from the outside.
 
 PingPong
 ---
-Ein Beispiel zur Nutzung der Agentenkommunikation auf Basis von JIacMessages
+Example about usage of agent communication; shows how to do "Ping Pong" using various techniques,
+e.g. JIAC messages, actions, rules, etc.
 
 pingPong_WithTLS
 ---
-Ping-Pong with TLS excryption; Maintainer: _Sandor Selowski_
+Ping-Pong with TLS excryption
 
 simpleChatExample
 ---
-ein kleines Chat-Programm auf Basis von JIAC V; _verwaist_
+A simple chat UI based on JIAC's communication infrastructure.

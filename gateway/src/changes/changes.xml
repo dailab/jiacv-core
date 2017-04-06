@@ -6,6 +6,8 @@
 		<author email="axle.hessler@dai-labor.de">axle</author>
 	</properties>
 	<body>
+        <release version="5.2.2" date="2017-04-06" description="Minor release">
+		</release>
 		<release version="5.2.1" date="2016-01-07" description="Minor release">
 			<action dev="keiser" type="change">
 				Logging framework changed from CommonsLogging to Log4j.

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab</groupId>
 	<artifactId>jiactng</artifactId>
-	<version>5.2.2-SNAPSHOT</version>
+	<version>5.2.2</version>
 	<packaging>pom</packaging>
 
 	<name>Java-based Intelligent Agent Componentware, Version 5</name>
@@ -700,7 +700,7 @@
 		<url>https://gitlab.tubit.tu-berlin.de/jiac-devs/core-new</url>
 		<connection>scm:git:git://gitlab.tubit.tu-berlin.de:jiac-devs/core-new.git</connection>
 		<developerConnection>scm:git:git@gitlab.tubit.tu-berlin.de:jiac-devs/core-new.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>jiactng-5.2.2</tag>
 	</scm>
 	
 	<modules>

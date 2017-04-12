@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-<beans>
 	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
 	<import resource ="classpath:de/dailab/jiactng/agentcore/conf/JMSMessaging.xml" />
@@ -34,7 +36,7 @@
 			<property name = "executionInterval" value="1"/>
 	</bean>
 	   
-		<bean name="DirectoryNodeBean" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" singleton="false">
+		<bean name="DirectoryNodeBean" class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean" scope="prototype">
 		<property name= "group" >
 			<list>
 				<value>groupB</value>
@@ -47,7 +49,7 @@
 	
 	<bean name="GatewayBroker"
 		class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQBroker"
-		singleton="false" lazy-init="true">
+		scope="prototype" lazy-init="true">
 
 		<property name="persistent" value="false" />
 		<property name="connectors">
@@ -59,7 +61,7 @@
 	
 	<bean name="GatewayConnector2"
 		class="de.dailab.jiactng.agentcore.comm.broker.ActiveMQTransportConnector"
-		singleton="false" lazy-init="true">
+		scope="prototype" lazy-init="true">
 
 		<property name="networkURI" value="static:(failover:(tcp://192.168.142.142:45678))" />
 		<property name="duplex" value="true" />

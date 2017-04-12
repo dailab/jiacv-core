@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
-<!--
-	- Application context definition for "example" DispatcherServlet.
--->
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
@@ -20,7 +18,7 @@
 	</bean>
 
 
-	<bean name="RoleTestAgent1" parent="SimpleAgent" singleton="false">
+	<bean name="RoleTestAgent1" parent="SimpleAgent" scope="prototype">
 		<property name="agentBeans">
 			<list>
 				<ref bean="NoRoleTestBean" />
@@ -28,7 +26,7 @@
 		</property>
 	</bean>
 
-	<bean name="RoleTestAgent2" parent="SimpleAgent" singleton="false">
+	<bean name="RoleTestAgent2" parent="SimpleAgent" scope="prototype">
 		<property name="roles">
 			<list>
 				<ref bean="RoleA" />
@@ -41,7 +39,7 @@
 		</property>
 	</bean>
 	
-	<bean name="RoleTestAgent3" parent="SimpleAgent" singleton="false">
+	<bean name="RoleTestAgent3" parent="SimpleAgent" scope="prototype">
 		<property name="roles">
 			<list>
 				<ref bean="RoleB" />
@@ -54,7 +52,7 @@
 		</property>
 	</bean>
 
-	<bean name="RoleA" class="de.dailab.jiactng.agentcore.AgentRole" singleton="false">
+	<bean name="RoleA" class="de.dailab.jiactng.agentcore.AgentRole" scope="prototype">
 		<property name="agentBeans">
 			<list>
 				<ref bean="RoleTestBeanA" />
@@ -62,7 +60,7 @@
 		</property>
 	</bean>
 
-	<bean name="RoleB" class="de.dailab.jiactng.agentcore.AgentRole" singleton="false">
+	<bean name="RoleB" class="de.dailab.jiactng.agentcore.AgentRole" scope="prototype">
 		<property name="agentBeans">
 			<list>
 				<ref bean="RoleTestBeanB" />
@@ -76,14 +74,14 @@
 	</bean>
 
 
-	<bean name="NoRoleTestBean" class="de.dailab.jiactng.agentcore.roletest.NoRoleBean"	singleton="false">
+	<bean name="NoRoleTestBean" class="de.dailab.jiactng.agentcore.roletest.NoRoleBean"	scope="prototype">
 		<property name="executionInterval" value="10"/>
 	</bean>
 
-	<bean name="RoleTestBeanA" class="de.dailab.jiactng.agentcore.roletest.RoleTestBeanA" singleton="false">
+	<bean name="RoleTestBeanA" class="de.dailab.jiactng.agentcore.roletest.RoleTestBeanA" scope="prototype">
 	</bean>
 	
- 	<bean name="RoleTestBeanB" class="de.dailab.jiactng.agentcore.roletest.RoleTestBeanB" singleton="false">
+ 	<bean name="RoleTestBeanB" class="de.dailab.jiactng.agentcore.roletest.RoleTestBeanB" scope="prototype">
 	</bean>
 
 

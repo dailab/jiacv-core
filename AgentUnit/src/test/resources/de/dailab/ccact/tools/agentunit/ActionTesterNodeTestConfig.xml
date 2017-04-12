@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
 	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
 
@@ -34,7 +36,7 @@
 
 	<bean name="TestMethodExposingBean"
 		class="de.dailab.ccact.tools.agentunit.TestMethodExposingBean"
-		singleton="false">
+		scope="prototype">
 		<property name="logLevel" value="WARN" />
 		<!-- property name="registeredActions">
 			<set>
@@ -45,7 +47,7 @@
 
 	<bean name="iDirectory"
 		class="de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBean"
-		singleton="false">
+		scope="prototype">
 		<property name="messageTransport">
 			<ref bean="StandardJMSMessageTransport" />
 		</property>

@@ -63,3 +63,11 @@ verify:jdk8:
   <<: *verify
   image: maven:3.3.9-jdk-8
 
+
+deploy:
+  stage: deploy
+  only: develop
+  script: 
+    - 'mvn $MAVEN_CLI_OPTS jar:jar deploy:deploy -DrepositoryId=dai-snapshots -Durl=http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/'
+
+

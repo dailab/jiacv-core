@@ -76,4 +76,4 @@ snapshotdeploy:
   only: 
     - develop
   script: 
-    - 'mvn $MAVEN_CLI_OPTS jar:jar deploy:deploy -DrepositoryId=dai-snapshots -Durl=http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/'
+    - 'mvn $MAVEN_CLI_OPTS package deploy:deploy -DrepositoryId=dai-snapshots -Durl=http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/'

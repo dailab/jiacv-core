@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.dailab</groupId>
@@ -17,7 +18,7 @@
 		<url>http://www.dai-labor.de</url>
 	</organization>
 	<prerequisites>
-		<maven>2.2.1</maven>
+		<maven>3.3.0</maven>
 	</prerequisites>
 
 	<licenses>
@@ -266,7 +267,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -276,7 +277,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18</version>
+
 				<configuration>
 					<forkMode>pertest</forkMode>
 				</configuration>
@@ -290,7 +291,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+
 				<executions>
 					<execution>
 						<goals>
@@ -303,7 +304,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -318,11 +318,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.10</version>
+
 				<dependencies>
 					<dependency>
-						<!-- If we use ${project.version} here, then this will 
-						mess up all projects that have a different version -->
+						<!-- If we use ${project.version} here, then this will mess up all 
+							projects that have a different version -->
 						<groupId>de.dailab.jiactng</groupId>
 						<artifactId>agentCoreAPI</artifactId>
 						<version>5.1.5</version>
@@ -342,7 +342,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.3</version>
 				<executions>
 					<execution>
 						<id>attach-descriptor</id>
@@ -373,7 +372,7 @@
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-javadoc-plugin</artifactId>
-							<version>2.9</version>
+
 							<configuration>
 								<failOnError>false</failOnError>
 								<additionalparam>${javadoc.opts}</additionalparam>
@@ -384,7 +383,7 @@
 									<link>http://docs.oracle.com/javase/8/docs/api/</link>
 									<link>http://docs.jboss.org/jbpm/v5.2/javadocs/</link>
 									<link>http://help.eclipse.org/help33/topic/org.eclipse.platform.doc.isv/reference/api/</link>
-									<!--<link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link>-->
+									<!--<link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link> -->
 									<!--link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCoreAPI/apidocs/</link> 
 										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCore/apidocs/</link> 
 										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/basicServices/Loadmeasurement/apidocs/</link> 
@@ -403,7 +402,7 @@
 									<link>http://docs.spring.io/spring/docs/3.0.3.RELEASE/api/</link>
 									<link>http://ws.apache.org/axis/java/apiDocs/</link>
 									<link>http://www.jdom.org/docs/apidocs/</link>
-									<!--<link>http://www.jmonkeyengine.com/doc/</link>-->
+									<!--<link>http://www.jmonkeyengine.com/doc/</link> -->
 									<!--link>http://java.sun.com/products/servlet/2.3/javadoc/</link -->
 								</links>
 								<quiet>true</quiet>
@@ -429,7 +428,8 @@
 								<configLocation>prealpha_checks.xml</configLocation>
 							</configuration>
 						</plugin>
-						<!-- Cobertura was commented out because it can cause build failures when generating maven-sites with "mvn site"  -->
+						<!-- Cobertura was commented out because it can cause build failures 
+							when generating maven-sites with "mvn site" -->
 						<!-- plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>cobertura-maven-plugin</artifactId> 
 							<version>2.5.1</version> <configuration> <includes> <include>**/*.java</include> 
 							</includes> </configuration> </plugin -->
@@ -452,7 +452,7 @@
 						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-surefire-report-plugin</artifactId>
-							<version>2.15</version>
+							<version>2.20</version>
 						</plugin>
 						<plugin>
 							<groupId>org.codehaus.mojo</groupId>
@@ -482,7 +482,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
 				<configuration>
 					<projectNameTemplate>[groupId] - [artifactId]</projectNameTemplate>
 					<downloadSources>true</downloadSources>
@@ -492,6 +491,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
+
 				<configuration>
 					<destFile>${sonar.jacoco.reportPath}</destFile>
 					<append>true</append>
@@ -523,9 +523,58 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>3.0.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.0.2</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.20</version>
+				</plugin>
+				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.7.4.201502262128</version>
+					<version>0.7.9</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.10.4</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-eclipse-plugin</artifactId>
+					<version>2.10</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.6</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>2.17</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.6.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>appassembler-maven-plugin</artifactId>
+					<version>2.0.0</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>3.0.0</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -537,7 +586,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.3</version>
 				<configuration>
 					<failOnError>false</failOnError>
 					<additionalparam>${javadoc.opts}</additionalparam>
@@ -655,22 +703,14 @@
 			<id>dai-repository</id>
 			<url>scp://repositories.dai-labor.de/export/home/local/maven/sites/jiactng/${project.version}</url>
 		</site>
-<!--	Deployment on Release and Edu not necessary, since Open is accessible by all.
-		<repository>
-			<id>dai-releases</id>
-			<name>dai-releases</name>
-			<url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
-		</repository>
-		<repository>
-			<id>edu-releases</id>
-			<name>Edu Repository</name>
-			<url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> 
-		</repository>
--->
+		<!-- Deployment on Release and Edu not necessary, since Open is accessible 
+			by all. <repository> <id>dai-releases</id> <name>dai-releases</name> <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url> 
+			</repository> <repository> <id>edu-releases</id> <name>Edu Repository</name> 
+			<url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> </repository> -->
 		<repository>
 			<id>dai-open</id>
 			<name>DAI Open</name>
-			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url> 
+			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url>
 		</repository>
 		<snapshotRepository>
 			<id>dai-snapshots</id>
@@ -702,14 +742,14 @@
 		<developerConnection>scm:git:git@gitlab.tubit.tu-berlin.de:jiac-devs/core-new.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
-	
+
 	<modules>
 		<!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->
 		<module>agentCoreAPI</module>
 		<module>gateway</module>
 		<module>agentCore</module>
 		<module>AgentUnit</module>
-        <module>examples</module>
+		<module>examples</module>
 	</modules>
 
 	<profiles>

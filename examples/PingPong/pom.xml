@@ -25,7 +25,6 @@
   			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>appassembler-maven-plugin</artifactId>
-				<version>1.10</version>
 				<executions>
 					<execution>
 						<id>generate start scripts</id>
@@ -67,7 +66,6 @@
 			<plugin>
 				<!-- copy the configuration files into target/appassembler/etc -->
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.7</version>
 				<executions>
 					<execution>
 						<id>copy-configuration</id>

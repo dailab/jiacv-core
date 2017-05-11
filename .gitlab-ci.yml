@@ -38,8 +38,9 @@ cache:
   script:
     - 'mvn $MAVEN_CLI_OPTS test-compile'
 
-build: 
+mvn-package: 
   stage: build
+  image: maven:3.3.9-jdk-8
   script: 
     - 'mvn $MAVEN_CLI_OPTS clean package -Dmaven.test.skip=true -Dmaven.javadoc.skip=true'
 
@@ -52,8 +53,9 @@ build:
 #  only:
 #    - master
 
-test: 
+mvn-test: 
   stage: test
+  image: maven:3.3.9-jdk-8
   script: 
     - 'mvn $MAVEN_CLI_OPTS test'
 
@@ -76,4 +78,4 @@ snapshotdeploy:
   only: 
     - develop
   script: 
-    - 'mvn $MAVEN_CLI_OPTS package deploy:deploy -DrepositoryId=dai-snapshots -Durl=http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/'
+    - 'mvn $MAVEN_CLI_OPTS package -Dmaven.test.skip=true -Dmaven.javadoc.skip=true deploy:deploy -DrepositoryId=dai-snapshots -Durl=http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/'

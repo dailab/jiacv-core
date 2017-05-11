@@ -64,7 +64,7 @@ verify:jdk8:
   image: maven:3.3.9-jdk-8
 
 
-deploy:
+daideploy:
   stage: deploy
   only: develop
   script: 

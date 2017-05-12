@@ -1,4 +1,3 @@
-
 stages: 
     - build
     - test
@@ -17,7 +16,7 @@ variables:
 # To keep cache across branches add 'key: "$CI_JOB_REF_NAME"'
 cache:
   paths:
-    - .m2/repository
+    - ~/.m2/repository
   key: "$CI_JOB_REF_NAME"
   untracked: true
 

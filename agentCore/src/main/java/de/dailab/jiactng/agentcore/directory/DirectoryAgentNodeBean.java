@@ -636,38 +636,24 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	@Override
 	public IActionDescription searchAction(IActionDescription template) {
 		if (template == null) {
-			log.error("Cannot find action: null!");
+			log.error("Cannot find action: action template is null!");
 			return null;
 		}
 
 		// use Matcher for matching if possible
 		if (hasSemanticIRI(template)) {
-			if (hasServiceMatcher()) {
-				
-				IServiceDescription templateSD = createTemplateSD(template);
-				if (templateSD != null){
-					final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
-					IServiceDescription matcherResult = this.serviceMatcher
-							.findBestMatch(templateSD, serviceDescList);
-
-					if (matcherResult != null) {
-						
-						IActionDescription iad = this.findActionDescription(matcherResult);
-						
-						if (iad != null){
-							
-							return iad;
-						
-						} else {
-							log.warn("Matcher found result, however the respective was not found afterwards. Trying normal template matching.");
-						}
-						
-					} else {
-						log.warn("Matcher found no result, trying normal template matching...");
-					}
+			IServiceDescription templateSD = createTemplateSD(template);
+			IServiceDescription matcherResult = searchAction(templateSD);
+			if (matcherResult != null) {
+				// XXX what is this step for, and why only here, but not in searchAllActions?
+				IActionDescription iad = this.findActionDescription(matcherResult);
+				if (iad != null){
+					return iad;
+				} else {
+					log.warn("Matcher found result, however the respective action was not found afterwards. Trying normal template matching.");
 				}
 			} else {
-				log.error("This agentnode has no servicematcher and / or ontology storage - no complex matching possible!");
+				log.warn("Matcher found no result, trying normal template matching...");
 			}
 		}
 
@@ -694,21 +680,16 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	@Override
 	public IServiceDescription searchAction(IServiceDescription template) {
 		if (template == null) {
-			log.error("Cannot find action: null!");
+			log.error("Cannot find action: service template is null!");
 			return null;
 		}
 
 		if (hasServiceMatcher()) {
 			final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
-			IServiceDescription matcherResult = this.serviceMatcher
+			final IServiceDescription matcherResult = this.serviceMatcher
 					.findBestMatch(template, serviceDescList);
+			return matcherResult;
 
-			if (matcherResult != null) {
-				return matcherResult;
-			} else {
-				log.warn("Matcher found no result, trying normal template matching...");
-			}
-			
 		} else {
 			log.error("This agentnode has no servicematcher and / or ontology storage - no complex matching possible!");
 		}
@@ -718,39 +699,27 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 
 	@Override
 	public List<IActionDescription> searchAllActions(IActionDescription template) {
-		final ArrayList<IActionDescription> actions = new ArrayList<IActionDescription>();
-
 		if (template == null) {
-			log.error("Cannot find action: null!");
-			return actions;
+			log.error("Cannot find actions: action template is null!");
+			return Collections.emptyList();
 		}
 
 		// use Matcher for matching if possible
 		if (hasSemanticIRI(template)) {
-			if (hasServiceMatcher()) {
-				
-				IServiceDescription templateSD = createTemplateSD(template);
-				if (templateSD != null){
-					final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
-					final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
-							.findAllMatches(templateSD, serviceDescList);
-
-					if ((matcherResults != null) && (matcherResults.size() > 0)) {
-						actions.addAll(matcherResults);
-						return actions;
-					} else {
-						log.warn("Matcher found no result, trying normal template matching...");
-					}
-				}
+			IServiceDescription templateSD = createTemplateSD(template);
+			List<IActionDescription> matcherResults = searchAllActions(templateSD);
+			if (! matcherResults.isEmpty()) {
+				return matcherResults;
 			} else {
-				log.error("This agentnode has no servicematcher and / or ontology storage - no complex matching possible!");
+				log.warn("Matcher found no result, trying normal template matching...");
 			}
 		}
 
+		final ArrayList<IActionDescription> actions = new ArrayList<IActionDescription>();
 		synchronized (localActions) {
 			for (IActionDescription actionDescription : localActions) {
 				if (actionDescription.matches(template)) {
-						actions.add(actionDescription);
+					actions.add(actionDescription);
 				}
 			}
 		}
@@ -768,29 +737,23 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	
 	@Override
 	public List<IActionDescription> searchAllActions(IServiceDescription template) {
-		final ArrayList<IActionDescription> actions = new ArrayList<IActionDescription>();
-
 		if (template == null) {
-			log.error("Cannot find action: null!");
-			return actions;
+			log.error("Cannot find actions: service template is null!");
+			return Collections.emptyList();
 		}
 
 		if (hasServiceMatcher()) {
 			final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 			final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
 					.findAllMatches(template, serviceDescList);
-
-			if ((matcherResults != null) && (matcherResults.size() > 0)) {
-				actions.addAll(matcherResults);
-				return actions;
-			} else {
-				log.warn("Matcher found no result, trying normal template matching...");
+			if (matcherResults != null) {
+				return new ArrayList<>(matcherResults);
 			}
 			
 		} else {
 			log.error("This agentnode has no servicematcher and / or ontology storage - no complex matching possible!");
 		}
-		return actions;
+		return Collections.emptyList();
 	}
 
 	/**
@@ -1363,12 +1326,9 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		// find serviceDescription in local actions
 		synchronized (localActions) {
 			for (IActionDescription localAct : localActions) {
-			    
-	
 				if (compare(localAct, isd)){
 					return localAct;
 				}
-						
 			}
 		}
 		

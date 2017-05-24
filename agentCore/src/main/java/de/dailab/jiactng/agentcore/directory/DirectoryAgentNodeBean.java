@@ -641,25 +641,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
-		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().isEmpty()){
-			if (this.serviceMatcher != null && this.ontologyStorage != null){
+		if (hasSemanticIRI(template)) {
+			if (hasServiceMatcher()) {
 				
-				IServiceDescription templateSD = null;
-				
-				try {
-					/** 
-					 * Since template URIs might be used multiple times with different 
-					 * content, we remove the old one before matching; otherwise there would
-					 * be no update on the service request for the matcher
-					 */
-					this.ontologyStorage.removeOntology(new URI(template.getSemanticServiceDescriptionIRI()));
-					templateSD = this.ontologyStorage.
-							loadServiceDescriptionFromOntology(new URI(template.getSemanticServiceDescriptionIRI()));
-				} catch (URISyntaxException e) {
-					log.error("Semantic IRI of action " + template.getName() 
-							+ " incorrect: " + template.getSemanticServiceDescriptionIRI());
-				}
-				
+				IServiceDescription templateSD = createTemplateSD(template);
 				if (templateSD != null){
 					final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 					IServiceDescription matcherResult = this.serviceMatcher
@@ -713,7 +698,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return null;
 		}
 
-		if (this.serviceMatcher != null && this.ontologyStorage != null){	
+		if (hasServiceMatcher()) {
 			final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 			IServiceDescription matcherResult = this.serviceMatcher
 					.findBestMatch(template, serviceDescList);
@@ -741,25 +726,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 
 		// use Matcher for matching if possible
-		if (template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().isEmpty()){
-			if (this.serviceMatcher != null && this.ontologyStorage != null){
+		if (hasSemanticIRI(template)) {
+			if (hasServiceMatcher()) {
 				
-				IServiceDescription templateSD = null;
-				
-				try {
-					/** 
-					 * Since template URIs might be used multiple times with different 
-					 * content, we remove the old one before matching; otherwise there would
-					 * be no update on the service request for the matcher
-					 */
-					this.ontologyStorage.removeOntology(new URI(template.getSemanticServiceDescriptionIRI()));
-					templateSD = this.ontologyStorage.
-							loadServiceDescriptionFromOntology(new URI(template.getSemanticServiceDescriptionIRI()));
-				} catch (URISyntaxException e) {
-					log.error("Semantic IRI of action " + template.getName() 
-							+ " incorrect: " + template.getSemanticServiceDescriptionIRI());
-				}
-				
+				IServiceDescription templateSD = createTemplateSD(template);
 				if (templateSD != null){
 					final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 					final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
@@ -805,7 +775,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			return actions;
 		}
 
-		if (this.serviceMatcher != null && this.ontologyStorage != null){	
+		if (hasServiceMatcher()) {
 			final ArrayList<IServiceDescription> serviceDescList = findAllComplexServices();
 			final ArrayList<? extends IActionDescription> matcherResults = this.serviceMatcher
 					.findAllMatches(template, serviceDescList);
@@ -822,6 +792,44 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		}
 		return actions;
 	}
+
+	/**
+	 * Create template ServiceDescription for ActionDescription with URI.
+	 *
+	 * Since template URIs might be used multiple times with different
+	 * content, we remove the old one before matching; otherwise there would
+	 * be no update on the service request for the matcher.
+	 *
+	 * @param template	some template action that has a semantic URI
+	 * @return			service description created from the OWL-S at the URI, or null
+	 */
+	private IServiceDescription createTemplateSD(IActionDescription template) {
+		try {
+			this.ontologyStorage.removeOntology(new URI(template.getSemanticServiceDescriptionIRI()));
+			return this.ontologyStorage.
+					loadServiceDescriptionFromOntology(new URI(template.getSemanticServiceDescriptionIRI()));
+		} catch (URISyntaxException e) {
+			log.error("Semantic IRI of action " + template.getName()
+					+ " incorrect: " + template.getSemanticServiceDescriptionIRI());
+			return null;
+		}
+	}
+
+	/**
+	 * @return whether service matcher and ontology storage are present.
+	 */
+	private boolean hasServiceMatcher() {
+		return this.serviceMatcher != null && this.ontologyStorage != null;
+	}
+
+	/**
+	 * @param template	some action template
+	 * @return			whether the template has a non-empty semantic service IRI
+	 */
+	private boolean hasSemanticIRI(IActionDescription template) {
+		return template.getSemanticServiceDescriptionIRI() != null && ! template.getSemanticServiceDescriptionIRI().isEmpty();
+	}
+
 
 	// ######################################
 	// ILifeCycleListener

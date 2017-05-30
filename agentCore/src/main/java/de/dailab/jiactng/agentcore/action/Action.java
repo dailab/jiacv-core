@@ -69,7 +69,7 @@ public class Action implements IActionDescription {
 	 * This constructor is used to create an action template
 	 */
 	public Action() {
-		this(null, null, (List<Class<?>>) null, (List<Class<?>>) null, null);
+		this(null, null, null, null, null);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class Action implements IActionDescription {
 	 *           the name of the action template
 	 */
 	public Action(final String name) {
-		this(name, null, (List<Class<?>>) null, (List<Class<?>>) null, null);
+		this(name, null, null, null, null);
 	}
 
 	/**

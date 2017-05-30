@@ -135,14 +135,14 @@ public class Action implements IActionDescription {
         this.setProviderBean(providerBean);
         this.setInputTypes(inputTypes);
         if (inputTypes != null) {
-            this.inputTypeNames = new ArrayList<String>();
+            this.inputTypeNames = new ArrayList<>();
             for (Class<?> type : inputTypes) {
                 this.inputTypeNames.add(type.getName());
             }
         }
         this.setResultTypes(resultTypes);
         if (resultTypes != null) {
-            this.resultTypeNames = new ArrayList<String>();
+            this.resultTypeNames = new ArrayList<>();
             for (Class<?> type : resultTypes) {
                 this.resultTypeNames.add(type.getName());
             }
@@ -252,7 +252,7 @@ public class Action implements IActionDescription {
 	 */
 	public final List<Class<?>> getInputTypes() throws ClassNotFoundException {
 		if (this.inputTypeNames != null) {
-			final List<Class<?>> list = new ArrayList<Class<?>>();
+			final List<Class<?>> list = new ArrayList<>();
 			for (final String type : this.inputTypeNames) {
 				list.add(this.getClassForName(type));
 			}
@@ -296,7 +296,7 @@ public class Action implements IActionDescription {
 	 */
 	public final List<Class<?>> getResultTypes() throws ClassNotFoundException {
 		if (this.resultTypeNames != null) {
-			final List<Class<?>> list = new ArrayList<Class<?>>();
+			final List<Class<?>> list = new ArrayList<>();
 			for (final String type : this.resultTypeNames) {
 				list.add(this.getClassForName(type));
 			}
@@ -336,7 +336,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setInputTypeNames(final List<String> newInputTypeNames) {
 		if (newInputTypeNames != null) {
-			final List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<>();
 			copy.addAll(newInputTypeNames);
 			this.inputTypeNames = Collections.unmodifiableList(copy);
 		}
@@ -353,7 +353,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setInputTypes(final List<Class<?>> newInputTypes) {
 		if (newInputTypes != null) {
-			final List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<>();
 			for (final Class<?> type : newInputTypes) {
 				copy.add(type.getName());
 			}
@@ -412,7 +412,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setResultTypeNames(final List<String> newResultTypeNames) {
 		if (newResultTypeNames != null) {
-			final List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<>();
 			copy.addAll(newResultTypeNames);
 			this.resultTypeNames = Collections.unmodifiableList(copy);
 		}
@@ -429,7 +429,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setResultTypes(final List<Class<?>> newResultTypes) {
 		if (newResultTypes != null) {
-			final List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<>();
 			for (final Class<?> type : newResultTypes) {
 				copy.add(type.getName());
 			}

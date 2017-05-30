@@ -558,33 +558,26 @@ public class Action implements IActionDescription {
 //	}
 
 	private Class<?> getClassForName(final String type) throws ClassNotFoundException {
-		if (type.equals("boolean")) {
-			return boolean.class;
-		}
-		else if (type.equals("byte")) {
-			return byte.class;
-		}
-		else if (type.equals("char")) {
-			return char.class;
-		}
-		else if (type.equals("short")) {
-			return short.class;
-		}
-		else if (type.equals("int")) {
-			return int.class;
-		}
-		else if (type.equals("long")) {
-			return long.class;
-		}
-		else if (type.equals("float")) {
-			return float.class;
-		}
-		else if (type.equals("double")) {
-			return double.class;
-		}
-		else {
-			return Class.forName(type);
-		}
+        switch (type) {
+            case "boolean":
+                return boolean.class;
+            case "byte":
+                return byte.class;
+            case "char":
+                return char.class;
+            case "short":
+                return short.class;
+            case "int":
+                return int.class;
+            case "long":
+                return long.class;
+            case "float":
+                return float.class;
+            case "double":
+                return double.class;
+            default:
+                return Class.forName(type);
+        }
 	}
 
 	/**

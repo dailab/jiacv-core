@@ -649,7 +649,7 @@ public class Action implements IActionDescription {
 			(this.scope != null) ? this.scope.toString() : null,
 			(this.providerBean != null) ? this.providerBean.getBeanName() : null,
 			(this.providerDescription != null) ? this.providerDescription.getDescription() : null,
-			(this.semanticServiceDescriptionIRI != null) ? this.semanticServiceDescriptionIRI.toString() : null
+			(this.semanticServiceDescriptionIRI != null) ? this.semanticServiceDescriptionIRI : null
 		};
 
 		final CompositeType type = (CompositeType) this.getDescriptionType();

@@ -197,7 +197,7 @@ public class Action implements IActionDescription {
 	 * {@inheritDoc}
 	 */
 	public final DoAction createDoAction(final Serializable[] newParams, final ResultReceiver source, final Long timeToLive) {
-		return new DoAction(this, source, newParams, timeToLive.longValue());
+		return new DoAction(this, source, newParams, timeToLive);
 	}
 
 	/**

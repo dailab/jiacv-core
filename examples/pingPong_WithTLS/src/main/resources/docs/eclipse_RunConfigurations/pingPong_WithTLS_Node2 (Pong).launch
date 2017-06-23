@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/pingPong_WithTLS/src/main/java/de/dailab/asgard/withTLS/pingPong/Main.java"/>
+<listEntry value="/pingPong_WithTLS/src/main/java/de/dailab/jiactng/examples/tls/pingPong/Main.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.dailab.asgard.withTLS.pingPong.Main"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.dailab.jiactng.examples.tls.pingPong.Main"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="/agentConfiguration/pingPong_WithTLS_node2.xml PingPong_WithTLS_Node2"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="pingPong_WithTLS"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>

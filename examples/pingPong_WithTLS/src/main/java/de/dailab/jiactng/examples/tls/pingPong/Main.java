@@ -1,4 +1,4 @@
-package de.dailab.asgard.withTLS.pingPong;
+package de.dailab.jiactng.examples.tls.pingPong;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

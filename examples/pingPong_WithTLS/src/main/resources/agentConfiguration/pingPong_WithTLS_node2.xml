@@ -42,7 +42,7 @@
 	</bean>
 
 	<!-- AgentBeans -->
-	<bean name="PongBean" class="de.dailab.asgard.withTLS.pingPong.PongBean"
+	<bean name="PongBean" class="de.dailab.jiactng.examples.tls.pingPong.PongBean"
 		scope="prototype">
 		<property name="executionInterval" value="2000" />
 		<property name="logLevel" value="INFO" />

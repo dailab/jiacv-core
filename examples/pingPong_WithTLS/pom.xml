@@ -7,7 +7,7 @@
         <version>5.2.3-SNAPSHOT</version>
     </parent>
 
-	<groupId>de.dailab.asgard.tls</groupId>
+	<groupId>de.dailab.jiactng.examples</groupId>
 	<artifactId>pingPong_WithTLS</artifactId>
 	<packaging>jar</packaging>
 	<name>${project.artifactId}</name>
@@ -56,7 +56,7 @@
 							<programs>
 								<program>
 									<id>pingPong_withTLS_node1</id>
-									<mainClass>de.dailab.asgard.withTLS.pingPong.Main</mainClass>
+									<mainClass>de.dailab.jiactng.examples.tls.pingPong.Main</mainClass>
 									<commandLineArguments>
 										<commandLineArgument>/agentConfiguration/pingPong_WithTLS_node1.xml</commandLineArgument>
 										<commandLineArgument>PingPong_WithTLS_Node1</commandLineArgument>
@@ -64,7 +64,7 @@
 								</program>
 								<program>
 									<id>pingPong_withTLS_node2</id>
-									<mainClass>de.dailab.asgard.withTLS.pingPong.Main</mainClass>
+									<mainClass>de.dailab.jiactng.examples.tls.pingPong.Main</mainClass>
 									<commandLineArguments>
 										<commandLineArgument>/agentConfiguration/pingPong_WithTLS_node2.xml</commandLineArgument>
 										<commandLineArgument>PingPong_WithTLS_Node2</commandLineArgument>

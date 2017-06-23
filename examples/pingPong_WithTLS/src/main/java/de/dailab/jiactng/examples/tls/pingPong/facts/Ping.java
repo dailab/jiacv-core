@@ -1,4 +1,4 @@
-package de.dailab.asgard.withTLS.pingPong.facts;
+package de.dailab.jiactng.examples.tls.pingPong.facts;
 
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 

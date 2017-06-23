@@ -1,4 +1,4 @@
-package de.dailab.asgard.withTLS.pingPong;
+package de.dailab.jiactng.examples.tls.pingPong;
 
 import java.io.Serializable;
 
@@ -6,7 +6,6 @@ import org.sercho.masp.space.event.SpaceEvent;
 import org.sercho.masp.space.event.SpaceObserver;
 import org.sercho.masp.space.event.WriteCallEvent;
 
-import de.dailab.asgard.withTLS.pingPong.facts.Ping;
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.Action;
 import de.dailab.jiactng.agentcore.comm.ICommunicationAddress;
@@ -15,6 +14,7 @@ import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
+import de.dailab.jiactng.examples.tls.pingPong.facts.Ping;
 
 public class PongBean extends AbstractAgentBean {
 

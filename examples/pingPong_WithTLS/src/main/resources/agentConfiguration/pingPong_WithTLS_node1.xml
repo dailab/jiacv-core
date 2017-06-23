@@ -20,9 +20,9 @@
 
 		<!-- TLS features -->
 		<property name="sslInUse" value="true" />
-		<property name="keyStore" value="src/main/resources/docs/stores/node1/keystore.jks" />
+		<property name="keyStore" value="docs/stores/node1/keystore.jks" />
 		<property name="keyStorePassword" value="changeit" />
-		<property name="trustStore" value="src/main/resources/docs/stores/node1/truststore.jks" />
+		<property name="trustStore" value="docs/stores/node1/truststore.jks" />
 		<property name="trustStorePassword" value="changeit" />
 		
 		<!-- Optional TLS properties -->

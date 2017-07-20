@@ -629,8 +629,7 @@
 		<repository>
 			<id>dai-open</id>
 			<name>DAI Open</name>
-			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/
-					</url>
+			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -659,6 +658,17 @@
 			<releases>
 				<enabled>false</enabled>
 			</releases>
+		</repository>
+		<repository>
+			<id>dai-open-snapshot</id>
+			<name>DAI Open Snapshot</name>
+			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open-snapshot/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>thirdparty</id>
@@ -713,9 +723,9 @@
 			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url>
 		</repository>
 		<snapshotRepository>
-			<id>dai-snapshots</id>
-			<name>dai-snapshots</name>
-			<url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url>
+            <id>dai-open-snapshot</id>
+			<name>DAI Open Snapshot</name>
+			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open-snapshot/</url>
 		</snapshotRepository>
 	</distributionManagement>
 

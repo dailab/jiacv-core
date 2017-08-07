@@ -767,6 +767,10 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	 * @return			service description created from the OWL-S at the URI, or null
 	 */
 	private IServiceDescription createTemplateSD(IActionDescription template) {
+		if (! hasServiceMatcher()) {
+			log.warn("Trying to Create Semantic Service Description without a Service Matcher!");
+			return null;
+		}
 		try {
 			this.ontologyStorage.removeOntology(new URI(template.getSemanticServiceDescriptionIRI()));
 			return this.ontologyStorage.

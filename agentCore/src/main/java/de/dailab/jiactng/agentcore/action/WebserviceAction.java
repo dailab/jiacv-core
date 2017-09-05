@@ -4,41 +4,20 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 public class WebserviceAction extends Action implements IWebserviceAction {
 
+	private static final long serialVersionUID = 9027891722413235875L;
+
 	private String serviceName = null;
 	private String operationName = null;
 	
 	
-	public WebserviceAction(Action action){
+	public WebserviceAction(IActionDescription action){
 		super(action);
-		this.setProviderDescription(action.getProviderDescription());
-		this.setSemanticServiceDescriptionIRI(action.getSemanticServiceDescriptionIRI());
 		if (action instanceof IWebserviceAction){
 			IWebserviceAction wsAction = (IWebserviceAction) action;
-			
-			if (wsAction.getOperationName() != null)
-				operationName = wsAction.getOperationName();
-			if (wsAction.getServiceName() != null)
-				serviceName = wsAction.getServiceName();
+			operationName = wsAction.getOperationName();
+			serviceName = wsAction.getServiceName();
 		}
 	}
-	
-	public WebserviceAction(IActionDescription ad){
-		this.setProviderDescription(ad.getProviderDescription());
-		this.setActionType(ad.getActionType());
-		this.setInputTypeNames(ad.getInputTypeNames());
-		this.setResultTypeNames(ad.getResultTypeNames());		
-		this.setName(ad.getName());
-		this.setScope(ad.getScope());
-		this.setSemanticServiceDescriptionIRI(ad.getSemanticServiceDescriptionIRI());
-		
-		try {
-			this.setInputTypes(ad.getInputTypes());
-			this.setResultTypes(ad.getResultTypes());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	
 	@Override
 	public String getOperationName() {
@@ -59,11 +38,5 @@ public class WebserviceAction extends Action implements IWebserviceAction {
 	public void setServiceName(String servicename) {
 		serviceName = servicename;
 	}
-	
-	private boolean isValid(String key){
-		return !(key==null || key.isEmpty());
-	}
-
-
 	
 }

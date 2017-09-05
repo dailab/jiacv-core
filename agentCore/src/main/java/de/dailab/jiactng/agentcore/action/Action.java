@@ -156,14 +156,18 @@ public class Action implements IActionDescription {
 	 * @param action
 	 *           the action to create an action from
 	 */
-	public Action(final Action action) {
+	public Action(final IActionDescription action) {
 		this.name = action.getName();
 		this.providerBean = action.getProviderBean();
 		this.scope = action.getScope();
+		this.actionType = action.getActionType();
+		this.providerDescription = action.getProviderDescription();
+		this.semanticServiceDescriptionIRI = action.getSemanticServiceDescriptionIRI();
 
 		// we can exchange references here, because the lists are immutable
 		this.inputTypeNames = action.getInputTypeNames();
 		this.resultTypeNames = action.getResultTypeNames();
+		this.inputNames = action.getInputNames();
 	}
 
 	/**

@@ -148,7 +148,8 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
 					names.add(name);
 				} else {
 					// no action names available without '-parameters' compiler flag
-					break;
+					// return null to indicate that no names are available, and not no parameters given
+					return null;
 				}
 			}
 			return Collections.unmodifiableList(names);

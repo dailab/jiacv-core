@@ -69,7 +69,7 @@ public class Action implements IActionDescription {
 	 * This constructor is used to create an action template
 	 */
 	public Action() {
-		this(null, null, (List<Class<?>>) null, (List<Class<?>>) null, null);
+		this(null, null, null, null, null);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class Action implements IActionDescription {
 	 *           the name of the action template
 	 */
 	public Action(final String name) {
-		this(name, null, (List<Class<?>>) null, (List<Class<?>>) null, null);
+		this(name, null, null, null, null);
 	}
 
 	/**
@@ -135,14 +135,14 @@ public class Action implements IActionDescription {
         this.setProviderBean(providerBean);
         this.setInputTypes(inputTypes);
         if (inputTypes != null) {
-            this.inputTypeNames = new ArrayList<String>();
+            this.inputTypeNames = new ArrayList<>();
             for (Class<?> type : inputTypes) {
                 this.inputTypeNames.add(type.getName());
             }
         }
         this.setResultTypes(resultTypes);
         if (resultTypes != null) {
-            this.resultTypeNames = new ArrayList<String>();
+            this.resultTypeNames = new ArrayList<>();
             for (Class<?> type : resultTypes) {
                 this.resultTypeNames.add(type.getName());
             }
@@ -201,7 +201,7 @@ public class Action implements IActionDescription {
 	 * {@inheritDoc}
 	 */
 	public final DoAction createDoAction(final Serializable[] newParams, final ResultReceiver source, final Long timeToLive) {
-		return new DoAction(this, source, newParams, timeToLive.longValue());
+		return new DoAction(this, source, newParams, timeToLive);
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class Action implements IActionDescription {
 	 */
 	public final List<Class<?>> getInputTypes() throws ClassNotFoundException {
 		if (this.inputTypeNames != null) {
-			final List<Class<?>> list = new ArrayList<Class<?>>();
+			final List<Class<?>> list = new ArrayList<>();
 			for (final String type : this.inputTypeNames) {
 				list.add(this.getClassForName(type));
 			}
@@ -300,7 +300,7 @@ public class Action implements IActionDescription {
 	 */
 	public final List<Class<?>> getResultTypes() throws ClassNotFoundException {
 		if (this.resultTypeNames != null) {
-			final List<Class<?>> list = new ArrayList<Class<?>>();
+			final List<Class<?>> list = new ArrayList<>();
 			for (final String type : this.resultTypeNames) {
 				list.add(this.getClassForName(type));
 			}
@@ -340,7 +340,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setInputTypeNames(final List<String> newInputTypeNames) {
 		if (newInputTypeNames != null) {
-			final List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<>();
 			copy.addAll(newInputTypeNames);
 			this.inputTypeNames = Collections.unmodifiableList(copy);
 		}
@@ -357,7 +357,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setInputTypes(final List<Class<?>> newInputTypes) {
 		if (newInputTypes != null) {
-			final List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<>();
 			for (final Class<?> type : newInputTypes) {
 				copy.add(type.getName());
 			}
@@ -416,7 +416,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setResultTypeNames(final List<String> newResultTypeNames) {
 		if (newResultTypeNames != null) {
-			final List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<>();
 			copy.addAll(newResultTypeNames);
 			this.resultTypeNames = Collections.unmodifiableList(copy);
 		}
@@ -433,7 +433,7 @@ public class Action implements IActionDescription {
 	 */
 	public final void setResultTypes(final List<Class<?>> newResultTypes) {
 		if (newResultTypes != null) {
-			final List<String> copy = new ArrayList<String>();
+			final List<String> copy = new ArrayList<>();
 			for (final Class<?> type : newResultTypes) {
 				copy.add(type.getName());
 			}
@@ -527,7 +527,7 @@ public class Action implements IActionDescription {
 
 		builder.append("\n provider =");
 		if (this.providerDescription != null) {
-			builder.append(this.providerDescription.getName() + "(" + this.providerDescription.getAid() + ")");
+			builder.append(this.providerDescription.getName()).append("(").append(this.providerDescription.getAid()).append(")");
 		}
 		else {
 			builder.append(this.providerDescription);
@@ -562,33 +562,26 @@ public class Action implements IActionDescription {
 //	}
 
 	private Class<?> getClassForName(final String type) throws ClassNotFoundException {
-		if (type.equals("boolean")) {
-			return boolean.class;
-		}
-		else if (type.equals("byte")) {
-			return byte.class;
-		}
-		else if (type.equals("char")) {
-			return char.class;
-		}
-		else if (type.equals("short")) {
-			return short.class;
-		}
-		else if (type.equals("int")) {
-			return int.class;
-		}
-		else if (type.equals("long")) {
-			return long.class;
-		}
-		else if (type.equals("float")) {
-			return float.class;
-		}
-		else if (type.equals("double")) {
-			return double.class;
-		}
-		else {
-			return Class.forName(type);
-		}
+        switch (type) {
+            case "boolean":
+                return boolean.class;
+            case "byte":
+                return byte.class;
+            case "char":
+                return char.class;
+            case "short":
+                return short.class;
+            case "int":
+                return int.class;
+            case "long":
+                return long.class;
+            case "float":
+                return float.class;
+            case "double":
+                return double.class;
+            default:
+                return Class.forName(type);
+        }
 	}
 
 	/**
@@ -660,7 +653,7 @@ public class Action implements IActionDescription {
 			(this.scope != null) ? this.scope.toString() : null,
 			(this.providerBean != null) ? this.providerBean.getBeanName() : null,
 			(this.providerDescription != null) ? this.providerDescription.getDescription() : null,
-			(this.semanticServiceDescriptionIRI != null) ? this.semanticServiceDescriptionIRI.toString() : null
+			(this.semanticServiceDescriptionIRI != null) ? this.semanticServiceDescriptionIRI : null
 		};
 
 		final CompositeType type = (CompositeType) this.getDescriptionType();

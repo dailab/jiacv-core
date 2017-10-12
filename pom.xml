@@ -730,8 +730,8 @@
 	</distributionManagement>
 
 	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.dai-lab.de/job/JIAC%20V%20Core/</url>
+		<system>gitlab-ci</system>
+		<url>https://gitlab.dai-labor.de/jiacv/core</url>
 	</ciManagement>
 
 	<issueManagement>
@@ -747,9 +747,9 @@
 	</mailingLists>
 
 	<scm>
-		<url>https://gitlab.tubit.tu-berlin.de/jiac-devs/core-new</url>
-		<connection>scm:git:git://gitlab.tubit.tu-berlin.de:jiac-devs/core-new.git</connection>
-		<developerConnection>scm:git:git@gitlab.tubit.tu-berlin.de:jiac-devs/core-new.git</developerConnection>
+		<url>https://gitlab.dai-labor.de/jiacv/core</url>
+		<connection>scm:git:git://gitlab.dai-labor.de:jiacv/core.git</connection>
+		<developerConnection>scm:git:git@gitlab.dai-labor.de:jiacv/core.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 

@@ -12,7 +12,7 @@
 	<artifactId>SimpleChatExample</artifactId>
 	<name>Simple Chat</name>
 
-	<description>A simple example for a GUI-driven chat using the CommunicationBean for JIAC TNG.</description>
+	<description>A simple example for a GUI-driven chat using the CommunicationBean for JIAC V.</description>
 
 	<dependencies>
 		<dependency>

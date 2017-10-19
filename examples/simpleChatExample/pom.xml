@@ -41,7 +41,7 @@
 							<extraJvmArguments>-Xms32M -Xmx48M</extraJvmArguments>
 							<programs>
 								<program>
-									<name>SimpleChat</name>
+									<id>SimpleChat</id>
 									<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
 									<commandLineArguments>
 										<commandLineArgument>classpath:simplechatnode.xml</commandLineArgument>

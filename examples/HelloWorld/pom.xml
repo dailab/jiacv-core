@@ -45,7 +45,7 @@
 							<commandLineArguments>
 								<commandLineArgument>classpath:helloWorld.xml</commandLineArgument>
 							</commandLineArguments>
-							<name>HelloWorld</name>
+							<id>HelloWorld</id>
 						</program>
 					</programs>
 				</configuration>

@@ -38,21 +38,21 @@
 							<extraJvmArguments>-Xms32M -Xmx48M</extraJvmArguments>
 							<programs>
 								<program>
-									<name>LocalAgentMemoryPingPong</name>
+									<id>LocalAgentMemoryPingPong</id>
 									<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
 									<commandLineArguments>
 										<commandLineArgument>classpath:memory_pingpongnode.xml</commandLineArgument>
 									</commandLineArguments>
 								</program>
 								<program>
-									<name>PingServicesStarter</name>
+									<id>PingServicesStarter</id>
 									<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
 									<commandLineArguments>
 										<commandLineArgument>classpath:services_pingnode.xml</commandLineArgument>
 									</commandLineArguments>
 								</program>
 								<program>
-									<name>PongServicesStarter</name>
+									<id>PongServicesStarter</id>
 									<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
 									<commandLineArguments>
 										<commandLineArgument>classpath:services_pongnode.xml</commandLineArgument>

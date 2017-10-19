@@ -41,11 +41,11 @@
 					<programs>
 						<program>
 							<mainClass>de.dailab.jiactng.examples.jmxExample.ShowLocalAgents</mainClass>
-							<name>ShowLocalAgents</name>
+							<id>ShowLocalAgents</id>
 						</program>
 						<program>
 							<mainClass>de.dailab.jiactng.examples.jmxExample.ShowMessages</mainClass>
-							<name>ShowMessages</name>
+							<id>ShowMessages</id>
 						</program>
 					</programs>
 				</configuration>

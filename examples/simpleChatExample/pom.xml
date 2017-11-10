@@ -1,84 +1,84 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+   <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>de.dailab.jiactng</groupId>
-		<artifactId>examples</artifactId>
-		<version>5.2.4-SNAPSHOT</version>
-	</parent>
+   <parent>
+      <groupId>de.dailab.jiactng</groupId>
+      <artifactId>examples</artifactId>
+      <version>5.2.4-SNAPSHOT</version>
+   </parent>
 
-	<groupId>de.dailab.jiactng.examples</groupId>
-	<artifactId>SimpleChatExample</artifactId>
-	<name>Simple Chat</name>
+   <groupId>de.dailab.jiactng.examples</groupId>
+   <artifactId>SimpleChatExample</artifactId>
+   <name>Simple Chat</name>
 
-	<description>A simple example for a GUI-driven chat using the CommunicationBean for JIAC V.</description>
+   <description>A simple example for a GUI-driven chat using the CommunicationBean for JIAC V.</description>
 
-	<dependencies>
-		<dependency>
-			<groupId>de.dailab.jiactng</groupId>
-			<artifactId>agentCore</artifactId>
-		</dependency>
-	</dependencies>
+   <dependencies>
+      <dependency>
+         <groupId>de.dailab.jiactng</groupId>
+         <artifactId>agentCore</artifactId>
+      </dependency>
+   </dependencies>
 
-	<build>
-		<plugins>
+   <build>
+      <plugins>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>appassembler-maven-plugin</artifactId>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>appassembler-maven-plugin</artifactId>
 
-				<executions>
-					<execution>
-						<id>generate start scripts</id>
-						<phase>package</phase>
-						<goals>
-							<goal>assemble</goal>
-						</goals>
-						<configuration>
-							<repositoryLayout>flat</repositoryLayout>
-							<repositoryName>lib</repositoryName>
-							<extraJvmArguments>-Xms32M -Xmx48M</extraJvmArguments>
-							<programs>
-								<program>
-									<id>SimpleChat</id>
-									<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
-									<commandLineArguments>
-										<commandLineArgument>classpath:simplechatnode.xml</commandLineArgument>
-									</commandLineArguments>
-								</program>
-							</programs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<!-- copy the configuration files into target/appassembler/etc -->
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-configuration</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/appassembler/etc</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/main/resources</directory>
-									<includes>
-										<include>**/*.xml</include>
-										<include>**/*.properties</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+            <executions>
+               <execution>
+                  <id>generate start scripts</id>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>assemble</goal>
+                  </goals>
+                  <configuration>
+                     <repositoryLayout>flat</repositoryLayout>
+                     <repositoryName>lib</repositoryName>
+                     <extraJvmArguments>-Xms32M -Xmx48M</extraJvmArguments>
+                     <programs>
+                        <program>
+                           <id>SimpleChat</id>
+                           <mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
+                           <commandLineArguments>
+                              <commandLineArgument>classpath:simplechatnode.xml</commandLineArgument>
+                           </commandLineArguments>
+                        </program>
+                     </programs>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <!-- copy the configuration files into target/appassembler/etc -->
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>copy-configuration</id>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>copy-resources</goal>
+                  </goals>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/appassembler/etc</outputDirectory>
+                     <resources>
+                        <resource>
+                           <directory>src/main/resources</directory>
+                           <includes>
+                              <include>**/*.xml</include>
+                              <include>**/*.properties</include>
+                           </includes>
+                        </resource>
+                     </resources>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
 
 </project>

@@ -1,93 +1,95 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  	<modelVersion>4.0.0</modelVersion>
-  	
-  	<parent>
-        <groupId>de.dailab.jiactng</groupId>
-        <artifactId>examples</artifactId>
-        <version>5.2.4-SNAPSHOT</version>
-    </parent>
-  	
-  	<groupId>de.dailab.jiactng.examples</groupId>
-  	<artifactId>PingPong</artifactId>  	
-  	<packaging>jar</packaging>  	
-  	<name>${project.artifactId}</name>   	
-  	
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
 
-  	<dependencies>
-  		<dependency>
-  			<groupId>de.dailab.jiactng</groupId>
-  			<artifactId>agentCore</artifactId>
-  		</dependency>
-  	</dependencies>
+   <parent>
+      <groupId>de.dailab.jiactng</groupId>
+      <artifactId>examples</artifactId>
+      <version>5.2.4-SNAPSHOT</version>
+   </parent>
 
-  	<build>
-  		<plugins>
-  			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>appassembler-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>generate start scripts</id>
-						<phase>package</phase>
-						<goals>
-							<goal>assemble</goal>
-						</goals>
-						<configuration>
-							<repositoryLayout>flat</repositoryLayout>
-							<repositoryName>lib</repositoryName>
-							<extraJvmArguments>-Xms32M -Xmx48M</extraJvmArguments>
-							<programs>
-								<program>
-									<id>LocalAgentMemoryPingPong</id>
-									<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
-									<commandLineArguments>
-										<commandLineArgument>classpath:memory_pingpongnode.xml</commandLineArgument>
-									</commandLineArguments>
-								</program>
-								<program>
-									<id>PingServicesStarter</id>
-									<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
-									<commandLineArguments>
-										<commandLineArgument>classpath:services_pingnode.xml</commandLineArgument>
-									</commandLineArguments>
-								</program>
-								<program>
-									<id>PongServicesStarter</id>
-									<mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
-									<commandLineArguments>
-										<commandLineArgument>classpath:services_pongnode.xml</commandLineArgument>
-									</commandLineArguments>
-								</program>
-							</programs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<!-- copy the configuration files into target/appassembler/etc -->
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-configuration</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/appassembler/etc</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/main/resources</directory>
-									<includes>
-										<include>**/*.xml</include>
-										<include>**/*.properties</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-  		</plugins>
-  	</build>
+   <groupId>de.dailab.jiactng.examples</groupId>
+   <artifactId>PingPong</artifactId>
+   <packaging>jar</packaging>
+   <name>${project.artifactId}</name>
+   <description>A simple example to show how two agents communicate with each other.</description>
+
+
+   <dependencies>
+      <dependency>
+         <groupId>de.dailab.jiactng</groupId>
+         <artifactId>agentCore</artifactId>
+      </dependency>
+   </dependencies>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>appassembler-maven-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>generate start scripts</id>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>assemble</goal>
+                  </goals>
+                  <configuration>
+                     <repositoryLayout>flat</repositoryLayout>
+                     <repositoryName>lib</repositoryName>
+                     <extraJvmArguments>-Xms32M -Xmx48M</extraJvmArguments>
+                     <programs>
+                        <program>
+                           <id>LocalAgentMemoryPingPong</id>
+                           <mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
+                           <commandLineArguments>
+                              <commandLineArgument>classpath:memory_pingpongnode.xml</commandLineArgument>
+                           </commandLineArguments>
+                        </program>
+                        <program>
+                           <id>PingServicesStarter</id>
+                           <mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
+                           <commandLineArguments>
+                              <commandLineArgument>classpath:services_pingnode.xml</commandLineArgument>
+                           </commandLineArguments>
+                        </program>
+                        <program>
+                           <id>PongServicesStarter</id>
+                           <mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
+                           <commandLineArguments>
+                              <commandLineArgument>classpath:services_pongnode.xml</commandLineArgument>
+                           </commandLineArguments>
+                        </program>
+                     </programs>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <!-- copy the configuration files into target/appassembler/etc -->
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>copy-configuration</id>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>copy-resources</goal>
+                  </goals>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/appassembler/etc</outputDirectory>
+                     <resources>
+                        <resource>
+                           <directory>src/main/resources</directory>
+                           <includes>
+                              <include>**/*.xml</include>
+                              <include>**/*.properties</include>
+                           </includes>
+                        </resource>
+                     </resources>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
 </project>

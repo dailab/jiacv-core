@@ -1,809 +1,834 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.dailab</groupId>
-	<artifactId>jiactng</artifactId>
-	<version>5.2.4-SNAPSHOT</version>
-	<packaging>pom</packaging>
+   <groupId>de.dailab</groupId>
+   <artifactId>jiactng</artifactId>
+   <version>5.2.4-SNAPSHOT</version>
 
-	<name>Java-based Intelligent Agent Componentware, Version 5</name>
-	<description>
-      JIAC V is a framework to fast and efficiently develop agent-based applications and services.
-   </description>
-	<url>http://repositories.dai-labor.de/sites/jiactng/${project.version}/</url>
-	<inceptionYear>2006</inceptionYear>
-	<organization>
-		<name>DAI-Labor</name>
-		<url>http://www.dai-labor.de</url>
-	</organization>
-	<prerequisites>
-		<maven>3.3.0</maven>
-	</prerequisites>
+   <packaging>pom</packaging>
+   <name>Java-based Intelligent Agent Componentware, Version 5</name>
+   <description>JIAC V is a framework to fast and efficiently develop agent-based applications and services.</description>
+   <url>http://repositories.dai-labor.de/sites/jiactng/${project.version}/</url>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<distribution>http://www.jiac.de</distribution>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<comments />
-		</license>
-	</licenses>
+   <inceptionYear>2006</inceptionYear>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- Sonar -->
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
-		<sonar.jacoco.itreportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itreportPath>
-	</properties>
+   <organization>
+      <name>DAI-Labor</name>
+      <url>http://www.dai-labor.de</url>
+   </organization>
 
-	<developers>
-		<developer>
-			<id>axle</id>
-			<name>Axel Hessler</name>
-			<email>axel.hessler@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>marcel</id>
-			<name>Marcel Patzlaff</name>
-			<email>marcel.patzlaff@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>tuguldur</id>
-			<name>Tuguldur Erdene-Ochir</name>
-			<email>tuguldur.erdene-ochir@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>moekon</id>
-			<name>Thomas Konnerth</name>
-			<email>thomas.konnerth@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>keiser</id>
-			<name>Jan Keiser</name>
-			<email>jan.keiser@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>schenk</id>
-			<name>Claus Schenk</name>
-			<email>claus.schenk@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>bsufka</id>
-			<name>Karsten Bsufka</name>
-			<email>karsten.bsufka@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>burkhardt</id>
-			<name>Michael Burkhardt</name>
-			<email>michael.burkhardt@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>jakob</id>
-			<name>Jakob Tonn</name>
-			<email>jakob.tonn@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>kaisers</id>
-			<name>Silvan Kaiser</name>
-			<email>silvan.kaiser@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>kuester</id>
-			<name>Tobias Kuester</name>
-			<email>tobias.kuester@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>masuch</id>
-			<name>Nils Masuch</name>
-			<email>nils.masuch@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>luetze</id>
-			<name>Marco Luetzenberger</name>
-			<email>marco.luetzenberger@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>arik</id>
-			<name>Arik Messerman</name>
-			<email>arik.messerman@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>rakow</id>
-			<name>Christian Rakow</name>
-			<email>christian.rakow@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>mattu</id>
-			<name>Marius Schulz</name>
-			<email>marius.schulz@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<id>stjung</id>
-			<name>Stefan Junghans</name>
-			<email>stefan.junghans@dai-labor.de</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<organization>DAI-Labor</organization>
-			<organizationUrl>http://www.dai-labor.de</organizationUrl>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
+   <prerequisites>
+      <maven>3.3.0</maven>
+   </prerequisites>
 
-	<build>
-		<resources>
-			<!-- REMOVED LICENSE INCLUSION BECAUSE OF PROBLEMS WITH MAVEN 2.x <resource> 
-				<directory>${basedir}</directory> <targetPath>META-INF</targetPath> <includes> 
-				<include>NOTICE.txt</include> <include>LICENSE.txt</include> </includes> 
-				</resource> <resource> <directory>${basedir}/../</directory> <targetPath>META-INF</targetPath> 
-				<includes> <include>NOTICE.txt</include> <include>LICENSE.txt</include> </includes> 
-				</resource> <resource> <directory>${basedir}/../../</directory> <targetPath>META-INF</targetPath> 
-				<includes> <include>NOTICE.txt</include> <include>LICENSE.txt</include> </includes> 
-				</resource> <resource> <directory>${basedir}/../../../</directory> <targetPath>META-INF</targetPath> 
-				<includes> <include>NOTICE.txt</include> <include>LICENSE.txt</include> </includes> 
-				</resource> -->
-			<resource>
-				<directory>${basedir}/src/main/java</directory>
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-			</resource>
-		</resources>
+   <licenses>
+      <license>
+         <name>The Apache Software License, Version 2.0</name>
+         <distribution>http://www.jiac.de</distribution>
+         <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+         <comments />
+      </license>
+   </licenses>
 
-		<testResources>
-			<testResource>
-				<directory>${basedir}/src/test/java</directory>
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-			</testResource>
-			<testResource>
-				<directory>${basedir}/src/test/resources</directory>
-			</testResource>
-		</testResources>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      <!-- Sonar -->
+      <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+      <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+      <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+      <sonar.jacoco.itreportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itreportPath>
 
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
+      <activemq.version>5.12.1</activemq.version>
+      <junit.version>4.12</junit.version>
+      <log4j.version>1.2.17</log4j.version>
+      <slf4j.version>1.7.10</slf4j.version>
+      <simplespacecore.version>2.6.4</simplespacecore.version>
+      <spring.version>4.3.12.RELEASE</spring.version>
+      <aamm.version>1.1.3</aamm.version>
+   </properties>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
+   <dependencyManagement>
 
-				<configuration>
-					<forkMode>pertest</forkMode>
-				</configuration>
-			</plugin>
+      <dependencies>
 
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-			</plugin>
+         <dependency>
+            <groupId>org.sercho.masp.space</groupId>
+            <artifactId>SimpleSpaceCore</artifactId>
+            <version>${simplespacecore.version}</version>
+         </dependency>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
+         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+         </dependency>
 
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+         <dependency>
+            <groupId>de.dailab.jiac.common</groupId>
+            <artifactId>aamm-spring</artifactId>
+            <version>${aamm.version}</version>
+         </dependency>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+         </dependency>
+         <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>test</scope>
+         </dependency>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
+         <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+            <version>${activemq.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <version>${activemq.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-kahadb-store</artifactId>
+            <version>${activemq.version}</version>
+         </dependency>
 
-				<dependencies>
-					<dependency>
-						<!-- If we use ${project.version} here, then this will mess up all 
-							projects that have a different version -->
-						<groupId>de.dailab.jiactng</groupId>
-						<artifactId>agentCoreAPI</artifactId>
-						<version>5.1.5</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<configLocation>prealpha_checks.xml</configLocation>
-				</configuration>
-			</plugin>
-
-			<!--plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>cobertura-maven-plugin</artifactId> 
-				<version>2.0</version> <configuration> <check> <totalBranchRate>35</totalBranchRate> 
-				<totalLineRate>30</totalLineRate> </check> </configuration> <executions> 
-				<execution> <goals> <goal>clean</goal> </goals> </execution> </executions> 
-				</plugin -->
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-descriptor</id>
-						<goals>
-							<goal>attach-descriptor</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.maven.wagon</groupId>
-						<artifactId>wagon-ssh</artifactId>
-						<version>1.0</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<reportPlugins>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-project-info-reports-plugin</artifactId>
-							<version>2.4</version>
-							<configuration>
-								<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-								<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-							</configuration>
-							<!--reports> <report>foo</report> <report>toto</report> </reports -->
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-javadoc-plugin</artifactId>
-
-							<configuration>
-								<failOnError>false</failOnError>
-								<additionalparam>${javadoc.opts}</additionalparam>
-								<links>
-									<link>http://activemq.apache.org/maven/5.7.0/apidocs/</link>
-									<link>http://commons.apache.org/proper/commons-logging/javadocs/api-1.1/</link>
-									<link>http://download.oracle.com/javaee/1.3/api/</link>
-									<link>http://docs.oracle.com/javase/8/docs/api/</link>
-									<link>http://docs.jboss.org/jbpm/v5.2/javadocs/</link>
-									<link>http://help.eclipse.org/help33/topic/org.eclipse.platform.doc.isv/reference/api/</link>
-									<!--<link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link> -->
-									<!--link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCoreAPI/apidocs/</link> 
-										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCore/apidocs/</link> 
-										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/basicServices/Loadmeasurement/apidocs/</link> 
-										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/jiacSecurity/identity/apidocs/</link> 
-										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/bdiAgent/agentInterpreter/jadlpp/apidocs/</link> 
-										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/bdiAgent/agentInterpreter/jadl.interpreter/apidocs/</link> 
-										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/basicServices/userManagement/apidocs/</link> 
-										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/basicServices/agentMigration/apidocs/</link> 
-										<link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/tools/asgard/asgardCore/apidocs/</link -->
-									<link>http://repositories.dai-labor.de/sites/owlapi-2.2.1-javadoc/</link>
-									<link>http://repositories.dai-labor.de/sites/pellet-2.0.0-rc7-javadoc/</link>
-									<link>http://repositories.dai-labor.de/sites/ruleengine/0.0.3-SNAPSHOT/ruleAPI/apidocs/</link>
-									<link>http://repositories.dai-labor.de/sites/ruleengine/0.0.3-SNAPSHOT/ruleEngineMonitor/apidocs/</link>
-									<link>http://repositories.dai-labor.de/sites/SimpleSpace/SimpleSpaceCore/apidocs/</link>
-									<link>http://repositories.dai-labor.de/sites/usermanagement/apidocs/</link>
-									<link>http://docs.spring.io/spring/docs/3.0.3.RELEASE/api/</link>
-									<link>http://ws.apache.org/axis/java/apiDocs/</link>
-									<link>http://www.jdom.org/docs/apidocs/</link>
-									<!--<link>http://www.jmonkeyengine.com/doc/</link> -->
-									<!--link>http://java.sun.com/products/servlet/2.3/javadoc/</link -->
-								</links>
-								<quiet>true</quiet>
-							</configuration>
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-changes-plugin</artifactId>
-							<version>2.9</version>
-							<reportSets>
-								<reportSet>
-									<reports>
-										<report>changes-report</report>
-									</reports>
-								</reportSet>
-							</reportSets>
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-checkstyle-plugin</artifactId>
-							<version>2.10</version>
-							<configuration>
-								<configLocation>prealpha_checks.xml</configLocation>
-							</configuration>
-						</plugin>
-						<!-- Cobertura was commented out because it can cause build failures 
-							when generating maven-sites with "mvn site" -->
-						<!-- plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>cobertura-maven-plugin</artifactId> 
-							<version>2.5.1</version> <configuration> <includes> <include>**/*.java</include> 
-							</includes> </configuration> </plugin -->
-						<plugin>
-							<groupId>org.codehaus.mojo</groupId>
-							<artifactId>findbugs-maven-plugin</artifactId>
-							<version>3.0.0</version>
-							<configuration>
-								<xmlOutput>true</xmlOutput>
-								<effort>Max</effort>
-							</configuration>
-						</plugin>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-jxr-plugin</artifactId>
-							<version>2.3</version>
-						</plugin>
-						<!-- plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-changelog-plugin</artifactId> 
-							</plugin -->
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-surefire-report-plugin</artifactId>
-							<version>2.20</version>
-						</plugin>
-						<plugin>
-							<groupId>org.codehaus.mojo</groupId>
-							<artifactId>jdepend-maven-plugin</artifactId>
-							<version>2.0</version>
-						</plugin>
-						<plugin>
-							<groupId>org.codehaus.mojo</groupId>
-							<artifactId>taglist-maven-plugin</artifactId>
-							<version>2.0</version>
-							<configuration>
-								<tags>
-									<tag>TODO</tag>
-									<tag>ToDo</tag>
-									<tag>@todo</tag>
-									<tag>@deprecated</tag>
-									<tag>FIXME</tag>
-								</tags>
-							</configuration>
-						</plugin>
-						<!--plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>dashboard-maven-plugin</artifactId> 
-							</plugin -->
-					</reportPlugins>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<configuration>
-					<projectNameTemplate>[groupId] - [artifactId]</projectNameTemplate>
-					<downloadSources>true</downloadSources>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-
-				<configuration>
-					<destFile>${sonar.jacoco.reportPath}</destFile>
-					<append>true</append>
-				</configuration>
-				<executions>
-					<execution>
-						<id>agent-for-ut</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>agent-for-it</id>
-						<goals>
-							<goal>prepare-agent-integration</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>jacoco-site</id>
-						<phase>site</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<version>3.0.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.20.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.7.9</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.0.0-M1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-eclipse-plugin</artifactId>
-					<version>2.10</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>3.6</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>2.17</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.7.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>appassembler-maven-plugin</artifactId>
-					<version>2.0.0</version>
-				</plugin>
-				<plugin>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>3.1.0</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+      </dependencies>
+   </dependencyManagement>
 
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<failOnError>false</failOnError>
-					<additionalparam>${javadoc.opts}</additionalparam>
-					<links>
-						<link>http://docs.oracle.com/javase/7/docs/api/</link>
-						<link>http://repositories.dai-labor.de/sites/jiactng/${project.parent.version}/agentCoreAPI/apidocs/</link>
-						<link>http://docs.spring.io/spring/docs/3.0.3.RELEASE/api/</link>
-						<link>http://commons.apache.org/proper/commons-logging/javadocs/api-1.1/</link>
-						<link>http://activemq.apache.org/maven/5.7.0/apidocs/</link>
-						<link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
-						<link>http://repositories.dai-labor.de/sites/SimpleSpace/SimpleSpaceCore/apidocs/</link>
-					</links>
-					<quiet>true</quiet>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+   <developers>
+      <developer>
+         <id>axle</id>
+         <name>Axel Hessler</name>
+         <email>axel.hessler@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>marcel</id>
+         <name>Marcel Patzlaff</name>
+         <email>marcel.patzlaff@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>tuguldur</id>
+         <name>Tuguldur Erdene-Ochir</name>
+         <email>tuguldur.erdene-ochir@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>moekon</id>
+         <name>Thomas Konnerth</name>
+         <email>thomas.konnerth@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>keiser</id>
+         <name>Jan Keiser</name>
+         <email>jan.keiser@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>schenk</id>
+         <name>Claus Schenk</name>
+         <email>claus.schenk@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>bsufka</id>
+         <name>Karsten Bsufka</name>
+         <email>karsten.bsufka@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>burkhardt</id>
+         <name>Michael Burkhardt</name>
+         <email>michael.burkhardt@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>jakob</id>
+         <name>Jakob Tonn</name>
+         <email>jakob.tonn@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>kaisers</id>
+         <name>Silvan Kaiser</name>
+         <email>silvan.kaiser@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>kuester</id>
+         <name>Tobias Kuester</name>
+         <email>tobias.kuester@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>masuch</id>
+         <name>Nils Masuch</name>
+         <email>nils.masuch@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>luetze</id>
+         <name>Marco Luetzenberger</name>
+         <email>marco.luetzenberger@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>arik</id>
+         <name>Arik Messerman</name>
+         <email>arik.messerman@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>rakow</id>
+         <name>Christian Rakow</name>
+         <email>christian.rakow@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>mattu</id>
+         <name>Marius Schulz</name>
+         <email>marius.schulz@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <id>stjung</id>
+         <name>Stefan Junghans</name>
+         <email>stefan.junghans@dai-labor.de</email>
+         <roles>
+            <role>Developer</role>
+         </roles>
+         <organization>DAI-Labor</organization>
+         <organizationUrl>http://www.dai-labor.de</organizationUrl>
+         <timezone>+1</timezone>
+      </developer>
+   </developers>
+   <build>
+      <resources>
+         <!-- REMOVED LICENSE INCLUSION BECAUSE OF PROBLEMS WITH MAVEN 2.x <resource> <directory>${basedir}</directory> <targetPath>META-INF</targetPath> 
+            <includes> <include>NOTICE.txt</include> <include>LICENSE.txt</include> </includes> </resource> <resource> <directory>${basedir}/../</directory> 
+            <targetPath>META-INF</targetPath> <includes> <include>NOTICE.txt</include> <include>LICENSE.txt</include> </includes> </resource> 
+            <resource> <directory>${basedir}/../../</directory> <targetPath>META-INF</targetPath> <includes> <include>NOTICE.txt</include> 
+            <include>LICENSE.txt</include> </includes> </resource> <resource> <directory>${basedir}/../../../</directory> <targetPath>META-INF</targetPath> 
+            <includes> <include>NOTICE.txt</include> <include>LICENSE.txt</include> </includes> </resource> -->
+         <resource>
+            <directory>${basedir}/src/main/java</directory>
+            <includes>
+               <include>**/*.xml</include>
+            </includes>
+         </resource>
+         <resource>
+            <directory>${basedir}/src/main/resources</directory>
+         </resource>
+      </resources>
+      <testResources>
+         <testResource>
+            <directory>${basedir}/src/test/java</directory>
+            <includes>
+               <include>**/*.xml</include>
+            </includes>
+         </testResource>
+         <testResource>
+            <directory>${basedir}/src/test/resources</directory>
+         </testResource>
+      </testResources>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <source>1.8</source>
+               <target>1.8</target>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <forkMode>pertest</forkMode>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.5.3</version>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>test-jar</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>attach-sources</id>
+                  <phase>verify</phase>
+                  <goals>
+                     <goal>jar</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <dependencies>
+               <dependency>
+                  <!-- If we use ${project.version} here, then this will mess up all projects that have a different version -->
+                  <groupId>de.dailab.jiactng</groupId>
+                  <artifactId>agentCoreAPI</artifactId>
+                  <version>5.1.5</version>
+               </dependency>
+            </dependencies>
+            <configuration>
+               <configLocation>prealpha_checks.xml</configLocation>
+            </configuration>
+         </plugin>
+         <!--plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>cobertura-maven-plugin</artifactId> <version>2.0</version> 
+            <configuration> <check> <totalBranchRate>35</totalBranchRate> <totalLineRate>30</totalLineRate> </check> </configuration> 
+            <executions> <execution> <goals> <goal>clean</goal> </goals> </execution> </executions> </plugin -->
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>attach-descriptor</id>
+                  <goals>
+                     <goal>attach-descriptor</goal>
+                  </goals>
+               </execution>
+            </executions>
+            <dependencies>
+               <dependency>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-ssh</artifactId>
+                  <version>1.0</version>
+               </dependency>
+            </dependencies>
+            <configuration>
+               <reportPlugins>
+                  <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-project-info-reports-plugin</artifactId>
+                     <version>2.4</version>
+                     <configuration>
+                        <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
+                        <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                     </configuration>
+                     <!--reports> <report>foo</report> <report>toto</report> </reports -->
+                  </plugin>
+                  <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-javadoc-plugin</artifactId>
+                     <configuration>
+                        <failOnError>false</failOnError>
+                        <additionalparam>${javadoc.opts}</additionalparam>
+                        <links>
+                           <link>http://activemq.apache.org/maven/5.7.0/apidocs/</link>
+                           <link>http://commons.apache.org/proper/commons-logging/javadocs/api-1.1/</link>
+                           <link>http://download.oracle.com/javaee/1.3/api/</link>
+                           <link>http://docs.oracle.com/javase/8/docs/api/</link>
+                           <link>http://docs.jboss.org/jbpm/v5.2/javadocs/</link>
+                           <link>http://help.eclipse.org/help33/topic/org.eclipse.platform.doc.isv/reference/api/</link>
+                           <!--<link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link> -->
+                           <!--link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCoreAPI/apidocs/</link> 
+                              <link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/agentCore/apidocs/</link> <link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/basicServices/Loadmeasurement/apidocs/</link> 
+                              <link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/jiacSecurity/identity/apidocs/</link> <link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/bdiAgent/agentInterpreter/jadlpp/apidocs/</link> 
+                              <link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/bdiAgent/agentInterpreter/jadl.interpreter/apidocs/</link> 
+                              <link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/basicServices/userManagement/apidocs/</link> <link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/basicServices/agentMigration/apidocs/</link> 
+                              <link>http://repositories.dai-labor.de/sites/jiactng/${project.version}/tools/asgard/asgardCore/apidocs/</link -->
+                           <link>http://repositories.dai-labor.de/sites/owlapi-2.2.1-javadoc/</link>
+                           <link>http://repositories.dai-labor.de/sites/pellet-2.0.0-rc7-javadoc/</link>
+                           <link>http://repositories.dai-labor.de/sites/ruleengine/0.0.3-SNAPSHOT/ruleAPI/apidocs/</link>
+                           <link>http://repositories.dai-labor.de/sites/ruleengine/0.0.3-SNAPSHOT/ruleEngineMonitor/apidocs/</link>
+                           <link>http://repositories.dai-labor.de/sites/SimpleSpace/SimpleSpaceCore/apidocs/</link>
+                           <link>http://repositories.dai-labor.de/sites/usermanagement/apidocs/</link>
+                           <link>http://docs.spring.io/spring/docs/3.0.3.RELEASE/api/</link>
+                           <link>http://ws.apache.org/axis/java/apiDocs/</link>
+                           <link>http://www.jdom.org/docs/apidocs/</link>
+                           <!--<link>http://www.jmonkeyengine.com/doc/</link> -->
+                           <!--link>http://java.sun.com/products/servlet/2.3/javadoc/</link -->
+                        </links>
+                        <quiet>true</quiet>
+                     </configuration>
+                  </plugin>
+                  <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-changes-plugin</artifactId>
+                     <version>2.9</version>
+                     <reportSets>
+                        <reportSet>
+                           <reports>
+                              <report>changes-report</report>
+                           </reports>
+                        </reportSet>
+                     </reportSets>
+                  </plugin>
+                  <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-checkstyle-plugin</artifactId>
+                     <version>2.10</version>
+                     <configuration>
+                        <configLocation>prealpha_checks.xml</configLocation>
+                     </configuration>
+                  </plugin>
+                  <!-- Cobertura was commented out because it can cause build failures when generating maven-sites with "mvn 
+                     site" -->
+                  <!-- plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>cobertura-maven-plugin</artifactId> <version>2.5.1</version> 
+                     <configuration> <includes> <include>**/*.java</include> </includes> </configuration> </plugin -->
+                  <plugin>
+                     <groupId>org.codehaus.mojo</groupId>
+                     <artifactId>findbugs-maven-plugin</artifactId>
+                     <version>3.0.0</version>
+                     <configuration>
+                        <xmlOutput>true</xmlOutput>
+                        <effort>Max</effort>
+                     </configuration>
+                  </plugin>
+                  <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-jxr-plugin</artifactId>
+                     <version>2.3</version>
+                  </plugin>
+                  <!-- plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-changelog-plugin</artifactId> 
+                     </plugin -->
+                  <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-surefire-report-plugin</artifactId>
+                     <version>2.20</version>
+                  </plugin>
+                  <plugin>
+                     <groupId>org.codehaus.mojo</groupId>
+                     <artifactId>jdepend-maven-plugin</artifactId>
+                     <version>2.0</version>
+                  </plugin>
+                  <plugin>
+                     <groupId>org.codehaus.mojo</groupId>
+                     <artifactId>taglist-maven-plugin</artifactId>
+                     <version>2.0</version>
+                     <configuration>
+                        <tags>
+                           <tag>TODO</tag>
+                           <tag>ToDo</tag>
+                           <tag>@todo</tag>
+                           <tag>@deprecated</tag>
+                           <tag>FIXME</tag>
+                        </tags>
+                     </configuration>
+                  </plugin>
+                  <!--plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>dashboard-maven-plugin</artifactId> </plugin -->
+               </reportPlugins>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-eclipse-plugin</artifactId>
+            <configuration>
+               <projectNameTemplate>[groupId] - [artifactId]</projectNameTemplate>
+               <downloadSources>true</downloadSources>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <configuration>
+               <destFile>${sonar.jacoco.reportPath}</destFile>
+               <append>true</append>
+            </configuration>
+            <executions>
+               <execution>
+                  <id>agent-for-ut</id>
+                  <goals>
+                     <goal>prepare-agent</goal>
+                  </goals>
+               </execution>
+               <execution>
+                  <id>agent-for-it</id>
+                  <goals>
+                     <goal>prepare-agent-integration</goal>
+                  </goals>
+               </execution>
+               <execution>
+                  <id>jacoco-site</id>
+                  <phase>site</phase>
+                  <goals>
+                     <goal>report</goal>
+                  </goals>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+      <pluginManagement>
+         <plugins>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-source-plugin</artifactId>
+               <version>3.0.1</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jar-plugin</artifactId>
+               <version>3.0.2</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-surefire-plugin</artifactId>
+               <version>2.20.1</version>
+            </plugin>
+            <plugin>
+               <groupId>org.jacoco</groupId>
+               <artifactId>jacoco-maven-plugin</artifactId>
+               <version>0.7.9</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-javadoc-plugin</artifactId>
+               <version>3.0.0-M1</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-eclipse-plugin</artifactId>
+               <version>2.10</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-site-plugin</artifactId>
+               <version>3.6</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-checkstyle-plugin</artifactId>
+               <version>2.17</version>
+            </plugin>
+            <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-compiler-plugin</artifactId>
+               <version>3.7.0</version>
+            </plugin>
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>appassembler-maven-plugin</artifactId>
+               <version>2.0.0</version>
+            </plugin>
+            <plugin>
+               <artifactId>maven-assembly-plugin</artifactId>
+               <version>3.1.0</version>
+            </plugin>
+         </plugins>
+      </pluginManagement>
+   </build>
+   <reporting>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+               <failOnError>false</failOnError>
+               <additionalparam>${javadoc.opts}</additionalparam>
+               <links>
+                  <link>http://docs.oracle.com/javase/7/docs/api/</link>
+                  <link>http://repositories.dai-labor.de/sites/jiactng/${project.parent.version}/agentCoreAPI/apidocs/</link>
+                  <link>http://docs.spring.io/spring/docs/3.0.3.RELEASE/api/</link>
+                  <link>http://commons.apache.org/proper/commons-logging/javadocs/api-1.1/</link>
+                  <link>http://activemq.apache.org/maven/5.7.0/apidocs/</link>
+                  <link>http://java.sun.com/j2ee/sdk_1.3/techdocs/api/</link>
+                  <link>http://repositories.dai-labor.de/sites/SimpleSpace/SimpleSpaceCore/apidocs/</link>
+               </links>
+               <quiet>true</quiet>
+            </configuration>
+         </plugin>
+      </plugins>
+   </reporting>
 
 
-	<repositories>
-		<repository>
-			<id>dai-releases</id>
-			<name>DAI Maven 2 Releases Repository</name>
-			<url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>dai-open</id>
-			<name>DAI Open</name>
-			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>edu-releases</id>
-			<name>Edu Repository</name>
-			<url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>dai-snapshots</id>
-			<name>DAI Maven 2 Snapshot Repository</name>
-			<url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>dai-open-snapshot</id>
-			<name>DAI Open Snapshot</name>
-			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open-snapshot/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>thirdparty</id>
-			<name>thirdparty</name>
-			<url>http://repositories.dai-labor.de/nexus/content/repositories/thirdparty/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-	</repositories>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>dai-releases</id>
-			<name>DAI Maven 2 Releases Repository</name>
-			<url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</pluginRepository>
-		<pluginRepository>
-			<id>dai-snapshots</id>
-			<name>DAI Maven 2 Snapshot Repository</name>
-			<url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</pluginRepository>
-	</pluginRepositories>
 
-	<distributionManagement>
-		<site>
-			<id>dai-repository</id>
-			<url>scp://repositories.dai-labor.de/export/home/local/maven/sites/jiactng/${project.version}</url>
-		</site>
-		<!-- Deployment on Release and Edu not necessary, since Open is accessible 
-			by all. <repository> <id>dai-releases</id> <name>dai-releases</name> <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url> 
-			</repository> <repository> <id>edu-releases</id> <name>Edu Repository</name> 
-			<url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> </repository> -->
-		<repository>
-			<id>dai-open</id>
-			<name>DAI Open</name>
-			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url>
-		</repository>
-		<snapshotRepository>
-            <id>dai-open-snapshot</id>
-			<name>DAI Open Snapshot</name>
-			<url>http://repositories.dai-labor.de/extern/content/repositories/dai-open-snapshot/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
-	<ciManagement>
-		<system>gitlab-ci</system>
-		<url>https://gitlab.dai-labor.de/jiacv/core</url>
-	</ciManagement>
-
-	<issueManagement>
-		<system>Redmine</system>
-		<url>https://redmine.dai-labor.de/redmine/projects/jiac</url>
-	</issueManagement>
-
-	<mailingLists>
-		<mailingList>
-			<name>JIAC TNG Developer Mailing List</name>
-			<post>jiactng-dev@dai-labor.de</post>
-		</mailingList>
-	</mailingLists>
-
-	<scm>
-		<url>https://gitlab.dai-labor.de/jiacv/core</url>
-		<connection>scm:git:git://gitlab.dai-labor.de:jiacv/core.git</connection>
-		<developerConnection>scm:git:git@gitlab.dai-labor.de:jiacv/core.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
-
-	<modules>
-		<!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->
-		<module>agentCoreAPI</module>
-		<module>gateway</module>
-		<module>agentCore</module>
-		<module>AgentUnit</module>
-		<module>examples</module>
-	</modules>
-
-	<profiles>
-		<profile>
-			<!-- Activate this profile during site build if you want to generate dependency 
-				graphs -->
-			<id>graph</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-site-plugin</artifactId>
-							<configuration>
-								<reportPlugins combine.children="append">
-									<plugin>
-										<groupId>org.fusesource.mvnplugins</groupId>
-										<artifactId>maven-graph-plugin</artifactId>
-										<version>1.11d</version>
-										<configuration>
-											<hideScopes>test</hideScopes>
-											<direction>BT</direction>
-										</configuration>
-									</plugin>
-								</reportPlugins>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
-
-		<profile>
-			<id>doclint-java8-disable</id>
-			<activation>
-				<jdk>[1.8,)</jdk>
-			</activation>
-
-			<properties>
-				<javadoc.opts>-Xdoclint:none</javadoc.opts>
-			</properties>
-		</profile>
-
-	</profiles>
+   <repositories>
+      <repository>
+         <id>dai-releases</id>
+         <name>DAI Maven 2 Releases Repository</name>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
+         <snapshots>
+            <enabled>false</enabled>
+         </snapshots>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
+      </repository>
+      <repository>
+         <id>dai-open</id>
+         <name>DAI Open</name>
+         <url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
+         <snapshots>
+            <enabled>false</enabled>
+         </snapshots>
+      </repository>
+      <repository>
+         <id>edu-releases</id>
+         <name>Edu Repository</name>
+         <url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
+         <snapshots>
+            <enabled>false</enabled>
+         </snapshots>
+      </repository>
+      <repository>
+         <id>dai-snapshots</id>
+         <name>DAI Maven 2 Snapshot Repository</name>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+         <releases>
+            <enabled>false</enabled>
+         </releases>
+      </repository>
+      <repository>
+         <id>dai-open-snapshot</id>
+         <name>DAI Open Snapshot</name>
+         <url>http://repositories.dai-labor.de/extern/content/repositories/dai-open-snapshot/</url>
+         <releases>
+            <enabled>false</enabled>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+      </repository>
+      <repository>
+         <id>thirdparty</id>
+         <name>thirdparty</name>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/thirdparty/</url>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
+      </repository>
+   </repositories>
+   <pluginRepositories>
+      <pluginRepository>
+         <id>dai-releases</id>
+         <name>DAI Maven 2 Releases Repository</name>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
+         <snapshots>
+            <enabled>false</enabled>
+         </snapshots>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
+      </pluginRepository>
+      <pluginRepository>
+         <id>dai-snapshots</id>
+         <name>DAI Maven 2 Snapshot Repository</name>
+         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url>
+         <snapshots>
+            <enabled>true</enabled>
+         </snapshots>
+         <releases>
+            <enabled>false</enabled>
+         </releases>
+      </pluginRepository>
+   </pluginRepositories>
+   <distributionManagement>
+      <site>
+         <id>dai-repository</id>
+         <url>scp://repositories.dai-labor.de/export/home/local/maven/sites/jiactng/${project.version}</url>
+      </site>
+      <!-- Deployment on Release and Edu not necessary, since Open is accessible by all. <repository> <id>dai-releases</id> 
+         <name>dai-releases</name> <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url> </repository> 
+         <repository> <id>edu-releases</id> <name>Edu Repository</name> <url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> 
+         </repository> -->
+      <repository>
+         <id>dai-open</id>
+         <name>DAI Open</name>
+         <url>http://repositories.dai-labor.de/extern/content/repositories/dai-open/</url>
+      </repository>
+      <snapshotRepository>
+         <id>dai-open-snapshot</id>
+         <name>DAI Open Snapshot</name>
+         <url>http://repositories.dai-labor.de/extern/content/repositories/dai-open-snapshot/</url>
+      </snapshotRepository>
+   </distributionManagement>
+   <ciManagement>
+      <system>gitlab-ci</system>
+      <url>https://gitlab.dai-labor.de/jiacv/core</url>
+   </ciManagement>
+   <issueManagement>
+      <system>Redmine</system>
+      <url>https://redmine.dai-labor.de/redmine/projects/jiac</url>
+   </issueManagement>
+   <mailingLists>
+      <mailingList>
+         <name>JIAC TNG Developer Mailing List</name>
+         <post>jiactng-dev@dai-labor.de</post>
+      </mailingList>
+   </mailingLists>
+   <scm>
+      <url>https://gitlab.dai-labor.de/jiacv/core</url>
+      <connection>scm:git:git://gitlab.dai-labor.de:jiacv/core.git</connection>
+      <developerConnection>scm:git:git@gitlab.dai-labor.de:jiacv/core.git</developerConnection>
+      <tag>HEAD</tag>
+   </scm>
+   <modules>
+      <!--module>ModuleTemplate</module --><!-- This is a template for new modules and testing; usually not required -->
+      <module>agentCoreAPI</module>
+      <module>gateway</module>
+      <module>agentCore</module>
+      <module>AgentUnit</module>
+      <module>examples</module>
+   </modules>
+   <profiles>
+      <profile>
+         <!-- Activate this profile during site build if you want to generate dependency graphs -->
+         <id>graph</id>
+         <activation>
+            <activeByDefault>false</activeByDefault>
+         </activation>
+         <build>
+            <pluginManagement>
+               <plugins>
+                  <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-site-plugin</artifactId>
+                     <configuration>
+                        <reportPlugins combine.children="append">
+                           <plugin>
+                              <groupId>org.fusesource.mvnplugins</groupId>
+                              <artifactId>maven-graph-plugin</artifactId>
+                              <version>1.11d</version>
+                              <configuration>
+                                 <hideScopes>test</hideScopes>
+                                 <direction>BT</direction>
+                              </configuration>
+                           </plugin>
+                        </reportPlugins>
+                     </configuration>
+                  </plugin>
+               </plugins>
+            </pluginManagement>
+         </build>
+      </profile>
+      <profile>
+         <id>doclint-java8-disable</id>
+         <activation>
+            <jdk>[1.8,)</jdk>
+         </activation>
+         <properties>
+            <javadoc.opts>-Xdoclint:none</javadoc.opts>
+         </properties>
+      </profile>
+   </profiles>
 </project>

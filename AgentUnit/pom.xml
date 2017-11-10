@@ -1,39 +1,40 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-	
-    <parent>
-	<groupId>de.dailab</groupId>
-	<artifactId>jiactng</artifactId>
-	<version>5.2.4-SNAPSHOT</version>
-    </parent>
-	
-    <groupId>de.dailab.jiactng.tools</groupId>
-    <artifactId>AgentUnit</artifactId>  	
-    <packaging>jar</packaging>  	
-    <name>Agent Unit</name>   	
-    
-    <dependencies>
-	    
-	<dependency>
-	    <groupId>de.dailab.jiactng</groupId>
-	    <artifactId>agentCore</artifactId>
-	    <version>${project.version}</version>
-	</dependency>
-	    
-    </dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
 
-    <build>
-	<plugins>
-	    <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-surefire-plugin</artifactId>
-		<configuration>
-		    <excludes>
-			<exclude>**/TestMethodExposingBean.java</exclude>
-		    </excludes>
-		</configuration>
-	    </plugin>
-	</plugins>		
-    </build>
+   <parent>
+      <groupId>de.dailab</groupId>
+      <artifactId>jiactng</artifactId>
+      <version>5.2.4-SNAPSHOT</version>
+   </parent>
+
+   <groupId>de.dailab.jiactng.tools</groupId>
+   <artifactId>AgentUnit</artifactId>
+   <packaging>jar</packaging>
+   <name>Agent Unit</name>
+
+   <dependencies>
+
+      <dependency>
+         <groupId>de.dailab.jiactng</groupId>
+         <artifactId>agentCore</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+
+   </dependencies>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+               <excludes>
+                  <exclude>**/TestMethodExposingBean.java</exclude>
+               </excludes>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
 
 </project>

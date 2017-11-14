@@ -37,6 +37,8 @@
                   <configuration>
                      <repositoryLayout>flat</repositoryLayout>
                      <repositoryName>lib</repositoryName>
+                     <configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
+                     <copyConfigurationDirectory>true</copyConfigurationDirectory>
                      <extraJvmArguments>-Xms32M -Xmx48M</extraJvmArguments>
                      <programs>
                         <program>
@@ -61,31 +63,6 @@
                            </commandLineArguments>
                         </program>
                      </programs>
-                  </configuration>
-               </execution>
-            </executions>
-         </plugin>
-         <plugin>
-            <!-- copy the configuration files into target/appassembler/etc -->
-            <artifactId>maven-resources-plugin</artifactId>
-            <executions>
-               <execution>
-                  <id>copy-configuration</id>
-                  <phase>package</phase>
-                  <goals>
-                     <goal>copy-resources</goal>
-                  </goals>
-                  <configuration>
-                     <outputDirectory>${project.build.directory}/appassembler/etc</outputDirectory>
-                     <resources>
-                        <resource>
-                           <directory>src/main/resources</directory>
-                           <includes>
-                              <include>**/*.xml</include>
-                              <include>**/*.properties</include>
-                           </includes>
-                        </resource>
-                     </resources>
                   </configuration>
                </execution>
             </executions>

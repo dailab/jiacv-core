@@ -18,7 +18,6 @@
       <dependency>
          <groupId>de.dailab.jiactng</groupId>
          <artifactId>agentCore</artifactId>
-         <version>${project.version}</version>
       </dependency>
 
    </dependencies>

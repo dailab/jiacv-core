@@ -70,7 +70,6 @@
 
          <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-
             <configuration>
                <descriptors>
                   <descriptor>${project.basedir}/directory-assembly.xml</descriptor>

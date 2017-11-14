@@ -40,7 +40,7 @@
                <repositoryLayout>flat</repositoryLayout>
                <programs>
                   <program>
-                     <mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode </mainClass>
+                     <mainClass>de.dailab.jiactng.agentcore.SimpleAgentNode</mainClass>
                      <commandLineArguments>
                         <commandLineArgument>classpath:helloWorld.xml</commandLineArgument>
                      </commandLineArguments>

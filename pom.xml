@@ -9,7 +9,8 @@
    <packaging>pom</packaging>
    <name>Java-based Intelligent Agent Componentware, Version 5</name>
    <description>JIAC V is a framework to fast and efficiently develop agent-based applications and services.</description>
-   <url>http://repositories.dai-labor.de/sites/jiactng/${project.version}/</url>
+   <url>http://www.jiac.de</url>
+<!--    <url>http://repositories.dai-labor.de/sites/jiactng/${project.version}/</url> -->
 
    <inceptionYear>2006</inceptionYear>
 

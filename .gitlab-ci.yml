@@ -66,11 +66,11 @@ snapshotdeploy:
   script: 
     - 'mvn $MAVEN_CLI_OPTS package -Dmaven.test.skip=true -Dmaven.javadoc.skip=true deploy:deploy'
 
-sitedeploy:
+mvnsite:
    stage: sitedeploy
    image: maven:3.3.9-jdk-8
    only: 
 #      - schedules
       - develop
    script:
-     - 'mvn $MAVEN_CLI_OPTS site site:deploy'
+     - 'mvn $MAVEN_CLI_OPTS package site site:deploy'

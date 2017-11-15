@@ -64,7 +64,7 @@ snapshotdeploy:
   only: 
     - develop
   script: 
-    - 'mvn $MAVEN_CLI_OPTS package -Dmaven.test.skip=true -Dmaven.javadoc.skip=true deploy:deploy'
+    - 'mvn $MAVEN_CLI_OPTS  -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package deploy:deploy'
 
 mvnsite:
    stage: sitedeploy
@@ -73,4 +73,4 @@ mvnsite:
 #      - schedules
       - develop
    script:
-     - 'mvn $MAVEN_CLI_OPTS package site site:deploy'
+     - 'mvn $MAVEN_CLI_OPTS package site:site site:deploy'

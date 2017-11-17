@@ -483,28 +483,28 @@
             <enabled>false</enabled>
          </snapshots>
       </repository>
-      <repository>
-         <id>edu-releases</id>
-         <name>Edu Repository</name>
-         <url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url>
-         <releases>
-            <enabled>true</enabled>
-         </releases>
-         <snapshots>
-            <enabled>false</enabled>
-         </snapshots>
-      </repository>
-      <repository>
-         <id>dai-snapshots</id>
-         <name>DAI Maven 2 Snapshot Repository</name>
-         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url>
-         <snapshots>
-            <enabled>true</enabled>
-         </snapshots>
-         <releases>
-            <enabled>false</enabled>
-         </releases>
-      </repository>
+<!--       <repository> -->
+<!--          <id>edu-releases</id> -->
+<!--          <name>Edu Repository</name> -->
+<!--          <url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> -->
+<!--          <releases> -->
+<!--             <enabled>true</enabled> -->
+<!--          </releases> -->
+<!--          <snapshots> -->
+<!--             <enabled>false</enabled> -->
+<!--          </snapshots> -->
+<!--       </repository> -->
+<!--       <repository> -->
+<!--          <id>dai-snapshots</id> -->
+<!--          <name>DAI Maven 2 Snapshot Repository</name> -->
+<!--          <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url> -->
+<!--          <snapshots> -->
+<!--             <enabled>true</enabled> -->
+<!--          </snapshots> -->
+<!--          <releases> -->
+<!--             <enabled>false</enabled> -->
+<!--          </releases> -->
+<!--       </repository> -->
       <repository>
          <id>dai-open-snapshot</id>
          <name>DAI Open Snapshot</name>

@@ -71,6 +71,6 @@ mvnsite:
    image: maven:3.3.9-jdk-8
    only: 
       - schedules
-      - develop
+#      - develop
    script:
      - 'mvn $MAVEN_CLI_OPTS deploy site:site site:deploy'

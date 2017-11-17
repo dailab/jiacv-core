@@ -70,7 +70,7 @@ mvnsite:
    stage: sitedeploy
    image: maven:3.3.9-jdk-8
    only: 
-#      - schedules
+      - schedules
       - develop
    script:
-     - 'mvn $MAVEN_CLI_OPTS package site:site site:deploy'
+     - 'mvn $MAVEN_CLI_OPTS deploy site:site site:deploy'

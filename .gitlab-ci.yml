@@ -2,7 +2,7 @@ stages:
     - build
     - test
     - deploy
-    - sitedeploy
+      #    - sitedeploy
 
 variables:
   # This will supress any download for dependencies and plugins or upload messages which would clutter the console log.
@@ -66,11 +66,12 @@ snapshotdeploy:
   script: 
     - 'mvn $MAVEN_CLI_OPTS  -Dmaven.test.skip=true -Dmaven.javadoc.skip=true package deploy:deploy'
 
-mvnsite:
-   stage: sitedeploy
-   image: maven:3.3.9-jdk-8
-   only: 
-      - schedules
+# mvnsite:
+#   stage: sitedeploy
+#   image: maven:3.3.9-jdk-8
+#   only: 
+#      - schedules
 #      - develop
-   script:
-     - 'mvn $MAVEN_CLI_OPTS deploy site:site site:deploy'
+#   script:
+#     - 'mvn $MAVEN_CLI_OPTS deploy site:site site:deploy'
+

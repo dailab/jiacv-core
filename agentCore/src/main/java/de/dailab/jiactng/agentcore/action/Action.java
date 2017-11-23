@@ -539,28 +539,6 @@ public class Action implements IActionDescription {
 		return builder.toString();
 	}
 
-	/*
-	 * Utility-method for a nicely formatted output
-	 * XXX this is doing exactly the same thing as ArrayList.toString is doing anyway 
-	 */
-//	private void prettyPrintArray(final StringBuilder builder, final List<String> list) {
-//		if (list == null) {
-//			builder.append("null");
-//		}
-//		else {
-//			builder.append('[');
-//			for (final Iterator<String> iter = list.iterator(); iter.hasNext();) {
-//				builder.append(iter.next());
-//
-//				if (iter.hasNext()) {
-//					builder.append("; ");
-//				}
-//			}
-//
-//			builder.append(']');
-//		}
-//	}
-
 	private Class<?> getClassForName(final String type) throws ClassNotFoundException {
         switch (type) {
             case "boolean":

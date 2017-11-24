@@ -21,6 +21,12 @@
       <dependency>
          <groupId>org.sercho.masp.space</groupId>
          <artifactId>SimpleSpaceCore</artifactId>
+         <exclusions>
+             <exclusion>
+                <groupId>org.sercho.masp.utilities</groupId>
+                <artifactId>ReflectiveTest</artifactId>
+             </exclusion>
+         </exclusions>
       </dependency>
    </dependencies>
 

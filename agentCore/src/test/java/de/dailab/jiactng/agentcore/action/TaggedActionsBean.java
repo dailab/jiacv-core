@@ -2,6 +2,7 @@ package de.dailab.jiactng.agentcore.action;
 
 import java.util.Arrays;
 
+import de.dailab.jiactng.agentcore.action.scope.ActionScope;
 import de.dailab.jiactng.agentcore.ontology.IActionDescription;
 
 /**
@@ -11,15 +12,15 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  */
 public class TaggedActionsBean extends AbstractMethodExposingBean {
 
-	@Expose(name="noTags")
-	public void noTags() {
+	@Expose(name="noTags", scope=ActionScope.NODE)
+	public void noTags(String foo, Integer bar) {
 	}
 
-	@Expose(name="hasTags", tags= {"foo", "bar", "blub"})
+	@Expose(name="hasTags", scope=ActionScope.NODE, tags= {"foo", "bar", "blub"})
 	public void hasTags() {
 	}
 	
-	@Expose(name="hasOther", tags= {"other", "tags"})
+	@Expose(name="hasOther", scope=ActionScope.NODE, tags= {"other", "tags"})
 	public void hasOther() {
 	}
 	
@@ -29,5 +30,5 @@ public class TaggedActionsBean extends AbstractMethodExposingBean {
 		IActionDescription action = thisAgent.searchAction(template);
 		return action != null ? action.getName() : null;
 	}
-	
+
 }

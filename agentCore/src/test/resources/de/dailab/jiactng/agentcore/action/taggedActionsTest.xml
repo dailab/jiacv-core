@@ -19,6 +19,13 @@
 						</list>
 					</property>
 				</bean>
+				<bean name="ActionsCallerAgent" parent="SimpleAgent">
+					<property name="agentBeans">
+						<list>
+							<bean class="de.dailab.jiactng.agentcore.action.TaggedActionsCallerBean" scope="prototype" />
+						</list>
+					</property>
+				</bean>
             </list>
         </property>
     </bean>

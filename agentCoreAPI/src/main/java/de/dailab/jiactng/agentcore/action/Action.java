@@ -34,7 +34,7 @@ import de.dailab.jiactng.agentcore.util.EqualityChecker;
  */
 public class Action implements IActionDescription {
 	/** SerialVersionUID for Serialization */
-	private static final long serialVersionUID = 2416102010976263587L;
+	private static final long serialVersionUID = 4349459306047995736L;
 
 	/** the name of the action */
 	private String name;
@@ -510,6 +510,7 @@ public class Action implements IActionDescription {
 		return EqualityChecker.equals(this.getName(), other.getName())
 		      && EqualityChecker.equals(this.getInputTypeNames(), other.getInputTypeNames())
 		      && EqualityChecker.equals(this.getResultTypeNames(), other.getResultTypeNames())
+		      && EqualityChecker.equals(this.getTags(), other.getTags())
 		      && EqualityChecker.equals(this.getSemanticServiceDescriptionIRI(), other.getSemanticServiceDescriptionIRI());
 	}
 	
@@ -522,6 +523,13 @@ public class Action implements IActionDescription {
 		final IAgentDescription myAgent = this.getProviderDescription();
 		if (myAgent != null && ! myAgent.matches(template.getProviderDescription())) {
 			return false;
+		}
+		
+		if (template.getTags() != null && ! template.getTags().isEmpty()) {
+			if (this.getTags() == null || ! template.getTags().stream()
+					.allMatch(t -> this.getTags().contains(t))) {
+				return false;
+			}
 		}
 
 		return EqualityChecker.equalsOrOtherNull(this.getName(), template.getName()) && 

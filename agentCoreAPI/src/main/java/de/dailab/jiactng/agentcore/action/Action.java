@@ -58,6 +58,9 @@ public class Action implements IActionDescription {
 	
 	/** The IRI link to a semantic service description 	 */
 	private String semanticServiceDescriptionIRI;
+	
+	/** tags (labels, categories) of this action, used for matching, optional */
+	private List<String> tags;
 
 	/**
 	 * The type of this action. This field is designed to store information about the type of the action. By default,
@@ -366,6 +369,24 @@ public class Action implements IActionDescription {
 		else {
 			this.inputTypeNames = null;
 		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public final void setTags(List<String> tags) {
+		if (tags != null) {
+			this.tags = Collections.unmodifiableList(new ArrayList<>(tags));
+		} else {
+			this.tags = null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> getTags() {
+		return this.tags;
 	}
 	
 	/**

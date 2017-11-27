@@ -210,6 +210,20 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	void setSemanticServiceDescriptionURI(String iri);
 
 	/**
+	 * Set the tags (labels, categories) of this action.
+	 * 
+	 * @param tags	list of tags for this action
+	 */
+	void setTags(List<String> tags);
+	
+	/**
+	 * Get the tags (labels, categories) of this action.
+	 * 
+	 * @return	list of tags of this action
+	 */
+	List<String> getTags();
+	
+	/**
 	 * Sets the agent bean which provides this action.
 	 * 
 	 * @param newProviderBean

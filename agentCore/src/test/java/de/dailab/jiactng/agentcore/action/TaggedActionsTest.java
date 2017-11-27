@@ -11,6 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import de.dailab.jiactng.JIACTestForJUnit4;
 import de.dailab.jiactng.agentcore.IAgentNode;
 import de.dailab.jiactng.agentcore.SimpleAgentNodeMBean;
+import de.dailab.jiactng.agentcore.comm.CommunicationBean;
 
 /**
  * Test matching actions with and without tags; actions are just matched, not invoked.
@@ -44,6 +45,13 @@ public class TaggedActionsTest extends JIACTestForJUnit4 {
 		((SimpleAgentNodeMBean) node).shutdown();
 	}
 
+	@Test
+	public void testOldActions() {
+		// ensure "old" tag-less private actions can still be found (using memory)
+		String name = CommunicationBean.ACTION_SEND;
+		checkMatch(name, name);
+	}
+	
 	@Test
 	public void testNoTags() {
 		// matching without tags still works

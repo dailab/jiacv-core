@@ -34,7 +34,7 @@ import de.dailab.jiactng.agentcore.util.EqualityChecker;
  */
 public class Action implements IActionDescription {
 	/** SerialVersionUID for Serialization */
-	private static final long serialVersionUID = 4349459306047995736L;
+	private static final long serialVersionUID = 2416102010976263587L;
 
 	/** the name of the action */
 	private String name;
@@ -375,7 +375,7 @@ public class Action implements IActionDescription {
 	 * {@inheritDoc}
 	 */
 	public final void setTags(List<String> tags) {
-		if (tags != null) {
+		if (tags != null && ! tags.isEmpty()) {
 			this.tags = Collections.unmodifiableList(new ArrayList<>(tags));
 		} else {
 			this.tags = null;
@@ -563,6 +563,7 @@ public class Action implements IActionDescription {
 		}
 		builder.append("\n scope=").append(this.scope);
 		builder.append("\n IRI=").append(this.semanticServiceDescriptionIRI);
+		builder.append("\n tags=").append(this.tags);
 		builder.append("\n");
 
 		return builder.toString();

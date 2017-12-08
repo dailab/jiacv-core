@@ -58,6 +58,9 @@ public class Action implements IActionDescription {
 	
 	/** The IRI link to a semantic service description 	 */
 	private String semanticServiceDescriptionIRI;
+	
+	/** tags (labels, categories) of this action, used for matching, optional */
+	private List<String> tags;
 
 	/**
 	 * The type of this action. This field is designed to store information about the type of the action. By default,
@@ -370,6 +373,24 @@ public class Action implements IActionDescription {
 	
 	/**
 	 * {@inheritDoc}
+	 */
+	public final void setTags(List<String> tags) {
+		if (tags != null && ! tags.isEmpty()) {
+			this.tags = Collections.unmodifiableList(new ArrayList<>(tags));
+		} else {
+			this.tags = null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> getTags() {
+		return this.tags;
+	}
+	
+	/**
+	 * {@inheritDoc}
 	 * 
 	 * @deprecated Inconsistent name of setter; problems with TupleSpace/GetterSetterFinder, use {@link #setSemanticServiceDescriptionIRI(String)} instead
 	 */
@@ -489,6 +510,7 @@ public class Action implements IActionDescription {
 		return EqualityChecker.equals(this.getName(), other.getName())
 		      && EqualityChecker.equals(this.getInputTypeNames(), other.getInputTypeNames())
 		      && EqualityChecker.equals(this.getResultTypeNames(), other.getResultTypeNames())
+		      && EqualityChecker.equals(this.getTags(), other.getTags())
 		      && EqualityChecker.equals(this.getSemanticServiceDescriptionIRI(), other.getSemanticServiceDescriptionIRI());
 	}
 	
@@ -501,6 +523,13 @@ public class Action implements IActionDescription {
 		final IAgentDescription myAgent = this.getProviderDescription();
 		if (myAgent != null && ! myAgent.matches(template.getProviderDescription())) {
 			return false;
+		}
+		
+		if (template.getTags() != null && ! template.getTags().isEmpty()) {
+			if (this.getTags() == null || ! template.getTags().stream()
+					.allMatch(t -> this.getTags().contains(t))) {
+				return false;
+			}
 		}
 
 		return EqualityChecker.equalsOrOtherNull(this.getName(), template.getName()) && 
@@ -534,6 +563,7 @@ public class Action implements IActionDescription {
 		}
 		builder.append("\n scope=").append(this.scope);
 		builder.append("\n IRI=").append(this.semanticServiceDescriptionIRI);
+		builder.append("\n tags=").append(this.tags);
 		builder.append("\n");
 
 		return builder.toString();

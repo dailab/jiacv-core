@@ -42,6 +42,9 @@ public interface IMethodExposingBean {
         
         /** the action parameter names; can also be read via reflection, but only with special compiler flag */
         String[] paramNames() default {};
+        
+        /** tags (labels, categories) describing this action, optional */
+        String[] tags() default {};
 
         /** The action scope to be used for the exposed method. */
         ActionScope scope() default ActionScope.AGENT;

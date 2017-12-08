@@ -116,6 +116,14 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         return returnTypes;
     }
     
+    public static List<String> getTags(Method method) {
+    	Expose expose = method.getAnnotation(Expose.class);
+    	if (expose != null && expose.tags() != null && expose.tags().length > 0) {
+    		return Arrays.asList(expose.tags());
+    	}
+    	return null;
+    }
+    
     /**
      * Try to get the input parameter names from the method. The respective methods
      * are only available in Java 8, and only if compiled with '-parameters' flag.
@@ -332,6 +340,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
                 returnTypes
             );
             
+            act.setTags(getTags(method));
             
         	if (semanticURI != null && !semanticURI.equals("")) {
         		try {

@@ -9,3 +9,4 @@ agentCore/src/main/java/de/dailab/jiactng/Version.java
 jiactng.log*
 *.log.*
 activemq-data
+*.DS_Store

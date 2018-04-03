@@ -12,8 +12,6 @@ import javax.management.AttributeChangeNotification;
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 
-import org.apache.log4j.Level;
-
 import de.dailab.jiactng.agentcore.AbstractAgentBean;
 import de.dailab.jiactng.agentcore.action.AbstractActionAuthorizationBean;
 import de.dailab.jiactng.agentcore.action.Action;
@@ -134,9 +132,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
                } else {
                   session.setCurrentCallDepth(session.getCurrentCallDepth().intValue() + 1);
                }
-               if (log.isInfoEnabled()) {
-                  log.info("Writing session for " + act.getAction().getName() + " to memory: " + act.getSessionId() + " (" + session.getCurrentCallDepth() + ")");
-               }
+               log.debug("Writing session for " + act.getAction().getName() + " to memory: " + act.getSessionId() + " (" + session.getCurrentCallDepth() + ")");
                memory.write(act.getSession());
             }
 
@@ -144,23 +140,17 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
             final Session session = act.getSession();
             if ((session.getUserToken() == null) && (session.getOriginalProvider() != null) && (session.getOriginalUser() != null) && session.getOriginalUser().equals(session.getOriginalProvider())) {
                // no user token, and user is equal to provider - invoke is allowed
-               if (log.isInfoEnabled()) {
-                  log.info("Calling doAction with authorization: " + act.getAction().getName() + " (" + act.getSessionId() + ")");
-               }
+               log.debug("Calling doAction with authorization: " + act.getAction().getName() + " (" + act.getSessionId() + ")");
                providerBean.doAction(act);
 
             } else if (providerBean instanceof AbstractActionAuthorizationBean) {
                // use authorizationAction
-               if (log.isInfoEnabled()) {
-                  log.info("Checking authorization for action: " + act.getAction().getName() + " (" + act.getSessionId() + ")");
-               }
+               log.debug("Checking authorization for action: " + act.getAction().getName() + " (" + act.getSessionId() + ")");
                ((AbstractActionAuthorizationBean) providerBean).authorize(act);
 
             } else {
                // no authorization required
-               if (log.isInfoEnabled()) {
-                  log.info("Calling doAction: " + act.getAction().getName() + " (" + act.getSessionId() + ")");
-               }
+               log.debug("Calling doAction: " + act.getAction().getName() + " (" + act.getSessionId() + ")");
                providerBean.doAction(act);
             }
          } catch (Throwable t) {
@@ -188,9 +178,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
 
       if ((doAct.getAction().getResultTypeNames() != null) && (doAct.getAction().getResultTypeNames().size() > 0)) {
          if (session.getCurrentCallDepth() == null) {
-            if (log.isEnabledFor(Level.WARN)) {
-               log.warn("Found session with call-depth null. Setting calldepth to 1 for: " + doAct.getAction().getName() + " (" + session.getSessionId() + ")");
-            }
+           log.warn("Found session with call-depth null. Setting calldepth to 1 for: " + doAct.getAction().getName() + " (" + session.getSessionId() + ")");
             session.setCurrentCallDepth(1);
          }
 
@@ -199,15 +187,13 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       if (memory.read(session) == null) {
          if ((doAct.getAction().getResultTypeNames() != null) && doAct.getAction().getResultTypeNames().size() > 0) {
             if (doAct.getSession().isTimeout()) {
-               log.info("ActionResult for Action " + actionResult.getAction().getName() + " (" + actionResult.getSessionId() + ") written after session timeout");
+               log.debug("ActionResult for Action " + actionResult.getAction().getName() + " (" + actionResult.getSessionId() + ") written after session timeout");
             } else {
-               log.warn("ActionResult for Action " + actionResult.getAction().getName() + " written with unknown Session: " + doAct.getSessionId());
+               log.debug("ActionResult for Action " + actionResult.getAction().getName() + " written with unknown Session: " + doAct.getSessionId());
             }
          }
       } else if (session.getCurrentCallDepth().intValue() <= 0) {
-         if (log.isInfoEnabled()) {
-            log.info("Removing session for " + actionResult.getAction().getName() + " from memory: " + session.getSessionId() + " (" + session.getCurrentCallDepth() + ")");
-         }
+        log.debug("Removing session for " + actionResult.getAction().getName() + " from memory: " + session.getSessionId() + " (" + session.getCurrentCallDepth() + ")");
          memory.remove(session);
       }
 
@@ -395,8 +381,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       try {
          manager.registerAgentResource(thisAgent, "ExecutionCycle", this);
       } catch (Exception e) {
-         System.err.println("WARNING: Unable to register execution cycle of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
-         System.err.println(e.getMessage());
+         log.error("Unable to register execution cycle of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.", e);
       }
 
       _manager = manager;
@@ -415,8 +400,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
       try {
          _manager.unregisterAgentResource(thisAgent, "ExecutionCycle");
       } catch (Exception e) {
-         System.err.println("WARNING: Unable to deregister execution cycle of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.");
-         System.err.println(e.getMessage());
+          log.error("Unable to deregister execution cycle of agent " + thisAgent.getAgentName() + " of agent node " + thisAgent.getAgentNode().getName() + " as JMX resource.", e);
       }
 
       _manager = null;

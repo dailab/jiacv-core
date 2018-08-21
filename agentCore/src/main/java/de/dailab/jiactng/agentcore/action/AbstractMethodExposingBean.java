@@ -324,7 +324,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         final ArrayList<Action> actions= new ArrayList<Action>();
         this.ontologyStorage = thisAgent.getAgentNode().findAgentNodeBean(IOntologyStorage.class);
         
-        
+        boolean warnAgain = true;
         for(Method method : getExposedPublicMethods(getClass())) {
             // check for Expose annotation
             final Class<?>[] returnTypes= getReturnTypes(method);
@@ -346,8 +346,11 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         		try {
         			Class.forName("de.dailab.jiactng.owlsdescription.ServiceDescription");
         		} catch (ClassNotFoundException e) {
-        			log.warn("Exposing Action with semantic service IRI without having access to "
-        					+ "ServiceDescription class to handle invocations of the service.");
+        			if (warnAgain) {
+        				log.warn("Exposing Action with semantic service IRI without having access to "
+        						+ "ServiceDescription class to handle invocations of the service.");
+        				warnAgain = false;
+        			}
         		}
         		act.setSemanticServiceDescriptionIRI(semanticURI);
         	}

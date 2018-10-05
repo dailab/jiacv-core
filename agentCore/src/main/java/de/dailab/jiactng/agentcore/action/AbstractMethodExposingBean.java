@@ -293,7 +293,7 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
             			}
             			// check whether result types match
             			for (int i = 0; i < Math.min(results.length, expected.size()); i++) {
-            				if (! action.getResultTypes().get(i).isInstance(results[i])) {
+            				if (results[i] != null && ! action.getResultTypes().get(i).isInstance(results[i])) {
             					log.warn(String.format("Action result does not match expected type. Expected %s, but got %s", 
             							expected.get(i).getName(), results[i].getClass().getName()));
             				}

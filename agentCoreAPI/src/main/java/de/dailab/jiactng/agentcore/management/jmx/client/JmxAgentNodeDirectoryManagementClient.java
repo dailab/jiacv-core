@@ -66,6 +66,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAliveInterval()
 	 */
+	@SuppressWarnings("unchecked")
 	public final Map<String, Long> getAliveIntervals() throws IOException, InstanceNotFoundException {
 		return (Map<String, Long>) getAttribute("AliveIntervals");
 	}
@@ -79,6 +80,7 @@ public class JmxAgentNodeDirectoryManagementClient extends JmxAbstractManagement
 	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
 	 * @see de.dailab.jiactng.agentcore.directory.DirectoryAgentNodeBeanMBean#getAdvertiseInterval()
 	 */
+	@SuppressWarnings("unchecked")
 	public final Map<String, Long> getAdvertiseIntervals() throws IOException, InstanceNotFoundException {
 		return (Map<String, Long>) getAttribute("AdvertiseIntervals");
 	}

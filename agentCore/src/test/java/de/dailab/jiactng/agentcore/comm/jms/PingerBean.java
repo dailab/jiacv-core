@@ -29,7 +29,9 @@ public class PingerBean extends AbstractAgentBean implements ResultReceiver {
     private IJiacMessage pongMessage= null;
     
     private class MessageObserver implements SpaceObserver<IFact> {
-        @SuppressWarnings("unchecked")
+		private static final long serialVersionUID = 6443856144893774561L;
+
+		@SuppressWarnings("rawtypes")
         public void notify(SpaceEvent<? extends IFact> event) {
             if(event instanceof WriteCallEvent) {
                 WriteCallEvent callEvent= (WriteCallEvent) event;

@@ -9,6 +9,7 @@ import de.dailab.jiactng.agentcore.knowledge.IFact;
  *
  */
 public class Message implements IFact{
+	private static final long serialVersionUID = 5737278004372816216L;
 	
 	/**
 	 * The time of sending this message

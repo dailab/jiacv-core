@@ -37,7 +37,7 @@ public class MessageReaderBean extends AbstractAgentBean {
             _numBytes= 0;
         };
         
-        @SuppressWarnings({ "unchecked", "synthetic-access" })
+        @SuppressWarnings({ "rawtypes", "synthetic-access" })
         public void notify(SpaceEvent<? extends IFact> event) {
             if(event instanceof WriteCallEvent) {
                 if(_startTime < 0) {

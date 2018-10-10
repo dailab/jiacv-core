@@ -73,7 +73,7 @@ public class ActionCallingAgentBean extends AbstractMethodExposingBean{
 			throw new RuntimeException("Action not found");
 		}
 			
-		ActionResult result = invokeAndWaitForResult(calculateSendTimeD, new Serializable[]{new Long(System.currentTimeMillis())});
+		ActionResult result = invokeAndWaitForResult(calculateSendTimeD, new Serializable[]{System.currentTimeMillis()});
 		return (Long)result.getResults()[0];
 	}
 	
@@ -85,7 +85,7 @@ public class ActionCallingAgentBean extends AbstractMethodExposingBean{
 			throw new RuntimeException("Action not found");
 		}
 			
-		invoke(calculateSendTimeD, new Serializable[]{new Long(System.currentTimeMillis())});
+		invoke(calculateSendTimeD, new Serializable[]{System.currentTimeMillis()});
 	}
 
 	/**

@@ -63,10 +63,10 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 		sendAction = memory.read(new Action(ICommunicationBean.ACTION_SEND,null,new Class[]{IJiacMessage.class, ICommunicationAddress.class},null));
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void notify(SpaceEvent<? extends IFact> event) {
 		if(event instanceof WriteCallEvent) {
+			@SuppressWarnings("rawtypes")
 			final WriteCallEvent writeCallEvent = (WriteCallEvent) event;
 			if (writeCallEvent.getObject() instanceof JiacMessage){
 				JiacMessage message = (JiacMessage)writeCallEvent.getObject();

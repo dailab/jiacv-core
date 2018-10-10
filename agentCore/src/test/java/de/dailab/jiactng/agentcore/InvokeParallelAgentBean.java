@@ -27,7 +27,7 @@ public class InvokeParallelAgentBean extends AbstractAgentBean{
 		}
 		
 		Action action = new Action("invokeWithBacktrackingMethod");
-		List<ActionResult> actionResults = invokeParallel(action, new Serializable[]{}, new Long(3000));
+		List<ActionResult> actionResults = invokeParallel(action, new Serializable[]{}, 3000L);
 
 		if (actionResults.size() < minActions) {
 			return false;

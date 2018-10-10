@@ -1,6 +1,8 @@
 package de.dailab.jiactng.agentcore.knowledge;
 
 public class Fact implements IFact {
+	private static final long serialVersionUID = -6023201290809361100L;
+
 	public Integer integer;
 	public String string;
 	public Boolean bool;

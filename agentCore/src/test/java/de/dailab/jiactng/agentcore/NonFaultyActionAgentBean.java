@@ -7,6 +7,6 @@ public class NonFaultyActionAgentBean extends AbstractMethodExposingBean{
 
 	@Expose (name = "invokeWithBacktrackingMethod", scope = ActionScope.GLOBAL)
 	public Object NonFaulteMethod(){
-		return new Long(0);
+		return 0L;
 	}
 }

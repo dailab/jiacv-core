@@ -10,8 +10,6 @@ import java.net.URISyntaxException;
  *
  */
 abstract class CommunicationAddress implements ICommunicationAddress {
-	private static final long serialVersionUID = 3261388801982517612L;
-
 	private final CommunicationAddress unboundAddress;
     private final URI uri;
     private final String transportId;

@@ -103,14 +103,14 @@ public class JMSMessageTransport extends MessageTransport {
          this._connection.stop();
       }
       catch (final JMSException e) {
-         this.log.warn("could not stop JMS connection ", e);
+         this.log.warn("could not stop JMS connection ");
       }
 
       try {
          this._connection.close();
       }
       catch (final Exception e) {
-         this.log.warn("could not close connection ", e);
+         this.log.warn("could not close connection ");
       }
 
       this._connection = null;

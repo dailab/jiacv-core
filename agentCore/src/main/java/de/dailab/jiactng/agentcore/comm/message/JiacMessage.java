@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.management.openmbean.CompositeData;
@@ -202,23 +200,8 @@ public final class JiacMessage implements IJiacMessage {
 
       try {
          recursionDetected = true;
-         final StringBuilder builder = new StringBuilder();
-         builder.append("[Headers: {");
-         int counter = headers.size() - 1;
-
-         for (final Iterator<Entry<String,String>> entries = headers.entrySet().iterator(); entries.hasNext(); --counter) {
-            final Entry<String,String> entry = entries.next();
-            builder.append(entry.getKey()).append("=>").append(entry.getValue());
-
-            if (counter > 0) {
-               builder.append(";");
-            }
-         }
-
-         builder.append("}");
-         builder.append(", Payload: ").append(getPayload()).append(", Sender: ").append(getSender());
-         builder.append("]");
-         return builder.toString();
+         return String.format("[Headers: %s, Payload: %s, Sender: %s",
+        		 headers,getPayload(), getSender());
       }
       finally {
          recursionDetected = false;

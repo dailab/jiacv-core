@@ -399,11 +399,7 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
         }
       }
     }
-    ActionResult result = listener.getResult();
-    if(result.getResults() != null && result.getResults().length == 0){
-    	log.warn("Action: " + a.getName() + " has no return parameter");
-    }
-    return result;
+    return listener.getResult();
   }
 
   /**
@@ -531,9 +527,6 @@ public abstract class AbstractAgentBean extends AbstractLifecycle implements IAg
 		    }
 		  actionResult = listener.getResult();
 		  if(actionResult != null && actionResult.getFailure() == null){
-			if(actionResult.getResults() != null && actionResult.getResults().length == 0){
-				log.warn("Action: " + template.getName() + " has no return parameter");
-			}
 		    return actionResult;
 		  }
 	  }

@@ -45,6 +45,8 @@ public interface IMethodExposingBean {
         
         /** tags (labels, categories) describing this action, optional */
         String[] tags() default {};
+        
+        String documentation() default "";
 
         /** The action scope to be used for the exposed method. */
         ActionScope scope() default ActionScope.AGENT;

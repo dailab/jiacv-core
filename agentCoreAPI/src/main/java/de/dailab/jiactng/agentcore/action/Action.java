@@ -61,6 +61,9 @@ public class Action implements IActionDescription {
 	
 	/** tags (labels, categories) of this action, used for matching, optional */
 	private List<String> tags;
+	
+	/** human readable description of this action, optional */
+	private String documentation;
 
 	/**
 	 * The type of this action. This field is designed to store information about the type of the action. By default,
@@ -391,6 +394,22 @@ public class Action implements IActionDescription {
 	
 	/**
 	 * {@inheritDoc}
+	 */
+	@Override
+	public void setDocumentation(String documentation) {
+		this.documentation = documentation;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getDocumentation() {
+		return this.documentation;
+	}
+	
+	/**
+	 * {@inheritDoc}
 	 * 
 	 * @deprecated Inconsistent name of setter; problems with TupleSpace/GetterSetterFinder, use {@link #setSemanticServiceDescriptionIRI(String)} instead
 	 */
@@ -614,7 +633,8 @@ public class Action implements IActionDescription {
 	private String[] getItemNames() {
 		return new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTTYPES,
 		      IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_SCOPE, IActionDescription.ITEMNAME_BEAN,
-		      IActionDescription.ITEMNAME_AGENT, IActionDescription.ITEMNAME_SEMURI };
+		      IActionDescription.ITEMNAME_AGENT, IActionDescription.ITEMNAME_SEMURI,
+		      IActionDescription.ITEMNAME_TAGS, IActionDescription.ITEMNAME_DOC};
 	}
 
 	/**
@@ -634,6 +654,8 @@ public class Action implements IActionDescription {
 			SimpleType.STRING, 
 			SimpleType.STRING,
 			(this.providerDescription != null) ? this.providerDescription.getDescriptionType() : SimpleType.VOID,
+			SimpleType.STRING,
+			new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
 			SimpleType.STRING
 		};
 
@@ -658,10 +680,12 @@ public class Action implements IActionDescription {
 			this.name, 
 			this.inputTypeNames.toArray(new String[this.inputTypeNames.size()]),
 			this.resultTypeNames.toArray(new String[this.resultTypeNames.size()]), 
-			(this.scope != null) ? this.scope.toString() : null,
-			(this.providerBean != null) ? this.providerBean.getBeanName() : null,
-			(this.providerDescription != null) ? this.providerDescription.getDescription() : null,
-			(this.semanticServiceDescriptionIRI != null) ? this.semanticServiceDescriptionIRI : null
+			this.scope != null ? this.scope.toString() : null,
+			this.providerBean != null ? this.providerBean.getBeanName() : null,
+			this.providerDescription != null ? this.providerDescription.getDescription() : null,
+			this.semanticServiceDescriptionIRI,
+			this.tags != null ? this.tags.toArray(new String[this.tags.size()]) : null,
+			this.documentation
 		};
 
 		final CompositeType type = (CompositeType) this.getDescriptionType();

@@ -43,6 +43,12 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	/** Item name which can be used to get the semantic service description URI for the current action*/
 	String ITEMNAME_SEMURI = "semuri";
 
+	/** Item name which can be used to get the tags for the current action*/
+	String ITEMNAME_TAGS = "tags";
+
+	/** Item name which can be used to get the documentation for the current action*/
+	String ITEMNAME_DOC = "documentation";
+
 	/**
 	 * This method returns the name of the action this description refers to.
 	 * 
@@ -222,6 +228,20 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 * @return	list of tags of this action
 	 */
 	List<String> getTags();
+	
+	/**
+	 * Set the documentation of this action.
+	 * 
+	 * @param documentation	new documentation
+	 */
+	void setDocumentation(String documentation);
+	
+	/**
+	 * Get the documentation of this action.
+	 * 
+	 * @return	current documentation
+	 */
+	String getDocumentation();
 	
 	/**
 	 * Sets the agent bean which provides this action.

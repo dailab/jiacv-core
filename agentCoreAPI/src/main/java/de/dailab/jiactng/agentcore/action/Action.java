@@ -169,11 +169,13 @@ public class Action implements IActionDescription {
 		this.actionType = action.getActionType();
 		this.providerDescription = action.getProviderDescription();
 		this.semanticServiceDescriptionIRI = action.getSemanticServiceDescriptionIRI();
+		this.documentation = action.getDocumentation();
 
 		// we can exchange references here, because the lists are immutable
 		this.inputTypeNames = action.getInputTypeNames();
 		this.resultTypeNames = action.getResultTypeNames();
 		this.inputNames = action.getInputNames();
+		this.tags = action.getTags();
 	}
 
 	/**
@@ -194,6 +196,8 @@ public class Action implements IActionDescription {
 		if (provider != null) {
 			this.providerDescription = new AgentDescription(provider);
 		}
+		this.tags = Arrays.asList((String[]) descr.get(IActionDescription.ITEMNAME_TAGS));
+		this.documentation = (String) descr.get(IActionDescription.ITEMNAME_DOC);
 	}
 
 	/**
@@ -527,6 +531,7 @@ public class Action implements IActionDescription {
 		}
 
 		return EqualityChecker.equals(this.getName(), other.getName())
+		      && EqualityChecker.equals(this.getDocumentation(), other.getDocumentation())
 		      && EqualityChecker.equals(this.getInputTypeNames(), other.getInputTypeNames())
 		      && EqualityChecker.equals(this.getResultTypeNames(), other.getResultTypeNames())
 		      && EqualityChecker.equals(this.getTags(), other.getTags())
@@ -551,7 +556,8 @@ public class Action implements IActionDescription {
 			}
 		}
 
-		return EqualityChecker.equalsOrOtherNull(this.getName(), template.getName()) && 
+		return EqualityChecker.equalsOrOtherNull(this.getName(), template.getName()) &&
+				EqualityChecker.equalsOrOtherNull(this.getDocumentation(), template.getDocumentation()) &&
 				EqualityChecker.equalsOrOtherNull(this.getInputTypeNames(), template.getInputTypeNames()) && 
 				EqualityChecker.equalsOrOtherNull(this.getResultTypeNames(), template.getResultTypeNames()) && 
 				EqualityChecker.equalsOrOtherNull(this.getSemanticServiceDescriptionIRI(), template.getSemanticServiceDescriptionIRI());
@@ -583,6 +589,7 @@ public class Action implements IActionDescription {
 		builder.append("\n scope=").append(this.scope);
 		builder.append("\n IRI=").append(this.semanticServiceDescriptionIRI);
 		builder.append("\n tags=").append(this.tags);
+		builder.append("\n documentation=").append(this.documentation);
 		builder.append("\n");
 
 		return builder.toString();

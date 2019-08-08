@@ -201,9 +201,6 @@ public class MemoryTest extends JIACTestForJUnit4 {
 	
 	/**
 	 * generates a line of the csv file and save it in output
-	 * @param order in csv file
-	 * @param synchronizes or not
-	 * @param times
 	 */
 	public void generateCsvOutput(int order, long usedHeap, long usedNonHeap, int numberOfAgents, int numberOfThreads){	
 		//number of agents

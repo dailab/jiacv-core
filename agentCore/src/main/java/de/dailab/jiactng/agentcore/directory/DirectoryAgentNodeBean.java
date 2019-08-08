@@ -1203,7 +1203,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 	/**
 	 * Set the time how often the directory will send a ping.
 	 * 
-	 * @param interval
+	 * @param aliveIntervals
 	 *            the time between pings
 	 */
 	public void setAliveIntervals(HashMap<String, Long> aliveIntervals) {
@@ -1244,9 +1244,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		advertiseInterval = interval;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public void setAdvertiseIntervals(HashMap<String, Long> advertiseIntervals) {
 		this.advertiseIntervals = new HashMap<String, Long>();
 		for (Entry<String, Long> entry : advertiseIntervals.entrySet()) {
@@ -1269,9 +1266,6 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 		return advertiseIntervals;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	public long getAdvertiseInterval(String groupName) {
 		return advertiseIntervals.get(groupName);
 	}

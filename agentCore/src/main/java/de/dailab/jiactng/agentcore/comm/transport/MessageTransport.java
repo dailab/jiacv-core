@@ -5,6 +5,7 @@ package de.dailab.jiactng.agentcore.comm.transport;
 
 import java.net.URI;
 
+import org.apache.commons.logging.Log;
 import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.comm.CommunicationException;

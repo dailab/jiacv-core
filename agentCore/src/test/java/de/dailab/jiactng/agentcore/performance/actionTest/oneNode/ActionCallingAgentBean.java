@@ -36,7 +36,7 @@ public class ActionCallingAgentBean extends AbstractMethodExposingBean{
 	
 	/**
 	 * initialize the agent
-	 * @param number actions to call
+	 * @param actionsToCall number actions to call
 	 */
 	public void initialize(int actionsToCall){
 		this.actionsToCall = actionsToCall;
@@ -82,7 +82,6 @@ public class ActionCallingAgentBean extends AbstractMethodExposingBean{
 	
 	/**
 	 * calls an action with the given name
-	 * @param time of getting the result
 	 */
 	public long callAction(String actionName){
 		Action action = new Action(actionName);
@@ -123,7 +122,7 @@ public class ActionCallingAgentBean extends AbstractMethodExposingBean{
 	
 	/**
 	 * own action from the node
-	 * @param current time
+	 * @param time current time
 	 * @return difference of the current time and the given time
 	 */
 	@Expose (name = ActionTestOneNode.CALCULATE_ACTION_CALLING_TIME_ONE, scope = ActionScope.GLOBAL)
@@ -133,8 +132,7 @@ public class ActionCallingAgentBean extends AbstractMethodExposingBean{
 	
 	/**
 	 * own action from the node asynchrony
-	 * @param current time
-	 * @return difference of the current time and the given time
+	 * @param time current time
 	 */
 	@Expose (name = ActionTestOneNode.CALCULATE_ACTION_CALLING_TIME_ONE_ASYNC, scope = ActionScope.GLOBAL)
 	public void calculateActionCallingTimeOneAsync(long time){

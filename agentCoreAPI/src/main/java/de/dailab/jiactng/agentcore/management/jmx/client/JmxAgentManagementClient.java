@@ -182,7 +182,7 @@ public class JmxAgentManagementClient extends JmxAbstractManagementClient {
 	 * @throws IOException A communication problem occurred when invoking the method of the remote agent.
 	 * @throws SecurityException if the agent's attribute cannot be changed for security reasons.
 	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
-	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#setLogLevelInheritance(boolean)
+	 * @see de.dailab.jiactng.agentcore.lifecycle.AbstractLifecycleMBean#setLogLevelInheritance(Boolean)
 	 */
 	public final void setAgentLogLevelInheritance(boolean inheritance) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
 		setAttribute("LogLevelInheritance", (Boolean) inheritance);

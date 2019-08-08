@@ -56,7 +56,7 @@ public class SendAgentBean extends AbstractAgentBean{
 	
 	/**
 	 * initialize the agent
-	 * @param number of messages to send
+	 * @param messagesToSend number of messages to send
 	 */
 	public void initialize(int messagesToSend){
 		this.messagesToSend = messagesToSend;
@@ -73,7 +73,6 @@ public class SendAgentBean extends AbstractAgentBean{
 	
 	/**
 	 * method for sending a message
-	 * @param message to send
 	 */
 	public void sendTime(){
 		List<IAgentDescription> agents = 

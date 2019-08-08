@@ -310,9 +310,6 @@ public class ActionTestOneNode {
 	
 	/**
 	 * generates a line of the csv file and save it in output
-	 * @param order in csv file
-	 * @param number of agents
-	 * @param times
 	 */
 	public void generateCsvOutput(int order, String sync, String numberOfAgents, long[] times){	
 		long totalTime = 0;

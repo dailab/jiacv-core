@@ -49,9 +49,6 @@ public class JARClassLoader extends URLClassLoader {
 
     // -- add urls / jars
 
-	/**
-	 * {@inheritDoc}
-	 */
     @Override
     public void addURL(URL url) {
         super.addURL(url);

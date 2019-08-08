@@ -20,9 +20,6 @@ public interface IAgentGroup {
 	 */
 	void setName(String name);
 
-	/**
-	 * {@inheritDoc}
-	 */
 	void addMember(IAgent member);
 
 	/**
@@ -32,14 +29,8 @@ public interface IAgentGroup {
 	 */
 	boolean removeMember(IAgent member);
 
-	/**
-	 * {@inheritDoc}
-	 */
 	List<IAgent> getMembers();
 
-	/**
-	 * {@inheritDoc}
-	 */
 	void setMembers(List<IAgent> members);
 
 	List<AgentRoleCardinality> getStructure();

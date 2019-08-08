@@ -18,7 +18,7 @@ public class TestBean extends AbstractMethodExposingBean {
 
 	/**
 	 * Invokes the test action synchronously and stores the result in the attribute <code>actions</code>.
-	 * @see de.dailab.jiactng.agentcore.AbstractAgentBean#invokeAndWaitForResult(Action,Serializable[])
+	 * @see de.dailab.jiactng.agentcore.AbstractAgentBean#invokeAndWaitForResult(IActionDescription,Serializable[])
 	 * @see #actions
 	 */
 	public void invokeTestAction() {

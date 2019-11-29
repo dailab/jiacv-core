@@ -35,7 +35,7 @@ public class ActionCallingAgentBean extends AbstractMethodExposingBean{
 	
 	/**
 	 * initialize the agent
-	 * @param number actions to call
+	 * @param actionsToCall number actions to call
 	 */
 	public void initialize(int actionsToCall){
 		this.actionsToCall = actionsToCall;
@@ -63,7 +63,6 @@ public class ActionCallingAgentBean extends AbstractMethodExposingBean{
 	
 	/**
 	 * calls an action with the given name
-	 * @param time of getting the result
 	 */
 	public long callAction(String actionName){
 		Action action = new Action(actionName);

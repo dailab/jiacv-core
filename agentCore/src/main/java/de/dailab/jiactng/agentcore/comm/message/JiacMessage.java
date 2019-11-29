@@ -262,7 +262,6 @@ public final class JiacMessage implements IJiacMessage {
    
    /**
     * Set the group of this message.
-    * @param sender the communication address of the sender
     */
    public void setGroup(String group) {
       setHeader(Header.GROUP, group);

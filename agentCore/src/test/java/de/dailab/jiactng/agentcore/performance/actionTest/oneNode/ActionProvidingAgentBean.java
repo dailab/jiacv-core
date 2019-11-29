@@ -30,7 +30,6 @@ public class ActionProvidingAgentBean extends AbstractMethodExposingBean{
 	
 	/**
 	 * initialize the agent
-	 * @param actions to call
 	 */
 	public void inititialize(int actionsToCall){
 		this.actionsToCall = actionsToCall;
@@ -56,7 +55,7 @@ public class ActionProvidingAgentBean extends AbstractMethodExposingBean{
 	
 	/**
 	 * asynchron action
-	 * @param current time
+	 * @param time current time
 	 * @return difference of the current time and the given time
 	 */
 	@Expose (name = ActionTestOneNode.CALCULATE_ACTION_CALLING_TIME_TWO_ASYNC, scope = ActionScope.GLOBAL)

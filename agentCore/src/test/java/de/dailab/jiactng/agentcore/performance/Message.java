@@ -25,7 +25,6 @@ public class Message implements IFact{
 	
 	/**
 	 * constructor of this class
-	 * @param message
 	 */
 	public Message(long timeStamp){
 		this.timeStamp = timeStamp;

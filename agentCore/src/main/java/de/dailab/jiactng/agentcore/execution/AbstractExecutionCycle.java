@@ -57,7 +57,7 @@ public abstract class AbstractExecutionCycle extends AbstractAgentBean implement
     * @throws Exception if the execution cycle can not be started.
     * @see AbstractAgentBean#doStart()
     * @see #setUseRemoteExecutor(boolean)
-    * @see RemoteExecutor#RemoteExecutor(de.dailab.jiactng.agentcore.knowledge.IMemory, org.apache.commons.logging.Log)
+    * @see RemoteExecutor#RemoteExecutor(de.dailab.jiactng.agentcore.knowledge.IMemory, org.apache.log4j.Logger))
     */
    @Override
    public void doStart() throws Exception {

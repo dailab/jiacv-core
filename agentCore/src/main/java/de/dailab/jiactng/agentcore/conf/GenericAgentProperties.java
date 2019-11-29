@@ -82,7 +82,7 @@ public class GenericAgentProperties {
 	 * FIXED: Seems like #{count} is some sort of Spring reserved syntax, so changed this to
 	 * just use StringFormat syntax, i.e. the running number has to be denoted using "%d"
 	 * 
-	 * Example: agentNamePattern = "MyAgent_%d" -> "MyAgent_1", "MyAgent_2", "MyAgent_3"
+	 * Example: agentNamePattern = "MyAgent_%d" becomes "MyAgent_1", "MyAgent_2", "MyAgent_3"
 	 * 
 	 * @param number the number of the current iteration cycle or any other number if wanted
 	 * @return A name that is created by replacing any occurrence of "#{count}" with the number.

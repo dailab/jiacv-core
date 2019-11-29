@@ -251,9 +251,9 @@ public class MessageTestOneNode {
 	
 	/**
 	 * generates a line of the csv file and save it in output
-	 * @param order in csv file
-	 * @param synchronizes or not
-	 * @param times
+	 * @param order order in csv file
+	 * @param sync synchronizes or not
+	 * @param times times
 	 */
 	public void generateCsvOutput(int order, String sync, long[] times){	
 		long totalTime = 0;

@@ -65,7 +65,7 @@ public class ReceiveAgentBean extends AbstractAgentBean{
 	
 	/**
 	 * initialize the agent
-	 * @param number of messages which are expected
+	 * @param messagesToReceive	number of messages which are expected
 	 */
 	public void initialize(int messagesToReceive){
 		this.messagesToReceive = messagesToReceive;
@@ -88,7 +88,7 @@ public class ReceiveAgentBean extends AbstractAgentBean{
 	}
 
 	/**
-	 * @param sets the number of messages which are expected
+	 * @param messagesToReceive sets the number of messages which are expected
 	 */
 	public void setMessagesToReceive(int messagesToReceive) {
 		this.messagesToReceive = messagesToReceive;

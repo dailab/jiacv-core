@@ -186,6 +186,7 @@ public class Action implements IActionDescription {
 	 */
 	public Action(final CompositeData descr) {
 		this.name = (String) descr.get(IActionDescription.ITEMNAME_NAME);
+		this.inputNames = Arrays.asList((String[]) descr.get(IActionDescription.ITEMNAME_INPUTNAMES));
 		this.inputTypeNames = Arrays.asList((String[]) descr.get(IActionDescription.ITEMNAME_INPUTTYPES));
 		this.resultTypeNames = Arrays.asList((String[]) descr.get(IActionDescription.ITEMNAME_RESULTTYPES));
 		final String actionScope = (String) descr.get(IActionDescription.ITEMNAME_SCOPE);
@@ -196,8 +197,10 @@ public class Action implements IActionDescription {
 		if (provider != null) {
 			this.providerDescription = new AgentDescription(provider);
 		}
+		this.semanticServiceDescriptionIRI = (String) descr.get(IActionDescription.ITEMNAME_SEMURI);
 		this.tags = Arrays.asList((String[]) descr.get(IActionDescription.ITEMNAME_TAGS));
 		this.documentation = (String) descr.get(IActionDescription.ITEMNAME_DOC);
+		this.actionType = (String) descr.get(IActionDescription.ITEMNAME_TYPE);
 	}
 
 	/**
@@ -532,10 +535,12 @@ public class Action implements IActionDescription {
 
 		return EqualityChecker.equals(this.getName(), other.getName())
 		      && EqualityChecker.equals(this.getDocumentation(), other.getDocumentation())
+		      && EqualityChecker.equals(this.getInputNames(), other.getInputNames())
 		      && EqualityChecker.equals(this.getInputTypeNames(), other.getInputTypeNames())
 		      && EqualityChecker.equals(this.getResultTypeNames(), other.getResultTypeNames())
 		      && EqualityChecker.equals(this.getTags(), other.getTags())
-		      && EqualityChecker.equals(this.getSemanticServiceDescriptionIRI(), other.getSemanticServiceDescriptionIRI());
+		      && EqualityChecker.equals(this.getSemanticServiceDescriptionIRI(), other.getSemanticServiceDescriptionIRI())
+		      && EqualityChecker.equals(this.getActionType(), other.getActionType());
 	}
 	
 	@Override
@@ -558,9 +563,11 @@ public class Action implements IActionDescription {
 
 		return EqualityChecker.equalsOrOtherNull(this.getName(), template.getName()) &&
 				EqualityChecker.equalsOrOtherNull(this.getDocumentation(), template.getDocumentation()) &&
+				EqualityChecker.equalsOrOtherNull(this.getInputNames(), template.getInputNames()) && 
 				EqualityChecker.equalsOrOtherNull(this.getInputTypeNames(), template.getInputTypeNames()) && 
 				EqualityChecker.equalsOrOtherNull(this.getResultTypeNames(), template.getResultTypeNames()) && 
-				EqualityChecker.equalsOrOtherNull(this.getSemanticServiceDescriptionIRI(), template.getSemanticServiceDescriptionIRI());
+				EqualityChecker.equalsOrOtherNull(this.getSemanticServiceDescriptionIRI(), template.getSemanticServiceDescriptionIRI()) &&
+				EqualityChecker.equalsOrOtherNull(this.getActionType(), template.getActionType());
 	}
 
 	/**
@@ -573,13 +580,13 @@ public class Action implements IActionDescription {
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Action:\n name='").append(this.name).append("'");
-		builder.append("\n parameters=").append(this.inputTypeNames);
 		builder.append("\n paramNames=").append(this.inputNames);
+		builder.append("\n parameters=").append(this.inputTypeNames);
 		builder.append("\n results=").append(this.resultTypeNames);
 		builder.append("\n bean=");
 		builder.append(this.providerBean);
 
-		builder.append("\n provider =");
+		builder.append("\n provider=");
 		if (this.providerDescription != null) {
 			builder.append(this.providerDescription.getName()).append("(").append(this.providerDescription.getAid()).append(")");
 		}
@@ -590,6 +597,7 @@ public class Action implements IActionDescription {
 		builder.append("\n IRI=").append(this.semanticServiceDescriptionIRI);
 		builder.append("\n tags=").append(this.tags);
 		builder.append("\n documentation=").append(this.documentation);
+		builder.append("\n action type=").append(this.actionType);
 		builder.append("\n");
 
 		return builder.toString();
@@ -638,17 +646,17 @@ public class Action implements IActionDescription {
 	}
 
 	private String[] getItemNames() {
-		return new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTTYPES,
-		      IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_SCOPE, IActionDescription.ITEMNAME_BEAN,
-		      IActionDescription.ITEMNAME_AGENT, IActionDescription.ITEMNAME_SEMURI,
-		      IActionDescription.ITEMNAME_TAGS, IActionDescription.ITEMNAME_DOC};
+		return new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTNAMES, 
+			  IActionDescription.ITEMNAME_INPUTTYPES, IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_SCOPE, 
+			  IActionDescription.ITEMNAME_BEAN, IActionDescription.ITEMNAME_AGENT, IActionDescription.ITEMNAME_SEMURI,
+		      IActionDescription.ITEMNAME_TAGS, IActionDescription.ITEMNAME_DOC, IActionDescription.ITEMNAME_TYPE};
 	}
 
 	/**
 	 * Gets the type of JIAC action descriptions based on JMX open types.
 	 * 
-	 * @return A composite type containing action name, input types, result types, scope, provider bean, and provider
-	 *         agent.
+	 * @return A composite type containing action name, input names, input types, result types, scope, provider bean, provider
+	 *         agent, semantic URI, tags, documentation, and action type.
 	 * @throws OpenDataException
 	 *            if an error occurs during the creation of the type.
 	 * @see javax.management.openmbean.CompositeType
@@ -657,12 +665,14 @@ public class Action implements IActionDescription {
 		final OpenType<?>[] itemTypes = new OpenType<?>[] {
 			SimpleType.STRING, 
 			new ArrayType<SimpleType<String>>(SimpleType.STRING, false),
+			new ArrayType<SimpleType<String>>(SimpleType.STRING, false),
 			new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
 			SimpleType.STRING, 
 			SimpleType.STRING,
 			(this.providerDescription != null) ? this.providerDescription.getDescriptionType() : SimpleType.VOID,
 			SimpleType.STRING,
 			new ArrayType<SimpleType<String>>(SimpleType.STRING, false), 
+			SimpleType.STRING,
 			SimpleType.STRING
 		};
 
@@ -685,6 +695,7 @@ public class Action implements IActionDescription {
 	public Object getDescription() throws OpenDataException {
 		final Object[] itemValues = new Object[] { 
 			this.name, 
+			this.inputNames.toArray(new String[this.inputNames.size()]),
 			this.inputTypeNames.toArray(new String[this.inputTypeNames.size()]),
 			this.resultTypeNames.toArray(new String[this.resultTypeNames.size()]), 
 			this.scope != null ? this.scope.toString() : null,
@@ -692,7 +703,8 @@ public class Action implements IActionDescription {
 			this.providerDescription != null ? this.providerDescription.getDescription() : null,
 			this.semanticServiceDescriptionIRI,
 			this.tags != null ? this.tags.toArray(new String[this.tags.size()]) : null,
-			this.documentation
+			this.documentation,
+			this.actionType
 		};
 
 		final CompositeType type = (CompositeType) this.getDescriptionType();

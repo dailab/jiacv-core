@@ -25,6 +25,9 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	/** Item name which can be used to get the name of the JMX-based action description. */
 	String ITEMNAME_NAME = "name";
 
+	/** Item name which can be used to get the input names of the JMX-based action description. */
+	String ITEMNAME_INPUTNAMES = "input names";
+
 	/** Item name which can be used to get the input types of the JMX-based action description. */
 	String ITEMNAME_INPUTTYPES = "input types";
 
@@ -40,14 +43,17 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	/** Item name which can be used to get the providing agent of the JMX-based action description. */
 	String ITEMNAME_AGENT = "agent";
 	
-	/** Item name which can be used to get the semantic service description URI for the current action*/
+	/** Item name which can be used to get the semantic service description URI of the JMX-based action description. */
 	String ITEMNAME_SEMURI = "semuri";
 
-	/** Item name which can be used to get the tags for the current action*/
+	/** Item name which can be used to get the tags of the JMX-based action description. */
 	String ITEMNAME_TAGS = "tags";
 
-	/** Item name which can be used to get the documentation for the current action*/
+	/** Item name which can be used to get the documentation of the JMX-based action description. */
 	String ITEMNAME_DOC = "documentation";
+
+	/** Item name which can be used to get the type of the JMX-based action description. */
+	String ITEMNAME_TYPE = "action type";
 
 	/**
 	 * This method returns the name of the action this description refers to.

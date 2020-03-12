@@ -210,7 +210,8 @@ public class AgentDescription implements IAgentDescription {
         		EqualityChecker.equals(name, other.getName()) &&
         		EqualityChecker.equals(owner, other.getOwner()) &&
         		EqualityChecker.equals(messageBoxAddress, other.getMessageBoxAddress()) && 
-        		EqualityChecker.equals(agentNodeUUID, other.getAgentNodeUUID());
+        		EqualityChecker.equals(agentNodeUUID, other.getAgentNodeUUID()) &&
+        		EqualityChecker.equals(isMobile, other.isMobile());
     }
     
     @Override
@@ -222,7 +223,8 @@ public class AgentDescription implements IAgentDescription {
         		EqualityChecker.equalsOrOtherNull(name, template.getName()) &&
         		EqualityChecker.equalsOrOtherNull(owner, template.getOwner()) &&
         		EqualityChecker.equalsOrOtherNull(messageBoxAddress, template.getMessageBoxAddress()) && 
-        		EqualityChecker.equalsOrOtherNull(agentNodeUUID, template.getAgentNodeUUID());
+        		EqualityChecker.equalsOrOtherNull(agentNodeUUID, template.getAgentNodeUUID()) &&
+        		EqualityChecker.equalsOrOtherNull(isMobile, template.isMobile());
     }
 
     /**
@@ -272,6 +274,14 @@ public class AgentDescription implements IAgentDescription {
         builder.append("\n state=");
         if (state != null) {
         	builder.append("'").append(state).append("'");
+        } else {
+        	builder.append("null");
+        }
+
+        // node
+        builder.append("\n node=");
+        if (agentNodeUUID != null) {
+        	builder.append("'").append(agentNodeUUID).append("'");
         } else {
         	builder.append("null");
         }

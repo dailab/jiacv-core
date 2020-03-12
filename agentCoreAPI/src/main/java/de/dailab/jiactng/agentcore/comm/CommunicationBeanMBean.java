@@ -22,4 +22,18 @@ public interface CommunicationBeanMBean extends AbstractMethodExposingBeanMBean 
 	 * lists of the selectors of the corresponding listeners.
 	 */
 	CompositeData getSelectorsOfAddresses();
+
+    /**
+     * Checks, if messages of type <code>BytesMessage</code> or <code>ObjectMessage</code> will be send. 
+     * @return <code>true</code> if bytes messages will be send, which can be handled by the broker 
+     * 	without knowing the classes of the message content
+     */
+    boolean isSerialization();
+
+    /**
+     * Sets, if messages of type <code>BytesMessage</code> or <code>ObjectMessage</code> will be send.
+     * @param serialization <code>true</code> if bytes messages will be send, which can be handled 
+     * 	by the broker without knowing the classes of the message content
+     */
+    void setSerialization(boolean serialization);
 }

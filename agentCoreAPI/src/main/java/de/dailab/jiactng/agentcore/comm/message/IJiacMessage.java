@@ -46,6 +46,9 @@ public interface IJiacMessage extends IFact, JmxDescriptionSupport {
 
         /** Key of the message header field which defines the receiver address of the message. */
         String SEND_TO = "JiacTNGSendToAddress";
+
+        /** Key of the message header field which defines that the payload is converted to BinaryContent. */
+        String BINARY_CONTENT = "JiacTNGBinaryContent";
     }
 
 
@@ -82,7 +85,13 @@ public interface IJiacMessage extends IFact, JmxDescriptionSupport {
      * @return the protocol
      */
     String getProtocol();
-    
+
+    /**
+     * Checks whether the payload is converted to BinaryContent.
+     * @return <code>true</code> if the payload is converted
+     */
+    boolean hasBinaryContent();
+
     /**
      * Set a header for this message
      * @param key       the key for the header

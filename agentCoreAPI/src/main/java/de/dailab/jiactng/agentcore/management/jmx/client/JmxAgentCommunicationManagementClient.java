@@ -3,6 +3,7 @@ package de.dailab.jiactng.agentcore.management.jmx.client;
 import java.io.IOException;
 
 import javax.management.InstanceNotFoundException;
+import javax.management.InvalidAttributeValueException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
 import javax.management.NotificationListener;
@@ -52,4 +53,32 @@ public class JmxAgentCommunicationManagementClient extends JmxAbstractManagement
 		removeNotificationListener(listener, filter);
 	}
 
+    /**
+     * Checks, if messages of type <code>BytesMessage</code> or <code>ObjectMessage</code> will be send. 
+     * @return <code>true</code> if bytes messages will be send, which can be handled by the broker 
+     * 	without knowing the classes of the message content
+	 * @throws InstanceNotFoundException The agent communication bean does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent communication bean.
+	 * @throws SecurityException if the agent communication bean's attribute cannot be read for security reasons.
+	 * @see MBeanServerConnection#getAttribute(ObjectName, String)
+	 * @see de.dailab.jiactng.agentcore.comm.CommunicationBeanMBean#isSerialization()
+     */
+    public final boolean isSerialization() throws IOException, InstanceNotFoundException {
+    	return ((Boolean) getAttribute("Serialization")).booleanValue();
+    }
+
+    /**
+     * Sets, if messages of type <code>BytesMessage</code> or <code>ObjectMessage</code> will be send.
+     * @param serialization <code>true</code> if bytes messages will be send, which can be handled 
+     * 	by the broker without knowing the classes of the message content
+	 * @throws InvalidAttributeValueException The value specified for the attribute is not valid.
+	 * @throws InstanceNotFoundException The agent communication bean does not exist on the managed agent node. 
+	 * @throws IOException A communication problem occurred when invoking the method of the remote agent communication bean.
+	 * @throws SecurityException if the agent communication bean's attribute cannot be changed for security reasons.
+	 * @see MBeanServerConnection#setAttribute(ObjectName, Attribute)
+	 * @see de.dailab.jiactng.agentcore.comm.CommunicationBeanMBean#setSerialization(boolean)
+     */
+    public final void setSerialization(boolean serialization) throws IOException, InstanceNotFoundException, InvalidAttributeValueException {
+    	setAttribute("Serialization", Boolean.valueOf(serialization));
+    }
 }

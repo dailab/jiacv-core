@@ -253,6 +253,27 @@ public final class JiacMessage implements IJiacMessage {
    }
 
    /**
+    * Sets that the payload is converted to BinaryContent.
+    * @param binaryContentFlag <code>true</code> if the payload is converted
+    */
+   public void setBinaryContent(boolean binaryContentFlag) {
+	   if (binaryContentFlag) {
+		   setHeader(Header.BINARY_CONTENT, "true");
+	   }
+	   else {
+		   headers.remove(Header.BINARY_CONTENT);
+	   }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   public boolean hasBinaryContent() {
+	   return headers.keySet().contains(Header.BINARY_CONTENT) && 
+			   headers.get(Header.BINARY_CONTENT).equals("true");
+   }
+
+   /**
     * Set the sender of this message.
     * @param sender the communication address of the sender
     */

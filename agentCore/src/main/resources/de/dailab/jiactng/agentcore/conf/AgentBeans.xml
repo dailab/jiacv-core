@@ -61,6 +61,16 @@
 		</property>
 	</bean>
 	
+	<!--
+		This standard communication component uses a JMSMessageTransport to exchange messages,
+		but converts its payload to BinaryContent.
+		See the documentation of the referenced bean to ensure the functionality!
+	-->
+	<bean name="ByteArrayCommunicationBean" parent="CommunicationBean" scope="prototype" >
+<!--	lazy-init="true">-->
+		<property name="serialization" value="true"/>
+	</bean>
+	
 	
 </beans>
 

@@ -3,6 +3,13 @@
  */
 package de.dailab.jiactng.agentcore.comm;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
+import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,10 +35,12 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import de.dailab.jiactng.agentcore.action.AbstractMethodExposingBean;
+import de.dailab.jiactng.agentcore.comm.message.BinaryContent;
 import de.dailab.jiactng.agentcore.comm.message.IJiacMessage;
 import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport;
 import de.dailab.jiactng.agentcore.comm.transport.MessageTransport.IMessageTransportDelegate;
+import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.management.Manager;
 import de.dailab.jiactng.agentcore.management.jmx.MessageExchangeNotification;
 import de.dailab.jiactng.agentcore.management.jmx.MessageExchangeNotification.MessageExchangeAction;
@@ -45,7 +54,11 @@ import de.dailab.jiactng.agentcore.management.jmx.MessageExchangeNotification.Me
  * @version $Revision$
  */
 public final class CommunicationBean extends AbstractMethodExposingBean implements ICommunicationBean, CommunicationBeanMBean {
-    /**
+
+	/* If true, message payload will be converted to BinaryContent. */
+	private boolean serialization = false;
+
+	/**
      * a save way to cast from object to targetType
      * 
      * @param <T>
@@ -438,6 +451,17 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
      * @see de.dailab.jiactng.agentcore.knowledge.Memory#write(de.dailab.jiactng.agentcore.knowledge.IFact)
      */
     protected void processMessage(MessageTransport source, IJiacMessage message, CommunicationAddress at) {
+		// convert BinaryContent to IFact
+        if (message.hasBinaryContent()) {
+        	try {
+        		message = convertFromBinaryContent((JiacMessage)message);
+        	}
+        	catch (Exception e) {
+        		log.error("Unable to convert binary content to object.", e);
+        		return;
+        	}
+        }					
+
     	// notification about receiving message
         messageExchanged(MessageExchangeAction.RECEIVE, at, message, source.getTransportIdentifier());
     	
@@ -484,6 +508,18 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         // set the sender of the message
         message.setSender(thisAgent.getAgentDescription().getMessageBoxAddress());
 
+		// convert IFact to binary content
+        JiacMessage convertedMessage = message;
+	    if (serialization) {
+	    	try {
+	    		convertedMessage = convertToBinaryContent(message);
+	    	}
+	    	catch (Exception e) {
+		  		log.error("Unable to convert object to binary content.", e);
+	    		throw new CommunicationException("Unable to convert object to binary content.", e);
+	    	}
+	    }
+
         if (address instanceof MessageBoxAddress) {
             if (log.isDebugEnabled()) {
                 log.debug("address is a message box address -> choosing one transport");
@@ -499,7 +535,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             }
 
             if (transport != null) {
-                transport.send(message, unboundAddress, timeToLive);
+                transport.send(convertedMessage, unboundAddress, timeToLive);
                 // notification about sending message
                 messageExchanged(MessageExchangeAction.SEND, unboundAddress, message, transport.getTransportIdentifier());
             } else {
@@ -511,7 +547,7 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
             }
             // 1:n communication
             for (MessageTransport transport : transports.values()) {
-                transport.send(message, unboundAddress, timeToLive);
+                transport.send(convertedMessage, unboundAddress, timeToLive);
                 // notification about sending message
                 messageExchanged(MessageExchangeAction.SEND, unboundAddress, message, transport.getTransportIdentifier());
             }
@@ -862,6 +898,81 @@ public final class CommunicationBean extends AbstractMethodExposingBean implemen
         result[size] = info;
         return result;
     }    
+
+	/**
+	 * {@inheritDoc}
+	 */
+    public boolean isSerialization() {
+ 	   return serialization;
+    }
+
+	/**
+	 * {@inheritDoc}
+	 */
+    public void setSerialization(boolean serialization) {
+ 	   this.serialization = serialization;
+    }
+
+    /*
+	 * Creates a copy of a message, but with converted payload from object to binary content and with a corresponding header information.
+	 */
+	private JiacMessage convertToBinaryContent(JiacMessage message) throws IOException {
+		JiacMessage result = new JiacMessage();
+		for (String key : message.getHeaderKeys()) {
+			result.setHeader(key, message.getHeader(key));
+		}
+
+      	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      	ObjectOutputStream oos = new ObjectOutputStream(baos);
+      	oos.writeObject(message.getPayload());
+      	result.setPayload(new BinaryContent(baos.toByteArray()));
+    	result.setBinaryContent(true);
+
+    	return result;
+	}
+
+	/*
+	 * Creates a copy of a message, but with converted payload from binary content to object and without the corresponding header information.
+	 */
+	private JiacMessage convertFromBinaryContent(JiacMessage message) throws IOException, ClassNotFoundException {
+		JiacMessage result = new JiacMessage();
+		for (String key : message.getHeaderKeys()) {
+			result.setHeader(key, message.getHeader(key));
+		}
+
+		ByteArrayInputStream bais = new ByteArrayInputStream(((BinaryContent)message.getPayload()).getData());
+    	final ClassLoader cl = (thisAgent.getClassLoader() == null)? thisAgent.getAgentNode().getClass().getClassLoader() : thisAgent.getClassLoader();
+	  	ObjectInputStream ois = new ObjectInputStream(bais) {
+	  		@Override
+	  		protected Class<?> resolveClass(ObjectStreamClass objectStreamClass)
+	  		        throws IOException, ClassNotFoundException {
+
+	  		    Class<?> clazz = Class.forName(objectStreamClass.getName(), false, cl);
+	  		    if (clazz != null) {
+	  		        return clazz;
+	  		    } else {
+	  		        return super.resolveClass(objectStreamClass);
+	  		    }
+	  		}
+
+	  		@Override
+	  		protected Class<?> resolveProxyClass(String[] interfaces) throws IOException, ClassNotFoundException {
+	  		    Class<?>[] interfaceClasses = new Class[interfaces.length];
+	  		    for (int i = 0; i < interfaces.length; i++) {
+	  		        interfaceClasses[i] = Class.forName(interfaces[i], false, cl);
+	  		    }
+	  		    try {
+	  		        return Proxy.getProxyClass(cl, interfaceClasses);
+	  		    } catch (IllegalArgumentException e) {
+	  		        return super.resolveProxyClass(interfaces);
+	  		    }
+	  		}
+	  	};
+	  	result.setPayload((IFact) ois.readObject());
+	  	result.setBinaryContent(false);
+
+	  	return result;
+	}
 }
 
 class ListenerContext {

@@ -1723,7 +1723,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 				return data;
 			} catch (OpenDataException e) {
-				e.printStackTrace();
+				log.error("Unable to create open data format for known nodes.", e);
 				return null;
 			}
 		}
@@ -1744,18 +1744,14 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 						.getClass().getName(),
 						"local actions stored in the directory",
 						(CompositeType) localActions.iterator().next()
-								.getDescriptionType(), new String[] {
-								IActionDescription.ITEMNAME_NAME,
-								IActionDescription.ITEMNAME_INPUTTYPES,
-								IActionDescription.ITEMNAME_RESULTTYPES,
-								IActionDescription.ITEMNAME_AGENT });
+								.getDescriptionType(), IActionDescription.getItemNames());
 				final TabularData data = new TabularDataSupport(type);
 				for (IActionDescription action : localActions) {
 					data.put((CompositeData) action.getDescription());
 				}
 				return data;
 			} catch (OpenDataException e) {
-				e.printStackTrace();
+				log.error("Unable to create open data format for local actions.", e);
 				return null;
 			}
 		}
@@ -1797,7 +1793,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 				return data;
 			} catch (OpenDataException e) {
-				e.printStackTrace();
+				log.error("Unable to create open data format for local agents.", e);
 				return null;
 			}
 		}
@@ -1844,7 +1840,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 			}
 			return data;
 		} catch (OpenDataException e) {
-			e.printStackTrace();
+			log.error("Unable to create open data format for remote actions.", e);
 			return null;
 		}
 	}
@@ -1885,7 +1881,7 @@ public class DirectoryAgentNodeBean extends AbstractAgentNodeBean implements
 				}
 				return data;
 			} catch (OpenDataException e) {
-				e.printStackTrace();
+				log.error("Unable to create open data format for remote agents.", e);
 				return null;
 			}
 		}

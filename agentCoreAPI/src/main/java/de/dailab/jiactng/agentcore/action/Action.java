@@ -645,13 +645,6 @@ public class Action implements IActionDescription {
 		this.scope = newScope;
 	}
 
-	private String[] getItemNames() {
-		return new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTNAMES, 
-			  IActionDescription.ITEMNAME_INPUTTYPES, IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_SCOPE, 
-			  IActionDescription.ITEMNAME_BEAN, IActionDescription.ITEMNAME_AGENT, IActionDescription.ITEMNAME_SEMURI,
-		      IActionDescription.ITEMNAME_TAGS, IActionDescription.ITEMNAME_DOC, IActionDescription.ITEMNAME_TYPE};
-	}
-
 	/**
 	 * Gets the type of JIAC action descriptions based on JMX open types.
 	 * 
@@ -677,10 +670,10 @@ public class Action implements IActionDescription {
 		};
 
 		// use names of action items as their description
-		final String[] itemDescriptions = this.getItemNames();
+		final String[] itemDescriptions = IActionDescription.getItemNames();
 
 		// create and return open type of a JIAC action
-		return new CompositeType(this.getClass().getName(), "standard JIAC-TNG action", this.getItemNames(), itemDescriptions, itemTypes);
+		return new CompositeType(this.getClass().getName(), "standard JIAC-TNG action", IActionDescription.getItemNames(), itemDescriptions, itemTypes);
 	}
 
 	/**
@@ -694,20 +687,20 @@ public class Action implements IActionDescription {
 	 */
 	public Object getDescription() throws OpenDataException {
 		final Object[] itemValues = new Object[] { 
-			this.name, 
-			this.inputNames.toArray(new String[this.inputNames.size()]),
-			this.inputTypeNames.toArray(new String[this.inputTypeNames.size()]),
-			this.resultTypeNames.toArray(new String[this.resultTypeNames.size()]), 
-			this.scope != null ? this.scope.toString() : null,
-			this.providerBean != null ? this.providerBean.getBeanName() : null,
-			this.providerDescription != null ? this.providerDescription.getDescription() : null,
-			this.semanticServiceDescriptionIRI,
-			this.tags != null ? this.tags.toArray(new String[this.tags.size()]) : null,
-			this.documentation,
-			this.actionType
+			name, 
+			inputNames != null ? inputNames.toArray(new String[inputNames.size()]) : null,
+			inputTypeNames != null ? inputTypeNames.toArray(new String[inputTypeNames.size()]) : null,
+			resultTypeNames != null ? resultTypeNames.toArray(new String[resultTypeNames.size()]) : null, 
+			scope != null ? scope.toString() : null,
+			providerBean != null ? providerBean.getBeanName() : null,
+			providerDescription != null ? providerDescription.getDescription() : null,
+			semanticServiceDescriptionIRI,
+			tags != null ? tags.toArray(new String[tags.size()]) : null,
+			documentation,
+			actionType
 		};
 
 		final CompositeType type = (CompositeType) this.getDescriptionType();
-		return new CompositeDataSupport(type, this.getItemNames(), itemValues);
+		return new CompositeDataSupport(type, IActionDescription.getItemNames(), itemValues);
 	}
 }

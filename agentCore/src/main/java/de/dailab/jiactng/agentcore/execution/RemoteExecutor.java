@@ -19,6 +19,7 @@ import de.dailab.jiactng.agentcore.comm.message.JiacMessage;
 import de.dailab.jiactng.agentcore.environment.ResultReceiver;
 import de.dailab.jiactng.agentcore.knowledge.IFact;
 import de.dailab.jiactng.agentcore.knowledge.IMemory;
+import de.dailab.jiactng.agentcore.ontology.ThisAgentDescription;
 
 /**
  * Handles remote agent action invocation.
@@ -50,6 +51,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 	 * Default constructor. Starts listening to special JiacMessages.
 	 * 
 	 * @param memory the space to listen to
+	 * @param log the logger to be used
 	 * @see IMemory
 	 */
 	public RemoteExecutor(IMemory memory, Logger log) {
@@ -78,7 +80,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 					if (message.getPayload() instanceof DoAction) {
 						final DoAction doAction = (DoAction) message.getPayload();
 						Action a = new Action((Action)doAction.getAction());
-						a.setProviderDescription(((Action)doAction.getAction()).getProviderDescription());
+						a.setProviderDescription(new ThisAgentDescription(((Action)doAction.getAction()).getProviderDescription().getAid(),null,null,null,null,null));
 						final Action localAction = (Action) memory.read(a);
 
 						if (localAction != null) {
@@ -108,7 +110,7 @@ public class RemoteExecutor implements SpaceObserver<IFact>, ResultReceiver {
 					}
 					
 					else {
-						System.err.println("Got strange message: " + message.toString());
+						log.error("Got strange message: " + message.toString());
 					}
 				}
 			}

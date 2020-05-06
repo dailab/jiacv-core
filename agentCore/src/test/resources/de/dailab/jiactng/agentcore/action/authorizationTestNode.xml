@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/AgentNode.xml" />
+	<import resource="classpath:de/dailab/jiactng/agentcore/conf/Agent.xml" />
+
+	<bean name="myNode" parent="NodeWithDirectory">
+		<property name="agents">
+			<list>
+				<ref bean="UserAgent" />
+				<ref bean="ProviderAgent" />
+			</list>
+		</property>
+	</bean>
+
+
+	<bean name="UserAgent" parent="ReactiveAgent">
+      <property name="executionInterval" value="10000"/>
+  	  <property name="agentBeans">
+	    <list>
+		  <ref bean="userBean" />
+        </list>
+	  </property>
+	</bean>
+
+	<bean name="ProviderAgent" parent="ReactiveAgent">
+      <property name="executionInterval" value="10000"/>
+  	  <property name="agentBeans">
+	    <list>
+		  <ref bean="providerBean" />
+		  <ref bean="authorizationBean" />
+        </list>
+	  </property>
+	</bean>
+
+	<bean name="userBean"
+		class="de.dailab.jiactng.agentcore.action.AuthorizedActionCallerBean">
+	</bean>
+
+	<bean name="providerBean"
+		class="de.dailab.jiactng.agentcore.action.AuthorizedActionBean">
+      <property name="authorizationActionName" value="AuthorizationBean.authorize"/>
+	</bean>
+
+	<bean name="authorizationBean"
+		class="de.dailab.jiactng.agentcore.action.AuthorizationBean">
+	</bean>
+
+</beans>

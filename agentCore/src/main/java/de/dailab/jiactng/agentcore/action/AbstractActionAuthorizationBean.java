@@ -15,7 +15,7 @@ import de.dailab.jiactng.agentcore.ontology.IActionDescription;
  * 
  * @author Jan Keiser
  */
-public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean implements IEffector, ResultReceiver, AbstractActionAuthorizationBeanMBean {
+public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean implements IEffector, AbstractActionAuthorizationBeanMBean {
 
    /**
     * Name of action to be used for authorization.
@@ -74,11 +74,7 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
 	  authorizationActionName = newAuthorizationActionName;
       authorizationAction = null;
 
-      // // search for authorization action
-      // if ((newAuthorizationActionName != null) && getState().equals(LifecycleStates.STARTED)) {
-      // invokeActionSearch(newAuthorizationActionName, false, 0, this);
-      // }
-
+      // search for authorization action
       if ((thisAgent != null) && (LifecycleStates.STARTED.equals(thisAgent.getState()))) {
          final List<IActionDescription> foundActs = thisAgent.searchAllActions(new Action(newAuthorizationActionName));
          if (log.isDebugEnabled()) {
@@ -104,45 +100,6 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
    }
 
    /**
-    * {@inheritDoc}
-    */
-   public void receiveResult(ActionResult result) {
-      // handle result of authorization
-      final DoAction doAction = doActionAuthorizations.remove(result.getSessionId());
-      if (doAction != null) {
-         final Serializable[] results = result.getResults();
-         if (results != null) {
-            if (results.length == 1) {
-               try {
-                  if ((String) results[0] != null) {
-                     // authorization successful => invoke service
-                     try {
-                        doAction.getSession().setOriginalUser((String) results[0]);
-                        doAction(doAction);
-                     } catch (Throwable t) {
-                        returnFailure(doAction, t);
-                        log.error("--- action failed: " + doAction.getAction().getName() + " (" + doAction.getSessionId() + ")", t);
-                     }
-                  } else {
-                     // user is not authorized
-                     returnFailure(doAction, "Not authorized");
-                  }
-               } catch (ClassCastException e) {
-                  log.error("Got wrong type of authorization results");
-                  returnFailure(doAction, "Unable to authorize");
-               }
-            } else {
-               log.error("Got wrong number of authorization results");
-               returnFailure(doAction, "Unable to authorize");
-            }
-         } else {
-            log.error("Authorization action failed");
-            returnFailure(doAction, "Unable to authorize");
-         }
-      }
-   }
-
-   /**
     * Starts the authorization action if defined in property "authorizationActionName".
     * 
     * @param doAction the action invocation for which the authorization will be executed.
@@ -160,8 +117,51 @@ public abstract class AbstractActionAuthorizationBean extends AbstractAgentBean 
          returnFailure(doAction, "Unknown user token");
       } else {
          // start authorization
-         final String sessionId = invoke(authorizationAction, doAction.getSession(), new Serializable[] { doAction.getSession().getUserToken(), doAction.getAction() }, this);
+         final String sessionId = invoke(authorizationAction, doAction.getSession(), new Serializable[] { doAction.getSession().getUserToken(), doAction.getAction() }, new AuthorizationResultReceiver());
          doActionAuthorizations.put(sessionId, doAction);
       }
    }
+
+   private class AuthorizationResultReceiver implements ResultReceiver {
+
+	   /**
+	    * {@inheritDoc}
+	    */
+	   public void receiveResult(ActionResult result) {
+	      // handle result of authorization
+	      final DoAction doAction = doActionAuthorizations.remove(result.getSessionId());
+	      if (doAction != null) {
+	         final Serializable[] results = result.getResults();
+	         if (results != null) {
+	            if (results.length == 1) {
+	               try {
+	                  if ((String) results[0] != null) {
+	                     // authorization successful => invoke service
+	                     try {
+	                        doAction.getSession().setOriginalUser((String) results[0]);
+	                        doAction(doAction);
+	                     } catch (Throwable t) {
+	                        returnFailure(doAction, t);
+	                        log.error("--- action failed: " + doAction.getAction().getName() + " (" + doAction.getSessionId() + ")", t);
+	                     }
+	                  } else {
+	                     // user is not authorized
+	                     returnFailure(doAction, "Not authorized");
+	                  }
+	               } catch (ClassCastException e) {
+	                  log.error("Got wrong type of authorization results");
+	                  returnFailure(doAction, "Unable to authorize");
+	               }
+	            } else {
+	               log.error("Got wrong number of authorization results");
+	               returnFailure(doAction, "Unable to authorize");
+	            }
+	         } else {
+	            log.error("Authorization action failed");
+	            returnFailure(doAction, "Unable to authorize");
+	         }
+	      }
+	   }
+   }
+
 }

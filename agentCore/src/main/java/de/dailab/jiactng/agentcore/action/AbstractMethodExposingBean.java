@@ -9,6 +9,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +41,9 @@ import de.dailab.jiactng.agentcore.directory.IOntologyStorage;
  * @version $Revision$
  */
 public abstract class AbstractMethodExposingBean extends AbstractActionAuthorizationBean implements IMethodExposingBean, AbstractMethodExposingBeanMBean {
-    
+
+	private HashMap<Long,Session> sessions = new HashMap<Long,Session>();
+	
 	private IOntologyStorage ontologyStorage = null;
 	
 	private int counter = 0;
@@ -280,7 +283,10 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         final Action action= (Action)doAction.getAction();
         final Method method= searchMethod(action.getName(), action.getInputTypes());
         if(method != null) {
+        	final long threadId = Thread.currentThread().getId();
+        	sessions.put(threadId, doAction.getSession());
             final Serializable result= (Serializable)method.invoke(this, (Object[]) doAction.getParams());
+            sessions.remove(threadId);
         	if (log.isDebugEnabled()) {
         		log.debug("action processed and about to write result...");
         	}
@@ -474,5 +480,13 @@ public abstract class AbstractMethodExposingBean extends AbstractActionAuthoriza
         	e.printStackTrace();
         	return null;
         }
+	}
+
+	/**
+	 * Gets session information about the action, which is actual in execution by the current thread.
+	 * @return the session object or <code>null</code> if the current thread is not in action execution
+	 */
+	protected Session getSession() {
+		return sessions.get(Thread.currentThread().getId());
 	}
 }

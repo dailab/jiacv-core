@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -151,6 +152,8 @@ public final class JmxConnectorManager extends TimerTask {
 							final DatagramPacket dp = new DatagramPacket(buffer, buffer.length, group, multicastPort);
 							socket.send(dp);
 						}
+					} catch (SocketException e2) {
+						log.warn("Unable to send multicast message on interface " + ifcName + ": " + e2.getMessage());
 					} catch (Exception e1) {
 						log.error("Unable to send multicast message on interface " + ifcName, e1);
 					}

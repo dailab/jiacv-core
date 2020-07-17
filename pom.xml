@@ -18,9 +18,11 @@
       <url>http://www.dai-labor.de</url>
    </organization>
 
+<!--
    <prerequisites>
       <maven>3.3.0</maven>
    </prerequisites>
+-->
 
    <licenses>
       <license>

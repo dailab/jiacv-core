@@ -9,20 +9,12 @@
    <name>Java-based Intelligent Agent Componentware, Version 5</name>
    <description>JIAC V is a framework to fast and efficiently develop agent-based applications and services.</description>
    <url>http://www.jiac.de</url>
-<!--    <url>http://repositories.dai-labor.de/sites/jiactng/${project.version}/</url> -->
-
    <inceptionYear>2006</inceptionYear>
 
    <organization>
       <name>DAI-Labor</name>
       <url>http://www.dai-labor.de</url>
    </organization>
-
-<!--
-   <prerequisites>
-      <maven>3.3.0</maven>
-   </prerequisites>
--->
 
    <licenses>
       <license>
@@ -37,17 +29,15 @@
       <resource.delimiter>@</resource.delimiter> <!-- delimiter that doesn't clash with Spring ${} placeholders -->
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+      <java.version>11</java.version>
+
       <maven.compiler.source>${java.version}</maven.compiler.source>
       <maven.compiler.target>${java.version}</maven.compiler.target>
-      <!-- Sonar -->
+
       <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
       <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
       <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
       <sonar.jacoco.itreportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itreportPath>
-
-      <java.version>1.8</java.version>
-      <maven.compiler.source>${java.version}</maven.compiler.source>
-      <maven.compiler.target>${java.version}</maven.compiler.target>
 
       <activemq.version>5.12.1</activemq.version>
       <junit.version>4.12</junit.version>
@@ -59,8 +49,6 @@
    </properties>
 
    <modules>
-      <!-- This is a template for new modules and testing; usually not required -->
-      <!--module>ModuleTemplate</module -->
       <module>agentCoreAPI</module>
       <module>gateway</module>
       <module>agentCore</module>
@@ -134,7 +122,6 @@
    </dependencyManagement>
 
    <build>
-
       <resources>
          <resource>
             <directory>${project.basedir}/src/main/java</directory>
@@ -167,6 +154,7 @@
                <target>${java.version}</target>
             </configuration>
          </plugin>
+
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
@@ -174,9 +162,11 @@
                <forkMode>pertest</forkMode>
             </configuration>
          </plugin>
+
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
          </plugin>
+
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
@@ -188,6 +178,7 @@
                </execution>
             </executions>
          </plugin>
+
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
@@ -201,6 +192,7 @@
                </execution>
             </executions>
          </plugin>
+
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-checkstyle-plugin</artifactId>
@@ -266,6 +258,7 @@
                <downloadSources>true</downloadSources>
             </configuration>
          </plugin>
+
          <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
@@ -296,6 +289,7 @@
             </executions>
          </plugin>
       </plugins>
+
       <pluginManagement>
          <plugins>
             <plugin>
@@ -363,9 +357,9 @@
          </plugins>
       </pluginManagement>
    </build>
+
    <reporting>
       <plugins>
-
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -374,7 +368,6 @@
                <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
             </configuration>
-            <!--reports> <report>foo</report> <report>toto</report> </reports -->
          </plugin>
          
          <plugin>
@@ -459,22 +452,7 @@
       </plugins>
    </reporting>
 
-
-
    <repositories>
-<!--
-      <repository>
-         <id>dai-releases</id>
-         <name>DAI Maven 2 Releases Repository</name>
-         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
-         <snapshots>
-            <enabled>false</enabled>
-         </snapshots>
-         <releases>
-            <enabled>true</enabled>
-         </releases>
-      </repository>
--->
       <repository>
          <id>dai-open</id>
          <name>DAI Open</name>
@@ -486,28 +464,6 @@
             <enabled>false</enabled>
          </snapshots>
       </repository>
-<!--       <repository> -->
-<!--          <id>edu-releases</id> -->
-<!--          <name>Edu Repository</name> -->
-<!--          <url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> -->
-<!--          <releases> -->
-<!--             <enabled>true</enabled> -->
-<!--          </releases> -->
-<!--          <snapshots> -->
-<!--             <enabled>false</enabled> -->
-<!--          </snapshots> -->
-<!--       </repository> -->
-<!--       <repository> -->
-<!--          <id>dai-snapshots</id> -->
-<!--          <name>DAI Maven 2 Snapshot Repository</name> -->
-<!--          <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url> -->
-<!--          <snapshots> -->
-<!--             <enabled>true</enabled> -->
-<!--          </snapshots> -->
-<!--          <releases> -->
-<!--             <enabled>false</enabled> -->
-<!--          </releases> -->
-<!--       </repository> -->
       <repository>
          <id>dai-open-snapshot</id>
          <name>DAI Open Snapshot</name>
@@ -519,55 +475,13 @@
             <enabled>true</enabled>
          </snapshots>
       </repository>
-<!--
-      <repository>
-         <id>thirdparty</id>
-         <name>thirdparty</name>
-         <url>http://repositories.dai-labor.de/nexus/content/repositories/thirdparty/</url>
-         <snapshots>
-            <enabled>true</enabled>
-         </snapshots>
-         <releases>
-            <enabled>true</enabled>
-         </releases>
-      </repository>
--->
    </repositories>
-<!--
-   <pluginRepositories>
-      <pluginRepository>
-         <id>dai-releases</id>
-         <name>DAI Maven 2 Releases Repository</name>
-         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url>
-         <snapshots>
-            <enabled>false</enabled>
-         </snapshots>
-         <releases>
-            <enabled>true</enabled>
-         </releases>
-      </pluginRepository>
-      <pluginRepository>
-         <id>dai-snapshots</id>
-         <name>DAI Maven 2 Snapshot Repository</name>
-         <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-snapshots/</url>
-         <snapshots>
-            <enabled>true</enabled>
-         </snapshots>
-         <releases>
-            <enabled>false</enabled>
-         </releases>
-      </pluginRepository>
-   </pluginRepositories>
--->
+
    <distributionManagement>
       <site>
          <id>dai-repository</id>
          <url>scp://repositories.dai-labor.de/export/home/local/maven/sites/jiactng/${project.version}</url>
       </site>
-      <!-- Deployment on Release and Edu not necessary, since Open is accessible by all. <repository> <id>dai-releases</id> 
-         <name>dai-releases</name> <url>http://repositories.dai-labor.de/nexus/content/repositories/dai-releases/</url> </repository> 
-         <repository> <id>edu-releases</id> <name>Edu Repository</name> <url>http://edu.dai-labor.de/nexus/content/repositories/releases/</url> 
-         </repository> -->
       <repository>
          <id>dai-open</id>
          <name>DAI Open</name>
@@ -579,27 +493,25 @@
          <url>https://repositories.dai-labor.de/extern/content/repositories/dai-open-snapshot/</url>
       </snapshotRepository>
    </distributionManagement>
+
    <ciManagement>
       <system>gitlab-ci</system>
       <url>https://gitlab.dai-labor.de/jiacv/core</url>
    </ciManagement>
-   <issueManagement>
-      <system>Redmine</system>
-      <url>https://redmine.dai-labor.de/redmine/projects/jiac</url>
-   </issueManagement>
+
    <mailingLists>
       <mailingList>
          <name>JIAC TNG Developer Mailing List</name>
          <post>jiactng-dev@dai-labor.de</post>
       </mailingList>
    </mailingLists>
+
    <scm>
       <url>https://gitlab.dai-labor.de/jiacv/core</url>
       <connection>scm:git:git://gitlab.dai-labor.de:jiacv/core.git</connection>
       <developerConnection>scm:git:git@gitlab.dai-labor.de:jiacv/core.git</developerConnection>
       <tag>HEAD</tag>
    </scm>
-
 
    <developers>
       <developer>

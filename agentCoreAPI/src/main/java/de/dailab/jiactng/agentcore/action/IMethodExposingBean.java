@@ -32,7 +32,7 @@ public interface IMethodExposingBean {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public static @interface Expose {
+    @interface Expose {
 
     	/** The action name to be used for the exposed method. */
         String name() default "";

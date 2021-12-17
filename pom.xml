@@ -203,7 +203,6 @@
             <artifactId>maven-checkstyle-plugin</artifactId>
             <dependencies>
                <dependency>
-                  <!-- If we use ${project.version} here, then this will mess up all projects that have a different version -->
                   <groupId>de.dailab.jiactng</groupId>
                   <artifactId>agentCoreAPI</artifactId>
                   <version>${project.version}</version>
@@ -373,9 +372,6 @@
                <configLocation>prealpha_checks.xml</configLocation>
             </configuration>
          </plugin>
-         <!-- Cobertura was commented out because it can cause build failures when generating maven-sites with "mvn site" -->
-         <!-- plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>cobertura-maven-plugin</artifactId> <version>2.5.1</version> 
-            <configuration> <includes> <include>**/*.java</include> </includes> </configuration> </plugin -->
          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>findbugs-maven-plugin</artifactId>
@@ -390,7 +386,6 @@
             <artifactId>maven-jxr-plugin</artifactId>
             <version>2.3</version>
          </plugin>
-         <!-- plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-changelog-plugin</artifactId> </plugin -->
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-report-plugin</artifactId>

@@ -30,7 +30,7 @@ public interface IJiacMessage extends IFact, JmxDescriptionSupport {
    /**
     * This interface defines the keys of the message header fields.
     */
-    public interface Header {
+    interface Header {
 
     	/** Key of the message header field which defines the sender of the message. */
         String SENDER= "JiacTNGSenderAddress";

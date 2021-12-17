@@ -14,7 +14,7 @@ public final class IdFactory {
 	/**
 	 * Defines the prefixes of the different ID types. 
 	 */
-    public static enum IdPrefix {
+    public enum IdPrefix {
 
     	/** The prefix for agent IDs is "a-". */
         Agent("a-"), 
@@ -33,7 +33,7 @@ public final class IdFactory {
 
         private final String value;
 
-        private IdPrefix(String value) {
+        IdPrefix(String value) {
             this.value = value;
         }
 

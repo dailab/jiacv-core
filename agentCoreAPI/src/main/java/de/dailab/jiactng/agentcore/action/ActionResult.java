@@ -85,20 +85,6 @@ public class ActionResult extends SessionEvent<DoAction> {
 		}
 		this.failure = failure;
 	}
-	
-	// /**
-	// * @return the <code>DoAction</code> that triggered the action
-	// */
-	// public Session getResultOf() {
-	// return session;
-	// }
-	//
-	// /**
-	// * @param resultOf the <code>DoAction</code> that triggered the action
-	// */
-	// public void setResultOf(Session resultOf) {
-	// this.session = resultOf;
-	// }
 
 	/**
 	 * Gets the successful results.
@@ -132,20 +118,6 @@ public class ActionResult extends SessionEvent<DoAction> {
 	public final Serializable getFailure(){
 		return failure;
 	}
-	
-	// /**
-	// * @return true if action succeeded, false otherwise
-	// */
-	// public boolean isSuccess() {
-	// return success;
-	// }
-	//
-	// /**
-	// * @param success set true if the action succeeded, set false otherwise
-	// */
-	// public void setSuccess(boolean success) {
-	// this.success = success;
-	// }
 
 	/**
 	 * Returns a multiline text which contains the successful result of an action.
@@ -156,12 +128,12 @@ public class ActionResult extends SessionEvent<DoAction> {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("ActionResult:\n results=");
 		if (results != null) {
-			builder.append(Arrays.asList(results).toString());
+			builder.append(Arrays.asList(results));
 		} else {
 			builder.append("null");
 		}
 		if (failure != null) {
-			builder.append("\n failure=").append(String.valueOf(failure));
+			builder.append("\n failure=").append(failure);
 		}
 		builder.append('\n');
 		return builder.toString();

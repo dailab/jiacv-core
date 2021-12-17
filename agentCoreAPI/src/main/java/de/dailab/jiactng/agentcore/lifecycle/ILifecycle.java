@@ -56,7 +56,7 @@ public interface ILifecycle extends Manageable {
          */
         CLEANED_UP,
 
-    };
+    }
 
     /**
      * Initialize your object, prepare to grab all resources you need for work.

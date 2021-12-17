@@ -133,7 +133,7 @@ public class JARFileReader extends ClassLoader {
       in.close();
     }
     catch (IOException ioe) {
-      System.err.println(ioe.toString());
+      System.err.println(ioe);
     }
   }
 }

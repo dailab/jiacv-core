@@ -56,7 +56,7 @@ abstract class CommunicationAddress implements ICommunicationAddress {
     
     @Override
     public final boolean equals(Object obj) {
-        if(obj == null || !getClass().isInstance(obj)) {
+        if(! getClass().isInstance(obj)) {
             return false;
         }
         

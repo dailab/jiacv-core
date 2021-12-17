@@ -39,12 +39,17 @@
       <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
       <sonar.jacoco.itreportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itreportPath>
 
+      <!-- there are major new versions of there libs, but updating those would require a lot of refactoring -->
       <activemq.version>5.12.1</activemq.version>
-      <junit.version>4.12</junit.version>
+      <spring.version>4.3.30.RELEASE</spring.version>
+      <junit.version>4.13.2</junit.version>
+
+      <!-- this version of Log4J is _old_; it fact it's so old it predates the security risk discovered in 2021 -->
       <log4j.version>1.2.17</log4j.version>
-      <slf4j.version>1.7.10</slf4j.version>
+      <slf4j.version>1.7.32</slf4j.version>
+
+      <!-- dependencies to other DAI-internal repositories; no updates here -->
       <simplespacecore.version>2.6.4</simplespacecore.version>
-      <spring.version>4.3.12.RELEASE</spring.version>
       <aamm.version>1.1.3</aamm.version>
    </properties>
 

@@ -22,7 +22,7 @@ mvn-test:
 
 snapshotdeploy:
   stage: deploy
-#  only:
-#    - develop
+  only:
+    - develop
   script: 
     - mvn package deploy:deploy

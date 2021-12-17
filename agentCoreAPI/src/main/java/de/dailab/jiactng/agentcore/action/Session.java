@@ -212,14 +212,6 @@ public class Session implements IFact {
       return new ArrayList<>(history);
    }
 
-   // /**
-   // * @param history
-   // * the history to set
-   // */
-   // public void setHistory(ArrayList<SessionEvent> history) {
-   // this.history = history;
-   // }
-
    /**
     * Will add the given object to the session history.
     * 
@@ -272,7 +264,7 @@ public class Session implements IFact {
       // time
       final Calendar calendar = Calendar.getInstance();
       calendar.setTimeInMillis(creationTime != null ? creationTime.longValue() : 0L);
-      builder.append("\n created='").append(calendar.getTime().toString()).append("'");
+      builder.append("\n created='").append(calendar.getTime()).append("'");
 
       // timeToLive
       builder.append("\n timeToLive='").append(timeToLive).append("'");
@@ -281,7 +273,7 @@ public class Session implements IFact {
       builder.append("\n history=");
       if (history != null) {
          // TODO: history probably needs real synchronization 
-         builder.append(getHistory().toString());
+         builder.append(getHistory());
       } else {
          builder.append("null");
       }

@@ -41,10 +41,6 @@ public class AgentDescription implements IAgentDescription {
 	/** Flag, if it is set <code>true</code>, it is a mobile agent */
 	private Boolean isMobile = Boolean.FALSE;
 	
-//	public AgentDescription(String aid, String name, String state) {
-//        this(aid, name, state, name != null ? CommunicationAddressFactory.createMessageBoxAddress(aid) : null);
-//	}
-
 	/**
 	 * Creates an empty agent description.
 	 */
@@ -62,11 +58,6 @@ public class AgentDescription implements IAgentDescription {
 	 * @param agentNodeUUID the unique identifier of the agents node
 	 */
     public AgentDescription(String aid, String name, String owner, String state, IMessageBoxAddress messageBoxAddress, String agentNodeUUID) {
-//        this.aid=aid;
-//        this.name=name;
-//        this.state=state;
-//        this.messageBoxAddress= messageBoxAddress;
-//        this.agentNodeUUID = agentNodeUUID;
     	this( aid,  name,  owner, state,  messageBoxAddress,  agentNodeUUID, Boolean.FALSE);
     }
 
@@ -289,14 +280,14 @@ public class AgentDescription implements IAgentDescription {
         // endpoint
         if (messageBoxAddress != null) {
         	// local
-        	builder.append("\n messageBoxAddress=").append(messageBoxAddress.toString());
+        	builder.append("\n messageBoxAddress=").append(messageBoxAddress);
         } else {
         	builder.append("\n messageBoxAddress=null");
         }
         
         // mobile
         if (isMobile != null) {
-        	builder.append("\n mobile=").append(isMobile.toString());
+        	builder.append("\n mobile=").append(isMobile);
         }
         else {
         	builder.append("\n mobile=null");

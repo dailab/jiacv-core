@@ -115,15 +115,6 @@ public class SessionEvent<T> implements IFact {
 		return session;
 	}
 
-//	/**
-//	 * @param session
-//	 *            the session to set
-//	 */
-//	final public void setSession(Session session) {
-//		this.session = session;
-//		if (session != null)
-//			this.sessionId = session.getSessionId();
-//	}
 
 	/**
 	 * Gets the session Id of this session event.

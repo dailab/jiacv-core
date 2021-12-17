@@ -41,13 +41,13 @@ class JARClassPath {
                 final String resource= url.getFile();
                 
                 if(resource == null || resource.length() <= 0) {
-                    throw new IOException("Unable to find resource: " + url.toString());
+                    throw new IOException("Unable to find resource: " + url);
                 }
                 
                 final int index= resource.indexOf('!');
                 
                 if(index <= 0 || index >= resource.length() - 1) {
-                    throw new IOException("The URL is no valid resource location: " + url.toString());
+                    throw new IOException("The URL is no valid resource location: " + url);
                 }
                 
                 final String containerName= resource.substring(0, index);

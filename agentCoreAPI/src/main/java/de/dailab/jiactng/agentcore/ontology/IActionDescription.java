@@ -59,7 +59,7 @@ public interface IActionDescription extends IFact, JmxDescriptionSupport {
 	 * Gets the list of item names of a JMX-based action description.
 	 * @return the list if item names
 	 */
-	public static String[] getItemNames() {
+	static String[] getItemNames() {
 		return new String[] { IActionDescription.ITEMNAME_NAME, IActionDescription.ITEMNAME_INPUTNAMES, 
 			  IActionDescription.ITEMNAME_INPUTTYPES, IActionDescription.ITEMNAME_RESULTTYPES, IActionDescription.ITEMNAME_SCOPE, 
 			  IActionDescription.ITEMNAME_BEAN, IActionDescription.ITEMNAME_AGENT, IActionDescription.ITEMNAME_SEMURI,

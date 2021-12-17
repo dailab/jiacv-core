@@ -49,7 +49,7 @@ public class MessageExchangeNotification extends Notification {
 
         /** Receiving a message from another agent. */
         RECEIVE,		
-	};
+	}
 
 	
 	/**

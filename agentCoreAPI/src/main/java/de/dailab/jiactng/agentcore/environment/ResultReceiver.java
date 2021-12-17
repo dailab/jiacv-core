@@ -29,20 +29,4 @@ public interface ResultReceiver {
 	 */
 	void receiveResult(ActionResult result);
 
-//	/**
-//	 * Setter for the beanName. This method is called by Spring during
-//	 * initialization.
-//	 * 
-//	 * @param name the unqualified name of the bean.
-//	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
-//	 */
-//	
-//	void setBeanName(String name);
-//
-//	/**
-//	 * Getter for the name of the agentbean.
-//	 * 
-//	 * @return a string representing the name of the agentbean.
-//	 */
-//	String getBeanName();
 }

@@ -40,9 +40,9 @@
       <sonar.jacoco.itreportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itreportPath>
 
       <!-- there are major new versions of there libs, but updating those would require a lot of refactoring -->
-      <activemq.version>5.12.1</activemq.version>
       <spring.version>4.3.30.RELEASE</spring.version>
       <junit.version>4.13.2</junit.version>
+      <activemq.version>5.16.3</activemq.version>
 
       <!-- this version of Log4J is _old_; it fact it's so old it predates the security risk discovered in 2021 -->
       <log4j.version>1.2.17</log4j.version>

@@ -3,7 +3,7 @@
 Copyright 2007 - 2024, DAI-Labor, TU Berlin
 
 * Main contributors: Axel Heßler, Thomas Konnerth, Jan Keiser
-* Additional contributors see `pom.xml` file and Git history
+* Additional contributors (also see `pom.xml` file and Git history): Michael Burkhardt, Janko Dimitrow, Jaschar Domann, Joachim Fuchs, Silvan Kaiser, Tobias Küster, Martin Löffelholz, Marco Lützenberger, Nils Masuch, Marcel Patzlaff, Christian Rakow, Alexander Thiele, Jakob Tonn, Hilmi Yildirim
 
 Please refer to the [License](LICENSE.txt) and [Contributing](CONTRIBUTING.md) files for how to use and contribute to this project. For a changelog, please refer to [changes.xml](src/changes/changes.xml).
 
